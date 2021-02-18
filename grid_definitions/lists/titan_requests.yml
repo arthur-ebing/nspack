@@ -1,0 +1,22 @@
+---
+:dataminer_definition: titan_requests
+:actions:
+- :url: "/finished_goods/inspection/titan_requests/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+#- :url: "/finished_goods/inspection/titan_requests/$:id$"
+#  :text: delete
+#  :icon: delete
+#  :is_delete: true
+#  :popup: true
+:conditions:
+  :inspection:
+    - :col: titan_requests.govt_inspection_sheet_id
+      :op: =
+      :val: $:govt_inspection_sheet_id$
+  :addendum:
+    - :col: titan_requests.load_id
+      :op: =
+      :val: $:load_id$

@@ -11,6 +11,7 @@ module Crossbeams
       @responder = responder
       @open_timeout = open_timeout
       @read_timeout = read_timeout
+      @responder = responder
     end
 
     # See if a host is reachable via ping.

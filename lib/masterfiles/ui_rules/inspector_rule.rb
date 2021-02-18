@@ -9,9 +9,8 @@ module UiRules
       apply_form_values
 
       common_values_for_fields common_fields
-      add_approve_behaviours if %i[new].include? @mode
 
-      set_show_fields if %i[show reopen].include? @mode
+      set_show_fields if %i[show].include? @mode
 
       form_name 'inspector'
     end
@@ -28,19 +27,11 @@ module UiRules
     end
 
     def common_fields
-      party_role_options = [['Create New Person', 'P'], [@form_object.inspector, @form_object.inspector_party_role_id]] - [[nil, nil]]
-      party_role_options += @party_repo.for_select_party_roles_exclude(AppConst::ROLE_INSPECTOR, where: { organization_id: nil })
-      { inspector: { caption: 'Inspector',
+      {
+        inspector: { caption: 'Inspector',
                      renderer: :label,
-                     hide_on_load: @mode == :new },
-        inspector_party_role_id: { caption: 'Inspector',
-                                   renderer: :select,
-                                   options: party_role_options,
-                                   sort_items: false,
-                                   searchable: true,
-                                   prompt: true,
-                                   hide_on_load: @mode == :edit,
-                                   required: true },
+                     initially_visible: @mode == :edit },
+        inspector_party_role_id: { hide_on_load: true },
         inspector_code: { caption: 'Inspector Code',
                           force_uppercase: true,
                           required: true },
@@ -50,10 +41,11 @@ module UiRules
                               caption: 'Tablet Port Number',
                               required: true },
         # Person
-        title: { hide_on_load: true },
-        surname: { hide_on_load: true },
-        first_name: { hide_on_load: true },
-        vat_number: { hide_on_load: true } }
+        title: { required: true },
+        surname: { required: true },
+        first_name: { required: true },
+        vat_number: {}
+      }
     end
 
     def make_form_object
@@ -64,16 +56,9 @@ module UiRules
 
     def make_new_form_object
       @form_object = OpenStruct.new(inspector_code: nil,
+                                    inspector_party_role_id: 'P',
                                     tablet_ip_address: nil,
                                     tablet_port_number: nil)
-    end
-
-    private
-
-    def add_approve_behaviours
-      behaviours do |behaviour|
-        behaviour.dropdown_change :inspector_party_role_id, notify: [{ url: '/masterfiles/quality/inspectors/inspector_party_role_changed' }]
-      end
     end
   end
 end

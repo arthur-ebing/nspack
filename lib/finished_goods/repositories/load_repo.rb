@@ -17,24 +17,41 @@ module FinishedGoodsApp
                                    parent_tables: [{ parent_table: :voyage_ports,
                                                      columns: %i[port_id voyage_id eta ata],
                                                      foreign_key: :pod_voyage_port_id,
-                                                     flatten_columns: { port_id: :pod_port_id, voyage_id: :voyage_id, eta: :eta, ata: :ata } },
+                                                     flatten_columns: { port_id: :pod_port_id,
+                                                                        voyage_id: :voyage_id,
+                                                                        eta: :eta,
+                                                                        ata: :ata } },
                                                    { parent_table: :voyage_ports,
                                                      columns: %i[port_id etd atd],
                                                      foreign_key: :pol_voyage_port_id,
                                                      flatten_columns: { port_id: :pol_port_id, etd: :etd, atd: :atd } },
+                                                   { parent_table: :depots,
+                                                     columns: %i[depot_code],
+                                                     foreign_key: :depot_id,
+                                                     flatten_columns: { depot_code: :depot_code } },
                                                    { parent_table: :voyages,
                                                      columns: %i[voyage_type_id vessel_id voyage_number year voyage_code],
                                                      foreign_key: :voyage_id,
-                                                     flatten_columns: { voyage_type_id: :voyage_type_id, vessel_id: :vessel_id, voyage_number: :voyage_number, voyage_code: :voyage_code, year: :year } }],
+                                                     flatten_columns: { voyage_type_id: :voyage_type_id,
+                                                                        vessel_id: :vessel_id,
+                                                                        voyage_number: :voyage_number,
+                                                                        voyage_code: :voyage_code,
+                                                                        year: :year } }],
                                    sub_tables: [{ sub_table: :load_voyages,
                                                   columns: %i[shipping_line_party_role_id shipper_party_role_id booking_reference memo_pad],
-                                                  one_to_one: { shipping_line_party_role_id: :shipping_line_party_role_id, shipper_party_role_id: :shipper_party_role_id, booking_reference: :booking_reference, memo_pad: :memo_pad } },
+                                                  one_to_one: { shipping_line_party_role_id: :shipping_line_party_role_id,
+                                                                shipper_party_role_id: :shipper_party_role_id,
+                                                                booking_reference: :booking_reference,
+                                                                memo_pad: :memo_pad } },
                                                 { sub_table: :load_vehicles,
                                                   columns: %i[vehicle_number],
                                                   one_to_one: { vehicle_number: :vehicle_number } },
                                                 { sub_table: :load_containers,
-                                                  columns: %i[container_code],
-                                                  one_to_one: { container_code: :container_code } }],
+                                                  columns: %i[container_code cargo_temperature_id verified_gross_weight],
+                                                  one_to_one: { container_code: :container_code,
+                                                                cargo_temperature_id: :cargo_temperature_id,
+                                                                verified_gross_weight: :verified_gross_weight } }],
+
                                    lookup_functions: [{ function: :fn_current_status, args: ['loads', :id],  col_name: :status },
                                                       { function: :fn_party_role_name, args: [:customer_party_role_id], col_name: :customer },
                                                       { function: :fn_party_role_name, args: [:exporter_party_role_id], col_name: :exporter },
@@ -43,14 +60,43 @@ module FinishedGoodsApp
                                                       { function: :fn_party_role_name, args: [:final_receiver_party_role_id], col_name: :final_receiver }])
       return nil if hash.nil?
 
+      # load_voyages
+      hash[:load_voyage_id] = get_id(:load_voyages, load_id: id)
       hash[:shipping_line] = DB.get(Sequel.function(:fn_party_role_name, hash[:shipping_line_party_role_id]))
       hash[:shipper] = DB.get(Sequel.function(:fn_party_role_name, hash[:shipper_party_role_id]))
-      hash[:container] = exists?(:load_containers, load_id: id)
-      hash[:vehicle] = exists?(:load_vehicles, load_id: id)
-      hash[:temp_tail] = DB[:pallets].where(load_id: id).exclude(temp_tail: nil).get(:temp_tail)
-      hash[:temp_tail_pallet_number] = DB[:pallets].where(load_id: id).exclude(temp_tail: nil).get(:pallet_number)
-      hash[:edi] = exists?(:edi_out_transactions, record_id: id)
+
+      # load_vehicles
+      hash[:load_vehicle_id] = get_id(:load_vehicles, load_id: id)
+      hash[:vehicle] = !hash[:load_vehicle_id].nil?
+
+      # load_container
+      hash[:load_container_id] = get_id(:load_containers, load_id: id)
+      hash[:container] = !hash[:load_container_id].nil?
+      hash[:temperature_code] = get(:cargo_temperatures, hash[:cargo_temperature_id], :temperature_code)
+
+      # Voyage
+      hash[:pol_port_code] = get(:ports, hash[:pol_port_id], :port_code)
+      hash[:pod_port_code] = get(:ports, hash[:pod_port_id], :port_code)
+      hash[:vessel_code] = get(:vessels, hash[:vessel_id], :vessel_code)
+
+      # Load
       hash[:load_id] = id
+      hash[:edi] = exists?(:edi_out_transactions, record_id: id)
+      final_destination = MasterfilesApp::DestinationRepo.new.find_city(hash[:final_destination_id])
+      hash[:destination_city] = final_destination.city_name
+      hash[:destination_country] = final_destination.country_name
+      hash[:destination_region] = final_destination.region_name
+
+      # Pallets
+      pallets = DB[:pallets].where(load_id: id)
+      hash[:temp_tail] = pallets.exclude(temp_tail: nil).get(:temp_tail)
+      hash[:temp_tail_pallet_number] = pallets.exclude(temp_tail: nil).get(:pallet_number)
+      hash[:pallet_count] = pallets.select_map(:pallet_number).count
+      hash[:nett_weight] = pallets.select_map(:nett_weight).map!(&:to_i).sum
+
+      # Addendum
+      hash[:addendum] = exists?(:titan_requests, load_id: id)
+
       LoadFlat.new(hash)
     end
 

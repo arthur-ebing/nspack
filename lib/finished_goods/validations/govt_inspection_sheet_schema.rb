@@ -18,7 +18,6 @@ module FinishedGoodsApp
     required(:packed_tm_group_id).filled(:integer)
     required(:destination_region_id).filled(:integer)
     optional(:destination_country_id).maybe(:integer)
-    optional(:govt_inspection_api_result_id).maybe(:integer)
     optional(:reinspection).maybe(:bool)
     optional(:tripsheet_created).maybe(:bool)
     optional(:tripsheet_created_at).maybe(:time)

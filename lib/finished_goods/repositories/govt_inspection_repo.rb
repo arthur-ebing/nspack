@@ -15,7 +15,7 @@ module FinishedGoodsApp
                           label: :id,
                           value: :id,
                           order_by: :id
-    crud_calls_for :govt_inspection_sheets, name: :govt_inspection_sheet, wrapper: GovtInspectionSheet
+    crud_calls_for :govt_inspection_sheets, name: :govt_inspection_sheet
 
     build_for_select :govt_inspection_pallets,
                      label: :failure_remarks,
@@ -27,26 +27,6 @@ module FinishedGoodsApp
                           order_by: :failure_remarks
     crud_calls_for :govt_inspection_pallets, name: :govt_inspection_pallet, wrapper: GovtInspectionPallet
 
-    build_for_select :govt_inspection_api_results,
-                     label: :upn_number,
-                     value: :id,
-                     order_by: :upn_number
-    build_inactive_select :govt_inspection_api_results,
-                          label: :upn_number,
-                          value: :id,
-                          order_by: :upn_number
-    crud_calls_for :govt_inspection_api_results, name: :govt_inspection_api_result, wrapper: GovtInspectionApiResult
-
-    build_for_select :govt_inspection_pallet_api_results,
-                     label: :id,
-                     value: :id,
-                     order_by: :id
-    build_inactive_select :govt_inspection_pallet_api_results,
-                          label: :id,
-                          value: :id,
-                          order_by: :id
-    crud_calls_for :govt_inspection_pallet_api_results, name: :govt_inspection_pallet_api_result, wrapper: GovtInspectionPalletApiResult
-
     crud_calls_for :vehicle_jobs, name: :vehicle_job, wrapper: VehicleJob
     crud_calls_for :vehicle_job_units, name: :vehicle_job_unit, wrapper: VehicleJobUnit
 
@@ -56,6 +36,10 @@ module FinishedGoodsApp
                                                      columns: %i[target_market_group_name],
                                                      foreign_key: :packed_tm_group_id,
                                                      flatten_columns: { target_market_group_name: :packed_tm_group } },
+                                                   { parent_table: :inspectors,
+                                                     columns: %i[inspector_code],
+                                                     foreign_key: :inspector_id,
+                                                     flatten_columns: { inspector_code: :inspector_code } },
                                                    { parent_table: :destination_regions,
                                                      columns: %i[destination_region_name],
                                                      foreign_key: :destination_region_id,
@@ -75,7 +59,9 @@ module FinishedGoodsApp
       inspector_party_role_id = get(:inspectors, hash[:inspector_id], :inspector_party_role_id)
       hash[:inspector] = DB.get(Sequel.function(:fn_party_role_name, inspector_party_role_id))
       hash[:status] = DB.get(Sequel.function(:fn_current_status, 'govt_inspection_sheets', id))
-
+      pallet_ids = select_values(:govt_inspection_pallets, :pallet_id, govt_inspection_sheet_id: id)
+      ecert_passed = select_values(:ecert_tracking_units, :passed, pallet_id: pallet_ids)
+      hash[:allow_titan_inspection] = pallet_ids.length == ecert_passed.length && ecert_passed.all? && !AppConst::TITAN_INSPECTION_API_USER_ID.nil?
       GovtInspectionSheet.new(hash)
     end
 
@@ -145,7 +131,7 @@ module FinishedGoodsApp
         end
 
         update(:pallets, pallet_id, params)
-        log_status(:pallets, pallet_id, status, user_name: user.user_name)
+        log_status(:pallets, pallet_id, "INSPECTION_#{status}", user_name: user.user_name)
       end
     end
 
@@ -172,8 +158,8 @@ module FinishedGoodsApp
       end
     end
 
-    def get_last(table_name, column, order = nil)
-      DB[table_name].exclude(column => nil).reverse(order || :id).get(column)
+    def get_last(table_name, column, args = {})
+      DB[table_name].where(args).exclude(column => nil).reverse(:id).get(column)
     end
 
     def find_govt_inspection_pallet_flat(id)
@@ -194,6 +180,7 @@ module FinishedGoodsApp
           inspection_failure_reasons.secondary_factor,
           govt_inspection_pallets.failure_remarks,
           govt_inspection_sheets.inspected AS sheet_inspected,
+          pallets.nett_weight,
           pallets.gross_weight,
           pallets.carton_quantity,
           array_agg(distinct marketing_varieties.marketing_variety_code) AS marketing_varieties,

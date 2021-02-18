@@ -18,48 +18,27 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def fail_govt_inspection_pallet(id, params) # rubocop:disable Metrics/AbcSize
+    def fail_govt_inspection_pallet(id, params)
       res = FailGovtInspectionPalletSchema.call(params)
       return validation_failed_response(res) if res.failure?
 
-      govt_inspection_sheet_id = repo.get(:govt_inspection_pallets, id, :govt_inspection_sheet_id)
-      reinspection = repo.get(:govt_inspection_sheets, govt_inspection_sheet_id, :reinspection)
-      attrs = res.to_h
-      attrs[:passed] = false
-      attrs[:inspected] = true
-      if reinspection
-        attrs[:reinspected] = true
-        attrs[:reinspected_at] = Time.now
-      else
-        attrs[:inspected_at] = Time.now
-      end
+      res = nil
       repo.transaction do
-        repo.update_govt_inspection_pallet(id, attrs)
+        res = FailGovtInspectionPallet.call(id, params)
       end
       instance = govt_inspection_pallet(id)
-      success_response('Govt inspection: pallet failed.', instance)
+      success_response(res.message, instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
-    def pass_govt_inspection_pallet(ids) # rubocop:disable Metrics/AbcSize
-      govt_inspection_sheet_ids = repo.select_values(:govt_inspection_pallets, :govt_inspection_sheet_id, id: ids).uniq
-      govt_inspection_sheet_ids.each do |sheet_id|
-        reinspection = repo.get(:govt_inspection_sheets, sheet_id, :reinspection)
-        attrs = { passed: true, inspected: true, failure_reason_id: nil, failure_remarks: nil }
-        if reinspection
-          attrs[:reinspected] = true
-          attrs[:reinspected_at] = Time.now
-        else
-          attrs[:inspected_at] = Time.now
-        end
-        repo.transaction do
-          [ids].each do |id|
-            repo.update_govt_inspection_pallet(id, attrs)
-          end
-        end
+    def pass_govt_inspection_pallet(ids)
+      res = nil
+      repo.transaction do
+        res = PassGovtInspectionPallet.call(ids)
       end
-      success_response('Govt inspection: pallets passed.')
+      instance = govt_inspection_pallet(Array(ids).first)
+      success_response(res.message, instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

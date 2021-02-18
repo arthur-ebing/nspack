@@ -52,7 +52,7 @@ module UiRules
       end
 
       hash = @repo.find_inspection(@options[:id]).to_h
-      hash[:inspector_id] ||= FinishedGoodsApp::GovtInspectionRepo.new.get_last(:inspections, :inspector_id, :updated_at)
+      hash[:inspector_id] ||= FinishedGoodsApp::GovtInspectionRepo.new.get_last(:inspections, :inspector_id)
       @form_object = OpenStruct.new(hash)
     end
 

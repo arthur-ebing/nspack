@@ -90,6 +90,7 @@ module FinishedGoodsApp
         completed: false,
         completed_at: '2010-01-01 12:00',
         inspected: false,
+        inspector_code: nil,
         inspection_point: 'ABC',
         awaiting_inspection_results: false,
         packed_tm_group_id: target_market_group_id,
@@ -98,8 +99,8 @@ module FinishedGoodsApp
         destination_region: Faker::Lorem.unique.word,
         destination_country_id: destination_country_id,
         destination_country: Faker::Lorem.unique.word,
-        govt_inspection_api_result_id: nil,
         reinspection: false,
+        allow_titan_inspection: false,
         created_by: 'ABC',
         consignment_note_number: '00000001',
         cancelled: false,
@@ -110,6 +111,7 @@ module FinishedGoodsApp
         tripsheet_loaded_at: '2010-01-01 12:00',
         tripsheet_offloaded: false,
         use_inspection_destination_for_load_out: false,
+        upn: nil,
         active: true
       }
     end

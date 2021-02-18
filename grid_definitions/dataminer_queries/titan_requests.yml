@@ -1,0 +1,221 @@
+---
+:caption: Titan Requests
+:sql: "SELECT\r\n    titan_requests.id,\r\n    titan_requests.load_id,\r\n    titan_requests.govt_inspection_sheet_id,\r\n
+  \   titan_requests.request_type,\r\n    titan_requests.success,\r\n    titan_requests.created_at,\r\n
+  \   titan_requests.updated_at,\r\n    titan_requests.transaction_id,\r\n    titan_requests.inspection_message_id,\r\n
+  \   titan_requests.request_id,\r\n    govt_inspection_sheets.completed AS inspection_completed\r\nFROM
+  titan_requests\r\nLEFT JOIN govt_inspection_sheets ON titan_requests.govt_inspection_sheet_id
+  = govt_inspection_sheets.id\r\nORDER BY id DESC"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: titan_requests.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  load_id:
+    :name: load_id
+    :sequence_no: 2
+    :caption: Load
+    :namespaced_name: titan_requests.load_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  govt_inspection_sheet_id:
+    :name: govt_inspection_sheet_id
+    :sequence_no: 3
+    :caption: Govt inspection sheet
+    :namespaced_name: titan_requests.govt_inspection_sheet_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  request_type:
+    :name: request_type
+    :sequence_no: 4
+    :caption: Request type
+    :namespaced_name: titan_requests.request_type
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  success:
+    :name: success
+    :sequence_no: 5
+    :caption: Success
+    :namespaced_name: titan_requests.success
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 6
+    :caption: Created at
+    :namespaced_name: titan_requests.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 7
+    :caption: Updated at
+    :namespaced_name: titan_requests.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  transaction_id:
+    :name: transaction_id
+    :sequence_no: 8
+    :caption: Transaction id
+    :namespaced_name: titan_requests.transaction_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inspection_message_id:
+    :name: inspection_message_id
+    :sequence_no: 9
+    :caption: Inspection message id
+    :namespaced_name: titan_requests.inspection_message_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  request_id:
+    :name: request_id
+    :sequence_no: 10
+    :caption: Request id
+    :namespaced_name: titan_requests.request_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inspection_completed:
+    :name: inspection_completed
+    :sequence_no: 11
+    :caption: Inspection completed
+    :namespaced_name: govt_inspection_sheets.completed
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: titan_requests.load_id
+  :caption: Load
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT order_number, id FROM loads ORDER BY order_number
+- :column: titan_requests.govt_inspection_sheet_id
+  :caption: Govt inspection sheet
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT booking_reference, id FROM govt_inspection_sheets ORDER BY booking_reference
+- :column: titan_requests.transaction_id
+  :caption: Transaction
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: titan_requests.request_id
+  :caption: Request
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

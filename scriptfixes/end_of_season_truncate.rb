@@ -28,8 +28,6 @@ class EndOfSeasonTruncate < BaseScript
     empty_bin_transaction_items
     empty_bin_transactions
     export_data_event_logs
-    govt_inspection_pallet_api_results
-    govt_inspection_api_results
     govt_inspection_pallets
     govt_inspection_sheets
     load_containers

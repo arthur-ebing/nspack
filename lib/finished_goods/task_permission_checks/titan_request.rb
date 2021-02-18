@@ -2,13 +2,13 @@
 
 module FinishedGoodsApp
   module TaskPermissionCheck
-    class GovtInspectionApiResult < BaseService
+    class TitanRequest < BaseService
       attr_reader :task, :entity
-      def initialize(task, govt_inspection_api_result_id = nil)
+      def initialize(task, titan_request_id = nil)
         @task = task
-        @repo = GovtInspectionRepo.new
-        @id = govt_inspection_api_result_id
-        @entity = @id ? @repo.find_govt_inspection_api_result(@id) : nil
+        @repo = TitanRepo.new
+        @id = titan_request_id
+        @entity = @id ? @repo.find_titan_request(@id) : nil
       end
 
       CHECKS = {
@@ -18,7 +18,7 @@ module FinishedGoodsApp
       }.freeze
 
       def call
-        return failed_response 'Govt Inspection Api Result record not found' unless @entity || task == :create
+        return failed_response 'Titan Request record not found' unless @entity || task == :create
 
         check = CHECKS[task]
         raise ArgumentError, "Task \"#{task}\" is unknown for #{self.class}" if check.nil?

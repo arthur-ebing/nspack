@@ -187,6 +187,17 @@ class Nspack < Roda
         show_partial_or_page(r) { FinishedGoods::Ecert::EcertTrackingUnit::New.call(govt_inspection_sheet_id: id, remote: fetch?(r)) }
       end
 
+      r.on 'titan_inspection', String do |mode|
+        interactor.assert_permission!(:titan_inspection, id)
+        res = interactor.titan_inspection(id, mode)
+        flash[res.success ? :notice : :error] = res.message
+        r.redirect "/finished_goods/inspection/govt_inspection_sheets/#{id}/titan_inspection"
+      end
+
+      r.on 'titan_inspection' do
+        show_partial_or_page(r) { FinishedGoods::Inspection::GovtInspectionSheet::TitanInspection.call(id) }
+      end
+
       r.is do
         r.get do       # SHOW
           check_auth!('inspection', 'read')
@@ -394,6 +405,35 @@ class Nspack < Roda
             FinishedGoods::Inspection::GovtInspectionPallet::New.call(form_values: params[:govt_inspection_pallet],
                                                                       form_errors: res.errors,
                                                                       remote: fetch?(r))
+          end
+        end
+      end
+    end
+
+    # TITAN REQUESTS
+    # --------------------------------------------------------------------------
+    r.on 'titan_requests', Integer do |id|
+      interactor = FinishedGoodsApp::TitanRequestInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:titan_requests, id) do
+        handle_not_found(r)
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('inspection', 'read')
+          show_partial { FinishedGoods::Inspection::TitanRequest::Show.call(id) }
+        end
+
+        r.delete do    # DELETE
+          check_auth!('inspection', 'delete')
+          interactor.assert_permission!(:delete, id)
+          res = interactor.delete_titan_request(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
           end
         end
       end

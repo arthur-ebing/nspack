@@ -29,6 +29,7 @@ module FinishedGoodsApp
     attribute :secondary_factor, Types::Bool
     attribute :failure_remarks, Types::String
     attribute :sheet_inspected, Types::Bool
+    attribute :nett_weight, Types::Float
     attribute :gross_weight, Types::Float
     attribute :carton_quantity, Types::Integer
     attribute :marketing_varieties, Types::Array

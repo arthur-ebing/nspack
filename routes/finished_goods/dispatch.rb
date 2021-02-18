@@ -347,6 +347,17 @@ class Nspack < Roda
         update_dialog_content(content: wrap_content_in_style(res.message, res.success ? :success : :error, caption: ''))
       end
 
+      r.on 'titan_addendum', String do |mode|
+        interactor.assert_permission!(:titan_addendum, id)
+        res = interactor.titan_addendum(id, mode)
+        flash[res.success ? :notice : :error] = res.message
+        r.redirect "/finished_goods/dispatch/loads/#{id}/titan_addendum"
+      end
+
+      r.on 'titan_addendum' do
+        show_partial_or_page(r) { FinishedGoods::Dispatch::Load::TitanAddendum.call(id) }
+      end
+
       r.on 'allocate_multiselect' do
         check_auth!('dispatch', 'edit')
         interactor.assert_permission!(:edit, id)

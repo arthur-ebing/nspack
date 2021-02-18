@@ -21,7 +21,7 @@ module FinishedGoodsApp
     attribute :vehicle_type_id, Types::Integer
     attribute :vehicle_type_code, Types::String
     attribute :haulier_party_role_id, Types::Integer
-    attribute :haulier_party_role, Types::String
+    attribute :haulier, Types::String
     attribute :vehicle_number, Types::String
     attribute :vehicle_weight_out, Types::Decimal
     attribute :dispatch_consignment_note_number, Types::String

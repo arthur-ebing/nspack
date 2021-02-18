@@ -234,8 +234,9 @@ class AppConst # rubocop:disable Metrics/ClassLength
   ROLE_TRANSPORTER = 'TRANSPORTER'
   ROLE_FARM_MANAGER = 'FARM_MANAGER'
 
-  PARTY_ROLE_REGISTRATION_TYPES = { SHIPPER: %w[CF],
-                                    EXPORTER: %w[FBO LSP] }.freeze
+  PARTY_ROLE_REGISTRATION_TYPES = { SHIPPER: %w[CF LSP],
+                                    EXPORTER: %w[FBO],
+                                    BILLING: %w[BILLING] }.freeze
 
   # Target Market Type: 'PACKED'
   PACKED_TM_GROUP = 'PACKED'
@@ -313,7 +314,8 @@ class AppConst # rubocop:disable Metrics/ClassLength
   BYPASS_LOGIN_ROUTES = [
     '/masterfiles/config/label_templates/published',
     '/messcada/.*',
-    '/dashboard/.*'
+    '/dashboard/.*',
+    '/finished_goods/titan/titan_inspection_results_post_back'
   ].freeze
 
   # Menu
@@ -460,7 +462,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   SCRAP_LOCATION = 'SCRAP_PACKHSE'
   UNSCRAP_LOCATION = 'UNSCRAP_PACKHSE'
   UNTIP_LOCATION = 'UNTIPPED_BIN'
-  MAX_PALLETS_ON_LOAD = ENV['MAX_PALLETS_ON_LOAD'].to_i || 50
+  MAX_PALLETS_ON_LOAD = (ENV['MAX_PALLETS_ON_LOAD'] || 50).to_i
   TEMP_TAIL_REQUIRED_TO_SHIP = make_boolean('TEMP_TAIL_REQUIRED_TO_SHIP')
   # Constants for port types:
   PORT_TYPE_POL = 'POL'
@@ -644,9 +646,13 @@ class AppConst # rubocop:disable Metrics/ClassLength
   USE_EXTENDED_PALLET_PICKLIST = make_boolean('USE_EXTENDED_PALLET_PICKLIST')
 
   # Titan: Govt Inspections
-  TITAN_ENVIRONMENT = { UAT: 'uatapigateway', STAGING: 'stagingapigateway', PRODUCTION: 'apigateway' }[ENV.fetch('TITAN_ENVIRONMENT', 'UAT').to_sym]
-  TITAN_API_USER_ID = ENV['TITAN_API_USER_ID']
-  TITAN_API_SECRET = ENV['TITAN_API_SECRET']
+  TITAN_ENVIRONMENT = { UAT: 'https://uatapigateway.ppecb.com',
+                        STAGING: 'https://stagingapigateway.ppecb.com',
+                        PRODUCTION: 'https://apigateway.ppecb.com' }[ENV.fetch('TITAN_ENVIRONMENT', 'UAT').to_sym]
+  TITAN_INSPECTION_API_USER_ID = ENV['TITAN_INSPECTION_API_USER_ID']
+  TITAN_INSPECTION_API_SECRET = ENV['TITAN_INSPECTION_API_SECRET']
+  TITAN_ADDENDUM_API_USER_ID = ENV['TITAN_ADDENDUM_API_USER_ID']
+  TITAN_ADDENDUM_API_SECRET = ENV['TITAN_ADDENDUM_API_SECRET']
 
   # QUALITY APP result types
   PASS_FAIL = 'Pass/Fail'

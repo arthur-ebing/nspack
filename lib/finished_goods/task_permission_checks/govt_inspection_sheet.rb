@@ -20,7 +20,8 @@ module FinishedGoodsApp
         uncomplete: :uncomplete_check,
         finish: :finish_check,
         cancel: :cancel_check,
-        reopen: :reopen_check
+        reopen: :reopen_check,
+        titan_inspection: :titan_inspection_check
       }.freeze
 
       def call # rubocop:disable Metrics/AbcSize
@@ -98,6 +99,10 @@ module FinishedGoodsApp
       def cancel_check
         return failed_response 'Govt Inspection Sheet has not been inspected.' unless inspected?
 
+        all_ok
+      end
+
+      def titan_inspection_check
         all_ok
       end
 

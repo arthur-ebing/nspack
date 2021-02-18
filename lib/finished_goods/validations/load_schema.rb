@@ -30,6 +30,7 @@ module FinishedGoodsApp
     optional(:shipper_party_role_id).maybe(:integer)
     optional(:booking_reference).maybe(Types::StrippedString)
     optional(:memo_pad).maybe(Types::StrippedString)
+    optional(:location_of_issue).maybe(Types::StrippedString)
   end
 
   LoadSchema = Dry::Schema.Params do
@@ -55,5 +56,6 @@ module FinishedGoodsApp
     optional(:rmt_load).maybe(:bool)
     optional(:allocated_at).maybe(:time)
     required(:requires_temp_tail).filled(:bool)
+    optional(:location_of_issue).maybe(Types::StrippedString)
   end
 end

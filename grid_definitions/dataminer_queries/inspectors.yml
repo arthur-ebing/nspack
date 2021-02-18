@@ -43,7 +43,7 @@
   tablet_ip_address:
     :name: tablet_ip_address
     :sequence_no: 3
-    :caption: Tablet ip address
+    :caption: Tablet IP address
     :namespaced_name: inspectors.tablet_ip_address
     :data_type: :string
     :width: 

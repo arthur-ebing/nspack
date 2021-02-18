@@ -45,8 +45,8 @@ module MesscadaApp
     attribute :pallet_verification_failure_reason_id, Types::Integer
     attribute :verified_at, Types::DateTime
     attribute :nett_weight, Types::Decimal
-    attribute :verified, Types::Bool
-    attribute :verification_passed, Types::Bool
+    attribute? :verified, Types::Bool
+    attribute? :verification_passed, Types::Bool
     attribute :pick_ref, Types::String
     attribute :grade_id, Types::Integer
     attribute :verified_by, Types::String
@@ -66,6 +66,15 @@ module MesscadaApp
     attribute :created_by, Types::String
     attribute :target_market_id, Types::Integer
     attribute :pm_mark_id, Types::Integer
+    attribute :marketing_puc_id, Types::Integer
+    attribute :marketing_orchard_id, Types::Integer
+    attribute :gtin_code, Types::String
+    attribute :rmt_class_id, Types::Integer
+    attribute :packing_specification_item_id, Types::Integer
+    attribute :tu_labour_product_id, Types::Integer
+    attribute :ru_labour_product_id, Types::Integer
+    attribute :fruit_sticker_ids, Types::Array
+    attribute :tu_sticker_ids, Types::Array
     attribute? :legacy_data, Types::Hash.optional
     attribute? :active, Types::Bool
   end

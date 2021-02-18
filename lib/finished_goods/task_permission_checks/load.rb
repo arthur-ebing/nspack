@@ -22,6 +22,7 @@ module FinishedGoodsApp
         unload_truck: :unload_truck_check,
         ship: :ship_check,
         unship: :unship_check,
+        titan_addendum: :titan_addendum_check,
         delete: :delete_check
       }.freeze
 
@@ -133,6 +134,19 @@ module FinishedGoodsApp
         all_ok
       end
 
+      def titan_addendum_check # rubocop:disable Metrics/AbcSize
+        return failed_response("Load: #{id} does not have a container") unless container?
+
+        failed_pallet_numbers = []
+        repo.select_values(:pallets, %i[id pallet_number], load_id: id).each do |pallet_id, pallet_number|
+          inspected = repo.select_values(:govt_inspection_pallets, :inspected, pallet_id: pallet_id).all?
+          failed_pallet_numbers << pallet_number unless inspected
+        end
+        return failed_response("Pallet: #{failed_pallet_numbers.join(', ')} not inspected, Unable to request Addendum.") unless failed_pallet_numbers.empty?
+
+        all_ok
+      end
+
       def shipped?
         @entity.shipped
       end
@@ -147,6 +161,10 @@ module FinishedGoodsApp
 
       def loaded?
         @entity.loaded
+      end
+
+      def container?
+        @entity.container
       end
 
       def temp_tail?

@@ -21,7 +21,6 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      govt_inspection_api_result_id_label = @repo.find_govt_inspection_api_result(@form_object.govt_inspection_api_result_id)&.upn_number
       fields[:inspector_id] = { renderer: :label,
                                 with_value: @form_object.inspector,
                                 caption: 'Inspector' }
@@ -59,9 +58,7 @@ module UiRules
                                           caption: 'Destination Country' }
       fields[:active] = { renderer: :label,
                           as_boolean: true }
-      fields[:govt_inspection_api_result_id] = { renderer: :label,
-                                                 with_value: govt_inspection_api_result_id_label,
-                                                 caption: 'Govt Inspection Api Result' }
+      fields[:upn] = { renderer: :label, caption: 'UPN' }
       fields[:reinspection] = { renderer: :label,
                                 hide_on_load: !@form_object.reinspection,
                                 as_boolean: true }
@@ -118,10 +115,7 @@ module UiRules
                                   caption: 'Destination Country',
                                   prompt: true,
                                   required: false },
-        govt_inspection_api_result_id: { renderer: :select,
-                                         options: @repo.for_select_govt_inspection_api_results,
-                                         disabled_options: @repo.for_select_inactive_govt_inspection_api_results,
-                                         caption: 'Govt Inspection Api Result' },
+        upn: { renderer: :label, caption: 'UPN' },
         scanned_number: { renderer: :input,
                           caption: 'Pallet Number',
                           subtype: :numeric,
@@ -138,8 +132,8 @@ module UiRules
     def make_form_object
       make_new_form_object && return if %i[new reinspection].include? @mode
 
-      @form_object = @repo.find_govt_inspection_sheet(@options[:id])
-      @form_object = OpenStruct.new(@form_object.to_h.merge!(scanned_number: nil))
+      @form_object = OpenStruct.new(@repo.find_govt_inspection_sheet(@options[:id]).to_h)
+      @form_object[:scanned_number] = nil
     end
 
     def make_new_form_object
@@ -159,7 +153,6 @@ module UiRules
                                     packed_tm_group_id: @repo.get_last(:govt_inspection_sheets, :packed_tm_group_id),
                                     destination_region_id: @repo.get_last(:govt_inspection_sheets, :destination_region_id),
                                     destination_country_id: @repo.get_last(:govt_inspection_sheets, :destination_country_id),
-                                    govt_inspection_api_result_id: nil,
                                     reinspection: @mode == :reinspection,
                                     scanned_number: nil)
     end
@@ -172,7 +165,8 @@ module UiRules
       step = 1 if @form_object.completed
       step = 2 if @form_object.inspected
 
-      @form_object = OpenStruct.new(@form_object.to_h.merge(steps: steps, step: step))
+      @form_object[:steps] = steps
+      @form_object[:step] = step
     end
 
     def add_controls # rubocop:disable Metrics/AbcSize
@@ -204,9 +198,15 @@ module UiRules
                      icon: :back }
       preverify = { control_type: :link,
                     style: :action_button,
-                    text: 'eCert preverify',
+                    text: 'eCert Preverify',
                     url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/preverify",
                     icon: :checkon }
+      titan_inspection = { control_type: :link,
+                           style: :action_button,
+                           text: 'Titan Inspection',
+                           url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/titan_inspection",
+                           visible: @form_object.allow_titan_inspection,
+                           icon: :edit }
       finish = { control_type: :link,
                  style: :action_button,
                  text: 'Finish Inspection',
@@ -228,21 +228,20 @@ module UiRules
 
       case @form_object.step
       when 0
-        progress_controls = [complete]
         instance_controls = [edit, delete]
+        progress_controls = [complete]
       when 1
-        progress_controls = [uncomplete, preverify, finish]
         instance_controls = [edit]
+        progress_controls = [uncomplete, preverify, titan_inspection, finish]
       when 2
-        progress_controls = [reopen, toggle_use_inspection_destination]
         instance_controls = []
+        progress_controls = [reopen, titan_inspection, toggle_use_inspection_destination]
       else
-        progress_controls = []
         instance_controls = []
+        progress_controls = []
       end
-
-      @form_object = OpenStruct.new(@form_object.to_h.merge(progress_controls: progress_controls,
-                                                            instance_controls: instance_controls))
+      @form_object[:progress_controls] = progress_controls
+      @form_object[:instance_controls] = instance_controls
     end
 
     def add_behaviours

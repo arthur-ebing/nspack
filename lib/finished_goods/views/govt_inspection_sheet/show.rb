@@ -82,7 +82,7 @@ module FinishedGoods
               end
             end
             page.form do |form|
-              form.caption 'Govt Inspection Sheet'
+              # form.caption 'Govt Inspection Sheet'
               form.submit_captions 'Add Pallet'
               if AppConst::CONTINUOUS_GOVT_INSPECTION_SHEETS
                 form.action "/finished_goods/inspection/govt_inspection_sheets/#{id}/add_inspected_pallet"
@@ -91,28 +91,31 @@ module FinishedGoods
                 form.action "/finished_goods/inspection/govt_inspection_sheets/#{id}/add_pallet"
               end
               form.no_submit! if ui_rule.form_object.completed
-
-              form.row do |row|
-                row.column do |col|
-                  col.add_field :inspector_id
-                  col.add_field :inspection_billing_party_role_id
-                  col.add_field :exporter_party_role_id
-                  col.add_field :booking_reference
-                  col.add_field :created_by
-                  col.add_field :scanned_number
-                  col.add_field :status
-                end
-                row.column do |col|
-                  col.add_field :consignment_note_number
-                  col.add_field :inspection_point
-                  col.add_field :destination_region_id
-                  col.add_field :destination_country_id
-                  col.add_field :use_inspection_destination_for_load_out
-                  col.add_field :completed
-                  col.add_field :inspected
-                  col.add_field :reinspection
+              form.fold_up do |fold|
+                fold.caption 'Govt Inspection Sheet'
+                fold.row do |row|
+                  row.column do |col|
+                    col.add_field :inspector_id
+                    col.add_field :inspection_billing_party_role_id
+                    col.add_field :exporter_party_role_id
+                    col.add_field :booking_reference
+                    col.add_field :created_by
+                    col.add_field :upn
+                    col.add_field :status
+                  end
+                  row.column do |col|
+                    col.add_field :consignment_note_number
+                    col.add_field :inspection_point
+                    col.add_field :destination_region_id
+                    col.add_field :destination_country_id
+                    col.add_field :use_inspection_destination_for_load_out
+                    col.add_field :completed
+                    col.add_field :inspected
+                    col.add_field :reinspection
+                  end
                 end
               end
+              form.add_field :scanned_number
             end
             page.section do |section|
               section.add_progress_step ui_rule.form_object.steps, position: ui_rule.form_object.step

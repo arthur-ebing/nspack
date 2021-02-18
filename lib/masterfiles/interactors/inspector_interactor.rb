@@ -22,8 +22,9 @@ module MasterfilesApp
       end
       instance = inspector(id)
       success_response("Created inspector #{instance.inspector_code}", instance)
-    rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { first_name: ['This person or inspector code already exists'] }))
+    rescue Sequel::UniqueConstraintViolation => e
+      key = e.to_s.partition('(').last.partition(')').first
+      validation_failed_response(OpenStruct.new(messages: { key.to_sym => ["This #{key.gsub('_', ' ')} already exists"] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue Crossbeams::ServiceError

@@ -41,8 +41,7 @@ module FinishedGoodsApp
         destination_region_id: destination_region_id,
         active: true,
         created_at: '2010-01-01 12:00',
-        updated_at: '2010-01-01 12:00',
-        govt_inspection_api_result_id: nil
+        updated_at: '2010-01-01 12:00'
       }
       DB[:govt_inspection_sheets].insert(default.merge(opts))
     end
@@ -65,42 +64,6 @@ module FinishedGoodsApp
         updated_at: '2010-01-01 12:00'
       }
       DB[:govt_inspection_pallets].insert(default.merge(opts))
-    end
-
-    def create_govt_inspection_api_result(opts = {})
-      govt_inspection_sheet_id = create_govt_inspection_sheet
-
-      default = {
-        govt_inspection_sheet_id: govt_inspection_sheet_id,
-        govt_inspection_request_doc: {},
-        govt_inspection_result_doc: {},
-        results_requested: false,
-        results_requested_at: '2010-01-01 12:00',
-        results_received: false,
-        results_received_at: '2010-01-01 12:00',
-        upn_number: Faker::Lorem.unique.word,
-        active: true,
-        created_at: '2010-01-01 12:00',
-        updated_at: '2010-01-01 12:00'
-      }
-      default.merge(opts)
-
-      DB[:govt_inspection_api_results].insert(default.merge(opts))
-    end
-
-    def create_govt_inspection_pallet_api_result(opts = {})
-      govt_inspection_pallet_id = create_govt_inspection_pallet
-
-      default = {
-        passed: false,
-        failure_reasons: {},
-        govt_inspection_pallet_id: govt_inspection_pallet_id,
-        govt_inspection_api_result_id: govt_inspection_api_result_id,
-        active: true,
-        created_at: '2010-01-01 12:00',
-        updated_at: '2010-01-01 12:00'
-      }
-      DB[:govt_inspection_pallet_api_results].insert(default.merge(opts))
     end
   end
 end

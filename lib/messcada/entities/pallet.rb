@@ -7,9 +7,9 @@ module MesscadaApp
     attribute :exit_ref, Types::String
     attribute :scrapped_at, Types::DateTime
     attribute :location_id, Types::Integer
-    attribute :shipped, Types::Bool
-    attribute :in_stock, Types::Bool
-    attribute :inspected, Types::Bool
+    attribute? :shipped, Types::Bool
+    attribute? :in_stock, Types::Bool
+    attribute? :inspected, Types::Bool
     attribute :shipped_at, Types::DateTime
     attribute :govt_first_inspection_at, Types::DateTime
     attribute :govt_reinspection_at, Types::DateTime
@@ -20,26 +20,26 @@ module MesscadaApp
     attribute :build_status, Types::String
     attribute :gross_weight, Types::Decimal
     attribute :gross_weight_measured_at, Types::DateTime
-    attribute :palletized, Types::Bool
-    attribute :partially_palletized, Types::Bool
+    attribute? :palletized, Types::Bool
+    attribute? :partially_palletized, Types::Bool
     attribute :palletized_at, Types::DateTime
     attribute :partially_palletized_at, Types::DateTime
     attribute :fruit_sticker_pm_product_id, Types::Integer
     attribute :fruit_sticker_pm_product_2_id, Types::Integer
-    attribute :allocated, Types::Bool
+    attribute? :allocated, Types::Bool
     attribute :allocated_at, Types::DateTime
-    attribute :reinspected, Types::Bool
-    attribute :scrapped, Types::Bool
+    attribute? :reinspected, Types::Bool
+    attribute? :scrapped, Types::Bool
     attribute :pallet_format_id, Types::Integer
     attribute :carton_quantity, Types::Integer
-    attribute :govt_inspection_passed, Types::Bool
+    attribute? :govt_inspection_passed, Types::Bool
     attribute :plt_packhouse_resource_id, Types::Integer
     attribute :plt_line_resource_id, Types::Integer
     attribute :nett_weight, Types::Decimal
     attribute :load_id, Types::Integer
-    attribute :cooled, Types::Bool
+    attribute? :cooled, Types::Bool
     attribute :palletizing_bay_resource_id, Types::Integer
-    attribute :has_individual_cartons, Types::Bool
+    attribute? :has_individual_cartons, Types::Bool
     attribute :temp_tail, Types::String
     attribute :depot_pallet, Types::Bool
     attribute :edi_in_transaction_id, Types::Integer

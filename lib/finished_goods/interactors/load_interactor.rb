@@ -219,6 +219,17 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
+    def titan_addendum(id, mode)
+      res = nil
+      repo.transaction do
+        res = TitanAddendum.call(id, mode, @user)
+        log_transaction
+      end
+      success_response(res.message)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def update_otmc(id)
       otmc_count = nil
       phyto_count = nil

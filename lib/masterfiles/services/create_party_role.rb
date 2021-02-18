@@ -4,12 +4,12 @@ module MasterfilesApp
   class CreatePartyRole < BaseService
     attr_reader :repo, :user, :params, :party_role_id, :role_id, :person_id, :organization_id, :party_id
 
-    def initialize(role, params, user)
+    def initialize(role, params, user) # rubocop:disable Metrics/AbcSize
       @repo = PartyRepo.new
       @user = user
       @params = params
       @party_role_id = params["#{role.downcase}_party_role_id".to_sym]
-      raise Crossbeams::InfoError, 'party_role_id nil' if party_role_id.nil?
+      raise Crossbeams::InfoError, "#{role.downcase}_party_role_id is nil" if party_role_id.nil?
 
       @role_id = repo.get_id(:roles, name: role)
       raise Crossbeams::InfoError, "Role: #{role} not defined." if role_id.nil?
@@ -18,6 +18,7 @@ module MasterfilesApp
     end
 
     def call # rubocop:disable Metrics/AbcSize
+      # The for_select for the party_role_id should contain a 'P' or 'O' in order to create a new party
       case party_role_id
       when 'O'
         res = create_organization

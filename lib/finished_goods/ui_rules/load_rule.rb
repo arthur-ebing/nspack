@@ -71,30 +71,54 @@ module UiRules
       # Load Vehicles
       load_vehicle_id = @repo.get_id(:load_vehicles, load_id: @form_object.id)
       vehicle = FinishedGoodsApp::LoadVehicleRepo.new.find_load_vehicle_flat(load_vehicle_id)
-      fields[:vehicle_number] = { renderer: :label, with_value: vehicle&.vehicle_number }
-      fields[:driver] = { renderer: :label, with_value: vehicle&.driver_name }
-      fields[:driver_number] = { renderer: :label, with_value: vehicle&.driver_cell_number }
-      fields[:vehicle_type] = { renderer: :label, with_value: vehicle&.vehicle_type_code }
-      fields[:haulier] = { renderer: :label, with_value: vehicle&.haulier_party_role }
-      fields[:vehicle_weight_out] = { renderer: :label, with_value: vehicle&.vehicle_weight_out }
+      vehicle_fields = {}
+      vehicle_fields[:vehicle_number] = { renderer: :label, with_value: vehicle&.vehicle_number }
+      vehicle_fields[:driver] = { renderer: :label, with_value: vehicle&.driver_name }
+      vehicle_fields[:driver_number] = { renderer: :label, with_value: vehicle&.driver_cell_number }
+      vehicle_fields[:vehicle_type] = { renderer: :label, with_value: vehicle&.vehicle_type_code }
+      vehicle_fields[:haulier] = { renderer: :label, with_value: vehicle&.haulier }
+      vehicle_fields[:vehicle_weight_out] = { renderer: :label, with_value: vehicle&.vehicle_weight_out }
+      fields.merge!(vehicle_fields.each { |_, v| v[:invisible] = vehicle.nil? })
 
       # Load Container
       load_container_id = @repo.get_id(:load_containers, load_id: @form_object.id)
       container = FinishedGoodsApp::LoadContainerRepo.new.find_load_container_flat(load_container_id)
-      fields[:container_code] = { renderer: :label, with_value: container&.container_code }
-      fields[:container_vents] = { renderer: :label, with_value: container&.container_vents }
-      fields[:container_seal_code] = { renderer: :label, with_value: container&.container_seal_code }
-      fields[:internal_container_code] = { renderer: :label, with_value: container&.internal_container_code }
-      fields[:stack_type] = { renderer: :label, with_value: "#{container&.stack_type_code} - #{container&.stack_type_description}" }
-      fields[:temperature_rhine] = { renderer: :label, with_value: container&.container_temperature_rhine }
-      fields[:temperature_rhine2] = { renderer: :label, with_value: container&.container_temperature_rhine2 }
-      fields[:max_gross_weight] = { renderer: :label, with_value: container&.max_gross_weight }
-      fields[:tare_weight] = { renderer: :label, with_value: container&.tare_weight }
-      fields[:max_payload] = { renderer: :label, with_value: container&.max_payload }
-      fields[:actual_payload] = { renderer: :label, with_value: container&.actual_payload }
-      fields[:cargo_temperature] = { renderer: :label, with_value: "#{container&.cargo_temperature_code} - #{container&.set_point_temperature}" }
-      fields[:verified_gross_weight] = { renderer: :label, with_value: container&.verified_gross_weight }
-      fields[:verified_gross_weight_date] = { renderer: :label, with_value: container&.verified_gross_weight_date }
+      container_fields = {}
+      container_fields[:container_code] = { renderer: :label, with_value: container&.container_code }
+      container_fields[:container_vents] = { renderer: :label, with_value: container&.container_vents }
+      container_fields[:container_seal_code] = { renderer: :label, with_value: container&.container_seal_code }
+      container_fields[:internal_container_code] = { renderer: :label, with_value: container&.internal_container_code }
+      container_fields[:stack_type] = { renderer: :label, with_value: "#{container&.stack_type_code} - #{container&.stack_type_description}" }
+      container_fields[:temperature_rhine] = { renderer: :label, with_value: container&.container_temperature_rhine }
+      container_fields[:temperature_rhine2] = { renderer: :label, with_value: container&.container_temperature_rhine2 }
+      container_fields[:max_gross_weight] = { renderer: :label, with_value: container&.max_gross_weight }
+      container_fields[:tare_weight] = { renderer: :label, with_value: container&.tare_weight }
+      container_fields[:max_payload] = { renderer: :label, with_value: container&.max_payload }
+      container_fields[:actual_payload] = { renderer: :label, with_value: container&.actual_payload }
+      container_fields[:cargo_temperature] = { renderer: :label, with_value: "#{container&.cargo_temperature_code} - #{container&.set_point_temperature}" }
+      container_fields[:verified_gross_weight] = { renderer: :label, with_value: container&.verified_gross_weight }
+      container_fields[:verified_gross_weight_date] = { renderer: :label, with_value: container&.verified_gross_weight_date }
+      fields.merge!(container_fields.each { |_, v| v[:invisible] = container.nil? })
+
+      # Titan Addendum
+      addendum = FinishedGoodsApp::TitanRepo.new.find_titan_addendum(@form_object.id)
+      addendum_fields = {}
+      fields[:location_of_issue] = { renderer: :label }
+      addendum_fields[:addendum_status] = { renderer: :label, with_value: addendum&.addendum_status }
+      addendum_fields[:best_regime_code] = { renderer: :label, with_value: addendum&.best_regime_code }
+      addendum_fields[:verification_status] = { renderer: :label, with_value: addendum&.verification_status }
+      addendum_fields[:addendum_validations] = { renderer: :label, with_value: addendum&.addendum_validations }
+      addendum_fields[:available_regime_code] = { renderer: :label, with_value: addendum&.available_regime_code }
+      addendum_fields[:e_cert_response_message] = { renderer: :label, with_value: addendum&.e_cert_response_message }
+      addendum_fields[:e_cert_hub_tracking_number] = { renderer: :label, with_value: addendum&.e_cert_hub_tracking_number }
+      addendum_fields[:e_cert_hub_tracking_status] = { renderer: :label, with_value: addendum&.e_cert_hub_tracking_status }
+      addendum_fields[:e_cert_application_status] = { renderer: :label, with_value: addendum&.e_cert_application_status }
+      addendum_fields[:phyt_clean_verification_key] = { renderer: :label, with_value: addendum&.phyt_clean_verification_key }
+      addendum_fields[:export_certification_status] = { renderer: :label, with_value: addendum&.export_certification_status }
+      addendum_fields[:cancelled_status] = { renderer: :label, with_value: addendum&.cancelled_status }
+      addendum_fields[:cancelled_at] = { renderer: :label, with_value: addendum&.cancelled_at }
+
+      fields.merge!(addendum_fields.each { |_, v| v[:invisible] = addendum.nil? })
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize
@@ -218,12 +242,17 @@ module UiRules
         temp_tail: { renderer: :input,
                      hide_on_load: @mode != :temp_tail,
                      required: true },
-        spacer: { hide_on_load: true }
+        spacer: { hide_on_load: true },
+        # Addendum
+        location_of_issue: {}
       }
     end
 
     def make_form_object
-      make_new_form_object && return if @mode == :new
+      if @mode == :new
+        make_new_form_object
+        return
+      end
 
       hash = @repo.find_load_flat(@options[:id]).to_h
       hash[:pallet_list] = nil
@@ -251,7 +280,8 @@ module UiRules
                                     shipped: false,
                                     loaded: false,
                                     requires_temp_tail: AppConst::TEMP_TAIL_REQUIRED_TO_SHIP,
-                                    transfer_load: nil)
+                                    transfer_load: nil,
+                                    location_of_issue: nil)
     end
 
     private
@@ -340,18 +370,18 @@ module UiRules
                  url: "/finished_goods/dispatch/loads/#{id}/unship",
                  prompt: 'Are you sure, you want to unship this load?',
                  icon: :back }
+      addendum = { control_type: :link,
+                   style: :action_button,
+                   text: 'Titan Addendum',
+                   visible: @form_object.container & !AppConst::TITAN_ADDENDUM_API_USER_ID.nil?,
+                   url: "/finished_goods/dispatch/loads/#{id}/titan_addendum",
+                   icon: :edit }
       update_otmc = { control_type: :link,
                       style: :action_button,
                       text: 'Update Phyto Data',
                       url: "/finished_goods/dispatch/loads/#{id}/update_otmc",
                       prompt: 'Are you sure, you want to update the OTMC Results for this load?',
                       icon: :plus }
-      re_send_edi = { control_type: :link,
-                      text: 'Re-send EDI',
-                      url: "/finished_goods/dispatch/loads/#{id}/re_send_edi",
-                      icon: :plus,
-                      behaviour: :popup,
-                      style: :action_button }
 
       case @form_object.step
       when 0
@@ -367,7 +397,7 @@ module UiRules
         progress_controls = [unload_truck, delete_tail, tail, ship]
         instance_controls = [edit]
       when 4
-        progress_controls = [unship, update_otmc, re_send_edi]
+        progress_controls = [unship, addendum, update_otmc]
         instance_controls = [edit]
       else
         progress_controls = []

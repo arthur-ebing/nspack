@@ -3,7 +3,9 @@
 module FinishedGoodsApp
   class GovtInspectionSheet < Dry::Struct
     attribute :id, Types::Integer
+    attribute :consignment_note_number, Types::String
     attribute :inspector_id, Types::Integer
+    attribute :inspector_code, Types::String
     attribute :inspector, Types::String
     attribute :inspection_billing_party_role_id, Types::Integer
     attribute :inspection_billing, Types::String
@@ -21,6 +23,7 @@ module FinishedGoodsApp
     attribute :cancelled, Types::Bool
     attribute :cancelled_at, Types::DateTime
     attribute :inspected, Types::Bool
+    attribute :allow_titan_inspection, Types::Bool
     attribute :inspection_point, Types::String
     attribute :awaiting_inspection_results, Types::Bool
     attribute :packed_tm_group_id, Types::Integer
@@ -29,16 +32,15 @@ module FinishedGoodsApp
     attribute :destination_region, Types::String
     attribute :destination_country_id, Types::Integer
     attribute :destination_country, Types::String
-    attribute :govt_inspection_api_result_id, Types::Integer
     attribute :reinspection, Types::Bool
     attribute :created_by, Types::String
-    attribute :consignment_note_number, Types::String
     attribute :tripsheet_created, Types::Bool
     attribute :tripsheet_created_at, Types::DateTime
     attribute :tripsheet_loaded, Types::Bool
     attribute :tripsheet_loaded_at, Types::DateTime
     attribute :tripsheet_offloaded, Types::Bool
     attribute :use_inspection_destination_for_load_out, Types::Bool
+    attribute :upn, Types::String
     attribute? :status, Types::String
     attribute? :active, Types::Bool
   end

@@ -91,7 +91,8 @@ module FinishedGoodsApp
         nett_weight: 1.0,
 
         # addendum
-        addendum: true
+        addendum: true,
+        location_of_issue: '123'
       }
       FinishedGoodsApp::LoadFlat.new(base_attrs.merge(attrs))
     end

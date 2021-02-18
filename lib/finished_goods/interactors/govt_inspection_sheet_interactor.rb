@@ -145,6 +145,17 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
+    def titan_inspection(id, mode)
+      res = nil
+      repo.transaction do
+        res = TitanInspection.call(id, mode, @user)
+        log_transaction
+      end
+      res
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def manually_create_pallet_tripsheet(planned_location_to_id) # rubocop:disable Metrics/AbcSize
       res = validate_manual_tripsheet_params(planned_location_to_id: planned_location_to_id, business_process_id: MesscadaApp::MesscadaRepo.new.find_business_process('MANUAL_TRIPSHEET')[:id],
                                              stock_type_id: MesscadaApp::MesscadaRepo.new.find_stock_type('PALLET')[:id])
