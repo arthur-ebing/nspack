@@ -205,7 +205,7 @@ module UiRules
                            style: :action_button,
                            text: 'Titan Inspection',
                            url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/titan_inspection",
-                           visible: @form_object.allow_titan_inspection,
+                           visible: @form_object.allow_titan_inspection & !AppConst::TITAN_INSPECTION_API_USER_ID.nil?,
                            icon: :edit }
       finish = { control_type: :link,
                  style: :action_button,
