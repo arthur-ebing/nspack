@@ -157,6 +157,8 @@ module MesscadaApp
         res = MesscadaApp::CloneAutopackPalletCarton.call(attrs) if autopack
         res = MesscadaApp::CompletePallet.call(pallet_id)
 
+        res = FinishedGoodsApp::Job::CalculateExtendedFgCodes.enqueue(pallet_id) if AppConst::CR_FG.lookup_extended_fg_code?
+
         changeset = { current_state: state_machine.current.to_s,
                       pallet_sequence_id: nil,
                       determining_carton_id: nil,
