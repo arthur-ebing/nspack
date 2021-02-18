@@ -6,8 +6,11 @@ module UiRules
   end
 
   class Compiler
+    attr_reader :params
+
     def initialize(rule, mode, options = {})
       @options = options
+      @params = {}
       authorizer = options.delete(:authorizer) || BlockAuth.new
       klass = UiRules.const_get("#{rule.to_s.split('_').map(&:capitalize).join}Rule")
       @rule = klass.new(mode, authorizer, options)
@@ -18,13 +21,23 @@ module UiRules
       @rule.rules
     end
 
+    def respond_to_behaviour(params)
+      raise Crossbeams::FrameworkError, "#{self.class.name} does not implement the handle_behaviour method" unless @rule.respond_to?(:handle_behaviour)
+
+      @rule.params = params
+      @rule.handle_behaviour
+    end
+
     def form_object
       @rule.form_object
     end
   end
 
   class Base # rubocop:disable Metrics/ClassLength
+    include JsonHelpers
+
     attr_reader :rules, :inflector
+    attr_accessor :params
 
     def initialize(mode, authorizer, options)
       @mode        = mode
@@ -33,6 +46,7 @@ module UiRules
       @form_object = nil
       @inflector   = Dry::Inflector.new
       @rules       = { fields: {} }
+      @params      = {}
     end
 
     def form_object
@@ -40,6 +54,10 @@ module UiRules
     end
 
     private
+
+    def unhandled_behaviour!
+      raise Crossbeams::FrameworkError, %(#{self.class} has not implemented a behaviour handler for mode "#{@mode}")
+    end
 
     def make_caption(value)
       inflector.humanize(value.to_s).gsub(/\s\D/, &:upcase)

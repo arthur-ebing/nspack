@@ -135,6 +135,7 @@ MesServer is the java interface between web applications and printers and robots
 View source code documentation for methods in the following files:
 
 * link:/yarddocthis/helpers=common_helpers.rb[Common Helper methods]
+* link:/yarddocthis/helpers=json_helpers.rb[JSON Helper methods]
 * link:/yarddocthis/helpers=error_helpers.rb[Error Helper methods]
 * link:/yarddocthis/lib=base_repo.rb[BaseRepo methods]
 * link:/yarddocthis/lib=base_interactor.rb[BaseInteractor methods]

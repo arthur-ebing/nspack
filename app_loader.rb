@@ -57,10 +57,10 @@ require './lib/rmd_form'
 require './lib/robot_responder'
 require './lib/json_robot_interface'
 require './lib/messcada_xml_interpreter'
-require './lib/ui_rules'
 require './lib/library_versions'
 require './lib/dataminer_connections'
 Dir['./helpers/**/*.rb'].sort.each { |f| require f }
+require './lib/ui_rules'
 Dir['./lib/applets/*.rb'].sort.each { |f| require f }
 
 ENV['ROOT'] = File.dirname(__FILE__)

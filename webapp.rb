@@ -6,6 +6,7 @@
 require './app_loader'
 
 class Nspack < Roda
+  include JsonHelpers
   include CommonHelpers
   include ErrorHelpers
   include MenuHelpers
