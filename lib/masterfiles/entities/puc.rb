@@ -6,5 +6,7 @@ module MasterfilesApp
     attribute :puc_code, Types::String
     attribute :gap_code, Types::String
     attribute? :active, Types::Bool
+    attribute :gap_code_valid_from, Types::DateTime
+    attribute :gap_code_valid_until, Types::DateTime
   end
 end

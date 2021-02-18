@@ -72,7 +72,9 @@ module MasterfilesApp
         id: 1,
         puc_code: Faker::Lorem.unique.word,
         gap_code: 'ABC',
-        active: true
+        active: true,
+        gap_code_valid_from: '2010-01-01 12:00',
+        gap_code_valid_until: '2010-01-01 12:00'
       }
     end
 

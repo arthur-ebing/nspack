@@ -15,6 +15,8 @@ module Masterfiles
               form.view_only!
               form.add_field :puc_code
               form.add_field :gap_code
+              form.add_field :gap_code_valid_from
+              form.add_field :gap_code_valid_until
               form.add_field :active
               form.add_field :farms
             end

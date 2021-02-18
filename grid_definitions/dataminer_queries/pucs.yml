@@ -1,10 +1,11 @@
 ---
 :caption: PUCs
 :sql: "SELECT pucs.id,\r\n       pucs.puc_code,\r\n       fn_masterfile_variants('pucs',
-  pucs.id) AS variant_codes,\r\n       pucs.gap_code,\r\n       array_agg(farms.farm_code
-  order by farms.farm_code) AS farm_codes,\r\n       pucs.active,\r\n       pucs.created_at,\r\n
-  \      pucs.updated_at\r\nFROM pucs\r\nLEFT JOIN farms_pucs on pucs.id = farms_pucs.puc_id\r\nLEFT
-  JOIN farms on farms_pucs.farm_id = farms.id\r\nGROUP BY pucs.id\r\nORDER BY pucs.puc_code"
+  pucs.id) AS variant_codes,\r\n       pucs.gap_code,\r\n       pucs.gap_code_valid_from,\r\n
+  \      pucs.gap_code_valid_until,\r\n       array_agg(farms.farm_code order by farms.farm_code)
+  AS farm_codes,\r\n       pucs.active,\r\n       pucs.created_at,\r\n       pucs.updated_at\r\nFROM
+  pucs\r\nLEFT JOIN farms_pucs on pucs.id = farms_pucs.puc_id\r\nLEFT JOIN farms on
+  farms_pucs.farm_id = farms.id\r\nGROUP BY pucs.id\r\nORDER BY pucs.puc_code"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -31,7 +32,7 @@
     :caption: PUC code
     :namespaced_name: pucs.puc_code
     :data_type: :string
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -47,7 +48,7 @@
     :caption: Variant codes
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 200
     :format: 
     :hide: false
     :pinned: 
@@ -63,7 +64,7 @@
     :caption: Gap code
     :namespaced_name: pucs.gap_code
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -73,13 +74,45 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  gap_code_valid_from:
+    :name: gap_code_valid_from
+    :sequence_no: 5
+    :caption: Gap code valid from
+    :namespaced_name: pucs.gap_code_valid_from
+    :data_type: :datetime
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  gap_code_valid_until:
+    :name: gap_code_valid_until
+    :sequence_no: 6
+    :caption: Gap code valid until
+    :namespaced_name: pucs.gap_code_valid_until
+    :data_type: :datetime
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   farm_codes:
     :name: farm_codes
-    :sequence_no: 5
+    :sequence_no: 7
     :caption: Farm codes
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 300
     :format: 
     :hide: false
     :pinned: 
@@ -91,11 +124,11 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 6
+    :sequence_no: 8
     :caption: Active
     :namespaced_name: pucs.active
     :data_type: :boolean
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -107,7 +140,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 7
+    :sequence_no: 9
     :caption: Created at
     :namespaced_name: pucs.created_at
     :data_type: :datetime
@@ -123,7 +156,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 8
+    :sequence_no: 10
     :caption: Updated at
     :namespaced_name: pucs.updated_at
     :data_type: :datetime

@@ -408,7 +408,9 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.patch do     # UPDATE
           res = interactor.update_puc(id, params[:puc])
           if res.success
-            update_grid_row(id, changes: { puc_code: res.instance[:puc_code], gap_code: res.instance[:gap_code] }, notice: res.message)
+            update_grid_row(id, changes: { puc_code: res.instance[:puc_code], gap_code: res.instance[:gap_code],
+                                           gap_code_valid_from: res.instance[:gap_code_valid_from],
+                                           gap_code_valid_until: res.instance[:gap_code_valid_until] }, notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::Farms::Puc::Edit.call(id, form_values: params[:puc], form_errors: res.errors) }
           end
@@ -440,6 +442,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             puc_code
             gap_code
             active
+            gap_code_valid_from
+            gap_code_valid_until
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)

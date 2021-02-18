@@ -4,7 +4,7 @@ module Masterfiles
   module Farms
     module Puc
       class Edit
-        def self.call(id, form_values: nil, form_errors: nil)
+        def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:puc, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -19,6 +19,8 @@ module Masterfiles
               form.method :update
               form.add_field :puc_code
               form.add_field :gap_code
+              form.add_field :gap_code_valid_from
+              form.add_field :gap_code_valid_until
             end
           end
 
