@@ -26,7 +26,7 @@ module ProductionApp
 
     def test_create_production_run
       attrs = fake_production_run.to_h.reject { |k, _| k == :id }
-      res = interactor.create_production_run(attrs)
+      res = interactor.create_production_run(attrs, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
       assert_instance_of(ProductionRunFlat, res.instance)
       assert res.instance.id.nonzero?
@@ -34,7 +34,7 @@ module ProductionApp
 
     def test_create_production_run_fail
       attrs = fake_production_run(season_id: nil).to_h.reject { |k, _| k == :id }
-      res = interactor.create_production_run(attrs)
+      res = interactor.create_production_run(attrs, attrs)
       refute res.success, 'should fail validation'
       assert_equal ['must be filled'], res.errors[:season_id]
     end

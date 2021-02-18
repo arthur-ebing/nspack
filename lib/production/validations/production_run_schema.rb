@@ -1,6 +1,18 @@
 # frozen_string_literal: true
 
 module ProductionApp
+  ProductionRunNewFirstSchema = Dry::Schema.Params do
+    required(:packhouse_resource_id).filled(:integer)
+    required(:production_line_id).filled(:integer)
+    required(:season_id).filled(:integer)
+    required(:cultivar_group_id).filled(:integer)
+    required(:cultivar_id).maybe(:integer)
+    optional(:product_setup_template_id).maybe(:integer)
+    required(:allow_cultivar_mixing).maybe(:bool)
+    required(:allow_orchard_mixing).maybe(:bool)
+    required(:allow_cultivar_group_mixing).maybe(:bool)
+  end
+
   ProductionRunNewSchema = Dry::Schema.Params do
     required(:farm_id).filled(:integer)
     required(:puc_id).filled(:integer)

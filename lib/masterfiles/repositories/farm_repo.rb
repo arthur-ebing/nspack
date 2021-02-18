@@ -197,6 +197,44 @@ module MasterfilesApp
       hash.nil? ? nil : hash[:farm_section]
     end
 
+    def find_orchards_by_farm_and_cultivar(farm_id, cultivar_id)
+      DB["select distinct o.id, o.orchard_code
+          from orchards o
+          join farms f on f.id=o.farm_id
+          join cultivars c ON c.id = ANY (o.cultivar_ids)
+          where f.id=? and c.id=?", farm_id, cultivar_id]
+        .map { |r| [r[:orchard_code], r[:id]] }
+    end
+
+    def find_orchards_by_farm_and_cultivar_group(farm_id, cultivar_group_id)
+      DB["select distinct o.id, o.orchard_code
+          from orchards o
+          join farms f on f.id=o.farm_id
+          join cultivars c ON c.id = ANY (o.cultivar_ids)
+          join cultivar_groups g on g.id=c.cultivar_group_id
+          where f.id=? and g.id=?", farm_id, cultivar_group_id]
+        .map { |r| [r[:orchard_code], r[:id]] }
+    end
+
+    def find_farms_by_cultivar(cultivar_id)
+      DB["select distinct f.id, f.farm_code
+          from farms f
+          join orchards o on o.farm_id=f.id
+          join cultivars c ON c.id = ANY (o.cultivar_ids)
+          where c.id=?", cultivar_id]
+        .map { |r| [r[:farm_code], r[:id]] }
+    end
+
+    def find_farms_by_cultivar_group(cultivar_group_id)
+      DB["select distinct f.id, f.farm_code
+          from farms f
+          join orchards o on o.farm_id=f.id
+          join cultivars c ON c.id = ANY (o.cultivar_ids)
+          join cultivar_groups g ON g.id = c.cultivar_group_id
+          where g.id=?", cultivar_group_id]
+        .map { |r| [r[:farm_code], r[:id]] }
+    end
+
     def selected_farm_orchard_codes(farm_id, puc_id)
       return [] if farm_id.nil? || puc_id.nil?
 

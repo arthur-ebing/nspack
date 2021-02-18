@@ -18,6 +18,7 @@ module UiRules
 
       common_values_for_fields common_fields unless %i[allocate_setups allocate_target_customers complete_stage confirm].include?(@mode)
 
+      set_select_new_fields if @mode == :new
       set_show_fields if %i[show reopen template show_stats].include? @mode
       set_select_template_fields if @mode == :template
       make_header_table if @mode == :template
@@ -103,6 +104,61 @@ module UiRules
     def set_stage_fields
       fields[:current_stage] = { renderer: :label, with_value: current_stage }
       fields[:new_stage] = { renderer: :label, with_value: next_stage }
+    end
+
+    def set_select_new_fields # rubocop:disable Metrics/AbcSize
+      fields[:cultivar_group_id] = { renderer: :select,
+                                     options: @cultivar_repo.for_select_cultivar_groups,
+                                     disabled_options: @cultivar_repo.for_select_inactive_cultivar_groups,
+                                     caption: 'Cultivar group',
+                                     prompt: true }
+      fields[:cultivar_id] = { renderer: :select,
+                               options: MasterfilesApp::CultivarRepo.new.for_select_cultivars(where: { cultivar_group_id: @form_object.cultivar_group_id }),
+                               disabled_options: MasterfilesApp::CultivarRepo.new.for_select_inactive_cultivars,
+                               prompt: true,
+                               caption: 'Cultivar' }
+
+      seasons = if !@form_object.cultivar_id.nil_or_empty?
+                  MasterfilesApp::CalendarRepo.new.for_select_seasons_for_cultivar(@form_object.cultivar_id)
+                else
+                  MasterfilesApp::CalendarRepo.new.for_select_seasons_for_cultivar_group(@form_object.cultivar_group_id)
+                end
+      fields[:season_id] = { renderer: :select,
+                             options: seasons,
+                             disabled_options: MasterfilesApp::CalendarRepo.new.for_select_inactive_seasons,
+                             caption: 'Season',
+                             prompt: true,
+                             required: true }
+
+      farms = if !@form_object.cultivar_id.nil_or_empty?
+                @farm_repo.find_farms_by_cultivar(@form_object.cultivar_id)
+              else
+                @farm_repo.find_farms_by_cultivar_group(@form_object.cultivar_group_id)
+              end
+      fields[:farm_id] = { renderer: :select,
+                           options: farms,
+                           disabled_options: @farm_repo.for_select_inactive_farms,
+                           caption: 'Farm',
+                           prompt: true,
+                           required: true }
+
+      fields[:puc_id] = { renderer: :select,
+                          options: @farm_repo.selected_farm_pucs(where: { farm_id: @form_object.farm_id }),
+                          disabled_options: @farm_repo.for_select_inactive_pucs,
+                          caption: 'PUC',
+                          prompt: true,
+                          required: true }
+
+      orchards = if !@form_object.cultivar_id.nil_or_empty?
+                   @farm_repo.find_orchards_by_farm_and_cultivar(@form_object.farm_id, @form_object.cultivar_id)
+                 else
+                   @farm_repo.find_orchards_by_farm_and_cultivar_group(@form_object.farm_id, @form_object.cultivar_group_id)
+                 end
+      fields[:orchard_id] = { renderer: :select,
+                              options: orchards,
+                              disabled_options: @farm_repo.for_select_inactive_orchards,
+                              prompt: true,
+                              caption: 'Orchard' }
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
@@ -339,15 +395,15 @@ module UiRules
         behaviour.dropdown_change :packhouse_resource_id,
                                   notify: [{ url: '/production/runs/production_runs/changed/packhouse' }]
         behaviour.dropdown_change :farm_id,
-                                  notify: [{ url: '/production/runs/production_runs/changed/farm' }]
-        behaviour.dropdown_change :puc_id,
-                                  notify: [{ url: '/production/runs/production_runs/changed/puc',
-                                             param_keys: %i[production_run_farm_id] }]
-        behaviour.dropdown_change :orchard_id,
-                                  notify: [{ url: '/production/runs/production_runs/changed/orchard' }]
+                                  notify: [{ url: '/production/runs/production_runs/farm_combo_changed',
+                                             param_keys: %i[cultivar_id cultivar_group_id],
+                                             param_values: { cultivar_id: @options[:form_values] ? @options[:form_values][:cultivar_id] : nil,
+                                                             cultivar_group_id: @options[:form_values] ? @options[:form_values][:cultivar_group_id] : nil } }]
         behaviour.dropdown_change :cultivar_group_id,
-                                  notify: [{ url: '/production/runs/production_runs/changed/cultivar_group',
-                                             param_keys: %i[production_run_orchard_id] }]
+                                  notify: [{ url: '/production/runs/production_runs/cultivar_group_combo_changed' }]
+        behaviour.dropdown_change :cultivar_id,
+                                  notify: [{ url: '/production/runs/production_runs/cultivar_combo_changed',
+                                             param_keys: %i[cultivar_group_id] }]
       end
     end
 

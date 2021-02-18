@@ -625,6 +625,74 @@ class Nspack < Roda
         show_partial_or_page(r) { Production::Runs::ProductionRun::New.call(remote: fetch?(r)) }
       end
 
+      r.on 'new_first_submit' do
+        res = interactor.validate_new_first(params[:production_run])
+        if res.success
+          store_locally(:production_run, params[:production_run])
+          show_partial_or_page(r) { Production::Runs::ProductionRun::New.call(form_values: params[:production_run], remote: fetch?(r), is_second_form: true) }
+        else
+          re_show_form(r, res, url: '/production/runs/production_runs/new_first_submit') do
+            Production::Runs::ProductionRun::New.call(form_values: params[:production_run],
+                                                      form_errors: res.errors,
+                                                      remote: fetch?(r))
+          end
+        end
+      end
+
+      r.on 'farm_combo_changed' do
+        if !params[:changed_value].nil_or_empty?
+          farm_repo = MasterfilesApp::FarmRepo.new
+          pucs = farm_repo.selected_farm_pucs(where: { farm_id: params[:changed_value] })
+          orchards = if !params[:cultivar_id].nil_or_empty?
+                       farm_repo.find_orchards_by_farm_and_cultivar(params[:changed_value], params[:cultivar_id])
+                     else
+                       farm_repo.find_orchards_by_farm_and_cultivar_group(params[:changed_value], params[:cultivar_group_id])
+                     end
+          json_actions([OpenStruct.new(type: :replace_select_options,
+                                       dom_id: 'production_run_puc_id',
+                                       options_array: pucs),
+                        OpenStruct.new(type: :replace_select_options,
+                                       dom_id: 'production_run_orchard_id',
+                                       options_array: orchards)])
+        else
+          json_actions([OpenStruct.new(type: :replace_select_options,
+                                       dom_id: 'production_run_puc_id',
+                                       options_array: []),
+                        OpenStruct.new(type: :replace_select_options,
+                                       dom_id: 'production_run_orchard_id',
+                                       options_array: [])])
+        end
+      end
+
+      r.on 'cultivar_group_combo_changed' do
+        if !params[:changed_value].nil_or_empty?
+          cultivars = MasterfilesApp::CultivarRepo.new.for_select_cultivars(where: { cultivar_group_id: params[:changed_value] })
+          seasons = MasterfilesApp::CalendarRepo.new.for_select_seasons_for_cultivar_group(params[:changed_value])
+          json_actions([OpenStruct.new(type: :replace_select_options,
+                                       dom_id: 'production_run_cultivar_id',
+                                       options_array: cultivars),
+                        OpenStruct.new(type: :replace_select_options,
+                                       dom_id: 'production_run_season_id',
+                                       options_array: seasons)])
+        else
+          json_actions([OpenStruct.new(type: :replace_select_options,
+                                       dom_id: 'production_run_cultivar_id',
+                                       options_array: []),
+                        OpenStruct.new(type: :replace_select_options,
+                                       dom_id: 'production_run_season_id',
+                                       options_array: [])])
+        end
+      end
+
+      r.on 'cultivar_combo_changed' do
+        seasons = if !params[:changed_value].nil_or_empty?
+                    MasterfilesApp::CalendarRepo.new.for_select_seasons_for_cultivar(params[:changed_value])
+                  else
+                    MasterfilesApp::CalendarRepo.new.for_select_seasons_for_cultivar_group(params[:cultivar_group_id])
+                  end
+        json_replace_select_options('production_run_season_id', seasons)
+      end
+
       r.on 'ripe_point_code_combo_changed' do
         pc_codes = []
         pc_codes = MesscadaApp::MesscadaRepo.new.ripe_point_codes(ripe_point_code: params[:changed_value]).map { |s| s[1] }.uniq unless params[:changed_value].to_s.empty?
@@ -708,7 +776,8 @@ class Nspack < Roda
       end
 
       r.post do        # CREATE
-        res = interactor.create_production_run(params[:production_run])
+        production_run = retrieve_from_local_store(:production_run)
+        res = interactor.create_production_run(params[:production_run], production_run)
         if res.success
           if fetch?(r)
             row_keys = %i[
@@ -755,9 +824,11 @@ class Nspack < Roda
           end
         else
           re_show_form(r, res, url: '/production/runs/production_runs/new') do
-            Production::Runs::ProductionRun::New.call(form_values: params[:production_run],
+            store_locally(:production_run, production_run)
+            Production::Runs::ProductionRun::New.call(form_values: res.instance,
                                                       form_errors: res.errors,
-                                                      remote: fetch?(r))
+                                                      remote: fetch?(r),
+                                                      is_second_form: true)
           end
         end
       end

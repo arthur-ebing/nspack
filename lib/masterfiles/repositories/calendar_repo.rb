@@ -76,6 +76,17 @@ module MasterfilesApp
         .select_map([:season_code, Sequel[:seasons][:id]])
     end
 
+    def for_select_seasons_for_cultivar(cultivar_id) # rubocop:disable Metrics/AbcSize
+      DB[:seasons]
+        .join(:cultivars, commodity_id: :commodity_id)
+        .where(Sequel[:cultivars][:id] => cultivar_id)
+        .where(Sequel.lit('start_date').< Time.now)
+        .where(Sequel.lit('end_date').> Time.now)
+        .order(:season_code)
+        .distinct
+        .select_map([:season_code, Sequel[:seasons][:id]])
+    end
+
     def one_year_from_start_date(start_date)
       return nil if start_date.nil_or_empty?
 

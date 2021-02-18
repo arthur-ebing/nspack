@@ -2,7 +2,15 @@
 
 module ProductionApp
   class ProductionRunInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
-    def create_production_run(params) # rubocop:disable Metrics/AbcSize
+    def validate_new_first(params)
+      res = validate_new_first_production_run_params(params)
+      return validation_failed_response(res) if res.failure?
+
+      ok_response
+    end
+
+    def create_production_run(params1, params2) # rubocop:disable Metrics/AbcSize
+      params = params1.merge(params2)
       res = validate_new_production_run_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -712,6 +720,10 @@ module ProductionApp
 
     def validate_bin_tipping_control_data_params(params)
       BinTippingControlDataSchema.call(params)
+    end
+
+    def validate_new_first_production_run_params(params)
+      ProductionRunNewFirstSchema.call(params)
     end
 
     def validate_new_production_run_params(params)
