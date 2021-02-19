@@ -58,5 +58,13 @@ module Crossbeams
 
       setting(:integrate_extended_fg)
     end
+
+    def do_titan_inspections?
+      !AppConst::TITAN_INSPECTION_API_USER_ID.nil?
+    end
+
+    def do_titan_addenda?
+      !AppConst::TITAN_ADDENDUM_API_USER_ID.nil?
+    end
   end
 end

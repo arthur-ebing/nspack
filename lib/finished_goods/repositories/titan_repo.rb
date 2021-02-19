@@ -4,6 +4,24 @@ module FinishedGoodsApp
   class TitanRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     crud_calls_for :titan_requests, name: :titan_request
 
+    def find_pallet_for_titan(pallet_id)
+      oldest_id = DB[:pallet_sequences].where(pallet_id: pallet_id).order(:id).get(:id)
+      query = MesscadaApp::DatasetPalletSequence.call('WHERE pallet_sequences.id = ? AND pallet_sequences.pallet_id IS NOT NULL')
+      hash = DB[query, oldest_id].first
+      raise Crossbeams::FrameworkError, "Pallet not found for pallet_id: #{pallet_id}" if hash.nil_or_empty?
+
+      PalletForTitan.new(hash)
+    end
+
+    def find_pallet_sequence_for_titan(id)
+      query = MesscadaApp::DatasetPalletSequence.call('WHERE pallet_sequences.id = ?')
+      hash = DB[query, id].first
+      raise Crossbeams::FrameworkError, "Pallet Sequence not found for pallet_sequence_id: #{pallet_sequence_id}" if hash.nil_or_empty?
+
+      hash[:pallet_percentage] = hash[:pallet_carton_quantity].zero? ? 0 : (hash[:carton_quantity] / hash[:pallet_carton_quantity].to_f).round(3)
+      PalletSequenceForTitan.new(hash)
+    end
+
     def find_titan_request(id)
       hash = find_hash(:titan_requests, id)
       return nil unless hash
@@ -19,62 +37,40 @@ module FinishedGoodsApp
       TitanRequest.new(hash)
     end
 
-    def parse_titan_inspection_request_doc(hash) # rubocop:disable Metrics/AbcSize
+    def parse_titan_inspection_request_doc(hash)
       request_doc = hash[:request_doc] ||= {}
       request_lines = request_doc.delete('consignmentLines') || []
-      hash[:request_array] = []
-      request_doc.each { |k, v| hash[:request_array] << { column: humanize(k), value: Array(v).join(' ') } }
-      Array(0...request_lines.length).each do |i|
-        request_lines[i].each { |k, v| hash[:request_array] << { column: "#{humanize(k)}[#{i}]", value: Array(v).join(', ') } }
-      end
+      hash[:request_array] = flatten_to_table(request_doc)
+      hash[:request_array] += flatten_to_table(request_lines)
       hash
     end
 
-    def parse_titan_inspection_result_doc(hash) # rubocop:disable Metrics/AbcSize
+    def parse_titan_inspection_result_doc(hash)
       result_doc = hash[:result_doc] ||= {}
       result_lines = result_doc.delete('errors') || []
-      hash[:result_array] = []
-
-      result_doc.each { |k, v| hash[:result_array] << { column: humanize(k), value: Array(v).join(' ') } }
-
-      Array(0...result_lines.length).each do |i|
-        result_lines[i].each { |k, v| hash[:result_array] << { column: "#{humanize(k)}[#{i}]", value: Array(v).join(' ') } }
-      end
+      hash[:result_array] = flatten_to_table(result_doc)
+      hash[:result_array] += flatten_to_table(result_lines)
       hash
     end
 
-    def parse_titan_addendum_request_doc(hash) # rubocop:disable Metrics/AbcSize
+    def parse_titan_addendum_request_doc(hash)
       request_doc = hash[:request_doc] ||= {}
-      hash[:request_array] = []
-
       addendum_details = request_doc.delete('addendumDetails') || []
       consignment_items = request_doc.delete('consignmentItems') || []
-      request_doc.each { |k, v| hash[:request_array] << { column: humanize(k), value: Array(v).join(' ') } }
-
-      Array(0...addendum_details.length).each do |i|
-        addendum_details[i].each { |k, v| hash[:request_array] << { column: "AddendumDetails[#{i}].#{humanize(k)}", value: Array(v).join(', ') } }
-      end
-      Array(0...consignment_items.length).each do |i|
-        consignment_items[i].each { |k, v| hash[:request_array] << { column: "ConsignmentItems[#{i}].#{humanize(k)}", value: Array(v).join(', ') } }
-      end
-
+      hash[:request_array] = flatten_to_table(request_doc)
+      hash[:request_array] += flatten_to_table(addendum_details, prefix: 'AddendumDetails')
+      hash[:request_array] += flatten_to_table(consignment_items, prefix: 'ConsignmentItems')
       hash
     end
 
-    def parse_titan_addendum_result_doc(hash) # rubocop:disable Metrics/AbcSize
+    def parse_titan_addendum_result_doc(hash)
       result_doc = hash[:result_doc] ||= {}
       result_doc.delete('type')
       result_doc.delete('traceId')
       result_lines = result_doc.delete('errors')
-      hash[:result_array] = []
-      result_doc.each { |k, v| hash[:result_array] << { column: humanize(k), value: Array(v).join(' ') } }
-      result_lines.each { |k, v| hash[:result_array] << { column: "Error: #{humanize(k)}", value: Array(v).join(' ') } } if result_lines.is_a? Hash
+      hash[:result_array] = flatten_to_table(result_doc)
+      hash[:result_array] += flatten_to_table(result_lines, prefix: 'Error: ') if result_lines.is_a? Hash
       hash
-    end
-
-    def humanize(value)
-      array = value.to_s.split(/(?=[A-Z])/)
-      array.map(&:capitalize).join('')
     end
 
     def find_titan_inspection(govt_inspection_sheet_id) # rubocop:disable Metrics/AbcSize
@@ -93,19 +89,20 @@ module FinishedGoodsApp
       consignment_lines.each do |line|
         pallet_number = line['sscc']
         pallet_id = get_id(:pallets, pallet_number: pallet_number)
+        raise Crossbeams::FrameworkError, "Pallet id not found for #{pallet_number}" unless pallet_id
+
         hash[:pallets] << { pallet_id: pallet_id, pallet_number: pallet_number, passed: line['result'] == 'Pass', rejection_reasons: line['rejectionReasons'] || [] }
       end
       TitanInspectionFlat.new(hash)
     end
 
     def compile_inspection(govt_inspection_sheet_id) # rubocop:disable Metrics/AbcSize
-      govt_inspection_sheet = FinishedGoodsApp::GovtInspectionRepo.new.find_govt_inspection_sheet(govt_inspection_sheet_id)
-
+      govt_inspection_sheet = GovtInspectionRepo.new.find_govt_inspection_sheet(govt_inspection_sheet_id)
       { consignmentNumber: govt_inspection_sheet.consignment_note_number,
         transactionType: '202',
         bookingRef: govt_inspection_sheet.booking_reference,
-        exporter: MasterfilesApp::PartyRepo.new.find_registration_code_for_party_role('FBO', govt_inspection_sheet.exporter_party_role_id),
-        billingParty: MasterfilesApp::PartyRepo.new.find_registration_code_for_party_role('BILLING', govt_inspection_sheet.inspection_billing_party_role_id),
+        exporter: party_repo.find_registration_code_for_party_role('FBO', govt_inspection_sheet.exporter_party_role_id),
+        billingParty: party_repo.find_registration_code_for_party_role('BILLING', govt_inspection_sheet.inspection_billing_party_role_id),
         inspectionPoint: AppConst::TITAN_INSPECTION_API_USER_ID,
         inspector: govt_inspection_sheet.inspector_code,
         inspectionDate: Time.now.strftime('%Y-%m-%d'),
@@ -114,31 +111,24 @@ module FinishedGoodsApp
     end
 
     def compile_inspection_pallets(govt_inspection_sheet_id) # rubocop:disable Metrics/AbcSize
-      govt_inspection_sheet = FinishedGoodsApp::GovtInspectionRepo.new.find_govt_inspection_sheet(govt_inspection_sheet_id)
       pallet_ids = select_values(:govt_inspection_pallets, :pallet_id, govt_inspection_sheet_id: govt_inspection_sheet_id)
-
       inspection_pallets = []
       pallet_ids.each do |pallet_id|
-        instance = where_hash(:vw_pallet_sequence_flat, pallet_id: pallet_id)
-
-        commodity_id = get_id(:commodities, code: instance[:commodity])
-        nett_weight = instance[:nett_weight].nil_or_empty? ? get(:standard_product_weights, commodity_id, :nett_weight) : (instance[:nett_weight] / instance[:carton_quantity])
-        gross_weight = instance[:gross_weight].nil_or_empty? ? get(:standard_product_weights, commodity_id, :gross_weight) : (instance[:gross_weight] / instance[:carton_quantity])
+        pallet = find_pallet_for_titan(pallet_id)
         ecert_agreement_id = get_value(:ecert_tracking_units, :ecert_agreement_id, pallet_id: pallet_id)
         ecert_agreement_code = get(:ecert_agreements, ecert_agreement_id, :code)
-
-        inspection_pallets << { phc: instance[:phc],
-                                sscc: instance[:pallet_number],
-                                commodity: instance[:commodity],
-                                variety: instance[:marketing_variety],
-                                class: instance[:grade],
+        inspection_pallets << { phc: pallet.phc,
+                                sscc: pallet.pallet_number,
+                                commodity: pallet.commodity,
+                                variety: pallet.marketing_variety,
+                                class: pallet.grade,
                                 inspectionSampleWeight: nett_weight.to_f.round(3),
                                 nettWeightPack: nett_weight.to_f.round(3),
                                 grossWeightPack: gross_weight.to_f.round(3),
                                 carton: 'C',
-                                cartonQty: get(:pallets, pallet_id, :carton_quantity),
-                                targetRegion: govt_inspection_sheet.destination_region,
-                                targetCountry: govt_inspection_sheet.destination_country,
+                                cartonQty: pallet.pallet_carton_quantity,
+                                targetRegion: pallet.region,
+                                targetCountry: pallet.country,
                                 protocolExceptionIndicator: 'NA',
                                 agreementCode: ecert_agreement_code,
                                 consignmentLinePallets: compile_inspection_pallet_sequences(pallet_id) }
@@ -151,17 +141,17 @@ module FinishedGoodsApp
 
       inspection_pallet_sequences = []
       pallet_sequence_ids.each do |pallet_sequence_id|
-        instance = where_hash(:vw_pallet_sequence_flat, id: pallet_sequence_id)
-        inspection_pallet_sequences << { ssccReference: instance[:pallet_number],
-                                         palletQty: get(:pallet_sequences, pallet_sequence_id, :carton_quantity),
-                                         ssccSequenceNumber: instance[:pallet_sequence_number],
-                                         puc: instance[:puc],
-                                         orchard: instance[:orchard],
+        pallet_sequence = find_pallet_sequence_for_titan(pallet_sequence_id)
+        inspection_pallet_sequences << { ssccReference: pallet_sequence.pallet_number,
+                                         palletQty: pallet_sequence.carton_quantity,
+                                         ssccSequenceNumber: pallet_sequence.pallet_sequence_number,
+                                         puc: pallet_sequence.puc,
+                                         orchard: pallet_sequence.orchard,
                                          phytoData: '',
-                                         packCode: instance[:std_pack],
-                                         packDate: instance[:palletized_at],
-                                         sizeCount: instance[:actual_count].nil_or_empty? ? instance[:size_ref] : instance[:actual_count].to_i,
-                                         inventoryCode: instance[:inventory_code],
+                                         packCode: pallet_sequence.std_pack,
+                                         packDate: pallet_sequence.palletized_at,
+                                         sizeCount: pallet_sequence.actual_count.nil_or_empty? ? pallet_sequence.size_ref : pallet_sequence.actual_count.to_i,
+                                         inventoryCode: pallet_sequence.inventory_code,
                                          prePackingTreatment: 'NA' }
       end
       inspection_pallet_sequences
@@ -192,13 +182,12 @@ module FinishedGoodsApp
     end
 
     def compile_addendum(load_id) # rubocop:disable Metrics/AbcSize
-      load = FinishedGoodsApp::LoadRepo.new.find_load_flat(load_id)
-      consignor_address = MasterfilesApp::PartyRepo.new.find_address_for_party_role('Delivery Address', load.exporter_party_role_id)
-      consignee_address = MasterfilesApp::PartyRepo.new.find_address_for_party_role('Delivery Address', load.consignee_party_role_id)
+      load = LoadRepo.new.find_load_flat(load_id)
+      consignor_address = party_repo.find_address_for_party_role('Delivery Address', load.exporter_party_role_id)
+      consignee_address = party_repo.find_address_for_party_role('Delivery Address', load.consignee_party_role_id)
       pallet_ids = select_values(:pallets, :id, load_id: load_id)
       ecert_agreement_ids = select_values(:ecert_tracking_units, :ecert_agreement_id, pallet_id: pallet_ids)
       ecert_agreement_codes = select_values(:ecert_agreements, :code, id: ecert_agreement_ids).join('')
-
       {
         eCertRequired: false,
         cbrid: 1, # central business register id
@@ -206,20 +195,20 @@ module FinishedGoodsApp
         requestId: load_id,
         eCertAgreementCode: ecert_agreement_codes,
         eCertDesiredIssueLocation: 1,
-        exporterCode: MasterfilesApp::PartyRepo.new.find_registration_code_for_party_role('FBO', load.exporter_party_role_id).to_s,
-        consignorName: MasterfilesApp::PartyRepo.new.find_organization_for_party_role(load.exporter_party_role_id).short_description,
+        exporterCode: party_repo.find_registration_code_for_party_role('FBO', load.exporter_party_role_id).to_s,
+        consignorName: party_repo.find_organization_for_party_role(load.exporter_party_role_id).short_description,
         consignorAddressLine1: [consignor_address&.address_line_1, consignor_address&.address_line_2, consignor_address&.address_line_3].compact!.join(', '),
         consignorAddressLine2: consignor_address&.city,
         consignorAddressLine3: consignor_address&.postal_code,
-        consigneeId: MasterfilesApp::PartyRepo.new.find_organization_for_party_role(load.consignee_party_role_id).short_description,
-        consigneeName: MasterfilesApp::PartyRepo.new.find_organization_for_party_role(load.consignee_party_role_id).medium_description,
+        consigneeId: party_repo.find_organization_for_party_role(load.consignee_party_role_id).short_description,
+        consigneeName: party_repo.find_organization_for_party_role(load.consignee_party_role_id).medium_description,
         consigneeAddressLine1: [consignee_address&.address_line_1, consignee_address&.address_line_2, consignee_address&.address_line_3].compact!.join(', '),
         consigneeAddressLine2: consignee_address&.city,
         consigneeAddressLine3: consignee_address&.postal_code,
         consigneeCountryId: load.destination_country,
         importCountryId: load.destination_country,
-        cfCode: MasterfilesApp::PartyRepo.new.find_registration_code_for_party_role('CF', load.shipper_party_role_id).to_s,
-        lspCode: MasterfilesApp::PartyRepo.new.find_registration_code_for_party_role('LSP', load.shipper_party_role_id).to_s,
+        cfCode: party_repo.find_registration_code_for_party_role('CF', load.shipper_party_role_id).to_s,
+        lspCode: party_repo.find_registration_code_for_party_role('LSP', load.shipper_party_role_id).to_s,
         transportType: get(:voyage_types, load.voyage_type_id, :industry_description),
         vesselName: load.vessel_code,
         vesselType: load.container ? 'CONTAINER' : 'CONVENTIONAL',
@@ -245,14 +234,12 @@ module FinishedGoodsApp
       }
     end
 
-    def compile_consignment_items(load_id) # rubocop:disable Metrics/AbcSize
-      load = FinishedGoodsApp::LoadRepo.new.find_load_flat(load_id)
+    def compile_consignment_items(load_id)
+      load = LoadRepo.new.find_load_flat(load_id)
       pallet_id = select_values_in_order(:pallets, :id, where: { load_id: load_id }, order: :id).first
       pallet = find_pallet_for_titan(pallet_id)
-      pallet_sequence = find_pallet_sequence_for_titan(pallet&.oldest_pallet_sequence_id)
-
       {
-        productDescription: pallet_sequence&.commodity_description,
+        productDescription: pallet.commodity_description,
         commonName: 'required', # Common name of product. Required if flag eCertRequired is set to true
         scientificName: 'required',
         nettWeightMeasureCode: 'KG',
@@ -285,71 +272,34 @@ module FinishedGoodsApp
       }
     end
 
-    def find_pallet_for_titan(pallet_id) # rubocop:disable Metrics/AbcSize
-      hash = find_with_association(:pallets, pallet_id)
-      return nil if hash.nil?
-
-      hash[:govt_inspection_pallet_id] = DB[:govt_inspection_pallets].where(pallet_id: pallet_id).get(:id)
-      hash[:govt_inspection_sheet_id] = DB[:govt_inspection_pallets].where(pallet_id: pallet_id).get(:govt_inspection_sheet_id)
-      hash[:oldest_pallet_sequence_id] = DB[:pallet_sequences].where(pallet_id: pallet_id).order(:id).get(:id)
-      hash[:nett_weight] = hash[:nett_weight].to_f.round(2)
-      hash[:gross_weight] = hash[:gross_weight].to_f.round(2)
-
-      PalletForTitan.new(hash)
-    end
-
-    def find_pallet_sequence_for_titan(id) # rubocop:disable Metrics/AbcSize
-      hash = find_with_association(:pallet_sequences, id)
-      return nil if hash.nil?
-
-      hash[:commodity_code] = get(:commodities, hash[:commodity_id], :code)
-      hash[:commodity_description] = get(:commodities, hash[:commodity_id], :description)
-      hash[:marketing_variety_code] = get(:marketing_varieties, hash[:marketing_variety_id], :marketing_variety_code)
-      hash[:grade_code] = get(:grades, hash[:grade_id], :grade_code)
-      hash[:puc_code] = get(:pucs, hash[:puc_id], :puc_code)
-      hash[:orchard_code] = get(:orchards, hash[:orchard_id], :orchard_code)
-      hash[:production_region_code] = get(:production_regions, hash[:production_region_id], :production_region_code)
-      hash[:fruit_size_reference] = get(:fruit_size_references, hash[:fruit_size_reference_id], :size_reference)
-      hash[:standard_pack_code] = get(:standard_pack_codes, hash[:standard_pack_code_id], :standard_pack_code)
-      hash[:pallet_percentage] = hash[:pallet_carton_quantity].zero? ? 0 : (hash[:carton_quantity] / hash[:pallet_carton_quantity].to_f).round(3)
-      hash[:nett_weight] = hash[:nett_weight].to_f.round(2)
-
-      PalletSequenceForTitan.new(hash)
-    end
-
     def compile_addendum_details(load_id) # rubocop:disable Metrics/AbcSize
-      load = FinishedGoodsApp::LoadRepo.new.find_load_flat(load_id)
-
       details = []
       pallet_ids = select_values(:pallets, :id, load_id: load_id)
       pallet_ids.each do |pallet_id| # rubocop:disable Metrics/BlockLength
         pallet = find_pallet_for_titan(pallet_id)
-
-        pallet_sequence = find_pallet_sequence_for_titan(pallet&.oldest_pallet_sequence_id)
-        govt_inspection_sheet = GovtInspectionRepo.new.find_govt_inspection_sheet(pallet&.govt_inspection_sheet_id)
-        govt_inspection_pallet = GovtInspectionRepo.new.find_govt_inspection_pallet_flat(pallet&.govt_inspection_pallet_id)
-
+        govt_inspection_sheet = GovtInspectionRepo.new.find_govt_inspection_sheet(pallet.govt_inspection_sheet_id)
+        govt_inspection_pallet = GovtInspectionRepo.new.find_govt_inspection_pallet_flat(pallet.govt_inspection_pallet_id)
         details << {
           inspectedSSCC: pallet.pallet_number,
-          stuffLoadDate: load&.shipped_at&.strftime('%F'),
-          loadPointFboCode: govt_inspection_sheet&.inspection_point,
-          consignmentNumber: govt_inspection_sheet&.consignment_note_number,
+          stuffLoadDate: pallet.shipped_at.strftime('%F'),
+          loadPointFboCode: govt_inspection_sheet.inspection_point,
+          consignmentNumber: pallet.consignment_note_number,
           phc: pallet.phc,
-          clientRef: pallet_sequence&.pallet_sequence_number,
-          commodityCode: pallet_sequence&.commodity_code,
-          varietyCode: pallet_sequence&.marketing_variety_code,
+          clientRef: load_id,
+          commodityCode: pallet.commodity,
+          varietyCode: pallet.marketing_variety,
           protocolExceptionIndicator: 'X7', # Smartfresh, X7, X8, X9 where the first character denotes the destination and the second character denotes the applicable phytosanitary
-          productClass: pallet_sequence&.grade_code,
+          productClass: pallet.grade,
           nettWeight: pallet.nett_weight,
           grossWeight: pallet.gross_weight,
-          cartonQuantity: pallet.carton_quantity,
-          inspectionPoint: govt_inspection_sheet&.inspection_point,
-          inspectorCode: govt_inspection_sheet&.inspector_code,
-          inspectionDate: govt_inspection_pallet&.inspected_at,
-          upn: govt_inspection_sheet&.upn,
-          inspectedTargetRegion: govt_inspection_sheet&.destination_region,
-          inspectedTargetCountry: govt_inspection_sheet&.destination_country,
-          containerNumber: load&.container_code,
+          cartonQuantity: pallet.pallet_carton_quantity,
+          inspectionPoint: govt_inspection_sheet.inspection_point,
+          inspectorCode: govt_inspection_sheet.inspector_code,
+          inspectionDate: govt_inspection_pallet.inspected_at,
+          upn: govt_inspection_sheet.upn,
+          inspectedTargetRegion: pallet.region,
+          inspectedTargetCountry: pallet.country,
+          containerNumber: pallet.container,
           addendumDetailLines: compile_addendum_detail_sequences(pallet_id)
         }
       end
@@ -363,18 +313,41 @@ module FinishedGoodsApp
         pallet_sequence = find_pallet_sequence_for_titan(pallet_sequence_id)
         sequences << {
           sequenceNumberOfInspectedSSCC: pallet_sequence.pallet_sequence_number,
-          puc: pallet_sequence.puc_code,
-          orchard: pallet_sequence.orchard_code,
-          productionArea: pallet_sequence.production_region_code,
+          puc: pallet_sequence.puc,
+          orchard: pallet_sequence.orchard,
+          productionArea: pallet_sequence.production_region,
           phytoData: pallet_sequence.phyto_data || '',
-          sizeCountBerrySize: pallet_sequence.fruit_size_reference,
-          packCode: pallet_sequence.standard_pack_code,
-          palletQuantity: pallet_sequence.pallet_percentage
+          sizeCountBerrySize: pallet_sequence.size_ref,
+          packCode: pallet_sequence.std_pack,
+          palletQuantity: pallet_sequence.pallet_percentage.to_f.round(3)
         }
       end
       sequences
     end
 
+    def party_repo
+      MasterfilesApp::PartyRepo.new
+    end
+
+    def humanize(value)
+      array = value.to_s.split(/(?=[A-Z])/)
+      array.map(&:capitalize).join('')
+    end
+
+    def flatten_to_table(input, prefix: nil)
+      array_out = []
+      is_an_array = input.is_a? Array
+      input = [input] unless is_an_array
+      Array(0...input.length).each do |i|
+        input[i].each do |k, v|
+          column = "#{prefix}#{humanize(k)}"
+          column = "#{humanize(k)}[#{i}]" if is_an_array
+          column = "#{prefix}[#{i}].#{humanize(k)}" if prefix && is_an_array
+          array_out << { column: column, value: Array(v).join(' ') }
+        end
+      end
+      array_out
+    end
     # def sort_like(left, right)
     #   raise ArgumentError, 'Hash input required for "sort_like" method' unless (left.is_a? Hash) || (right.is_a? Hash)
     #

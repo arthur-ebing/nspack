@@ -61,7 +61,7 @@ module FinishedGoodsApp
       hash[:status] = DB.get(Sequel.function(:fn_current_status, 'govt_inspection_sheets', id))
       pallet_ids = select_values(:govt_inspection_pallets, :pallet_id, govt_inspection_sheet_id: id)
       ecert_passed = select_values(:ecert_tracking_units, :passed, pallet_id: pallet_ids)
-      hash[:allow_titan_inspection] = pallet_ids.length == ecert_passed.length && ecert_passed.all? && !AppConst::TITAN_INSPECTION_API_USER_ID.nil?
+      hash[:allow_titan_inspection] = (pallet_ids.length == ecert_passed.length) & ecert_passed.all?
       GovtInspectionSheet.new(hash)
     end
 

@@ -33,7 +33,6 @@ module FinishedGoods
               end
             end
             controls = ui_rule.form_object.progress_controls
-            p controls
             if controls
               page.section do |section|
                 section.show_border!

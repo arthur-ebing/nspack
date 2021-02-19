@@ -373,7 +373,7 @@ module UiRules
       addendum = { control_type: :link,
                    style: :action_button,
                    text: 'Titan Addendum',
-                   visible: @form_object.container & !AppConst::TITAN_ADDENDUM_API_USER_ID.nil?,
+                   visible: @form_object.container & AppConst::CR_FG.do_titan_addenda?,
                    url: "/finished_goods/dispatch/loads/#{id}/titan_addendum",
                    icon: :edit }
       update_otmc = { control_type: :link,
