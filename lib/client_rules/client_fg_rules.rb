@@ -59,11 +59,15 @@ module Crossbeams
       setting(:integrate_extended_fg)
     end
 
-    def do_titan_inspections?
+    def do_titan_inspections?(explain: false)
+      return 'Enable TITAN inspections when API user is given.' if explain
+
       !AppConst::TITAN_INSPECTION_API_USER_ID.nil?
     end
 
-    def do_titan_addenda?
+    def do_titan_addenda?(explain: false)
+      return 'Enable TITAN addenda when API user is given.' if explain
+
       !AppConst::TITAN_ADDENDUM_API_USER_ID.nil?
     end
   end
