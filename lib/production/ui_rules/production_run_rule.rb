@@ -15,6 +15,8 @@ module UiRules
       @rules[:show_bin_tipping_control_data] = (AppConst::CLIENT_CODE == 'kr')
       @rules[:show_bin_tipping_criteria] = (AppConst::CLIENT_CODE == 'kr')
       @rules[:use_packing_specifications] = AppConst::CR_PROD.use_packing_specifications?
+      @rules[:hide_on_new_second_form] = (@mode == :new && @options[:is_second_form])
+      @rules[:hide_on_new_first_form] = (@mode == :new && !@options[:is_second_form])
 
       common_values_for_fields common_fields unless %i[allocate_setups allocate_target_customers complete_stage confirm].include?(@mode)
 
@@ -111,11 +113,14 @@ module UiRules
                                      options: @cultivar_repo.for_select_cultivar_groups,
                                      disabled_options: @cultivar_repo.for_select_inactive_cultivar_groups,
                                      caption: 'Cultivar group',
+                                     required: true,
+                                     hide_on_load: @rules[:hide_on_new_second_form],
                                      prompt: true }
       fields[:cultivar_id] = { renderer: :select,
                                options: MasterfilesApp::CultivarRepo.new.for_select_cultivars(where: { cultivar_group_id: @form_object.cultivar_group_id }),
                                disabled_options: MasterfilesApp::CultivarRepo.new.for_select_inactive_cultivars,
                                prompt: true,
+                               hide_on_load: @rules[:hide_on_new_second_form],
                                caption: 'Cultivar' }
 
       seasons = if !@form_object.cultivar_id.nil_or_empty?
@@ -127,6 +132,7 @@ module UiRules
                              options: seasons,
                              disabled_options: MasterfilesApp::CalendarRepo.new.for_select_inactive_seasons,
                              caption: 'Season',
+                             hide_on_load: @rules[:hide_on_new_second_form],
                              prompt: true,
                              required: true }
 
@@ -140,6 +146,8 @@ module UiRules
                            disabled_options: @farm_repo.for_select_inactive_farms,
                            caption: 'Farm',
                            prompt: true,
+                           min_charwidth: 30,
+                           hide_on_load: @rules[:hide_on_new_first_form],
                            required: true }
 
       fields[:puc_id] = { renderer: :select,
@@ -147,6 +155,7 @@ module UiRules
                           disabled_options: @farm_repo.for_select_inactive_pucs,
                           caption: 'PUC',
                           prompt: true,
+                          hide_on_load: @rules[:hide_on_new_first_form],
                           required: true }
 
       orchards = if !@form_object.cultivar_id.nil_or_empty?
@@ -158,6 +167,7 @@ module UiRules
                               options: orchards,
                               disabled_options: @farm_repo.for_select_inactive_orchards,
                               prompt: true,
+                              hide_on_load: @rules[:hide_on_new_first_form],
                               caption: 'Orchard' }
     end
 
@@ -167,11 +177,14 @@ module UiRules
                         options: ProductionApp::ResourceRepo.new.for_select_plant_resources_of_type(Crossbeams::Config::ResourceDefinitions::PACKHOUSE),
                         disabled_options: ProductionApp::ResourceRepo.new.for_select_plant_resources_of_type(Crossbeams::Config::ResourceDefinitions::PACKHOUSE, active: false),
                         caption: 'Packhouse',
+                        min_charwidth: 30,
+                        hide_on_load: @rules[:hide_on_new_second_form],
                         required: true }
         line_renderer = { renderer: :select,
                           options: @resource_repo.packhouse_lines(@form_object.packhouse_resource_id),
                           disabled_options: @resource_repo.packhouse_lines(@form_object.packhouse_resource_id, active: false),
                           caption: 'Production line',
+                          hide_on_load: @rules[:hide_on_new_second_form],
                           required: true }
       else
         ph_renderer = { renderer: :label, with_value: @form_object.packhouse_code }
@@ -261,8 +274,8 @@ module UiRules
         closed_at: { renderer: :label, format: :without_timezone_or_seconds },
         re_executed_at: { renderer: :label, format: :without_timezone_or_seconds },
         completed_at: { renderer: :label, format: :without_timezone_or_seconds },
-        allow_cultivar_mixing: { renderer: :checkbox },
-        allow_orchard_mixing: { renderer: :checkbox },
+        allow_cultivar_mixing: { renderer: :checkbox, hide_on_load: @rules[:hide_on_new_second_form] },
+        allow_orchard_mixing: { renderer: :checkbox, hide_on_load: @rules[:hide_on_new_second_form] },
         reconfiguring: { renderer: :label, as_boolean: true },
         running: { renderer: :label, as_boolean: true },
         tipping: { renderer: :label, as_boolean: true },

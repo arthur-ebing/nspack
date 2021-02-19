@@ -628,7 +628,6 @@ class Nspack < Roda
       r.on 'new_first_submit' do
         res = interactor.validate_new_first(params[:production_run])
         if res.success
-          store_locally(:production_run, params[:production_run])
           show_partial_or_page(r) { Production::Runs::ProductionRun::New.call(form_values: params[:production_run], remote: fetch?(r), is_second_form: true) }
         else
           re_show_form(r, res, url: '/production/runs/production_runs/new_first_submit') do
@@ -776,8 +775,7 @@ class Nspack < Roda
       end
 
       r.post do        # CREATE
-        production_run = retrieve_from_local_store(:production_run)
-        res = interactor.create_production_run(params[:production_run], production_run)
+        res = interactor.create_production_run(params[:production_run])
         if res.success
           if fetch?(r)
             row_keys = %i[
@@ -824,8 +822,7 @@ class Nspack < Roda
           end
         else
           re_show_form(r, res, url: '/production/runs/production_runs/new') do
-            store_locally(:production_run, production_run)
-            Production::Runs::ProductionRun::New.call(form_values: res.instance,
+            Production::Runs::ProductionRun::New.call(form_values: params[:production_run],
                                                       form_errors: res.errors,
                                                       remote: fetch?(r),
                                                       is_second_form: true)

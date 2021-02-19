@@ -6,13 +6,16 @@ module ProductionApp
       res = validate_new_first_production_run_params(params)
       return validation_failed_response(res) if res.failure?
 
+      return validation_failed_response(OpenStruct.new(messages: { cultivar_id: ['must be filled, mixing not allowed'] })) if res[:cultivar_id].nil? && !res[:allow_cultivar_mixing]
+
       ok_response
     end
 
-    def create_production_run(params1, params2) # rubocop:disable Metrics/AbcSize
-      params = params1.merge(params2)
+    def create_production_run(params) # rubocop:disable Metrics/AbcSize
       res = validate_new_production_run_params(params)
       return validation_failed_response(res) if res.failure?
+
+      return validation_failed_response(OpenStruct.new(messages: { orchard_id: ['must be filled, mixing not allowed'] })) if res[:orchard_id].nil? && !res[:allow_orchard_mixing]
 
       id = nil
       repo.transaction do
