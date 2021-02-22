@@ -102,7 +102,6 @@ module FinishedGoodsApp
     def compile_inspection(govt_inspection_sheet_id) # rubocop:disable Metrics/AbcSize
       govt_inspection_sheet = GovtInspectionRepo.new.find_govt_inspection_sheet(govt_inspection_sheet_id)
       { consignmentNumber: govt_inspection_sheet.consignment_note_number,
-        transactionType: '202',
         bookingRef: govt_inspection_sheet.booking_reference,
         exporter: party_repo.find_registration_code_for_party_role('FBO', govt_inspection_sheet.exporter_party_role_id),
         billingParty: party_repo.find_registration_code_for_party_role('BILLING', govt_inspection_sheet.inspection_billing_party_role_id),
