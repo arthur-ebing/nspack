@@ -174,7 +174,8 @@ module MesscadaApp
     end
 
     def find_stock_item(stock_item_id, stock_type)
-      return DB[:pallets].where(id: stock_item_id).first if stock_type == AppConst::PALLET_STOCK_TYPE
+      # return DB[:pallets].where(id: stock_item_id).first if stock_type == AppConst::PALLET_STOCK_TYPE
+      return find_pallet(stock_item_id) if stock_type == AppConst::PALLET_STOCK_TYPE
 
       DB[:rmt_bins].where(id: stock_item_id).first
     end
