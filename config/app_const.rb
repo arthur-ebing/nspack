@@ -234,9 +234,10 @@ class AppConst # rubocop:disable Metrics/ClassLength
   ROLE_TRANSPORTER = 'TRANSPORTER'
   ROLE_FARM_MANAGER = 'FARM_MANAGER'
 
-  PARTY_ROLE_REGISTRATION_TYPES = { SHIPPER: %w[CF LSP],
-                                    EXPORTER: %w[FBO],
-                                    BILLING: %w[BILLING] }.freeze
+  PARTY_ROLE_REGISTRATION_TYPES = { 'LSP' => ROLE_SHIPPER,
+                                    'CF' => ROLE_SHIPPER,
+                                    'FBO' => ROLE_EXPORTER,
+                                    'BILLING' => ROLE_BILLING_CLIENT }.freeze
 
   # Target Market Type: 'PACKED'
   PACKED_TM_GROUP = 'PACKED'

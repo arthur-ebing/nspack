@@ -16,7 +16,7 @@ module Masterfiles
               form.caption 'New Party Role Registration'
               form.action '/masterfiles/parties/registrations'
               form.remote! if remote
-              form.add_field :party_role_id
+              form.add_field :party_id
               form.add_field :registration_type
               form.add_field :registration_code
             end

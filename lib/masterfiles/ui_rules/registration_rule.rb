@@ -22,16 +22,19 @@ module UiRules
     end
 
     def common_fields
+      options = []
+      role_ids = @repo.select_values(:party_roles, :role_id, party_id: @form_object.party_id)
+      roles = @repo.select_values(:roles, :name, id: role_ids)
+      AppConst::PARTY_ROLE_REGISTRATION_TYPES.each do |registration_type, role|
+        next unless roles.include? role
+
+        options << ["#{role} - #{registration_type}", registration_type]
+      end
+
       {
-        party_role_id: { renderer: :select,
-                         options: @repo.for_select_roles_for_party_roles(
-                           where: { party_id: @form_object.party_id }
-                         ),
-                         disabled_options: @repo.for_select_inactive_roles_for_party_roles,
-                         caption: 'Role',
-                         required: true },
+        party_id: { renderer: :hidden },
         registration_type: { renderer: :select,
-                             options: AppConst::PARTY_ROLE_REGISTRATION_TYPES,
+                             options: options,
                              required: true },
         registration_code: { required: true }
       }

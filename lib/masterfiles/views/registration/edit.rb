@@ -17,7 +17,7 @@ module Masterfiles
               form.action "/masterfiles/parties/registrations/#{id}"
               form.remote!
               form.method :update
-              form.add_field :party_role_id
+              form.add_field :party_id
               form.add_field :registration_type
               form.add_field :registration_code
             end

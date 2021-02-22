@@ -27,7 +27,7 @@ module MasterfilesApp
     crud_calls_for :contact_methods, name: :contact_method
     crud_calls_for :party_roles, name: :party_role
     crud_calls_for :parties, name: :party
-    crud_calls_for :registrations, name: :registration
+    crud_calls_for :registrations, name: :registration, exclude: %i[create update]
 
     def for_select_contact_method_types
       DevelopmentApp::ContactMethodTypeRepo.new.for_select_contact_method_types
@@ -77,7 +77,7 @@ module MasterfilesApp
       hash = DB[:registrations].where(id: id).first
       return nil if hash.nil?
 
-      hash.merge!(find_party_role(hash[:party_role_id]).to_h)
+      hash = find_party_role(hash[:party_role_id]).to_h.merge(hash)
       Registration.new(hash)
     end
 
@@ -510,6 +510,26 @@ module MasterfilesApp
 
     def find_registration_code_for_party_role(type, party_role_id)
       DB[:registrations].where(registration_type: type, party_role_id: party_role_id).get(:registration_code)
+    end
+
+    def create_registration(res)
+      args = res.to_h
+      role = AppConst::PARTY_ROLE_REGISTRATION_TYPES[args[:registration_type]]
+      role_id = get_id(:roles, name: role)
+      args[:party_role_id] = get_id(:party_roles, party_id: args.delete(:party_id), role_id: role_id)
+      raise Crossbeams::InfoError, 'Party Role not found.' unless args[:party_role_id]
+
+      create(:registrations, args)
+    end
+
+    def update_registration(id, res)
+      args = res.to_h
+      role = AppConst::PARTY_ROLE_REGISTRATION_TYPES[args[:registration_type]]
+      role_id = get_id(:roles, name: role)
+      args[:party_role_id] = get_id(:party_roles, party_id: args.delete(:party_id), role_id: role_id)
+      raise Crossbeams::InfoError, 'Party Role not found.' unless args[:party_role_id]
+
+      update(:registrations, id, args)
     end
 
     private

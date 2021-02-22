@@ -34,14 +34,14 @@ module MasterfilesApp
 
     def test_update_registration
       id = create_registration
-      attrs = interactor.send(:repo).find_hash(:registrations, id).reject { |k, _| k == :id }
-      value = attrs[:registration_type]
-      attrs[:registration_type] = 'a_change'
+      attrs = interactor.send(:repo).find_registration(id).to_h.reject { |k, _| k == :id }
+      value = attrs[:registration_code]
+      attrs[:registration_code] = 'a_change'
       res = interactor.update_registration(id, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
       assert_instance_of(Registration, res.instance)
-      assert_equal 'a_change', res.instance.registration_type
-      refute_equal value, res.instance.registration_type
+      assert_equal 'a_change', res.instance.registration_code
+      refute_equal value, res.instance.registration_code
     end
 
     def test_update_registration_fail

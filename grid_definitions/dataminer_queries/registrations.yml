@@ -46,7 +46,7 @@
   party_name:
     :name: party_name
     :sequence_no: 3
-    :caption: Party name
+    :caption: Party
     :namespaced_name: 
     :data_type: :string
     :width: 150
@@ -78,7 +78,7 @@
   role_name:
     :name: role_name
     :sequence_no: 5
-    :caption: Role name
+    :caption: Party Role
     :namespaced_name: roles.name
     :data_type: :string
     :width: 150
