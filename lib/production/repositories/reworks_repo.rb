@@ -976,6 +976,7 @@ module ProductionApp
                 :qty_inner_bins,
                 :rmt_inner_container_material_id,
                 :rmt_inner_container_type_id,
+                :rmt_container_type_id,
                 :gross_weight)
         .all
     end
