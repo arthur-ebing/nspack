@@ -44,28 +44,32 @@ module FinishedGoodsApp
       res = inspection_call
       return res unless res.success
 
-      validation_call
+      res = validation_call unless inspection_message_id.nil_or_empty?
+      res
     end
 
     def request_reinspection_task
       res = reinspection_call
       return res unless res.success
 
-      validation_call
+      res = validation_call unless inspection_message_id.nil_or_empty?
+      res
     end
 
     def update_inspection_task
       res = update_inspection_call
       return res unless res.success
 
-      validation_call
+      res = validation_call unless inspection_message_id.nil_or_empty?
+      res
     end
 
     def update_reinspection_task
       res = update_reinspection_call
       return res unless res.success
 
-      validation_call
+      res = validation_call unless inspection_message_id.nil_or_empty?
+      res
     end
 
     def request_results_task
@@ -108,9 +112,10 @@ module FinishedGoodsApp
       end
     end
 
-    def log_titan_request(request_type, res)
+    def log_titan_request(request_type, res) # rubocop:disable Metrics/AbcSize
       result_doc = res.instance
       result_doc = { message: res.message } if result_doc.empty?
+      @inspection_message_id = res.instance['inspectionMessageId']
 
       attrs = { request_type: request_type,
                 govt_inspection_sheet_id: govt_inspection_sheet_id,
@@ -148,12 +153,13 @@ module FinishedGoodsApp
       log_titan_request('Request Reinspection', res)
     end
 
-    def validation_call
+    def validation_call # rubocop:disable Metrics/AbcSize
       auth_token_call if header.nil?
       url = "#{AppConst::TITAN_ENVIRONMENT}/pi/ProductInspection/InspectionMessages/ValidationResult?inspectionMessageId=#{inspection_message_id}"
       @header.delete('api-version')
 
       res = http.request_get(url, header)
+      res = failed_response(res.message, res.instance) unless res.instance['errors'].nil_or_empty?
       log_titan_request('Validation', res)
     end
 
@@ -212,18 +218,21 @@ module FinishedGoodsApp
 
     class TitanHttpResponder
       include Crossbeams::Responses
-      def format_response(response, _context)
-        instance = JSON.parse(response.body) || {}
-        return failed_response('Results not available') if instance.nil_or_empty?
-
+      def format_response(response, _context) # rubocop:disable Metrics/AbcSize
         case response.code
         when '200'
+          instance = JSON.parse(response.body) || {}
           success_response(instance['message'], instance)
+        when '204'
+          failed_response('Response code: 204 No Content')
         when '400'
+          instance = JSON.parse(response.body)
           failed_response('Response code: 400 Bad Request', instance)
         when '500'
+          instance = JSON.parse(response.body)
           failed_response('Response code: 500 An unexpected error occurred while processing the request.', instance)
         else
+          instance = JSON.parse(response.body)
           failed_response("Response code: #{response.code}", instance)
         end
       end
