@@ -24,6 +24,7 @@ module FinishedGoodsApp
     attribute :success, Types::String
     attribute :upn, Types::String
     attribute :pallets, Types::Array
+    attribute :reinspection, Types::Bool
   end
 
   class TitanAddendumFlat < Dry::Struct

@@ -33,7 +33,7 @@ module FinishedGoodsApp
       return failed_response 'Govt Inspection Record not found' unless govt_inspection_sheet
 
       @inspection_message_id = repo.get_last(:titan_requests, :inspection_message_id, govt_inspection_sheet_id: govt_inspection_sheet_id)
-      return failed_response 'Cant find inspection message id' unless inspection_message_id || task == :request_inspection
+      return failed_response 'Cant find inspection message id' unless inspection_message_id || %i[request_inspection request_reinspection].include?(task)
 
       send(mode)
     end
@@ -151,6 +151,7 @@ module FinishedGoodsApp
     def validation_call
       auth_token_call if header.nil?
       url = "#{AppConst::TITAN_ENVIRONMENT}/pi/ProductInspection/InspectionMessages/ValidationResult?inspectionMessageId=#{inspection_message_id}"
+      @header.delete('api-version')
 
       res = http.request_get(url, header)
       log_titan_request('Validation', res)

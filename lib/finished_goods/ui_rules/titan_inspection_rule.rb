@@ -29,7 +29,7 @@ module UiRules
 
     private
 
-    def add_controls
+    def add_controls # rubocop:disable Metrics/AbcSize
       id = @options[:govt_inspection_sheet_id]
       inspect = { control_type: :link, text: 'Request Inspection',
                   url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/titan_inspection/request_inspection",
@@ -60,8 +60,14 @@ module UiRules
                     url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/titan_inspection/request_reinspection",
                     icon: :checkon,
                     style: :action_button,
-                    visible: @form_object&.inspection_message_id }
-      progress_controls = [inspect, update, validate, results, delete, reinspect]
+                    visible: !@form_object&.inspection_message_id }
+      update_reinspection = { control_type: :link, text: 'Update Re-Inspection',
+                              url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/titan_inspection/update_reinspection",
+                              icon: :checkon,
+                              visible: @form_object&.inspection_message_id,
+                              style: :action_button }
+      progress_controls = [inspect, update, validate, results, delete]
+      progress_controls = [reinspect, update_reinspection, validate, results, delete] if @form_object.reinspection
       @form_object.progress_controls = progress_controls unless @repo.get(:govt_inspection_sheets, @options[:govt_inspection_sheet_id], :inspected)
     end
   end

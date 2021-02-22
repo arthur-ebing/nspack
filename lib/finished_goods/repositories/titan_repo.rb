@@ -81,6 +81,7 @@ module FinishedGoodsApp
       return nil unless ds.get(:id)
 
       hash[:govt_inspection_sheet_id] = govt_inspection_sheet_id
+      hash[:reinspection] = get(:govt_inspection_sheets, govt_inspection_sheet_id, :reinspection)
       hash[:request_type] = ds.get(:request_type)
       hash[:success] = ds.get(:success)
       hash[:inspection_message_id] = ds.exclude(inspection_message_id: nil).get(:inspection_message_id)
