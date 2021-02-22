@@ -81,6 +81,8 @@ module FinishedGoodsApp
       return nil unless ds.get(:id)
 
       hash[:govt_inspection_sheet_id] = govt_inspection_sheet_id
+      hash[:reinspection] = get(:govt_inspection_sheets, govt_inspection_sheet_id, :reinspection)
+      hash[:validated] = ds.where(request_type: 'Validation').get(:success)
       hash[:request_type] = ds.get(:request_type)
       hash[:success] = ds.get(:success)
       hash[:inspection_message_id] = ds.exclude(inspection_message_id: nil).get(:inspection_message_id)
@@ -101,7 +103,6 @@ module FinishedGoodsApp
     def compile_inspection(govt_inspection_sheet_id) # rubocop:disable Metrics/AbcSize
       govt_inspection_sheet = GovtInspectionRepo.new.find_govt_inspection_sheet(govt_inspection_sheet_id)
       { consignmentNumber: govt_inspection_sheet.consignment_note_number,
-        transactionType: '202',
         bookingRef: govt_inspection_sheet.booking_reference,
         exporter: party_repo.find_registration_code_for_party_role('FBO', govt_inspection_sheet.exporter_party_role_id),
         billingParty: party_repo.find_registration_code_for_party_role('BILLING', govt_inspection_sheet.inspection_billing_party_role_id),
@@ -150,7 +151,7 @@ module FinishedGoodsApp
                                          ssccSequenceNumber: pallet_sequence.pallet_sequence_number,
                                          puc: pallet_sequence.puc,
                                          orchard: pallet_sequence.orchard,
-                                         phytoData: pallet_sequence.phyto_data,
+                                         phytoData: pallet_sequence.phyto_data || '',
                                          packCode: pallet_sequence.std_pack,
                                          packDate: pallet_sequence.palletized_at,
                                          sizeCount: pallet_sequence.actual_count.nil_or_empty? ? pallet_sequence.size_ref : pallet_sequence.actual_count.to_i,
