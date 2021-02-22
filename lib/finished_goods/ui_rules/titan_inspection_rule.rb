@@ -29,15 +29,15 @@ module UiRules
 
     private
 
-    def add_controls
+    def add_controls # rubocop:disable Metrics/AbcSize
       id = @options[:govt_inspection_sheet_id]
       inspect = { control_type: :link, text: 'Request Inspection',
                   url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/titan_inspection/request_inspection",
-                  # visible: !@form_object&.inspection_message_id,
+                  visible: !@form_object.validated,
                   style: :action_button }
       update = { control_type: :link, text: 'Update',
                  url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/titan_inspection/update_inspection",
-                 visible: @form_object&.inspection_message_id,
+                 visible: @form_object.validated,
                  style: :action_button }
       validate = { control_type: :link, text: 'Validate',
                    url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/titan_inspection/validate",
@@ -45,7 +45,7 @@ module UiRules
                    style: :action_button }
       results = { control_type: :link, text: 'Get Results',
                   url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/titan_inspection/results",
-                  visible: @form_object&.inspection_message_id,
+                  visible: @form_object.validated,
                   style: :action_button }
       delete = { control_type: :link, text: 'Delete',
                  url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/titan_inspection/delete",
@@ -53,11 +53,11 @@ module UiRules
                  visible: @form_object&.inspection_message_id }
       reinspect = { control_type: :link, text: 'Request Re-Inspection ',
                     url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/titan_inspection/request_reinspection",
-                    # visible: !@form_object&.inspection_message_id,
+                    visible: !@form_object.validated,
                     style: :action_button }
       update_reinspection = { control_type: :link, text: 'Update Re-Inspection',
                               url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/titan_inspection/update_reinspection",
-                              visible: @form_object&.inspection_message_id,
+                              visible: @form_object.validated,
                               style: :action_button }
       progress_controls = [inspect, update, validate, results, delete]
       progress_controls = [reinspect, update_reinspection, validate, results, delete] if @form_object.reinspection

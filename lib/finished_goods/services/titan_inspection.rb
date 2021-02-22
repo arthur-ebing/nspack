@@ -213,7 +213,9 @@ module FinishedGoodsApp
     class TitanHttpResponder
       include Crossbeams::Responses
       def format_response(response, _context)
-        instance = JSON.parse(response.body)
+        instance = JSON.parse(response.body) || {}
+        return failed_response('Results not available') if instance.nil_or_empty?
+
         case response.code
         when '200'
           success_response(instance['message'], instance)
