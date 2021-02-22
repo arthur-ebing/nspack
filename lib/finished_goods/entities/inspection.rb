@@ -32,7 +32,6 @@ module FinishedGoodsApp
     attribute :commodity_description, Types::String
     attribute :consignment_note_number, Types::String
     attribute :container, Types::String
-    attribute :country, Types::String
     attribute :govt_inspection_pallet_id, Types::Integer
     attribute :govt_inspection_sheet_id, Types::Integer
     attribute :grade, Types::String
@@ -43,7 +42,6 @@ module FinishedGoodsApp
     attribute :pallet_id, Types::Integer
     attribute :pallet_number, Types::String
     attribute :phc, Types::String
-    attribute :region, Types::String
     attribute :shipped_at, Types::DateTime
   end
 

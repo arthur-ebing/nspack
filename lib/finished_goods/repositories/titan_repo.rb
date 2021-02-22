@@ -47,6 +47,8 @@ module FinishedGoodsApp
 
     def parse_titan_inspection_result_doc(hash)
       result_doc = hash[:result_doc] ||= {}
+      result_doc.delete('type')
+      result_doc.delete('traceId')
       result_lines = result_doc.delete('errors') || []
       hash[:result_array] = flatten_to_table(result_doc)
       hash[:result_array] += flatten_to_table(result_lines)
@@ -112,6 +114,7 @@ module FinishedGoodsApp
 
     def compile_inspection_pallets(govt_inspection_sheet_id) # rubocop:disable Metrics/AbcSize
       pallet_ids = select_values(:govt_inspection_pallets, :pallet_id, govt_inspection_sheet_id: govt_inspection_sheet_id)
+      govt_inspection_sheet = GovtInspectionRepo.new.find_govt_inspection_sheet(govt_inspection_sheet_id)
       inspection_pallets = []
       pallet_ids.each do |pallet_id|
         pallet = find_pallet_for_titan(pallet_id)
@@ -122,13 +125,13 @@ module FinishedGoodsApp
                                 commodity: pallet.commodity,
                                 variety: pallet.marketing_variety,
                                 class: pallet.grade,
-                                inspectionSampleWeight: nett_weight.to_f.round(3),
-                                nettWeightPack: nett_weight.to_f.round(3),
-                                grossWeightPack: gross_weight.to_f.round(3),
+                                inspectionSampleWeight: pallet.nett_weight.to_f.round(3),
+                                nettWeightPack: pallet.nett_weight.to_f.round(3),
+                                grossWeightPack: pallet.gross_weight.to_f.round(3),
                                 carton: 'C',
                                 cartonQty: pallet.pallet_carton_quantity,
-                                targetRegion: pallet.region,
-                                targetCountry: pallet.country,
+                                targetRegion: govt_inspection_sheet.destination_region,
+                                targetCountry: govt_inspection_sheet.destination_country,
                                 protocolExceptionIndicator: 'NA',
                                 agreementCode: ecert_agreement_code,
                                 consignmentLinePallets: compile_inspection_pallet_sequences(pallet_id) }
@@ -147,7 +150,7 @@ module FinishedGoodsApp
                                          ssccSequenceNumber: pallet_sequence.pallet_sequence_number,
                                          puc: pallet_sequence.puc,
                                          orchard: pallet_sequence.orchard,
-                                         phytoData: '',
+                                         phytoData: pallet_sequence.phyto_data,
                                          packCode: pallet_sequence.std_pack,
                                          packDate: pallet_sequence.palletized_at,
                                          sizeCount: pallet_sequence.actual_count.nil_or_empty? ? pallet_sequence.size_ref : pallet_sequence.actual_count.to_i,
@@ -297,8 +300,8 @@ module FinishedGoodsApp
           inspectorCode: govt_inspection_sheet.inspector_code,
           inspectionDate: govt_inspection_pallet.inspected_at,
           upn: govt_inspection_sheet.upn,
-          inspectedTargetRegion: pallet.region,
-          inspectedTargetCountry: pallet.country,
+          inspectedTargetRegion: govt_inspection_sheet.destination_region,
+          inspectedTargetCountry: govt_inspection_sheet.destination_country,
           containerNumber: pallet.container,
           addendumDetailLines: compile_addendum_detail_sequences(pallet_id)
         }
