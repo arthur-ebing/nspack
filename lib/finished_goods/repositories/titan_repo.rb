@@ -150,7 +150,7 @@ module FinishedGoodsApp
                                          ssccSequenceNumber: pallet_sequence.pallet_sequence_number,
                                          puc: pallet_sequence.puc,
                                          orchard: pallet_sequence.orchard,
-                                         phytoData: pallet_sequence.phyto_data,
+                                         phytoData: pallet_sequence.phyto_data || '',
                                          packCode: pallet_sequence.std_pack,
                                          packDate: pallet_sequence.palletized_at,
                                          sizeCount: pallet_sequence.actual_count.nil_or_empty? ? pallet_sequence.size_ref : pallet_sequence.actual_count.to_i,
