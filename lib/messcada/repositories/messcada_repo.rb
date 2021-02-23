@@ -11,10 +11,7 @@ module MesscadaApp
       hash = find_with_association(:pallets, id,
                                    lookup_functions: [{ function: :fn_current_status,
                                                         args: ['pallets', :id],
-                                                        col_name: :status },
-                                                      { function: :fn_party_role_name,
-                                                        args: [:target_customer_party_role_id],
-                                                        col_name: :target_customer }])
+                                                        col_name: :status }])
       return nil if hash.nil?
 
       hash[:last_govt_inspection_sheet_id] = get(:govt_inspection_pallets, hash[:last_govt_inspection_pallet_id], :govt_inspection_sheet_id)
@@ -79,10 +76,17 @@ module MesscadaApp
                                                    { parent_table: :grades,
                                                      columns: %i[grade_code],
                                                      foreign_key: :grade_id,
-                                                     flatten_columns: { grade_code: :grade_code } }],
+                                                     flatten_columns: { grade_code: :grade_code } },
+                                                   { parent_table: :rmt_classes,
+                                                     columns: %i[rmt_class_code],
+                                                     foreign_key: :rmt_class_id,
+                                                     flatten_columns: { rmt_class_code: :rmt_class_code } }],
                                    lookup_functions: [{ function: :fn_current_status,
                                                         args: ['pallet_sequences', :id],
-                                                        col_name: :status }])
+                                                        col_name: :status },
+                                                      { function: :fn_party_role_name,
+                                                        args: [:target_customer_party_role_id],
+                                                        col_name: :target_customer }])
       return nil if hash.nil?
 
       hash[:pallet_carton_quantity] = get(:pallets, hash[:pallet_id], :carton_quantity) || 0
@@ -162,7 +166,8 @@ module MesscadaApp
           cl.tu_labour_product_id,
           cl.ru_labour_product_id,
           cl.fruit_sticker_ids,
-          cl.tu_sticker_ids
+          cl.tu_sticker_ids,
+          cl.target_customer_party_role_id
 
         FROM cartons
         JOIN carton_labels cl ON cl.id = cartons.carton_label_id

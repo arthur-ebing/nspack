@@ -83,7 +83,6 @@ module MesscadaApp
           loads.customer_order_number,
           loads.customer_reference,
           fn_party_role_name(loads.customer_party_role_id) AS customer,
-          fn_party_role_name(pallets.target_customer_party_role_id) AS target_customer,
           vessels.vessel_code AS vessel,
           pol_ports.port_code AS pol,
           pod_ports.port_code AS pod,
@@ -225,7 +224,6 @@ module MesscadaApp
           pallet_sequences.created_by,
           pallet_sequences.verified_by,
           fn_edi_size_count(standard_pack_codes.use_size_ref_for_edi, commodities.use_size_ref_for_edi, fruit_size_references.edi_out_code, fruit_size_references.size_reference, fruit_actual_counts_for_packs.actual_count_for_pack) AS edi_size_count,
-          pallets.target_customer_party_role_id,
           fn_consignment_note_number(govt_inspection_sheets.id) AS consignment_note_number,
           'DN'::text || loads.id::text AS dispatch_note,
           loads.edi_file_name AS po_file_name,
@@ -253,7 +251,9 @@ module MesscadaApp
            FROM pm_products t
              JOIN pallet_sequences sq ON t.id = ANY (sq.tu_sticker_ids)
           WHERE sq.id = pallet_sequences.id
-          GROUP BY sq.id) AS tu_stickers
+          GROUP BY sq.id) AS tu_stickers,
+         pallet_sequences.target_customer_party_role_id,
+         fn_party_role_name(pallet_sequences.target_customer_party_role_id) AS target_customer
 
         FROM pallet_sequences
         JOIN pallets ON pallets.id = pallet_sequences.pallet_id

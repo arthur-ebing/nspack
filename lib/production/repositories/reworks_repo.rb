@@ -370,7 +370,7 @@ module ProductionApp
           standard_pack_code_id, fruit_actual_counts_for_pack_id, fruit_size_reference_id, marketing_org_party_role_id,
           packed_tm_group_id, target_market_id, mark_id, pm_mark_id, inventory_code_id, pallet_format_id, cartons_per_pallet_id, pm_bom_id, client_size_reference,
           client_product_code, treatment_ids, marketing_order_number, sell_by_code, grade_id, product_chars, pm_type_id, pm_subtype_id,
-          rmt_class_id, packing_specification_item_id, tu_labour_product_id, ru_labour_product_id, fruit_sticker_ids, tu_sticker_ids
+          rmt_class_id, packing_specification_item_id, tu_labour_product_id, ru_labour_product_id, fruit_sticker_ids, tu_sticker_ids, target_customer_party_role_id
           FROM pallet_sequences
           WHERE id = ?", id].first
     end
@@ -379,7 +379,7 @@ module ProductionApp
       data_ar = %i[marketing_variety customer_variety std_size basic_pack std_pack actual_count size_ref marketing_org
                    packed_tm_group target_market mark pm_mark inventory_code pallet_base stack_type cpp bom client_size_ref
                    client_product_code treatments order_number sell_by_code grade product_chars pm_type pm_subtype
-                   rmt_class_code tu_labour_product ru_labour_product fruit_stickers tu_stickers]
+                   rmt_class_code tu_labour_product ru_labour_product fruit_stickers tu_stickers target_customer]
       query = MesscadaApp::DatasetPalletSequence.call('WHERE pallet_sequences.id = ?')
       DB[query, id].first.select { |key, _| data_ar.include?(key) }
     end
@@ -416,7 +416,8 @@ module ProductionApp
         tu_labour_product: get(:pm_products, attrs[:tu_labour_product_id], :product_code),
         ru_labour_product: get(:pm_products, attrs[:ru_labour_product_id], :product_code),
         fruit_stickers: sticker_values(attrs[:fruit_sticker_ids]),
-        tu_stickers: sticker_values(attrs[:tu_sticker_ids]) }
+        tu_stickers: sticker_values(attrs[:tu_sticker_ids]),
+        target_customer: DB['SELECT fn_party_role_name(?) AS target_customer FROM party_roles WHERE party_roles.id = ?', attrs[:target_customer_party_role_id], attrs[:target_customer_party_role_id]].first[:target_customer] }
     end
 
     def customer_variety(customer_variety_id)
@@ -601,7 +602,7 @@ module ProductionApp
         packhouses.plant_resource_code AS packhouse, lines.plant_resource_code AS line, farms.farm_code AS farm,
         pucs.puc_code AS puc, orchards.orchard_code AS orchard, cultivar_groups.cultivar_group_code AS cultivar_group,
         cultivars.cultivar_name AS cultivar, ps.packing_specification_item_id, ps.tu_labour_product_id, ps.ru_labour_product_id,
-        ps.fruit_sticker_ids, ps,rmt_class_id
+        ps.fruit_sticker_ids, ps.rmt_class_id, ps.target_customer_party_role_id
         FROM pallet_sequences ps
         JOIN cultivar_groups ON cultivar_groups.id = ps.cultivar_group_id
         JOIN cultivars ON cultivars.id = ps.cultivar_id

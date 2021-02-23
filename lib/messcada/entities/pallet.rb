@@ -48,7 +48,6 @@ module MesscadaApp
     attribute :edi_in_inspection_point, Types::String
     attribute :repacked, Types::Bool
     attribute :repacked_at, Types::DateTime
-    attribute :target_customer_party_role_id, Types::Integer
     attribute :last_govt_inspection_pallet_id, Types::Integer
     attribute? :status, Types::String
     attribute? :active, Types::Bool
@@ -100,8 +99,6 @@ module MesscadaApp
     attribute :edi_in_inspection_point, Types::String
     attribute :repacked, Types::Bool
     attribute :repacked_at, Types::DateTime
-    attribute :target_customer_party_role_id, Types::Integer
-    attribute :target_customer, Types::String
     attribute :palletizing_bay_resource_id, Types::Integer
     attribute :has_individual_cartons, Types::Bool
     attribute :oldest_pallet_sequence_id, Types::Integer

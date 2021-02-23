@@ -123,6 +123,7 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
     optional(:ru_labour_product_id).maybe(:integer)
     optional(:fruit_sticker_ids).maybe(:array).maybe { each(:integer) }
     optional(:tu_sticker_ids).maybe(:array).maybe { each(:integer) }
+    optional(:target_customer_party_role_id).maybe(:integer)
   end
 
   ReworksRunUpdatePalletSchema = Dry::Schema.Params do
@@ -130,7 +131,6 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
     required(:pallet_number).maybe(Types::StrippedString)
     required(:fruit_sticker_pm_product_id).filled(:integer)
     required(:fruit_sticker_pm_product_2_id).maybe(:integer)
-    required(:target_customer_party_role_id).maybe(:integer)
   end
 
   EditCartonQuantitySchema = Dry::Schema.Params do

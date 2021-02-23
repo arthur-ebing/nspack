@@ -52,6 +52,7 @@ module Production
                   col.fold_up do |fold|
                     fold.caption 'Marketing details'
                     fold.add_field :marketing_org_party_role_id
+                    fold.add_field :target_customer_party_role_id
                     fold.add_field :packed_tm_group_id
                     fold.add_field :target_market_id
                     fold.add_field :sell_by_code

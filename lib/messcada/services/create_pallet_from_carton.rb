@@ -76,8 +76,7 @@ module MesscadaApp
         pallet_format_id: carton[:pallet_format_id],
         plt_packhouse_resource_id: carton[:packhouse_resource_id],
         plt_line_resource_id: carton[:production_line_id],
-        palletizing_bay_resource_id: palletizing_bay_resource_id,
-        target_customer_party_role_id: target_customer
+        palletizing_bay_resource_id: palletizing_bay_resource_id
       }
       params[:pallet_number] = carton[:pallet_number] if AppConst::CARTON_EQUALS_PALLET
       params[:has_individual_cartons] = individual_cartons?
@@ -86,12 +85,6 @@ module MesscadaApp
 
     def resource_location
       repo.find_resource_location_id(carton[:packhouse_resource_id])
-    end
-
-    def target_customer
-      return nil if carton[:product_resource_allocation_id].nil_or_empty?
-
-      repo.find_allocation_target_customer_id(carton[:product_resource_allocation_id])
     end
 
     def validate_pallet_params(params)

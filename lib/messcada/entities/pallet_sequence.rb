@@ -75,6 +75,7 @@ module MesscadaApp
     attribute :ru_labour_product_id, Types::Integer
     attribute :fruit_sticker_ids, Types::Array
     attribute :tu_sticker_ids, Types::Array
+    attribute :target_customer_party_role_id, Types::Integer
     attribute? :legacy_data, Types::Hash.optional
     attribute? :active, Types::Bool
   end
@@ -163,6 +164,14 @@ module MesscadaApp
     attribute :target_market_id, Types::Integer
     attribute :target_market_name, Types::String
     attribute :gtin_code, Types::String
+    attribute :rmt_class_id, Types::Integer
+    attribute :packing_specification_item_id, Types::Integer
+    attribute :tu_labour_product_id, Types::Integer
+    attribute :ru_labour_product_id, Types::Integer
+    attribute :fruit_sticker_ids, Types::Array
+    attribute :tu_sticker_ids, Types::Array
+    attribute :target_customer_party_role_id, Types::Integer
+    attribute :target_customer, Types::String
     attribute? :active, Types::Bool
   end
 end

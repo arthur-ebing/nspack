@@ -99,7 +99,7 @@ module EdiApp
       if role == AppConst::ROLE_MARKETER
         'pallet_sequences.marketing_org_party_role_id'
       else
-        'pallets.target_customer_party_role_id'
+        'pallet_sequences.target_customer_party_role_id'
       end
     end
   end

@@ -156,11 +156,12 @@ module FinishedGoodsApp
     end
 
     def set_pallets_target_customer(target_customer_id, pallet_ids)
-      existing_pallet_ids = select_values(:pallets, :id, target_customer_party_role_id: target_customer_id)
-      removed_pallet_ids = existing_pallet_ids - pallet_ids
-      new_pallet_ids = pallet_ids - existing_pallet_ids
-      DB[:pallets].where(id: removed_pallet_ids).update(target_customer_party_role_id: nil)
-      DB[:pallets].where(id: new_pallet_ids).update(target_customer_party_role_id: target_customer_id)
+      pallet_sequence_ids = select_values(:pallet_sequences, :id, pallet_id: pallet_ids)
+      existing_pallet_sequence_ids = select_values(:pallet_sequences, :id, target_customer_party_role_id: target_customer_id)
+      removed_pallet_sequence_ids = existing_pallet_sequence_ids - pallet_sequence_ids
+      new_pallet_sequence_ids = pallet_sequence_ids - existing_pallet_sequence_ids
+      DB[:pallet_sequences].where(id: removed_pallet_sequence_ids).update(target_customer_party_role_id: nil)
+      DB[:pallet_sequences].where(id: new_pallet_sequence_ids).update(target_customer_party_role_id: target_customer_id)
     end
 
     def allocate_pallets(load_id, pallet_numbers, user)

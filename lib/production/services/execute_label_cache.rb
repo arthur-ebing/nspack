@@ -11,7 +11,8 @@ module ProductionApp
           production_run_data: cache_run.merge(product_resource_allocation_id: rec[:product_resource_allocation_id],
                                                resource_id: rec[:resource_id],
                                                packing_method_id: rec[:packing_method_id],
-                                               label_name: rec[:label_template_name])
+                                               label_name: rec[:label_template_name],
+                                               target_customer_party_role_id: rec[:target_customer_party_role_id])
         }
       end
       FileUtils.mkpath(AppConst::LABELING_CACHED_DATA_FILEPATH)

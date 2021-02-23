@@ -85,7 +85,6 @@ module MesscadaApp
       packhouse_resource_id = create_plant_resource
       line_resource_id = create_plant_resource
       plant_resource_id = create_plant_resource
-      target_customer_party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_TARGET_CUSTOMER)
 
       {
         id: 1,
@@ -134,7 +133,6 @@ module MesscadaApp
         edi_in_inspection_point: 'ABC',
         repacked: false,
         repacked_at: '2010-01-01 12:00',
-        target_customer_party_role_id: target_customer_party_role_id,
         palletizing_bay_resource_id: plant_resource_id,
         has_individual_cartons: false,
         nett_weight_externally_calculated: false,

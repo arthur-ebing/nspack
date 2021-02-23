@@ -119,6 +119,7 @@ module MesscadaApp
       target_market_id = create_target_market
       pm_mark_id = create_pm_mark
       registered_orchard_id = create_registered_orchard
+      target_customer_party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_TARGET_CUSTOMER)
 
       {
         id: 1,
@@ -195,6 +196,7 @@ module MesscadaApp
         ru_labour_product_id: 1,
         fruit_sticker_ids: [1, 2, 3],
         tu_sticker_ids: [1, 2, 3],
+        target_customer_party_role_id: target_customer_party_role_id,
         active: true
       }
     end
