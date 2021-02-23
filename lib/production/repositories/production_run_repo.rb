@@ -286,8 +286,11 @@ module ProductionApp
         AND NOT EXISTS(SELECT id FROM product_resource_allocations a WHERE a.production_run_id = r.id AND a.plant_resource_id = p.id)
       SQL
       insert_ds.insert
+      # use another type for packpoint-button?
+      # Crossbeams::Config::ResourceDefinitions::ROBOT_BUTTON
 
       # Also insert if client rule && type is packpoint
+      # Crossbeams::Config::ResourceDefinitions::DROP_STATION
       if AppConst::CR_PROD.print_from_line_scanning
         insert_ds = DB[<<~SQL, id]
           INSERT INTO product_resource_allocations (production_run_id, plant_resource_id, packing_method_id)

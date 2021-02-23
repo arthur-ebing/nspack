@@ -8,6 +8,7 @@ module ProductionApp
     required(:plant_resource_code).filled(Types::StrippedString)
     required(:description).filled(Types::StrippedString)
     optional(:location_id).maybe(:integer)
+    optional(:represents_plant_resource_id).maybe(:integer)
     optional(:resource_properties).maybe(:hash)
   end
 

@@ -471,6 +471,13 @@ module ProductionApp
       SystemResourceIncentiveSettings.new(hash.merge(packpoint: packpoint, card_reader: card_reader || '1'))
     end
 
+    def packpoint_for_button(resource_code)
+      represented_id = get_value(:plant_resources, :represents_plant_resource_id, plant_resource_code: resource_code)
+      return nil if represented_id.nil?
+
+      get(:plant_resources, represented_id, :plant_resource_code)
+    end
+
     private
 
     def create_twin_system_resource(parent_id, res, sys_code)

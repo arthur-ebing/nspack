@@ -167,6 +167,7 @@ module Crossbeams
       DROP_STATION = 'DROP_STATION'
       DROP_TABLE = 'DROP_TABLE'
       ROBOT_BUTTON = 'ROBOT_BUTTON'
+      PACKPOINT_BUTTON = 'PACKPOINT_BUTTON'
       CLM_ROBOT = 'CLM_ROBOT'
       QC_ROBOT = 'QC_ROBOT'
       SCALE_ROBOT = 'SCALE_ROBOT'
@@ -296,8 +297,15 @@ module Crossbeams
                           create_with_system_resource: 'MODULE_BUTTON',
                           sequence_without_zero_padding: true,  ## spec no zeros.... (default == 1)
                           code_prefix: '${CODE}-B' }, # prefixed by module name followed by....
+        PACKPOINT_BUTTON => { description: 'Robot packpoint button',
+                              allowed_children: [],
+                              represents: DROP_STATION,
+                              icon: { file: 'circle-o', colour: CLR_G },
+                              create_with_system_resource: 'MODULE_BUTTON',
+                              sequence_without_zero_padding: true,  ## spec no zeros.... (default == 1)
+                              code_prefix: '${CODE}-B' }, # prefixed by module name followed by....
         CLM_ROBOT => { description: 'CLM Robot',
-                       allowed_children: [ROBOT_BUTTON],
+                       allowed_children: [ROBOT_BUTTON, PACKPOINT_BUTTON],
                        icon: { file: 'server3', colour: CLR_E },
                        create_with_system_resource: 'MODULE',
                        code_prefix: 'CLM-' },
@@ -611,16 +619,19 @@ module Crossbeams
       def self.refresh_plant_resource_types # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
         cnt = 0
         repo = BaseRepo.new
+        representers = {}
         PLANT_RESOURCE_RULES.each_key do |key|
           next if repo.exists?(:plant_resource_types, plant_resource_type_code: key)
 
           icon = PLANT_RESOURCE_RULES[key][:icon].nil? ? nil : PLANT_RESOURCE_RULES[key][:icon].values.join(',')
 
-          repo.create(:plant_resource_types,
-                      plant_resource_type_code: key,
-                      icon: icon,
-                      description: PLANT_RESOURCE_RULES[key][:description],
-                      packpoint: PLANT_RESOURCE_RULES[key][:packpoint] || false)
+          id = repo.create(:plant_resource_types,
+                           plant_resource_type_code: key,
+                           icon: icon,
+                           description: PLANT_RESOURCE_RULES[key][:description],
+                           packpoint: PLANT_RESOURCE_RULES[key][:packpoint] || false)
+
+          representers[id] = PLANT_RESOURCE_RULES[key][:represents] if PLANT_RESOURCE_RULES[key][:represents]
           cnt += 1
         end
 
@@ -634,6 +645,12 @@ module Crossbeams
                       peripheral: SYSTEM_RESOURCE_RULES[key][:peripheral] || false,
                       description: SYSTEM_RESOURCE_RULES[key][:description])
           cnt += 1
+        end
+
+        # If one resource represents another, set the id after all types have been added.
+        representers.each do |id, type_code|
+          type_id = DB[:plant_resource_types].where(plant_resource_type_code: type_code).get(:id)
+          DB[:plant_resource_types].where(id: id).update(represents_plant_resource_type_id: type_id)
         end
 
         if cnt.zero?

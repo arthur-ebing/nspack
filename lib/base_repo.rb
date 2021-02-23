@@ -191,7 +191,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # @param args [Hash] the where-clause conditions.
   # @return [Boolean] true if the row exists.
   def exists?(table_name, args)
-    DB.select(1).where(DB[table_name].where(args).exists).one?
+    !DB[table_name].where(args).empty?
   end
 
   # Find a row in a table with one or more associated sub-tables, parent tables or lookup functions.

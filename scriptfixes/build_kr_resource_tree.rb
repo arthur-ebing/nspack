@@ -21,7 +21,7 @@ require_relative '../app_loader'
 #
 class BuildKrResourceTree < BaseScript # rubocop:disable Metrics/ClassLength
   attr_reader :repo, :ph_id, :line_type, :reverse, :itpc_type, :drop_station, :drop_type, :printer_type, :clm_type, :btn_type,
-              :ptz_type, :bay_type, :ship_type, :subline_type, :bts_type, :btm_type
+              :ptz_type, :bay_type, :ship_type, :subline_type, :bts_type, :btm_type, :pbtn_type
 
   def run # rubocop:disable Metrics/PerceivedComplexity
     # Make this reversable using a parameter
@@ -40,6 +40,7 @@ class BuildKrResourceTree < BaseScript # rubocop:disable Metrics/ClassLength
     @printer_type = @repo.plant_resource_type_id_from_code(Crossbeams::Config::ResourceDefinitions::PRINTER)
     @clm_type = @repo.plant_resource_type_id_from_code(Crossbeams::Config::ResourceDefinitions::CLM_ROBOT)
     @btn_type = @repo.plant_resource_type_id_from_code(Crossbeams::Config::ResourceDefinitions::ROBOT_BUTTON)
+    @pbtn_type = @repo.plant_resource_type_id_from_code(Crossbeams::Config::ResourceDefinitions::PACKPOINT_BUTTON)
     @ptz_type = @repo.plant_resource_type_id_from_code(Crossbeams::Config::ResourceDefinitions::PALLETIZING_ROBOT)
     @bay_type = @repo.plant_resource_type_id_from_code(Crossbeams::Config::ResourceDefinitions::PALLETIZING_BAY)
     @ship_type = @repo.plant_resource_type_id_from_code(Crossbeams::Config::ResourceDefinitions::PALLETIZING_STATION)
@@ -225,9 +226,11 @@ class BuildKrResourceTree < BaseScript # rubocop:disable Metrics/ClassLength
     repo.create_child_plant_resource(line_id, res)
     res = plant_res(drop_type, "DPK-#{line_no}-C2D", "Class 2 drop #{line_no}")
     drop_id = repo.create_child_plant_resource(line_id, res)
+    pp_ids = []
     4.times do |n|
       res = plant_res(drop_station, "DPK-#{line_no}-C2-PP#{n + 1}", "Class 2 packpoint #{n + 1} for #{line_no}")
-      repo.create_child_plant_resource(drop_id, res)
+      pp_id = repo.create_child_plant_resource(drop_id, res)
+      pp_ids << pp_id
     end
 
     # create printer...
@@ -240,8 +243,8 @@ class BuildKrResourceTree < BaseScript # rubocop:disable Metrics/ClassLength
     repo.update_system_resource(sysres_id, dp_clm_attrs[line_no])
     # Add buttons (& link to packpoints...)
     4.times do |n|
-      res = plant_res(btn_type, "#{line_no}C2B#{n + 1}", "Class 2 robot #{line_no} Button B#{n + 1}")
-      repo.create_child_plant_resource(clm_id, res, sys_code: "#{line_no}C2B#{n + 1}")
+      res = plant_res(pbtn_type, "#{line_no}C2B#{n + 1}", "Class 2 robot #{line_no} Button B#{n + 1}", pp_ids[n])
+      repo.create_child_plant_resource(clm_id, res, sys_code: "DPK-#{line_no}-C2-B#{n + 1}")
     end
     # link printer
     sysres_id = repo.get(:plant_resources, printer_id, :system_resource_id)
@@ -629,8 +632,12 @@ class BuildKrResourceTree < BaseScript # rubocop:disable Metrics/ClassLength
     end
   end
 
-  def plant_res(type, code, desc)
-    ProductionApp::PlantResourceSchema.call(plant_resource_type_id: type, plant_resource_code: code, description: desc)
+  def plant_res(type, code, desc, represents_plant_resource_id = nil)
+    if represents_plant_resource_id.nil?
+      ProductionApp::PlantResourceSchema.call(plant_resource_type_id: type, plant_resource_code: code, description: desc)
+    else
+      ProductionApp::PlantResourceSchema.call(plant_resource_type_id: type, plant_resource_code: code, description: desc, represents_plant_resource_id: represents_plant_resource_id)
+    end
   end
 
   PTZ = {
