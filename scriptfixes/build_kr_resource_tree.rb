@@ -46,6 +46,9 @@ class BuildKrResourceTree < BaseScript # rubocop:disable Metrics/ClassLength
     @bts_type = @repo.plant_resource_type_id_from_code(Crossbeams::Config::ResourceDefinitions::BIN_TIPPING_STATION)
     @btm_type = @repo.plant_resource_type_id_from_code(Crossbeams::Config::ResourceDefinitions::BIN_TIPPING_ROBOT)
 
+    # robot-packpoint
+    # rebins - 2 per line 1-3, 1 for DP (on ph) - with printers
+
     if debug_mode
       puts "Updated something #{some_value}: #{some_change}"
     else
@@ -54,9 +57,12 @@ class BuildKrResourceTree < BaseScript # rubocop:disable Metrics/ClassLength
           puts "\nDropping logoff ITPC"
           plant_id = repo.get_id(:plant_resources, plant_resource_code: 'DPK-40')
           repo.delete_plant_resource(plant_id)
+          puts "\nDropping rebins"
+          drop_rebins
+
           %w[41 42 43 44 45 46].each { |line| drop_dp_line(line) }
           drop_old_line(1)
-          drop_old_line(2)
+          # drop_old_line(2)
           drop_old_line(47)
           # drop_selected_palletizers(ph_id)
           drop_palletizers
@@ -71,9 +77,10 @@ class BuildKrResourceTree < BaseScript # rubocop:disable Metrics/ClassLength
 
           # Dedicated pack (Need packpoint robots)
           %w[41 42 43 44 45 46].each { |line| build_dp_line(line) }
+          build_rebins(ph_id, [{ ip: '172.16.34.10', code: 'REB-DPK', desc: 'Rebin DP Lyne', mac: '00603516E3F9', printer: { code: 'REB-PRN-DPK', ip: '172.16.112.132', mac: '785F4C0188C4' } }])
           # Line 1, Line 2 (Need sub-line split and ITPC system details printer on the line?)
           build_old_line(1)
-          build_old_line(2)
+          # build_old_line(2)
           build_old_line(47)
           # build_selected_palletizers(ph_id, :ship_5a)
           build_palletizers
@@ -92,6 +99,45 @@ class BuildKrResourceTree < BaseScript # rubocop:disable Metrics/ClassLength
   end
 
   private
+
+  def drop_rebins
+    reb_id = repo.get_id(:plant_resources, plant_resource_code: 'REB-INF-1')
+    repo.link_peripherals(reb_id, [])
+    plant_id = repo.get_id(:plant_resources, plant_resource_code: 'REB-PRN-INF-1')
+    repo.delete_plant_resource(plant_id)
+    repo.delete_plant_resource(reb_id)
+
+    reb_id = repo.get_id(:plant_resources, plant_resource_code: 'REB-L1')
+    repo.link_peripherals(reb_id, [])
+    plant_id = repo.get_id(:plant_resources, plant_resource_code: 'REB-PRN-L1')
+    repo.delete_plant_resource(plant_id)
+    repo.delete_plant_resource(reb_id)
+    reb_id = repo.get_id(:plant_resources, plant_resource_code: 'REB-INF-2')
+    repo.link_peripherals(reb_id, [])
+    plant_id = repo.get_id(:plant_resources, plant_resource_code: 'REB-PRN-INF-2')
+    repo.delete_plant_resource(plant_id)
+    repo.delete_plant_resource(reb_id)
+    reb_id = repo.get_id(:plant_resources, plant_resource_code: 'REB-L2')
+    repo.link_peripherals(reb_id, [])
+    plant_id = repo.get_id(:plant_resources, plant_resource_code: 'REB-PRN-L2')
+    repo.delete_plant_resource(plant_id)
+    repo.delete_plant_resource(reb_id)
+    reb_id = repo.get_id(:plant_resources, plant_resource_code: 'REB-INF-47')
+    repo.link_peripherals(reb_id, [])
+    plant_id = repo.get_id(:plant_resources, plant_resource_code: 'REB-PRN-INF-47')
+    repo.delete_plant_resource(plant_id)
+    repo.delete_plant_resource(reb_id)
+    reb_id = repo.get_id(:plant_resources, plant_resource_code: 'REB-L47')
+    repo.link_peripherals(reb_id, [])
+    plant_id = repo.get_id(:plant_resources, plant_resource_code: 'REB-PRN-L47')
+    repo.delete_plant_resource(plant_id)
+    repo.delete_plant_resource(reb_id)
+    reb_id = repo.get_id(:plant_resources, plant_resource_code: 'REB-DPK')
+    repo.link_peripherals(reb_id, [])
+    plant_id = repo.get_id(:plant_resources, plant_resource_code: 'REB-PRN-DPK')
+    repo.delete_plant_resource(plant_id)
+    repo.delete_plant_resource(reb_id)
+  end
 
   def drop_dp_line(line_no)
     puts "\nDropping DP line #{line_no}..."
@@ -228,39 +274,51 @@ class BuildKrResourceTree < BaseScript # rubocop:disable Metrics/ClassLength
     plant_id = repo.get_id(:plant_resources, plant_resource_code: "BTS-#{line_no}")
     repo.delete_plant_resource(plant_id)
 
-    # get line and delete all drops and drop stations
-    40.times do |drop_no| # Need to mix in qty for sub-line...
-      2.times do |stn_no|
-        plant_id = repo.get_id(:plant_resources, plant_resource_code: "PP-#{line_no}-#{drop_no + 1}-#{stn_no + 1}")
-        repo.delete_plant_resource(plant_id)
-      end
+    plant_ids = DB[:plant_resources]
+                .join(:tree_plant_resources, descendant_plant_resource_id: Sequel[:plant_resources][:id])
+                .join(:plant_resource_types, id: Sequel[:plant_resources][:plant_resource_type_id])
+                .where(Sequel[:tree_plant_resources][:ancestor_plant_resource_id] => line_id)
+                .where(Sequel[:plant_resource_types][:plant_resource_type_code] => Crossbeams::Config::ResourceDefinitions::DROP_STATION)
+                .select_map(Sequel[:plant_resources][:id])
+    plant_ids.each { |id| repo.delete_plant_resource(id) }
 
-      plant_id = repo.get_id(:plant_resources, plant_resource_code: "DROP-#{line_no}-#{drop_no + 1}")
-      repo.delete_plant_resource(plant_id)
-    end
+    plant_ids = DB[:plant_resources]
+                .join(:tree_plant_resources, descendant_plant_resource_id: Sequel[:plant_resources][:id])
+                .join(:plant_resource_types, id: Sequel[:plant_resources][:plant_resource_type_id])
+                .where(Sequel[:tree_plant_resources][:ancestor_plant_resource_id] => line_id)
+                .where(Sequel[:plant_resource_types][:plant_resource_type_code] => Crossbeams::Config::ResourceDefinitions::DROP)
+                .select_map(Sequel[:plant_resources][:id])
+    plant_ids.each { |id| repo.delete_plant_resource(id) }
+    # get line and delete all drops and drop stations
+    # 40.times do |drop_no| # Need to mix in qty for sub-line...
+    #   2.times do |stn_no|
+    #     plant_id = repo.get_id(:plant_resources, plant_resource_code: "PP-#{line_no}-#{drop_no + 1}-#{stn_no + 1}")
+    #     repo.delete_plant_resource(plant_id)
+    #   end
+    #
+    #   plant_id = repo.get_id(:plant_resources, plant_resource_code: "DROP-#{line_no}-#{drop_no + 1}")
+    #   repo.delete_plant_resource(plant_id)
+    # end
     plant_id = repo.get_id(:plant_resources, plant_resource_code: "LBL-#{line_no}A")
     repo.delete_plant_resource(plant_id)
     plant_id = repo.get_id(:plant_resources, plant_resource_code: "LBL-#{line_no}B")
     repo.delete_plant_resource(plant_id)
-    plant_id = repo.get_id(:plant_resources, plant_resource_code: "SUB-LINE-#{line_no}")
-    repo.delete_plant_resource(plant_id)
+    if line_no == 1
+      plant_id = repo.get_id(:plant_resources, plant_resource_code: 'LBL-2A')
+      repo.delete_plant_resource(plant_id)
+      plant_id = repo.get_id(:plant_resources, plant_resource_code: 'LBL-2B')
+      repo.delete_plant_resource(plant_id)
+      plant_id = repo.get_id(:plant_resources, plant_resource_code: 'LINE-2')
+      repo.delete_plant_resource(plant_id)
+    end
 
     repo.delete_plant_resource(line_id)
   end
 
   def build_old_line(line_no)
-    # The second set needs to have its IP addresses checked...
-    itpc_attrs = {
-      1 => [{ ip_address: '172.16.35.104', port: 2000, group_incentive: false, login: true, logoff: false, legacy_messcada: true, equipment_type: 'ITPC', robot_function: 'HTTP-CartonLabel', module_function: 'demand', ttl: 10_000, cycle_time: 9000, module_action: 'server' },
-            { ip_address: '172.16.35.107', port: 2000, group_incentive: false, login: true, logoff: false, legacy_messcada: true, equipment_type: 'ITPC', robot_function: 'HTTP-CartonLabel', module_function: 'demand', ttl: 10_000, cycle_time: 9000, module_action: 'server' }],
-      2 => [{ ip_address: '172.16.35.65', port: 2000, group_incentive: false, login: true, logoff: false, legacy_messcada: true, equipment_type: 'ITPC', robot_function: 'HTTP-CartonLabel', module_function: 'demand', ttl: 10_000, cycle_time: 9000, module_action: 'server' },
-            { ip_address: '172.16.35.109', port: 2000, group_incentive: false, login: true, logoff: false, legacy_messcada: true, equipment_type: 'ITPC', robot_function: 'HTTP-CartonLabel', module_function: 'demand', ttl: 10_000, cycle_time: 9000, module_action: 'server' }],
-      47 => [{ ip_address: '172.16.35.111', port: 2000, group_incentive: false, login: true, logoff: false, legacy_messcada: true, equipment_type: 'ITPC', robot_function: 'HTTP-CartonLabel', module_function: 'demand', ttl: 10_000, cycle_time: 9000, module_action: 'server' },
-             { ip_address: '172.16.35.120', port: 2000, group_incentive: false, login: true, logoff: false, legacy_messcada: true, equipment_type: 'ITPC', robot_function: 'HTTP-CartonLabel', module_function: 'demand', ttl: 10_000, cycle_time: 9000, module_action: 'server' }]
-    }
     btm_attrs = {
       1 => { ip_address: '172.16.34.1', mac_address: '00:60:35:16:E4:12', port: 2000, equipment_type: 'robot-T200', robot_function: 'HTTP-BinTip', module_function: 'TERMINAL', ttl: 10_000, cycle_time: 9000, module_action: 'bin_tipping' },
-      2 => { ip_address: '172.16.34.2', mac_address: '00:60:35:16:e4:02', port: 2000, equipment_type: 'robot-T200', robot_function: 'HTTP-BinTip', module_function: 'TERMINAL', ttl: 10_000, cycle_time: 9000, module_action: 'bin_tipping' },
+      # 2 => { ip_address: '172.16.34.2', mac_address: '00:60:35:16:e4:02', port: 2000, equipment_type: 'robot-T200', robot_function: 'HTTP-BinTip', module_function: 'TERMINAL', ttl: 10_000, cycle_time: 9000, module_action: 'bin_tipping' },
       47 => { ip_address: '172.16.34.3', mac_address: '00:60:35:35:57:B4', port: 2000, equipment_type: 'robot-T200', robot_function: 'HTTP-BinTip', module_function: 'TERMINAL', ttl: 10_000, cycle_time: 9000, module_action: 'bin_tipping' }
     }
     puts "\nBuilding line #{line_no}"
@@ -276,9 +334,111 @@ class BuildKrResourceTree < BaseScript # rubocop:disable Metrics/ClassLength
     sysres_id = repo.get(:plant_resources, btm_id, :system_resource_id)
     repo.update_system_resource(sysres_id, btm_attrs[line_no])
 
-    res = plant_res(subline_type, "SUB-LINE-#{line_no}", "Sub line #{line_no}")
-    repo.create_child_plant_resource(line_id, res)
+    build_onto_old_line(line_no, line_id)
 
+    return unless line_no == 1
+
+    res = plant_res(subline_type, 'LINE-2', 'Sub line 2')
+    sub_line_id = repo.create_child_plant_resource(line_id, res)
+    build_onto_old_line(2, sub_line_id)
+  end
+
+  def build_onto_old_line(line_no, line_id)
+    # rubocop:disable Style/WordArray
+    ppoints = {
+      1 => {
+        '02' => ['1A'],
+        '03' => ['1A', 'SA'],
+        '04' => ['1A'],
+        '05' => ['1A'],
+        '06' => ['1A', '1L'],
+        '07' => ['1A'],
+        '08' => ['1A'],
+        '09' => ['1A'],
+        '10' => ['1A'],
+        '11' => ['1A', 'SA'],
+        '12' => ['1A'],
+        '13' => ['1A', '1L'],
+        '14' => ['1A', '1L'],
+        '15' => ['1A', '1L'],
+        '16' => ['1A', 'SA'],
+        '17' => ['1A'],
+        '18' => ['1A'],
+        '19' => ['1A', '1L'],
+        '20' => ['1A'],
+        '21' => ['1A', 'SA'],
+        '23' => ['1A'],
+        '24' => ['1A'],
+        '27' => ['1A'],
+        '28' => ['1A'],
+        '31' => ['1A', 'SA']
+      },
+      2 => {
+        '01' => ['1A', '1L'],
+        '02' => ['1A', '1L'],
+        '03' => ['1A', '1L'],
+        '04' => ['1A', '1L'],
+        '05' => ['1A'],
+        '06' => ['1A', '1L'],
+        '07' => ['1A', '1L'],
+        '08' => ['1A'],
+        '09' => ['1A'],
+        '10' => ['1A'],
+        '11' => ['1A'],
+        '12' => ['1A'],
+        '13' => ['1A'],
+        '14' => ['1A'],
+        '15' => ['1A', '1L'],
+        '16' => ['1A'],
+        '17' => ['1A', '1L'],
+        '18' => ['1A', '1L'],
+        '19' => ['1A', '1L'],
+        '20' => ['1A'],
+        '21' => ['1A'],
+        '22' => ['1A', '1B', '1L'],
+        '25' => ['1A'],
+        '26' => ['1A'],
+        '27' => ['1A']
+      },
+      47 => {
+        '01' => ['2L'],
+        '02' => ['2L'],
+        '03' => ['2L'],
+        '04' => ['2L'],
+        '05' => ['2L'],
+        '06' => ['2L'],
+        '07' => ['2L'],
+        '08' => ['2L'],
+        '09' => ['2L'],
+        '10' => ['2L'],
+        '11' => ['1L', '2L'],
+        '12' => ['2L'],
+        '13' => ['1L', '2L'],
+        '14' => ['2L'],
+        '15' => ['1L', '2L'],
+        '16' => ['2L']
+      }
+    }
+    rebins = {
+      1 => [{ ip: '172.16.34.4', code: 'REB-INF-1', desc: 'Rebin Lyn1 Invoer', mac: '00603516E3F4', printer: { code: 'REB-PRN-INF-1', ip: '172.16.112.125', mac: '785F4C0188C1' } },
+            { ip: '172.16.34.7', code: 'REB-L1', desc: 'Rebin Lyn1', mac: '00603516E40A', printer: { code: 'REB-PRN-L1', ip: '172.16.112.128', mac: '785F4C0188C3' } }],
+      2 => [{ ip: '172.16.34.5', code: 'REB-INF-2', desc: 'Rebin Lyn2 Invoer', mac: '00603529A849', printer: { code: 'REB-PRN-INF-2', ip: '172.16.112.126', mac: '785F4C0188C9' } },
+            { ip: '172.16.34.8', code: 'REB-L2', desc: 'Rebin Lyn2', mac: '0060352C9AA0', printer: { code: 'REB-PRN-L2', ip: '172.16.112.129', mac: '785F4C0188C7' } }],
+      47 => [{ ip: '172.16.34.6', code: 'REB-INF-47', desc: 'Rebin Lyn47 Invoer', mac: '0060352CA30D', printer: { code: 'REB-PRN-INF-47', ip: '172.16.112.127', mac: '785E4C0188CA' } },
+             { ip: '172.16.34.9', code: 'REB-L47', desc: 'Rebin Lyn47', mac: '00603516E401', printer: { code: 'REB-PRN-L47', ip: '172.16.112.131', mac: '785F4C0188C8' } }]
+      # linedp: [{ ip: '172.16.34.10', code: 'REB-DPK', desc: 'Rebin DP Lyne', mac: '00603516E3F9', printer: { code: 'REB-PRN-DPK', ip: '172.16.112.132', mac: '785F4C0188C4' } }]
+    }
+    # rubocop:enable Style/WordArray
+
+    # The second set needs to have its IP addresses checked...
+    itpc_attrs = {
+      1 => [{ ip_address: '172.16.35.104', port: 2000, group_incentive: false, login: true, logoff: false, legacy_messcada: true, equipment_type: 'ITPC', robot_function: 'HTTP-CartonLabel', module_function: 'demand', ttl: 10_000, cycle_time: 9000, module_action: 'server' },
+            { ip_address: '172.16.35.107', port: 2000, group_incentive: false, login: true, logoff: false, legacy_messcada: true, equipment_type: 'ITPC', robot_function: 'HTTP-CartonLabel', module_function: 'demand', ttl: 10_000, cycle_time: 9000, module_action: 'server' }],
+      2 => [{ ip_address: '172.16.35.65', port: 2000, group_incentive: false, login: true, logoff: false, legacy_messcada: true, equipment_type: 'ITPC', robot_function: 'HTTP-CartonLabel', module_function: 'demand', ttl: 10_000, cycle_time: 9000, module_action: 'server' },
+            { ip_address: '172.16.35.109', port: 2000, group_incentive: false, login: true, logoff: false, legacy_messcada: true, equipment_type: 'ITPC', robot_function: 'HTTP-CartonLabel', module_function: 'demand', ttl: 10_000, cycle_time: 9000, module_action: 'server' }],
+      47 => [{ ip_address: '172.16.35.111', port: 2000, group_incentive: false, login: true, logoff: false, legacy_messcada: true, equipment_type: 'ITPC', robot_function: 'HTTP-CartonLabel', module_function: 'demand', ttl: 10_000, cycle_time: 9000, module_action: 'server' },
+             { ip_address: '172.16.35.120', port: 2000, group_incentive: false, login: true, logoff: false, legacy_messcada: true, equipment_type: 'ITPC', robot_function: 'HTTP-CartonLabel', module_function: 'demand', ttl: 10_000, cycle_time: 9000, module_action: 'server' }]
+    }
     # ITPC
     res = plant_res(itpc_type, "LBL-#{line_no}A", "Line scanner LBL-#{line_no}A")
     itpc_id = repo.create_child_plant_resource(line_id, res, sys_code: "LBL-#{line_no}A")
@@ -293,17 +453,58 @@ class BuildKrResourceTree < BaseScript # rubocop:disable Metrics/ClassLength
 
     # printer each?
 
-    40.times do |drop_no| # Need to mix in qty for sub-line...
-      res = plant_res(drop_type, "DROP-#{line_no}-#{drop_no + 1}", "Drop #{line_no}-#{drop_no + 1}")
+    ppoints[line_no].each do |drop_no, points|
+      res = plant_res(drop_type, "DROP-#{line_no}#{drop_no}", "Drop #{line_no}#{drop_no}")
       drop_id = repo.create_child_plant_resource(line_id, res)
-      2.times do |stn_no|
-        res = plant_res(drop_station, "PP-#{line_no}-#{drop_no + 1}-#{stn_no + 1}", "Drop packpoint #{line_no}-#{drop_no + 1}-#{stn_no + 1}")
+      points.each do |point|
+        res = plant_res(drop_station, "#{line_no}#{drop_no}#{point}", "Drop packpoint #{line_no}#{drop_no}#{point}")
         repo.create_child_plant_resource(drop_id, res)
       end
     end
+
+    build_rebins(line_id, rebins[line_no])
+
+    # if line_no == 1
+    #   ppoints[2].each do |subdrop_no, subpoints|
+    #     res = plant_res(drop_type, "DROP-2#{subdrop_no}", "Drop 2#{subdrop_no}")
+    #     drop_id = repo.create_child_plant_resource(sub_line_id, res)
+    #     subpoints.each do |point|
+    #       res = plant_res(drop_station, "2#{subdrop_no}#{point}", "Drop packpoint 2#{subdrop_no}#{point}")
+    #       repo.create_child_plant_resource(drop_id, res)
+    #     end
+    #   end
+    # add ITPC...
+
+    # 40.times do |drop_no| # Need to mix in qty for sub-line...
+    #   res = plant_res(drop_type, "DROP-#{line_no}-#{drop_no + 1}", "Drop #{line_no}-#{drop_no + 1}")
+    #   drop_id = repo.create_child_plant_resource(line_id, res)
+    #   2.times do |stn_no|
+    #     res = plant_res(drop_station, "PP-#{line_no}-#{drop_no + 1}-#{stn_no + 1}", "Drop packpoint #{line_no}-#{drop_no + 1}-#{stn_no + 1}")
+    #     repo.create_child_plant_resource(drop_id, res)
+    #   end
+    # end
     # build_selected_palletizers(line_id, %i[ship_1a ship_1b]) if line_no == 1
     # build_selected_palletizers(line_id, %i[ship_2a ship_2b]) if line_no == 2
     # build_selected_palletizers(line_id, %i[ship_3a ship_3b]) if line_no == 47
+  end
+
+  def build_rebins(line_id, rebins)
+    rebins.each do |rebin|
+      p_hash = rebin[:printer]
+      res = plant_res(printer_type, p_hash[:code], p_hash[:code])
+      printer_id = repo.create_child_plant_resource(line_id, res) # set ip & mac address...
+
+      res = plant_res(itpc_type, rebin[:code], rebin[:desc])
+      clm_id = repo.create_child_plant_resource(line_id, res, sys_code: rebin[:code])
+      sysres_id = repo.get(:plant_resources, clm_id, :system_resource_id)
+      attrs = { ip_address: rebin[:ip], port: 2000, equipment_type: 'itpc', legacy_messcada: true, robot_function: 'HTTP-Rebin', module_function: 'rebin', ttl: 10_000, cycle_time: 9000, module_action: 'rebin', mac_address: rebin[:mac] }
+      repo.update_system_resource(sysres_id, attrs)
+
+      sysres_id = repo.get(:plant_resources, printer_id, :system_resource_id)
+      attrs = { ip_address: p_hash[:ip], mac_address: p_hash[:mac], connection_type: 'TCP', printer_language: 'pplz', pixels_mm: 8, peripheral_model: 'datamax' }
+      repo.update_system_resource(sysres_id, attrs)
+      repo.link_a_peripheral(clm_id, sysres_id)
+    end
   end
 
   def drop_selected_palletizers(line_ph_id)
