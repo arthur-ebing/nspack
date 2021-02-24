@@ -13,7 +13,7 @@ module Masterfiles
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.caption 'Edit Rmt Class'
+              form.caption 'Edit RMT Class'
               form.action "/masterfiles/fruit/rmt_classes/#{id}"
               form.remote!
               form.method :update

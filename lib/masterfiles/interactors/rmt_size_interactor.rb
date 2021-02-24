@@ -13,10 +13,9 @@ module MasterfilesApp
         log_transaction
       end
       instance = rmt_size(id)
-      success_response("Created rmt size #{instance.size_code}",
-                       instance)
+      success_response("Created RMT size #{instance.size_code}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { size_code: ['This rmt size already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { size_code: ['This RMT size already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -30,8 +29,7 @@ module MasterfilesApp
         log_transaction
       end
       instance = rmt_size(id)
-      success_response("Updated rmt size #{instance.size_code}",
-                       instance)
+      success_response("Updated RMT size #{instance.size_code}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -43,12 +41,11 @@ module MasterfilesApp
         log_status(:rmt_sizes, id, 'DELETED')
         log_transaction
       end
-      success_response("Deleted rmt size #{name}")
+      success_response("Deleted RMT size #{name}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue Sequel::ForeignKeyConstraintViolation => e
-      puts e.message
-      failed_response("Unable to delete rmt size. It is still referenced#{e.message.partition('referenced').last}")
+      failed_response("Unable to delete RMT size. It is still referenced#{e.message.partition('referenced').last}")
     end
 
     def assert_permission!(task, id = nil)

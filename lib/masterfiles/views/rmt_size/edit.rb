@@ -13,7 +13,7 @@ module Masterfiles
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.caption 'Edit Rmt Size'
+              form.caption 'Edit RMT Size'
               form.action "/masterfiles/raw_materials/rmt_sizes/#{id}"
               form.remote!
               form.method :update

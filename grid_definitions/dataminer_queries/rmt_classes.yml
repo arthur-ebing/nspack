@@ -1,5 +1,5 @@
 ---
-:caption: Rmt Classes
+:caption: RMT Classes
 :sql: SELECT "rmt_classes"."id", "rmt_classes"."rmt_class_code", "rmt_classes"."description",fn_masterfile_variants('rmt_classes', rmt_classes.id) AS variant_codes,
   "rmt_classes"."active", "rmt_classes"."created_at", "rmt_classes"."updated_at",
   fn_current_status('rmt_classes', "rmt_classes"."id") AS status FROM "rmt_classes"
@@ -26,7 +26,7 @@
   rmt_class_code:
     :name: rmt_class_code
     :sequence_no: 2
-    :caption: Rmt class code
+    :caption: RMT class code
     :namespaced_name: rmt_classes.rmt_class_code
     :data_type: :string
     :width: 
@@ -137,7 +137,7 @@
     :group_max: false
 :query_parameter_definitions:
 - :column: rmt_classes.rmt_class_code
-  :caption: Rmt class code
+  :caption: RMT class code
   :data_type: :string
   :control_type: :text
   :default_value: 

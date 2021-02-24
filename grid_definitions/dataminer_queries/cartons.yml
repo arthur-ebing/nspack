@@ -1002,7 +1002,7 @@
   rmt_bin_id:
     :name: rmt_bin_id
     :sequence_no: 62
-    :caption: Rmt bin
+    :caption: RMT bin
     :namespaced_name: rmt_bin_id
     :data_type: :integer
     :width: 

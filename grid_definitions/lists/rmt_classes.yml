@@ -58,6 +58,6 @@
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/fruit/rmt_classes/new"
-  :text: New Rmt Class
+  :text: New RMT Class
   :style: :button
   :behaviour: :popup

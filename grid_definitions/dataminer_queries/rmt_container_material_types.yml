@@ -1,5 +1,5 @@
 ---
-:caption: Rmt Container Material Types
+:caption: RMT Container Material Types
 :sql: SELECT "rmt_container_material_types"."id", "rmt_container_material_types"."rmt_container_type_id",
   "rmt_container_material_types"."container_material_type_code", "rmt_container_material_types"."description",
   "rmt_container_material_types"."active", "rmt_container_material_types"."created_at",
@@ -30,7 +30,7 @@
   rmt_container_type_id:
     :name: rmt_container_type_id
     :sequence_no: 2
-    :caption: Rmt container type
+    :caption: RMT container type
     :namespaced_name: rmt_container_material_types.rmt_container_type_id
     :data_type: :integer
     :width: 
@@ -157,7 +157,7 @@
     :group_max: false
 :query_parameter_definitions:
 - :column: rmt_container_material_types.rmt_container_type_id
-  :caption: Rmt container type
+  :caption: RMT container type
   :data_type: :integer
   :control_type: :list
   :default_value: 

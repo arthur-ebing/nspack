@@ -737,7 +737,7 @@
   rmt_load:
     :name: rmt_load
     :sequence_no: 44
-    :caption: Rmt load
+    :caption: RMT load
     :namespaced_name: loads.rmt_load
     :data_type: :boolean
     :width: 100

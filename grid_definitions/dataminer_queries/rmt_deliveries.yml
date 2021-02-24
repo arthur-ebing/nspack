@@ -1,5 +1,5 @@
 ---
-:caption: Rmt Deliveries
+:caption: RMT Deliveries
 :sql: "SELECT\r\n    rmt_deliveries.id,\r\n    fn_current_status ('rmt_deliveries',
   rmt_deliveries.id) AS status,\r\n    rmt_deliveries.reference_number,\r\n    CASE\r\n  WHEN rmt_deliveries.keep_open or rmt_deliveries.delivery_tipped THEN false ELSE true END as show_keep_delivery_open,
   \   rmt_deliveries.season_id,\r\n    seasons.season_code,\r\n    --\r\n    rmt_deliveries.farm_id,\r\n
@@ -269,7 +269,7 @@
   rmt_delivery_destination_id:
     :name: rmt_delivery_destination_id
     :sequence_no: 15
-    :caption: Rmt delivery destination
+    :caption: RMT delivery destination
     :namespaced_name: rmt_deliveries.rmt_delivery_destination_id
     :data_type: :integer
     :width: 
@@ -644,7 +644,7 @@
   :ui_priority: 1
   :list_def: SELECT cultivar_name, id FROM cultivars ORDER BY cultivar_name
 - :column: rmt_deliveries.rmt_delivery_destination_id
-  :caption: Rmt delivery destination
+  :caption: RMT delivery destination
   :data_type: :integer
   :control_type: :list
   :default_value: 

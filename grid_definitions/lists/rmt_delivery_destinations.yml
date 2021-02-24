@@ -24,6 +24,6 @@
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/raw_materials/rmt_delivery_destinations/new"
-  :text: New Rmt Delivery Destination
+  :text: New RMT Delivery Destination
   :style: :button
   :behaviour: :popup

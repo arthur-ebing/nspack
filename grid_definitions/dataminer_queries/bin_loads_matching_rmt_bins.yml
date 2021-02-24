@@ -1,5 +1,5 @@
 ---
-:caption: Rmt Bins matching Bin Loads
+:caption: RMT Bins matching Bin Loads
 :sql: "SELECT\r\n    rmt_bins.id,\r\n    asset_number,\r\n    status,\r\n    rmt_bins.qty_bins,\r\n
   \   discrete_bin,\r\n    qty_inner_bins,\r\n    bin_fullness,\r\n    nett_weight,\r\n
   \   gross_weight,\r\n    avg_gross_weight,\r\n    weighed_manually,\r\n    rmt_bins.active,\r\n
@@ -610,7 +610,7 @@
   rmt_class_id:
     :name: rmt_class_id
     :sequence_no: 36
-    :caption: Rmt class
+    :caption: RMT class
     :namespaced_name: rmt_bins.rmt_class_id
     :data_type: :integer
     :width: 
@@ -626,7 +626,7 @@
   rmt_class_code:
     :name: rmt_class_code
     :sequence_no: 37
-    :caption: Rmt class code
+    :caption: RMT class code
     :namespaced_name: rmt_class_code
     :data_type: :string
     :width: 120
@@ -642,7 +642,7 @@
   rmt_material_owner_party_role_id:
     :name: rmt_material_owner_party_role_id
     :sequence_no: 38
-    :caption: Rmt material owner party role
+    :caption: RMT material owner party role
     :namespaced_name: rmt_bins.rmt_material_owner_party_role_id
     :data_type: :integer
     :width: 
@@ -674,7 +674,7 @@
   rmt_container_type_id:
     :name: rmt_container_type_id
     :sequence_no: 40
-    :caption: Rmt container type
+    :caption: RMT container type
     :namespaced_name: rmt_container_type_id
     :data_type: :integer
     :width: 
@@ -706,7 +706,7 @@
   rmt_container_material_type_id:
     :name: rmt_container_material_type_id
     :sequence_no: 42
-    :caption: Rmt container material type
+    :caption: RMT container material type
     :namespaced_name: rmt_bins.rmt_container_material_type_id
     :data_type: :integer
     :width: 
@@ -738,7 +738,7 @@
   rmt_inner_container_type_id:
     :name: rmt_inner_container_type_id
     :sequence_no: 44
-    :caption: Rmt inner container type
+    :caption: RMT inner container type
     :namespaced_name: rmt_inner_container_type_id
     :data_type: :integer
     :width: 
@@ -770,7 +770,7 @@
   rmt_inner_container_material_id:
     :name: rmt_inner_container_material_id
     :sequence_no: 46
-    :caption: Rmt inner container material
+    :caption: RMT inner container material
     :namespaced_name: rmt_inner_container_material_id
     :data_type: :integer
     :width: 

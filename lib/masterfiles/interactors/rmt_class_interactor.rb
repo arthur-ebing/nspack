@@ -21,14 +21,13 @@ module MasterfilesApp
       id = nil
       repo.transaction do
         id = repo.create_rmt_class(res)
-        log_status('rmt_classes', id, 'CREATED')
+        log_status(:rmt_classes, id, 'CREATED')
         log_transaction
       end
       instance = rmt_class(id)
-      success_response("Created rmt class #{instance.rmt_class_code}",
-                       instance)
+      success_response("Created RMT class #{instance.rmt_class_code}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { rmt_class_code: ['This rmt class already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { rmt_class_code: ['This RMT class already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -42,8 +41,7 @@ module MasterfilesApp
         log_transaction
       end
       instance = rmt_class(id)
-      success_response("Updated rmt class #{instance.rmt_class_code}",
-                       instance)
+      success_response("Updated RMT class #{instance.rmt_class_code}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -52,10 +50,10 @@ module MasterfilesApp
       name = rmt_class(id).rmt_class_code
       repo.transaction do
         repo.delete_rmt_class(id)
-        log_status('rmt_classes', id, 'DELETED')
+        log_status(:rmt_classes, id, 'DELETED')
         log_transaction
       end
-      success_response("Deleted rmt class #{name}")
+      success_response("Deleted RMT class #{name}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

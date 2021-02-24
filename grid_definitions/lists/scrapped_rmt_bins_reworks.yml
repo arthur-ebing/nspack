@@ -11,6 +11,6 @@
 :multiselect:
   :unscrap_bins_reworks:
     :url: "/production/reworks/reworks_run_types/$:id$/reworks_runs/multiselect_reworks_run_rmt_bins"
-    :section_caption: "SELECT 'Select rmt bins for reworks run type: ' || run_type FROM reworks_run_types WHERE id = $:id$"
+    :section_caption: "SELECT 'Select RMT bins for reworks run type: ' || run_type FROM reworks_run_types WHERE id = $:id$"
     :multiselect_save_method: remote
     :conditions: unscrap_bins_reworks

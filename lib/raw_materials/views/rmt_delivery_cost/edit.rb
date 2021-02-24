@@ -13,7 +13,7 @@ module RawMaterials
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.caption 'Edit Rmt Delivery Cost'
+              form.caption 'Edit RMT Delivery Cost'
               form.action "/raw_materials/deliveries/rmt_delivery_costs/#{rmt_delivery_id}/update/#{cost_id}"
               form.remote!
               form.method :update

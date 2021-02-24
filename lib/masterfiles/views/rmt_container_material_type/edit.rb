@@ -13,7 +13,7 @@ module Masterfiles
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.caption 'Edit Rmt Container Material Type'
+              form.caption 'Edit RMT Container Material Type'
               form.action "/masterfiles/farms/rmt_container_material_types/#{id}"
               form.remote!
               form.method :update

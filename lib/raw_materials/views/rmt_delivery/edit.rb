@@ -38,7 +38,7 @@ module RawMaterials
                                   style: :button)
 
               section.form do |form|
-                form.caption 'Edit Rmt Delivery'
+                form.caption 'Edit RMT Delivery'
                 form.action "/raw_materials/deliveries/rmt_deliveries/#{id}"
                 form.remote!
                 form.method :update
@@ -94,7 +94,7 @@ module RawMaterials
                   bin_type = 'asset_number_'
                 elsif AppConst::USE_PERMANENT_RMT_BIN_BARCODES
                   section.add_control(control_type: :link,
-                                      text: 'New Rmt Bin',
+                                      text: 'New RMT Bin',
                                       url: "/rmd/rmt_deliveries/rmt_bins/#{id}/new_delivery_bin",
                                       style: :button,
                                       grid_id: 'rmt_bins_deliveries',
@@ -102,7 +102,7 @@ module RawMaterials
                   bin_type = 'asset_number_'
                 else
                   section.add_control(control_type: :link,
-                                      text: 'New Rmt Bin',
+                                      text: 'New RMT Bin',
                                       url: "/raw_materials/deliveries/rmt_deliveries/#{id}/rmt_bins/new",
                                       style: :button,
                                       grid_id: 'rmt_bins_deliveries',

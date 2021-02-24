@@ -418,7 +418,7 @@
   rmt_material_owner:
     :name: rmt_material_owner
     :sequence_no: 22
-    :caption: Rmt material owner
+    :caption: RMT material owner
     :namespaced_name: 
     :data_type: :string
     :width: 150

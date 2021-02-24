@@ -112,7 +112,7 @@
   rmt_delivery_id:
     :name: rmt_delivery_id
     :sequence_no: 7
-    :caption: Rmt delivery id
+    :caption: RMT delivery id
     :namespaced_name: rmt_delivery_id
     :data_type: :string
     :width: 120

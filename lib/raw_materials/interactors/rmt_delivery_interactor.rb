@@ -13,9 +13,9 @@ module RawMaterialsApp
         log_transaction
       end
       instance = rmt_delivery(id)
-      success_response("Created rmt delivery #{id}", instance)
+      success_response("Created RMT delivery #{id}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { reference_number: ['This rmt delivery already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { reference_number: ['This RMT delivery already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -30,7 +30,7 @@ module RawMaterialsApp
         log_transaction
       end
       instance = rmt_delivery(id)
-      success_response("Updated rmt delivery #{instance.reference_number}", instance)
+      success_response("Updated RMT delivery #{instance.reference_number}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -60,7 +60,7 @@ module RawMaterialsApp
         log_status(:rmt_deliveries, id, 'DELETED')
         log_transaction
       end
-      success_response('Deleted rmt delivery')
+      success_response('Deleted RMT delivery')
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -89,7 +89,7 @@ module RawMaterialsApp
         log_transaction
       end
       instance = rmt_delivery(id)
-      success_response("Updated rmt delivery #{instance.reference_number}", instance)
+      success_response("Updated RMT delivery #{instance.reference_number}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -336,10 +336,9 @@ module RawMaterialsApp
         log_transaction
       end
       instance = rmt_delivery_cost(id, res[:cost_id])
-      success_response("Created rmt delivery cost #{instance[:id]}",
-                       instance)
+      success_response("Created RMT delivery cost #{instance[:id]}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { base: ['This rmt delivery cost already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { base: ['This RMT delivery cost already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -354,8 +353,7 @@ module RawMaterialsApp
         log_transaction
       end
       instance = rmt_delivery_cost(rmt_delivery_id, cost_id)
-      success_response('Updated rmt delivery cost',
-                       instance)
+      success_response('Updated RMT delivery cost', instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -365,12 +363,12 @@ module RawMaterialsApp
         repo.delete_rmt_delivery_cost(rmt_delivery_id, cost_id)
         log_transaction
       end
-      success_response('Deleted rmt delivery cost')
+      success_response('Deleted RMT delivery cost')
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue Sequel::ForeignKeyConstraintViolation => e
       puts e.message
-      failed_response("Unable to delete rmt delivery cost. It is still referenced#{e.message.partition('referenced').last}")
+      failed_response("Unable to delete RMT delivery cost. It is still referenced#{e.message.partition('referenced').last}")
     end
 
     def cost(id)

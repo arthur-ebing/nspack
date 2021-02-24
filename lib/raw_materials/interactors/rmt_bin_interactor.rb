@@ -89,7 +89,7 @@ module RawMaterialsApp
         bin_asset_numbers.map(&:last).each do |bin_asset_number|
           params[:bin_asset_number] = bin_asset_number
           id = repo.create_rmt_bin(params)
-          log_status('rmt_bins', id, 'REBIN_CREATED')
+          log_status(:rmt_bins, id, 'REBIN_CREATED')
           log_transaction
           created_rebins << rmt_bin(id)
         end
@@ -117,14 +117,13 @@ module RawMaterialsApp
       id = nil
       repo.transaction do
         id = repo.create_rmt_bin(res)
-        log_status('rmt_bins', id, 'REBIN_CREATED')
+        log_status(:rmt_bins, id, 'REBIN_CREATED')
         log_transaction
       end
       instance = rmt_bin(id)
-      success_response('Created rmt rebin',
-                       instance)
+      success_response('Created RMT rebin', instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { status: ['This rmt bin already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { status: ['This RMT bin already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -156,10 +155,9 @@ module RawMaterialsApp
         log_transaction
       end
       instance = rmt_bin(id)
-      success_response('Created rmt bin',
-                       instance)
+      success_response('Created RMT bin', instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { status: ['This rmt bin already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { status: ['This RMT bin already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue StandardError => e
@@ -284,8 +282,7 @@ module RawMaterialsApp
         log_transaction
       end
       instance = rmt_bin(id)
-      success_response('Updated rmt bin',
-                       instance)
+      success_response('Updated RMT bin', instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -296,7 +293,7 @@ module RawMaterialsApp
         log_status(:rmt_bins, id, 'DELETED')
         log_transaction
       end
-      success_response('Deleted rmt bin')
+      success_response('Deleted RMT bin')
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

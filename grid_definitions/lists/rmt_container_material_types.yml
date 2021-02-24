@@ -25,6 +25,6 @@
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/farms/rmt_container_material_types/new"
-  :text: New Rmt Container Material Type
+  :text: New RMT Container Material Type
   :style: :button
   :behaviour: :popup
