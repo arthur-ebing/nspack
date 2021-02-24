@@ -73,7 +73,7 @@ module Crossbeams
       sr: { run_allocations: true,
             pallet_label_seqs_sql: nil,
             use_gtins: false,
-            print_from_line_scanning: true,   # TEMP TEST...
+            print_from_line_scanning: false,
             incentive_palletizing: true,
             clm_button_caption_format: '$:size_ref_or_count$ $:product_chars$ $:target_market_group_name$',
             provide_pack_type_at_verification: false,
@@ -84,7 +84,18 @@ module Crossbeams
             allow_cultivar_group_mix: false,
             use_packing_specifications: false },
       sr2: { run_allocations: true,
-             bin_tip_match_farm_on_group: false }
+             pallet_label_seqs_sql: nil,
+             use_gtins: false,
+             print_from_line_scanning: false,
+             incentive_palletizing: false,
+             clm_button_caption_format: '$:size_reference$ $:product_chars$ $:target_market_group_name$',
+             provide_pack_type_at_verification: false,
+             group_incentive_packer_roles: false,
+             integrate_with_external_rmt_system: false,
+             bin_tip_match_farm_on_group: false,
+             default_marketing_org: 'SY',
+             allow_cultivar_group_mix: false,
+             use_packing_specifications: false }
     }.freeze
     # ALLOW_OVERFULL_REWORKS_PALLETIZING
     # BYPASS_QUALITY_TEST_LOAD_CHECK

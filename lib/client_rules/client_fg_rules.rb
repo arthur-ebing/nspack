@@ -24,7 +24,7 @@ module Crossbeams
             vgm_required: true,
             integrate_extended_fg: false },
       sr2: { place_of_issue_for_addendum: 'PLZ',
-             vgm_required: false,
+             vgm_required: true,
              integrate_extended_fg: false }
     }.freeze
     # ALLOW_EXPORT_PALLETS_TO_BYPASS_INSPECTION

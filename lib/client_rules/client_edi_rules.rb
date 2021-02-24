@@ -17,7 +17,7 @@ module Crossbeams
             ps_apply_substitutes: false },
       sr: { install_location: 'SRKIRKW',
             ps_apply_substitutes: false },
-      sr2: { install_location: '',
+      sr2: { install_location: 'SRADDO',
              ps_apply_substitutes: false }
     }.freeze
 

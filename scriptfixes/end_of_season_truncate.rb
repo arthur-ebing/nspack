@@ -21,6 +21,7 @@ class EndOfSeasonTruncate < BaseScript
     bin_loads
     cartons
     carton_labels
+    group_incentives
     ecert_tracking_units
     ecert_agreements
     edi_in_transactions

@@ -117,7 +117,7 @@
     :caption: Packhouse
     :namespaced_name: ph.plant_resource_code
     :data_type: :string
-    :width: 100
+    :width: 200
     :format: 
     :hide: false
     :pinned: 
@@ -133,7 +133,7 @@
     :caption: Line
     :namespaced_name: line.plant_resource_code
     :data_type: :string
-    :width: 80
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
