@@ -7,14 +7,14 @@ module MesscadaApp
 
       attr_reader :label_name, :instance, :repo, :messerver_repo, :carton_label_ids, :printer_id, :packhouse_no, :request_ip
 
-      def run(packhouse_resource_id, carton_label_ids, label_template_id, printer_id, request_ip)
+      def run(params, carton_label_ids, request_ip)
         setup_repos
-        @printer_id = printer_id
+        @printer_id = params[:printer_id]
         @request_ip = request_ip
-        @packhouse_no = repo.find_resource_packhouse_no(packhouse_resource_id)
-        @supporting_data = {}
+        @packhouse_no = repo.find_resource_packhouse_no(params[:packhouse_resource_id])
+        @supporting_data = params[:supporting_data] || {}
 
-        find_label(label_template_id)
+        find_label(params[:label_template_id])
         @instance = repo.carton_label_printing_instance(carton_label_ids.first)
 
         print_labels(carton_label_ids)

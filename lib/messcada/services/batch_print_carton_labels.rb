@@ -27,12 +27,16 @@ module MesscadaApp
       end
     end
 
-    def call
+    def call # rubocop:disable Metrics/AbcSize
       attrs = prepare_carton_label_record
 
       repo.transaction do
         ids = repo.create_carton_labels(no_of_prints, attrs)
-        Job::BatchPrintCartonLabels.enqueue(attrs[:packhouse_resource_id], ids, label_template_id, printer_id, request_ip)
+        args = { packhouse_resource_id: attrs[:packhouse_resource_id],
+                 label_template_id: label_template_id,
+                 printer_id: printer_id }
+        args = args.merge(supporting_data: { packed_date: run_start_date }) unless active_run?
+        Job::BatchPrintCartonLabels.enqueue(args, ids, request_ip)
       end
       ok_response
     end
@@ -49,6 +53,14 @@ module MesscadaApp
 
       packing_spec = production_repo.packing_specification_keys(packing_specification_item_id)
       attrs.merge(pr).merge(packing_spec.to_h).merge(production_run_id: production_run_id, label_name: label_name, phc: phc, packing_method_id: default_packing_method_id)
+    end
+
+    def active_run?
+      repo.active_run?(production_run_id)
+    end
+
+    def run_start_date
+      repo.run_start_date(production_run_id)
     end
   end
 end

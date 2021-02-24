@@ -712,5 +712,17 @@ module MesscadaApp
         .where(id: rmt_bin_id)
         .get(:farm_id)
     end
+
+    def active_run?(production_run_id)
+      DB[:production_runs]
+        .where(id: production_run_id)
+        .get(:running)
+    end
+
+    def run_start_date(production_run_id)
+      DB[:production_runs]
+        .where(id: production_run_id)
+        .get(:started_at)
+    end
   end
 end
