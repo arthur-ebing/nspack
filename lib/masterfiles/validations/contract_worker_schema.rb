@@ -15,7 +15,7 @@ module MasterfilesApp
     required(:personnel_number).maybe(Types::StrippedString)
     required(:start_date).maybe(:date)
     required(:end_date).maybe(:date)
-    required(:packer_role_id).maybe(:integer)
+    optional(:packer_role_id).filled(:integer)
   end
 
   ContractWorkerLinkSchema = Dry::Schema.Params do

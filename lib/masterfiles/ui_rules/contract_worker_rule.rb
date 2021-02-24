@@ -78,6 +78,7 @@ module UiRules
                                  caption: 'Packer role',
                                  min_charwidth: 35,
                                  prompt: true,
+                                 required: true,
                                  invisible: !AppConst::CR_PROD.group_incentive_has_packer_roles? }
                              end
 
