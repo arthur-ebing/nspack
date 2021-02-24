@@ -7,6 +7,7 @@ module ProductionApp
     attribute :system_resource_id, Types::Integer
     attribute :plant_resource_code, Types::String
     attribute :description, Types::String
+    attribute :represents_plant_resource_id, Types::Integer
     attribute :location_id, Types::Integer
     attribute? :resource_properties, Types::Hash
     attribute? :active, Types::Bool
@@ -20,6 +21,8 @@ module ProductionApp
     attribute :system_resource_id, Types::Integer
     attribute :plant_resource_code, Types::String
     attribute :description, Types::String
+    attribute :represents_plant_resource_id, Types::Integer
+    attribute :represents_plant_resource_code, Types::String
     attribute :system_resource_code, Types::String
     attribute :location_id, Types::Integer
     attribute :location_long_code, Types::String

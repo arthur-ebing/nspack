@@ -164,7 +164,7 @@ module Crossbeams
       ROOM = 'ROOM' # (AREA?)
       LINE = 'LINE'
       DROP = 'DROP'
-      DROP_STATION = 'DROP_STATION'
+      PACK_POINT = 'PACK_POINT'
       DROP_TABLE = 'DROP_TABLE'
       ROBOT_BUTTON = 'ROBOT_BUTTON'
       PACKPOINT_BUTTON = 'PACKPOINT_BUTTON'
@@ -276,20 +276,20 @@ module Crossbeams
                   allowed_children: [QC_ROBOT, BIN_SCALE_ROBOT, CARTON_SCALE_ROBOT, PALLET_SCALE_ROBOT, SCALE, PRINTER, WEIGHING_STATION],
                   icon: { file: 'home', colour: CLR_K } },
         LINE => { description: 'Line',
-                  allowed_children: [SUB_LINE, DROP, DROP_STATION, DROP_TABLE, CLM_ROBOT, QC_ROBOT, PALLETIZING_STATION, AUTOPACK_PALLET_BAY, PALLETIZING_BAY, BIN_TIPPING_STATION, SCALE, PRINTER, PRINT_STATION, ITPC],
+                  allowed_children: [SUB_LINE, DROP, PACK_POINT, DROP_TABLE, CLM_ROBOT, QC_ROBOT, PALLETIZING_STATION, AUTOPACK_PALLET_BAY, PALLETIZING_BAY, BIN_TIPPING_STATION, SCALE, PRINTER, PRINT_STATION, ITPC],
                   icon: { file: 'packline', colour: CLR_S } },
         SUB_LINE => { description: 'Sub-Line',
-                      allowed_children: [DROP, DROP_STATION, DROP_TABLE, CLM_ROBOT, QC_ROBOT, PALLETIZING_STATION, AUTOPACK_PALLET_BAY, PALLETIZING_BAY, SCALE, PRINTER, PRINT_STATION, ITPC],
+                      allowed_children: [DROP, PACK_POINT, DROP_TABLE, CLM_ROBOT, QC_ROBOT, PALLETIZING_STATION, AUTOPACK_PALLET_BAY, PALLETIZING_BAY, SCALE, PRINTER, PRINT_STATION, ITPC],
                       icon: { file: 'packline', colour: CLR_D } },
         DROP => { description: 'Drop',
-                  allowed_children: [DROP_STATION, DROP_TABLE, CLM_ROBOT, BIN_SCALE_ROBOT, CARTON_SCALE_ROBOT, PALLET_SCALE_ROBOT, SCALE, PRINTER],
+                  allowed_children: [PACK_POINT, DROP_TABLE, CLM_ROBOT, BIN_SCALE_ROBOT, CARTON_SCALE_ROBOT, PALLET_SCALE_ROBOT, SCALE, PRINTER],
                   icon: { file: 'packing', colour: CLR_D } },
-        DROP_STATION => { description: 'Drop station',
-                          packpoint: true,
-                          allowed_children: [],
-                          icon: { file: 'station', colour: CLR_R } },
+        PACK_POINT => { description: 'Pack point',
+                        packpoint: true,
+                        allowed_children: [],
+                        icon: { file: 'station', colour: CLR_R } },
         DROP_TABLE => { description: 'Drop table',
-                        allowed_children: [DROP_STATION, CLM_ROBOT, BIN_SCALE_ROBOT, CARTON_SCALE_ROBOT, PALLET_SCALE_ROBOT, SCALE, PRINTER],
+                        allowed_children: [PACK_POINT, CLM_ROBOT, BIN_SCALE_ROBOT, CARTON_SCALE_ROBOT, PALLET_SCALE_ROBOT, SCALE, PRINTER],
                         icon: { file: 'packing', colour: CLR_N } },
         ROBOT_BUTTON => { description: 'Robot button',
                           allowed_children: [],
@@ -299,7 +299,7 @@ module Crossbeams
                           code_prefix: '${CODE}-B' }, # prefixed by module name followed by....
         PACKPOINT_BUTTON => { description: 'Robot packpoint button',
                               allowed_children: [],
-                              represents: DROP_STATION,
+                              represents: PACK_POINT,
                               icon: { file: 'circle-o', colour: CLR_G },
                               create_with_system_resource: 'MODULE_BUTTON',
                               sequence_without_zero_padding: true,  ## spec no zeros.... (default == 1)

@@ -20,7 +20,7 @@ require_relative '../app_loader'
 # Dev   : ruby scripts/base_script.rb BuildKrResourceTree
 #
 class BuildKrResourceTree < BaseScript # rubocop:disable Metrics/ClassLength
-  attr_reader :repo, :ph_id, :line_type, :reverse, :itpc_type, :drop_station, :drop_type, :printer_type, :clm_type, :btn_type,
+  attr_reader :repo, :ph_id, :line_type, :reverse, :itpc_type, :pack_point, :drop_type, :printer_type, :clm_type, :btn_type,
               :ptz_type, :bay_type, :ship_type, :subline_type, :bts_type, :btm_type, :pbtn_type
 
   def run # rubocop:disable Metrics/PerceivedComplexity
@@ -35,7 +35,7 @@ class BuildKrResourceTree < BaseScript # rubocop:disable Metrics/ClassLength
     @line_type = @repo.plant_resource_type_id_from_code(Crossbeams::Config::ResourceDefinitions::LINE)
     @subline_type = @repo.plant_resource_type_id_from_code(Crossbeams::Config::ResourceDefinitions::SUB_LINE)
     @itpc_type = @repo.plant_resource_type_id_from_code(Crossbeams::Config::ResourceDefinitions::ITPC)
-    @drop_station = @repo.plant_resource_type_id_from_code(Crossbeams::Config::ResourceDefinitions::DROP_STATION)
+    @pack_point = @repo.plant_resource_type_id_from_code(Crossbeams::Config::ResourceDefinitions::PACK_POINT)
     @drop_type = @repo.plant_resource_type_id_from_code(Crossbeams::Config::ResourceDefinitions::DROP)
     @printer_type = @repo.plant_resource_type_id_from_code(Crossbeams::Config::ResourceDefinitions::PRINTER)
     @clm_type = @repo.plant_resource_type_id_from_code(Crossbeams::Config::ResourceDefinitions::CLM_ROBOT)
@@ -222,13 +222,13 @@ class BuildKrResourceTree < BaseScript # rubocop:disable Metrics/ClassLength
     repo.update_system_resource(sysres_id, dp_line_attrs[line_no])
 
     # get sysres id from itpc_id & update with relevant attrs...
-    res = plant_res(drop_station, "#{line_no}DP#{line_no}", "Dedicated pack packpoint #{line_no}")
+    res = plant_res(pack_point, "#{line_no}DP#{line_no}", "Dedicated pack packpoint #{line_no}")
     repo.create_child_plant_resource(line_id, res)
     res = plant_res(drop_type, "DPK-#{line_no}-C2D", "Class 2 drop #{line_no}")
     drop_id = repo.create_child_plant_resource(line_id, res)
     pp_ids = []
     4.times do |n|
-      res = plant_res(drop_station, "DPK-#{line_no}-C2-PP#{n + 1}", "Class 2 packpoint #{n + 1} for #{line_no}")
+      res = plant_res(pack_point, "DPK-#{line_no}-C2-PP#{n + 1}", "Class 2 packpoint #{n + 1} for #{line_no}")
       pp_id = repo.create_child_plant_resource(drop_id, res)
       pp_ids << pp_id
     end
@@ -281,7 +281,7 @@ class BuildKrResourceTree < BaseScript # rubocop:disable Metrics/ClassLength
                 .join(:tree_plant_resources, descendant_plant_resource_id: Sequel[:plant_resources][:id])
                 .join(:plant_resource_types, id: Sequel[:plant_resources][:plant_resource_type_id])
                 .where(Sequel[:tree_plant_resources][:ancestor_plant_resource_id] => line_id)
-                .where(Sequel[:plant_resource_types][:plant_resource_type_code] => Crossbeams::Config::ResourceDefinitions::DROP_STATION)
+                .where(Sequel[:plant_resource_types][:plant_resource_type_code] => Crossbeams::Config::ResourceDefinitions::PACK_POINT)
                 .select_map(Sequel[:plant_resources][:id])
     plant_ids.each { |id| repo.delete_plant_resource(id) }
 
@@ -460,7 +460,7 @@ class BuildKrResourceTree < BaseScript # rubocop:disable Metrics/ClassLength
       res = plant_res(drop_type, "DROP-#{line_no}#{drop_no}", "Drop #{line_no}#{drop_no}")
       drop_id = repo.create_child_plant_resource(line_id, res)
       points.each do |point|
-        res = plant_res(drop_station, "#{line_no}#{drop_no}#{point}", "Drop packpoint #{line_no}#{drop_no}#{point}")
+        res = plant_res(pack_point, "#{line_no}#{drop_no}#{point}", "Drop packpoint #{line_no}#{drop_no}#{point}")
         repo.create_child_plant_resource(drop_id, res)
       end
     end
@@ -472,7 +472,7 @@ class BuildKrResourceTree < BaseScript # rubocop:disable Metrics/ClassLength
     #     res = plant_res(drop_type, "DROP-2#{subdrop_no}", "Drop 2#{subdrop_no}")
     #     drop_id = repo.create_child_plant_resource(sub_line_id, res)
     #     subpoints.each do |point|
-    #       res = plant_res(drop_station, "2#{subdrop_no}#{point}", "Drop packpoint 2#{subdrop_no}#{point}")
+    #       res = plant_res(pack_point, "2#{subdrop_no}#{point}", "Drop packpoint 2#{subdrop_no}#{point}")
     #       repo.create_child_plant_resource(drop_id, res)
     #     end
     #   end
@@ -482,7 +482,7 @@ class BuildKrResourceTree < BaseScript # rubocop:disable Metrics/ClassLength
     #   res = plant_res(drop_type, "DROP-#{line_no}-#{drop_no + 1}", "Drop #{line_no}-#{drop_no + 1}")
     #   drop_id = repo.create_child_plant_resource(line_id, res)
     #   2.times do |stn_no|
-    #     res = plant_res(drop_station, "PP-#{line_no}-#{drop_no + 1}-#{stn_no + 1}", "Drop packpoint #{line_no}-#{drop_no + 1}-#{stn_no + 1}")
+    #     res = plant_res(pack_point, "PP-#{line_no}-#{drop_no + 1}-#{stn_no + 1}", "Drop packpoint #{line_no}-#{drop_no + 1}-#{stn_no + 1}")
     #     repo.create_child_plant_resource(drop_id, res)
     #   end
     # end

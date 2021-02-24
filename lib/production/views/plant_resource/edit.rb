@@ -21,6 +21,7 @@ module Production
               # form.add_field :system_resource_id
               form.add_field :plant_resource_code
               form.add_field :description
+              form.add_field :represents_plant_resource_id
               form.add_field :location_id
               form.add_field :gln
               form.add_field :phc

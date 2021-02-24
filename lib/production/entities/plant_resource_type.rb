@@ -7,6 +7,7 @@ module ProductionApp
     attribute :description, Types::String
     # attribute :attribute_rules, Types::Hash
     # attribute :behaviour_rules, Types::Hash
+    attribute :represents_plant_resource_type_id, Types::Integer
     attribute? :active, Types::Bool
     attribute? :packpoint, Types::Bool
     attribute? :icon, Types::String

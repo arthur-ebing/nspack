@@ -1,9 +1,13 @@
 ---
 :caption: Plant Resource Types
-:sql: "SELECT \"plant_resource_types\".\"id\", \"plant_resource_types\".\"plant_resource_type_code\",
-  \"plant_resource_types\".\"description\",\r\n\"plant_resource_types\".\"icon\",\r\n\"plant_resource_types\".\"packpoint\",\r\n\"plant_resource_types\".\"active\",
-  \"plant_resource_types\".\"created_at\", \"plant_resource_types\".\"updated_at\"\r\nFROM
-  \"plant_resource_types\" ORDER BY \"plant_resource_types\".\"plant_resource_type_code\""
+:sql: "SELECT\r\n  \"plant_resource_types\".\"id\",\r\n  \"plant_resource_types\".\"plant_resource_type_code\",\r\n
+  \ \"plant_resource_types\".\"description\",\r\n  \"plant_resource_types\".\"icon\",\r\n
+  \ \"plant_resource_types\".\"packpoint\",\r\n  \"represents\".\"plant_resource_type_code\"
+  AS represents_type,\r\n  \"plant_resource_types\".\"active\",\r\n  \"plant_resource_types\".\"created_at\",\r\n
+  \ \"plant_resource_types\".\"updated_at\"\r\nFROM\r\n  \"plant_resource_types\"\r\n
+  \ LEFT OUTER JOIN \"plant_resource_types\" \"represents\" ON \"represents\".\"id\"
+  = \"plant_resource_types\".\"represents_plant_resource_type_id\"\r\nORDER BY\r\n
+  \ \"plant_resource_types\".\"plant_resource_type_code\""
 :limit: 
 :offset: 
 :external_settings: {}
@@ -88,9 +92,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  represents_type:
+    :name: represents_type
+    :sequence_no: 6
+    :caption: Represents type
+    :namespaced_name: represents.plant_resource_type_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   active:
     :name: active
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Active
     :namespaced_name: plant_resource_types.active
     :data_type: :boolean
@@ -106,7 +126,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Created at
     :namespaced_name: plant_resource_types.created_at
     :data_type: :datetime
@@ -122,7 +142,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Updated at
     :namespaced_name: plant_resource_types.updated_at
     :data_type: :datetime

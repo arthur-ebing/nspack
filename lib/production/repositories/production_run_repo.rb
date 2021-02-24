@@ -290,14 +290,13 @@ module ProductionApp
       # Crossbeams::Config::ResourceDefinitions::ROBOT_BUTTON
 
       # Also insert if client rule && type is packpoint
-      # Crossbeams::Config::ResourceDefinitions::DROP_STATION
       if AppConst::CR_PROD.print_from_line_scanning
         insert_ds = DB[<<~SQL, id]
           INSERT INTO product_resource_allocations (production_run_id, plant_resource_id, packing_method_id)
           SELECT r.id, p.id, #{default_packing_method_id}
           FROM production_runs r
           JOIN tree_plant_resources t ON t.ancestor_plant_resource_id = r.production_line_id
-          JOIN plant_resources p ON p.id = t.descendant_plant_resource_id -- AND p.plant_resource_type_id = (SELECT id from plant_resource_types WHERE plant_resource_type_code = 'DROP_STATION')
+          JOIN plant_resources p ON p.id = t.descendant_plant_resource_id
           JOIN plant_resource_types prt ON prt.id = p.plant_resource_type_id AND prt.packpoint
           WHERE r.id = ?
           AND NOT EXISTS(SELECT id FROM product_resource_allocations a WHERE a.production_run_id = r.id AND a.plant_resource_id = p.id)

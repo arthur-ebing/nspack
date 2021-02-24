@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class PlantResourceRule < Base
+  class PlantResourceRule < Base # rubocop:disable Metrics/ClassLength
     def generate_rules
       @repo = ProductionApp::ResourceRepo.new
       @print_repo = LabelApp::PrinterRepo.new
@@ -25,6 +25,7 @@ module UiRules
       fields[:plant_resource_code] = { renderer: :label }
       fields[:system_resource_code] = { renderer: :label }
       fields[:description] = { renderer: :label }
+      fields[:represents_plant_resource_code] = { renderer: :label, invisible: @form_object.represents_plant_resource_id.nil?, caption: 'Represents Resource' }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
@@ -55,6 +56,11 @@ module UiRules
                                 maxvalue: 9,
                                 parent_field: :resource_properties,
                                 invisible: !at_ph_level }
+      # if type is representative...
+      fields[:represents_plant_resource_id] = { renderer: :select,
+                                                options: representative_resources(rules[:represents]),
+                                                invisible: rules[:represents].nil?,
+                                                caption: 'Represents Resource' }
     end
 
     def set_print_fields
@@ -105,6 +111,15 @@ module UiRules
                                     packpoint: false,
                                     # plant_resource_attributes: nil,
                                     description: nil)
+    end
+
+    def representative_resources(code)
+      return [] if code.nil?
+
+      rep_type = @repo.get_value(:plant_resource_types, :id, plant_resource_type_code: code)
+      raise Crossbeams::FrameworkError, "There is no plant type `#{code}`" if rep_type.nil?
+
+      @repo.for_select_plant_resources(where: { plant_resource_type_id: rep_type })
     end
 
     def add_behaviours

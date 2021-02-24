@@ -19,6 +19,7 @@ module UiRules
       fields[:description] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
       fields[:packpoint] = { renderer: :label, as_boolean: true }
+      fields[:represents_plant_resource_type_id] = { renderer: :label, with_value: represents_type }
       rules[:icon_render] = render_icon(@form_object.icon)
     end
 
@@ -28,6 +29,12 @@ module UiRules
         description: { required: true },
         packpoint: { requred: true }
       }
+    end
+
+    def represents_type
+      return nil if @form_object.represents_plant_resource_type_id.nil?
+
+      @repo.get(:plant_resource_types, @form_object.represents_plant_resource_type_id, :plant_resource_type_code)
     end
 
     def make_form_object
