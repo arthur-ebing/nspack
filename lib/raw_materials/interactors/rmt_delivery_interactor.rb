@@ -84,6 +84,7 @@ module RawMaterialsApp
         log_status(:rmt_deliveries, id, AppConst::RMT_BIN_RECEIPT_DATE_OVERRIDE)
 
         bin_ids = repo.select_values(:rmt_bins, :id, rmt_delivery_id: id)
+        repo.update(:rmt_bins, bin_ids, bin_received_date_time: params[:date_delivered])
         log_multiple_statuses(:rmt_bins, bin_ids, AppConst::RMT_BIN_RECEIPT_DATE_OVERRIDE)
         log_transaction
       end
