@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/ClassLength
 # rubocop:disable Metrics/BlockLength
 class Nspack < Roda
   route 'xml', 'messcada' do |r|
@@ -104,28 +103,6 @@ class Nspack < Roda
         Crossbeams::RobotResponder.new(feedback).render
       end
     end
-
-    # CHANGE LOGIN ROLE
-    # --------------------------------------------------------------------------
-    r.on 'change_packer_role' do
-      hr_interactor = MesscadaApp::HrInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-      params = xml_interpreter.params_for_packer_role
-      res = MesscadaApp::AddSystemResourceIncentiveToParams.call(params)
-      res = hr_interactor.change_packer_role(res.instance) if res.success
-
-      feedback = if res.success
-                   MesscadaApp::RobotFeedback.new(device: params[:device],
-                                                  status: true,
-                                                  line1: res.message)
-                 else
-                   MesscadaApp::RobotFeedback.new(device: params[:device],
-                                                  status: false,
-                                                  line1: 'Cannot change packer role',
-                                                  line4: res.message)
-                 end
-      Crossbeams::RobotResponder.new(feedback).render
-    end
   end
 end
 # rubocop:enable Metrics/BlockLength
-# rubocop:enable Metrics/ClassLength
