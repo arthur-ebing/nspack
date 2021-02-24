@@ -35,7 +35,7 @@ module MesscadaApp
       sock.puts request
       result = sock.read
 
-      puts "RESPONSE FROM #{system_resource_code} : #{result}"
+      puts "RESPONSE FROM #{opts[:system_resource_code]} : #{result}"
       sock.close
     end
   end

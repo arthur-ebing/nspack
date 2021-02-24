@@ -93,7 +93,7 @@ module MasterfilesApp
       return success_response('Role has not changed', { packer_role: role }) if params[:packer_role_id].to_i == instance.packer_role_id
 
       repo.transaction do
-        repo.update_contract_worker(id, params)
+        repo.update_contract_worker(id, params.merge(from_external_system: false))
         messcada_hr_repo.apply_changed_role_to_group(id)
         log_status(:contract_workers, id, 'ROLE CHANGE', comment: role)
       end
