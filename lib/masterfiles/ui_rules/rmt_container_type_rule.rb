@@ -9,35 +9,29 @@ module UiRules
 
       common_values_for_fields common_fields
 
-      set_show_fields if %i[show reopen].include? @mode
-      set_edit_fields if @mode == :edit
-      # set_complete_fields if @mode == :complete
-      # set_approve_fields if @mode == :approve
-
-      # add_approve_behaviours if @mode == :approve
+      set_show_fields if %i[show].include? @mode
 
       form_name 'rmt_container_type'
     end
 
     def set_show_fields
-      rmt_inner_container_type_id_label = MasterfilesApp::RmtContainerTypeRepo.new.find_container_type(@form_object.rmt_inner_container_type_id)&.container_type_code
-      fields[:rmt_inner_container_type_id] = { renderer: :label, with_value: rmt_inner_container_type_id_label }
+      fields[:rmt_inner_container_type] = { renderer: :label,
+                                            caption: 'Inner Container Type Code',
+                                            hide_on_load: @form_object.rmt_inner_container_type.nil? }
       fields[:container_type_code] = { renderer: :label }
       fields[:description] = { renderer: :label }
       fields[:tare_weight] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
-    def set_edit_fields
-      fields[:active] = { renderer: :checkbox }
-    end
-
     def common_fields
       {
-        # where_clause = (@form_object.id ? "id <> #{@form_object.id}" : true)
-        rmt_inner_container_type_id: { renderer: :select, options: MasterfilesApp::RmtContainerTypeRepo.new.find_inner_container_types(@form_object.id ? "id <> #{@form_object.id}" : true),  # (where: (@form_object.id : ? true)),
-                                       disabled_options: MasterfilesApp::RmtContainerTypeRepo.new.for_select_inactive_rmt_container_types,
-                                       caption: 'Inner Container Type Code', prompt: 'Inner Container Type Code' },
+        rmt_inner_container_type_id: { renderer: :select, caption: 'Inner Container Type Code',
+                                       options: @repo.for_select_rmt_container_types(
+                                         exclude: { id: @form_object.id }
+                                       ),
+                                       disabled_options: @repo.for_select_inactive_rmt_container_types,
+                                       prompt: true },
         container_type_code: { required: true },
         tare_weight: {},
         description: {}
@@ -54,16 +48,9 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(container_type_code: nil,
+      @form_object = OpenStruct.new(id: nil,
+                                    container_type_code: nil,
                                     description: nil)
     end
-
-    # private
-
-    # def add_approve_behaviours
-    #   behaviours do |behaviour|
-    #     behaviour.enable :reject_reason, when: :approve_action, changes_to: ['r']
-    #   end
-    # end
   end
 end
