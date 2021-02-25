@@ -1,5 +1,5 @@
 ---
-:caption: Rmt Sizes
+:caption: RMT Sizes
 :sql: SELECT "rmt_sizes"."id", "rmt_sizes"."size_code", "rmt_sizes"."description", fn_masterfile_variants('rmt_sizes', rmt_sizes.id) AS variant_codes,
   fn_current_status('rmt_sizes', "rmt_sizes"."id") AS status FROM "rmt_sizes"
 :limit: 

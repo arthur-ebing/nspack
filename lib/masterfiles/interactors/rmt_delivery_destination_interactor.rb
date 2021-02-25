@@ -21,14 +21,13 @@ module MasterfilesApp
       id = nil
       repo.transaction do
         id = repo.create_rmt_delivery_destination(res)
-        log_status('rmt_delivery_destinations', id, 'CREATED')
+        log_status(:rmt_delivery_destinations, id, 'CREATED')
         log_transaction
       end
       instance = rmt_delivery_destination(id)
-      success_response("Created rmt delivery destination #{instance.delivery_destination_code}",
-                       instance)
+      success_response("Created RMT delivery destination #{instance.delivery_destination_code}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { delivery_destination_code: ['This rmt delivery destination already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { delivery_destination_code: ['This RMT delivery destination already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -42,8 +41,7 @@ module MasterfilesApp
         log_transaction
       end
       instance = rmt_delivery_destination(id)
-      success_response("Updated rmt delivery destination #{instance.delivery_destination_code}",
-                       instance)
+      success_response("Updated RMT delivery destination #{instance.delivery_destination_code}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -52,10 +50,10 @@ module MasterfilesApp
       name = rmt_delivery_destination(id).delivery_destination_code
       repo.transaction do
         repo.delete_rmt_delivery_destination(id)
-        log_status('rmt_delivery_destinations', id, 'DELETED')
+        log_status(:rmt_delivery_destinations, id, 'DELETED')
         log_transaction
       end
-      success_response("Deleted rmt delivery destination #{name}")
+      success_response("Deleted RMT delivery destination #{name}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

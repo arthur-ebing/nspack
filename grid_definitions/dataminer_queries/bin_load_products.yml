@@ -186,7 +186,7 @@
   rmt_container_material_type_id:
     :name: rmt_container_material_type_id
     :sequence_no: 9
-    :caption: Rmt container material type
+    :caption: RMT container material type
     :namespaced_name: bin_load_products.rmt_container_material_type_id
     :data_type: :integer
     :width: 
@@ -218,7 +218,7 @@
   rmt_material_owner_party_role_id:
     :name: rmt_material_owner_party_role_id
     :sequence_no: 11
-    :caption: Rmt material owner party role
+    :caption: RMT material owner party role
     :namespaced_name: bin_load_products.rmt_material_owner_party_role_id
     :data_type: :integer
     :width: 
@@ -346,7 +346,7 @@
   rmt_class_id:
     :name: rmt_class_id
     :sequence_no: 19
-    :caption: Rmt class
+    :caption: RMT class
     :namespaced_name: bin_load_products.rmt_class_id
     :data_type: :integer
     :width: 
@@ -362,7 +362,7 @@
   rmt_class_code:
     :name: rmt_class_code
     :sequence_no: 20
-    :caption: Rmt class code
+    :caption: RMT class code
     :namespaced_name: rmt_classes.rmt_class_code
     :data_type: :string
     :width: 120
@@ -609,7 +609,7 @@
   :ui_priority: 1
   :list_def: SELECT cultivar_group_code, id FROM cultivar_groups ORDER BY cultivar_group_code
 - :column: bin_load_products.rmt_container_material_type_id
-  :caption: Rmt container material type
+  :caption: RMT container material type
   :data_type: :integer
   :control_type: :list
   :default_value: 
@@ -642,7 +642,7 @@
   :ui_priority: 1
   :list_def: SELECT orchard_code, id FROM orchards ORDER BY orchard_code
 - :column: bin_load_products.rmt_class_id
-  :caption: Rmt class
+  :caption: RMT class
   :data_type: :integer
   :control_type: :list
   :default_value: 

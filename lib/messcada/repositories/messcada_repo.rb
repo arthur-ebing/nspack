@@ -720,9 +720,8 @@ module MesscadaApp
     end
 
     def run_start_date(production_run_id)
-      DB[:production_runs]
-        .where(id: production_run_id)
-        .get(:started_at)
+      time = get(:production_runs, production_run_id, :started_at)
+      time.nil? ? nil : time.to_date
     end
   end
 end

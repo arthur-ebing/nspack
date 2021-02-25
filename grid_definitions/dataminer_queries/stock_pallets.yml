@@ -760,7 +760,7 @@
   rmt_grade:
     :name: rmt_grade
     :sequence_no: 46
-    :caption: Rmt grade
+    :caption: RMT grade
     :namespaced_name: rmt_grade
     :data_type: :boolean
     :width: 100

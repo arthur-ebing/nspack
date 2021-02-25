@@ -21,14 +21,13 @@ module MasterfilesApp
       id = nil
       repo.transaction do
         id = repo.create_rmt_container_material_type(res)
-        log_status('rmt_container_material_types', id, 'CREATED')
+        log_status(:rmt_container_material_types, id, 'CREATED')
         log_transaction
       end
       instance = rmt_container_material_type(id)
-      success_response("Created rmt container material type #{instance.container_material_type_code}",
-                       instance)
+      success_response("Created RMT container material type #{instance.container_material_type_code}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { container_material_type_code: ['This rmt container material type already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { container_material_type_code: ['This RMT container material type already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -46,8 +45,7 @@ module MasterfilesApp
           log_transaction
         end
         instance = rmt_container_material_type(id)
-        success_response("Updated rmt container material type #{instance.container_material_type_code}",
-                         instance)
+        success_response("Updated RMT container material type #{instance.container_material_type_code}", instance)
       else
         validation_failed_response(OpenStruct.new(messages: { roles: ['Could no assign party role'] }))
       end
@@ -81,10 +79,10 @@ module MasterfilesApp
       name = rmt_container_material_type(id).container_material_type_code
       repo.transaction do
         repo.delete_rmt_container_material_type(id)
-        log_status('rmt_container_material_types', id, 'DELETED')
+        log_status(:rmt_container_material_types, id, 'DELETED')
         log_transaction
       end
-      success_response("Deleted rmt container material type #{name}")
+      success_response("Deleted RMT container material type #{name}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

@@ -24,6 +24,6 @@
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/raw_materials/rmt_sizes/new"
-  :text: New Rmt Size
+  :text: New RMT Size
   :style: :button
   :behaviour: :popup

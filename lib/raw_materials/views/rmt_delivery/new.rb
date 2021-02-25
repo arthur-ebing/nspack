@@ -14,7 +14,7 @@ module RawMaterials
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.caption 'New Rmt Delivery'
+              form.caption 'New RMT Delivery'
               form.action '/raw_materials/deliveries/rmt_deliveries'
               form.remote! if remote
               form.row do |row|

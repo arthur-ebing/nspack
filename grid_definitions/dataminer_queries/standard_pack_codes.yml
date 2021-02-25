@@ -202,7 +202,7 @@
   rmt_container_type_id:
     :name: rmt_container_type_id
     :sequence_no: 12
-    :caption: Rmt container type
+    :caption: RMT container type
     :namespaced_name: standard_pack_codes.rmt_container_type_id
     :data_type: :string
     :width: 
@@ -234,7 +234,7 @@
   rmt_container_material_type_id:
     :name: rmt_container_material_type_id
     :sequence_no: 14
-    :caption: Rmt container material type
+    :caption: RMT container material type
     :namespaced_name: standard_pack_codes.rmt_container_material_type_id
     :data_type: :string
     :width: 

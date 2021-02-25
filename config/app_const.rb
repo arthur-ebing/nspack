@@ -171,7 +171,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # Constants for pallet build statuses:
   PALLET_FULL_BUILD_STATUS = 'FULL'
 
-  # Constants for rmt bin statuses:
+  # Constants for RMT bin statuses:
   RMT_BIN_TIPPED_MANUALLY = 'TIPPED MANUALLY'
   RMT_BIN_WEIGHED_MANUALLY = 'WEIGHED MANUALLY'
   RMT_BIN_MOVED = 'BIN_MOVED'

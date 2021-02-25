@@ -710,7 +710,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
         capture_container_material = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL
         capture_container_material_owner = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER
-        capture_inner_bins = AppConst::DELIVERY_CAPTURE_INNER_BINS && !default_rmt_container_type[:id].nil? && MasterfilesApp::RmtContainerTypeRepo.new.find_container_type(default_rmt_container_type[:id])&.rmt_inner_container_type_id
+        capture_inner_bins = AppConst::DELIVERY_CAPTURE_INNER_BINS && !default_rmt_container_type[:id].nil? && MasterfilesApp::RmtContainerTypeRepo.new.find_rmt_container_type(default_rmt_container_type[:id])&.rmt_inner_container_type_id
 
         notice = retrieve_from_local_store(:flash_notice)
         rmt_container_material_type_id = retrieve_from_local_store(:rmt_container_material_type_id)
@@ -904,7 +904,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                   options_array: rmt_container_material_type_ids)
       end
       if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL && AppConst::DELIVERY_CAPTURE_INNER_BINS
-        actions << OpenStruct.new(type: MasterfilesApp::RmtContainerTypeRepo.new.find_container_type(params[:changed_value])&.rmt_inner_container_type_id ? :show_element : :hide_element,
+        actions << OpenStruct.new(type: MasterfilesApp::RmtContainerTypeRepo.new.find_rmt_container_type(params[:changed_value])&.rmt_inner_container_type_id ? :show_element : :hide_element,
                                   dom_id: "#{form_name}_qty_inner_bins_row")
       end
     else
@@ -960,7 +960,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE)
       details = retrieve_from_local_store(:bin) || { bin_fullness: :Full } # cultivar_id: bin_delivery[:cultivar_id],
 
-      capture_inner_bins = AppConst::DELIVERY_CAPTURE_INNER_BINS && !default_rmt_container_type[:id].nil? && !MasterfilesApp::RmtContainerTypeRepo.new.find_container_type(default_rmt_container_type[:id])&.rmt_inner_container_type_id
+      capture_inner_bins = AppConst::DELIVERY_CAPTURE_INNER_BINS && !default_rmt_container_type[:id].nil? && !MasterfilesApp::RmtContainerTypeRepo.new.find_rmt_container_type(default_rmt_container_type[:id])&.rmt_inner_container_type_id
       capture_container_material = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL
       capture_container_material_owner = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER
 

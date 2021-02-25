@@ -19,7 +19,7 @@
 :page_controls:
 - :control_type: :link
   :url: "/raw_materials/deliveries/rmt_delivery_costs/$:rmt_delivery_costs.rmt_delivery_id$/new"
-  :text: New Rmt Delivery Cost
+  :text: New RMT Delivery Cost
   :style: :button
   :behaviour: :popup
 :conditions:

@@ -678,7 +678,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                       options_array: rmt_container_material_type_ids)
           end
           if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL && AppConst::DELIVERY_CAPTURE_INNER_BINS
-            actions << OpenStruct.new(type: MasterfilesApp::RmtContainerTypeRepo.new.find_container_type(params[:changed_value])&.rmt_inner_container_type_id ? :show_element : :hide_element,
+            actions << OpenStruct.new(type: MasterfilesApp::RmtContainerTypeRepo.new.find_rmt_container_type(params[:changed_value])&.rmt_inner_container_type_id ? :show_element : :hide_element,
                                       dom_id: 'rmt_bin_qty_inner_bins_field_wrapper')
           end
         else

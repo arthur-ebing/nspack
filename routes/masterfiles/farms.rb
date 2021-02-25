@@ -481,7 +481,11 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.patch do     # UPDATE
           res = interactor.update_rmt_container_type(id, params[:rmt_container_type])
           if res.success
-            update_grid_row(id, changes: { container_type_code: res.instance[:container_type_code], description: res.instance[:description] },
+            update_grid_row(id, changes: {
+                              container_type_code: res.instance[:container_type_code],
+                              inner_container_type: res.instance[:inner_container_type],
+                              description: res.instance[:description]
+                            },
                                 notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::Farms::RmtContainerType::Edit.call(id, form_values: params[:rmt_container_type], form_errors: res.errors) }
@@ -512,6 +516,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           row_keys = %i[
             id
             container_type_code
+            inner_container_type
             description
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),

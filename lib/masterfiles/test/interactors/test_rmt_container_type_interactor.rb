@@ -74,7 +74,8 @@ module MasterfilesApp
         description: 'ABC',
         active: true,
         tare_weight: 20.3,
-        rmt_inner_container_type_id: 1
+        rmt_inner_container_type_id: 1,
+        rmt_inner_container_type: 'ABC'
       }
     end
 

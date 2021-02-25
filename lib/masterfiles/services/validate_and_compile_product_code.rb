@@ -31,6 +31,8 @@ module MasterfilesApp
     private
 
     def compile_product_code
+      return erp_product_code if DB[:pm_composition_levels].empty?
+
       return minimum_composition_level_product_code if pm_subtype.minimum_composition_level
 
       return mid_composition_level_product_code unless pm_subtype.minimum_composition_level || pm_subtype.fruit_composition_level
