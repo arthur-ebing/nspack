@@ -92,11 +92,15 @@ module MasterfilesApp
       instance = contract_worker(id)
       return success_response('Role has not changed', { packer_role: role }) if params[:packer_role_id].to_i == instance.packer_role_id
 
+      system_resource_id = nil
       repo.transaction do
         repo.update_contract_worker(id, params.merge(from_external_system: false))
-        messcada_hr_repo.apply_changed_role_to_group(id)
+        system_resource_id = messcada_hr_repo.apply_changed_role_to_group(id)
         log_status(:contract_workers, id, 'ROLE CHANGE', comment: role)
       end
+
+      # Do TCP call if device is legacy messcada
+      MesscadaApp::RefreshMesScadaGroupDisplay.call(system_resource_id) unless system_resource_id.nil?
 
       success_response("Changed role to #{role} for contract worker #{instance.first_name} #{instance.surname}", instance.to_h.merge(packer_role: role))
     rescue Crossbeams::InfoError => e

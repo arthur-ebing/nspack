@@ -211,8 +211,8 @@ module MesscadaApp
       update(:group_incentives, group_id, active: false, from_external_system: false)
       attrs[:from_external_system] = false
       create_group_incentive(attrs)
-      # Do TCP call if device is legacy messcada
-      RefreshMesScadaGroupDisplay.call(attrs[:system_resource_id])
+      # RefreshMesScadaGroupDisplay.call(attrs[:system_resource_id])
+      attrs[:system_resource_id]
     end
 
     def group_incentive_contract_worker_ids(group_incentive_id)
