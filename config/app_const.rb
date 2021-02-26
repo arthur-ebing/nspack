@@ -42,7 +42,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
     'um' => 'Unifrutti Matroozefontein',
     'ud' => 'Unifrutti Dunbrody',
     'sr' => 'Sitrusrand Kirkwood',
-    'srp' => 'Sitrusrand Addo Presort', # ????? Not sure - can't connect yet
+    'sr2' => 'Sitrusrand Addo',
     'kr' => 'Kromco'
   }.freeze
   CLIENT_CODE = ENV.fetch('CLIENT_CODE')
