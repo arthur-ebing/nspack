@@ -27,7 +27,6 @@ module Crossbeams
 
     def json_post(url, params, headers = {}) # rubocop:disable Metrics/AbcSize
       uri, http = setup_http(url)
-      http.use_ssl = use_ssl if use_ssl
       request = Net::HTTP::Post.new(uri.request_uri, 'Content-Type' => 'application/json')
       headers.each do |k, v|
         request.add_field(k.to_s, v.to_s)
@@ -49,7 +48,6 @@ module Crossbeams
 
     def json_put(url, params, headers = {}) # rubocop:disable Metrics/AbcSize
       uri, http = setup_http(url)
-      http.use_ssl = use_ssl if use_ssl
       request = Net::HTTP::Put.new(uri.request_uri, 'Content-Type' => 'application/json')
       headers.each do |k, v|
         request.add_field(k.to_s, v.to_s)
@@ -71,7 +69,6 @@ module Crossbeams
 
     def json_delete(url, params, headers = {}) # rubocop:disable Metrics/AbcSize
       uri, http = setup_http(url)
-      http.use_ssl = use_ssl if use_ssl
       request = Net::HTTP::Delete.new(uri.request_uri, 'Content-Type' => 'application/json')
       headers.each do |k, v|
         request.add_field(k.to_s, v.to_s)
@@ -91,9 +88,8 @@ module Crossbeams
       failed_response("There was an error: #{e.message}")
     end
 
-    def xml_post(url, xml) # rubocop:disable Metrics/AbcSize
+    def xml_post(url, xml)
       uri, http = setup_http(url)
-      http.use_ssl = use_ssl if use_ssl
       request = Net::HTTP::Post.new(uri.request_uri, 'Content-Type' => 'application/xml')
       request.body = xml
 
@@ -112,7 +108,6 @@ module Crossbeams
 
     def request_get(url, headers = {}) # rubocop:disable Metrics/AbcSize
       uri, http = setup_http(url)
-      http.use_ssl = use_ssl if use_ssl
       request = Net::HTTP::Get.new(uri.request_uri)
       headers.each do |k, v|
         request.add_field(k.to_s, v.to_s)
@@ -132,7 +127,6 @@ module Crossbeams
 
     def request_post(url, fields, headers = {}) # rubocop:disable Metrics/AbcSize
       uri, http = setup_http(url)
-      http.use_ssl = use_ssl if use_ssl
       request = Net::HTTP::Post.new(uri.request_uri)
       headers.each do |k, v|
         request.add_field(k.to_s, v.to_s)
@@ -160,6 +154,7 @@ module Crossbeams
       uri = URI.parse(url)
       http = Net::HTTP.new(uri.host, uri.port)
 
+      http.use_ssl = @use_ssl if @use_ssl
       http.open_timeout = @open_timeout
       http.read_timeout = @read_timeout
 
