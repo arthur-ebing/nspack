@@ -5,7 +5,7 @@ module FinishedGoodsApp
     attr_reader :header
 
     def auth_token_call
-      http = Crossbeams::HTTPCalls.new(false, open_timeout: AppConst::E_CERT_OPEN_TIMEOUT, read_timeout: AppConst::E_CERT_READ_TIMEOUT)
+      http = Crossbeams::HTTPCalls.new(use_ssl: false, open_timeout: AppConst::E_CERT_OPEN_TIMEOUT, read_timeout: AppConst::E_CERT_READ_TIMEOUT)
       url = 'http://uas.ecert.co.za/oauth2/token'
       raise Crossbeams::InfoError, 'Service Unavailable: Failed to connect to remote server.' unless http.can_ping?('ecert.co.za')
 
@@ -21,7 +21,7 @@ module FinishedGoodsApp
       auth_token_call if header.nil?
 
       url = "#{AppConst::E_CERT_ENVIRONMENT}tur.ecert.co.za/api/TrackingUnit/GetTrackingUnitStatus?trackingUnitId=#{pallet_number}"
-      http = Crossbeams::HTTPCalls.new(url.include?('https'), open_timeout: AppConst::E_CERT_OPEN_TIMEOUT, read_timeout: AppConst::E_CERT_READ_TIMEOUT)
+      http = Crossbeams::HTTPCalls.new(open_timeout: AppConst::E_CERT_OPEN_TIMEOUT, read_timeout: AppConst::E_CERT_READ_TIMEOUT)
 
       res = http.request_get(url, header)
       return failed_response(res.message) unless res.success
@@ -30,11 +30,11 @@ module FinishedGoodsApp
       success_response('Found Tracking Unit', instance)
     end
 
-    def elot(params, body) # rubocop:disable Metrics/AbcSize
+    def elot(params, body)
       auth_token_call if header.nil?
 
       url = "#{AppConst::E_CERT_ENVIRONMENT}tur.ecert.co.za/api/TrackingUnit/eLot?#{params}"
-      http = Crossbeams::HTTPCalls.new(url.include?('https'), open_timeout: AppConst::E_CERT_OPEN_TIMEOUT, read_timeout: AppConst::E_CERT_READ_TIMEOUT)
+      http = Crossbeams::HTTPCalls.new(open_timeout: AppConst::E_CERT_OPEN_TIMEOUT, read_timeout: AppConst::E_CERT_READ_TIMEOUT)
       res = http.json_post(url, body, header)
       return failed_response(res.message) unless res.success
 
@@ -46,7 +46,7 @@ module FinishedGoodsApp
 
     def update_agreements # rubocop:disable Metrics/AbcSize
       url = 'https://app.ecert.co.za/api/v1/Agreement/Get'
-      http = Crossbeams::HTTPCalls.new(url.include?('https'))
+      http = Crossbeams::HTTPCalls.new
       return failed_response('Service Unavailable: Failed to connect to remote server.') unless http.can_ping?('ecert.co.za')
 
       res = http.request_get(url)

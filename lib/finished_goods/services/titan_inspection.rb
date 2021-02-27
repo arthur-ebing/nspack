@@ -204,7 +204,7 @@ module FinishedGoodsApp
     end
 
     def auth_token_call
-      @http = Crossbeams::HTTPCalls.new(AppConst::TITAN_ENVIRONMENT.include?('https'), responder: TitanHttpResponder.new)
+      @http = Crossbeams::HTTPCalls.new(responder: TitanHttpResponder.new)
       raise Crossbeams::InfoError, 'Service Unavailable: Failed to connect to remote server.' unless http.can_ping?('ppecb.com')
 
       url = "#{AppConst::TITAN_ENVIRONMENT}/oauth/ApiAuth"

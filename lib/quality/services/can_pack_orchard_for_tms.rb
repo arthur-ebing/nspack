@@ -33,7 +33,7 @@ module QualityApp
     private
 
     def phyt_clean_available?
-      http = Crossbeams::HTTPCalls.new(AppConst::PHYT_CLEAN_ENVIRONMENT.include?('https'), read_timeout: 30)
+      http = Crossbeams::HTTPCalls.new(read_timeout: 30)
       http.can_ping?(AppConst::PHYT_CLEAN_ENVIRONMENT)
     end
 
