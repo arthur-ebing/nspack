@@ -218,7 +218,7 @@ module FinishedGoodsApp
 
     class TitanHttpResponder
       include Crossbeams::Responses
-      def format_response(response, _context) # rubocop:disable Metrics/AbcSize
+      def format_response(response, _context) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
         case response.code
         when '200'
           instance = JSON.parse(response.body) || {}
@@ -226,7 +226,11 @@ module FinishedGoodsApp
         when '204'
           failed_response('Response code: 204 No Content')
         when '400'
-          instance = JSON.parse(response.body)
+          begin
+            instance = JSON.parse(response.body)
+          rescue JSON::ParserError
+            instance = response.body
+          end
           failed_response('Response code: 400 Bad Request', instance)
         when '500'
           instance = JSON.parse(response.body)
