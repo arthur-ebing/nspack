@@ -385,6 +385,8 @@ module ProductionApp
     end
 
     def sequence_edit_data(attrs)  # rubocop:disable Metrics/AbcSize
+      party_repo = MasterfilesApp::PartyRepo.new
+
       pallet_format = MasterfilesApp::PackagingRepo.new.find_pallet_format(attrs[:pallet_format_id])
       { marketing_variety: get(:marketing_varieties, attrs[:marketing_variety_id], :marketing_variety_code),
         customer_variety: customer_variety(attrs[:customer_variety_id]),
@@ -393,7 +395,7 @@ module ProductionApp
         std_pack: get(:standard_pack_codes, attrs[:standard_pack_code_id], :standard_pack_code),
         actual_count: get(:fruit_actual_counts_for_packs, attrs[:fruit_actual_counts_for_pack_id], :actual_count_for_pack),
         size_ref: get(:fruit_size_references, attrs[:fruit_size_reference_id], :size_reference),
-        marketing_org: DB['SELECT fn_party_role_name(?) AS marketing_org FROM party_roles WHERE party_roles.id = ?', attrs[:marketing_org_party_role_id], attrs[:marketing_org_party_role_id]].first[:marketing_org],
+        marketing_org: party_repo.new.fn_party_role_name(attrs[:marketing_org_party_role_id]),
         packed_tm_group: get(:target_market_groups, attrs[:packed_tm_group_id], :target_market_group_name),
         target_market: get(:target_markets, attrs[:target_market_id], :target_market_name),
         mark: get(:marks, attrs[:mark_id], :mark_code),
@@ -417,7 +419,7 @@ module ProductionApp
         ru_labour_product: get(:pm_products, attrs[:ru_labour_product_id], :product_code),
         fruit_stickers: sticker_values(attrs[:fruit_sticker_ids]),
         tu_stickers: sticker_values(attrs[:tu_sticker_ids]),
-        target_customer: DB['SELECT fn_party_role_name(?) AS target_customer FROM party_roles WHERE party_roles.id = ?', attrs[:target_customer_party_role_id], attrs[:target_customer_party_role_id]].first[:target_customer] }
+        target_customer: party_repo.new.fn_party_role_name(attrs[:target_customer_party_role_id]) }
     end
 
     def customer_variety(customer_variety_id)
