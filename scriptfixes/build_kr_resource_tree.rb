@@ -500,7 +500,7 @@ class BuildKrResourceTree < BaseScript # rubocop:disable Metrics/ClassLength
       res = plant_res(clm_type, rebin[:code], rebin[:desc])
       clm_id = repo.create_child_plant_resource(line_id, res, sys_code: rebin[:code])
       sysres_id = repo.get(:plant_resources, clm_id, :system_resource_id)
-      attrs = { ip_address: rebin[:ip], port: 2000, equipment_type: 'robot-T200', legacy_messcada: true, robot_function: 'HTTP-Rebin', module_function: 'rebin', ttl: 10_000, cycle_time: 9000, module_action: 'rebin', mac_address: rebin[:mac] }
+      attrs = { ip_address: rebin[:ip], port: 2000, equipment_type: 'robot-T200', legacy_messcada: true, robot_function: 'HTTP-CartonLabel', module_function: 'rebin', ttl: 10_000, cycle_time: 9000, module_action: 'rebin', mac_address: rebin[:mac] }
       repo.update_system_resource(sysres_id, attrs)
 
       sysres_id = repo.get(:plant_resources, printer_id, :system_resource_id)

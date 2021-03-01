@@ -1498,7 +1498,7 @@ module ProductionApp
       scrapped_pallets = repo.scrapped_pallets?(pallet_numbers)
       if AppConst::RUN_TYPE_UNSCRAP_PALLET == reworks_run_type
         unscrapped_pallets = (pallet_numbers - scrapped_pallets)
-        return OpenStruct.new(success: false, messages: { pallets_selected: ["#{unscrapped_pallets.join(', ')} cannot be unscrapped"] }, pallets_selected: pallet_numbers) unless unscrapped_pallets.nil_or_empty?
+        return OpenStruct.new(success: false, messages: { pallets_selected: ["#{unscrapped_pallets.join(', ')} cannot be unscrapped - they are not scrapped"] }, pallets_selected: pallet_numbers) unless unscrapped_pallets.nil_or_empty?
       else
         return OpenStruct.new(success: false, messages: { pallets_selected: ["#{scrapped_pallets.join(', ')} already scrapped"] }, pallets_selected: pallet_numbers) unless scrapped_pallets.nil_or_empty?
       end
