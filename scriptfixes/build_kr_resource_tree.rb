@@ -78,7 +78,7 @@ class BuildKrResourceTree < BaseScript # rubocop:disable Metrics/ClassLength
 
           # Dedicated pack (Need packpoint robots)
           %w[41 42 43 44 45 46].each { |line| build_dp_line(line) }
-          build_rebins(ph_id, [{ ip: '172.16.34.10', code: 'REB-DPK', desc: 'Rebin DP Lyne', mac: '00603516E3F9', printer: { code: 'REB-PRN-DPK', ip: '172.16.112.132', mac: '785F4C0188C4' } }])
+          build_rebins(ph_id, [{ ip: '172.16.34.10', code: 'REB-DPK', desc: 'Rebin DP Lyne', mac: '00603516E3F9', printer: { code: 'REB-PRN-DPK', ip: '172.16.112.132', mac: '785F4C0188C4' }, buttons: 6 }])
           # Line 1, Line 2 (Need sub-line split and ITPC system details printer on the line?)
           build_old_line(1)
           # build_old_line(2)
@@ -423,13 +423,13 @@ class BuildKrResourceTree < BaseScript # rubocop:disable Metrics/ClassLength
       }
     }
     rebins = {
-      1 => [{ ip: '172.16.34.4', code: 'REB-INF-1', desc: 'Rebin Lyn1 Invoer', mac: '00603516E3F4', printer: { code: 'REB-PRN-INF-1', ip: '172.16.112.125', mac: '785F4C0188C1' } },
-            { ip: '172.16.34.7', code: 'REB-L1', desc: 'Rebin Lyn1', mac: '00603516E40A', printer: { code: 'REB-PRN-L1', ip: '172.16.112.128', mac: '785F4C0188C3' } }],
-      2 => [{ ip: '172.16.34.5', code: 'REB-INF-2', desc: 'Rebin Lyn2 Invoer', mac: '00603529A849', printer: { code: 'REB-PRN-INF-2', ip: '172.16.112.126', mac: '785F4C0188C9' } },
-            { ip: '172.16.34.8', code: 'REB-L2', desc: 'Rebin Lyn2', mac: '0060352C9AA0', printer: { code: 'REB-PRN-L2', ip: '172.16.112.129', mac: '785F4C0188C7' } }],
-      47 => [{ ip: '172.16.34.6', code: 'REB-INF-47', desc: 'Rebin Lyn47 Invoer', mac: '0060352CA30D', printer: { code: 'REB-PRN-INF-47', ip: '172.16.112.127', mac: '785E4C0188CA' } },
-             { ip: '172.16.34.9', code: 'REB-L47', desc: 'Rebin Lyn47', mac: '00603516E401', printer: { code: 'REB-PRN-L47', ip: '172.16.112.131', mac: '785F4C0188C8' } }]
-      # linedp: [{ ip: '172.16.34.10', code: 'REB-DPK', desc: 'Rebin DP Lyne', mac: '00603516E3F9', printer: { code: 'REB-PRN-DPK', ip: '172.16.112.132', mac: '785F4C0188C4' } }]
+      1 => [{ ip: '172.16.34.4', code: 'REB-INF-1', desc: 'Rebin Lyn1 Invoer', mac: '00603516E3F4', printer: { code: 'REB-PRN-INF-1', ip: '172.16.112.125', mac: '785F4C0188C1' }, buttons: 3 },
+            { ip: '172.16.34.7', code: 'REB-L1', desc: 'Rebin Lyn1', mac: '00603516E40A', printer: { code: 'REB-PRN-L1', ip: '172.16.112.128', mac: '785F4C0188C3' }, buttons: 2 }],
+      2 => [{ ip: '172.16.34.5', code: 'REB-INF-2', desc: 'Rebin Lyn2 Invoer', mac: '00603529A849', printer: { code: 'REB-PRN-INF-2', ip: '172.16.112.126', mac: '785F4C0188C9' }, buttons: 2 },
+            { ip: '172.16.34.8', code: 'REB-L2', desc: 'Rebin Lyn2', mac: '0060352C9AA0', printer: { code: 'REB-PRN-L2', ip: '172.16.112.129', mac: '785F4C0188C7' }, buttons: 2 }],
+      47 => [{ ip: '172.16.34.6', code: 'REB-INF-47', desc: 'Rebin Lyn47 Invoer', mac: '0060352CA30D', printer: { code: 'REB-PRN-INF-47', ip: '172.16.112.127', mac: '785E4C0188CA' }, buttons: 2 },
+             { ip: '172.16.34.9', code: 'REB-L47', desc: 'Rebin Lyn47', mac: '00603516E401', printer: { code: 'REB-PRN-L47', ip: '172.16.112.131', mac: '785F4C0188C8' }, buttons: 2 }]
+      # linedp: [{ ip: '172.16.34.10', code: 'REB-DPK', desc: 'Rebin DP Lyne', mac: '00603516E3F9', printer: { code: 'REB-PRN-DPK', ip: '172.16.112.132', mac: '785F4C0188C4' }, buttons: 6 }]
     }
     # rubocop:enable Style/WordArray
 
@@ -507,6 +507,11 @@ class BuildKrResourceTree < BaseScript # rubocop:disable Metrics/ClassLength
       attrs = { ip_address: p_hash[:ip], mac_address: p_hash[:mac], connection_type: 'TCP', printer_language: 'pplz', pixels_mm: 8, peripheral_model: 'datamax' }
       repo.update_system_resource(sysres_id, attrs)
       repo.link_a_peripheral(clm_id, sysres_id)
+      # add buttons
+      rebins[:buttons].times do |n|
+        res = plant_res(btn_type, "#{rebin[:code]}-B#{n + 1}", "Button B#{n + 1}")
+        repo.create_child_plant_resource(clm_id, res, sys_code: "#{rebin[:code]}-B#{n + 1}")
+      end
     end
   end
 
