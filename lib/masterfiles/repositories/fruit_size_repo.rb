@@ -2,6 +2,58 @@
 
 module MasterfilesApp
   class FruitSizeRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+    build_inactive_select :basic_pack_codes,
+                          alias: :basic_packs,
+                          label: :basic_pack_code,
+                          value: :id,
+                          order_by: :basic_pack_code
+
+    build_inactive_select :standard_pack_codes,
+                          alias: :standard_packs,
+                          label: :standard_pack_code,
+                          value: :id,
+                          order_by: :standard_pack_code
+
+    build_for_select :std_fruit_size_counts,
+                     label: :size_count_value,
+                     value: :id,
+                     order_by: :size_count_value
+    build_inactive_select :std_fruit_size_counts,
+                          label: :size_count_value,
+                          value: :id,
+                          order_by: :size_count_value
+    crud_calls_for :std_fruit_size_counts, name: :std_fruit_size_count, exclude: %i[delete]
+
+    build_for_select :standard_product_weights,
+                     label: :id,
+                     value: :id,
+                     order_by: :id
+    build_inactive_select :standard_product_weights,
+                          label: :id,
+                          value: :id,
+                          order_by: :id
+    crud_calls_for :standard_product_weights, name: :standard_product_weight, wrapper: StandardProductWeight
+
+    build_for_select :fruit_size_references,
+                     label: :size_reference,
+                     value: :id,
+                     order_by: :size_reference
+    build_inactive_select :fruit_size_references,
+                          label: :size_reference,
+                          value: :id,
+                          order_by: :size_reference
+    crud_calls_for :fruit_size_references, name: :fruit_size_reference, wrapper: FruitSizeReference
+
+    build_for_select :fruit_actual_counts_for_packs,
+                     label: :actual_count_for_pack,
+                     value: :id,
+                     order_by: :actual_count_for_pack
+    build_inactive_select :fruit_actual_counts_for_packs,
+                          label: :actual_count_for_pack,
+                          value: :id,
+                          order_by: :actual_count_for_pack
+    crud_calls_for :fruit_actual_counts_for_packs, name: :fruit_actual_counts_for_pack
+
     def for_select_basic_packs(where: {}, exclude: {}, active: true)
       DB[:basic_pack_codes]
         .left_join(:basic_packs_standard_packs, basic_pack_id: :id)
@@ -12,8 +64,6 @@ module MasterfilesApp
         .distinct
         .select_map(%i[basic_pack_code id])
     end
-
-    build_inactive_select :basic_pack_codes, alias: :basic_packs,  label: :basic_pack_code, value: :id, order_by: :basic_pack_code
 
     def find_basic_pack(id)
       hash = find_with_association(:basic_pack_codes, id)
@@ -71,8 +121,6 @@ module MasterfilesApp
         .select_map(%i[standard_pack_code id])
     end
 
-    build_inactive_select :standard_pack_codes, alias: :standard_packs, label: :standard_pack_code, value: :id, order_by: :standard_pack_code
-
     def find_standard_pack(id)
       hash = find_with_association(:standard_pack_codes, id,
                                    parent_tables: [{ parent_table: :rmt_container_types,
@@ -129,10 +177,6 @@ module MasterfilesApp
       delete(:standard_pack_codes, id)
     end
 
-    build_for_select :standard_product_weights,  label: :id, value: :id, order_by: :id
-    build_inactive_select :standard_product_weights, label: :id, value: :id, order_by: :id
-    crud_calls_for :standard_product_weights, name: :standard_product_weight, wrapper: StandardProductWeight
-
     def find_standard_product_weight_flat(id)
       find_with_association(:standard_product_weights, id,
                             parent_tables: [{ parent_table: :commodities,
@@ -144,10 +188,6 @@ module MasterfilesApp
                                               flatten_columns: { standard_pack_code: :standard_pack_code } }],
                             wrapper: StandardProductWeightFlat)
     end
-
-    build_for_select :std_fruit_size_counts, label: :size_count_value, value: :id, order_by: :size_count_value
-    build_inactive_select :std_fruit_size_counts, label: :size_count_value, value: :id, order_by: :size_count_value
-    crud_calls_for :std_fruit_size_counts, name: :std_fruit_size_count, exclude: %i[delete]
 
     def find_std_fruit_size_count(id)
       query = <<~SQL
@@ -173,10 +213,6 @@ module MasterfilesApp
       DB[:std_fruit_size_counts].where(id: id).delete
     end
 
-    build_for_select :fruit_actual_counts_for_packs, label: :actual_count_for_pack, value: :id, order_by: :actual_count_for_pack
-    build_inactive_select :fruit_actual_counts_for_packs, label: :actual_count_for_pack, value: :id, order_by: :actual_count_for_pack
-    crud_calls_for :fruit_actual_counts_for_packs, name: :fruit_actual_counts_for_pack
-
     def find_fruit_actual_counts_for_pack(id)
       hash = find_with_association(:fruit_actual_counts_for_packs, id,
                                    parent_tables: [{ parent_table: :std_fruit_size_counts,
@@ -198,10 +234,6 @@ module MasterfilesApp
       hash[:size_references] = hash[:fruit_size_references].map { |r| r[:size_reference] }.sort.join(',')
       FruitActualCountsForPack.new(hash)
     end
-
-    build_for_select :fruit_size_references, label: :size_reference, value: :id, order_by: :size_reference
-    build_inactive_select :fruit_size_references, label: :size_reference, value: :id, order_by: :size_reference
-    crud_calls_for :fruit_size_references, name: :fruit_size_reference, wrapper: FruitSizeReference
 
     def list_standard_pack_codes(id)
       query = <<~SQL
