@@ -83,7 +83,7 @@ module UiRules
     end
 
     def list_size_references
-      @repo.size_references(@options[:id])
+      @repo.list_size_references(@options[:id])
     end
   end
 end
