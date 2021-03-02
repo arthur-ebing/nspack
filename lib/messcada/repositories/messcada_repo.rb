@@ -418,6 +418,17 @@ module MesscadaApp
       DB[upd, id].update
     end
 
+    def update_packing_specification_item_extended_fg(id, extended_fg_code, extended_fg_id)
+      legacy_data = get(:packing_specification_items, id, :legacy_data)
+      set = legacy_data ? " legacy_data - 'extended_fg_code' - 'extended_fg_id' || " : ''
+      upd = <<~SQL
+        UPDATE packing_specification_items
+        SET legacy_data = #{set} '{"extended_fg_code":"#{extended_fg_code}","extended_fg_id":#{extended_fg_id || '""'}}'
+        WHERE id = ?
+      SQL
+      DB[upd, id].update
+    end
+
     # def create_pallet_and_sequences(pallet, pallet_sequence)
     #   id = DB[:pallets].insert(pallet)
     #

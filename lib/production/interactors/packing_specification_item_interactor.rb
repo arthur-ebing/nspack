@@ -19,6 +19,7 @@ module ProductionApp
       id = nil
       repo.transaction do
         id = repo.create_packing_specification_item(res)
+        FinishedGoodsApp::Job::CalculateExtendedFgCodesForPackingSpecs.enqueue([id]) if AppConst::CR_FG.lookup_extended_fg_code?
         check!(:duplicates, id)
 
         log_status(:packing_specification_items, id, 'CREATED')
@@ -32,12 +33,13 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def update_packing_specification_item(id, params)
+    def update_packing_specification_item(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_packing_specification_item_params(params)
       return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_packing_specification_item(id, res)
+        FinishedGoodsApp::Job::CalculateExtendedFgCodesForPackingSpecs.enqueue([id]) if AppConst::CR_FG.lookup_extended_fg_code?
         check!(:duplicates, id)
 
         log_transaction

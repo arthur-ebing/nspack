@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  class CalculateExtendedFgCodes < BaseService
-    attr_accessor :pallet_ids
+  class CalculateExtendedFgCodesForPackingSpecs < BaseService
+    attr_accessor :packing_specification_item_ids
 
-    def initialize(pallet_ids)
-      @pallet_ids = pallet_ids
+    def initialize(packing_specification_item_ids)
+      @packing_specification_item_ids = packing_specification_item_ids
     end
 
     def call
@@ -20,17 +20,17 @@ module FinishedGoodsApp
 
     private
 
-    def calculate_extended_fg_codes # rubocop:disable Metrics/AbcSize
+    def calculate_extended_fg_codes
       seq_extended_fgs = []
-      repo.select_values(:pallet_sequences, %i[id packing_specification_item_id], pallet_id: pallet_ids).each do |id, packing_specification_item_id|
-        seq_extended_fgs << { id: id, extended_fg_code: repo.calculate_extended_fg_code(packing_specification_item_id) }
+      packing_specification_item_ids.each do |packing_specification_item_id|
+        seq_extended_fgs << { id: packing_specification_item_id, extended_fg_code: repo.calculate_extended_fg_code(packing_specification_item_id) }
       end
 
       ms_repo = MesscadaApp::MesscadaRepo.new
       seq_extended_fgs.group_by { |h| h[:extended_fg_code] }.each do |k, v|
         extended_fg_id = ms_repo.extended_fg_id(k)
         v.each do |s|
-          ms_repo.update_pallet_sequence_extended_fg(s[:id], k, extended_fg_id)
+          ms_repo.update_packing_specification_item_extended_fg(s[:id], k, extended_fg_id)
         end
       end
     end
