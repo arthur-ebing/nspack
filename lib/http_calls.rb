@@ -188,6 +188,8 @@ module Crossbeams
     end
 
     def log_request(request)
+      return if AppConst.test?
+
       if request.method == 'GET'
         puts ">>> HTTP call: #{request.method} >> #{request.path}"
       else
