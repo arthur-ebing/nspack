@@ -126,8 +126,28 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.post do
           res = interactor.create_plant_resource(id, params[:plant_resource])
           if res.success
-            flash[:notice] = res.message
-            redirect_to_last_grid(r)
+            row_keys = %i[
+              id
+              plant_resource_type_id
+              icon
+              plant_resource_code
+              description
+              system_resource_code
+              phc
+              ph_no
+              gln
+              linked_resources
+              active
+              plant_resource_type_code
+              type_description
+              path_array
+              level
+              system_resource_id
+              peripheral
+              packpoint
+            ]
+            add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                         notice: res.message)
           else
             re_show_form(r, res, url: "/production/resources/plant_resources/#{id}/add_child") do
               Production::Resources::PlantResource::New.call(id: id,
@@ -193,16 +213,27 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.patch do     # UPDATE
           res = interactor.update_plant_resource(id, params[:plant_resource])
           if res.success
-            flash[:notice] = res.message
-            redirect_to_last_grid(r)
-            # row_keys = %i[
-            #   resource_type_id
-            #   system_resource_id
-            #   resource_code
-            #   description
-            #   resource_attributes
-            # ]
-            # update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+            row_keys = %i[
+              id
+              plant_resource_type_id
+              icon
+              plant_resource_code
+              description
+              system_resource_code
+              phc
+              ph_no
+              gln
+              linked_resources
+              active
+              plant_resource_type_code
+              type_description
+              path_array
+              level
+              system_resource_id
+              peripheral
+              packpoint
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
             re_show_form(r, res) { Production::Resources::PlantResource::Edit.call(id, form_values: params[:plant_resource], form_errors: res.errors) }
           end

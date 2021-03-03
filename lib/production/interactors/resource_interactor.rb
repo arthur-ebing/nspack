@@ -47,7 +47,7 @@ module ProductionApp
         log_status('plant_resources', id, 'CREATED')
         log_transaction
       end
-      instance = plant_resource(id)
+      instance = plant_resource_for_grid(id)
       success_response("Created plant resource #{instance.plant_resource_code}",
                        instance)
     rescue Sequel::UniqueConstraintViolation
@@ -66,7 +66,7 @@ module ProductionApp
         repo.update_plant_resource(id, res, name_changed)
         log_transaction
       end
-      instance = plant_resource(id)
+      instance = plant_resource_for_grid(id)
       success_response("Updated plant resource #{instance.plant_resource_code}",
                        instance)
     rescue Sequel::UniqueConstraintViolation
@@ -198,6 +198,10 @@ module ProductionApp
 
     def plant_resource(id)
       repo.find_plant_resource(id)
+    end
+
+    def plant_resource_for_grid(id)
+      repo.find_plant_resource_flat_for_grid(id)
     end
 
     def system_resource(id)

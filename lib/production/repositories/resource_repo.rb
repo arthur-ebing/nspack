@@ -94,6 +94,52 @@ module ProductionApp
                             wrapper: PlantResourceFlat)
     end
 
+    def find_plant_resource_flat_for_grid(id)
+      query = <<~SQL
+        SELECT plant_resources.id, plant_resources.plant_resource_type_id,
+        plant_resource_types.icon,
+        CASE WHEN representing_plant.plant_resource_code IS NULL THEN
+          plant_resources.plant_resource_code
+        ELSE
+          plant_resources.plant_resource_code || ' (' || representing_plant.plant_resource_code || ')'
+        END AS plant_resource_code,
+        plant_resources.description,
+        system_resources.system_resource_code,
+        plant_resources.resource_properties ->> 'phc' AS phc,
+        plant_resources.resource_properties ->> 'packhouse_no' AS ph_no,
+        plant_resources.resource_properties ->> 'gln' AS gln,
+        (SELECT string_agg(system_resource_code, '; ') FROM (SELECT pr.system_resource_code
+          FROM plant_resources_system_resources prs
+          JOIN system_resources pr ON pr.id = prs.system_resource_id
+          WHERE prs.plant_resource_id = plant_resources.id) sub) AS linked_resources,
+        plant_resources.active,
+        plant_resource_types.plant_resource_type_code,
+        plant_resource_types.description AS type_description,
+        (SELECT array_agg(cc.plant_resource_code) as path
+          FROM (SELECT c.plant_resource_code
+                 FROM plant_resources AS c
+                JOIN tree_plant_resources AS t1 ON t1.ancestor_plant_resource_id = c.id
+               WHERE t1.descendant_plant_resource_id = plant_resources.id
+               ORDER BY t1.path_length DESC) AS cc) AS path_array,
+        (SELECT MAX(path_length)
+           FROM tree_plant_resources
+           WHERE descendant_plant_resource_id = plant_resources.id) + 1 AS level,
+        plant_resources.system_resource_id,
+        system_resource_types.peripheral,
+        plant_resource_types.packpoint
+        FROM plant_resources
+        JOIN plant_resource_types ON plant_resource_types.id = plant_resources.plant_resource_type_id
+        LEFT OUTER JOIN system_resources ON system_resources.id = plant_resources.system_resource_id
+        LEFT OUTER JOIN system_resource_types ON system_resource_types.id = system_resources.system_resource_type_id
+        LEFT OUTER JOIN plant_resources representing_plant ON representing_plant.id = plant_resources.represents_plant_resource_id
+        WHERE plant_resources.id = ?
+      SQL
+      hash = DB[query, id].first
+      return nil if hash.nil?
+
+      PlantResourceFlatForGrid.new(hash)
+    end
+
     def find_system_resource_flat(id)
       find_with_association(:system_resources,
                             id,
