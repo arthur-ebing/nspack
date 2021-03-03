@@ -396,17 +396,15 @@ module ProductionApp
     end
 
     def calculate_extended_fg_code(packing_specification_item_id) # rubocop:disable Metrics/AbcSize
-      fruit_size_repo ||= MasterfilesApp::FruitSizeRepo.new
-      fruit_repo ||= MasterfilesApp::FruitRepo.new
       prod_setup = packing_specification_item_prod_setup(packing_specification_item_id)
       fg_code_components = []
       fg_code_components << prod_setup_commodity_code(prod_setup[:id])
-      fg_code_components << MasterfilesApp::CultivarRepo.new.find_marketing_variety(prod_setup[:marketing_variety_id])&.marketing_variety_code
-      fg_code_components << fruit_repo.find_rmt_class(prod_setup[:rmt_class_id])&.rmt_class_code
-      fg_code_components << fruit_repo.find_grade(prod_setup[:grade_id])&.grade_code
-      fg_code_components << fruit_size_repo.find_fruit_actual_counts_for_pack(prod_setup[:fruit_actual_counts_for_pack_id])&.actual_count_for_pack
-      fg_code_components << fruit_repo.find_inventory_code(prod_setup[:inventory_code_id])&.inventory_code
-      fg_code_components << fruit_size_repo.find_fruit_size_reference(prod_setup[:fruit_size_reference_id])&.size_reference
+      fg_code_components << get(:marketing_varieties, prod_setup[:marketing_variety_id], :marketing_variety_code)
+      fg_code_components << get(:rmt_classes, prod_setup[:rmt_class_id], :rmt_class_code)
+      fg_code_components << get(:grades, prod_setup[:grade_id], :grade_code)
+      fg_code_components << get(:fruit_actual_counts_for_packs, prod_setup[:fruit_actual_counts_for_pack_id], :actual_count_for_pack)
+      fg_code_components << get(:inventory_codes, prod_setup[:inventory_code_id], :inventory_code)
+      fg_code_components << get(:fruit_size_references, prod_setup[:fruit_size_reference_id], :size_reference)
       fg_code_components << packing_specification_item_units_per_carton(packing_specification_item_id).to_f
       fg_code_components << packing_specification_item_unit_pack_product(packing_specification_item_id)
       fg_code_components << packing_specification_item_carton_pack_product(packing_specification_item_id)

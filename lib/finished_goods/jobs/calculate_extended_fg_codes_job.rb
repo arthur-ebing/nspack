@@ -6,6 +6,8 @@ module FinishedGoodsApp
       def run(pallets)
         res = FinishedGoodsApp::CalculateExtendedFgCodes.call(pallets)
         raise res.message unless res.success
+
+        finish
       end
     end
   end
