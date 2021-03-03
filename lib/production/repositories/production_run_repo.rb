@@ -329,8 +329,8 @@ module ProductionApp
         WHERE product_setup_template_id = (SELECT product_setup_template_id FROM production_runs WHERE id = #{run_id})
          AND fn_packing_specification_code(packing_specification_items.id) = '#{packing_specification_item_code}'
       SQL
-      rec = DB[qry].first
-      attrs = { packing_specification_item_id: rec[:id], product_setup_id: rec[:product_setup_id] }
+      spec_id, setup_id = DB[qry].get(%i[id product_setup_id])
+      attrs = { packing_specification_item_id: spec_id, product_setup_id: setup_id }
       update(:product_resource_allocations, product_resource_allocation_id, attrs)
 
       success_response("Allocated #{packing_specification_item_code}", packing_specification_item_code: packing_specification_item_code)
