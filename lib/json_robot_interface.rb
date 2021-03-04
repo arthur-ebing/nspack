@@ -208,7 +208,29 @@ class JsonRobotInterface # rubocop:disable Metrics/ClassLength
     respond(feedback, false)
   end
 
+  def register_identifier # rubocop:disable Metrics/AbcSize
+    interactor = MesscadaApp::HrInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+    params = { device: robot.system_resource_code, value: robot_params[:id], card_reader: '1' }
+    res = interactor.register_identifier(params)
+
+    feedback = if res.success
+                 MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                status: true,
+                                                line1: params[:value],
+                                                line4: res.message)
+               else
+                 MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                status: false,
+                                                line1: "Cannot add #{params[:value]}",
+                                                line3: 'Please try again',
+                                                line4: res.message)
+               end
+    respond(feedback, res.success)
+  end
+
   def publish_logon # rubocop:disable Metrics/AbcSize
+    return register_identifier if robot.bulk_registration_mode
+
     interactor = MesscadaApp::HrInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
     params = { device: robot.system_resource_code, identifier: robot_params[:id], card_reader: '1' }
     res = MesscadaApp::AddSystemResourceIncentiveToParams.call(params, get_group_incentive: false)
