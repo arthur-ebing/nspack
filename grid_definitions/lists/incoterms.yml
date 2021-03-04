@@ -1,0 +1,29 @@
+---
+:dataminer_definition: incoterms
+:actions:
+- :url: "/masterfiles/finance/incoterms/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/masterfiles/finance/incoterms/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/finance/incoterms/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :url: "/development/statuses/list/incoterms/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/finance/incoterms/new"
+  :text: New Incoterm
+  :style: :button
+  :behaviour: :popup

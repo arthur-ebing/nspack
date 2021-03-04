@@ -2,36 +2,34 @@
 
 module MasterfilesApp
   class CreatePartyRole < BaseService
-    attr_reader :repo, :user, :params, :party_role_id, :role_id, :person_id, :organization_id, :party_id
+    attr_reader :repo, :user, :party_role_id, :role_id
+    attr_accessor :params
 
     def initialize(role, params, user) # rubocop:disable Metrics/AbcSize
       @repo = PartyRepo.new
       @user = user
       @params = params
       @party_role_id = params["#{role.downcase}_party_role_id".to_sym]
-      raise Crossbeams::InfoError, "#{role.downcase}_party_role_id is nil" if party_role_id.nil?
+      raise Crossbeams::InfoError, "#{role.downcase}_party_role_id empty" if party_role_id.nil?
 
-      @role_id = repo.get_id(:roles, name: role)
-      raise Crossbeams::InfoError, "Role: #{role} not defined." if role_id.nil?
+      params[:role_id] = repo.get_id(:roles, name: role)
+      raise Crossbeams::InfoError, "Role: #{role} not defined." if params[:role_id].nil?
 
-      @params[:role_ids] = [role_id]
+      params[:role_ids] = [params[:role_id]]
     end
 
     def call # rubocop:disable Metrics/AbcSize
-      # The for_select for the party_role_id should contain a 'P' or 'O' in order to create a new party
-      case party_role_id
-      when 'O'
-        res = create_organization
-        return res unless res.success
-      when 'P'
-        res = create_person
-        return res unless res.success
-      else
-        create_party_role
-      end
-      party_role_id = repo.get_id(:party_roles, role_id: role_id, person_id: person_id, organization_id: organization_id)
-      party_role_id ||= repo.get_id(:party_roles, role_id: role_id, party_id: party_id)
+      res = case party_role_id
+            when 'Create New Organization'
+              create_organization
+            when 'Create New Person'
+              create_person
+            else
+              create_party_role
+            end
+      return res unless res.success
 
+      party_role_id ||= repo.get_id(:party_roles, role_id: params[:role_id], person_id: params[:person_id], organization_id: params[:organization_id])
       success_response('Created Party Role', OpenStruct.new(party_role_id: party_role_id))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
@@ -39,28 +37,32 @@ module MasterfilesApp
 
     private
 
-    def create_party_role
-      @party_id = DB[:party_roles].where(id: party_role_id).get(:party_id)
-      return if repo.exists?(:party_roles, id: party_role_id, role_id: role_id)
+    def create_party_role # rubocop:disable Metrics/AbcSize
+      params[:organization_id], params[:person_id], params[:party_id] = DB[:party_roles].where(id: party_role_id).get(%i[organization_id person_id party_id])
+      return ok_response if repo.exists?(:party_roles, id: party_role_id, role_id: params[:role_id])
 
-      repo.create_party_role(party_id, role_id)
+      res = PartyRoleSchema.call(params)
+      return validation_failed_response(res) if res.failure?
+
+      @party_role_id = repo.create_party_role(res)
+      success_response('Created party role')
     end
 
     def create_organization
       res = OrganizationSchema.call(params)
       return validation_failed_response(res) if res.failure?
 
-      @organization_id = repo.create_organization(res)
+      params[:organization_id] = repo.create_organization(res)
       success_response('Created organization')
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { medium_description: ['This organization already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { medium_description: ['This organization or short description already exists'] }))
     end
 
     def create_person
       res = PersonSchema.call(params)
       return validation_failed_response(res) if res.failure?
 
-      @person_id = repo.create_person(res)
+      params[:person_id] = repo.create_person(res)
       success_response('Created person')
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { first_name: ['This person already exists'] }))

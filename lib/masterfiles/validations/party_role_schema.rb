@@ -7,6 +7,6 @@ module MasterfilesApp
     required(:role_id).filled(:integer)
     required(:organization_id).maybe(:integer)
     required(:person_id).maybe(:integer)
-    required(:active).filled(:bool)
+    optional(:active).maybe(:bool)
   end
 end

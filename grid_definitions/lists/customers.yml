@@ -1,0 +1,30 @@
+---
+:dataminer_definition: customers
+:actions:
+- :url: "/masterfiles/finance/customers/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/masterfiles/finance/customers/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/finance/customers/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :separator: true
+- :url: "/development/statuses/list/customers/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/finance/customers/new"
+  :text: New Customer
+  :style: :button
+  :behaviour: :popup

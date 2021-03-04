@@ -1,0 +1,264 @@
+---
+:caption: Payment Term Date Types
+:sql: SELECT "payment_term_date_types"."id", "payment_term_date_types"."type_of_date",
+  "payment_term_date_types"."no_days_after_etd", "payment_term_date_types"."no_days_after_eta",
+  "payment_term_date_types"."no_days_after_atd", "payment_term_date_types"."no_days_after_ata",
+  "payment_term_date_types"."no_days_after_invoice", "payment_term_date_types"."no_days_after_invoice_sent",
+  "payment_term_date_types"."no_days_after_container_load", "payment_term_date_types"."anchor_to_date",
+  "payment_term_date_types"."adjust_anchor_date_to_month_end", "payment_term_date_types"."active",
+  "payment_term_date_types"."created_at", "payment_term_date_types"."updated_at",
+  fn_current_status('payment_term_date_types', "payment_term_date_types"."id") AS
+  status FROM "payment_term_date_types"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: payment_term_date_types.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  type_of_date:
+    :name: type_of_date
+    :sequence_no: 2
+    :caption: Type of date
+    :namespaced_name: payment_term_date_types.type_of_date
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  no_days_after_etd:
+    :name: no_days_after_etd
+    :sequence_no: 3
+    :caption: No days after etd
+    :namespaced_name: payment_term_date_types.no_days_after_etd
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  no_days_after_eta:
+    :name: no_days_after_eta
+    :sequence_no: 4
+    :caption: No days after eta
+    :namespaced_name: payment_term_date_types.no_days_after_eta
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  no_days_after_atd:
+    :name: no_days_after_atd
+    :sequence_no: 5
+    :caption: No days after atd
+    :namespaced_name: payment_term_date_types.no_days_after_atd
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  no_days_after_ata:
+    :name: no_days_after_ata
+    :sequence_no: 6
+    :caption: No days after ata
+    :namespaced_name: payment_term_date_types.no_days_after_ata
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  no_days_after_invoice:
+    :name: no_days_after_invoice
+    :sequence_no: 7
+    :caption: No days after invoice
+    :namespaced_name: payment_term_date_types.no_days_after_invoice
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  no_days_after_invoice_sent:
+    :name: no_days_after_invoice_sent
+    :sequence_no: 8
+    :caption: No days after invoice sent
+    :namespaced_name: payment_term_date_types.no_days_after_invoice_sent
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  no_days_after_container_load:
+    :name: no_days_after_container_load
+    :sequence_no: 9
+    :caption: No days after container load
+    :namespaced_name: payment_term_date_types.no_days_after_container_load
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  anchor_to_date:
+    :name: anchor_to_date
+    :sequence_no: 10
+    :caption: Anchor to date
+    :namespaced_name: payment_term_date_types.anchor_to_date
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  adjust_anchor_date_to_month_end:
+    :name: adjust_anchor_date_to_month_end
+    :sequence_no: 11
+    :caption: Adjust anchor date to month end
+    :namespaced_name: payment_term_date_types.adjust_anchor_date_to_month_end
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 12
+    :caption: Active
+    :namespaced_name: payment_term_date_types.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 13
+    :caption: Created at
+    :namespaced_name: payment_term_date_types.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 14
+    :caption: Updated at
+    :namespaced_name: payment_term_date_types.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 15
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: payment_term_date_types.type_of_date
+  :caption: Type of date
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

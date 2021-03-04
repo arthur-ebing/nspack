@@ -424,7 +424,7 @@ class Nspack < Roda
           actions << OpenStruct.new(type: :set_required, dom_id: "supplier_#{dom_id}", required: false)
         end
 
-        if params[:changed_value] == 'O'
+        if params[:changed_value] == 'Create New Organization'
           %w[medium_description short_description].each do |dom_id|
             actions << OpenStruct.new(type: :set_required, dom_id: "supplier_#{dom_id}", required: true)
           end

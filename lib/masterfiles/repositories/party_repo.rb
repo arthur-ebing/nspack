@@ -343,15 +343,15 @@ module MasterfilesApp
       raise Crossbeams::InfoError, 'Party must have at least one role.' if (current_role_ids + new_role_ids - removed_role_ids).empty?
 
       new_role_ids.each do |role_id|
-        create_party_role(party_id, role_id)
+        create_party_role(party_id: party_id, role_id: role_id)
       end
     end
 
-    def create_party_role(party_id, role_id)
-      DB[:party_roles].insert(party_id: party_id,
-                              organization_id: get_id(:organizations, party_id: party_id),
-                              person_id: get_id(:people, party_id: party_id),
-                              role_id: role_id)
+    def create_party_role(res)
+      args = res.to_h
+      args[:organization_id] ||= get_id(:organizations, party_id: args[:party_id])
+      args[:person_id] ||= get_id(:people, party_id: args[:party_id])
+      DB[:party_roles].insert(args)
     end
 
     def delete_party_role(id)

@@ -9,7 +9,7 @@ module UiRules
       apply_form_values
 
       common_values_for_fields common_fields
-      add_approve_behaviours if %i[new].include? @mode
+      add_behaviours if %i[new].include? @mode
 
       set_show_fields if %i[show].include? @mode
 
@@ -29,8 +29,9 @@ module UiRules
     end
 
     def common_fields
-      party_role_options = [['Create New Organization', 'O'], [@form_object.supplier, @form_object.supplier_party_role_id]] - [[nil, nil]]
+      party_role_options = [['Create New Organization'], [@form_object.supplier, @form_object.supplier_party_role_id]] - [[nil, nil]]
       party_role_options += @party_repo.for_select_party_roles_exclude(AppConst::ROLE_SUPPLIER, where: { person_id: nil })
+      hide_org_renderers = @form_object.customer_party_role_id != 'Create New Organization'
       {
         supplier: { caption: 'Supplier',
                     renderer: :label,
@@ -55,11 +56,11 @@ module UiRules
                     required: true },
         # Organization
         medium_description: { caption: 'Organization Code',
-                              hide_on_load: true },
-        short_description: { hide_on_load: true },
-        long_description: { hide_on_load: true },
-        company_reg_no: { hide_on_load: true },
-        vat_number: { hide_on_load: true }
+                              hide_on_load: hide_org_renderers },
+        short_description: { hide_on_load: hide_org_renderers },
+        long_description: { hide_on_load: hide_org_renderers },
+        company_reg_no: { hide_on_load: hide_org_renderers },
+        vat_number: { hide_on_load: hide_org_renderers }
       }
     end
 
@@ -81,7 +82,7 @@ module UiRules
 
     private
 
-    def add_approve_behaviours
+    def add_behaviours
       behaviours do |behaviour|
         behaviour.dropdown_change :supplier_party_role_id, notify: [{ url: '/masterfiles/parties/suppliers/supplier_party_role_changed' }]
       end

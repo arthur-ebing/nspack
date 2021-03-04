@@ -6,7 +6,6 @@ module MasterfilesApp
       res = CreateSupplierSchema.call(params)
       return validation_failed_response(res) if res.failure?
 
-      params = res.to_h
       id = nil
       repo.transaction do
         res = CreatePartyRole.call(AppConst::ROLE_SUPPLIER, params, @user)
@@ -48,7 +47,6 @@ module MasterfilesApp
       instance = supplier(id)
       repo.transaction do
         repo.delete_supplier(id)
-        PartyRepo.new.delete_party_role(instance.supplier_party_role_id)
         log_status(:suppliers, id, 'DELETED')
         log_transaction
       end

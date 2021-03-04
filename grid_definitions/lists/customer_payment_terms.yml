@@ -1,0 +1,30 @@
+---
+:dataminer_definition: customer_payment_terms
+:actions:
+- :url: "/masterfiles/finance/customer_payment_terms/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/masterfiles/finance/customer_payment_terms/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/finance/customer_payment_terms/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :separator: true
+- :url: "/development/statuses/list/customer_payment_terms/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/finance/customer_payment_terms/new"
+  :text: New Customer Payment Term
+  :style: :button
+  :behaviour: :popup

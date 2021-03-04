@@ -1,0 +1,30 @@
+---
+:dataminer_definition: deal_types
+:actions:
+- :url: "/masterfiles/finance/deal_types/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/masterfiles/finance/deal_types/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/finance/deal_types/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :separator: true
+- :url: "/development/statuses/list/deal_types/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/finance/deal_types/new"
+  :text: New Deal Type
+  :style: :button
+  :behaviour: :popup

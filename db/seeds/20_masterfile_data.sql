@@ -29,7 +29,6 @@ INSERT INTO port_types (port_type_code, description) VALUES('TRANSSHIP', 'Transf
 -- ROLES
 INSERT INTO roles (name) VALUES ('BILLING_CLIENT') ON CONFLICT DO NOTHING;
 INSERT INTO roles (name) VALUES ('CONSIGNEE') ON CONFLICT DO NOTHING;
-INSERT INTO roles (name) VALUES ('CUSTOMER') ON CONFLICT DO NOTHING;
 INSERT INTO roles (name) VALUES ('EXPORTER') ON CONFLICT DO NOTHING;
 INSERT INTO roles (name) VALUES ('FARM_MANAGER') ON CONFLICT DO NOTHING;
 INSERT INTO roles (name) VALUES ('FARM_OWNER') ON CONFLICT DO NOTHING;
@@ -47,6 +46,7 @@ INSERT INTO roles (name) VALUES ('TARGET CUSTOMER') ON CONFLICT DO NOTHING;
 INSERT INTO roles (name) VALUES ('TRANSPORTER') ON CONFLICT DO NOTHING;
 INSERT INTO roles (name, specialised) VALUES ('INSPECTOR', true) ON CONFLICT DO NOTHING;
 INSERT INTO roles (name, specialised) VALUES ('SUPPLIER', true) ON CONFLICT DO NOTHING;
+INSERT INTO roles (name, specialised) VALUES ('CUSTOMER', true) ON CONFLICT DO NOTHING;
 
 -- TARGET MARKET GROUP TYPES
 INSERT INTO target_market_group_types (target_market_group_type_code) VALUES('PACKED') ON CONFLICT DO NOTHING;
@@ -171,3 +171,13 @@ INSERT INTO employment_types (employment_type_code) VALUES ('PALLETIZER') ON CON
 
 -- REMOVING GLOBAL PALLET MIX RULE
 DELETE FROM pallet_mix_rules WHERE scope = 'GLOBAL';
+
+-- CURRENCIES
+INSERT INTO currencies (currency, description) VALUES ('ZAR' , 'South African Rand') ON CONFLICT DO NOTHING;
+INSERT INTO currencies (currency, description) VALUES ('USD' , 'United States Dollar') ON CONFLICT DO NOTHING;
+INSERT INTO currencies (currency, description) VALUES ('EUR' , 'European Euro') ON CONFLICT DO NOTHING;
+INSERT INTO currencies (currency, description) VALUES ('CHF' , 'Swiss Franc') ON CONFLICT DO NOTHING;
+INSERT INTO currencies (currency, description) VALUES ('RUB' , 'Russian Ruble') ON CONFLICT DO NOTHING;
+INSERT INTO currencies (currency, description) VALUES ('CNY' , 'Chinese Yuan') ON CONFLICT DO NOTHING;
+INSERT INTO currencies (currency, description) VALUES ('AUD' , 'Australian Dollar') ON CONFLICT DO NOTHING;
+INSERT INTO currencies (currency, description) VALUES ('NZD' , 'New Zealand Dollar') ON CONFLICT DO NOTHING;
