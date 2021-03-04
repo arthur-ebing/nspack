@@ -52,7 +52,7 @@ module MasterfilesApp
       rows = repo.select_values(:masterfile_variants, :id, params)
       row_defs = []
       rows.each do |row_id|
-        row_defs << repo.find_masterfile_variant_flat(row_id).to_h
+        row_defs << repo.find_masterfile_variant(row_id).to_h
       end
       {
         columnDefs: col_defs_for_masterfile_variant_grid,
@@ -69,7 +69,7 @@ module MasterfilesApp
         end
         mk.integer 'id', 'id', hide: true
         mk.integer 'masterfile_id', 'masterfile_id', hide: true
-        mk.col 'variant', 'Variant', width: 120
+        mk.col 'variant', 'Variant', width: 150
         mk.col 'masterfile_code', 'Masterfile code', width: 300
         mk.col 'variant_code', 'Variant code', width: 300
         mk.col 'masterfile_table', 'Masterfile table', width: 200
@@ -78,14 +78,22 @@ module MasterfilesApp
       end
     end
 
+    def lookup_mf_variant(table_name)
+      repo.lookup_mf_variant(table_name)
+    end
+
+    def select_values(table_name, columns)
+      repo.select_values(table_name, columns)
+    end
+
     private
 
     def repo
-      @repo ||= MasterfileVariantRepo.new
+      @repo ||= GeneralRepo.new
     end
 
     def masterfile_variant(id)
-      repo.find_masterfile_variant_flat(id)
+      repo.find_masterfile_variant(id)
     end
 
     def validate_masterfile_variant_params(params)

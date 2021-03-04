@@ -193,11 +193,10 @@ class Nspack < Roda
       end
 
       r.on 'masterfile_table_changed' do
-        repo = MasterfilesApp::MasterfileVariantRepo.new
         action = params[:changed_value].empty? ? :hide_element : :show_element
         actions = []
-        hash = repo.lookup_mf_variant(params[:changed_value])
-        options_array = repo.select_values(hash[:table_name].to_sym, [hash[:column_name].to_sym, :id])
+        hash = interactor.lookup_mf_variant(params[:changed_value])
+        options_array = interactor.select_values(hash[:table_name].to_sym, [hash[:column_name].to_sym, :id])
         actions << OpenStruct.new(type: action, dom_id: 'masterfile_variant_variant_code_field_wrapper')
         actions << OpenStruct.new(type: action, dom_id: 'masterfile_variant_masterfile_id_field_wrapper')
         actions << OpenStruct.new(type: :replace_select_options, dom_id: 'masterfile_variant_masterfile_id', options_array: options_array)
@@ -227,6 +226,109 @@ class Nspack < Roda
             Masterfiles::General::MasterfileVariant::New.call(form_values: params[:masterfile_variant],
                                                               form_errors: res.errors,
                                                               remote: fetch?(r))
+          end
+        end
+      end
+    end
+
+    # MASTERFILE MAPPINGS
+    # --------------------------------------------------------------------------
+    r.on 'external_masterfile_mappings', Integer do |id|
+      interactor = MasterfilesApp::ExternalMasterfileMappingInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:external_masterfile_mappings, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('general', 'edit')
+        interactor.assert_permission!(:edit, id)
+        show_partial { Masterfiles::General::ExternalMasterfileMapping::Edit.call(id) }
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('general', 'read')
+          show_partial { Masterfiles::General::ExternalMasterfileMapping::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_external_masterfile_mapping(id, params[:external_masterfile_mapping])
+          if res.success
+            row_keys = %i[
+              mapping
+              masterfile_table
+              masterfile_code
+              external_system
+              external_code
+              masterfile_id
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+          else
+            re_show_form(r, res) { Masterfiles::General::ExternalMasterfileMapping::Edit.call(id, form_values: params[:external_masterfile_mapping], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('general', 'delete')
+          interactor.assert_permission!(:delete, id)
+          res = interactor.delete_external_masterfile_mapping(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+
+    r.on 'external_masterfile_mappings' do
+      interactor = MasterfilesApp::ExternalMasterfileMappingInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'list' do
+        show_page { Masterfiles::General::ExternalMasterfileMapping::Grid.call(form_values: params) }
+      end
+
+      r.on 'grid' do
+        interactor.external_masterfile_mapping_grid(params)
+      rescue StandardError => e
+        show_json_exception(e)
+      end
+
+      r.on 'masterfile_table_changed' do
+        action = params[:changed_value].empty? ? :hide_element : :show_element
+        actions = []
+        hash = interactor.lookup_mf_mapping(params[:changed_value])
+        options_array = interactor.select_values(hash[:table_name].to_sym, [hash[:column_name].to_sym, :id])
+        actions << OpenStruct.new(type: action, dom_id: 'external_masterfile_mapping_external_code_field_wrapper')
+        actions << OpenStruct.new(type: action, dom_id: 'external_masterfile_mapping_masterfile_id_field_wrapper')
+        actions << OpenStruct.new(type: :replace_select_options, dom_id: 'external_masterfile_mapping_masterfile_id', options_array: options_array)
+        json_actions(actions)
+      end
+
+      r.on 'new' do    # NEW
+        check_auth!('general', 'new')
+        show_partial_or_page(r) { Masterfiles::General::ExternalMasterfileMapping::New.call(remote: fetch?(r)) }
+      end
+
+      r.post do        # CREATE
+        res = interactor.create_external_masterfile_mapping(params[:external_masterfile_mapping])
+        if res.success
+          row_keys = %i[
+            id
+            mapping
+            masterfile_table
+            masterfile_code
+            external_system
+            external_code
+            masterfile_id
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
+        else
+          re_show_form(r, res, url: '/masterfiles/general/external_masterfile_mappings/new') do
+            Masterfiles::General::ExternalMasterfileMapping::New.call(form_values: params[:external_masterfile_mapping],
+                                                                      form_errors: res.errors,
+                                                                      remote: fetch?(r))
           end
         end
       end

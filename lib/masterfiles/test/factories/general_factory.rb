@@ -2,6 +2,31 @@
 
 module MasterfilesApp
   module GeneralFactory
+    def create_external_masterfile_mapping(opts = {})
+      puc_id = create_puc
+      default = {
+        masterfile_table: 'pucs',
+        masterfile_id: puc_id,
+        external_system: Faker::Lorem.word,
+        external_code: Faker::Lorem.word,
+        created_at: '2010-01-01 12:00',
+        updated_at: '2010-01-01 12:00'
+      }
+      DB[:external_masterfile_mappings].insert(default.merge(opts))
+    end
+
+    def create_masterfile_variant(opts = {})
+      puc_id = create_puc
+      default = {
+        masterfile_table: 'pucs',
+        masterfile_id: puc_id,
+        variant_code: Faker::Lorem.word,
+        created_at: '2010-01-01 12:00',
+        updated_at: '2010-01-01 12:00'
+      }
+      DB[:masterfile_variants].insert(default.merge(opts))
+    end
+
     def create_uom(opts = {})
       uom_type_id = create_uom_type
 

@@ -4,15 +4,16 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
 module MasterfilesApp
   class TestMasterfileVariantInteractor < MiniTestWithHooks
-    include MasterfileVariantFactory
+    include GeneralFactory
+    include FarmFactory
 
     def test_repo
       repo = interactor.send(:repo)
-      assert repo.is_a?(MasterfilesApp::MasterfileVariantRepo)
+      assert repo.is_a?(MasterfilesApp::GeneralRepo)
     end
 
     def test_masterfile_variant
-      MasterfilesApp::MasterfileVariantRepo.any_instance.stubs(:find_masterfile_variant_flat).returns(fake_masterfile_variant)
+      MasterfilesApp::GeneralRepo.any_instance.stubs(:find_masterfile_variant).returns(fake_masterfile_variant)
       entity = interactor.send(:masterfile_variant, 1)
       assert entity.is_a?(MasterfileVariant)
     end
@@ -21,7 +22,7 @@ module MasterfilesApp
       attrs = fake_masterfile_variant.to_h.reject { |k, _| k == :id }
       res = interactor.create_masterfile_variant(attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(MasterfileVariantFlat, res.instance)
+      assert_instance_of(MasterfileVariant, res.instance)
       assert res.instance.id.nonzero?
     end
 
@@ -39,7 +40,7 @@ module MasterfilesApp
       attrs[:variant_code] = 'a_change'
       res = interactor.update_masterfile_variant(id, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(MasterfileVariantFlat, res.instance)
+      assert_instance_of(MasterfileVariant, res.instance)
       assert_equal 'a_change', res.instance.variant_code
       refute_equal value, res.instance.masterfile_table
     end
@@ -65,9 +66,14 @@ module MasterfilesApp
     def masterfile_variant_attrs
       {
         id: 1,
-        masterfile_table: 'target_market_groups',
+        masterfile_table: 'pucs',
+        masterfile_column: 'puc_code',
+        masterfile_code: 'ABC',
+        variant: 'ABC',
         variant_code: 'ABC',
-        masterfile_id: 1
+        masterfile_id: 1,
+        created_at: '2012-03-01',
+        updated_at: '2012-03-01'
       }
     end
 

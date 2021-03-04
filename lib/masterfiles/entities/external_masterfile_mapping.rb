@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class MasterfileVariant < Dry::Struct
+  class ExternalMasterfileMapping < Dry::Struct
     attribute :id, Types::Integer
-    attribute :variant, Types::String
+    attribute :mapping, Types::String
     attribute :masterfile_table, Types::String
     attribute :masterfile_column, Types::String
-    attribute :variant_code, Types::String
+    attribute :external_code, Types::String
+    attribute :external_system, Types::String
     attribute :masterfile_code, Types::String
     attribute :masterfile_id, Types::Integer
     attribute :created_at, Types::DateTime
