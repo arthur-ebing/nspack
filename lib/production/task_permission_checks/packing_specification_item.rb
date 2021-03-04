@@ -42,7 +42,7 @@ module ProductionApp
       end
 
       def duplicates_check
-        hash = repo.find_hash(:packing_specification_items, id).reject { |k, _| %i[id created_at updated_at].include?(k) }
+        hash = repo.find_hash(:packing_specification_items, id).reject { |k, _| %i[id created_at updated_at legacy_data].include?(k) }
         args = hash.transform_values { |v| v.is_a?(Array) ? Sequel.pg_array(v, :integer) : v }
         ids = DB[:packing_specification_items].where(args).select_map(:id)
         return failed_response 'Unable to update, this packing specification item already exists' if ids.length > 1
