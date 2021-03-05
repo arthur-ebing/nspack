@@ -2,6 +2,16 @@
 
 namespace :app do
   namespace :masterfiles do
+    desc 'List Phytclean Seasons'
+    task list_phytclean_seasons: [:load_app] do
+      res = QualityApp::PhytCleanApi.new.request_phyt_clean_seasons
+      if res.success
+        puts "SUCCESS: #{res.message}: \n#{res.instance.join("\n")}"
+      else
+        puts "FAILURE: #{res.message}"
+      end
+    end
+
     desc 'Update Phytclean Standard Data'
     task update_phytclean_standard_data: [:load_app] do
       if Date.today <= Date.parse(AppConst::PHYT_CLEAN_SEASON_END_DATE || Date.today.to_s)
@@ -23,6 +33,7 @@ namespace :app do
         puts "FAILURE: #{res.message}"
       end
     end
+
     desc 'Import locations'
     task :import_locations, [:fn] => [:load_app] do |_, args|
       res = MasterfilesApp::ImportLocations.call(args.fn)
