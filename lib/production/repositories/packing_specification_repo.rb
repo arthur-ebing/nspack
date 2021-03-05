@@ -11,14 +11,25 @@ module ProductionApp
     crud_calls_for :packing_specification_items, name: :packing_specification_item, wrapper: PackingSpecificationItem
 
     def find_packing_specification(id)
-      find_with_association(:packing_specifications, id,
-                            parent_tables: [{ parent_table: :product_setup_templates,
-                                              columns: [:template_name],
-                                              flatten_columns: { template_name: :product_setup_template } }],
-                            lookup_functions: [{ function: :fn_current_status,
-                                                 args: ['packing_specifications', :id],
-                                                 col_name: :status }],
-                            wrapper: PackingSpecification)
+      hash = find_with_association(
+        :packing_specifications, id,
+        parent_tables: [{ parent_table: :product_setup_templates,
+                          columns: %i[template_name packhouse_resource_id production_line_id],
+                          flatten_columns: { template_name: :product_setup_template,
+                                             packhouse_resource_id: :packhouse_resource_id,
+                                             production_line_id: :production_line_id } },
+                        { parent_table: :cultivar_groups,
+                          columns: [:cultivar_group_code],
+                          flatten_columns: { cultivar_group_code: :cultivar_group_code } }],
+        lookup_functions: [{ function: :fn_current_status,
+                             args: ['packing_specifications', :id],
+                             col_name: :status }]
+      )
+      return nil unless hash
+
+      hash[:packhouse] = get(:plant_resources, hash[:packhouse_resource_id], :plant_resource_code)
+      hash[:line] = get(:plant_resources, hash[:production_line_id], :plant_resource_code)
+      PackingSpecification.new(hash)
     end
 
     def find_packing_specification_item(id)
@@ -34,7 +45,7 @@ module ProductionApp
           product_setups.mark_id AS mark_id,
           product_setups.std_fruit_size_count_id AS std_fruit_size_count_id,
           product_setups.basic_pack_code_id AS basic_pack_id,
-          pm_marks.description AS pm_mark,
+          fn_pkg_mark(pm_marks.id) AS pm_mark,
           packing_specification_items.product_setup_id,
           packing_specifications.product_setup_template_id,
           fn_product_setup_code(packing_specification_items.product_setup_id) AS product_setup,
@@ -87,6 +98,7 @@ module ProductionApp
       when 'pm_mark'
         column = 'pm_mark_id'
         ar = params[:column_value].split('_')
+
         mark_id = get_id(:marks, mark_code: ar.shift)
         value = get_id(:pm_marks, mark_id: mark_id, packaging_marks: array_of_text_for_db_col(ar))
 

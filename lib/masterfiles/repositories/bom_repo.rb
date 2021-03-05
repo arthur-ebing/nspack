@@ -174,16 +174,14 @@ module MasterfilesApp
         .select_map([:bom_code, Sequel[:pm_boms][:id]])
     end
 
-    def for_select_pm_marks(where: {}, active: true)
+    def for_select_pm_marks(where: {}, active: true) # rubocop:disable Metrics/AbcSize
       DB[:pm_marks]
         .join(:marks, id: :mark_id)
         .where(Sequel[:pm_marks][:active] => active)
         .where(where)
         .order(:mark_code)
-        .select(:mark_code,
-                Sequel.lit("array_to_string(packaging_marks, '_') AS packaging_marks"),
-                Sequel[:pm_marks][:id])
-        .map { |r| ["#{r[:mark_code]}_#{r[:packaging_marks]}", r[:id]] }
+        .select(Sequel[:pm_marks][:id], Sequel.function(:fn_pkg_mark, Sequel[:pm_marks][:id]))
+        .map { |r| [r[:fn_pkg_mark], r[:id]] }
     end
 
     def for_select_pm_boms_products(where: {}, active: true)

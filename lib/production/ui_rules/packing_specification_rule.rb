@@ -20,18 +20,23 @@ module UiRules
       fields[:product_setup_template] = { renderer: :label, caption: 'Product Setup Template' }
       fields[:packing_specification_code] = { renderer: :label }
       fields[:description] = { renderer: :label }
+      fields[:cultivar_group_code] = { renderer: :label, caption: 'Cultivar Group' }
+      fields[:packhouse] = { renderer: :label }
+      fields[:line] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields
       {
-        product_setup_template_id: { renderer: :select,
-                                     options: ProductionApp::ProductSetupRepo.new.for_select_product_setup_templates,
-                                     disabled_options: ProductionApp::ProductSetupRepo.new.for_select_inactive_product_setup_templates,
-                                     caption: 'Product Setup Template',
-                                     prompt: true,
-                                     searchable: true,
-                                     required: true },
+        product_setup_template_id: {
+          renderer: :select,
+          options: ProductionApp::ProductSetupRepo.new.for_select_product_setup_templates,
+          disabled_options: ProductionApp::ProductSetupRepo.new.for_select_inactive_product_setup_templates,
+          caption: 'Product Setup Template',
+          prompt: true,
+          searchable: true,
+          required: true
+        },
         packing_specification_code: { required: true },
         description: {}
       }
@@ -47,9 +52,11 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(product_setup_template_id: nil,
-                                    packing_specification_code: nil,
-                                    description: nil)
+      @form_object = OpenStruct.new(
+        product_setup_template_id: nil,
+        packing_specification_code: nil,
+        description: nil
+      )
     end
 
     private

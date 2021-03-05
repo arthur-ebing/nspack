@@ -41,9 +41,6 @@
   :url: "/production/packing_specifications/packing_specification_items/refresh"
   :text: Refresh Packing Specification Items
   :style: :button
-:captions:
-  :conditions:
-    :packing_specification: $:packing_specification$ Items
 :conditions:
   :packing_specification:
     - :col: packing_specification_items.packing_specification_id

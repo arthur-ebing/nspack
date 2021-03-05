@@ -14,6 +14,9 @@ module ProductionApp
         product_setup_template: 'ABC',
         packing_specification_code: Faker::Lorem.unique.word,
         description: 'ABC',
+        cultivar_group_code: 'ABC',
+        packhouse: 'ABC',
+        line: 'ABC',
         active: true
       }
       ProductionApp::PackingSpecification.new(base_attrs.merge(attrs))

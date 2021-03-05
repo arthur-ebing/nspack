@@ -4,19 +4,42 @@ module Production
   module PackingSpecifications
     module PackingSpecification
       class Show
-        def self.call(id)
+        def self.call(id) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:packing_specification, :show, id: id)
           rules   = ui_rule.compile
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page|
+          layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
+            page.section do |section|
+              section.add_control(control_type: :link,
+                                  text: 'Back',
+                                  url: '/list/packing_specifications',
+                                  style: :back_button)
+            end
             page.form do |form|
-              # form.caption 'Packing Specification'
-              form.view_only!
-              form.add_field :product_setup_template
-              form.add_field :packing_specification_code
-              form.add_field :description
-              form.add_field :active
+              form.no_submit!
+              form.fold_up do |fold|
+                fold.caption 'Packing Specification'
+                fold.open!
+                fold.row do |row|
+                  row.column do |col|
+                    col.add_field :product_setup_template
+                    col.add_field :packing_specification_code
+                    col.add_field :description
+                  end
+                  row.column do |col|
+                    col.add_field :cultivar_group_code
+                    col.add_field :packhouse
+                    col.add_field :line
+                  end
+                end
+              end
+            end
+            page.section do |section|
+              section.add_grid('packing_specification_items',
+                               "/list/packing_specification_items/grid?key=packing_specification&id=#{id}",
+                               caption: 'Packing Specification Items',
+                               height: 30)
             end
           end
 

@@ -22,7 +22,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.is do
         r.get do       # SHOW
           check_auth!('packing specifications', 'read')
-          show_partial { Production::PackingSpecifications::PackingSpecification::Show.call(id) }
+          show_partial_or_page(r) { Production::PackingSpecifications::PackingSpecification::Show.call(id) }
         end
         r.patch do     # UPDATE
           res = interactor.update_packing_specification(id, params[:packing_specification])
@@ -37,7 +37,13 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
-            re_show_form(r, res) { Production::PackingSpecifications::PackingSpecification::Edit.call(id, form_values: params[:packing_specification], form_errors: res.errors) }
+            re_show_form(r, res) do
+              Production::PackingSpecifications::PackingSpecification::Edit.call(
+                id,
+                form_values: params[:packing_specification],
+                form_errors: res.errors
+              )
+            end
           end
         end
 
