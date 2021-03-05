@@ -594,6 +594,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   }.freeze
 
   MF_VARIANT_RULES = {
+    Basic_Packs: { table_name: 'basic_pack_codes', column_name: 'basic_pack_code' },
     Cities: { table_name: 'destination_cities', column_name: 'city_name' },
     Commodities: { table_name: 'commodities', column_name: 'code' },
     Cultivars: { table_name: 'cultivars', column_name: 'cultivar_name' },
@@ -601,12 +602,13 @@ class AppConst # rubocop:disable Metrics/ClassLength
     Farms: { table_name: 'farms', column_name: 'farm_code' },
     Fruit_Size_References: { table_name: 'fruit_size_references', column_name: 'size_reference' },
     Grades: { table_name: 'grades', column_name: 'grade_code' },
+    Inner_PKG_Marks: { table_name: 'inner_pm_marks', column_name: 'inner_pm_mark_code' },
     Inventory_Codes: { table_name: 'inventory_codes', column_name: 'inventory_code' },
     Locations: { table_name: 'locations', column_name: 'location_short_code' },
     Marketing_Varieties: { table_name: 'marketing_varieties',  column_name: 'marketing_variety_code' },
     Marks: { table_name: 'marks', column_name: 'mark_code' },
     Orchards: { table_name: 'orchards', column_name: 'orchard_code' },
-    Organizations: { table_name: 'organizations', column_name: 'medium_description' },
+    Organizations: { table_name: 'organizations', column_name: 'short_description' },
     PUCs: { table_name: 'pucs', column_name: 'puc_code' },
     Packed_TM_Group: { table_name: 'target_market_groups', column_name: 'target_market_group_name' },
     Ports: { table_name: 'ports', column_name: 'port_code' },
@@ -614,12 +616,14 @@ class AppConst # rubocop:disable Metrics/ClassLength
     RMT_Delivery_Destinations: { table_name: 'rmt_delivery_destinations', column_name: 'delivery_destination_code' },
     RMT_Sizes: { table_name: 'rmt_sizes', column_name: 'size_code' },
     Seasons: { table_name: 'seasons', column_name: 'season_code' },
-    Standard_Pack_Codes: { table_name: 'standard_pack_codes', column_name: 'standard_pack_code' },
+    Standard_Packs: { table_name: 'standard_pack_codes', column_name: 'standard_pack_code' },
+    Target_Markets: { table_name: 'target_markets', column_name: 'target_market_name' },
     Vessels: { table_name: 'vessels', column_name: 'vessel_code' }
   }.freeze
 
-  EXTERNAL_MF_MAPPING_SYSTEMS = %w[PalTrack LegacySystem].freeze
+  EXTERNAL_MF_MAPPING_SYSTEMS = ['Kromco MES'].freeze
   EXTERNAL_MF_MAPPING_RULES = {
+    Basic_Packs: { table_name: 'basic_pack_codes', column_name: 'basic_pack_code' },
     Cities: { table_name: 'destination_cities', column_name: 'city_name' },
     Commodities: { table_name: 'commodities', column_name: 'code' },
     Cultivars: { table_name: 'cultivars', column_name: 'cultivar_name' },
@@ -627,12 +631,13 @@ class AppConst # rubocop:disable Metrics/ClassLength
     Farms: { table_name: 'farms', column_name: 'farm_code' },
     Fruit_Size_References: { table_name: 'fruit_size_references', column_name: 'size_reference' },
     Grades: { table_name: 'grades', column_name: 'grade_code' },
+    Inner_PKG_Marks: { table_name: 'inner_pm_marks', column_name: 'inner_pm_mark_code' },
     Inventory_Codes: { table_name: 'inventory_codes', column_name: 'inventory_code' },
     Locations: { table_name: 'locations', column_name: 'location_short_code' },
     Marketing_Varieties: { table_name: 'marketing_varieties',  column_name: 'marketing_variety_code' },
     Marks: { table_name: 'marks', column_name: 'mark_code' },
     Orchards: { table_name: 'orchards', column_name: 'orchard_code' },
-    Organizations: { table_name: 'organizations', column_name: 'medium_description' },
+    Organizations: { table_name: 'organizations', column_name: 'short_description' },
     PUCs: { table_name: 'pucs', column_name: 'puc_code' },
     Packed_TM_Group: { table_name: 'target_market_groups', column_name: 'target_market_group_name' },
     Ports: { table_name: 'ports', column_name: 'port_code' },
@@ -640,7 +645,8 @@ class AppConst # rubocop:disable Metrics/ClassLength
     RMT_Delivery_Destinations: { table_name: 'rmt_delivery_destinations', column_name: 'delivery_destination_code' },
     RMT_Sizes: { table_name: 'rmt_sizes', column_name: 'size_code' },
     Seasons: { table_name: 'seasons', column_name: 'season_code' },
-    Standard_Pack_Codes: { table_name: 'standard_pack_codes', column_name: 'standard_pack_code' },
+    Standard_Packs: { table_name: 'standard_pack_codes', column_name: 'standard_pack_code' },
+    Target_Markets: { table_name: 'target_markets', column_name: 'target_market_name' },
     Vessels: { table_name: 'vessels', column_name: 'vessel_code' }
   }.freeze
 
