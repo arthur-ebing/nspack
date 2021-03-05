@@ -22,6 +22,10 @@
   :is_delete: true
   :popup: true
 - :separator: true
+- :url: "/production/product_setups/product_setups/$:product_setup_id$"
+  :text: view product setup
+  :icon: information-solid
+  :title: View Product Setup
 - :url: "/development/statuses/list/packing_specification_items/$:id$"
   :text: status
   :icon: information-solid
