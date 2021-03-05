@@ -504,7 +504,7 @@ module ProductionApp
           COALESCE(mes_modules.bulk_registration_mode, false) AS bulk_registration_mode
         FROM system_resources
         JOIN plant_resources ON plant_resources.system_resource_id = system_resources.id
-        LEFT JOIN mes_modules ON mes_modules.module_code = system_resources.system_resource_code;
+        LEFT JOIN mes_modules ON mes_modules.module_code = system_resources.system_resource_code
         WHERE system_resources.mac_address = ?
       SQL
       hash = DB[query, mac_addr].first

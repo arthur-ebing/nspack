@@ -37,7 +37,7 @@ class JsonRobotInterface # rubocop:disable Metrics/ClassLength
   end
 
   def process_invalid_params # rubocop:disable Metrics/CyclomaticComplexity
-    puts "JSON ROBOT: Invalid params. #{@validation_errors.inspect} - #{input_payload.inspect}"
+    puts "#{Time.now.strftime('%Y-%m-%d %H:%M:%S')} JSON ROBOT: Invalid params. #{@validation_errors.inspect} - #{input_payload.inspect}"
 
     return invalid_setup if @action_type && @action_type == :requestSetup
 
@@ -60,7 +60,7 @@ class JsonRobotInterface # rubocop:disable Metrics/ClassLength
   end
 
   def process_request
-    puts "JSON ROBOT: #{@robot.system_resource_code} - #{input_payload.inspect}"
+    puts "#{Time.now.strftime('%Y-%m-%d %H:%M:%S')} JSON ROBOT: #{@robot.system_resource_code} - #{input_payload.inspect}"
 
     send(inflector.underscore(action_type))
   end

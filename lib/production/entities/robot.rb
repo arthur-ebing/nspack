@@ -13,5 +13,6 @@ module ProductionApp
     attribute :mac_address, Types::String
     attribute :module_action, Types::String
     attribute :robot_function, Types::String
+    attribute :bulk_registration_mode, Types::Bool
   end
 end

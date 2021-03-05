@@ -504,7 +504,7 @@ class BuildKrResourceTree < BaseScript # rubocop:disable Metrics/ClassLength
       repo.update_system_resource(sysres_id, attrs)
 
       sysres_id = repo.get(:plant_resources, printer_id, :system_resource_id)
-      attrs = { ip_address: p_hash[:ip], mac_address: p_hash[:mac], connection_type: 'TCP', printer_language: 'pplz', pixels_mm: 8, peripheral_model: 'datamax' }
+      attrs = { ip_address: p_hash[:ip], mac_address: p_hash[:mac], connection_type: 'TCP', port: 9100, printer_language: 'pplz', pixels_mm: 8, peripheral_model: 'datamax' }
       repo.update_system_resource(sysres_id, attrs)
       repo.link_a_peripheral(clm_id, sysres_id)
       # add buttons

@@ -64,7 +64,7 @@ module UiRules
     end
 
     def set_print_fields
-      fields[:plant_reqource_code] = { renderer: :label }
+      fields[:plant_resource_code] = { renderer: :label }
       fields[:printer] = { renderer: :select,
                            options: @print_repo.select_printers_for_application(AppConst::PRINT_APP_PACKPOINT),
                            required: true }
