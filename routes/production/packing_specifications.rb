@@ -108,13 +108,18 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
       r.on 'inline_select_pm_marks' do
         specification_item = interactor.packing_specification_item(id)
-        items = interactor.for_select_pm_marks(where: { mark_id: specification_item.mark_id })
+        items = interactor.for_select_pm_marks(
+          where: { mark_id: specification_item.mark_id }
+        )
         { items: items }.to_json
       end
 
       r.on 'inline_select_pm_boms' do
         specification_item = interactor.packing_specification_item(id)
-        items = interactor.for_select_pm_boms(where: { std_fruit_size_count_id: specification_item.std_fruit_size_count_id })
+        items = interactor.for_select_pm_boms(
+          where: { std_fruit_size_count_id: specification_item.std_fruit_size_count_id,
+                   basic_pack_id: specification_item.basic_pack_id }
+        )
         { items: items }.to_json
       end
 
@@ -179,7 +184,13 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
-            re_show_form(r, res) { Production::PackingSpecifications::PackingSpecificationItem::Edit.call(id, form_values: params[:packing_specification_item], form_errors: res.errors) }
+            re_show_form(r, res) do
+              Production::PackingSpecifications::PackingSpecificationItem::Edit.call(
+                id,
+                form_values: params[:packing_specification_item],
+                form_errors: res.errors
+              )
+            end
           end
         end
         r.delete do    # DELETE

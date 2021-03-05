@@ -11,6 +11,7 @@ module ProductionApp
     attribute :pm_mark_id, Types::Integer
     attribute :mark_id, Types::Integer
     attribute :std_fruit_size_count_id, Types::Integer
+    attribute :basic_pack_id, Types::Integer
     attribute :pm_mark, Types::String
     attribute :product_setup_id, Types::Integer
     attribute :product_setup_template_id, Types::Integer

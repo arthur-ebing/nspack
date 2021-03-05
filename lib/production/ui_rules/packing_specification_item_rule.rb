@@ -48,7 +48,9 @@ module UiRules
                          hide_on_load: @mode == :new },
         product_setup_id: { renderer: :select,
                             caption: 'Product Setup',
-                            options: ProductionApp::ProductSetupRepo.new.for_select_product_setups(where: { product_setup_template_id: @form_object.product_setup_template_id }),
+                            options: ProductionApp::ProductSetupRepo.new.for_select_product_setups(
+                              where: { product_setup_template_id: @form_object.product_setup_template_id }
+                            ),
                             disabled_options: ProductionApp::ProductSetupRepo.new.for_select_inactive_product_setups,
                             prompt: true,
                             required: true,
@@ -56,7 +58,10 @@ module UiRules
         description: {},
         pm_bom_id: { renderer: :select,
                      caption: 'PKG BOM',
-                     options: @bom_repo.for_select_pm_boms(where: { std_fruit_size_count_id: @form_object.std_fruit_size_count_id }),
+                     options: @bom_repo.for_select_pm_boms(
+                       where: { std_fruit_size_count_id: @form_object.std_fruit_size_count_id,
+                                basic_pack_id: @form_object.basic_pack_id }
+                     ),
                      disabled_options: @bom_repo.for_select_inactive_pm_boms,
                      searchable: true,
                      prompt: true,
@@ -135,6 +140,7 @@ module UiRules
                                     mark_id: nil,
                                     product_setup_id: nil,
                                     std_fruit_size_count_id: nil,
+                                    basic_pack_code_id: nil,
                                     product_setup_template_id: nil,
                                     tu_labour_product_id: nil,
                                     ru_labour_product_id: nil,

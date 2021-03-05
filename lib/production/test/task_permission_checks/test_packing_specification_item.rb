@@ -16,6 +16,7 @@ module ProductionApp
         pm_bom: 'ABC',
         pm_mark_id: 1,
         mark_id: 1,
+        basic_pack_id: 1,
         pm_mark: 'ABC',
         product_setup_id: 1,
         product_setup_template_id: 1,

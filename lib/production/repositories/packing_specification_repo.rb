@@ -33,6 +33,7 @@ module ProductionApp
           packing_specification_items.pm_mark_id,
           product_setups.mark_id AS mark_id,
           product_setups.std_fruit_size_count_id AS std_fruit_size_count_id,
+          product_setups.basic_pack_code_id AS basic_pack_id,
           pm_marks.description AS pm_mark,
           packing_specification_items.product_setup_id,
           packing_specifications.product_setup_template_id,
