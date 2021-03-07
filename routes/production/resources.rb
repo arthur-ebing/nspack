@@ -338,6 +338,11 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         handle_not_found(r)
       end
 
+      r.is do
+        check_auth!('resources', 'read')
+        show_partial { Production::Resources::SystemResource::Show.call(id) }
+      end
+
       r.on 'view_xml_config' do
         check_auth!('resources', 'read')
         res = interactor.system_resource_xml_for(id)

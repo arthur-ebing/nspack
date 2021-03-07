@@ -1,15 +1,48 @@
 # frozen_string_literal: true
 
 module UiRules
-  class SystemResourceRule < Base
+  class SystemResourceRule < Base # rubocop:disable Metrics/ClassLength
     def generate_rules
       @repo = ProductionApp::ResourceRepo.new
       make_form_object
       apply_form_values
 
       common_values_for_fields common_fields
+      set_show_fields if @mode == :show
 
       form_name 'system_resource'
+    end
+
+    def set_show_fields # rubocop:disable Metrics/AbcSize
+      plant_resource_type_id_label = @repo.find_plant_resource_type(@form_object.plant_resource_type_id)&.plant_resource_type_code
+      fields[:plant_resource_type_id] = { renderer: :label, with_value: plant_resource_type_id_label, caption: 'Plant Type' }
+      fields[:plant_resource_code] = { renderer: :label, caption: 'Plant Code' }
+      fields[:system_resource_type_code] = { renderer: :label, caption: 'System Type' }
+      fields[:system_resource_code] = { renderer: :label, caption: 'System Code' }
+      fields[:description] = { renderer: :label }
+      fields[:represents_plant_resource_code] = { renderer: :label, invisible: @form_object.represents_plant_resource_code.nil?, caption: 'Represents' }
+      fields[:active] = { renderer: :label, as_boolean: true }
+
+      fields[:equipment_type] = { renderer: :label }
+      fields[:module_function] = { renderer: :label }
+      fields[:robot_function] = { renderer: :label }
+      fields[:mac_address] = { renderer: :label }
+      fields[:ip_address] = { renderer: :label }
+      fields[:port] = { renderer: :label }
+      fields[:ttl] = { renderer: :label }
+      fields[:cycle_time] = { renderer: :label }
+      fields[:publishing] = { renderer: :label, as_boolean: true }
+      fields[:login] = { renderer: :label, as_boolean: true }
+      fields[:logoff] = { renderer: :label, as_boolean: true }
+      fields[:group_incentive] = { renderer: :label, as_boolean: true }
+      fields[:legacy_messcada] = { renderer: :label, as_boolean: true }
+      fields[:module_action] = { renderer: :label }
+      fields[:peripheral_model] = { renderer: :label }
+      fields[:connection_type] = { renderer: :label }
+      fields[:printer_language] = { renderer: :label }
+      fields[:print_username] = { renderer: :label }
+      fields[:print_password] = { renderer: :label }
+      fields[:pixels_mm] = { renderer: :label }
     end
 
     def common_fields
@@ -21,8 +54,6 @@ module UiRules
                         end
       {
         plant_resource_type_id: { renderer: :label, with_value: plant_resource_type_id_label, caption: 'Plant Resource Type' },
-        system_resource_code: { renderer: :label },
-        description: { renderer: :label },
         equipment_type: { renderer: :select, options: equipment_types, sort_items: false },
         module_function: {},
         robot_function: { renderer: :select, options: robot_functions, sort_items: false, prompt: true },
@@ -47,7 +78,13 @@ module UiRules
     end
 
     def make_form_object
-      @form_object = @repo.find_system_resource(@options[:id])
+      @form_object = if @mode == :show
+                       sysres = @repo.find_system_resource_flat(@options[:id])
+                       represents = @repo.packpoint_for_button(sysres.plant_resource_code)
+                       OpenStruct.new(sysres.to_h.merge(represents_plant_resource_code: represents))
+                     else
+                       @repo.find_system_resource(@options[:id])
+                     end
       set_module_function
     end
 
