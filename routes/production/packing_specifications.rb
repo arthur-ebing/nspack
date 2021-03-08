@@ -122,7 +122,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
       r.on 'inline_select_pm_boms' do
         specification_item = interactor.packing_specification_item(id)
-        items = interactor.for_select_pm_boms(
+        items = interactor.for_select_packing_spec_pm_boms(
           where: { std_fruit_size_count_id: specification_item.std_fruit_size_count_id,
                    basic_pack_id: specification_item.basic_pack_id }
         )

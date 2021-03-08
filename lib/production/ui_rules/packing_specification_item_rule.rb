@@ -58,7 +58,7 @@ module UiRules
         description: {},
         pm_bom_id: { renderer: :select,
                      caption: 'PKG BOM',
-                     options: @bom_repo.for_select_pm_boms(
+                     options: @bom_repo.for_select_packing_spec_pm_boms(
                        where: { std_fruit_size_count_id: @form_object.std_fruit_size_count_id,
                                 basic_pack_id: @form_object.basic_pack_id }
                      ),

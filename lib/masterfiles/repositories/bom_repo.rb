@@ -174,6 +174,27 @@ module MasterfilesApp
         .select_map([:bom_code, Sequel[:pm_boms][:id]])
     end
 
+    def for_select_packing_spec_pm_boms(where: {})
+      query = <<~SQL
+        SELECT bom_code, id
+        FROM (
+            SELECT
+                pm_boms.id,
+                pm_boms.bom_code,
+                MAX(pm_products.std_fruit_size_count_id) AS std_fruit_size_count_id,
+                MAX(pm_products.basic_pack_id) AS basic_pack_id
+            FROM pm_boms
+            JOIN pm_boms_products ON (pm_boms_products.pm_bom_id = pm_boms.id)
+            JOIN pm_products ON (pm_products.id = pm_boms_products.pm_product_id)
+            WHERE pm_boms.active
+            GROUP BY pm_boms.id
+            ) sq
+        WHERE sq.std_fruit_size_count_id = ? AND sq.basic_pack_id = ?
+        ORDER BY bom_code
+      SQL
+      DB[query, where[:std_fruit_size_count_id], where[:basic_pack_id]].select_map(%i[bom_code id])
+    end
+
     def for_select_pm_marks(where: {}, active: true) # rubocop:disable Metrics/AbcSize
       DB[:pm_marks]
         .join(:marks, id: :mark_id)
