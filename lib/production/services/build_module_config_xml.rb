@@ -18,6 +18,8 @@ module ProductionApp
     end
 
     def build_xml(sys_mod, no_buttons, server) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
+      return 'No module action defined' if sys_mod.module_action.nil?
+
       action = Crossbeams::Config::ResourceDefinitions::MODULE_ACTIONS[sys_mod.module_action.to_sym]
       builder = Nokogiri::XML::Builder.new do |xml| # rubocop:disable Metrics/BlockLength
         xml.SystemSchema do # rubocop:disable Metrics/BlockLength

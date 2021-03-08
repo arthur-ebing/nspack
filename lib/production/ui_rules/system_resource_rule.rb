@@ -54,6 +54,8 @@ module UiRules
                         end
       {
         plant_resource_type_id: { renderer: :label, with_value: plant_resource_type_id_label, caption: 'Plant Resource Type' },
+        system_resource_code: { renderer: :label },
+        description: { renderer: :label },
         equipment_type: { renderer: :select, options: equipment_types, sort_items: false },
         module_function: {},
         robot_function: { renderer: :select, options: robot_functions, sort_items: false, prompt: true },
