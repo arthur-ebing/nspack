@@ -176,20 +176,17 @@ module MasterfilesApp
 
     def for_select_packing_spec_pm_boms(where: {})
       query = <<~SQL
-        SELECT bom_code, id
-        FROM (
-            SELECT
-                pm_boms.id,
-                pm_boms.bom_code,
-                MAX(pm_products.std_fruit_size_count_id) AS std_fruit_size_count_id,
-                MAX(pm_products.basic_pack_id) AS basic_pack_id
-            FROM pm_boms
-            JOIN pm_boms_products ON (pm_boms_products.pm_bom_id = pm_boms.id)
-            JOIN pm_products ON (pm_products.id = pm_boms_products.pm_product_id)
-            WHERE pm_boms.active
-            GROUP BY pm_boms.id
-            ) sq
-        WHERE sq.std_fruit_size_count_id = ? AND sq.basic_pack_id = ?
+        SELECT pm_boms.bom_code, pm_boms.id
+        FROM pm_boms
+        WHERE pm_boms.active
+        AND EXISTS (
+            SELECT pm_products.id
+            FROM pm_products JOIN pm_boms_products ON (pm_boms_products.pm_bom_id = pm_boms.id)
+            WHERE pm_product_id = pm_products.id AND pm_products.std_fruit_size_count_id = ?)
+        AND EXISTS (
+            SELECT pm_products.id
+            FROM pm_products JOIN pm_boms_products ON (pm_boms_products.pm_bom_id = pm_boms.id)
+            WHERE pm_product_id = pm_products.id AND pm_products.basic_pack_id = ?)
         ORDER BY bom_code
       SQL
       DB[query, where[:std_fruit_size_count_id], where[:basic_pack_id]].select_map(%i[bom_code id])
