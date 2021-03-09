@@ -393,11 +393,7 @@ module ProductionApp
           #{hash[:height_mm].nil? ? 'height_mm' : 'footprint_code'} is missing
         STR
 
-        DevelopmentApp::SendMailJob.enqueue(from: AppConst::SYSTEM_MAIL_SENDER,
-                                            to: AppConst::ERROR_MAIL_RECIPIENTS,
-                                            subject: 'EXT FG CODE INTEGRATION FAIL',
-                                            body: mail)
-
+        ErrorMailer.send_error_email(subject: 'EXT FG CODE INTEGRATION FAIL', message: mail)
         return nil
       end
 
