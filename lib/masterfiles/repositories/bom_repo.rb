@@ -298,7 +298,9 @@ module MasterfilesApp
       DB[:pm_boms].where(id: id).delete
     end
 
-    def pm_bom_system_code(pm_bom_id)
+    def pm_bom_system_code(pm_bom_id, exclude_subtype_id = nil)
+      exclude_str = exclude_subtype_id.nil_or_empty? ? '' : " AND pm_subtypes.id != #{exclude_subtype_id}"
+
       query = <<~SQL
         SELECT string_agg(product_codes.product_code, '_'::text) AS system_code
         FROM (
@@ -311,6 +313,7 @@ module MasterfilesApp
           JOIN pm_types ON pm_types.id = pm_subtypes.pm_type_id
           JOIN pm_composition_levels ON pm_composition_levels.id = pm_types.pm_composition_level_id
           WHERE pm_boms_products.pm_bom_id = ?
+          #{exclude_str}
           ORDER BY pm_composition_levels.composition_level
         ) product_codes
       SQL
@@ -348,7 +351,8 @@ module MasterfilesApp
         JOIN pm_types ON pm_types.id = pm_subtypes.pm_type_id
         JOIN pm_composition_levels ON pm_composition_levels.id = pm_types.pm_composition_level_id
         LEFT JOIN std_fruit_size_counts ON std_fruit_size_counts.id = pm_products.std_fruit_size_count_id
-        LEFT JOIN standard_pack_codes ON standard_pack_codes.basic_pack_code_id = pm_products.basic_pack_id
+        LEFT JOIN basic_packs_standard_packs ON basic_packs_standard_packs.basic_pack_id = pm_products.basic_pack_id
+        LEFT JOIN standard_pack_codes ON standard_pack_codes.id = basic_packs_standard_packs.standard_pack_id
         WHERE pm_boms_products.pm_bom_id = #{pm_bom_id}
         ORDER BY pm_composition_levels.composition_level
       SQL
@@ -396,7 +400,7 @@ module MasterfilesApp
         pm_subtype_id: fruit_product[:pm_subtype_id],
         uom_id: fruit_product[:uom_id],
         quantity: fruit_product[:quantity],
-        fruit_count_product_ids: available_for_clone_fruit_count_products(fruit_product[:pm_subtype_id]) }
+        fruit_count_product_ids: available_for_clone_fruit_count_products(pm_bom_id, fruit_product[:pm_subtype_id]) }
     end
 
     def find_pm_bom_fruit_product(pm_bom_id)
@@ -412,14 +416,16 @@ module MasterfilesApp
         .first
     end
 
-    def available_for_clone_fruit_count_products(pm_subtype_id)
+    def available_for_clone_fruit_count_products(pm_bom_id, pm_subtype_id) # rubocop:disable Metrics/AbcSize
       return nil if pm_subtype_id.nil_or_empty?
 
       DB[:pm_products]
         .where(pm_subtype_id: pm_subtype_id)
         .exclude(id: DB[:pm_boms_products]
                        .join(:pm_products, id: :pm_product_id)
+                       .join(:pm_boms, id: Sequel[:pm_boms_products][:pm_bom_id])
                        .where(pm_subtype_id: pm_subtype_id)
+                       .where(Sequel.like(:bom_code, "#{pm_bom_system_code(pm_bom_id, pm_subtype_id)}%"))
                        .distinct
                        .select_map(:pm_product_id))
         .select_map(:id)

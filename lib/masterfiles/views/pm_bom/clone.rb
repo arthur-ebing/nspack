@@ -51,7 +51,7 @@ module Masterfiles
                                multiselect_key: 'clone_bom_to_counts',
                                multiselect_params: { pm_bom_id: attrs[:pm_bom_id],
                                                      pm_subtype_id: attrs[:pm_subtype_id],
-                                                     fruit_count_product_ids: attrs[:fruit_count_product_ids].nil_or_empty? ? 'null' : attrs[:fruit_count_product_ids].join(',') })
+                                                     fruit_count_product_ids: attrs[:fruit_count_product_ids].nil_or_empty? ? 'null' : attrs[:fruit_count_product_ids] })
             end
           end
 
