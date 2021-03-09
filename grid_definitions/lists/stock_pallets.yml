@@ -32,6 +32,7 @@
   - failed_and_not_repacked
   - reject_to_repack
   - target_customer_pallets
+  - scrap_reworks_pallets
 :captions:
   :conditions:
     :active: Active Pallets
@@ -170,6 +171,13 @@
   - :col: in_stock
     :op: "="
     :val: true
+  :pallets_available_to_scrap:
+    - :col: in_stock
+      :op: "="
+      :val: true
+    - :col: allocated
+      :op: "="
+      :val: false
 :multiselect:
   :allocate:
     :url: "/finished_goods/dispatch/loads/$:id$/allocate"
@@ -224,6 +232,12 @@
     :grid_caption: Export Pallets
     :caption: Test
     :conditions: export_pack
+  :scrap_reworks_pallets:
+    :url: "/production/reworks/reworks_run_types/$:id$/reworks_runs/multiselect_reworks_run_pallets"
+    :section_caption: 'SELECT ''Select pallets for reworks run type: '' || run_type
+        FROM reworks_run_types WHERE id = $:id$'
+    :multiselect_save_method: remote
+    :conditions: pallets_available_to_scrap
 :hide_for_client:
   hb:
   - marketing_puc

@@ -26,6 +26,9 @@ module Production
           elsif rules[:unscrap_bin]
             grid = 'scrapped_rmt_bins_reworks'
             grid_key = 'unscrap_bins_reworks'
+          elsif rules[:scrap_pallet]
+            grid = 'stock_pallets'
+            grid_key = 'scrap_reworks_pallets'
           else
             grid = 'stock_pallets'
             grid_key = 'reworks_pallets'
