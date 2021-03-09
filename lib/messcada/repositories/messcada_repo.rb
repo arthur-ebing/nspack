@@ -358,6 +358,28 @@ module MesscadaApp
       success_response('ok', instance)
     end
 
+    def complete_external_bin_tipping(bin_number, run_id) # rubocop:disable Metrics/AbcSize
+      url = "#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/integrate?type=bin_tipped&record_id=#{bin_number}&model=BinsTipped&nspack_run_id=#{run_id}"
+      http = Crossbeams::HTTPCalls.new
+      res = http.request_get(url)
+      err = res.message unless res.success
+
+      unless err
+        packet = Nokogiri::XML(res.instance.body)
+        err = packet.root.child.text if packet.root.child.name == 'error'
+      end
+
+      return unless err
+
+      mail = <<~STR
+        Bin:#{bin_number} could not be tipped successfully
+
+        #{err}
+      STR
+
+      ErrorMailer.send_error_email(subject: 'LEGACY BIN TIP FAIL', message: mail)
+    end
+
     def can_bin_be_tipped?(bin_number)
       url = "#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/can_bin_be_tipped?bin_number=#{bin_number}"
       http = Crossbeams::HTTPCalls.new

@@ -10,7 +10,7 @@ module MesscadaApp
       @device = params[:device]
     end
 
-    def call # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def call # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       if !bin_exists? && AppConst::CR_PROD.kromco_rmt_integration?
         res = active_run_for_device
         return res unless res.success
@@ -26,9 +26,10 @@ module MesscadaApp
       res = FinishedGoodsApp::MoveStockService.new(AppConst::BIN_STOCK_TYPE, rmt_bin_id, location_to_id, AppConst::BIN_TIP_MOVE_BIN_BUSINESS_PROCESS, nil).call
       return res unless res.success
 
+      repo.complete_external_bin_tipping(bin_number, @run_id) if AppConst::CR_PROD.kromco_rmt_integration?
+
       update_bin
 
-      # run_stats_bins_tipped = repo.production_run_stats(@run_id)
       run_stats_bins_tipped = repo.get_run_bins_tipped(@run_id)
       success_response('rmt bin tipped successfully', @run_attrs.merge(rmt_bin_id: @rmt_bin_id, run_id: @run_id, bins_tipped: run_stats_bins_tipped))
     end
