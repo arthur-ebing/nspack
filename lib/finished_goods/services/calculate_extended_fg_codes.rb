@@ -23,7 +23,9 @@ module FinishedGoodsApp
     def calculate_extended_fg_codes # rubocop:disable Metrics/AbcSize
       seq_extended_fgs = []
       repo.select_values(:pallet_sequences, %i[id packing_specification_item_id], pallet_id: pallet_ids).each do |id, packing_specification_item_id|
-        seq_extended_fgs << { id: id, extended_fg_code: repo.calculate_extended_fg_code(packing_specification_item_id) }
+        if (extended_fg_code = repo.calculate_extended_fg_code(packing_specification_item_id))
+          seq_extended_fgs << { id: id, extended_fg_code: extended_fg_code }
+        end
       end
 
       ms_repo = MesscadaApp::MesscadaRepo.new

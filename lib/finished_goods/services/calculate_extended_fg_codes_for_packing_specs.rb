@@ -23,7 +23,9 @@ module FinishedGoodsApp
     def calculate_extended_fg_codes
       seq_extended_fgs = []
       packing_specification_item_ids.each do |packing_specification_item_id|
-        seq_extended_fgs << { id: packing_specification_item_id, extended_fg_code: repo.calculate_extended_fg_code(packing_specification_item_id) }
+        if (extended_fg_code = repo.calculate_extended_fg_code(packing_specification_item_id))
+          seq_extended_fgs << { id: packing_specification_item_id, extended_fg_code: extended_fg_code }
+        end
       end
 
       ms_repo = MesscadaApp::MesscadaRepo.new

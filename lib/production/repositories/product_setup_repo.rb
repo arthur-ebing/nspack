@@ -370,14 +370,38 @@ module ProductionApp
         .get(:product_code)
     end
 
-    def packing_specification_item_carton_pack_product(packing_specification_item_id)
-      DB[:packing_specification_items]
-        .join(:pm_boms_products, pm_bom_id: :pm_bom_id)
-        .join(:pm_products, id: :pm_product_id)
-        .join(:pm_subtypes, id: :pm_subtype_id)
-        .join(:pm_types, id: :pm_type_id)
-        .where(Sequel[:packing_specification_items][:id] => packing_specification_item_id, pm_composition_level_id: 1)
-        .get(:product_code)
+    def packing_specification_item_carton_pack_product(packing_specification_item_id) # rubocop:disable Metrics/AbcSize
+      hash = DB[:packing_specification_items]
+             .join(:pm_boms_products, pm_bom_id: :pm_bom_id)
+             .join(:pm_products, id: :pm_product_id)
+             .join(:basic_pack_codes, id: :basic_pack_id)
+             .join(:pm_subtypes, id: Sequel[:pm_products][:pm_subtype_id])
+             .join(:pm_types, id: :pm_type_id)
+             .where(Sequel[:packing_specification_items][:id] => packing_specification_item_id, pm_composition_level_id: 1)
+             .select(
+               Sequel[:pm_types][:short_code].as(:pm_type_short_code),
+               Sequel[:basic_pack_codes][:footprint_code],
+               Sequel[:pm_subtypes][:short_code].as(:pm_subtype_short_code),
+               Sequel[:basic_pack_codes][:height_mm]
+             ).first
+      return nil if hash.nil?
+
+      unless hash[:height_mm] && hash[:footprint_code]
+        mail = <<~STR
+          Extended FG for packing specification item:#{packing_specification_item_id} could not be fetched.
+
+          #{hash[:height_mm].nil? ? 'height_mm' : 'footprint_code'} is missing
+        STR
+
+        DevelopmentApp::SendMailJob.enqueue(from: AppConst::SYSTEM_MAIL_SENDER,
+                                            to: AppConst::ERROR_MAIL_RECIPIENTS,
+                                            subject: 'EXT FG CODE INTEGRATION FAIL',
+                                            body: mail)
+
+        return nil
+      end
+
+      "#{hash[:pm_type_short_code]}#{hash[:footprint_code]}#{hash[:pm_subtype_short_code]}#{hash[:height_mm]}"
     end
 
     def prod_setup_organisation(prod_setup_id)
@@ -407,7 +431,10 @@ module ProductionApp
       fg_code_components << get(:fruit_size_references, prod_setup[:fruit_size_reference_id], :size_reference)
       fg_code_components << packing_specification_item_units_per_carton(packing_specification_item_id).to_f
       fg_code_components << packing_specification_item_unit_pack_product(packing_specification_item_id)
-      fg_code_components << packing_specification_item_carton_pack_product(packing_specification_item_id)
+      carton_pack_product = packing_specification_item_carton_pack_product(packing_specification_item_id)
+      return nil unless carton_pack_product
+
+      fg_code_components << carton_pack_product
       fg_code_components << prod_setup_organisation(prod_setup[:id])
       fg_code_components << packing_specification_item_fg_marks(packing_specification_item_id)
       fg_code_components.join('_')
