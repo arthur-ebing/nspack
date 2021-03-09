@@ -393,7 +393,7 @@ module ProductionApp
           #{hash[:height_mm].nil? ? 'height_mm' : 'footprint_code'} is missing
         STR
 
-        ErrorMailer.send_error_email(subject: 'EXT FG CODE INTEGRATION FAIL', message: mail)
+        ErrorMailer.send_error_email(subject: 'EXT FG CODE INTEGRATION FAIL', message: mail, append_recipients: AppConst::LEGACY_SYSTEM_ERROR_RECIPIENTS)
         return nil
       end
 

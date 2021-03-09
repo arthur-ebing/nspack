@@ -377,7 +377,7 @@ module MesscadaApp
         #{err}
       STR
 
-      ErrorMailer.send_error_email(subject: 'LEGACY BIN TIP FAIL', message: mail)
+      ErrorMailer.send_error_email(subject: 'LEGACY BIN TIP FAIL', message: mail, append_recipients: AppConst::LEGACY_SYSTEM_ERROR_RECIPIENTS)
     end
 
     def can_bin_be_tipped?(bin_number)

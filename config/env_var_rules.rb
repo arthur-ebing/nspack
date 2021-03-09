@@ -130,6 +130,7 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { SYSTEM_MAIL_SENDER: 'Email address for "FROM" address in the format NAME<email>' },
     { ERROR_MAIL_PREFIX: 'Prefix to be placed in subject of emails sent from exceptions.' },
     { ERROR_MAIL_RECIPIENTS: 'Comma-separated list of recipients of exception emails.' },
+    { LEGACY_SYSTEM_ERROR_RECIPIENTS: 'Comma-separated list of recipients for kr integration error emails.' },
     { CLIENT_CODE: 'Short, lowercase code to identify the implementation client. Used e.g. in defining per-client behaviour.' },
     { GLN_OR_LINE_NUMBERS: 'A comma-separated list of GLN or line numbers. Must be composed of digits only' },
     { INSTALL_LOCATION: 'A maximum 7-character name for the location - required by EDI transformers' },
