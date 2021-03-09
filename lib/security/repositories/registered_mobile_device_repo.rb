@@ -40,7 +40,7 @@ module SecurityApp
       if hash
         success_response('Called from a RMD', OpenStruct.new(hash))
       else
-        failed_response('Not a Remote Mobile Device')
+        failed_response('Not a Registered Mobile Device')
       end
     end
 
