@@ -3,7 +3,8 @@
 module MesscadaApp
   class CartonLabeling < BaseService # rubocop:disable Metrics/ClassLength
     attr_reader :repo, :hr_repo, :production_run_id, :setup_data, :carton_label_id, :pick_ref,
-                :pallet_number, :personnel_number, :params, :system_resource, :bin_attrs
+                :pallet_number, :personnel_number, :params, :system_resource,
+                :dedicated_pack, :bin_attrs, :farm_codes
 
     def initialize(params)
       @params = params
@@ -48,6 +49,9 @@ module MesscadaApp
         .gsub('$:FNC:iso_week$', iso_week)
         .gsub('$:FNC:iso_week_day$', iso_week_day)
         .gsub('$:FNC:current_date$', current_date)
+        .gsub('$:farm_code$', farm_codes[:farm_code].to_s)
+        .gsub('$:puc_code$', farm_codes[:puc_code].to_s)
+        .gsub('$:orchard_code$', farm_codes[:orchard_code].to_s)
     end
 
     def carton_labeling  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
@@ -69,11 +73,11 @@ module MesscadaApp
                             contract_worker_id: system_resource.contract_worker_id)
       end
 
-      attrs = attrs.merge(resolve_marketing_attrs) if AppConst::USE_MARKETING_PUC
-
+      attrs = attrs.merge(resolve_marketing_attrs) if AppConst::CR_PROD.use_marketing_puc?
       res = validate_carton_label_params(attrs)
       return validation_failed_response(res) if res.failure?
 
+      @farm_codes = farm_attrs_codes(res)
       res = create_carton_label(res)
       return res unless res.success
 
@@ -88,29 +92,38 @@ module MesscadaApp
       repo.find_resource_phc(setup_data[:production_run_data][:production_line_id]) || repo.find_resource_phc(setup_data[:production_run_data][:packhouse_resource_id])
     end
 
-    def resolve_marketing_attrs
-      farm_id = params[:bin_number].nil_or_empty? ? setup_data[:production_run_data][:farm_id] : find_bin_farm
+    def resolve_marketing_attrs # rubocop:disable Metrics/AbcSize
+      @dedicated_pack = !params[:bin_number].nil_or_empty?
+      attrs = dedicated_pack ? dp_bin_farm_attrs : production_run_farm_attrs
 
-      marketing_puc_id = marketing_puc(farm_id)
-      attrs = { farm_id: farm_id,
-                marketing_puc_id: marketing_puc_id,
-                marketing_orchard_id: marketing_orchard(marketing_puc_id) }
+      marketing_puc_id = marketing_puc(attrs[:farm_id])
+      attrs = attrs.merge({ marketing_puc_id: marketing_puc_id,
+                            marketing_orchard_id: marketing_orchard(marketing_puc_id) })
       attrs = attrs.merge(bin_attrs) unless bin_attrs.nil_or_empty?
       attrs
     end
 
-    def find_bin_farm
+    def production_run_farm_attrs
+      { farm_id: setup_data[:production_run_data][:farm_id],
+        puc_id: setup_data[:production_run_data][:puc_id],
+        orchard_id: setup_data[:production_run_data][:orchard_id] }
+    end
+
+    def dp_bin_farm_attrs
       res = validate_dp_bin
       return res unless res.success
 
-      repo.find_rmt_bin_farm(bin_attrs[:rmt_bin_id])
+      dp_bin = repo.find_rmt_bin_farm_attrs(bin_attrs[:rmt_bin_id])
+      { farm_id: dp_bin[:farm_id],
+        puc_id: dp_bin[:puc_id],
+        orchard_id: dp_bin[:orchard_id] }
     end
 
     def validate_dp_bin
-      rmt_bin = repo.find_rmt_bin_by_bin_number(params[:bin_number])
-      raise Crossbeams::InfoError, "DP Bin #{rmt_bin} not found" unless rmt_bin_exists?(rmt_bin)
+      rmt_bin_id = repo.find_rmt_bin_by_bin_number(params[:bin_number])
+      raise Crossbeams::InfoError, "DP Bin : #{rmt_bin_id} not found" unless rmt_bin_exists?(rmt_bin_id)
 
-      @bin_attrs = { rmt_bin_id: rmt_bin, dp_carton: true }
+      @bin_attrs = { rmt_bin_id: rmt_bin_id, dp_carton: true }
 
       ok_response
     end
@@ -120,7 +133,7 @@ module MesscadaApp
     end
 
     def marketing_puc(farm_id)
-      repo.find_marketing_puc(setup_data[:production_run_data][:marketing_org_party_role_id], farm_id)
+      repo.find_marketing_puc(setup_data[:setup_data][:marketing_org_party_role_id], farm_id)
     end
 
     def marketing_orchard(marketing_puc_id)
@@ -191,6 +204,12 @@ module MesscadaApp
 
     def resolve_col_array(ids)
       repo.array_for_db_col(ids) unless ids.nil?
+    end
+
+    def farm_attrs_codes(attrs)
+      { farm_code: repo.get_value(:farms, :farm_code, id: attrs[:farm_id]),
+        puc_code: repo.get_value(:pucs, :puc_code, id: attrs[:puc_id]),
+        orchard_code: repo.get_value(:orchards, :orchard_code, id: attrs[:orchard_id]) }
     end
   end
 end

@@ -589,7 +589,7 @@ module ProductionApp
     end
 
     def recalc_marketing_attrs?(params)
-      recalc = AppConst::USE_MARKETING_PUC
+      recalc = AppConst::CR_PROD.use_marketing_puc?
       recalc = false unless params.include?(:marketing_org_party_role_id)
       recalc
     end
@@ -733,7 +733,7 @@ module ProductionApp
                 cultivar_group_id: instance[:cultivar_group_id],
                 cultivar_id: instance[:cultivar_id],
                 season_id: instance[:season_id] }
-      attrs = attrs.merge(marketing_attrs(instance)) if AppConst::USE_MARKETING_PUC
+      attrs = attrs.merge(marketing_attrs(instance)) if AppConst::CR_PROD.use_marketing_puc?
       attrs
     end
 
@@ -755,7 +755,7 @@ module ProductionApp
                 cultivar_group: instance_data[:cultivar_group],
                 cultivar: instance_data[:cultivar],
                 season: instance_data[:season] }
-      attrs = attrs.merge(marketing_descriptions(instance_data)) if AppConst::USE_MARKETING_PUC
+      attrs = attrs.merge(marketing_descriptions(instance_data)) if AppConst::CR_PROD.use_marketing_puc?
       attrs
     end
 

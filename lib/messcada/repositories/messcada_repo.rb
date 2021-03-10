@@ -746,6 +746,13 @@ module MesscadaApp
         .get(:farm_id)
     end
 
+    def find_rmt_bin_farm_attrs(rmt_bin_id)
+      DB[:rmt_bins]
+        .where(id: rmt_bin_id)
+        .select(:farm_id, :puc_id, :orchard_id)
+        .first
+    end
+
     def active_run?(production_run_id)
       DB[:production_runs]
         .where(id: production_run_id)
