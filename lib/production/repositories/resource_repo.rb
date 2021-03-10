@@ -524,7 +524,11 @@ module ProductionApp
     end
 
     def packpoint_for_button(resource_code)
-      represented_id = get_value(:plant_resources, :represents_plant_resource_id, plant_resource_code: resource_code)
+      system_resource_id = get_id(:system_resources, system_resource_code: resource_code)
+      return nil if system_resource_id.nil?
+
+      # represented_id = get_value(:plant_resources, :represents_plant_resource_id, plant_resource_code: resource_code)
+      represented_id = get_value(:plant_resources, :represents_plant_resource_id, system_resource_id: system_resource_id)
       return nil if represented_id.nil?
 
       get(:plant_resources, represented_id, :plant_resource_code)
