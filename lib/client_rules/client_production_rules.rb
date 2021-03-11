@@ -148,7 +148,7 @@ module Crossbeams
     end
 
     def can_mix_cultivar_groups?(explain: false)
-      return 'Can culivar groups be mixed in a production run?' if explain
+      return 'Can cultivar groups be mixed in a production run?' if explain
 
       setting(:allow_cultivar_group_mix)
     end
