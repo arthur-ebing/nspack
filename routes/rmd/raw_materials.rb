@@ -197,7 +197,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.on 'print_rebin' do
         r.get do
           printer_repo = LabelApp::PrinterRepo.new
-          bin_attrs = printer_repo.select_values(:rmt_bins, %i[bin_asset_number rmt_delivery_id], id: id)&.first
+          bin_asset_number, delivery_id = printer_repo.get_value(:rmt_bins, %i[bin_asset_number rmt_delivery_id], id: id)
           form_state = { qty_to_print: 2 }
           error = retrieve_from_local_store(:errors)
           notice = retrieve_from_local_store(:flash_notice)
@@ -212,8 +212,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                          action: "/rmd/rmt_deliveries/rmt_bins/#{id}/print_rebin",
                                          button_caption: 'Submit')
 
-          form.add_label(:delivery_number, 'Delivery Number', bin_attrs&.last)
-          form.add_label(:bin_asset_number, 'Bin Number', bin_attrs&.first)
+          form.add_label(:delivery_number, 'Delivery Number', delivery_id)
+          form.add_label(:bin_asset_number, 'Bin Number', bin_asset_number)
           form.add_field(:qty_to_print, 'Qty To Print', required: false, prompt: true, data_type: :number)
           form.add_select(:printer,
                           'Printer',
