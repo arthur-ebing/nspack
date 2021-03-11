@@ -60,6 +60,10 @@ class Nspack < Roda
             puts "MESSCADA XML - response: #{s}"
             s
           end
+        rescue Crossbeams::FrameworkError => e
+          s = %(<ProductLabel PID="223" Status="false" Threading="true" LabelRenderAmount="0" Msg="#{e.message}" />)
+          puts "MESSCADA XML - response: #{s}"
+          s
         end
       end
     end

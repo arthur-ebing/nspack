@@ -38,7 +38,7 @@ class MesscadaXMLInterpreter
   #   { device: device, identifier: identifier, role: role }
   # end
 
-  def params_for_carton_labeling
+  def params_for_carton_labeling # rubocop:disable Metrics/AbcSize
     # mode = schema.xpath('.//ProductLabel').attribute('Mode').value
     # mode 6: 10:
     #          Input modes i.e. choose one of the following
@@ -69,7 +69,10 @@ class MesscadaXMLInterpreter
     device = schema.xpath(".//#{root}").attribute('Module').value
     packpoint = schema.xpath(".//#{root}").attribute('Input1').value # DPK-41-DP-1A
     identifier = schema.xpath(".//#{root}").attribute('Input2').value
-    { device: device, packpoint: packpoint, card_reader: '', identifier: identifier, identifier_is_person: true }
+    attr = schema.xpath(".//#{root}").attribute('BinNumber')
+    bin_number = attr.nil? ? nil : attr.value
+    # App 32625 output: MESSCADA XML - received: <ProductLabel PID="223"  Module="DPK-45" Name="172.16.35.204_45" TransactionType="" Op="" Su="" Mode="10" BinNumber="50985140" LotNumber="1196395" Input1="45DP45" Input2="DPK-45-A-2021-03-09-15:38:30" LabelRenderAmount="1" Store="false" Printer="PRN-45" Mass="0.0" />
+    { device: device, packpoint: packpoint, card_reader: '', bin_number: bin_number, identifier: identifier, identifier_is_person: true }
   end
 
   def params_for_can_bin_be_tipped
