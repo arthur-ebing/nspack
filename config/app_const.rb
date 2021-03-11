@@ -366,6 +366,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
 
   PRINT_APP_LOCATION = 'Location'
   PRINT_APP_BIN = 'Bin'
+  PRINT_APP_REBIN = 'Rebin'
   PRINT_APP_CARTON = 'Carton'
   PRINT_APP_PALLET = 'Pallet'
   PRINT_APP_PACKPOINT = 'Packpoint'
@@ -374,6 +375,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   PRINTER_APPLICATIONS = [
     PRINT_APP_LOCATION,
     PRINT_APP_BIN,
+    PRINT_APP_REBIN,
     PRINT_APP_CARTON,
     PRINT_APP_PALLET,
     PRINT_APP_PACKPOINT,

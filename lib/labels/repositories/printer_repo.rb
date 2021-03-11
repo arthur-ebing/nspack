@@ -231,5 +231,9 @@ module LabelApp
     def find_bin_labels
       MasterfilesApp::LabelTemplateRepo.new.for_select_label_templates(where: { application: AppConst::PRINT_APP_BIN }).map { |nm, _| nm }
     end
+
+    def find_rebin_labels
+      MasterfilesApp::LabelTemplateRepo.new.for_select_label_templates(where: { application: AppConst::PRINT_APP_REBIN }).map { |nm, _| nm }
+    end
   end
 end

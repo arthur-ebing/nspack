@@ -102,6 +102,11 @@ module RawMaterialsApp
     end
 
     def create_rebin(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      bin_asset = repo.get_available_bin_asset_numbers(1)
+      bin_asset_id = bin_asset.map(&:last).last
+      params[:bin_asset_number] = bin_asset.map(&:last).first
+      return failed_response("Couldn't find 1 available bin_asset_numbers in the system") unless params[:bin_asset_number]
+
       vres = validate_bin_asset_no_format(params)
       return vres unless vres.success
       return failed_response("Scanned Bin Number:#{params[:bin_asset_number]} is already in stock") if AppConst::USE_PERMANENT_RMT_BIN_BARCODES && !bin_asset_number_available?(params[:bin_asset_number])
@@ -117,6 +122,7 @@ module RawMaterialsApp
       id = nil
       repo.transaction do
         id = repo.create_rmt_bin(res)
+        repo.update(:bin_asset_numbers, bin_asset_id, last_used_at: Time.now)
         log_status(:rmt_bins, id, 'REBIN_CREATED')
         log_transaction
       end
@@ -385,6 +391,14 @@ module RawMaterialsApp
       success_response('Labels Printed Successfully', bin_asset_numbers.map { |b| b[1] }.join(','))
     end
 
+    def print_rebin_barcodes(id, params)
+      label_name = params[:rebin_label]
+      print_params = { no_of_prints: params[:qty_to_print], printer: params[:printer] }
+
+      instance = repo.rebin_label_printing_instance(id)
+      LabelPrintingApp::PrintLabel.call(label_name, instance, print_params)
+    end
+
     def pre_print_bin_labels(params) # rubocop:disable Metrics/AbcSize
       res = validate_bin_label_params(params)
       return validation_failed_response(res) if res.failure?
@@ -393,6 +407,17 @@ module RawMaterialsApp
       return failed_response("Couldn't find #{params[:no_of_prints]} available bin_asset_numbers in the system") unless bin_asset_numbers.length == params[:no_of_prints].to_i
 
       preprint_bin_barcodes(bin_asset_numbers, params)
+    rescue StandardError => e
+      failed_response(e.message)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def print_rebin_labels(id, params)
+      res = validate_rebin_label_params(params)
+      return validation_failed_response(res) if res.failure?
+
+      print_rebin_barcodes(id, params)
     rescue StandardError => e
       failed_response(e.message)
     rescue Crossbeams::InfoError => e
@@ -479,6 +504,10 @@ module RawMaterialsApp
 
     def validate_bin_label_params(params)
       BinLabelSchema.call(params)
+    end
+
+    def validate_rebin_label_params(params)
+      RebinLabelSchema.call(params)
     end
   end
 end

@@ -387,5 +387,9 @@ module RawMaterialsApp
     def delete_rmt_delivery_cost(rmt_delivery_id, cost_id)
       DB[:rmt_delivery_costs].where(rmt_delivery_id: rmt_delivery_id, cost_id: cost_id).delete
     end
+
+    def rebin_label_printing_instance(id)
+      DB[:vw_rebin_label].where(id: id).first
+    end
   end
 end

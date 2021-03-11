@@ -183,6 +183,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # BINS
     # --------------------------------------------------------------------------
     r.on 'rmt_bins', Integer do |id|
+      interactor = RawMaterialsApp::RmtBinInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
       r.on 'new' do # NEW
         new_bin_screen(id, '/rmd/rmt_deliveries/rmt_bins/new')
       end
@@ -190,6 +192,50 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.on 'new_delivery_bin' do # NEW
         store_locally(:new_bin_mode, :edit_delivery)
         new_bin_screen(id, '/rmd/rmt_deliveries/rmt_bins/new')
+      end
+
+      r.on 'print_rebin' do
+        r.get do
+          printer_repo = LabelApp::PrinterRepo.new
+          rmt_delivery_id = printer_repo.get(:rmt_bins, id, :rmt_delivery_id)
+          form_state = { qty_to_print: 2 }
+          error = retrieve_from_local_store(:errors)
+          notice = retrieve_from_local_store(:flash_notice)
+          form_state.merge!(error_message: error[:message], errors:  error[:errors]) unless error.nil?
+
+          form = Crossbeams::RMDForm.new(form_state,
+                                         notes: notice,
+                                         form_name: :rmt_bin,
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         caption: 'Create Rebin',
+                                         reset_button: false,
+                                         action: "/rmd/rmt_deliveries/rmt_bins/#{id}/print_rebin",
+                                         button_caption: 'Submit')
+
+          form.add_label(:delivery_number, 'Delivery Number', rmt_delivery_id)
+          form.add_field(:qty_to_print, 'Qty To Print', required: false, prompt: true, data_type: :number)
+          form.add_select(:printer,
+                          'Printer',
+                          items: printer_repo.select_printers_for_application(AppConst::PRINT_APP_REBIN),
+                          required: false)
+          form.add_select(:rebin_label,
+                          'Rebin Label',
+                          items: printer_repo.find_rebin_labels,
+                          required: false)
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+
+        r.post do
+          res = interactor.print_rebin_labels(id, params[:rmt_bin])
+          if res.success
+            store_locally(:flash_notice, "Rebin: #{res.instance[:bin_asset_number]} printed successfully")
+            r.redirect('/rmd/rmt_deliveries/rmt_bins/create_rebin')
+          else
+            store_locally(:errors, res)
+            r.redirect("/rmd/rmt_deliveries/rmt_bins/#{id}/print_rebin")
+          end
+        end
       end
     end
 
@@ -384,10 +430,10 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             behaviour.dropdown_change :production_line_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/rmt_bin_production_line_id_combo_changed' }]
             behaviour.dropdown_change :production_run_rebin_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/rmt_bin_production_run_rebin_id_combo_changed' }]
             behaviour.input_change :bin_asset_number, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/bin_asset_number_changed' }]
-            behaviour.dropdown_change :rmt_container_material_type_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/rmt_bin_rebin_container_material_type_combo_changed', param_keys: %i[rmt_bin_bin_asset_number] }] if capture_container_material_owner
+            behaviour.dropdown_change :rmt_container_material_type_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/rmt_bin_rebin_container_material_type_combo_changed' }] if capture_container_material_owner
           end
 
-          form.add_field(:bin_asset_number, 'Bin Number', scan: 'key248_all', scan_type: :bin_asset, required: true, submit_form: false)
+          # form.add_field(:bin_asset_number, 'Bin Number', scan: 'key248_all', scan_type: :bin_asset, required: true, submit_form: false)
           form.add_select(:rmt_class_id, 'Rmt Class', items: MasterfilesApp::FruitRepo.new.for_select_rmt_classes, prompt: true, required: true)
           form.add_select(:production_line_id, 'Production Line', items: ProductionApp::ResourceRepo.new.for_select_plant_resources_of_type('LINE'), prompt: true, required: true)
           form.add_select(:production_run_rebin_id, 'Production Run', items: form_state[:production_line_id] ? ProductionApp::ProductionRunRepo.new.for_select_production_runs_for_line(form_state[:production_line_id]) : [], prompt: true, required: true)
@@ -417,13 +463,13 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.post do
           res = interactor.create_rebin(params[:rmt_bin])
           if res.success
-            store_locally(:flash_notice, "Rebin: #{params[:rmt_bin][:bin_asset_number]} created successfully")
+            store_locally(:flash_notice, "Rebin: #{res.instance[:bin_asset_number]} created successfully")
+            r.redirect("/rmd/rmt_deliveries/rmt_bins/#{res.instance[:id]}/print_rebin")
           else
             store_locally(:errors, error_message: "Error: #{unwrap_failed_response(res)}")
-            params[:rmt_bin][:bin_asset_number] = nil
             store_locally(:form_state, params[:rmt_bin])
+            r.redirect('/rmd/rmt_deliveries/rmt_bins/create_rebin')
           end
-          r.redirect('/rmd/rmt_deliveries/rmt_bins/create_rebin')
         end
       end
 
