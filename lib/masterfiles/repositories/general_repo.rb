@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class GeneralRepo < BaseRepo
+  class GeneralRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     build_for_select :uom_types,
                      label: :code,
                      value: :id,
@@ -22,7 +22,7 @@ module MasterfilesApp
 
     crud_calls_for :masterfile_variants, name: :masterfile_variant
 
-    crud_calls_for :external_masterfile_mappings, name: :external_masterfile_mapping, wrapper: ExternalMasterfileMapping
+    crud_calls_for :external_masterfile_mappings, name: :external_masterfile_mapping
 
     def for_select_uoms(where: {}, exclude: {}, active: true)
       DB[:uoms]
@@ -120,6 +120,22 @@ module MasterfilesApp
       { mapping: mapping.keys.first.to_s.gsub('_', ' '),
         table_name: table_name,
         column_name: mapping.values.first[:column_name] }
+    end
+
+    def get_transformation(external_system, masterfile_table, masterfile_id)
+      DB[:external_masterfile_mappings]
+        .where(external_system: external_system,
+               masterfile_table: masterfile_table.to_s,
+               masterfile_id: masterfile_id)
+        .get(:external_code)
+    end
+
+    def get_transformation_or_value(external_system, masterfile_table, masterfile_id, column)
+      transformation = get_transformation(external_system, masterfile_table, masterfile_id)
+      return transformation if transformation
+
+      column ||= lookup_mf_mapping(masterfile_table)[:column_name]
+      get(masterfile_table.to_sym, masterfile_id, column.to_sym)
     end
   end
 end

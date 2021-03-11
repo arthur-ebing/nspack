@@ -334,15 +334,6 @@ module ProductionApp
         .get(:marketing_variety_id)
     end
 
-    def prod_setup_commodity_code(prod_setup_id)
-      DB[:product_setups]
-        .join(:product_setup_templates, id: :product_setup_template_id)
-        .join(:cultivars, id: :cultivar_id)
-        .join(:commodities, id: :commodity_id)
-        .where(Sequel[:product_setups][:id] => prod_setup_id)
-        .get(:code)
-    end
-
     def packing_specification_item_units_per_carton(packing_specification_item_id)
       DB[:packing_specification_items]
         .join(:pm_boms_products, pm_bom_id: :pm_bom_id)
@@ -354,13 +345,14 @@ module ProductionApp
     end
 
     def packing_specification_item_unit_pack_product(packing_specification_item_id)
-      DB[:packing_specification_items]
-        .join(:pm_boms_products, pm_bom_id: :pm_bom_id)
-        .join(:pm_products, id: :pm_product_id)
-        .join(:pm_subtypes, id: :pm_subtype_id)
-        .join(:pm_types, id: :pm_type_id)
-        .where(Sequel[:packing_specification_items][:id] => packing_specification_item_id, pm_composition_level_id: 2)
-        .get(:product_code)
+      id = DB[:packing_specification_items]
+           .join(:pm_boms_products, pm_bom_id: :pm_bom_id)
+           .join(:pm_products, id: :pm_product_id)
+           .join(:pm_subtypes, id: :pm_subtype_id)
+           .join(:pm_types, id: :pm_type_id)
+           .where(Sequel[:packing_specification_items][:id] => packing_specification_item_id, pm_composition_level_id: 2)
+           .get(Sequel[:pm_products][:id])
+      get_transformation(:pm_products, id, :product_code)
     end
 
     def packing_specification_item_carton_pack_product(packing_specification_item_id) # rubocop:disable Metrics/AbcSize
@@ -394,11 +386,12 @@ module ProductionApp
     end
 
     def prod_setup_organisation(prod_setup_id)
-      DB[:product_setups]
-        .join(:party_roles, id: :marketing_org_party_role_id)
-        .join(:organizations, id: :organization_id)
-        .where(Sequel[:product_setups][:id] => prod_setup_id)
-        .get(:short_description)
+      id = DB[:product_setups]
+           .join(:party_roles, id: :marketing_org_party_role_id)
+           .join(:organizations, id: :organization_id)
+           .where(Sequel[:product_setups][:id] => prod_setup_id)
+           .get(Sequel[:organizations][:id])
+      get_transformation(:organizations, id, :short_description)
     end
 
     def packing_specification_item_fg_marks(packing_specification_item_id)
@@ -408,18 +401,22 @@ module ProductionApp
         .get(:packaging_marks)&.join('_')
     end
 
+    def get_transformation(table_name, id, column)
+      MasterfilesApp::GeneralRepo.new.get_transformation_or_value('Kromco MES', table_name, id, column)
+    end
+
     def calculate_extended_fg_code(packing_specification_item_id) # rubocop:disable Metrics/AbcSize
       product_setup_id = get(:packing_specification_items, packing_specification_item_id, :product_setup_id)
-      prod_setup = find_hash(:product_setups, product_setup_id)
+      prod_setup = find_product_setup(product_setup_id).to_h
 
       fg_code_components = []
-      fg_code_components << prod_setup_commodity_code(prod_setup[:id])
-      fg_code_components << get(:marketing_varieties, prod_setup[:marketing_variety_id], :marketing_variety_code)
-      fg_code_components << get(:rmt_classes, prod_setup[:rmt_class_id], :rmt_class_code)
-      fg_code_components << get(:grades, prod_setup[:grade_id], :grade_code)
-      fg_code_components << get(:fruit_actual_counts_for_packs, prod_setup[:fruit_actual_counts_for_pack_id], :actual_count_for_pack)
-      fg_code_components << get(:inventory_codes, prod_setup[:inventory_code_id], :inventory_code)
-      fg_code_components << get(:fruit_size_references, prod_setup[:fruit_size_reference_id], :size_reference)
+      fg_code_components << get_transformation(:commodities, prod_setup[:commodity_id], :code)
+      fg_code_components << get_transformation(:marketing_varieties, prod_setup[:marketing_variety_id], :marketing_variety_code)
+      fg_code_components << get_transformation(:rmt_classes, prod_setup[:rmt_class_id], :rmt_class_code)
+      fg_code_components << get_transformation(:grades, prod_setup[:grade_id], :grade_code)
+      fg_code_components << get_transformation(:fruit_actual_counts_for_packs, prod_setup[:fruit_actual_counts_for_pack_id], :actual_count_for_pack)
+      fg_code_components << get_transformation(:inventory_codes, prod_setup[:inventory_code_id], :inventory_code)
+      fg_code_components << get_transformation(:fruit_size_references, prod_setup[:fruit_size_reference_id], :size_reference)
       fg_code_components << packing_specification_item_units_per_carton(packing_specification_item_id).to_f
       fg_code_components << packing_specification_item_unit_pack_product(packing_specification_item_id)
       carton_pack_product = packing_specification_item_carton_pack_product(packing_specification_item_id)
