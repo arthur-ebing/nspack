@@ -2,13 +2,13 @@
 
 module MasterfilesApp
   module TaskPermissionCheck
-    class ExternalMasterfileMapping < BaseService
+    class MasterfileTransformation < BaseService
       attr_reader :task, :entity
-      def initialize(task, external_masterfile_mapping_id = nil)
+      def initialize(task, masterfile_transformation_id = nil)
         @task = task
         @repo = GeneralRepo.new
-        @id = external_masterfile_mapping_id
-        @entity = @id ? @repo.find_external_masterfile_mapping(@id) : nil
+        @id = masterfile_transformation_id
+        @entity = @id ? @repo.find_masterfile_transformation(@id) : nil
       end
 
       CHECKS = {
@@ -18,7 +18,7 @@ module MasterfilesApp
       }.freeze
 
       def call
-        return failed_response 'External Masterfile Mapping record not found' unless @entity || task == :create
+        return failed_response 'Masterfile Transformation record not found' unless @entity || task == :create
 
         check = CHECKS[task]
         raise ArgumentError, "Task \"#{task}\" is unknown for #{self.class}" if check.nil?

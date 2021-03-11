@@ -22,7 +22,7 @@ module MasterfilesApp
 
     crud_calls_for :masterfile_variants, name: :masterfile_variant
 
-    crud_calls_for :external_masterfile_mappings, name: :external_masterfile_mapping
+    crud_calls_for :masterfile_transformations, name: :masterfile_transformation
 
     def for_select_uoms(where: {}, exclude: {}, active: true)
       DB[:uoms]
@@ -91,51 +91,51 @@ module MasterfilesApp
       get_id(table_name, args.merge(id: id))
     end
 
-    def find_external_masterfile_mapping(id)
-      hash = find_hash(:external_masterfile_mappings, id)
+    def find_masterfile_transformation(id)
+      hash = find_hash(:masterfile_transformations, id)
       return nil if hash.nil?
 
-      mapping = lookup_mf_mapping(hash[:masterfile_table])
-      hash[:mapping] = mapping[:mapping]
-      hash[:masterfile_column] = mapping[:column_name]
+      transformation = lookup_mf_transformation(hash[:masterfile_table])
+      hash[:transformation] = transformation[:transformation]
+      hash[:masterfile_column] = transformation[:column_name]
       hash[:masterfile_code] = get(hash[:masterfile_table].to_sym, hash[:masterfile_id], hash[:masterfile_column].to_sym)
 
-      ExternalMasterfileMapping.new(hash)
+      MasterfileTransformation.new(hash)
     end
 
-    def for_select_external_mf_mapping
+    def for_select_mf_transformation
       array = []
-      AppConst::EXTERNAL_MF_MAPPING_RULES.each do |mapping, hash|
-        array << [mapping.to_s.gsub('_', ' '), hash[:table_name]]
+      AppConst::MF_TRANSFORMATION_RULES.each do |transformation, hash|
+        array << [transformation.to_s.gsub('_', ' '), hash[:table_name]]
       end
       array
     end
 
-    def lookup_mf_mapping(table_name)
+    def lookup_mf_transformation(table_name)
       return {} if table_name.to_s.nil_or_empty?
 
-      mapping = AppConst::EXTERNAL_MF_MAPPING_RULES.select { |_, hash| hash.key(table_name.to_s) }
-      return {} if mapping.values.empty?
+      transformation = AppConst::MF_TRANSFORMATION_RULES.select { |_, hash| hash.key(table_name.to_s) }
+      return {} if transformation.values.empty?
 
-      { mapping: mapping.keys.first.to_s.gsub('_', ' '),
+      { transformation: transformation.keys.first.to_s.gsub('_', ' '),
         table_name: table_name,
-        column_name: mapping.values.first[:column_name] }
+        column_name: transformation.values.first[:column_name] }
     end
 
     def get_transformation(external_system, masterfile_table, masterfile_id)
-      DB[:external_masterfile_mappings]
+      DB[:masterfile_transformations]
         .where(external_system: external_system,
                masterfile_table: masterfile_table.to_s,
                masterfile_id: masterfile_id)
         .get(:external_code)
     end
 
-    def get_transformation_or_value(external_system, masterfile_table, masterfile_id, column)
-      transformation = get_transformation(external_system, masterfile_table, masterfile_id)
+    def get_transformation_or_value(external_system, table_name, id, column)
+      transformation = get_transformation(external_system, table_name, id)
       return transformation if transformation
 
-      column ||= lookup_mf_mapping(masterfile_table)[:column_name]
-      get(masterfile_table.to_sym, masterfile_id, column.to_sym)
+      column ||= lookup_mf_transformation(masterfile_table)[:column_name]
+      get(table_name.to_sym, id, column.to_sym)
     end
   end
 end

@@ -624,8 +624,8 @@ class AppConst # rubocop:disable Metrics/ClassLength
     Vessels: { table_name: 'vessels', column_name: 'vessel_code' }
   }.freeze
 
-  EXTERNAL_MF_MAPPING_SYSTEMS = ['Kromco MES'].freeze
-  EXTERNAL_MF_MAPPING_RULES = {
+  MF_TRANSFORMATION_SYSTEMS = ['Kromco MES'].freeze
+  MF_TRANSFORMATION_RULES = {
     Basic_Packs: { table_name: 'basic_pack_codes', column_name: 'basic_pack_code' },
     Cities: { table_name: 'destination_cities', column_name: 'city_name' },
     Commodities: { table_name: 'commodities', column_name: 'code' },

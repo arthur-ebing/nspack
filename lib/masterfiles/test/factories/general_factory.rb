@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   module GeneralFactory
-    def create_external_masterfile_mapping(opts = {})
+    def create_masterfile_transformation(opts = {})
       puc_id = create_puc
       default = {
         masterfile_table: 'pucs',
@@ -12,7 +12,7 @@ module MasterfilesApp
         created_at: '2010-01-01 12:00',
         updated_at: '2010-01-01 12:00'
       }
-      DB[:external_masterfile_mappings].insert(default.merge(opts))
+      DB[:masterfile_transformations].insert(default.merge(opts))
     end
 
     def create_masterfile_variant(opts = {})

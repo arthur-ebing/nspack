@@ -2,14 +2,14 @@
 
 module Masterfiles
   module General
-    module ExternalMasterfileMapping
+    module MasterfileTransformation
       class Grid
         def self.call(form_values: {})
-          ui_rule = UiRules::Compiler.new(:external_masterfile_mapping, :grid, form_values: form_values)
+          ui_rule = UiRules::Compiler.new(:masterfile_transformation, :grid, form_values: form_values)
           rules   = ui_rule.compile
 
-          grid_url = '/masterfiles/general/external_masterfile_mappings/grid'
-          new_url = '/masterfiles/general/external_masterfile_mappings/new'
+          grid_url = '/masterfiles/general/masterfile_transformations/grid'
+          new_url = '/masterfiles/general/masterfile_transformations/new'
 
           unless form_values.empty?
             append_url = "?masterfile_table=#{form_values[:masterfile_table]}&masterfile_id=#{form_values[:masterfile_id]}"
@@ -20,16 +20,16 @@ module Masterfiles
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.section do |section|
               section.add_control(control_type: :link,
-                                  text: "New #{ui_rule.form_object.mapping} Mapping",
+                                  text: "New #{ui_rule.form_object.transformation} Transformation",
                                   url: new_url,
-                                  grid_id: 'external_masterfile_mappings',
+                                  grid_id: 'masterfile_transformations',
                                   behaviour: :popup,
                                   style: :button)
             end
-            page.add_grid('external_masterfile_mappings',
+            page.add_grid('masterfile_transformations',
                           grid_url,
                           height: 44,
-                          caption: 'External Masterfile Mappings')
+                          caption: 'Masterfile Transformations')
           end
 
           layout

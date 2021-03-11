@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class ExternalMasterfileMapping < Dry::Struct
+  class MasterfileTransformation < Dry::Struct
     attribute :id, Types::Integer
-    attribute :mapping, Types::String
+    attribute :transformation, Types::String
     attribute :masterfile_table, Types::String
     attribute :masterfile_column, Types::String
     attribute :external_code, Types::String
