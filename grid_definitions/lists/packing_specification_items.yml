@@ -22,6 +22,11 @@
   :is_delete: true
   :popup: true
 - :separator: true
+- :url: "/production/packing_specifications/packing_specification_items/$:id$/refresh_extended_fg_code"
+  :text: refresh extended fg code
+  :icon: code
+  :title: Refresh Extended FG Code
+- :separator: true
 - :url: "/production/product_setups/product_setups/$:product_setup_id$"
   :text: view product setup
   :icon: information-solid
@@ -132,4 +137,19 @@
                   FROM pm_products
                   JOIN pm_subtypes ON pm_products.pm_subtype_id = pm_subtypes.id
                   WHERE pm_subtypes.subtype_code = 'RU_STICKER'
-
+:hide_for_client:
+  hb:
+    - extended_fg_code
+    - extended_fg_id
+  um:
+    - extended_fg_code
+    - extended_fg_id
+  ud:
+    - extended_fg_code
+    - extended_fg_id
+  sr:
+    - extended_fg_code
+    - extended_fg_id
+  srp:
+    - extended_fg_code
+    - extended_fg_id

@@ -3,7 +3,9 @@
 :sql: "SELECT\r\n    packing_specification_items.id,\r\n    packing_specification_items.packing_specification_id,\r\n
   \   packing_specifications.packing_specification_code AS packing_specification,\r\n
   \   packing_specification_items.product_setup_id,\r\n    fn_product_setup_code(packing_specification_items.product_setup_id)
-  AS product_setup,\r\n    packing_specification_items.description,\r\n    packing_specification_items.pm_bom_id,\r\n
+  AS product_setup,\r\n    packing_specification_items.description,\r\n    packing_specification_items.legacy_data
+  \ ->> 'extended_fg_code' AS extended_fg_code,\r\n    packing_specification_items.legacy_data
+  \ ->> 'extended_fg_id' AS extended_fg_id,\r\n    packing_specification_items.pm_bom_id,\r\n
   \   pm_boms.bom_code AS pm_bom,\r\n    packing_specification_items.pm_mark_id,\r\n
   \   marks.mark_code ||'_'|| array_to_string(pm_marks.packaging_marks, '_') AS pm_mark,\r\n\r\n
   \   pm_products_tu.product_code AS tu_labour_product,\r\n    pm_products_ru.product_code
@@ -18,15 +20,15 @@
   = ru_sticker_ids[2] ) AS ru_sticker_2,\r\n\r\n    packing_specification_items.active,\r\n
   \   packing_specification_items.created_at,\r\n    packing_specification_items.updated_at,\r\n
   \   fn_current_status('packing_specification_items', packing_specification_items.id)
-  AS status\r\n\r\nFROM packing_specification_items\r\nJOIN packing_specifications
-  ON packing_specifications.id = packing_specification_items.packing_specification_id\r\nJOIN
-  product_setups ON packing_specification_items.product_setup_id = product_setups.id\r\nLEFT
-  JOIN pm_boms ON pm_boms.id = packing_specification_items.pm_bom_id\r\nLEFT JOIN
-  pm_marks ON pm_marks.id = packing_specification_items.pm_mark_id\r\nLEFT JOIN marks
-  ON marks.id = pm_marks.mark_id\r\nLEFT JOIN pm_products pm_products_tu ON pm_products_tu.id
-  = packing_specification_items.tu_labour_product_id\r\nLEFT JOIN pm_products pm_products_ru
-  ON pm_products_ru.id = packing_specification_items.ru_labour_product_id\r\nLEFT
-  JOIN pm_products pm_products_ri ON pm_products_ri.id = packing_specification_items.ri_labour_product_id\r\nORDER
+  AS status\r\n\r\nFROM packing_specification_items\r\n         JOIN packing_specifications
+  ON packing_specifications.id = packing_specification_items.packing_specification_id\r\n
+  \        JOIN product_setups ON packing_specification_items.product_setup_id = product_setups.id\r\n
+  \        LEFT JOIN pm_boms ON pm_boms.id = packing_specification_items.pm_bom_id\r\n
+  \        LEFT JOIN pm_marks ON pm_marks.id = packing_specification_items.pm_mark_id\r\n
+  \        LEFT JOIN marks ON marks.id = pm_marks.mark_id\r\n         LEFT JOIN pm_products
+  pm_products_tu ON pm_products_tu.id = packing_specification_items.tu_labour_product_id\r\n
+  \        LEFT JOIN pm_products pm_products_ru ON pm_products_ru.id = packing_specification_items.ru_labour_product_id\r\n
+  \        LEFT JOIN pm_products pm_products_ri ON pm_products_ri.id = packing_specification_items.ri_labour_product_id\r\nORDER
   BY packing_specification_items.updated_at DESC"
 :limit: 
 :offset: 
@@ -128,9 +130,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  extended_fg_code:
+    :name: extended_fg_code
+    :sequence_no: 7
+    :caption: Extended FG code
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  extended_fg_id:
+    :name: extended_fg_id
+    :sequence_no: 8
+    :caption: Extended FG id
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   pm_bom_id:
     :name: pm_bom_id
-    :sequence_no: 7
+    :sequence_no: 9
     :caption: PKG BOM id
     :namespaced_name: packing_specification_items.pm_bom_id
     :data_type: :integer
@@ -146,7 +180,7 @@
     :group_max: false
   pm_bom:
     :name: pm_bom
-    :sequence_no: 8
+    :sequence_no: 10
     :caption: PKG BOM
     :namespaced_name: pm_boms.bom_code
     :data_type: :string
@@ -162,7 +196,7 @@
     :group_max: false
   pm_mark_id:
     :name: pm_mark_id
-    :sequence_no: 9
+    :sequence_no: 11
     :caption: PKG Mark id
     :namespaced_name: packing_specification_items.pm_mark_id
     :data_type: :integer
@@ -178,7 +212,7 @@
     :group_max: false
   pm_mark:
     :name: pm_mark
-    :sequence_no: 10
+    :sequence_no: 12
     :caption: PKG Mark
     :namespaced_name: 
     :data_type: :string
@@ -194,7 +228,7 @@
     :group_max: false
   tu_labour_product:
     :name: tu_labour_product
-    :sequence_no: 11
+    :sequence_no: 13
     :caption: TU Labour product
     :namespaced_name: pm_products_tu.product_code
     :data_type: :string
@@ -210,7 +244,7 @@
     :group_max: false
   ru_labour_product:
     :name: ru_labour_product
-    :sequence_no: 12
+    :sequence_no: 14
     :caption: RU Labour product
     :namespaced_name: pm_products_ru.product_code
     :data_type: :string
@@ -226,7 +260,7 @@
     :group_max: false
   ri_labour_product:
     :name: ri_labour_product
-    :sequence_no: 13
+    :sequence_no: 15
     :caption: RI Labour product
     :namespaced_name: pm_products_ri.product_code
     :data_type: :string
@@ -242,7 +276,7 @@
     :group_max: false
   fruit_sticker_1:
     :name: fruit_sticker_1
-    :sequence_no: 14
+    :sequence_no: 16
     :caption: Fruit Sticker 1
     :namespaced_name: 
     :data_type: :string
@@ -258,7 +292,7 @@
     :group_max: false
   fruit_sticker_2:
     :name: fruit_sticker_2
-    :sequence_no: 15
+    :sequence_no: 17
     :caption: Fruit Sticker 2
     :namespaced_name: 
     :data_type: :string
@@ -274,7 +308,7 @@
     :group_max: false
   tu_sticker_1:
     :name: tu_sticker_1
-    :sequence_no: 16
+    :sequence_no: 18
     :caption: TU Sticker 1
     :namespaced_name: 
     :data_type: :string
@@ -290,7 +324,7 @@
     :group_max: false
   tu_sticker_2:
     :name: tu_sticker_2
-    :sequence_no: 17
+    :sequence_no: 19
     :caption: TU Sticker 2
     :namespaced_name: 
     :data_type: :string
@@ -306,7 +340,7 @@
     :group_max: false
   ru_sticker_1:
     :name: ru_sticker_1
-    :sequence_no: 18
+    :sequence_no: 20
     :caption: RU Sticker 1
     :namespaced_name: 
     :data_type: :string
@@ -322,7 +356,7 @@
     :group_max: false
   ru_sticker_2:
     :name: ru_sticker_2
-    :sequence_no: 19
+    :sequence_no: 21
     :caption: RU Sticker 2
     :namespaced_name: 
     :data_type: :string
@@ -338,7 +372,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 20
+    :sequence_no: 22
     :caption: Active
     :namespaced_name: packing_specification_items.active
     :data_type: :boolean
@@ -354,7 +388,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 21
+    :sequence_no: 23
     :caption: Created at
     :namespaced_name: packing_specification_items.created_at
     :data_type: :datetime
@@ -370,7 +404,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 22
+    :sequence_no: 24
     :caption: Updated at
     :namespaced_name: packing_specification_items.updated_at
     :data_type: :datetime
@@ -386,7 +420,7 @@
     :group_max: false
   status:
     :name: status
-    :sequence_no: 23
+    :sequence_no: 25
     :caption: Status
     :namespaced_name: 
     :data_type: :string

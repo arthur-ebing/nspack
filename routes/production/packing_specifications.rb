@@ -98,6 +98,12 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         handle_not_found(r)
       end
 
+      r.on 'refresh_extended_fg_code' do
+        res = interactor.refresh_extended_fg_code(id)
+        flash[res.success ? :notice : :error] = res.message
+        r.redirect request.referer
+      end
+
       r.on 'edit' do   # EDIT
         check_auth!('packing specifications', 'edit')
         interactor.assert_permission!(:edit, id)

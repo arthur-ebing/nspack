@@ -334,13 +334,6 @@ module ProductionApp
         .get(:marketing_variety_id)
     end
 
-    def packing_specification_item_prod_setup(packing_specification_item_id)
-      DB[:product_setups]
-        .join(:packing_specification_items, product_setup_id: :id)
-        .select(Sequel.lit('product_setups.*'))
-        .where(Sequel[:packing_specification_items][:id] => packing_specification_item_id).first
-    end
-
     def prod_setup_commodity_code(prod_setup_id)
       DB[:product_setups]
         .join(:product_setup_templates, id: :product_setup_template_id)
@@ -416,7 +409,9 @@ module ProductionApp
     end
 
     def calculate_extended_fg_code(packing_specification_item_id) # rubocop:disable Metrics/AbcSize
-      prod_setup = packing_specification_item_prod_setup(packing_specification_item_id)
+      product_setup_id = get(:packing_specification_items, packing_specification_item_id, :product_setup_id)
+      prod_setup = find_hash(:product_setups, product_setup_id)
+
       fg_code_components = []
       fg_code_components << prod_setup_commodity_code(prod_setup[:id])
       fg_code_components << get(:marketing_varieties, prod_setup[:marketing_variety_id], :marketing_variety_code)

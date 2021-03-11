@@ -2,13 +2,25 @@
 
 module ProductionApp
   class PackingSpecificationRepo < BaseRepo # rubocop:disable Metrics/ClassLength
-    build_for_select :packing_specifications, label: :packing_specification_code, value: :id, order_by: :packing_specification_code
-    build_inactive_select :packing_specifications, label: :packing_specification_code, value: :id, order_by: :packing_specification_code
-    crud_calls_for :packing_specifications, name: :packing_specification, wrapper: PackingSpecification
+    build_for_select :packing_specifications,
+                     label: :packing_specification_code,
+                     value: :id,
+                     order_by: :packing_specification_code
+    build_inactive_select :packing_specifications,
+                          label: :packing_specification_code,
+                          value: :id,
+                          order_by: :packing_specification_code
+    crud_calls_for :packing_specifications, name: :packing_specification
 
-    build_for_select :packing_specification_items, label: :description, value: :id, order_by: :description
-    build_inactive_select :packing_specification_items, label: :description, value: :id, order_by: :description
-    crud_calls_for :packing_specification_items, name: :packing_specification_item, wrapper: PackingSpecificationItem
+    build_for_select :packing_specification_items,
+                     label: :description,
+                     value: :id,
+                     order_by: :description
+    build_inactive_select :packing_specification_items,
+                          label: :description,
+                          value: :id,
+                          order_by: :description
+    crud_calls_for :packing_specification_items, name: :packing_specification_item, exclude: [:update]
 
     def find_packing_specification(id)
       hash = find_with_association(
@@ -146,6 +158,14 @@ module ProductionApp
           log_status(:packing_specification_items, item_id, 'CREATED', user_name: user.user_name)
         end
       end
+    end
+
+    def update_packing_specification_item(id, res)
+      attrs = res.to_h
+      legacy_data = UtilityFunctions.symbolize_keys(get(:packing_specification_items, id, :legacy_data).to_h)
+
+      attrs[:legacy_data] = legacy_data.merge(attrs[:legacy_data].to_h)
+      update(:packing_specification_items, id, attrs)
     end
   end
 end

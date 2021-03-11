@@ -19,8 +19,8 @@ module ProductionApp
       id = nil
       repo.transaction do
         id = repo.create_packing_specification_item(res)
-        FinishedGoodsApp::Job::CalculateExtendedFgCodesForPackingSpecs.enqueue([id]) if AppConst::CR_FG.lookup_extended_fg_code?
         check!(:duplicates, id)
+        ProductionApp::CalculateExtendedFgCodesForPackingSpecs.call(id) if AppConst::CR_FG.lookup_extended_fg_code?
 
         log_status(:packing_specification_items, id, 'CREATED')
         log_transaction
@@ -39,8 +39,8 @@ module ProductionApp
 
       repo.transaction do
         repo.update_packing_specification_item(id, res)
-        FinishedGoodsApp::Job::CalculateExtendedFgCodesForPackingSpecs.enqueue([id]) if AppConst::CR_FG.lookup_extended_fg_code?
         check!(:duplicates, id)
+        ProductionApp::CalculateExtendedFgCodesForPackingSpecs.call(id) if AppConst::CR_FG.lookup_extended_fg_code?
 
         log_transaction
       end
@@ -76,6 +76,15 @@ module ProductionApp
       failed_response(e.message)
     rescue Sequel::ForeignKeyConstraintViolation => e
       failed_response("Unable to delete packing specification item. It is still referenced#{e.message.partition('referenced').last}")
+    end
+
+    def refresh_extended_fg_code(id)
+      repo.transaction do
+        ProductionApp::CalculateExtendedFgCodesForPackingSpecs.call(id)
+      end
+      success_response('Updated Extended FG code')
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def assert_permission!(task, id = nil)
