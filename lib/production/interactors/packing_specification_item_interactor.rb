@@ -20,7 +20,7 @@ module ProductionApp
       repo.transaction do
         id = repo.create_packing_specification_item(res)
         check!(:duplicates, id)
-        ProductionApp::CalculateExtendedFgCodesForPackingSpecs.call(id) if AppConst::CR_FG.lookup_extended_fg_code?
+        ProductionApp::Job::CalculateExtendedFgCodesForPackingSpecs.enqueue(id) if AppConst::CR_FG.lookup_extended_fg_code?
 
         log_status(:packing_specification_items, id, 'CREATED')
         log_transaction
@@ -40,7 +40,7 @@ module ProductionApp
       repo.transaction do
         repo.update_packing_specification_item(id, res)
         check!(:duplicates, id)
-        ProductionApp::CalculateExtendedFgCodesForPackingSpecs.call(id) if AppConst::CR_FG.lookup_extended_fg_code?
+        ProductionApp::Job::CalculateExtendedFgCodesForPackingSpecs.enqueue(id) if AppConst::CR_FG.lookup_extended_fg_code?
 
         log_transaction
       end
