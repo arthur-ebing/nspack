@@ -22,8 +22,8 @@ module MesscadaApp
       @button_packpoint = @resource_repo.packpoint_for_button(params[:device]) if has_button
     end
 
-    def call # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
-      @sys_res = resource_repo.system_resource_incentive_settings(device, params[:packpoint] || @button_packpoint || params[:device], params[:card_reader])
+    def call # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+      @sys_res = resource_repo.system_resource_incentive_settings(device, params[:packpoint] || @button_packpoint, params[:device], params[:card_reader])
       return failed_response("#{device} is not configured") if sys_res.nil?
       return success_response('ok', merge_incentive_just_system_resource) if !sys_res.login && !sys_res.group_incentive
       return merge_incentive_contract_worker unless get_group_incentive && sys_res.group_incentive

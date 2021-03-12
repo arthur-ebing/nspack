@@ -11,7 +11,7 @@ module MesscadaApp
       @repo = MesscadaApp::MesscadaRepo.new
       @hr_repo = MesscadaApp::HrRepo.new
       @system_resource = params[:system_resource]
-      @carton_equals_pallet = AppConst::CR_PROD.carton_equals_pallet?(system_resource_code: system_resource[:packpoint])
+      @carton_equals_pallet = AppConst::CR_PROD.carton_equals_pallet?(plant_resource_code: system_resource[:packpoint])
     end
 
     def call
@@ -143,7 +143,7 @@ module MesscadaApp
 
     def retrieve_resource_cached_setup_data
       @setup_data = search_cache_files
-      raise Crossbeams::InfoError, "No setup data cached for resource #{system_resource[:packpoint]}." if setup_data.empty?
+      raise Crossbeams::InfoError, "No setup data cached for resource #{system_resource[:cache_key]}." if setup_data.empty?
 
       @production_run_id = setup_data[:production_run_data][:production_run_id]
       raise Crossbeams::InfoError, "Production Run:#{production_run_id} could not be found" unless production_run_exists?
@@ -159,7 +159,7 @@ module MesscadaApp
         file_data = yaml_data_from_file(f)
         next unless file_data
 
-        return file_data[system_resource[:packpoint]] unless file_data.empty? || file_data[system_resource[:packpoint]].nil?
+        return file_data[system_resource[:cache_key]] unless file_data.empty? || file_data[system_resource[:cache_key]].nil?
       end
 
       {}

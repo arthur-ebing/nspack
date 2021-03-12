@@ -248,7 +248,7 @@ module Crossbeams
       setting(:use_marketing_puc)
     end
 
-    def carton_equals_pallet?(system_resource_code: nil, explain: false)
+    def carton_equals_pallet?(plant_resource_code: nil, explain: false)
       return 'Does carton become a pallet.' if explain
 
       carton_equals_pallet = setting(:carton_equals_pallet)
@@ -256,8 +256,7 @@ module Crossbeams
       return carton_equals_pallet[:default] if system_resource_code.nil?
 
       robot_carton_equals_pallet = DB[:plant_resources]
-                                   .join(:system_resources, id: :system_resource_id)
-                                   .where(system_resource_code: system_resource_code)
+                                   .where(plant_resource_code: plant_resource_code)
                                    .get(Sequel.lit("resource_properties ->> 'carton_equals_pallet'"))
       robot_carton_equals_pallet.nil_or_empty? ? carton_equals_pallet[:default] : robot_carton_equals_pallet == 't'
     end
