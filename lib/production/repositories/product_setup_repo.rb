@@ -403,7 +403,7 @@ module ProductionApp
         marks << get_kromco_mes_value(:inner_pm_marks, id, :inner_pm_mark_code)
       end
 
-      marks.reverse.join('_')
+      marks.reverse.join('-')
     end
 
     def get_kromco_mes_value(table_name, id, column)
