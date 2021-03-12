@@ -645,10 +645,7 @@ module ProductionApp
     end
 
     def production_run_status(id)
-      query = <<~SQL
-        SELECT fn_current_status ('production_runs', #{id}) as status
-      SQL
-      DB[query].get(:status)
+      DB.get(Sequel.function(:fn_current_status, 'production_runs', id))
     end
 
     def validate_run_bin_tipping_criteria_and_control_data(id)
