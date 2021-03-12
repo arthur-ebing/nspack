@@ -29,7 +29,7 @@ module MesscadaApp
       res = validate_carton_params(params.merge(carton_label_id: carton_label_id))
       return validation_failed_response(res) if res.failure?
 
-      @carton_id = DB[:cartons].insert(res.to_h)
+      @carton_id = repo.create(:cartons, res)
 
       ok_response
     rescue Crossbeams::InfoError => e

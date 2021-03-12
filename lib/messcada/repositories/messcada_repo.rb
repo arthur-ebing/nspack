@@ -778,9 +778,10 @@ module MesscadaApp
       pallet_sequence_ids = DB[:pallet_sequences].where(pallet_number: pallet_number).select_map(:id)
       return false if pallet_sequence_ids.nil_or_empty?
 
-      has_cartons = exists?(:cartons, pallet_sequence_id: pallet_sequence_ids)
+      return true if exists?(:cartons, pallet_sequence_id: pallet_sequence_ids)
+
       scanned_cartons = get(:pallet_sequences, pallet_sequence_ids, :scanned_from_carton_id)
-      has_cartons || !scanned_cartons.nil_or_empty?
+      !scanned_cartons.nil_or_empty?
     end
   end
 end

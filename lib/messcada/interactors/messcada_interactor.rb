@@ -49,7 +49,7 @@ module MesscadaApp
 
       args = repo.parse_pallet_or_carton_number({ scanned_number: scanned_carton_number })
       pallet = if args[:carton_number]
-                 repo.find_pallet_by_carton_number(params[:carton_number])
+                 repo.find_pallet_by_carton_number(scanned_carton_number)
                else
                  repo.find_pallet_by_pallet_number(args[:pallet_number])
                end
