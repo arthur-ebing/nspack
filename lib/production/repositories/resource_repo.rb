@@ -513,28 +513,38 @@ module ProductionApp
       Robot.new(hash)
     end
 
-    def system_resource_incentive_settings(device, packpoint, card_reader)
+    def system_resource_incentive_settings(device, packpoint, button, card_reader)
       hash = DB[:system_resources]
              .select(:id, :system_resource_code, :login, :logoff, :group_incentive)
              .where(system_resource_code: device)
              .first
       return nil if hash.nil?
 
-      SystemResourceIncentiveSettings.new(hash.merge(packpoint: packpoint, card_reader: card_reader || '1'))
+      button_system_resource_id = get_id(:system_resources, system_resource_code: button)
+      cache_key = if button_system_resource_id && !button_points_to_packpoint?(button_system_resource_id)
+                    button
+                  else
+                    packpoint
+                  end
+      SystemResourceIncentiveSettings.new(hash.merge(packpoint: packpoint, cache_key: cache_key, card_reader: card_reader || '1'))
     end
 
-    def packpoint_for_button(resource_code)
-      system_resource_id = get_id(:system_resources, system_resource_code: resource_code)
+    def packpoint_for_button(system_resource_code)
+      system_resource_id = get_id(:system_resources, system_resource_code: system_resource_code)
       return nil if system_resource_id.nil?
 
-      # represented_id = get_value(:plant_resources, :represents_plant_resource_id, plant_resource_code: resource_code)
-      represented_id = get_value(:plant_resources, :represents_plant_resource_id, system_resource_id: system_resource_id)
-      return nil if represented_id.nil?
+      plant_resource_code, represented_id = get_value(:plant_resources, %i[plant_resource_code represents_plant_resource_id], system_resource_id: system_resource_id)
+      return plant_resource_code if represented_id.nil?
 
       get(:plant_resources, represented_id, :plant_resource_code)
     end
 
     private
+
+    def button_points_to_packpoint?(button_system_resource_id)
+      represented_id = get_value(:plant_resources, :represents_plant_resource_id, system_resource_id: button_system_resource_id)
+      !represented_id.nil?
+    end
 
     def create_twin_system_resource(parent_id, res, sys_code)
       rules = plant_resource_definition(res[:plant_resource_type_id])

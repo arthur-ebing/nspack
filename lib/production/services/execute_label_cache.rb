@@ -5,7 +5,7 @@ module ProductionApp
     def create_carton_label_cache # rubocop:disable Metrics/AbcSize
       cache = {}
       repo.allocated_setup_keys(production_run.id).each do |rec|
-        cache[rec[:packpoint]] = {
+        cache[rec[:device_or_packpoint]] = {
           print_command: print_command_for(rec[:product_resource_allocation_id], rec[:label_template_name]),
           setup_data: rec[:setup_data],
           production_run_data: cache_run.merge(product_resource_allocation_id: rec[:product_resource_allocation_id],
