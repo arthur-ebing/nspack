@@ -69,7 +69,8 @@ module Crossbeams
         if rest.empty?
           send(meth, explain: true)
         else
-          send(meth, *rest.map(&:last), explain: true)
+          args = rest.reject { |r| r.first == :key } # Ignore keyword arguments
+          send(meth, *args.map(&:last), explain: true)
         end
       else
         'I AM UNDOCUMENTED... FIXME PLEASE!'

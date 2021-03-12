@@ -249,7 +249,7 @@ module Crossbeams
     end
 
     def carton_equals_pallet?(plant_resource_code: nil, explain: false)
-      return 'Does carton become a pallet.' if explain
+      return "Does carton become a pallet. Setting: #{setting(:carton_equals_pallet).inspect}" if explain
 
       carton_equals_pallet = setting(:carton_equals_pallet)
       return carton_equals_pallet[:default] unless carton_equals_pallet[:can_override]
