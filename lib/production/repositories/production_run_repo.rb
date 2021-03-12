@@ -643,5 +643,22 @@ module ProductionApp
         .where(id: packing_specification_item_id)
         .get(:product_setup_id)
     end
+
+    def production_run_status(id)
+      query = <<~SQL
+        SELECT fn_current_status ('production_runs', #{id}) as status
+      SQL
+      DB[query].get(:status)
+    end
+
+    def validate_run_bin_tipping_criteria_and_control_data(id)
+      if AppConst::CR_PROD.kromco_rmt_integration?
+        run = find_production_run(id)
+        run.legacy_bintip_criteria.to_h.find_all { |_k, v| v == 't' }.each do |c|
+          return " Bintip criteria requires a value for #{c[0]}" if run.legacy_data.to_h[c[0]].nil_or_empty?
+        end
+      end
+      nil
+    end
   end
 end

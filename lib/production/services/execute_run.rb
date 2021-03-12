@@ -17,6 +17,9 @@ module ProductionApp
     end
 
     def call # rubocop:disable Metrics/AbcSize
+      err = repo.validate_run_bin_tipping_criteria_and_control_data(@production_run.id)
+      return failed_response(err, running: true, this_run: { tipping: production_run.tipping, setup_complete: production_run.setup_complete, reconfiguring: production_run.reconfiguring, labeling: production_run.labeling, running: production_run.running, status: repo.production_run_status(production_run.id), active_run_stage: production_run.active_run_stage, id: production_run.id, colour_rule: 'ok' }) if err
+
       changeset = build_changeset
       repo.transaction do
         repo.update_production_run(production_run.id, changeset)
