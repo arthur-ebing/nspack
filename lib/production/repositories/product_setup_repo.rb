@@ -334,25 +334,21 @@ module ProductionApp
         .get(:marketing_variety_id)
     end
 
-    def packing_specification_item_units_per_carton(packing_specification_item_id)
-      DB[:packing_specification_items]
-        .join(:pm_boms_products, pm_bom_id: :pm_bom_id)
-        .join(:pm_products, id: :pm_product_id)
-        .join(:pm_subtypes, id: :pm_subtype_id)
-        .join(:pm_types, id: :pm_type_id)
-        .where(Sequel[:packing_specification_items][:id] => packing_specification_item_id, pm_composition_level_id: 2)
-        .get(:quantity)
-    end
+    def packing_specification_item_unit_pack_product(packing_specification_item_id) # rubocop:disable Metrics/AbcSize
+      hash = DB[:packing_specification_items]
+             .join(:pm_boms_products, pm_bom_id: :pm_bom_id)
+             .join(:pm_products, id: :pm_product_id)
+             .join(:pm_subtypes, id: :pm_subtype_id)
+             .join(:pm_types, id: :pm_type_id)
+             .where(Sequel[:packing_specification_items][:id] => packing_specification_item_id,
+                    pm_composition_level_id: 2)
+             .select(Sequel[:pm_products][:id], Sequel[:pm_boms_products][:quantity]).first
 
-    def packing_specification_item_unit_pack_product(packing_specification_item_id)
-      id = DB[:packing_specification_items]
-           .join(:pm_boms_products, pm_bom_id: :pm_bom_id)
-           .join(:pm_products, id: :pm_product_id)
-           .join(:pm_subtypes, id: :pm_subtype_id)
-           .join(:pm_types, id: :pm_type_id)
-           .where(Sequel[:packing_specification_items][:id] => packing_specification_item_id, pm_composition_level_id: 2)
-           .get(Sequel[:pm_products][:id])
-      get_kromco_mes_value(:pm_products, id, :product_code)
+      quantity = hash[:quantity].to_i
+      quantity = '*' if [0, 1].include? quantity
+      code = get_kromco_mes_value(:pm_products, hash[:id], :product_code)
+
+      "#{quantity}#{code}"
     end
 
     def packing_specification_item_carton_pack_product(packing_specification_item_id) # rubocop:disable Metrics/AbcSize
@@ -362,7 +358,8 @@ module ProductionApp
              .join(:basic_pack_codes, id: :basic_pack_id)
              .join(:pm_subtypes, id: Sequel[:pm_products][:pm_subtype_id])
              .join(:pm_types, id: :pm_type_id)
-             .where(Sequel[:packing_specification_items][:id] => packing_specification_item_id, pm_composition_level_id: 1)
+             .where(Sequel[:packing_specification_items][:id] => packing_specification_item_id,
+                    pm_composition_level_id: 1)
              .select(
                Sequel[:pm_types][:short_code].as(:pm_type_short_code),
                Sequel[:basic_pack_codes][:footprint_code],
@@ -378,8 +375,10 @@ module ProductionApp
           #{hash[:height_mm].nil? ? 'height_mm' : 'footprint_code'} is missing
         STR
 
-        ErrorMailer.send_error_email(subject: 'EXT FG CODE INTEGRATION FAIL', message: mail, append_recipients: AppConst::LEGACY_SYSTEM_ERROR_RECIPIENTS)
-        return nil
+        ErrorMailer.send_error_email(subject: 'EXT FG CODE INTEGRATION FAIL',
+                                     message: mail,
+                                     append_recipients: AppConst::LEGACY_SYSTEM_ERROR_RECIPIENTS)
+        return mail
       end
 
       "#{hash[:pm_type_short_code]}#{hash[:footprint_code]}#{hash[:pm_subtype_short_code]}#{hash[:height_mm]}"
@@ -394,10 +393,17 @@ module ProductionApp
     end
 
     def packing_specification_item_fg_marks(packing_specification_item_id)
-      DB[:packing_specification_items]
-        .join(:pm_marks, id: :pm_mark_id)
-        .where(Sequel[:packing_specification_items][:id] => packing_specification_item_id)
-        .get(:packaging_marks)&.join('_')
+      packaging_marks = DB[:packing_specification_items]
+                        .join(:pm_marks, id: :pm_mark_id)
+                        .where(Sequel[:packing_specification_items][:id] => packing_specification_item_id)
+                        .get(:packaging_marks)
+      marks = []
+      packaging_marks.each do |inner_pm_mark_code|
+        id = get_id(:inner_pm_marks, inner_pm_mark_code: inner_pm_mark_code)
+        marks << get_kromco_mes_value(:inner_pm_marks, id, :inner_pm_mark_code)
+      end
+
+      marks.reverse.join('_')
     end
 
     def get_kromco_mes_value(table_name, id, column)
@@ -414,9 +420,9 @@ module ProductionApp
       fg_code_components << get_kromco_mes_value(:rmt_classes, prod_setup[:rmt_class_id], :rmt_class_code)
       fg_code_components << get_kromco_mes_value(:grades, prod_setup[:grade_id], :grade_code)
       fg_code_components << get_kromco_mes_value(:fruit_actual_counts_for_packs, prod_setup[:fruit_actual_counts_for_pack_id], :actual_count_for_pack)
+      fg_code_components << get_kromco_mes_value(:basic_pack_codes, prod_setup[:basic_pack_code_id], :footprint_code)
       fg_code_components << get_kromco_mes_value(:inventory_codes, prod_setup[:inventory_code_id], :inventory_code)
       fg_code_components << get_kromco_mes_value(:fruit_size_references, prod_setup[:fruit_size_reference_id], :size_reference)
-      fg_code_components << packing_specification_item_units_per_carton(packing_specification_item_id).to_f
       fg_code_components << packing_specification_item_unit_pack_product(packing_specification_item_id)
       carton_pack_product = packing_specification_item_carton_pack_product(packing_specification_item_id)
       return nil unless carton_pack_product
