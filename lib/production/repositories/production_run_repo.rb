@@ -649,11 +649,10 @@ module ProductionApp
     end
 
     def validate_run_bin_tipping_criteria_and_control_data(id)
-      if AppConst::CR_PROD.kromco_rmt_integration?
-        run = find_production_run(id)
-        run.legacy_bintip_criteria.to_h.find_all { |_k, v| v == 't' }.each do |c|
-          return " Bintip criteria requires a value for #{c[0]}" if run.legacy_data.to_h[c[0]].nil_or_empty?
-        end
+      run = find_production_run(id)
+      data = run.legacy_data.to_h
+      run.legacy_bintip_criteria.to_h.select { |_, v| v == 't' }.each_key do |column|
+        return " Bintip criteria requires a value for #{column}" if data[column].nil_or_empty?
       end
       nil
     end
