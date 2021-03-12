@@ -340,6 +340,11 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           end
 
           carton_id = (interactor.find_carton_by_carton_label_id(carton_number) || {})[:id]
+          if interactor.carton_label_pallet_exists?(carton_number)
+            store_locally(:errors, errors: val_res.errors, error_message: "Pallet already created from this carton: #{carton_number}")
+            r.redirect('/rmd/production/palletizing/create_new_pallet')
+          end
+
           unless AppConst::CARTON_VERIFICATION_REQUIRED
             if carton_id.nil?
               res = messcada_interactor.carton_verification(carton_number: carton_number)

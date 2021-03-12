@@ -282,13 +282,11 @@ module MesscadaApp
 
     # Create several carton_labels records returning an array of the newly-created ids
     def create_carton_labels(no_of_prints, attrs)
-      prep_attrs = prepare_values_for_db(:carton_labels, attrs.merge(carton_equals_pallet: AppConst::CARTON_EQUALS_PALLET))
+      prep_attrs = prepare_values_for_db(:carton_labels, attrs.merge(carton_equals_pallet: AppConst::CR_PROD.carton_equals_pallet?))
       DB[:carton_labels].multi_insert(no_of_prints.to_i.times.map { prep_attrs }, return: :primary_key)
     end
 
     def carton_label_pallet_number(carton_label_id)
-      return nil unless AppConst::CARTON_EQUALS_PALLET
-
       DB[:carton_labels].where(id: carton_label_id).get(:pallet_number)
     end
 
@@ -503,16 +501,24 @@ module MesscadaApp
     #   return pallet[:pallet_number] unless pallet.nil?
     # end
 
-    def find_pallet_by_carton_number(carton_number)
+    def get_pallet_sequence_id_from_carton_label(carton_label_id)
+      pallet_sequence_id = carton_label_carton_palletizing_sequence(carton_label_id)
+      pallet_sequence_id = carton_label_scanned_from_carton_sequence(carton_label_id) if pallet_sequence_id.nil?
+      pallet_sequence_id
+    end
+
+    def find_pallet_by_carton_number(carton_label_id)
       # FIXME: This is dodgy..... Returns pallet or a string...
-      return carton_number if AppConst::CARTON_EQUALS_PALLET && !AppConst::USE_LABEL_ID_ON_BIN_LABEL
+      # carton_equals_pallet = carton_label_carton_equals_pallet(carton_number)
+      # return carton_number if carton_equals_pallet
+      #
+      # pallet_sequence_id = if !carton_equals_pallet && AppConst::USE_CARTON_PALLETIZING
+      #                        get_value(:cartons, :pallet_sequence_id, carton_label_id: carton_number)
+      #                      else
+      #                        DB[:pallet_sequences].join(:cartons, id: :scanned_from_carton_id).where(carton_label_id: carton_number).select_map(Sequel[:pallet_sequences][:id]).first
+      #                      end
 
-      pallet_sequence_id = if !AppConst::CARTON_EQUALS_PALLET && AppConst::USE_CARTON_PALLETIZING
-                             get_value(:cartons, :pallet_sequence_id, carton_label_id: carton_number)
-                           else
-                             DB[:pallet_sequences].join(:cartons, id: :scanned_from_carton_id).where(carton_label_id: carton_number).select_map(Sequel[:pallet_sequences][:id]).first
-                           end
-
+      pallet_sequence_id = get_pallet_sequence_id_from_carton_label(carton_label_id)
       pallet_id = get(:pallet_sequences, pallet_sequence_id, :pallet_id)
       find_pallet_flat(pallet_id)
     end
@@ -751,6 +757,30 @@ module MesscadaApp
     def run_start_date(production_run_id)
       time = get(:production_runs, production_run_id, :started_at)
       time.nil? ? nil : time.to_date
+    end
+
+    def carton_label_carton_equals_pallet(carton_label_id)
+      DB[:carton_labels].where(id: carton_label_id).get(:carton_equals_pallet)
+    end
+
+    def carton_label_carton_palletizing_sequence(carton_label_id)
+      get_value(:cartons, :pallet_sequence_id, carton_label_id: carton_label_id)
+    end
+
+    def carton_label_scanned_from_carton_sequence(carton_label_id)
+      DB[:pallet_sequences]
+        .join(:cartons, id: :scanned_from_carton_id)
+        .where(carton_label_id: carton_label_id)
+        .get(Sequel[:pallet_sequences][:id])
+    end
+
+    def pallet_number_carton_exists?(pallet_number)
+      pallet_sequence_ids = DB[:pallet_sequences].where(pallet_number: pallet_number).select_map(:id)
+      return false if pallet_sequence_ids.nil_or_empty?
+
+      has_cartons = exists?(:cartons, pallet_sequence_id: pallet_sequence_ids)
+      scanned_cartons = get(:pallet_sequences, pallet_sequence_ids, :scanned_from_carton_id)
+      has_cartons || !scanned_cartons.nil_or_empty?
     end
   end
 end

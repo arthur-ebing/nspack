@@ -61,6 +61,7 @@ module UiRules
                                                 options: representative_resources(rules[:represents]),
                                                 invisible: rules[:represents].nil?,
                                                 caption: 'Represents Resource' }
+      fields[:carton_equals_pallet] = { renderer: :checkbox, parent_field: :resource_properties }
     end
 
     def set_print_fields

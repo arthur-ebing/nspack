@@ -62,6 +62,9 @@ module ProductionApp
       res = UtilityFunctions.validate_integer_length(:carton_number, carton_number)
       return failed_response("Value #{carton_number} is too big to be a carton. Perhaps you scanned a pallet number?") if res.failure?
 
+      carton_equals_pallet = messcada_repo.carton_label_carton_equals_pallet(carton_number)
+      return failed_response("This Carton #{carton_number} is already a pallet and cannot be palletized") if carton_equals_pallet
+
       ok_response
     end
 
@@ -87,12 +90,13 @@ module ProductionApp
       repo.find_carton_by_carton_label_id(carton_label_id)
     end
 
-    def create_pallet_from_carton(carton_id) # rubocop:disable Metrics/AbcSize
+    def create_pallet_from_carton(carton_id) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       return failed_response("Scanned Carton:#{carton_id} not found. #{AppConst::CARTON_VERIFICATION_REQUIRED ? ' Needs to be verified' : nil}") unless carton_id
 
       carton = find_carton_with_run_info(carton_id)
       return failed_response("Scanned Carton:#{carton_id} doesn't exist") unless carton
       return failed_response('Scanned Carton Production Run is closed') if carton[:production_run_closed]
+      return failed_response("Pallet already created from this carton: #{carton[:carton_label_id]}") if carton_label_pallet_exists?(carton[:carton_label_id])
 
       cpp = find_carton_cpp(carton_id)
 
@@ -677,6 +681,13 @@ module ProductionApp
 
     def production_run(id)
       repo.find_production_run(id)
+    end
+
+    def carton_label_pallet_exists?(carton_label_id)
+      pallet_number = messcada_repo.carton_label_pallet_number(carton_label_id)
+      return false if pallet_number.nil_or_empty?
+
+      messcada_repo.pallet_exists?(pallet_number)
     end
 
     private

@@ -18,7 +18,8 @@ module Crossbeams
             default_marketing_org: 'HABATA',
             allow_cultivar_group_mix: true,
             use_packing_specifications: false,
-            use_marketing_puc: false },
+            use_marketing_puc: false,
+            carton_equals_pallet: { default: false, can_override: false }  },
       hl: { run_allocations: true,
             pallet_label_seqs_sql: nil,
             use_gtins: false,
@@ -32,7 +33,8 @@ module Crossbeams
             default_marketing_org: 'HABATA',
             allow_cultivar_group_mix: true,
             use_packing_specifications: false,
-            use_marketing_puc: false },
+            use_marketing_puc: false,
+            carton_equals_pallet: { default: false, can_override: false }  },
       kr: { run_allocations: true,
             pallet_label_seqs_sql: 'SELECT p.puc_code, p.gap_code, ps.gtin_code, ps.carton_quantity FROM pallet_sequences ps JOIN pucs p ON p.id = ps.puc_id WHERE ps.pallet_id = ? ORDER BY ps.pallet_sequence_number',
             use_gtins: true,
@@ -46,7 +48,8 @@ module Crossbeams
             default_marketing_org: 'KR',
             allow_cultivar_group_mix: false,
             use_packing_specifications: true,
-            use_marketing_puc: true },
+            use_marketing_puc: true,
+            carton_equals_pallet: { default: false, can_override: false }  },
       um: { run_allocations: true,
             pallet_label_seqs_sql: 'SELECT o.orchard_code, m.marketing_variety_code, s.size_reference, ps.carton_quantity FROM pallet_sequences ps JOIN orchards o ON o.id = ps.orchard_id JOIN marketing_varieties m ON m.id = ps.marketing_variety_id JOIN fruit_size_references s ON s.id = ps.fruit_size_reference_id WHERE ps.pallet_id = ? ORDER BY ps.pallet_sequence_number',
             use_gtins: false,
@@ -60,7 +63,8 @@ module Crossbeams
             default_marketing_org: 'UI',
             allow_cultivar_group_mix: false,
             use_packing_specifications: false,
-            use_marketing_puc: false },
+            use_marketing_puc: false,
+            carton_equals_pallet: { default: false, can_override: false }  },
       ud: { run_allocations: true,
             pallet_label_seqs_sql: nil,
             use_gtins: false,
@@ -74,7 +78,8 @@ module Crossbeams
             default_marketing_org: 'UI',
             allow_cultivar_group_mix: true,
             use_packing_specifications: false,
-            use_marketing_puc: false },
+            use_marketing_puc: false,
+            carton_equals_pallet: { default: false, can_override: false }  },
       sr: { run_allocations: true,
             pallet_label_seqs_sql: nil,
             use_gtins: false,
@@ -88,7 +93,8 @@ module Crossbeams
             default_marketing_org: 'SY',
             allow_cultivar_group_mix: false,
             use_packing_specifications: false,
-            use_marketing_puc: false },
+            use_marketing_puc: false,
+            carton_equals_pallet: { default: false, can_override: false }  },
       sr2: { run_allocations: true,
              pallet_label_seqs_sql: nil,
              use_gtins: false,
@@ -102,7 +108,8 @@ module Crossbeams
              default_marketing_org: 'SY',
              allow_cultivar_group_mix: false,
              use_packing_specifications: false,
-             use_marketing_puc: false }
+             use_marketing_puc: false,
+             carton_equals_pallet: { default: false, can_override: true }  }
     }.freeze
     # ALLOW_OVERFULL_REWORKS_PALLETIZING
     # BYPASS_QUALITY_TEST_LOAD_CHECK
@@ -239,6 +246,20 @@ module Crossbeams
       return "Lookup a marketing organization's puc and orchard values to store on cartons and sequences." if explain
 
       setting(:use_marketing_puc)
+    end
+
+    def carton_equals_pallet?(system_resource_code: nil, explain: false)
+      return 'Does carton become a pallet.' if explain
+
+      carton_equals_pallet = setting(:carton_equals_pallet)
+      return carton_equals_pallet[:default] unless carton_equals_pallet[:can_override]
+      return carton_equals_pallet[:default] if system_resource_code.nil?
+
+      robot_carton_equals_pallet = DB[:plant_resources]
+                                   .join(:system_resources, id: :system_resource_id)
+                                   .where(system_resource_code: system_resource_code)
+                                   .get(Sequel.lit("resource_properties ->> 'carton_equals_pallet'"))
+      robot_carton_equals_pallet.nil_or_empty? ? carton_equals_pallet[:default] : robot_carton_equals_pallet == 't'
     end
   end
 end

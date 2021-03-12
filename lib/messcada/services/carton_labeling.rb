@@ -4,13 +4,14 @@ module MesscadaApp
   class CartonLabeling < BaseService # rubocop:disable Metrics/ClassLength
     attr_reader :repo, :hr_repo, :production_run_id, :setup_data, :carton_label_id, :pick_ref,
                 :pallet_number, :personnel_number, :params, :system_resource,
-                :dedicated_pack, :bin_attrs, :farm_codes
+                :dedicated_pack, :bin_attrs, :farm_codes, :carton_equals_pallet
 
     def initialize(params)
       @params = params
       @repo = MesscadaApp::MesscadaRepo.new
       @hr_repo = MesscadaApp::HrRepo.new
       @system_resource = params[:system_resource]
+      @carton_equals_pallet = AppConst::CR_PROD.carton_equals_pallet?(system_resource_code: system_resource[:packpoint])
     end
 
     def call
@@ -192,10 +193,10 @@ module MesscadaApp
       attrs[:tu_sticker_ids] = resolve_col_array(attrs.delete(:tu_sticker_ids)) if attrs.key?(:tu_sticker_ids)
 
       repo.transaction do
-        @carton_label_id = repo.create_carton_label(attrs.merge(carton_equals_pallet: AppConst::CARTON_EQUALS_PALLET, phc: phc))
+        @carton_label_id = repo.create_carton_label(attrs.merge(carton_equals_pallet: carton_equals_pallet, phc: phc))
       end
 
-      @pallet_number = repo.carton_label_pallet_number(carton_label_id)
+      @pallet_number = carton_equals_pallet ? repo.carton_label_pallet_number(carton_label_id) : nil
 
       ok_response
     rescue Crossbeams::InfoError => e

@@ -1,23 +1,24 @@
 # frozen_string_literal: true
 
 module MesscadaApp
-  class CreatePalletFromCarton < BaseService
-    attr_reader :repo, :palletizing_repo, :carton_id, :carton_quantity, :carton, :cartons_per_pallet, :pallet_id, :pallet_sequence_id,
-                :user_name, :palletizing_bay_resource_id, :carton_palletizing, :carton_equals_pallet
+  class CreateCartonEqualsPalletPallet < BaseService
+    attr_reader :repo, :palletizing_repo, :carton_id, :carton_quantity, :carton, :pallet_id,
+                :pallet_sequence_id, :user_name, :palletizing_bay_resource_id, :carton_palletizing,
+                :carton_equals_pallet
 
-    def initialize(user, carton_id, carton_quantity, palletizing_bay_resource_id = nil, carton_palletizing = false)
-      @carton_id = carton_id
-      @carton_quantity = carton_quantity
+    def initialize(user, params, palletizing_bay_resource_id = nil, carton_palletizing = false)
+      @carton_id = params[:carton_id]
+      @carton_quantity = params[:carton_quantity]
+      @carton_equals_pallet = params[:carton_equals_pallet]
       @user_name = user&.user_name
       @palletizing_bay_resource_id = palletizing_bay_resource_id
       @carton_palletizing = carton_palletizing
-    end
-
-    def call
       @repo = MesscadaApp::MesscadaRepo.new
       @palletizing_repo = MesscadaApp::PalletizingRepo.new
       @carton = find_carton
-      @carton_equals_pallet = repo.carton_label_carton_equals_pallet(carton[:carton_label_id])
+    end
+
+    def call
       res = create_pallet_and_sequences
       raise Crossbeams::InfoError, unwrap_failed_response(res) unless res.success
 
@@ -31,7 +32,7 @@ module MesscadaApp
     end
 
     def create_pallet_and_sequences
-      return failed_response("Carton / Bin:#{carton_id} not verified") unless carton_exists?
+      return failed_response("Carton : #{carton_id} not verified") unless carton_exists?
 
       res = create_pallet
       return res unless res.success
@@ -78,7 +79,7 @@ module MesscadaApp
         plt_line_resource_id: carton[:production_line_id],
         palletizing_bay_resource_id: palletizing_bay_resource_id
       }
-      params[:pallet_number] = carton[:pallet_number] if carton_equals_pallet
+      params[:pallet_number] = carton[:pallet_number]
       params[:has_individual_cartons] = individual_cartons?
       params
     end

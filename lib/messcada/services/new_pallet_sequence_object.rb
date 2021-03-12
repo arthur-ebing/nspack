@@ -2,7 +2,7 @@
 
 module MesscadaApp
   class NewPalletSequenceObject < BaseService
-    attr_reader :repo, :carton_id, :carton, :carton_quantity, :cartons_per_pallet, :user_name, :carton_palletizing
+    attr_reader :repo, :carton_id, :carton, :carton_quantity, :cartons_per_pallet, :user_name, :carton_palletizing, :carton_equals_pallet
 
     def initialize(user_name, carton_id, carton_quantity, carton_palletizing = false)
       @carton_id = carton_id
@@ -15,6 +15,7 @@ module MesscadaApp
     def call
       @carton = repo.find_carton(carton_id)
       @cartons_per_pallet = repo.find_cartons_per_pallet(carton[:cartons_per_pallet_id])
+      @carton_equals_pallet = repo.carton_label_carton_equals_pallet(carton[:carton_label_id])
 
       make_pallet_sequence_object
     end
@@ -39,12 +40,12 @@ module MesscadaApp
                                   phc pallet_label_name active created_at updated_at packing_method_id palletizer_identifier_id palletizer_contract_worker_id
                                   pallet_sequence_id palletizing_bay_resource_id is_virtual scrapped scrapped_reason scrapped_at scrapped_sequence_id
                                   group_incentive_id rmt_bin_id dp_carton]
-      carton_rejected_fields << :pallet_number unless AppConst::CARTON_EQUALS_PALLET
+      carton_rejected_fields << :pallet_number unless carton_equals_pallet
       repo.find_carton(carton_id).to_h.reject { |k, _| carton_rejected_fields.include?(k) }
     end
 
     def pallet_sequence_pallet_params
-      quantity = if !AppConst::CARTON_EQUALS_PALLET && AppConst::USE_CARTON_PALLETIZING
+      quantity = if !carton_equals_pallet && AppConst::USE_CARTON_PALLETIZING
                    carton_quantity
                  else
                    carton_quantity.nil? ? cartons_per_pallet : carton_quantity

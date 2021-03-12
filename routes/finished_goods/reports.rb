@@ -12,7 +12,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                        load_id: id,
                                        pallet_report: 'detail',
                                        for_picklist: false,
-                                       cartons_equals_pallets: AppConst::CARTON_EQUALS_PALLET)
+                                       cartons_equals_pallets: AppConst::CR_PROD.carton_equals_pallet?)
       res = CreateJasperReport.call(jasper_params)
 
       if res.success
@@ -30,7 +30,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                        load_id: id,
                                        pallet_report: 'summary',
                                        for_picklist: false,
-                                       cartons_equals_pallets: AppConst::CARTON_EQUALS_PALLET)
+                                       cartons_equals_pallets: AppConst::CR_PROD.carton_equals_pallet?)
       res = CreateJasperReport.call(jasper_params)
 
       if res.success
@@ -49,7 +49,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                        load_id: id,
                                        pallet_report: 'detail',
                                        for_picklist: true,
-                                       cartons_equals_pallets: AppConst::CARTON_EQUALS_PALLET)
+                                       cartons_equals_pallets: AppConst::CR_PROD.carton_equals_pallet?)
       jasper_params.file_name = file_name
       res = CreateJasperReport.call(jasper_params)
 

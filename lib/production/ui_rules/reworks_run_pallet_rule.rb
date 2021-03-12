@@ -10,7 +10,7 @@ module UiRules
 
       # @rules[:provide_pack_type] = AppConst::PROVIDE_PACK_TYPE_AT_VERIFICATION
       @rules[:provide_pack_type] = AppConst::CR_PROD.provide_pack_type_at_carton_verification?
-      @rules[:carton_equals_pallet] = AppConst::CARTON_EQUALS_PALLET
+      @rules[:carton_equals_pallet] = AppConst::CR_PROD.carton_equals_pallet?
       @rules[:show_shipping_details] = @form_object[:shipped]
       @rules[:has_individual_cartons] = @form_object[:has_individual_cartons]
 

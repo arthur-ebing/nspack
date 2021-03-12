@@ -983,5 +983,18 @@ module ProductionApp
                 :gross_weight)
         .all
     end
+
+    def sequence_carton_equals_pallet?(pallet_sequence_id)
+      carton_id = sequence_carton_id(pallet_sequence_id)
+      carton_label_id = get_value(:cartons, :carton_label_id, id: carton_id)
+      DB[:carton_labels].where(id: carton_label_id).get(:carton_equals_pallet)
+    end
+
+    def sequence_carton_id(pallet_sequence_id)
+      carton_id = get_value(:cartons, :id, pallet_sequence_id: pallet_sequence_id)
+      return carton_id unless carton_id.nil_or_empty?
+
+      get_value(:pallet_sequences, :scanned_from_carton_id, id: pallet_sequence_id)
+    end
   end
 end

@@ -7,7 +7,7 @@ class Nspack < Roda
     interactor = MesscadaApp::PalletizingInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
     ok_to_palletize = AppConst::USE_CARTON_PALLETIZING
-    ok_to_palletize = false if AppConst::CARTON_EQUALS_PALLET
+    ok_to_palletize = false if AppConst::CR_PROD.carton_equals_pallet?
     unless ok_to_palletize
       feedback = MesscadaApp::RobotFeedback.new(device: params[:device],
                                                 status: false,

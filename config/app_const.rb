@@ -79,10 +79,10 @@ class AppConst # rubocop:disable Metrics/ClassLength
   LABELING_CACHED_DATA_FILEPATH = File.expand_path('../tmp/run_cache', __dir__)
 
   # carton verification
-  CARTON_EQUALS_PALLET = make_boolean('CARTON_EQUALS_PALLET')
+  # CARTON_EQUALS_PALLET = make_boolean('CARTON_EQUALS_PALLET')
   CARTON_VERIFICATION_REQUIRED = make_boolean('CARTON_VERIFICATION_REQUIRED')
   PROVIDE_PACK_TYPE_AT_VERIFICATION = make_boolean('PROVIDE_PACK_TYPE_AT_VERIFICATION')
-  USE_LABEL_ID_ON_BIN_LABEL = make_boolean('USE_LABEL_ID_ON_BIN_LABEL')
+  # USE_LABEL_ID_ON_BIN_LABEL = make_boolean('USE_LABEL_ID_ON_BIN_LABEL')
 
   # carton palletizing
   USE_CARTON_PALLETIZING = make_boolean('USE_CARTON_PALLETIZING')

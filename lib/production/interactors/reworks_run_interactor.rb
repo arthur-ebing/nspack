@@ -468,7 +468,7 @@ module ProductionApp
       return failed_response('Marketing Varieties Error. Cultivar change invalidates existing marketing_varieties') if res[:allow_cultivar_mixing] && invalidates_marketing_varieties?(res)
 
       old_sequence_instance = pallet_sequence(res[:pallet_sequence_id])
-      return failed_response('Sequence cannot be cloned', pallet_number: old_sequence_instance[:pallet_number]) if AppConst::CARTON_EQUALS_PALLET
+      return failed_response('Sequence cannot be cloned', pallet_number: old_sequence_instance[:pallet_number]) if sequence_carton_equals_pallet?(res[:pallet_sequence_id])
 
       instance = nil
       repo.transaction do
@@ -491,6 +491,10 @@ module ProductionApp
       repo.invalidates_sequence_marketing_varieties?(args)
     end
 
+    def sequence_carton_equals_pallet?(pallet_sequence_id)
+      repo.sequence_carton_equals_pallet?(pallet_sequence_id)
+    end
+
     def reworks_run_attrs(sequence_id, reworks_run_type_id)
       {
         user: @user.user_name,
@@ -505,7 +509,7 @@ module ProductionApp
 
     def remove_pallet_sequence(sequence_id, reworks_run_type_id)  # rubocop:disable Metrics/AbcSize
       before_attrs = remove_sequence_changes(sequence_id)
-      return failed_response('Sequence cannot be removed', pallet_number: before_attrs[:pallet_number]) if AppConst::CARTON_EQUALS_PALLET || cannot_remove_sequence(before_attrs[:pallet_id])
+      return failed_response('Sequence cannot be removed', pallet_number: before_attrs[:pallet_number]) if cannot_remove_sequence(before_attrs[:pallet_id])
 
       repo.transaction do
         reworks_run_attrs = reworks_run_attrs(sequence_id, reworks_run_type_id)
@@ -1104,7 +1108,7 @@ module ProductionApp
 
     def scrap_carton(carton_id, reworks_run_type_id)  # rubocop:disable Metrics/AbcSize
       before_attrs = scrap_carton_changes(carton_id)
-      return failed_response('Carton cannot be scrapped', pallet_sequence_id: before_attrs[:pallet_sequence_id]) if AppConst::CARTON_EQUALS_PALLET || cannot_scrap_carton(before_attrs[:pallet_sequence_id])
+      return failed_response('Carton cannot be scrapped', pallet_sequence_id: before_attrs[:pallet_sequence_id]) if cannot_scrap_carton(before_attrs[:pallet_sequence_id])
 
       repo.transaction do
         original_pallet_sequence_id = before_attrs[:pallet_sequence_id]

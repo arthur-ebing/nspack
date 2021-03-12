@@ -62,4 +62,13 @@ module MesscadaApp
       base.failure 'must provide either fruit_size_reference or fruit_actual_count' unless values[:fruit_size_reference_id] || values[:fruit_actual_counts_for_pack_id]
     end
   end
+
+  CartonSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:carton_label_id).filled(:integer)
+    optional(:palletizer_identifier_id).maybe(:integer)
+    optional(:pallet_sequence_id).maybe(:integer)
+    optional(:palletizing_bay_resource_id).maybe(:integer)
+    optional(:palletizer_contract_worker_id).maybe(:integer)
+  end
 end

@@ -22,7 +22,7 @@ module MesscadaApp
       return validations unless validations.success
 
       id = repo.create_sequences(res.instance, pallet_id)
-      repo.update_carton(carton_id, { pallet_sequence_id: id }) if !AppConst::CARTON_EQUALS_PALLET && AppConst::USE_CARTON_PALLETIZING
+      repo.update_carton(carton_id, { pallet_sequence_id: id }) if !carton_equals_pallet? && AppConst::USE_CARTON_PALLETIZING
 
       success_response('ok', pallet_sequence_id: id)
     end
@@ -36,6 +36,11 @@ module MesscadaApp
 
       carton_number = repo.get_value(:cartons, :carton_label_id, id: carton_id)
       ProductionApp::TaskPermissionCheck::PalletMixRule.call(mix_rule_scope, new_sequence, oldest_sequence, carton_number)
+    end
+
+    def carton_equals_pallet?
+      carton_label_id = repo.get_value(:cartons, :carton_label_id, id: carton_id)
+      repo.carton_label_carton_equals_pallet(carton_label_id)
     end
   end
 end

@@ -44,16 +44,16 @@ module MesscadaApp
       # This should only be called when COMBINE_CARTON_AND_PALLET_VERIFICATION is true
       scanned_carton_number = params[:carton_number]
 
-      if AppConst::CARTON_EQUALS_PALLET
-        pallet = repo.find_pallet_by_pallet_number(scanned_carton_number)
-        return success_response('Carton found', pallet.pallet_sequence_ids.first) unless pallet.nil?
-      end
-
       res = carton_verification(carton_number: scanned_carton_number)
       return failed_response(res.message) unless res.success
 
-      # pallet = repo.find_pallet_by_carton_number(scanned_carton_number)
-      pallet = repo.find_pallet_by_pallet_number(scanned_carton_number)
+      args = repo.parse_pallet_or_carton_number({ scanned_number: scanned_carton_number })
+      pallet = if args[:carton_number]
+                 repo.find_pallet_by_carton_number(params[:carton_number])
+               else
+                 repo.find_pallet_by_pallet_number(args[:pallet_number])
+               end
+
       return failed_response('Carton verification failed to create pallet.') if pallet.nil?
 
       success_response('Verified Carton', pallet.pallet_sequence_ids.first)
@@ -271,11 +271,6 @@ module MesscadaApp
       res = CartonAndPalletVerificationSchema.call(params)
       return validation_failed_response(res) if res.failure?
 
-      check_res = validate_carton_label_exists(res[:carton_number])
-      return check_res unless check_res.success
-
-      res = convert_pallet_no_to_carton_no(res) if AppConst::CARTON_EQUALS_PALLET && !AppConst::USE_LABEL_ID_ON_BIN_LABEL
-
       cvl_res = nil
       repo.transaction do
         cvl_res = MesscadaApp::CartonVerification.call(@user, res)
@@ -300,11 +295,6 @@ module MesscadaApp
 
       check_res = validate_device_and_label_exist(res[:device], res[:carton_number])
       return check_res unless check_res.success
-
-      lookup_by_pallet_no = AppConst::CARTON_EQUALS_PALLET
-      lookup_by_pallet_no = false if AppConst::USE_LABEL_ID_ON_BIN_LABEL
-
-      res = convert_pallet_no_to_carton_no(res) if lookup_by_pallet_no
 
       cvl_res = nil
       repo.transaction do
@@ -331,11 +321,6 @@ module MesscadaApp
 
       check_res = validate_device_and_label_exist(res[:device], res[:carton_number])
       return check_res unless check_res.success
-
-      lookup_by_pallet_no = AppConst::CARTON_EQUALS_PALLET
-      lookup_by_pallet_no = false if AppConst::USE_LABEL_ID_ON_BIN_LABEL
-
-      res = convert_pallet_no_to_carton_no(res) if lookup_by_pallet_no
 
       cvl_res = nil
       repo.transaction do
@@ -551,19 +536,6 @@ module MesscadaApp
       !repo.carton_label_id_for_pallet_no(pallet_no).nil?
     end
 
-    def validate_carton_label_exists(carton_id_or_pallet_no)
-      lookup_by_pallet_no = AppConst::CARTON_EQUALS_PALLET
-      lookup_by_pallet_no = false if AppConst::USE_LABEL_ID_ON_BIN_LABEL
-
-      if lookup_by_pallet_no
-        return failed_response("Bin label:#{carton_id_or_pallet_no} could not be found") unless carton_label_exists_for_pallet?(carton_id_or_pallet_no)
-      else
-        return failed_response("Carton label:#{carton_id_or_pallet_no} could not be found") unless carton_label_exists?(carton_id_or_pallet_no)
-      end
-
-      ok_response
-    end
-
     def validate_device_exists(resource_code)
       return failed_response("Resource Code:#{resource_code} could not be found#{AppConst::ROBOT_MSG_SEP}#{resource_code} not found}") unless resource_code_exists?(resource_code)
 
@@ -576,12 +548,9 @@ module MesscadaApp
       ok_response
     end
 
-    def validate_device_and_label_exist(device, carton_id_or_pallet_no)
+    def validate_device_and_label_exist(device, _carton_id_or_pallet_no)
       res1 = validate_device_exists(device)
       return res1 unless res1.success
-
-      res2 = validate_carton_label_exists(carton_id_or_pallet_no)
-      return res2 unless res2.success
 
       ok_response
     end

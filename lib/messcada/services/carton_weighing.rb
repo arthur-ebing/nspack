@@ -14,7 +14,7 @@ module MesscadaApp
 
     def call
       @repo = MesscadaApp::MesscadaRepo.new
-      @carton_is_pallet = AppConst::CARTON_EQUALS_PALLET
+      @carton_is_pallet = repo.carton_label_carton_equals_pallet(carton_label_id)
       # @provide_pack_type = AppConst::PROVIDE_PACK_TYPE_AT_VERIFICATION
       @provide_pack_type = AppConst::CR_PROD.provide_pack_type_at_carton_verification?
       @plant_resource_button_indicator = resource_code.split('-').last
