@@ -4,12 +4,12 @@
   \            lines.plant_resource_code AS line,\r\n             plant_resources.plant_resource_code,\r\n
   \            plant_resources.description,\r\n             system_resources.system_resource_code,
   \r\n             system_resources.ip_address,\r\n             plant_resources.resource_properties
-  ->> 'carton_equals_pallet' AS carton_equals_pallet,\r\n\t     CASE \r\n                WHEN
-  plant_resource_types.plant_resource_type_code = 'BIN_FILLER_ROBOT' THEN \r\n\t\t
-  \    fn_bin_filler_robot_label_to_print(plant_resources.id)\r\n                ELSE
+  ->> 'carton_equals_pallet'::text ='t'::text AS carton_equals_pallet,\r\n\t     CASE
+  \r\n                WHEN plant_resource_types.plant_resource_type_code = 'BIN_FILLER_ROBOT'
+  THEN \r\n\t\t     fn_bin_filler_robot_label_to_print(plant_resources.id)\r\n                ELSE
   \r\n\t\t     CASE \r\n\t\t\t  WHEN plant_resources.resource_properties ->> 'carton_equals_pallet'::text
-  ='true'::text THEN 'Pallet'\r\n\t\t\t  WHEN plant_resources.resource_properties
-  ->> 'carton_equals_pallet'::text ='false'::text THEN 'Carton'\r\n\t\t\t  ELSE 'Mixed'::text
+  ='t'::text THEN 'Pallet'\r\n\t\t\t  WHEN plant_resources.resource_properties ->>
+  'carton_equals_pallet'::text ='f'::text THEN 'Carton'\r\n\t\t\t  ELSE 'Mixed'::text
   \ \r\n                     END     \r\n             END AS label_to_print,\r\n             CASE
   \r\n                WHEN plant_resource_types.plant_resource_type_code = 'BIN_FILLER_ROBOT'
   THEN true\r\n                ELSE false       \r\n             END AS is_robot\r\n\r\nFROM

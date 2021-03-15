@@ -1019,7 +1019,8 @@ class Nspack < Roda
           check_auth!('runs', 'edit')
           res = interactor.resolve_bin_filler_resource_params(Crossbeams::Config::ResourceDefinitions::ROBOT_BUTTON,
                                                               plant_resource_id: plant_resource_id)
-          r.redirect("/list/bin_filler_roles/with_params?key=robot_buttons&plant_resource_ids=#{res.instance[:plant_resource_ids]}")
+          plant_resource_ids = res.instance[:plant_resource_ids].nil_or_empty? ? 'null' : res.instance[:plant_resource_ids]
+          r.redirect("/list/bin_filler_roles/with_params?key=robot_buttons&plant_resource_ids=#{plant_resource_ids}")
         end
 
         r.on 'inline_edit_label_to_print' do

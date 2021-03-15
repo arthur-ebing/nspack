@@ -619,7 +619,7 @@ module ProductionApp
     end
 
     def resolve_resource_carton_equals_pallet(label_to_print)
-      opts = { 'Carton' => false, 'Pallet' => true }
+      opts = { 'Carton' => 'f', 'Pallet' => 't' }
       { resource_properties: { carton_equals_pallet: opts[label_to_print] } }
     end
 
