@@ -1004,6 +1004,36 @@ class Nspack < Roda
         json_replace_select_options('rebin_rmt_material_owner_party_role_id', [])
       end
     end
+
+    r.on 'bin_filler_roles' do
+      interactor = ProductionApp::ProductionRunInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'view_robots' do
+        check_auth!('runs', 'edit')
+        res = interactor.resolve_bin_filler_resource_params
+        r.redirect("/list/bin_filler_roles/with_params?key=standard&plant_resource_type_id=#{res.instance[:plant_resource_type_id]}")
+      end
+
+      r.on 'edit_bin_filler_roles', Integer do |plant_resource_id|
+        r.on 'view_robot_buttons' do
+          check_auth!('runs', 'edit')
+          res = interactor.resolve_bin_filler_resource_params(plant_resource_id: plant_resource_id)
+          r.redirect("/list/bin_filler_roles/with_params?key=robot_buttons&plant_resource_ids=#{res.instance[:plant_resource_ids]}")
+        end
+
+        r.on 'inline_edit_label_to_print' do
+          res = interactor.inline_edit_label_to_print(plant_resource_id, params)
+          if res.success
+            json_actions([OpenStruct.new(type: :update_grid_row,
+                                         ids: plant_resource_id,
+                                         changes: res.instance[:changes])],
+                         res.message)
+          else
+            undo_grid_inline_edit(message: res.message, message_type: :warning)
+          end
+        end
+      end
+    end
   end
 end
 # rubocop:enable Metrics/ClassLength

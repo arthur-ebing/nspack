@@ -690,6 +690,30 @@ module ProductionApp
       messcada_repo.pallet_exists?(pallet_number)
     end
 
+    def resolve_bin_filler_resource_params(plant_resource_id: nil)
+      plant_resource_type_code = if plant_resource_id.nil_or_empty?
+                                   Crossbeams::Config::ResourceDefinitions::BIN_FILLER_ROBOT
+                                 else
+                                   Crossbeams::Config::ResourceDefinitions::ROBOT_BUTTON
+                                 end
+
+      attrs = { plant_resource_type_id: repo.get_id(:plant_resource_types, plant_resource_type_code: plant_resource_type_code),
+                plant_resource_ids: resource_repo.robot_buttons(plant_resource_id) }
+      success_response('ok', attrs)
+    end
+
+    def inline_edit_label_to_print(plant_resource_id, params)
+      if params[:column_name] == 'label_to_print'
+        repo.transaction do
+          res = resource_repo.edit_bin_filler_role(plant_resource_id, params[:column_value])
+          res.instance = { changes: { label_to_print: res.instance[:label_to_print] } }
+          res
+        end
+      else
+        failed_response(%(There is no handler for changed column "#{params[:column_name]}"))
+      end
+    end
+
     private
 
     def repo
@@ -710,6 +734,10 @@ module ProductionApp
 
     def messcada_repo
       @messcada_repo ||= MesscadaApp::MesscadaRepo.new
+    end
+
+    def resource_repo
+      @resource_repo ||= ProductionApp::ResourceRepo.new
     end
 
     def pallet_mix_rule(id)

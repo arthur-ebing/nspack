@@ -1,0 +1,32 @@
+---
+:dataminer_definition: bin_filler_roles
+:actions:
+- :url: "/production/runs/bin_filler_roles/edit_bin_filler_roles/$:id$/view_robot_buttons"
+  :text: buttons
+  :icon: list
+  :title: Edit
+  :hide_if_false: is_robot
+:page_controls:
+- :control_type: :link
+  :url: "/production/runs/bin_filler_roles/view_robots"
+  :text: Back
+  :style: :back_button
+:captions:
+  :conditions:
+    :standard: Edit Bin Fillers Roles
+    :robot_buttons: Edit Bin Filler Robot Buttons Roles
+:conditions:
+  :standard:
+    - :col: plant_resources.plant_resource_type_id
+      :op: =
+      :val: $:plant_resource_type_id$
+  :robot_buttons:
+    - :col: plant_resources.id
+      :op: IN
+      :val: $:plant_resource_ids$
+:edit_rules:
+  :url: "/production/runs/bin_filler_roles/edit_bin_filler_roles/$:id$/inline_edit_label_to_print"
+  :editable_fields:
+    label_to_print:
+      :editor: :search_select
+      :value_sql: SELECT 'Carton' UNION SELECT 'Pallet'

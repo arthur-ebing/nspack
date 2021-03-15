@@ -1,0 +1,204 @@
+---
+:caption: Bin Filler Roles
+:sql: "SELECT plant_resources.id, \r\n             plant_resources.plant_resource_type_id,\r\n
+  \            lines.plant_resource_code AS line,\r\n             plant_resources.plant_resource_code,\r\n
+  \            plant_resources.description,\r\n             system_resources.system_resource_code,
+  \r\n             system_resources.ip_address,\r\n             plant_resources.resource_properties
+  ->> 'carton_equals_pallet' AS carton_equals_pallet,\r\n\t     CASE \r\n                WHEN
+  plant_resource_types.plant_resource_type_code = 'BIN_FILLER_ROBOT' THEN \r\n\t\t
+  \    fn_bin_filler_robot_label_to_print(plant_resources.id)\r\n                ELSE
+  \r\n\t\t     CASE \r\n\t\t\t  WHEN plant_resources.resource_properties ->> 'carton_equals_pallet'::text
+  ='true'::text THEN 'Pallet'\r\n\t\t\t  WHEN plant_resources.resource_properties
+  ->> 'carton_equals_pallet'::text ='false'::text THEN 'Carton'\r\n\t\t\t  ELSE 'Mixed'::text
+  \ \r\n                     END     \r\n             END AS label_to_print,\r\n             CASE
+  \r\n                WHEN plant_resource_types.plant_resource_type_code = 'BIN_FILLER_ROBOT'
+  THEN true\r\n                ELSE false       \r\n             END AS is_robot\r\n\r\nFROM
+  plant_resources\r\nJOIN plant_resource_types ON plant_resource_types.id = plant_resources.plant_resource_type_id\r\nJOIN
+  system_resources ON system_resources.id = plant_resources.system_resource_id\r\nJOIN
+  tree_plant_resources  ON plant_resources.id = tree_plant_resources.descendant_plant_resource_id\r\nJOIN
+  plant_resources lines ON lines.id = tree_plant_resources.ancestor_plant_resource_id\r\n
+  \  AND lines.plant_resource_type_id = ( SELECT id FROM plant_resource_types  WHERE
+  plant_resource_type_code = 'LINE')\r\nWHERE plant_resource_types.plant_resource_type_code
+  IN ('BIN_FILLER_ROBOT' ,'ROBOT_BUTTON')\r\nORDER BY lines.plant_resource_code ASC,
+  plant_resources.plant_resource_code ASC;"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: plant_resources.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  plant_resource_type_id:
+    :name: plant_resource_type_id
+    :sequence_no: 2
+    :caption: Plant resource type
+    :namespaced_name: plant_resources.plant_resource_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  line:
+    :name: line
+    :sequence_no: 3
+    :caption: Line
+    :namespaced_name: lines.plant_resource_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  plant_resource_code:
+    :name: plant_resource_code
+    :sequence_no: 4
+    :caption: Plant resource
+    :namespaced_name: plant_resources.plant_resource_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  description:
+    :name: description
+    :sequence_no: 5
+    :caption: Description
+    :namespaced_name: plant_resources.description
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  system_resource_code:
+    :name: system_resource_code
+    :sequence_no: 6
+    :caption: System resource
+    :namespaced_name: system_resources.system_resource_code
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  ip_address:
+    :name: ip_address
+    :sequence_no: 7
+    :caption: Ip address
+    :namespaced_name: system_resources.ip_address
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  carton_equals_pallet:
+    :name: carton_equals_pallet
+    :sequence_no: 8
+    :caption: Carton equals pallet
+    :namespaced_name: 
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  label_to_print:
+    :name: label_to_print
+    :sequence_no: 9
+    :caption: Label to print
+    :namespaced_name: 
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  is_robot:
+    :name: is_robot
+    :sequence_no: 10
+    :caption: Is robot
+    :namespaced_name: 
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: plant_resources.id
+  :caption: Plant resource
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: plant_resources.plant_resource_type_id
+  :caption: Plant resource type
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
