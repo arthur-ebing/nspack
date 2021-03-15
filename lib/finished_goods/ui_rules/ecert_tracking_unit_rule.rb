@@ -45,7 +45,8 @@ module UiRules
                        placeholder: 'Paste pallet numbers here',
                        caption: 'Pallet Numbers',
                        required: true },
-        pallet_number: { required: true }
+        pallet_number: { required: true },
+        govt_inspection_sheet_id: { renderer: :hidden }
       }
     end
 
@@ -70,6 +71,7 @@ module UiRules
                                     passed: nil,
                                     process_result: nil,
                                     rejection_reasons: nil,
+                                    govt_inspection_sheet_id: @options[:govt_inspection_sheet_id],
                                     pallet_list: pallet_list,
                                     pallet_number: nil)
     end

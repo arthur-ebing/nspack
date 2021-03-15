@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
+# rubocop:disable Metrics/BlockLength, Metrics/ClassLength
 class Nspack < Roda
   route 'ecert', 'finished_goods' do |r|
     # ECERT AGREEMENTS
@@ -106,7 +106,14 @@ class Nspack < Roda
       r.post do        # CREATE
         res = interactor.elot_preverify(params[:ecert_tracking_unit])
         if res.success
+          govt_inspection_sheet_id = params[:ecert_tracking_unit][:govt_inspection_sheet_id]
+          url = if govt_inspection_sheet_id.nil_or_empty?
+                  session[:last_grid_url]
+                else
+                  "/finished_goods/inspection/govt_inspection_sheets/#{govt_inspection_sheet_id}"
+                end
           flash[:notice] = res.message
+          r.redirect url
         else
           flash[:error] = res.message
           re_show_form(r, res, url: '/finished_goods/ecert/ecert_tracking_units/new') do
@@ -115,9 +122,8 @@ class Nspack < Roda
                                                               remote: fetch?(r))
           end
         end
-        redirect_to_last_grid(r)
       end
     end
   end
 end
-# rubocop:enable Metrics/BlockLength
+# rubocop:enable Metrics/BlockLength, Metrics/ClassLength

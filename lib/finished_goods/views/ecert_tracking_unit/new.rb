@@ -18,6 +18,7 @@ module FinishedGoods
               form.remote! if remote
               form.add_field :ecert_agreement_id
               form.add_field :pallet_list
+              form.add_field :govt_inspection_sheet_id
             end
           end
 
