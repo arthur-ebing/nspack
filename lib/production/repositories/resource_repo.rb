@@ -540,7 +540,7 @@ module ProductionApp
     end
 
     def robot_buttons(robot_id) # rubocop:disable Metrics/AbcSize
-      return nil if robot_id.nil?
+      return [] if robot_id.nil?
 
       DB[:plant_resources]
         .join(:tree_plant_resources, descendant_plant_resource_id: Sequel[:plant_resources][:id])
@@ -550,10 +550,10 @@ module ProductionApp
         .select_map(Sequel[:plant_resources][:id])
     end
 
-    def edit_bin_filler_role(plant_resource_id, label_to_print)
+    def update_bin_filler_role(plant_resource_id, label_to_print)
       attrs = resolve_resource_carton_equals_pallet(label_to_print)
       bin_filler = plant_resource_type_is_bin_filler?(plant_resource_id)
-      bin_filler ? edit_bin_filler_robot_button_roles(plant_resource_id, attrs) : update_plant_resource(plant_resource_id, attrs)
+      bin_filler ? update_bin_filler_robot_button_roles(plant_resource_id, attrs) : update_plant_resource(plant_resource_id, attrs)
 
       success_response("Applied #{label_to_print}", label_to_print: label_to_print)
     end
@@ -619,15 +619,8 @@ module ProductionApp
     end
 
     def resolve_resource_carton_equals_pallet(label_to_print)
-      attrs = {}
-      carton_equals_pallet = if label_to_print == 'Carton'
-                               false
-                             elsif label_to_print == 'Pallet'
-                               true
-                             end
-
-      attrs[:resource_properties] = { carton_equals_pallet: carton_equals_pallet }
-      attrs
+      opts = { 'Carton' => false, 'Pallet' => true }
+      { resource_properties: { carton_equals_pallet: opts[label_to_print] } }
     end
 
     def plant_resource_type_is_bin_filler?(plant_resource_id)
@@ -635,7 +628,7 @@ module ProductionApp
       type_code == Crossbeams::Config::ResourceDefinitions::BIN_FILLER_ROBOT
     end
 
-    def edit_bin_filler_robot_button_roles(robot_id, attrs)
+    def update_bin_filler_robot_button_roles(robot_id, attrs)
       robot_buttons(robot_id).each do |id|
         update_plant_resource(id, attrs)
       end

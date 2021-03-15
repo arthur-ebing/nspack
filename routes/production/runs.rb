@@ -1010,14 +1010,15 @@ class Nspack < Roda
 
       r.on 'view_robots' do
         check_auth!('runs', 'edit')
-        res = interactor.resolve_bin_filler_resource_params
+        res = interactor.resolve_bin_filler_resource_params(Crossbeams::Config::ResourceDefinitions::BIN_FILLER_ROBOT)
         r.redirect("/list/bin_filler_roles/with_params?key=standard&plant_resource_type_id=#{res.instance[:plant_resource_type_id]}")
       end
 
       r.on 'edit_bin_filler_roles', Integer do |plant_resource_id|
         r.on 'view_robot_buttons' do
           check_auth!('runs', 'edit')
-          res = interactor.resolve_bin_filler_resource_params(plant_resource_id: plant_resource_id)
+          res = interactor.resolve_bin_filler_resource_params(Crossbeams::Config::ResourceDefinitions::ROBOT_BUTTON,
+                                                              plant_resource_id: plant_resource_id)
           r.redirect("/list/bin_filler_roles/with_params?key=robot_buttons&plant_resource_ids=#{res.instance[:plant_resource_ids]}")
         end
 
