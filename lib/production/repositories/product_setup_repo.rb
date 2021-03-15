@@ -430,7 +430,7 @@ module ProductionApp
       fg_code_components << get_kromco_mes_value(:fruit_actual_counts_for_packs, prod_setup[:fruit_actual_counts_for_pack_id], :actual_count_for_pack)
       fg_code_components << get_kromco_mes_value(:basic_pack_codes, prod_setup[:basic_pack_code_id], :footprint_code)
       fg_code_components << cosmetic_code(packing_specification_item_id)
-      fg_code_components << get_kromco_mes_value(:fruit_size_references, prod_setup[:fruit_size_reference_id], :size_reference) || 'NOS'
+      fg_code_components << (get_kromco_mes_value(:fruit_size_references, prod_setup[:fruit_size_reference_id], :size_reference) || 'NOS')
       fg_code_components << packing_specification_item_unit_pack_product(packing_specification_item_id)
       carton_pack_product = packing_specification_item_carton_pack_product(packing_specification_item_id)
       return nil unless carton_pack_product
