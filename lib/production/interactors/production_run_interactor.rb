@@ -54,7 +54,7 @@ module ProductionApp
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('add_sequence_to_pallet'))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
       failed_response(e.message)
     end
 
@@ -107,10 +107,10 @@ module ProductionApp
       end
       res
     rescue Crossbeams::InfoError => e
-      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message('create_pallet_from_carton'))
+      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message(__method__))
       failed_response(e.message)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('create_pallet_from_carton'))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
       failed_response(e.message)
     end
 
@@ -146,7 +146,7 @@ module ProductionApp
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('edit_pallet_validations'))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
       failed_response(e.message)
     end
 
@@ -167,7 +167,7 @@ module ProductionApp
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("replace_pallet_sequence. pallet_sequence_id:#{pallet_sequence_id}, carton_number:#{carton_number} "))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("#{__method__}. pallet_sequence_id:#{pallet_sequence_id}, carton_number:#{carton_number} "))
       failed_response(e.message)
     end
 
@@ -195,7 +195,7 @@ module ProductionApp
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('update_pallet_sequence_carton_qty'))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
       failed_response(e.message)
     end
 
@@ -211,7 +211,7 @@ module ProductionApp
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('print_pallet_label'))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
       failed_response(e.message)
     end
 

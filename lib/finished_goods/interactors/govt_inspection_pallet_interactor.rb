@@ -99,7 +99,7 @@ module FinishedGoodsApp
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('reject_to_repack'))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
       puts e.backtrace.join("\n")
       failed_response(e.message)
     end

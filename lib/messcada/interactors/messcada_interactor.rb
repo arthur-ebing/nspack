@@ -88,7 +88,7 @@ module MesscadaApp
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('get_deck_pallets'))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
@@ -180,12 +180,12 @@ module MesscadaApp
 
       MesscadaApp::UpdateBinWeights.call(res)
     rescue Crossbeams::InfoError => e
-      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message('update_bin_weights'))
+      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message(__method__))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('update_bin_weights'))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
@@ -205,10 +205,10 @@ module MesscadaApp
         res
       end
     rescue Crossbeams::InfoError => e
-      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message('tip_rmt_bin'))
+      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message(__method__))
       failed_response(e.message)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('tip_rmt_bin'))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response("System error: #{e.message.gsub(/['"`<>]/, '')}")
@@ -220,10 +220,10 @@ module MesscadaApp
 
       MesscadaApp::TipBin.new(res).can_tip_bin?
     rescue Crossbeams::InfoError => e
-      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message('can_tip_bin'))
+      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message(__method__))
       failed_response(e.message)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('can_tip_bin'))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response("System error: #{e.message.gsub(/['"`<>]/, '')}")
@@ -237,12 +237,12 @@ module MesscadaApp
       end
       cvl_res
     rescue Crossbeams::InfoError => e
-      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message('carton_labeling')) if AppConst::ROBOT_DISPLAY_LINES != 4
+      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message(__method__)) if AppConst::ROBOT_DISPLAY_LINES != 4
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('carton_labeling'))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
       puts e
       puts e.backtrace.join("\n")
       failed_response(e.message)
@@ -256,12 +256,13 @@ module MesscadaApp
       end
       xml_label_content(params[:system_resource], cvl_res.instance)
     rescue Crossbeams::InfoError => e
-      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message('xml_carton_labeling'))
+      # Only send an email if the error is not caused by an un-allocated button:
+      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message(__method__)) unless e.message.start_with?('No setup data cached')
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('xml_carton_labeling'))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
       puts e
       puts e.backtrace.join("\n")
       failed_response(e.message)
@@ -278,12 +279,12 @@ module MesscadaApp
       end
       cvl_res
     rescue Crossbeams::InfoError => e
-      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message('carton_verification'))
+      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message(__method__))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('carton_verification'))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
       puts e
       puts e.backtrace.join("\n")
       failed_response(e.message)
@@ -304,12 +305,12 @@ module MesscadaApp
       end
       cvl_res
     rescue Crossbeams::InfoError => e
-      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message('carton_verification_and_weighing'))
+      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message(__method__))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('carton_verification_and_weighing'))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
@@ -331,12 +332,12 @@ module MesscadaApp
       end
       cvl_res
     rescue Crossbeams::InfoError => e
-      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message('carton_verification_and_weighing_and_labeling'))
+      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message(__method__))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('carton_verification_and_weighing_and_labeling'))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
@@ -372,7 +373,7 @@ module MesscadaApp
       verification_completed = pallet_verified?(pallet_id)
       success_response('Pallet Sequence updated successfully', verification_completed: verification_completed)
     rescue Crossbeams::InfoError => e
-      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message('verify_pallet_sequence'))
+      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message(__method__))
       failed_response(e.message)
     end
 
@@ -405,10 +406,10 @@ module MesscadaApp
       end
       fpw_res
     rescue Crossbeams::InfoError => e
-      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message('fg_pallet_weighing')) unless e.message.include?('pallet number length')
+      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message(__method__)) unless e.message.include?('pallet number length')
       failed_response(e.message)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('fg_pallet_weighing'))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
@@ -430,7 +431,7 @@ module MesscadaApp
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('repack_pallets'))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)

@@ -217,7 +217,7 @@ module DataminerApp
       rpt = DmConverter.new(repo.admin_report_path(dbname)).convert_hash(hash, params[:filename])
       success_response('Converted to a new report', rpt)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('convert_report'))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
       failed_response(e.message)
     end
 
@@ -305,7 +305,7 @@ module DataminerApp
       report.save(yp)
       success_response('Report saved', report)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('save_report'))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
       failed_response(e.message)
     end
 
@@ -316,7 +316,7 @@ module DataminerApp
       File.delete(filename)
       success_response('Report has been deleted')
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('delete_report'))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
       failed_response(e.message)
     end
 
@@ -359,7 +359,7 @@ module DataminerApp
       report.save(yp)
       success_response('Columns reordered', report)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('save_report_column_order'))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
       failed_response(e.message)
     end
 
@@ -468,7 +468,7 @@ module DataminerApp
       report.save(yp)
       success_response('Parameter has been deleted', report)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('delete_parameter'))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
       failed_response(e.message)
     end
 

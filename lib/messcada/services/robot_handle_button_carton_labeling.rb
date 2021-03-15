@@ -38,7 +38,8 @@ module MesscadaApp
         robot_interface.respond(feedback, false)
       end
     rescue Crossbeams::InfoError => e
-      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: robot_interface.decorate_mail_message('carton_labeling'))
+      # Only send an email if the error is not caused by an un-allocated button:
+      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: robot_interface.decorate_mail_message('carton_labeling')) unless e.message.start_with?('No setup data cached')
       puts e.message
       puts e.backtrace.join("\n")
       feedback = MesscadaApp::RobotFeedback.new(device: robot.system_resource_code,

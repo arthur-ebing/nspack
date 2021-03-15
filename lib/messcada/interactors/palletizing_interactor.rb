@@ -36,7 +36,7 @@ module MesscadaApp
     rescue Crossbeams::InfoError => e
       failed_response(e.message, current_bay_attributes(state_machine))
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("scan_carton\nParams: #{params.inspect}\nState: #{state_machine&.target.inspect}"))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("#{__method__}\nParams: #{params.inspect}\nState: #{state_machine&.target.inspect}"))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message, current_bay_attributes(state_machine))
@@ -57,7 +57,7 @@ module MesscadaApp
         failed_response("Bay is in #{state_machine.current} state - cannot select a QC carton", current_bay_attributes(state_machine))
       end
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("qc_out\nParams: #{params.inspect}\nState: #{state_machine&.target.inspect}"))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("#{__method__}\nParams: #{params.inspect}\nState: #{state_machine&.target.inspect}"))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message, current_bay_attributes(state_machine))
@@ -82,7 +82,7 @@ module MesscadaApp
       end
       success_response('ok', current_bay_attributes(state_machine))
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("return_to_bay\nParams: #{params.inspect}\nState: #{state_machine&.target.inspect}"))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("#{__method__}\nParams: #{params.inspect}\nState: #{state_machine&.target.inspect}"))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message, current_bay_attributes(state_machine))
@@ -107,7 +107,7 @@ module MesscadaApp
       end
       success_response('ok', current_bay_attributes(state_machine))
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("refresh\nParams: #{params.inspect}\nState: #{state_machine&.target.inspect}"))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("#{__method__}\nParams: #{params.inspect}\nState: #{state_machine&.target.inspect}"))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message, current_bay_attributes(state_machine))
@@ -133,7 +133,7 @@ module MesscadaApp
 
       success_response('ok', current_bay_attributes(state_machine, confirm))
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("complete\nParams: #{params.inspect}\nState: #{state_machine&.target.inspect}"))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("#{__method__}\nParams: #{params.inspect}\nState: #{state_machine&.target.inspect}"))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message, current_bay_attributes(state_machine))
@@ -170,7 +170,7 @@ module MesscadaApp
       print_pallet_label(pallet_id, state_machine.target.id) if AppConst::AUTO_PRINT_PALLET_LABEL_ON_BAY
       success_response('ok', current_bay_attributes(state_machine))
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("complete_pallet\nParams: #{params.inspect}\nState: #{state_machine&.target.inspect}"))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("#{__method__}\nParams: #{params.inspect}\nState: #{state_machine&.target.inspect}"))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message, current_bay_attributes(state_machine))
@@ -196,7 +196,7 @@ module MesscadaApp
 
       success_response('ok', current_bay_attributes(state_machine, confirm))
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("complete_autopack_pallet\nParams: #{params.inspect}\nState: #{state_machine&.target.inspect}"))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("#{__method__}\nParams: #{params.inspect}\nState: #{state_machine&.target.inspect}"))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message, current_bay_attributes(state_machine))
@@ -216,7 +216,7 @@ module MesscadaApp
       end
       success_response('Carton transfer was successful', current_bay_attributes(state_machine))
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("empty_bay_carton_transfer\nParams: #{params.inspect}\nState: #{state_machine&.target.inspect}"))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("#{__method__}\nParams: #{params.inspect}\nState: #{state_machine&.target.inspect}"))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message, current_bay_attributes(state_machine))
@@ -236,7 +236,7 @@ module MesscadaApp
 
       transfer_bay_carton(state_machine, params)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("transfer_carton\nParams: #{params.inspect}\nState: #{state_machine&.target.inspect}"))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("#{__method__}\nParams: #{params.inspect}\nState: #{state_machine&.target.inspect}"))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message, current_bay_attributes(state_machine))
@@ -627,7 +627,7 @@ module MesscadaApp
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('print_pallet_label'))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
       failed_response(e.message)
     end
 
