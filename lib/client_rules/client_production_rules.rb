@@ -253,7 +253,7 @@ module Crossbeams
 
       carton_equals_pallet = setting(:carton_equals_pallet)
       return carton_equals_pallet[:default] unless carton_equals_pallet[:can_override]
-      return carton_equals_pallet[:default] if system_resource_code.nil?
+      return carton_equals_pallet[:default] if plant_resource_code.nil?
 
       robot_carton_equals_pallet = DB[:plant_resources]
                                    .where(plant_resource_code: plant_resource_code)
