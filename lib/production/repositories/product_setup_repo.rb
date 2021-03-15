@@ -342,7 +342,9 @@ module ProductionApp
              .join(:pm_types, id: :pm_type_id)
              .where(Sequel[:packing_specification_items][:id] => packing_specification_item_id,
                     pm_composition_level_id: 2)
-             .select(Sequel[:pm_products][:id], Sequel[:pm_boms_products][:quantity]).first
+             .select(Sequel[:pm_products][:id],
+                     Sequel[:pm_boms_products][:quantity]).first
+      return "Product code and quantity not found for packing_specification_item_id: #{packing_specification_item_id}" if hash.nil_or_empty?
 
       quantity = hash[:quantity].to_i
       quantity = '*' if [0, 1].include? quantity
