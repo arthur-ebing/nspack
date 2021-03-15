@@ -18,7 +18,8 @@ module MasterfilesApp
         target_market_group_type_id: target_market_group_type_id,
         target_market_group_name: Faker::Lorem.word,
         description: Faker::Lorem.word,
-        active: true
+        active: true,
+        local_tm_group: false
       }
       DB[:target_market_groups].insert(default.merge(opts))
     end

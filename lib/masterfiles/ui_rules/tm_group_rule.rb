@@ -20,13 +20,15 @@ module UiRules
       fields[:target_market_group_name] = { renderer: :label, caption: 'Group' }
       fields[:description] = { renderer: :label }
       fields[:regions] = { renderer: :list, items: destination_region_names }
+      fields[:local_tm_group] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields
       {
         target_market_group_type_id: { renderer: :select, options: @repo.for_select_tm_group_types, caption: 'Group Type', required: true },
         target_market_group_name: { required: true, caption: 'Group' },
-        description: {}
+        description: {},
+        local_tm_group: { renderer: :checkbox }
       }
     end
 
@@ -39,7 +41,8 @@ module UiRules
     def make_new_form_object
       @form_object = OpenStruct.new(target_market_group_type_id: nil,
                                     target_market_group_name: nil,
-                                    description: nil)
+                                    description: nil,
+                                    local_tm_group: nil)
     end
 
     def destination_region_names

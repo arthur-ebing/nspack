@@ -6,5 +6,6 @@ module MasterfilesApp
     attribute :target_market_group_type_id, Types::Integer
     attribute :target_market_group_name, Types::String
     attribute :description, Types::String
+    attribute :local_tm_group, Types::Bool
   end
 end

@@ -15,6 +15,7 @@ module Masterfiles
               form.add_field :target_market_group_type_id
               form.add_field :target_market_group_name
               form.add_field :description
+              form.add_field :local_tm_group
               form.add_field :regions
             end
           end

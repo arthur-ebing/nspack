@@ -5,12 +5,12 @@
   \   fn_masterfile_variants('target_market_groups', target_market_groups.id) AS variant_codes,\r\n
   \   target_market_group_types.target_market_group_type_code,\r\n    array_agg(distinct
   destination_region_name order by destination_region_name) filter (where destination_region_name
-  is not null) AS regions,\r\n    target_market_groups.created_at,\r\n    target_market_groups.updated_at\r\n\r\nFROM
-  target_market_groups\r\n         JOIN target_market_group_types ON target_market_group_types.id
-  = target_market_groups.target_market_group_type_id\r\n         LEFT JOIN destination_regions_tm_groups
-  drtmg ON  drtmg.target_market_group_id = target_market_groups.id\r\n         LEFT
-  JOIN destination_regions dr ON drtmg.destination_region_id = dr.id\r\n\r\nGROUP
-  BY\r\n    target_market_groups.id,\r\n    target_market_group_types.id\r\nORDER
+  is not null) AS regions,\r\n    target_market_groups.created_at,\r\n    target_market_groups.updated_at,\r\n
+  \   target_market_groups.local_tm_group\r\n\r\nFROM target_market_groups\r\n         JOIN
+  target_market_group_types ON target_market_group_types.id = target_market_groups.target_market_group_type_id\r\n
+  \        LEFT JOIN destination_regions_tm_groups drtmg ON  drtmg.target_market_group_id
+  = target_market_groups.id\r\n         LEFT JOIN destination_regions dr ON drtmg.destination_region_id
+  = dr.id\r\n\r\nGROUP BY\r\n    target_market_groups.id,\r\n    target_market_group_types.id\r\nORDER
   BY\r\n    target_market_group_name"
 :limit: 
 :offset: 
@@ -153,6 +153,22 @@
     :width: 
     :format: :datetime_with_secs
     :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  local_tm_group:
+    :name: local_tm_group
+    :sequence_no: 10
+    :caption: Local tm group?
+    :namespaced_name: target_market_groups.local_tm_group
+    :data_type: :boolean
+    :width: 150
+    :format: 
+    :hide: false
     :pinned: 
     :groupable: false
     :group_by_seq: 

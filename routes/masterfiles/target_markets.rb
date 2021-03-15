@@ -97,11 +97,13 @@ class Nspack < Roda
         r.patch do     # UPDATE
           res = interactor.update_tm_group(id, params[:tm_group])
           if res.success
-            update_grid_row(id,
-                            changes: { target_market_group_type_id: res.instance[:target_market_group_type_id],
-                                       target_market_group_name: res.instance[:target_market_group_name],
-                                       description: res.instance[:description] },
-                            notice: res.message)
+            row_keys = %i[
+              target_market_group_type_id
+              target_market_group_name
+              description
+              local_tm_group
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::TargetMarkets::TmGroup::Edit.call(id, params[:tm_group], res.errors) }
           end

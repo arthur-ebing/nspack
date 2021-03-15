@@ -4,7 +4,7 @@ module Masterfiles
   module TargetMarkets
     module TmGroup
       class Edit
-        def self.call(id, form_values = nil, form_errors = nil)
+        def self.call(id, form_values = nil, form_errors = nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:tm_group, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -19,6 +19,7 @@ module Masterfiles
               form.add_field :target_market_group_type_id
               form.add_field :target_market_group_name
               form.add_field :description
+              form.add_field :local_tm_group
             end
           end
 
