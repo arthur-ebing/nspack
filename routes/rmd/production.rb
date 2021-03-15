@@ -208,7 +208,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         form.add_label(:verified, 'Verified', pallet_sequence[:verified])
         form.add_select(:verification_result,
                         'Verification Result',
-                        items: %w[unknown passed failed],
+                        items: %w[passed failed],
+                        prompt: true,
                         value: (pallet_sequence[:verification_result].nil_or_empty? ? 'unknown' : pallet_sequence[:verification_result]))
         form.add_select(:verification_failure_reason,
                         'Verification Failure Reason',
@@ -282,7 +283,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
         r.on 'verification_result_changed' do
           actions = [OpenStruct.new(type: params[:changed_value] == 'failed' ? :show_element : :hide_element, dom_id: 'verify_pallet_sequence_verification_failure_reason_row'),
-                     OpenStruct.new(type: params[:changed_value] != 'unknown' ? :show_element : :hide_element, dom_id: 'SaveSeq')]
+                     OpenStruct.new(type: params[:changed_value].nil_or_empty? ? :hide_element : :show_element, dom_id: 'SaveSeq')]
           json_actions(actions)
         end
       end
