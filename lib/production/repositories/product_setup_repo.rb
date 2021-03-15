@@ -404,8 +404,14 @@ module ProductionApp
         id = get_id(:inner_pm_marks, inner_pm_mark_code: inner_pm_mark_code)
         marks << get_kromco_mes_value(:inner_pm_marks, id, :inner_pm_mark_code)
       end
+      marks
+    end
 
-      marks.reverse.join('-')
+    def cosmetic_code(packing_specification_item_id)
+      fruit_mark = packing_specification_item_fg_marks(packing_specification_item_id).last
+      return 'UL' if fruit_mark == 'NONE'
+
+      'LB'
     end
 
     def get_kromco_mes_value(table_name, id, column)
@@ -423,7 +429,7 @@ module ProductionApp
       fg_code_components << get_kromco_mes_value(:grades, prod_setup[:grade_id], :grade_code)
       fg_code_components << get_kromco_mes_value(:fruit_actual_counts_for_packs, prod_setup[:fruit_actual_counts_for_pack_id], :actual_count_for_pack)
       fg_code_components << get_kromco_mes_value(:basic_pack_codes, prod_setup[:basic_pack_code_id], :footprint_code)
-      fg_code_components << get_kromco_mes_value(:inventory_codes, prod_setup[:inventory_code_id], :inventory_code)
+      fg_code_components << cosmetic_code(packing_specification_item_id)
       fg_code_components << get_kromco_mes_value(:fruit_size_references, prod_setup[:fruit_size_reference_id], :size_reference)
       fg_code_components << packing_specification_item_unit_pack_product(packing_specification_item_id)
       carton_pack_product = packing_specification_item_carton_pack_product(packing_specification_item_id)
@@ -431,7 +437,7 @@ module ProductionApp
 
       fg_code_components << carton_pack_product
       fg_code_components << prod_setup_organisation(prod_setup[:id])
-      fg_code_components << packing_specification_item_fg_marks(packing_specification_item_id)
+      fg_code_components << packing_specification_item_fg_marks(packing_specification_item_id).reverse.join('-')
       fg_code_components.join('_')
     end
   end
