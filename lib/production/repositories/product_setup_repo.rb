@@ -399,6 +399,8 @@ module ProductionApp
                         .join(:pm_marks, id: :pm_mark_id)
                         .where(Sequel[:packing_specification_items][:id] => packing_specification_item_id)
                         .get(:packaging_marks)
+      return 'No packaging marks found' unless packaging_marks
+
       marks = []
       packaging_marks.each do |inner_pm_mark_code|
         id = get_id(:inner_pm_marks, inner_pm_mark_code: inner_pm_mark_code)
