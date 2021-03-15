@@ -245,12 +245,6 @@ module FinishedGoodsApp
       FinishedGoodsApp::PalletFlat.new(hash)
     end
 
-    def create_govt_inspection_pallet(res)
-      attrs = res.to_h
-      attrs[:passed] = attrs[:failure_reason_id].nil?
-      create(:govt_inspection_pallets, attrs)
-    end
-
     def update_govt_inspection_pallet(id, res)
       attrs = res.to_h
       attrs[:passed] = attrs[:failure_reason_id].nil?
