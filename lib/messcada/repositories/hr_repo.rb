@@ -49,7 +49,9 @@ module MesscadaApp
     # Record login event to system resource logins
     def login_worker(name, params) # rubocop:disable Metrics/AbcSize
       system_resource = params[:system_resource]
-      logout_worker(system_resource[:contract_worker_id])
+      res_repo = ProductionApp::ResourceRepo.new
+      plant_type = res_repo.plant_resource_type_code_for_system_resource(system_resource.id)
+      logout_worker(system_resource[:contract_worker_id]) unless plant_type == Crossbeams::Config::ResourceDefinitions::PALLETIZING_ROBOT
       # Logout_from_group if applicable
       remove_login_from_group(system_resource[:contract_worker_id])
 

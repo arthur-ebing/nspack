@@ -225,6 +225,10 @@ module ProductionApp
       Crossbeams::Config::ResourceDefinitions::PLANT_RESOURCE_RULES[plant_resource_type]
     end
 
+    def plant_resource_type_code_for_system_resource(system_resource_id)
+      DB[:plant_resource_types].where(id: DB[:plant_resources].where(system_resource_id: system_resource_id).get(:plant_resource_type_id)).get(:plant_resource_type_code)
+    end
+
     def create_plant_resource(attrs)
       new_attrs = attrs.to_h
       new_attrs[:resource_properties] = hash_for_jsonb_col(attrs[:resource_properties]) if attrs.to_h[:resource_properties]
