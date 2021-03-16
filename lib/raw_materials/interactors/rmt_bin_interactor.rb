@@ -112,7 +112,6 @@ module RawMaterialsApp
       return failed_response("Scanned Bin Number:#{params[:bin_asset_number]} is already in stock") if AppConst::USE_PERMANENT_RMT_BIN_BARCODES && !bin_asset_number_available?(params[:bin_asset_number])
 
       params = calc_rebin_params(params)
-      return failed_response('Max delivery for run could not be found') if params[:rmt_delivery_id].nil_or_empty?
 
       res = validate_rmt_rebin_params(params)
       return validation_failed_response(res) if res.failure?
@@ -496,7 +495,6 @@ module RawMaterialsApp
       params[:qty_inner_bins] = 1 if AppConst::DELIVERY_CAPTURE_INNER_BINS
       params[:rebin_created_at] = Time.now
       params[:is_rebin] = true
-      params[:rmt_delivery_id] = ProductionApp::ProductionRunRepo.new.find_max_delivery_for_run(params[:production_run_rebin_id])
 
       production_run = repo.find(:production_runs, ProductionApp::ProductionRun, params[:production_run_rebin_id])
       params = params.merge(get_run_inherited_fields(production_run))
