@@ -43,3 +43,7 @@
   - product_setup_code
   - system_code
   - fg_marks
+  sr2:
+  - packing_specification_code
+  - system_code
+  - fg_marks

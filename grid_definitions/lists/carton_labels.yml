@@ -26,3 +26,9 @@
   - marketing_orchard
   - dp_carton
   - gtin_code
+  hl:
+  - marketing_puc
+  - marketing_orchard
+  sr2:
+  - marketing_puc
+  - marketing_orchard

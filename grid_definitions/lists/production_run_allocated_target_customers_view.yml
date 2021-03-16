@@ -28,5 +28,11 @@
   - packing_specification_code
   hl:
   - packing_specification_code
+  - system_code
+  - fg_marks
   kr:
   - product_setup_code
+  sr2:
+  - packing_specification_code
+  - system_code
+  - fg_marks

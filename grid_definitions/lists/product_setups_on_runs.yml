@@ -39,3 +39,11 @@
   - bom_code
   - fg_marks
   - gtin_code
+  hl:
+  - bom_code
+  - fg_marks
+  - gtin_code
+  sr2:
+  - bom_code
+  - fg_marks
+  - gtin_code

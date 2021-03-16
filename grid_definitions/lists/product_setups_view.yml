@@ -38,3 +38,7 @@
   - system_code
   - fg_marks
   - gtin_code
+  hl:
+  - gtin_code
+  sr2:
+  - gtin_code
