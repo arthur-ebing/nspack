@@ -4,9 +4,9 @@ module MesscadaApp
   # Take params, lookup system resource and some related attributes
   # and merge them into the params as { system_resource: SystemResourceWithIncentive }.
   class AddSystemResourceIncentiveToParams < BaseService
-    attr_reader :params, :get_group_incentive, :sys_res, :repo, :resource_repo, :device
+    attr_reader :params, :get_group_incentive, :sys_res, :repo, :resource_repo, :device, :origin
 
-    def initialize(params, has_button: false, get_group_incentive: true)
+    def initialize(params, has_button: false, get_group_incentive: true) # rubocop:disable Metrics/AbcSize
       super()
       @params = params
       @device = if has_button
@@ -14,6 +14,11 @@ module MesscadaApp
                   ar.take(ar.length - 1).join('-')
                 else
                   params[:device]
+                end
+      @origin = if has_button
+                  params[:device]
+                else
+                  params[:packpoint]
                 end
       @get_group_incentive = get_group_incentive
       @repo = MesscadaApp::HrRepo.new
@@ -23,7 +28,7 @@ module MesscadaApp
     end
 
     def call # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
-      @sys_res = resource_repo.system_resource_incentive_settings(device, params[:packpoint] || @button_packpoint, params[:device], params[:card_reader])
+      @sys_res = resource_repo.system_resource_incentive_settings(device, params[:packpoint] || @button_packpoint, origin, params[:card_reader])
       return failed_response("#{device} is not configured") if sys_res.nil?
       return success_response('ok', merge_incentive_just_system_resource) if !sys_res.login && !sys_res.group_incentive
       return merge_incentive_contract_worker unless get_group_incentive && sys_res.group_incentive

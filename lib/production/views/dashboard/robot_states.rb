@@ -5,13 +5,11 @@ module Production
     module Dashboard
       class RobotStates # rubocop:disable Metrics/ClassLength
         def self.call
-          layout = Crossbeams::Layout::Page.build({}) do |page|
+          Crossbeams::Layout::Page.build({}) do |page|
             page.add_text 'Robot states', wrapper: :h2
             page.add_text draw_states
             page.add_repeating_request '/production/dashboards/run_robot_state_checks', 2000, ''
           end
-
-          layout
         end
 
         def self.draw_states
@@ -77,7 +75,7 @@ module Production
           HTML
         end
 
-        def self.indiv(login, group_incentive, system_resource_id) # rubocop:disable Metrics/AbcSize
+        def self.indiv(login, group_incentive, system_resource_id) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
           return '' if group_incentive
           return '' unless login
 
@@ -97,7 +95,7 @@ module Production
                 <<~HTML
                   <tr class="bg-orange white"><td><span class="b">#{worker}</span></td></tr>
                   <tr class="bg-orange white"><td>Logout on reader: <span class="b">#{item[:card_reader]}</span></td>
-                  <tr class="bg-orange white"><td>at <span class="b">#{item[:last_logout_at].strftime('%H:%M:%S')}</span> on <span class="b">#{item[:last_logout_at].strftime('%Y-%m-%d')}</span></td>
+                  <tr class="bg-orange white"><td>at <span class="b">#{item[:last_logout_at].nil? ? '' : item[:last_logout_at].strftime('%H:%M:%S')}</span> on <span class="b">#{item[:last_logout_at].nil? ? '' : item[:last_logout_at].strftime('%Y-%m-%d')}</span></td>
                 HTML
               end
             end
