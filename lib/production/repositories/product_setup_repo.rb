@@ -399,7 +399,7 @@ module ProductionApp
                         .join(:pm_marks, id: :pm_mark_id)
                         .where(Sequel[:packing_specification_items][:id] => packing_specification_item_id)
                         .get(:packaging_marks)
-      return 'No packaging marks found' unless packaging_marks
+      return ['No packaging marks found'] unless packaging_marks
 
       marks = []
       packaging_marks.each do |inner_pm_mark_code|
@@ -420,7 +420,7 @@ module ProductionApp
       MasterfilesApp::GeneralRepo.new.get_transformation_or_value('Kromco MES', table_name, id, column)
     end
 
-    def calculate_extended_fg_code(packing_specification_item_id) # rubocop:disable Metrics/AbcSize
+    def calculate_extended_fg_code(packing_specification_item_id, packaging_marks_join: '_') # rubocop:disable Metrics/AbcSize
       product_setup_id = get(:packing_specification_items, packing_specification_item_id, :product_setup_id)
       prod_setup = find_product_setup(product_setup_id).to_h
 
@@ -439,7 +439,7 @@ module ProductionApp
 
       fg_code_components << carton_pack_product
       fg_code_components << prod_setup_organisation(prod_setup[:id])
-      fg_code_components << packing_specification_item_fg_marks(packing_specification_item_id).reverse.join('-')
+      fg_code_components << packing_specification_item_fg_marks(packing_specification_item_id).reverse.join(packaging_marks_join)
       fg_code_components.join('_')
     end
   end

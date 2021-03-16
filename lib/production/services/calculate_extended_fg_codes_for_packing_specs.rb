@@ -17,10 +17,16 @@ module ProductionApp
     private
 
     def calculate_extended_fg_codes
-      extended_fg_code = ProductionApp::ProductSetupRepo.new.calculate_extended_fg_code(packing_specification_item_id)
-      extended_fg_id = request_extended_fg_id(extended_fg_code)
+      extended_fg_code = nil
+      extended_fg_id = nil
 
-      args = { legacy_data: { extended_fg_code: extended_fg_code, extended_fg_id:  extended_fg_id } }
+      ['-', '_'].each do |pm_join|
+        extended_fg_code = ProductionApp::ProductSetupRepo.new.calculate_extended_fg_code(packing_specification_item_id, packaging_marks_join: pm_join)
+        extended_fg_id = request_extended_fg_id(extended_fg_code)
+        break if extended_fg_id.to_i.positive?
+      end
+
+      args = { legacy_data: { extended_fg_code: extended_fg_code, extended_fg_id: extended_fg_id } }
       ProductionApp::PackingSpecificationRepo.new.update_packing_specification_item(packing_specification_item_id, args)
     end
 

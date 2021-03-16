@@ -418,26 +418,6 @@ module MesscadaApp
       JSON.parse(res.instance.body)
     end
 
-    def extended_fg_id(extended_fg_code)
-      url = "#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/get_extended_fg?extended_fg_code=#{extended_fg_code}"
-      http = Crossbeams::HTTPCalls.new
-      res = http.request_get(url)
-      raise res.message unless res.success
-
-      return JSON.parse(res.instance.body) unless res.instance.body.nil_or_empty?
-    end
-
-    def update_pallet_sequence_extended_fg(id, extended_fg_code, extended_fg_id)
-      legacy_data = get(:pallet_sequences, id, :legacy_data)
-      set = legacy_data ? " legacy_data - 'extended_fg_code' - 'extended_fg_id' || " : ''
-      upd = <<~SQL
-        UPDATE pallet_sequences
-        SET legacy_data = #{set} '{"extended_fg_code":"#{extended_fg_code}","extended_fg_id":#{extended_fg_id || '""'}}'
-        WHERE id = ?
-      SQL
-      DB[upd, id].update
-    end
-
     # def create_pallet_and_sequences(pallet, pallet_sequence)
     #   id = DB[:pallets].insert(pallet)
     #
