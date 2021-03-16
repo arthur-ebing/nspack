@@ -134,6 +134,25 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
+    def update_rebin(id, params) # rubocop:disable Metrics/AbcSize
+      params = calc_edit_rebin_params(params)
+      res = validate_update_rmt_rebin_params(params)
+      return validation_failed_response(res) if res.failure?
+
+      return failed_response('Container Material Type must have a tare_weight') unless repo.get(:rmt_container_material_types, params[:rmt_container_material_type_id], :tare_weight)
+
+      failed_response('Bum Klaat')
+
+      repo.transaction do
+        repo.update_rmt_bin(id, res)
+        log_transaction
+      end
+      instance = rmt_bin(id)
+      success_response('Updated RMT rebin', instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def create_rmt_bin(delivery_id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity,  Metrics/PerceivedComplexity
       vres = validate_bin_asset_no_format(params)
       return vres unless vres.success
@@ -307,6 +326,19 @@ module RawMaterialsApp
     def validate_bin(bin_number)
       bin = find_rmt_bin_by_id_or_asset_number(bin_number)
       return failed_response("Scanned Bin:#{bin_number} is not in stock") unless bin
+      return failed_response("Rebin Scanned:#{bin_number}. Please scan a bin instead") if bin[:production_run_rebin_id]
+      return failed_response("Scanned Bin:#{bin_number} has been tipped") if bin[:bin_tipped]
+
+      success_response('Valid Bin Scanned',
+                       bin)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def validate_rebin(bin_number)
+      bin = find_rmt_bin_by_id_or_asset_number(bin_number)
+      return failed_response("Scanned Bin:#{bin_number} is not in stock") unless bin
+      return failed_response("Bin Scanned:#{bin_number}. Please scan a rebin instead") unless bin[:production_run_rebin_id]
       return failed_response("Scanned Bin:#{bin_number} has been tipped") if bin[:bin_tipped]
 
       success_response('Valid Bin Scanned',
@@ -349,6 +381,10 @@ module RawMaterialsApp
 
     def bin_details(id)
       repo.bin_details(id)
+    end
+
+    def rebin_details(id)
+      repo.rebin_details(id)
     end
 
     def find_rmt_delivery_by_bin_id(id)
@@ -476,6 +512,21 @@ module RawMaterialsApp
       params
     end
 
+    def calc_edit_rebin_params(params) # rubocop:disable Metrics/AbcSize
+      production_run = repo.find(:production_runs, ProductionApp::ProductionRun, params[:production_run_rebin_id])
+      params = params.merge(get_run_inherited_fields(production_run))
+
+      unless params[:rmt_container_material_type_id].nil_or_empty?
+        tare_weight = repo.get_rmt_bin_tare_weight(params)
+        params[:nett_weight] = (params[:gross_weight].to_i - tare_weight) if tare_weight
+      end
+
+      location_id = repo.get_run_packhouse_location(params[:production_run_rebin_id])
+      params = params.merge(location_id: location_id)
+
+      params
+    end
+
     def default_location_id
       return nil unless AppConst::DEFAULT_DELIVERY_LOCATION
 
@@ -496,6 +547,10 @@ module RawMaterialsApp
 
     def validate_rmt_rebin_params(params)
       RmtRebinBinSchema.call(params)
+    end
+
+    def validate_update_rmt_rebin_params(params)
+      UpdateRmtRebinBinSchema.call(params)
     end
 
     def validate_preprinting_input(params)

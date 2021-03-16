@@ -207,7 +207,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                          notes: notice,
                                          form_name: :rmt_bin,
                                          scan_with_camera: @rmd_scan_with_camera,
-                                         caption: 'Create Rebin',
+                                         caption: 'Print Rebin',
                                          reset_button: false,
                                          action: "/rmd/rmt_deliveries/rmt_bins/#{id}/print_rebin",
                                          button_caption: 'Submit')
@@ -231,7 +231,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           res = interactor.print_rebin_labels(id, params[:rmt_bin])
           if res.success
             store_locally(:flash_notice, "Rebin: #{res.instance[:bin_asset_number]} printed successfully")
-            r.redirect('/rmd/rmt_deliveries/rmt_bins/create_rebin')
+            r.redirect('/rmd/rmt_deliveries/rmt_bins/print_rebin_labels_complete')
           else
             store_locally(:errors, res)
             r.redirect("/rmd/rmt_deliveries/rmt_bins/#{id}/print_rebin")
@@ -262,6 +262,21 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             r.redirect("/rmd/rmt_deliveries/rmt_bins/#{id}/new")
           end
         end
+      end
+
+      r.on 'print_rebin_labels_complete' do
+        form = Crossbeams::RMDForm.new({},
+                                       notes: nil,
+                                       form_name: :print_rebin,
+                                       scan_with_camera: @rmd_scan_with_camera,
+                                       caption: 'Rebin Label Completed',
+                                       reset_button: false,
+                                       no_submit: true,
+                                       action: '/',
+                                       button_caption: '')
+        form.add_section_header('Labels printed successfully')
+        form.add_csrf_tag csrf_tag
+        view(inline: form.render, layout: :layout_rmd)
       end
 
       r.on 'rmt_bin_delivery_id_combo_changed' do
@@ -470,6 +485,103 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             store_locally(:errors, error_message: "Error: #{unwrap_failed_response(res)}")
             store_locally(:form_state, params[:rmt_bin])
             r.redirect('/rmd/rmt_deliveries/rmt_bins/create_rebin')
+          end
+        end
+      end
+
+      # --------------------------------------------------------------------------
+      # EDIT RMT REBIN
+      # --------------------------------------------------------------------------
+      r.on 'edit_rebin' do
+        r.get do
+          notice = retrieve_from_local_store(:flash_notice)
+          form_state = {}
+          error = retrieve_from_local_store(:errors)
+          form_state.merge!(error_message: error[:error_message], errors:  { bin_number: [''] }) unless error.nil?
+          form = Crossbeams::RMDForm.new(form_state,
+                                         form_name: :bin,
+                                         notes: notice,
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         caption: 'Scan Rebin',
+                                         action: '/rmd/rmt_deliveries/rmt_bins/edit_rebin',
+                                         button_caption: 'Submit')
+          form.add_field(:bin_number, 'Rebin Number', scan: 'key248_all', scan_type: :bin_asset, required: true, submit_form: true)
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+
+        r.post do
+          res = interactor.validate_rebin(params[:bin][:bin_number])
+          if res.success
+            r.redirect("/rmd/rmt_deliveries/rmt_bins/rebins/#{res.instance[:id]}")
+          else
+            store_locally(:errors, error_message: "Error: #{unwrap_failed_response(res)}")
+            r.redirect('/rmd/rmt_deliveries/rmt_bins/edit_rebin')
+          end
+        end
+      end
+
+      r.on 'rebins', Integer do |id|
+        r.get do
+          rebin = interactor.rebin_details(id)
+          form_state = rebin
+          error = retrieve_from_local_store(:errors)
+          notice = retrieve_from_local_store(:flash_notice)
+          form_state.merge!(error_message: error[:error_message], errors:  {}) unless error.nil?
+
+          default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE)
+          capture_container_material_owner = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER
+
+          form = Crossbeams::RMDForm.new(form_state,
+                                         notes: notice,
+                                         form_name: :rmt_bin,
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         caption: 'Update Rebin',
+                                         reset_button: false,
+                                         action: "/rmd/rmt_deliveries/rmt_bins/rebins/#{id}",
+                                         button_caption: 'Submit')
+
+          form.behaviours do |behaviour|
+            behaviour.dropdown_change :production_line_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/rmt_bin_production_line_id_combo_changed' }]
+            behaviour.dropdown_change :production_run_rebin_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/rmt_bin_production_run_rebin_id_combo_changed' }]
+            behaviour.input_change :bin_asset_number, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/bin_asset_number_changed' }]
+            behaviour.dropdown_change :rmt_container_material_type_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/rmt_bin_rebin_container_material_type_combo_changed' }] if capture_container_material_owner
+          end
+
+          form.add_select(:rmt_class_id, 'Rmt Class', items: MasterfilesApp::FruitRepo.new.for_select_rmt_classes, required: true)
+          form.add_select(:production_line_id, 'Production Line', items: ProductionApp::ResourceRepo.new.for_select_plant_resources_of_type('LINE'), prompt: true, required: true)
+          form.add_select(:production_run_rebin_id, 'Production Run', items: ProductionApp::ProductionRunRepo.new.for_select_production_runs_for_line(rebin[:production_line_id]), prompt: true, required: true)
+          form.add_label(:farm, 'Farm', form_state[:farm_code])
+          form.add_label(:puc, 'PUC', form_state[:puc_code])
+          form.add_label(:orchard, 'Orchard', form_state[:orchard_code])
+          form.add_label(:cultivar, 'Cultivar', form_state[:cultivar_name])
+          form.add_label(:cultivar_group, 'Cultivar Group', form_state[:cultivar_group_code])
+          form.add_label(:season, 'Season', form_state[:season_code])
+          form.add_select(:bin_fullness, 'Bin Fullness', items: %w[Quarter Half Three\ Quarters Full], prompt: true)
+
+          form.add_select(:rmt_container_material_type_id, 'Container Material Type',
+                          items: MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_rmt_container_material_types(where: { rmt_container_type_id: default_rmt_container_type[:id] }),
+                          required: true, prompt: true)
+
+          if capture_container_material_owner
+            form.add_select(:rmt_material_owner_party_role_id, 'Container Material Owner',
+                            items: RawMaterialsApp::RmtDeliveryRepo.new.find_container_material_owners_by_container_material_type(rebin[:rmt_container_material_type_id]),
+                            required: true, prompt: true)
+          end
+
+          form.add_field(:gross_weight, 'Gross Weight', data_type: 'number')
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+
+        r.post do
+          res = interactor.update_rebin(id, params[:rmt_bin])
+          if res.success
+            store_locally(:flash_notice, "Rebin: #{res.instance[:bin_asset_number]} updated successfully")
+            r.redirect("/rmd/rmt_deliveries/rmt_bins/#{res.instance[:id]}/print_rebin")
+          else
+            store_locally(:errors, error_message: "Error: #{unwrap_failed_response(res)}")
+            r.redirect("/rmd/rmt_deliveries/rmt_bins/rebins/#{id}")
           end
         end
       end
