@@ -54,8 +54,16 @@
   - packing_specification_item_code
   hl:
   - packing_specification_item_code
+  - system_code
+  - fg_marks
+  - gtin_code
   kr:
   - id
   - product_setup_code
   - system_code
   - fg_marks
+  sr2:
+  - packing_specification_item_code
+  - system_code
+  - fg_marks
+  - gtin_code
