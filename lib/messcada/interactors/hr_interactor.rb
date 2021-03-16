@@ -137,8 +137,11 @@ module MesscadaApp
       return failed_response("#{params[:identifier]} not assigned") if name.nil_or_empty?
 
       # This temporary code put in place until the palletizing robot stops sending a logout with a login.
-      plant_type = resource_repo.plant_resource_type_code_for_system_resource(system_resource.id)
-      return success_response('Logout ignored for palletizing') if plant_type == Crossbeams::Config::ResourceDefinitions::PALLETIZING_ROBOT
+      if params[:device]
+        system_resource_id = resource_repo.get_value(:system_resources, :id, system_resource_code: params[:device])
+        plant_type = resource_repo.plant_resource_type_code_for_system_resource(system_resource_id)
+        return success_response('Logout ignored for palletizing') if plant_type == Crossbeams::Config::ResourceDefinitions::PALLETIZING_ROBOT
+      end
 
       res = nil
       repo.transaction do
