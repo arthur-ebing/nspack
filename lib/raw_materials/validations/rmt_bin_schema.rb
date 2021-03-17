@@ -30,7 +30,6 @@ module RawMaterialsApp
   RmtRebinBinSchema = Dry::Schema.Params do
     optional(:id).filled(:integer)
     required(:orchard_id).filled(:integer)
-    optional(:rmt_delivery_id).filled(:integer)
     required(:rmt_class_id).filled(:integer)
     required(:season_id).filled(:integer)
     required(:production_run_rebin_id).filled(:integer)
