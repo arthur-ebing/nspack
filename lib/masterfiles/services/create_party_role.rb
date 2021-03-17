@@ -59,7 +59,7 @@ module MasterfilesApp
     end
 
     def create_person
-      res = PersonSchema.call(params)
+      res = PersonSchema.call(params.merge(vat_number: nil))
       return validation_failed_response(res) if res.failure?
 
       params[:person_id] = repo.create_person(res)

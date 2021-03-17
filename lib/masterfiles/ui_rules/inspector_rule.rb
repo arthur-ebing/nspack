@@ -43,8 +43,7 @@ module UiRules
         # Person
         title: { required: true },
         surname: { required: true },
-        first_name: { required: true },
-        vat_number: {}
+        first_name: { required: true }
       }
     end
 
@@ -56,7 +55,7 @@ module UiRules
 
     def make_new_form_object
       @form_object = OpenStruct.new(inspector_code: nil,
-                                    inspector_party_role_id: 'P',
+                                    inspector_party_role_id: 'Create New Person',
                                     tablet_ip_address: nil,
                                     tablet_port_number: nil)
     end

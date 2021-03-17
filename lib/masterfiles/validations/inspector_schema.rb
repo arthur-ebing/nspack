@@ -15,7 +15,6 @@ module MasterfilesApp
     optional(:surname).maybe(Types::StrippedString)
     optional(:first_name).maybe(Types::StrippedString)
     optional(:title).maybe(Types::StrippedString)
-    optional(:vat_number).maybe(Types::StrippedString)
     optional(:tablet_ip_address).maybe(Types::StrippedString)
     optional(:tablet_port_number).maybe(:integer)
     optional(:inspector_code).maybe(Types::StrippedString)
