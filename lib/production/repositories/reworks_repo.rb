@@ -380,7 +380,7 @@ module ProductionApp
                    packed_tm_group target_market mark pm_mark inventory_code pallet_base stack_type cpp bom client_size_ref
                    client_product_code treatments order_number sell_by_code grade product_chars pm_type pm_subtype
                    tu_labour_product ru_labour_product fruit_stickers tu_stickers target_customer]
-      data_ar = data_ar.push(:rmt_class_code) if AppConst::CR_PROD.capture_product_setup_class?
+      data_ar << :rmt_class_code if AppConst::CR_PROD.capture_product_setup_class?
       query = MesscadaApp::DatasetPalletSequence.call('WHERE pallet_sequences.id = ?')
       DB[query, id].first.select { |key, _| data_ar.include?(key) }
     end
