@@ -181,6 +181,7 @@ module UiRules
       fields[:rmt_class_id] = { renderer: :select,
                                 options: MasterfilesApp::FruitRepo.new.for_select_rmt_classes,
                                 disabled_options: MasterfilesApp::FruitRepo.new.for_select_inactive_rmt_classes,
+                                invisible: !AppConst::CR_PROD.capture_product_setup_class?,
                                 caption: 'Class',
                                 prompt: 'Select Class',
                                 searchable: true,

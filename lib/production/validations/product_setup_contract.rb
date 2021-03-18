@@ -26,7 +26,7 @@ module ProductionApp
       required(:product_chars).maybe(Types::StrippedString)
       required(:target_market_id).maybe(:integer)
       optional(:gtin_code).maybe(Types::StrippedString)
-      required(:rmt_class_id).maybe(:integer)
+      optional(:rmt_class_id).maybe(:integer)
       optional(:standard_pack_code_id).maybe(:integer)
       required(:basic_pack_code_id).filled(:integer)
     end

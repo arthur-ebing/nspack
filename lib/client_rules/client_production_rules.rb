@@ -19,7 +19,8 @@ module Crossbeams
             allow_cultivar_group_mix: true,
             use_packing_specifications: false,
             use_marketing_puc: false,
-            carton_equals_pallet: { default: true, can_override: false }  },
+            carton_equals_pallet: { default: true, can_override: false },
+            capture_product_setup_class: false },
       hl: { run_allocations: true,
             pallet_label_seqs_sql: nil,
             use_gtins: false,
@@ -34,7 +35,8 @@ module Crossbeams
             allow_cultivar_group_mix: true,
             use_packing_specifications: false,
             use_marketing_puc: false,
-            carton_equals_pallet: { default: true, can_override: false }  },
+            carton_equals_pallet: { default: true, can_override: false },
+            capture_product_setup_class: false  },
       kr: { run_allocations: true,
             pallet_label_seqs_sql: 'SELECT p.puc_code, p.gap_code, ps.gtin_code, ps.carton_quantity FROM pallet_sequences ps JOIN pucs p ON p.id = ps.puc_id WHERE ps.pallet_id = ? ORDER BY ps.pallet_sequence_number',
             use_gtins: true,
@@ -49,7 +51,8 @@ module Crossbeams
             allow_cultivar_group_mix: false,
             use_packing_specifications: true,
             use_marketing_puc: true,
-            carton_equals_pallet: { default: false, can_override: false }  },
+            carton_equals_pallet: { default: false, can_override: false },
+            capture_product_setup_class: true  },
       um: { run_allocations: true,
             pallet_label_seqs_sql: 'SELECT o.orchard_code, m.marketing_variety_code, s.size_reference, ps.carton_quantity FROM pallet_sequences ps JOIN orchards o ON o.id = ps.orchard_id JOIN marketing_varieties m ON m.id = ps.marketing_variety_id JOIN fruit_size_references s ON s.id = ps.fruit_size_reference_id WHERE ps.pallet_id = ? ORDER BY ps.pallet_sequence_number',
             use_gtins: false,
@@ -64,7 +67,8 @@ module Crossbeams
             allow_cultivar_group_mix: false,
             use_packing_specifications: false,
             use_marketing_puc: false,
-            carton_equals_pallet: { default: false, can_override: false }  },
+            carton_equals_pallet: { default: false, can_override: false },
+            capture_product_setup_class: false  },
       ud: { run_allocations: true,
             pallet_label_seqs_sql: nil,
             use_gtins: false,
@@ -79,7 +83,8 @@ module Crossbeams
             allow_cultivar_group_mix: true,
             use_packing_specifications: false,
             use_marketing_puc: false,
-            carton_equals_pallet: { default: false, can_override: false }  },
+            carton_equals_pallet: { default: false, can_override: false },
+            capture_product_setup_class: false  },
       sr: { run_allocations: true,
             pallet_label_seqs_sql: nil,
             use_gtins: false,
@@ -94,7 +99,8 @@ module Crossbeams
             allow_cultivar_group_mix: false,
             use_packing_specifications: false,
             use_marketing_puc: false,
-            carton_equals_pallet: { default: false, can_override: false }  },
+            carton_equals_pallet: { default: false, can_override: false },
+            capture_product_setup_class: false  },
       sr2: { run_allocations: true,
              pallet_label_seqs_sql: nil,
              use_gtins: false,
@@ -109,7 +115,8 @@ module Crossbeams
              allow_cultivar_group_mix: false,
              use_packing_specifications: false,
              use_marketing_puc: false,
-             carton_equals_pallet: { default: false, can_override: true }  }
+             carton_equals_pallet: { default: false, can_override: true },
+             capture_product_setup_class: false  }
     }.freeze
     # ALLOW_OVERFULL_REWORKS_PALLETIZING
     # BYPASS_QUALITY_TEST_LOAD_CHECK
@@ -259,6 +266,12 @@ module Crossbeams
                                    .where(plant_resource_code: plant_resource_code)
                                    .get(Sequel.lit("resource_properties ->> 'carton_equals_pallet'"))
       robot_carton_equals_pallet.nil_or_empty? ? carton_equals_pallet[:default] : robot_carton_equals_pallet == 't'
+    end
+
+    def capture_product_setup_class?(explain: false)
+      return 'Show and capture rmt_class on product_setups and pallet_sequences forms.' if explain
+
+      setting(:capture_product_setup_class)
     end
   end
 end
