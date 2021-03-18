@@ -5,7 +5,7 @@ module QualityApp
     attr_reader :http, :header
 
     def auth_token_call
-      @http = Crossbeams::HTTPCalls.new(open_timeout: 30, read_timeout: 30)
+      @http = Crossbeams::HTTPCalls.new(open_timeout: AppConst::PHYT_CLEAN_OPEN_TIMEOUT, read_timeout: AppConst::PHYT_CLEAN_READ_TIMEOUT)
       url = "#{AppConst::PHYT_CLEAN_ENVIRONMENT}/api/oauth2/token"
       raise Crossbeams::InfoError, 'Service Unavailable: Failed to connect to remote server.' unless http.can_ping?(url)
 

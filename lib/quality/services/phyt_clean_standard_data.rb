@@ -59,7 +59,7 @@ module QualityApp
             control_points.each do |point|
               point_attrs = point['params'].first['p']
               point_attrs.each do |point_attr|
-                orchard_attrs[point_attr['name'].downcase.to_sym] = point_attr['value']
+                orchard_attrs[point_attr['name'].to_s.downcase.to_sym] = point_attr['value']
               end
             end
           end
