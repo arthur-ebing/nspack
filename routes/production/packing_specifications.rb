@@ -253,37 +253,14 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
       r.on 'new' do    # NEW
         check_auth!('packing specifications', 'new')
-        show_partial_or_page(r) { Production::PackingSpecifications::PackingSpecificationItem::New.call(remote: fetch?(r)) }
+        show_partial_or_page(r) { Production::PackingSpecifications::PackingSpecificationItem::New.call(form_values: params, remote: fetch?(r)) }
       end
 
       r.post do        # CREATE
         res = interactor.create_packing_specification_item(params[:packing_specification_item])
         if res.success
-          row_keys = %i[
-            id
-            packing_specification_id
-            packing_specification
-            description
-            pm_bom_id
-            pm_bom
-            pm_mark_id
-            pm_mark
-            product_setup_id
-            product_setup
-            tu_labour_product
-            ru_labour_product
-            ri_labour_product
-            fruit_sticker_1
-            fruit_sticker_2
-            tu_sticker_1
-            tu_sticker_2
-            ru_sticker_1
-            ru_sticker_2
-            status
-            active
-          ]
-          add_grid_row(attrs: select_attributes(res.instance, row_keys),
-                       notice: res.message)
+          flash[:notice] = res.message
+          redirect_via_json(request.referer || '/')
         else
           re_show_form(r, res, url: '/production/packing_specifications/packing_specification_items/new') do
             Production::PackingSpecifications::PackingSpecificationItem::New.call(form_values: params[:packing_specification_item],

@@ -36,6 +36,12 @@ module Production
               end
             end
             page.section do |section|
+              section.add_control(control_type: :link,
+                                  text: 'New Packing Specification Item',
+                                  url: "/production/packing_specifications/packing_specification_items/new/
+                                        with_params?packing_specification_id=#{id}&product_setup_template_id=#{ui_rule.form_object.product_setup_template_id}",
+                                  behaviour: :popup,
+                                  style: :button)
               section.add_grid('packing_specification_items',
                                "/list/packing_specification_items/grid?key=packing_specification&id=#{id}",
                                caption: 'Packing Specification Items',
