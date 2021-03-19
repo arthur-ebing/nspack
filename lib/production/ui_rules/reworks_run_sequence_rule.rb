@@ -129,7 +129,7 @@ module UiRules
                                    with_value: commodity_id_label,
                                    caption: 'Commodity' }
       fields[:marketing_variety_id] =  { renderer: :select,
-                                         options: @repo.for_select_template_commodity_marketing_varieties(commodity_id),
+                                         options: @repo.for_select_template_commodity_marketing_varieties(commodity_id, @form_object.cultivar_id),
                                          disabled_options: @cultivar_repo.for_select_inactive_marketing_varieties,
                                          caption: 'Marketing Variety',
                                          required: true,

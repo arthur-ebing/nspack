@@ -54,8 +54,8 @@ module ProductionApp
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 
-    def for_select_template_commodity_marketing_varieties(product_setup_template_id, commodity_id)
-      repo.for_select_template_commodity_marketing_varieties(product_setup_template_id, commodity_id)
+    def for_select_template_commodity_marketing_varieties(product_setup_template_id, commodity_id, cultivar_id)
+      repo.for_select_template_commodity_marketing_varieties(product_setup_template_id, commodity_id, cultivar_id)
     end
 
     def for_select_template_commodity_size_counts(commodity_id)

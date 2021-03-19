@@ -166,7 +166,7 @@ module UiRules
                         searchable: true,
                         remove_search_for_small_list: false },
         marketing_variety_id: { renderer: :select,
-                                options: @repo.for_select_template_commodity_marketing_varieties(product_setup_template_id, commodity_id),
+                                options: @repo.for_select_template_commodity_marketing_varieties(product_setup_template_id, commodity_id, cultivar_id),
                                 disabled_options: MasterfilesApp::CultivarRepo.new.for_select_inactive_marketing_varieties,
                                 caption: 'Marketing Variety',
                                 required: true,

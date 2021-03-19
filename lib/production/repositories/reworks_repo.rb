@@ -654,13 +654,14 @@ module ProductionApp
       DB[query].map { |s| [s[:farm_orchard_code], s[:id]] }
     end
 
-    def for_select_template_commodity_marketing_varieties(commodity_id)  # rubocop:disable Metrics/AbcSize
-      DB[:marketing_varieties]
-        .join(:marketing_varieties_for_cultivars, marketing_variety_id: :id)
-        .join(:cultivars, id: :cultivar_id)
-        .join(:cultivar_groups, id: :cultivar_group_id)
-        .where(Sequel[:cultivars][:commodity_id] => commodity_id)
-        .distinct(Sequel[:marketing_varieties][:id])
+    def for_select_template_commodity_marketing_varieties(commodity_id, cultivar_id = nil)  # rubocop:disable Metrics/AbcSize
+      ds = DB[:marketing_varieties]
+           .join(:marketing_varieties_for_cultivars, marketing_variety_id: :id)
+           .join(:cultivars, id: :cultivar_id)
+           .join(:cultivar_groups, id: :cultivar_group_id)
+           .where(Sequel[:cultivars][:commodity_id] => commodity_id)
+      ds = ds.where(Sequel[:cultivars][:id] => cultivar_id) unless cultivar_id.nil_or_empty?
+      ds.distinct(Sequel[:marketing_varieties][:id])
         .select(
           Sequel[:marketing_varieties][:id],
           Sequel[:marketing_varieties][:marketing_variety_code]
