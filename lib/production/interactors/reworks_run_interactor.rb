@@ -662,6 +662,11 @@ module ProductionApp
           pallet_id = pallet_sequence(sequence_id)[:pallet_id]
           log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id], pallet_id, sequence_id, AppConst::RW_PALLET_SINGLE_EDIT)
         end
+
+        if AppConst::CR_FG.lookup_extended_fg_code?
+          pallet_ids = repo.select_values(:pallet_sequences, :pallet_id, id: sequences)
+          FinishedGoodsApp::Job::CalculateExtendedFgCodes.enqueue(pallet_ids)
+        end
       end
       instance = { pallet_number: pallet_sequence_pallet_number(sequence_id).first,
                    batch_update: batch_update }

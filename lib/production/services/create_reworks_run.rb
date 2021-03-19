@@ -4,7 +4,7 @@ module ProductionApp
   class CreateReworksRun < BaseService # rubocop:disable Metrics/ClassLength
     attr_reader :repo, :user_name, :reworks_run_type, :pallets_selected, :pallets_affected,
                 :scrap_reason_id, :scrap_remarks, :make_changes,  :reworks_run_booleans, :reworks_action, :changes,
-                :affected_pallet_sequences, :allow_cultivar_group_mixing
+                :affected_pallet_sequences, :allow_cultivar_group_mixing, :pallet_ids
 
     def initialize(params, reworks_action, changes)  # rubocop:disable Metrics/AbcSize
       @repo = ProductionApp::ReworksRepo.new
@@ -28,13 +28,15 @@ module ProductionApp
       @scrap_remarks = params[:remarks]
     end
 
-    def call
+    def call # rubocop:disable Metrics/AbcSize
       res = create_reworks_run
       raise Crossbeams::InfoError, unwrap_failed_response(res) unless res.success
 
       if reworks_run_booleans[:scrap_pallets] || reworks_run_booleans[:unscrap_pallets]
         res = move_stock_pallet
         return res unless res.success
+
+        FinishedGoodsApp::Job::CalculateExtendedFgCodes.enqueue(pallet_ids) if AppConst::CR_FG.lookup_extended_fg_code?
       end
       success_response('ok', reworks_run_id: res.instance[:reworks_run_id])
     end
@@ -170,7 +172,7 @@ module ProductionApp
       location_to_id = MasterfilesApp::LocationRepo.new.find_location_by_location_long_code(location_long_code)&.id
       return failed_response('Location does not exist') if location_to_id.nil_or_empty?
 
-      pallet_ids = repo.find_pallet_ids_from_pallet_number(pallets_affected)
+      @pallet_ids = repo.find_pallet_ids_from_pallet_number(pallets_affected)
       pallet_ids.each  do |pallet_id|
         res = FinishedGoodsApp::MoveStockService.call(AppConst::PALLET_STOCK_TYPE, pallet_id, location_to_id, AppConst::REWORKS_MOVE_PALLET_BUSINESS_PROCESS, nil)
         return res unless res.success
