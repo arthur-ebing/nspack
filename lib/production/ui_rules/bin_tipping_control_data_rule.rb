@@ -16,6 +16,7 @@ module UiRules
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize
+      run_cultivar = MasterfilesApp::CultivarRepo.new.find_production_run_cultivar(@options[:production_run_id])
       {
         rmt_product_type: { renderer: :select, options: %w[presort orchard_run rebin], required: true, prompt: true, min_charwidth: 30 },
         treatment_code: { renderer: :select, options: repo.run_treatment_codes, required: true, prompt: true },
@@ -23,7 +24,7 @@ module UiRules
         ripe_point_code: { renderer: :select, options: repo.ripe_point_codes.map { |s| s[0] }.uniq, required: true, prompt: true },
         pc_code: { renderer: :select, options: @form_object.pc_code ? [@form_object.pc_code] : [], required: true, prompt: true },
         product_class_code: { renderer: :select, options: MasterfilesApp::FruitRepo.new.for_select_rmt_classes.map { |s| s[0] }.uniq, required: true, prompt: true },
-        track_indicator_code: { renderer: :select, options: repo.track_indicator_codes.uniq, required: true, prompt: true },
+        track_indicator_code: { renderer: :select, options: repo.track_indicator_codes(run_cultivar).uniq, required: true, prompt: true },
         cold_store_type: { renderer: :select, options: %w[CA RA KT NO], required: true, prompt: true }
       }
     end

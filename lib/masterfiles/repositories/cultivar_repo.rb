@@ -157,5 +157,12 @@ module MasterfilesApp
         .order(:marketing_variety_code)
         .select_map(:marketing_variety_code)
     end
+
+    def find_production_run_cultivar(production_run_id)
+      DB[:cultivars]
+        .join(:production_runs, cultivar_id: :id)
+        .where(Sequel[:production_runs][:id] => production_run_id)
+        .get(:cultivar_name)
+    end
   end
 end

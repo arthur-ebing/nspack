@@ -409,8 +409,8 @@ module MesscadaApp
       JSON.parse(res.instance.body)
     end
 
-    def track_indicator_codes
-      url = "#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/get_run_track_indicator_codes"
+    def track_indicator_codes(cultivar)
+      url = "#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/get_run_track_indicator_codes?rmt_variety_code=#{cultivar}"
       http = Crossbeams::HTTPCalls.new
       res = http.request_get(url)
       raise res.message unless res.success
