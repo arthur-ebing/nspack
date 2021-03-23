@@ -12,6 +12,7 @@ module ProductionApp
     end
 
     def create_production_run(params) # rubocop:disable Metrics/AbcSize
+      params.merge!(legacy_bintip_criteria: { commodity_code: true, rmt_variety_code: true, treatment_code: true, rmt_size: true, product_class_code: true }) if AppConst::CR_PROD.kromco_rmt_integration?
       res = validate_new_production_run_params(params)
       return validation_failed_response(res) if res.failure?
 

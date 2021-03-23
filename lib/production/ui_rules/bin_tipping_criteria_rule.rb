@@ -29,7 +29,7 @@ module UiRules
       fields[:track_indicator_code] = { renderer: :checkbox, disabled: true }
       fields[:ripe_point_code] = { renderer: :checkbox, disabled: true }
       fields[:rmt_product_type_label] = { renderer: :label, caption: 'Rmt Product Type', min_charwidth: 30 }
-      fields[:treatment_code_label] = { renderer: :label, caption: 'Treatment Code' }
+      fields[:treatment_code_label] = { renderer: :label, caption: 'Color' }
       fields[:rmt_size_label] = { renderer: :label, caption: 'Rmt Size' }
       fields[:ripe_point_code_label] = { renderer: :label, caption: 'Ripe Point Code' }
       fields[:pc_code_label] = { renderer: :label, caption: 'Pc Code', min_charwidth: 30 }
@@ -44,7 +44,7 @@ module UiRules
         farm_code: { renderer: :checkbox, required: true },
         commodity_code: { renderer: :checkbox, required: true },
         rmt_variety_code: { renderer: :checkbox, required: true },
-        treatment_code: { renderer: :checkbox, required: true },
+        treatment_code: { renderer: :checkbox, required: true, caption: 'Color' },
         rmt_size: { renderer: :checkbox, required: true },
         product_class_code: { renderer: :checkbox, required: true },
         rmt_product_type: { renderer: :checkbox, required: true },
@@ -58,7 +58,7 @@ module UiRules
 
     def make_form_object # rubocop:disable Metrics/AbcSize
       run = @repo.find_production_run(@options[:production_run_id])
-      attrs = run.legacy_bintip_criteria || { commodity_code: true, rmt_variety_code: true, treatment_code: true, rmt_size: true, product_class_code: true }
+      attrs = run.legacy_bintip_criteria
       if @mode == :show
         legacy_bintip_criteria = run.legacy_bintip_criteria || {}
         legacy_data = run.legacy_data || {}

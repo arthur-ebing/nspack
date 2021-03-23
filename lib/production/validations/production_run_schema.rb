@@ -26,6 +26,7 @@ module ProductionApp
     required(:allow_cultivar_mixing).maybe(:bool)
     required(:allow_orchard_mixing).maybe(:bool)
     required(:allow_cultivar_group_mixing).maybe(:bool)
+    optional(:legacy_bintip_criteria).maybe(:hash)
   end
 
   ProductionRunSchema = Dry::Schema.Params do
