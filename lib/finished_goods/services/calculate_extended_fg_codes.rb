@@ -2,7 +2,7 @@
 
 module FinishedGoodsApp
   class CalculateExtendedFgCodes < BaseService
-    attr_reader :repo, :pallet_sequence_ids, :packing_specification_item_id
+    attr_reader :repo, :pallet_sequence_ids, :packing_specification_item_id, :pallet_ids
 
     def initialize(pallet_ids)
       @pallet_ids = pallet_ids
@@ -57,7 +57,7 @@ module FinishedGoodsApp
     end
 
     def update_pallet_sequence(id, attrs)
-      legacy_data = UtilityFunctions.symbolize_keys(get(:pallet_sequences, id, :legacy_data).to_h)
+      legacy_data = UtilityFunctions.symbolize_keys(repo.get(:pallet_sequences, id, :legacy_data).to_h)
 
       attrs[:legacy_data] = legacy_data.merge(attrs[:legacy_data].to_h)
       repo.update(:pallet_sequences, id, attrs)
