@@ -79,6 +79,7 @@ module LabelApp
     def archive_label(id)
       repo.transaction do
         repo.update_label(id, active: false)
+        repo.archive_template(id, active: false, user_name: @user.user_name)
         log_status(:labels, id, 'ARCHIVED')
         log_transaction
       end
@@ -89,6 +90,7 @@ module LabelApp
     def un_archive_label(id)
       repo.transaction do
         repo.update_label(id, active: true)
+        repo.archive_template(id, active: true, user_name: @user.user_name)
         log_status(:labels, id, 'UN-ARCHIVED')
         log_transaction
       end

@@ -129,6 +129,19 @@ module LabelApp
       get_value(:users, :login_name, user_name: name)
     end
 
+    def archive_template(label_id, active: true, user_name: nil)
+      template_id = DB[:label_templates].where(label_template_name: get_value(:labels, :label_name, id: label_id)).get(:id)
+      return if template_id.nil?
+
+      update(:label_templates, template_id, active: active)
+      status = if active
+                 'UN-ARCHIVED'
+               else
+                 'ARCHIVED'
+               end
+      log_status(:label_templates, template_id, status, comment: nil, user_name: user_name)
+    end
+
     private
 
     # Re-combine F-numbers:
