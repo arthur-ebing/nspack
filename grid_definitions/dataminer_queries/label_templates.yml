@@ -1,8 +1,10 @@
 ---
 :caption: Label Templates
-:sql: SELECT "label_templates"."id", "label_templates"."label_template_name", "label_templates"."description",
-  "label_templates"."application", "label_templates"."active", "label_templates"."variables",
-  "label_templates"."created_at", "label_templates"."updated_at" FROM "label_templates"
+:sql: "SELECT\r\n  \"label_templates\".\"id\",\r\n  \"label_templates\".\"label_template_name\",\r\n
+  \ \"label_templates\".\"description\",\r\n  \"label_templates\".\"application\",\r\n
+  \ \"label_templates\".\"active\",\r\n  \"label_templates\".\"variables\",\r\n  \"label_templates\".\"created_at\",\r\n
+  \ \"label_templates\".\"updated_at\"\r\nFROM\r\n  \"label_templates\"\r\nORDER BY\r\n
+  \ \"label_templates\".\"application\",\r\n  \"label_templates\".\"label_template_name\""
 :limit: 
 :offset: 
 :external_settings: {}
@@ -16,6 +18,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -31,6 +34,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -46,6 +50,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -61,6 +66,23 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 5
+    :caption: Active
+    :namespaced_name: label_templates.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -76,22 +98,8 @@
     :width: 800
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  active:
-    :name: active
-    :sequence_no: 5
-    :caption: Active
-    :namespaced_name: label_templates.active
-    :data_type: :boolean
-    :width: 
-    :format: 
-    :hide: false
-    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -106,6 +114,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -121,6 +130,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
