@@ -37,7 +37,8 @@ module QualityApp
         puc_id = repo.get_id(:pucs, puc_code: puc['code'])
         orchards = puc['orchard']
         orchards.each do |orchard|
-          next unless repo.exists?(:orchards, orchard_code: orchard['name'].to_s.downcase, puc_id: puc_id)
+          next if orchard['name'].nil?
+          next unless repo.exists?(:orchards, orchard_code: orchard['name'].downcase, puc_id: puc_id)
 
           attrs["PUC #{puc['code']} - Orchard #{orchard['name']}"] = "Cultivar #{orchard['cultivarCode']}   "
         end
