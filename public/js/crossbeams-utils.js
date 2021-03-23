@@ -1074,7 +1074,12 @@ const crossbeamsUtils = {
       let val = element.param_values[key];
       if (val === undefined) {
         const e = document.getElementById(key);
-        val = e.value;
+        if (e === undefined) {
+          crossbeamsUtils.showWarning(`Unable to gather values for behaviour URL - element with id "${key}" not found.`);
+          val = '';
+        } else {
+          val = e.value;
+        }
       }
       queryParam[key] = val;
     });
