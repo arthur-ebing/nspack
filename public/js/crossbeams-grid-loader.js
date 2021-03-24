@@ -760,7 +760,9 @@ const crossbeamsGridEvents = {
           return `'${testStr}`;
         }
       }
-      if (parms.column.colDef.valueFormatter) {
+
+      // Leave Numeric columns unchanged so that spreadsheet programs do not treat them as text.
+      if (parms.column.colDef.type !== 'numericColumn' && parms.column.colDef.valueFormatter) {
         return (parms.column.colDef.valueFormatter({ data: parms.node.data, value: parms.value }));
       }
       return parms.value;
