@@ -216,16 +216,16 @@ module UiRules
           renderer: :select,
           options: @farm_repo.selected_farm_orchard_codes(@form_object.farm_id, @form_object.puc_id),
           disabled_options: @farm_repo.for_select_inactive_orchards,
+          prompt: true,
           caption: 'Orchard'
         }
       end
-      cultivar_groups = if @form_object.orchard_id.nil_or_empty?
-                          []
-                        else
-                          orchard = @farm_repo.find_orchard(@form_object.orchard_id)
-                          group_ids = @cultivar_repo.all_hash(:cultivars, id: orchard.cultivar_ids.to_a).map { |rec| rec[:cultivar_group_id] }.uniq
-                          @cultivar_repo.for_select_cultivar_groups(where: { id: group_ids })
-                        end
+
+      cultivar_ids = @repo.get(:orchards, @form_object.orchard_id, :cultivar_ids)
+      cultivar_ids ||= @repo.select_values(:orchards, :cultivar_ids, puc_id: @form_object.puc_id).flatten.uniq
+      group_ids = @repo.select_values(:cultivars, :cultivar_group_id, id: cultivar_ids.to_a).uniq
+      cultivar_groups = @cultivar_repo.for_select_cultivar_groups(where: { id: group_ids })
+
       cultivars = if @form_object.cultivar_group_id.nil_or_empty?
                     []
                   elsif @form_object.orchard_id.nil_or_empty?
@@ -254,6 +254,7 @@ module UiRules
         cultivar_group_id: { renderer: :select,
                              options: cultivar_groups,
                              disabled_options: MasterfilesApp::CultivarRepo.new.for_select_inactive_cultivar_groups,
+                             prompt: true,
                              caption: 'Cultivar group' },
         cultivar_id: { renderer: :select,
                        options: cultivars,

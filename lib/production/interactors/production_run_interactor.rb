@@ -516,7 +516,7 @@ module ProductionApp
       success_response('ok', instance)
     end
 
-    def change_for_puc(params)
+    def change_for_puc(params) # rubocop:disable Metrics/AbcSize
       res = validate_changed_value_as_int(params)
       return validation_failed_response(res) if res.failure?
 
@@ -525,6 +525,10 @@ module ProductionApp
 
       instance[:orchards] = farm_repo.selected_farm_orchard_codes(params[:production_run_farm_id], res[:changed_value])
       instance[:orchards].unshift(['', ''])
+
+      cultivar_ids = repo.select_values(:orchards, :cultivar_ids, puc_id: res[:changed_value]).flatten.uniq
+      group_ids = repo.select_values(:cultivars, :cultivar_group_id, id: cultivar_ids.to_a).uniq
+      instance[:cultivar_groups] = cultivar_repo.for_select_cultivar_groups(where: { id: group_ids })
 
       success_response('ok', instance)
     end
