@@ -41,12 +41,14 @@ module MasterfilesApp
 
       hash[:country_ids] = target_market_country_ids(id)
       hash[:tm_group_ids] = target_market_tm_group_ids(id)
+      hash[:target_customer_ids] = target_market_target_customer_ids(id)
       TargetMarket.new(hash)
     end
 
     def delete_target_market(id)
       DB[:target_markets_for_countries].where(target_market_id: id).delete
       DB[:target_markets_for_groups].where(target_market_id: id).delete
+      DB[:target_markets_target_customers].where(target_market_id: id).delete
       DB[:target_markets].where(id: id).delete
     end
 
@@ -147,6 +149,31 @@ module MasterfilesApp
           .where(target_market_group_type_code: type_code)
           .get(:id))
         .get(:id)
+    end
+
+    def link_target_customers(target_market_id, target_customer_ids)
+      target_customer_ids = [] if target_customer_ids.nil?
+
+      existing_ids      = target_market_target_customer_ids(target_market_id)
+      old_ids           = existing_ids - target_customer_ids
+      new_ids           = target_customer_ids - existing_ids
+
+      DB[:target_markets_target_customers].where(target_market_id: target_market_id).where(target_customer_party_role_id: old_ids).delete
+      new_ids.each do |id|
+        DB[:target_markets_target_customers].insert(target_market_id: target_market_id, target_customer_party_role_id: id)
+      end
+    end
+
+    def target_market_target_customer_ids(target_market_id)
+      DB[:target_markets_target_customers].where(target_market_id: target_market_id).select_map(:target_customer_party_role_id).sort
+    end
+
+    def target_customer_party_role_names_for(target_market_id)
+      DB[:target_markets_target_customers]
+        .join(:party_roles, id: :target_customer_party_role_id)
+        .where(role_id: get_id(:roles, name: AppConst::ROLE_TARGET_CUSTOMER))
+        .where(target_market_id: target_market_id)
+        .select_map(Sequel.function(:fn_party_role_name, :id)).sort
     end
   end
 end

@@ -80,6 +80,7 @@ module MasterfilesApp
       res = res.to_h
       country_ids = res.delete(:country_ids)
       tm_group_ids = res.delete(:tm_group_ids)
+      target_customer_ids = res.delete(:target_customer_ids)
 
       id = nil
       repo.transaction do
@@ -87,6 +88,8 @@ module MasterfilesApp
       end
       country_response = link_countries(id, country_ids)
       tm_groups_response = link_tm_groups(id, tm_group_ids)
+      link_target_customers(id, target_customer_ids) if AppConst::CR_PROD.kromco_target_markets_customers_link?
+
       instance = target_market(id)
       success_response("Created target market #{instance.target_market_name}, #{country_response.message}, #{tm_groups_response.message}", instance)
     rescue Sequel::UniqueConstraintViolation
@@ -100,9 +103,12 @@ module MasterfilesApp
       res = res.to_h
       country_ids = res.delete(:country_ids)
       tm_group_ids = res.delete(:tm_group_ids)
+      target_customer_ids = res.delete(:target_customer_ids)
 
       country_response = link_countries(id, country_ids)
       tm_groups_response = link_tm_groups(id, tm_group_ids)
+      link_target_customers(id, target_customer_ids) if AppConst::CR_PROD.kromco_target_markets_customers_link?
+
       repo.update_target_market(id, res)
       instance = target_market(id)
       success_response("Updated target market #{instance.target_market_name}, #{country_response.message}, #{tm_groups_response.message}", instance)
@@ -110,7 +116,9 @@ module MasterfilesApp
 
     def delete_target_market(id)
       name = target_market(id).target_market_name
-      repo.delete_target_market(id)
+      repo.transaction do
+        repo.delete_target_market(id)
+      end
       success_response("Deleted target market #{name}")
     end
 
@@ -157,6 +165,14 @@ module MasterfilesApp
       else
         failed_response('Some target market groups were not linked')
       end
+    end
+
+    def link_target_customers(target_market_id, target_customer_ids)
+      repo.transaction do
+        repo.link_target_customers(target_market_id, target_customer_ids)
+      end
+
+      success_response('Target Customers linked successfully')
     end
 
     private

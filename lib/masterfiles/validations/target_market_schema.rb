@@ -8,5 +8,6 @@ module MasterfilesApp
     required(:tm_group_ids).filled(:array).each(:integer)
     required(:description).maybe(Types::StrippedString)
     required(:inspection_tm).maybe(:bool)
+    optional(:target_customer_ids).maybe(:array).each(:integer)
   end
 end

@@ -17,5 +17,6 @@ module MasterfilesApp
     attribute :specialised_role_names, Types::Array
     attribute :variant_codes, Types::Array
     attribute :parent_organization, Types::String
+    attribute :target_market_ids, Types::Array
   end
 end

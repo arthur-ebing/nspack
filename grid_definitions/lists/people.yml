@@ -28,3 +28,16 @@
   :text: New Person
   :style: :button
   :behaviour: :popup
+:hide_for_client:
+  hb:
+  - target_markets
+  hl:
+  - target_markets
+  um:
+  - target_markets
+  ud:
+  - target_markets
+  sr:
+  - target_markets
+  sr2:
+  - target_markets

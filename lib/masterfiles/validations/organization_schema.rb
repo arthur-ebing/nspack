@@ -10,5 +10,6 @@ module MasterfilesApp
     required(:vat_number).maybe(Types::StrippedString)
     required(:company_reg_no).maybe(Types::StrippedString)
     required(:role_ids).maybe(:array).each(:integer)
+    optional(:target_market_ids).maybe(:array).each(:integer)
   end
 end

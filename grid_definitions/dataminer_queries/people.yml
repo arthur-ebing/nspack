@@ -2,10 +2,13 @@
 :caption: People
 :sql: "SELECT\r\n    people.id,\r\n    people.party_id,\r\n    people.surname,\r\n
   \   people.first_name,\r\n    people.title,\r\n    people.vat_number,\r\n    array_agg(distinct
-  roles.name order by roles.name) AS roles,\r\n--     fn_masterfile_variants('people',
-  people.id) AS variant_codes,\r\n    people.active,\r\n    people.created_at,\r\n
-  \   people.updated_at\r\n\r\nFROM people\r\nLEFT JOIN party_roles ON people.id =
-  party_roles.person_id\r\nLEFT JOIN roles ON party_roles.role_id = roles.id\r\nGROUP
+  roles.name order by roles.name) AS roles,\r\n    string_agg(target_market_name,
+  '; ') AS target_markets,\r\n    -- fn_masterfile_variants('people', people.id) AS
+  variant_codes,\r\n    people.active,\r\n    people.created_at,\r\n    people.updated_at\r\n\r\nFROM
+  people\r\nLEFT JOIN party_roles ON people.id = party_roles.person_id\r\nLEFT JOIN
+  roles ON party_roles.role_id = roles.id\r\nLEFT JOIN target_markets_target_customers
+  ON target_markets_target_customers.target_customer_party_role_id = party_roles.id\r\nLEFT
+  JOIN target_markets ON target_markets.id = target_markets_target_customers.target_market_id\r\nGROUP
   BY people.id"
 :limit: 
 :offset: 
@@ -123,9 +126,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  target_markets:
+    :name: target_markets
+    :sequence_no: 8
+    :caption: Target markets
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   active:
     :name: active
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Active
     :namespaced_name: people.active
     :data_type: :boolean
@@ -141,7 +160,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Created at
     :namespaced_name: people.created_at
     :data_type: :datetime
@@ -157,7 +176,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Updated at
     :namespaced_name: people.updated_at
     :data_type: :datetime

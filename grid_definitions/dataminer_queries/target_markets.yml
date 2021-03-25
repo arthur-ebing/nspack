@@ -9,9 +9,12 @@
   '; ')\r\n    FROM (\r\n      SELECT\r\n        g.target_market_group_name\r\n      FROM\r\n
   \       target_market_groups g\r\n      JOIN target_markets_for_groups t ON t.target_market_group_id
   = g.id\r\n        AND t.target_market_id = target_markets.id\r\n        AND g.active)
-  AS tab) AS target_market_groups,\r\n  \"target_markets\".\"inspection_tm\",\r\n
-  \ \"target_markets\".\"created_at\",\r\n  \"target_markets\".\"updated_at\"\r\nFROM\r\n
-  \ \"target_markets\""
+  AS tab) AS target_market_groups,\r\n  (\r\n    SELECT\r\n      string_agg(target_customer,
+  '; ')\r\n    FROM (\r\n      SELECT\r\n        fn_party_role_name(target_customer_party_role_id)
+  AS target_customer\r\n      FROM\r\n        target_markets_target_customers\r\n
+  \     WHERE target_markets_target_customers.target_market_id = target_markets.id)
+  AS tab) AS target_customers,\r\n  \"target_markets\".\"inspection_tm\",\r\n  \"target_markets\".\"created_at\",\r\n
+  \ \"target_markets\".\"updated_at\"\r\nFROM\r\n  \"target_markets\""
 :limit: 
 :offset: 
 :external_settings: {}
@@ -96,9 +99,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  target_customers:
+    :name: target_customers
+    :sequence_no: 6
+    :caption: Target customers
+    :namespaced_name: 
+    :data_type: :string
+    :width: 250
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   inspection_tm:
     :name: inspection_tm
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Inspection tm?
     :namespaced_name: target_markets.inspection_tm
     :data_type: :boolean
@@ -114,7 +133,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Created at
     :namespaced_name: target_markets.created_at
     :data_type: :datetime
@@ -130,7 +149,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Updated at
     :namespaced_name: target_markets.updated_at
     :data_type: :datetime

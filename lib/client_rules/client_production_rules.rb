@@ -20,7 +20,8 @@ module Crossbeams
             use_packing_specifications: false,
             use_marketing_puc: false,
             carton_equals_pallet: { default: true, can_override: false },
-            capture_product_setup_class: false },
+            capture_product_setup_class: false,
+            link_target_markets_to_target_customers: false },
       hl: { run_allocations: true,
             pallet_label_seqs_sql: nil,
             use_gtins: false,
@@ -36,7 +37,8 @@ module Crossbeams
             use_packing_specifications: false,
             use_marketing_puc: false,
             carton_equals_pallet: { default: true, can_override: false },
-            capture_product_setup_class: false  },
+            capture_product_setup_class: false,
+            link_target_markets_to_target_customers: false },
       kr: { run_allocations: true,
             pallet_label_seqs_sql: 'SELECT p.puc_code, p.gap_code, ps.gtin_code, ps.carton_quantity FROM pallet_sequences ps JOIN pucs p ON p.id = ps.puc_id WHERE ps.pallet_id = ? ORDER BY ps.pallet_sequence_number',
             use_gtins: true,
@@ -52,7 +54,8 @@ module Crossbeams
             use_packing_specifications: true,
             use_marketing_puc: true,
             carton_equals_pallet: { default: false, can_override: false },
-            capture_product_setup_class: true  },
+            capture_product_setup_class: true,
+            link_target_markets_to_target_customers: true },
       um: { run_allocations: true,
             pallet_label_seqs_sql: 'SELECT o.orchard_code, m.marketing_variety_code, s.size_reference, ps.carton_quantity FROM pallet_sequences ps JOIN orchards o ON o.id = ps.orchard_id JOIN marketing_varieties m ON m.id = ps.marketing_variety_id JOIN fruit_size_references s ON s.id = ps.fruit_size_reference_id WHERE ps.pallet_id = ? ORDER BY ps.pallet_sequence_number',
             use_gtins: false,
@@ -68,7 +71,8 @@ module Crossbeams
             use_packing_specifications: false,
             use_marketing_puc: false,
             carton_equals_pallet: { default: false, can_override: false },
-            capture_product_setup_class: false  },
+            capture_product_setup_class: false,
+            link_target_markets_to_target_customers: false },
       ud: { run_allocations: true,
             pallet_label_seqs_sql: nil,
             use_gtins: false,
@@ -84,7 +88,8 @@ module Crossbeams
             use_packing_specifications: false,
             use_marketing_puc: false,
             carton_equals_pallet: { default: false, can_override: false },
-            capture_product_setup_class: false  },
+            capture_product_setup_class: false,
+            link_target_markets_to_target_customers: false },
       sr: { run_allocations: true,
             pallet_label_seqs_sql: nil,
             use_gtins: false,
@@ -100,7 +105,8 @@ module Crossbeams
             use_packing_specifications: false,
             use_marketing_puc: false,
             carton_equals_pallet: { default: false, can_override: false },
-            capture_product_setup_class: false  },
+            capture_product_setup_class: false,
+            link_target_markets_to_target_customers: false },
       sr2: { run_allocations: true,
              pallet_label_seqs_sql: nil,
              use_gtins: false,
@@ -116,7 +122,8 @@ module Crossbeams
              use_packing_specifications: false,
              use_marketing_puc: false,
              carton_equals_pallet: { default: false, can_override: true },
-             capture_product_setup_class: false  }
+             capture_product_setup_class: false,
+             link_target_markets_to_target_customers: false }
     }.freeze
     # ALLOW_OVERFULL_REWORKS_PALLETIZING
     # BYPASS_QUALITY_TEST_LOAD_CHECK
@@ -272,6 +279,12 @@ module Crossbeams
       return 'Show and capture rmt_class on product_setups and pallet_sequences forms.' if explain
 
       setting(:capture_product_setup_class)
+    end
+
+    def kromco_target_markets_customers_link?(explain: false)
+      return 'Is the client Kromco, and do they need to link target_markets and target_customers?' if explain
+
+      setting(:link_target_markets_to_target_customers) && client_code == 'kr'
     end
   end
 end

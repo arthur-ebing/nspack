@@ -4,6 +4,7 @@ module UiRules
   class OrganizationRule < Base
     def generate_rules
       @repo = MasterfilesApp::PartyRepo.new
+      @tm_repo = MasterfilesApp::TargetMarketRepo.new
       make_form_object
       apply_form_values
 
@@ -38,6 +39,10 @@ module UiRules
                               hide_on_load: @form_object.role_names&.empty?,
                               items: @form_object.role_names }
       # fields[:active] = { renderer: :label, as_boolean: true }
+      fields[:target_market_ids] = { renderer: :list,
+                                     caption: 'Target Markets',
+                                     invisible: !show_target_markets_link(@form_object.role_names),
+                                     items: @repo.target_market_names_for(@repo.party_role_id_from_role_and_party_id(AppConst::ROLE_TARGET_CUSTOMER, @form_object[:party_id])) }
     end
 
     def common_fields
@@ -59,7 +64,12 @@ module UiRules
                     options: @repo.for_select_roles,
                     selected: @form_object.role_ids,
                     caption: 'Roles',
-                    required: false }
+                    required: false },
+        target_market_ids: { renderer: :multi,
+                             options: @tm_repo.for_select_target_markets,
+                             selected: @form_object.target_market_ids,
+                             invisible: !show_target_markets_link(@form_object.role_names),
+                             caption: 'Target Markets' }
       }
     end
 
@@ -75,7 +85,8 @@ module UiRules
                                     long_description: nil,
                                     vat_number: nil,
                                     specialised_role_names: [],
-                                    role_ids: [])
+                                    role_ids: [],
+                                    target_market_ids: [])
     end
 
     private
@@ -85,6 +96,14 @@ module UiRules
         behaviour.keyup :short_description,
                         notify: [{ url: '/masterfiles/parties/organizations/changed/short_desc' }]
       end
+    end
+
+    def show_target_markets_link(role_names)
+      return false if role_names.nil_or_empty?
+
+      show = role_names.include?(AppConst::ROLE_TARGET_CUSTOMER)
+      show = false unless AppConst::CR_PROD.kromco_target_markets_customers_link?
+      show
     end
   end
 end

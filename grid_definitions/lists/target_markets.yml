@@ -30,3 +30,16 @@
   :text: New Target Market
   :style: :button
   :behaviour: :popup
+:hide_for_client:
+  hb:
+  - target_customers
+  hl:
+  - target_customers
+  um:
+  - target_customers
+  ud:
+  - target_customers
+  sr:
+  - target_customers
+  sr2:
+  - target_customers

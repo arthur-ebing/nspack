@@ -70,6 +70,8 @@ module MasterfilesApp
       hash[:specialised_role_names] = select_values(:roles, :name, { id: hash[:role_ids], specialised: true })
       hash[:parent_organization] = get(:organizations, hash[:parent_id], :medium_description)
       hash[:variant_codes] = fn_masterfile_variants('organizations', id)
+      target_customer_party_role_id = party_role_id_from_role_and_party_id(AppConst::ROLE_TARGET_CUSTOMER, hash[:party_id])
+      hash[:target_market_ids] = target_customer_target_market_ids(target_customer_party_role_id)
       Organization.new(hash)
     end
 
@@ -142,6 +144,8 @@ module MasterfilesApp
       hash = add_party_name(hash)
       hash[:role_names] = select_values(:roles, :name, { id: hash[:role_ids], specialised: false })
       hash[:specialised_role_names] = select_values(:roles, :name, { id: hash[:role_ids], specialised: true })
+      target_customer_party_role_id = party_role_id_from_role_and_party_id(AppConst::ROLE_TARGET_CUSTOMER, hash[:party_id])
+      hash[:target_market_ids] = target_customer_target_market_ids(target_customer_party_role_id)
       Person.new(hash)
     end
 
@@ -532,6 +536,30 @@ module MasterfilesApp
       update(:registrations, id, args)
     end
 
+    def link_target_markets(target_customer_party_role_id, target_market_ids)
+      target_market_ids = [] if target_market_ids.nil?
+
+      existing_ids      = target_customer_target_market_ids(target_customer_party_role_id)
+      old_ids           = existing_ids - target_market_ids
+      new_ids           = target_market_ids - existing_ids
+
+      DB[:target_markets_target_customers].where(target_customer_party_role_id: target_customer_party_role_id).where(target_market_id: old_ids).delete
+      new_ids.each do |id|
+        DB[:target_markets_target_customers].insert(target_customer_party_role_id: target_customer_party_role_id, target_market_id: id)
+      end
+    end
+
+    def target_customer_target_market_ids(target_customer_party_role_id)
+      DB[:target_markets_target_customers].where(target_customer_party_role_id: target_customer_party_role_id).select_map(:target_market_id).sort
+    end
+
+    def target_market_names_for(target_customer_party_role_id)
+      DB[:target_markets_target_customers]
+        .join(:target_markets, id: :target_market_id)
+        .where(target_customer_party_role_id: target_customer_party_role_id)
+        .select_map(:target_market_name).sort
+    end
+
     private
 
     def add_party_name(hash)
@@ -549,6 +577,8 @@ module MasterfilesApp
     end
 
     def delete_party_dependents(party_id)
+      target_customer_party_role_id = party_role_id_from_role_and_party_id(AppConst::ROLE_TARGET_CUSTOMER, party_id)
+      DB[:target_markets_target_customers].where(target_customer_party_role_id: target_customer_party_role_id).delete
       DB[:party_roles].where(party_id: party_id).delete
       DB[:organizations].where(party_id: party_id).delete
       DB[:people].where(party_id: party_id).delete

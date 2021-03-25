@@ -15,6 +15,7 @@ module Masterfiles
               form.add_field :target_market_name
               form.add_field :tm_group_ids
               form.add_field :country_ids
+              form.add_field :target_customer_ids
               form.add_field :description
               form.add_field :inspection_tm
             end

@@ -15,5 +15,6 @@ module MasterfilesApp
     attribute :specialised_role_names, Types::Array
     attribute :address_ids, Types::Array
     attribute :contact_method_ids, Types::Array
+    attribute :target_market_ids, Types::Array
   end
 end

@@ -81,7 +81,8 @@ module MasterfilesApp
         specialised_role_names: ['ABC'],
         address_ids: address_ids,
         contact_method_ids: contact_method_ids,
-        active: true
+        active: true,
+        target_market_ids: []
       }
     end
 
