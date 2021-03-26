@@ -27,7 +27,7 @@ module EdiApp
           COALESCE(inventory_codes.edi_out_inventory_code, inventory_codes.inventory_code) AS inventory_code,
           pallet_sequences.pick_ref AS picking_reference,
           pallet_sequences.product_chars AS product_characteristic_code,
-          target_market_groups.target_market_group_name AS target_market,
+          COALESCE(target_markets.target_market_name, target_market_groups.target_market_group_name) AS target_market,
           pucs.puc_code AS farm,
           pucs.gap_code AS global_gap_number,
           pallet_sequences.carton_quantity,
@@ -77,6 +77,7 @@ module EdiApp
         JOIN marketing_varieties ON marketing_varieties.id = pallet_sequences.marketing_variety_id
         JOIN marks ON marks.id = pallet_sequences.mark_id
         JOIN inventory_codes ON inventory_codes.id = pallet_sequences.inventory_code_id
+        LEFT JOIN target_markets ON target_markets.id = pallet_sequences.target_market_id
         JOIN target_market_groups ON target_market_groups.id = pallet_sequences.packed_tm_group_id
         JOIN grades ON grades.id = pallet_sequences.grade_id
         JOIN standard_pack_codes ON standard_pack_codes.id = pallet_sequences.standard_pack_code_id

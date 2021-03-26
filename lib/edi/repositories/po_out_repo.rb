@@ -122,7 +122,7 @@ module EdiApp
           loads.shipped_at AS shipped_date,
           pallet_sequences.product_chars AS prod_char,
           govt_inspection_sheets.id AS orig_cons,
-          target_market_groups.target_market_group_name AS targ_mkt,
+          COALESCE(target_markets.target_market_name, target_market_groups.target_market_group_name) AS targ_mkt,
           pucs.puc_code AS farm,
           pallet_sequences.carton_quantity AS ctn_qty,
           1 AS plt_qty,
@@ -182,6 +182,7 @@ module EdiApp
         JOIN marketing_varieties ON marketing_varieties.id = pallet_sequences.marketing_variety_id
         JOIN marks ON marks.id = pallet_sequences.mark_id
         JOIN inventory_codes ON inventory_codes.id = pallet_sequences.inventory_code_id
+        LEFT JOIN target_markets ON target_markets.id = pallet_sequences.target_market_id
         JOIN target_market_groups ON target_market_groups.id = pallet_sequences.packed_tm_group_id
         JOIN grades ON grades.id = pallet_sequences.grade_id
         JOIN standard_pack_codes ON standard_pack_codes.id = pallet_sequences.standard_pack_code_id
