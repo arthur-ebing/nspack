@@ -21,7 +21,6 @@ module Masterfiles
               form.add_field :role_names
               form.add_address addresses
               form.add_contact_method contact_methods
-              form.add_field :target_market_ids
             end
           end
 

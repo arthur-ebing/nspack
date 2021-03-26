@@ -70,8 +70,6 @@ module MasterfilesApp
       hash[:specialised_role_names] = select_values(:roles, :name, { id: hash[:role_ids], specialised: true })
       hash[:parent_organization] = get(:organizations, hash[:parent_id], :medium_description)
       hash[:variant_codes] = fn_masterfile_variants('organizations', id)
-      target_customer_party_role_id = party_role_id_from_role_and_party_id(AppConst::ROLE_TARGET_CUSTOMER, hash[:party_id])
-      hash[:target_market_ids] = target_customer_target_market_ids(target_customer_party_role_id)
       Organization.new(hash)
     end
 
@@ -144,8 +142,6 @@ module MasterfilesApp
       hash = add_party_name(hash)
       hash[:role_names] = select_values(:roles, :name, { id: hash[:role_ids], specialised: false })
       hash[:specialised_role_names] = select_values(:roles, :name, { id: hash[:role_ids], specialised: true })
-      target_customer_party_role_id = party_role_id_from_role_and_party_id(AppConst::ROLE_TARGET_CUSTOMER, hash[:party_id])
-      hash[:target_market_ids] = target_customer_target_market_ids(target_customer_party_role_id)
       Person.new(hash)
     end
 

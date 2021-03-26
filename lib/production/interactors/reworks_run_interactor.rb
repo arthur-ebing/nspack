@@ -1165,7 +1165,9 @@ module ProductionApp
     end
 
     def for_select_basic_pack_actual_counts(basic_pack_code_id, std_fruit_size_count_id)
-      MasterfilesApp::FruitSizeRepo.new.for_select_fruit_actual_counts_for_packs(where: { basic_pack_code_id: basic_pack_code_id, std_fruit_size_count_id: std_fruit_size_count_id })
+      MasterfilesApp::FruitSizeRepo.new.for_select_fruit_actual_counts_for_packs(
+        where: { basic_pack_code_id: basic_pack_code_id, std_fruit_size_count_id: std_fruit_size_count_id }
+      )
     end
 
     def for_select_actual_count_standard_pack_codes(standard_pack_ids)
@@ -1179,7 +1181,15 @@ module ProductionApp
     end
 
     def for_select_customer_varieties(packed_tm_group_id, marketing_variety_id)
-      MasterfilesApp::MarketingRepo.new.for_select_customer_varieties(where: { packed_tm_group_id: packed_tm_group_id, marketing_variety_id: marketing_variety_id })
+      MasterfilesApp::MarketingRepo.new.for_select_customer_varieties(
+        where: { packed_tm_group_id: packed_tm_group_id, marketing_variety_id: marketing_variety_id }
+      )
+    end
+
+    def for_select_packed_group_tms(packed_tm_group_id)
+      MasterfilesApp::TargetMarketRepo.new.for_select_packed_group_tms(
+        where: { target_market_group_id: packed_tm_group_id }
+      )
     end
 
     def for_select_pallet_formats(pallet_base_id, pallet_stack_type_id)

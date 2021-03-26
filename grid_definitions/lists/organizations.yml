@@ -37,6 +37,11 @@
   :popup: true
   :show_if_env_var: USE_MARKETING_PUC:y
   :hide_if_false: has_marketing_role
+- :url: "/list/organization_target_markets/multi?key=target_markets&id=$:id$"
+  :text: target markets
+  :icon: list
+  :popup: true
+  :hide_if_false: has_target_customer_role
 - :separator: true
 :page_controls:
 - :control_type: :link

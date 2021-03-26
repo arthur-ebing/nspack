@@ -5,7 +5,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
   route 'reworks', 'production' do |r|
     # REWORKS RUNS
     # --------------------------------------------------------------------------
-
     interactor = ProductionApp::ReworksRunInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
     r.on 'change_deliveries_orchard' do
@@ -701,13 +700,14 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'packed_tm_group_changed' do
-        target_markets = MasterfilesApp::TargetMarketRepo.new.for_select_packed_group_tms(where: { target_market_group_id: params[:changed_value] })
         if params[:changed_value].blank? || params[:reworks_run_sequence_marketing_variety_id].blank?
           customer_varieties = []
+          target_markets = []
         else
           packed_tm_group_id = params[:changed_value]
           marketing_variety_id = params[:reworks_run_sequence_marketing_variety_id]
           customer_varieties = interactor.for_select_customer_varieties(packed_tm_group_id, marketing_variety_id)
+          target_markets = interactor.for_select_packed_group_tms(packed_tm_group_id)
         end
         json_actions([OpenStruct.new(type: :replace_select_options,
                                      dom_id: 'reworks_run_sequence_customer_variety_id',

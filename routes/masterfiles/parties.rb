@@ -18,6 +18,18 @@ class Nspack < Roda
         end
       end
 
+      r.on 'link_target_markets' do
+        r.post do
+          res = interactor.link_target_markets(id, multiselect_grid_choices(params))
+          if fetch?(r)
+            show_json_notice(res.message)
+          else
+            flash[:notice] = res.message
+          end
+          redirect_to_last_grid(r)
+        end
+      end
+
       # Check for notfound:
       r.on !interactor.exists?(:organizations, id) do
         handle_not_found(r)

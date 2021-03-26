@@ -13,8 +13,11 @@
   AS registrations,\r\n    organizations.active,\r\n    organizations.created_at,\r\n
   \   organizations.updated_at,\r\n    EXISTS(SELECT pr.id FROM party_roles pr\r\n
   \                JOIN roles r ON r.id = pr.role_id \r\n                 WHERE r.name
-  = 'MARKETER' AND organizations.id = pr.organization_id) AS has_marketing_role\r\nFROM\r\n
-  \   organizations\r\n        LEFT JOIN organizations parent ON parent.id = organizations.parent_id\r\n
+  = 'MARKETER' AND organizations.id = pr.organization_id) AS has_marketing_role,\r\n
+  \   EXISTS(SELECT pr.id FROM party_roles pr\r\n                 JOIN roles r ON
+  r.id = pr.role_id \r\n                 WHERE r.name = 'TARGET CUSTOMER' AND organizations.id
+  = pr.organization_id) AS has_target_customer_role\r\nFROM\r\n    organizations\r\n
+  \       LEFT JOIN organizations parent ON parent.id = organizations.parent_id\r\n
   \       LEFT JOIN party_roles ON organizations.id = party_roles.organization_id\r\n
   \       LEFT JOIN roles ON party_roles.role_id = roles.id\r\n        LEFT JOIN target_markets_target_customers
   ON target_markets_target_customers.target_customer_party_role_id = party_roles.id\r\n
@@ -191,7 +194,7 @@
     :caption: Target markets
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 500
     :format: 
     :hide: false
     :pinned: 
@@ -284,7 +287,23 @@
   has_marketing_role:
     :name: has_marketing_role
     :sequence_no: 17
-    :caption: Has marketing role
+    :caption: Has marketing role?
+    :namespaced_name: 
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  has_target_customer_role:
+    :name: has_target_customer_role
+    :sequence_no: 18
+    :caption: Has target customer role?
     :namespaced_name: 
     :data_type: :boolean
     :width: 

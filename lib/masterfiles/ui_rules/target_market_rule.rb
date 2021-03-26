@@ -24,7 +24,7 @@ module UiRules
       fields[:inspection_tm] = { renderer: :label, as_boolean: true }
       fields[:target_customer_ids] = { renderer: :list,
                                        caption: 'Target Customers',
-                                       invisible: !AppConst::CR_PROD.kromco_target_markets_customers_link?,
+                                       invisible: !AppConst::CR_PROD.link_target_markets_to_target_customers?,
                                        items: @repo.target_customer_party_role_names_for(@options[:id]) }
     end
 
@@ -38,7 +38,7 @@ module UiRules
         target_customer_ids: { renderer: :multi,
                                options: @party_repo.for_select_party_roles(AppConst::ROLE_TARGET_CUSTOMER),
                                selected: @form_object.target_customer_ids,
-                               invisible: !AppConst::CR_PROD.kromco_target_markets_customers_link?,
+                               invisible: !AppConst::CR_PROD.link_target_markets_to_target_customers?,
                                caption: 'Target Customers' }
       }
     end

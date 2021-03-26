@@ -82,8 +82,7 @@ module MasterfilesApp
         role_names: ['ABC'],
         specialised_role_names: ['ABC'],
         variant_codes: ['ABC'],
-        active: true,
-        target_market_ids: []
+        active: true
       }
     end
 
