@@ -12,7 +12,7 @@ module MesscadaApp
         @printer_id = params[:printer_id]
         @request_ip = request_ip
         @packhouse_no = repo.find_resource_packhouse_no(params[:packhouse_resource_id])
-        @supporting_data = params[:supporting_data] || {}
+        @supporting_data = resolve_supporting_data(params[:supporting_data] || {})
 
         find_label(params[:label_template_id])
         @instance = repo.carton_label_printing_instance(carton_label_ids.first)
@@ -61,6 +61,12 @@ module MesscadaApp
         return 'DEFAULT' if printer_id.nil?
 
         repo.get(:printers, printer_id, :printer_code)
+      end
+
+      def resolve_supporting_data(hash)
+        return hash unless hash.key?(:packed_date)
+
+        hash.merge(packed_date: Date.parse(hash[:packed_date]))
       end
     end
   end
