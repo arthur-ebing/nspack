@@ -2,18 +2,14 @@
 
 module MasterfilesApp
   class OrganizationInteractor < BaseInteractor
-    def create_organization(params) # rubocop:disable Metrics/AbcSize
+    def create_organization(params)
       res = validate_organization_params(params)
       return validation_failed_response(res) if res.failure?
-
-      res = res.to_h
-      target_market_ids = res.delete(:target_market_ids)
 
       id = nil
       repo.transaction do
         id = repo.create_organization(res)
       end
-      link_target_markets(organization_target_customer_party_role_id(id), target_market_ids) if AppConst::CR_PROD.kromco_target_markets_customers_link?
 
       instance = organization(id)
       success_response("Created organization #{instance.party_name}", instance)
@@ -27,13 +23,9 @@ module MasterfilesApp
       res = validate_organization_params(params)
       return validation_failed_response(res) if res.failure?
 
-      res = res.to_h
-      target_market_ids = res.delete(:target_market_ids)
-
       repo.transaction do
         repo.update_organization(id, res)
       end
-      link_target_markets(organization_target_customer_party_role_id(id), target_market_ids) if AppConst::CR_PROD.kromco_target_markets_customers_link?
 
       instance = organization(id)
       success_response("Updated organization #{instance.party_name}", instance)
@@ -64,11 +56,14 @@ module MasterfilesApp
       success_response('Marketing Organization => farm_pucs associated successfully')
     end
 
-    def link_target_markets(target_customer_party_role_id, target_market_ids)
+    def link_target_markets(id, target_market_ids)
+      return validation_failed_response(OpenStruct.new(messages: { target_market_ids: ['You did not choose any target_markets'] })) if target_market_ids.empty?
+
+      party_id = repo.get(:organizations, id, :party_id)
+      target_customer_party_role_id = repo.party_role_id_from_role_and_party_id(AppConst::ROLE_TARGET_CUSTOMER, party_id)
       repo.transaction do
         repo.link_target_markets(target_customer_party_role_id, target_market_ids)
       end
-
       success_response('Target Markets linked successfully')
     end
 

@@ -88,7 +88,7 @@ module MasterfilesApp
       end
       country_response = link_countries(id, country_ids)
       tm_groups_response = link_tm_groups(id, tm_group_ids)
-      link_target_customers(id, target_customer_ids) if AppConst::CR_PROD.kromco_target_markets_customers_link?
+      link_target_customers(id, target_customer_ids) if AppConst::CR_PROD.link_target_markets_to_target_customers?
 
       instance = target_market(id)
       success_response("Created target market #{instance.target_market_name}, #{country_response.message}, #{tm_groups_response.message}", instance)
@@ -107,7 +107,7 @@ module MasterfilesApp
 
       country_response = link_countries(id, country_ids)
       tm_groups_response = link_tm_groups(id, tm_group_ids)
-      link_target_customers(id, target_customer_ids) if AppConst::CR_PROD.kromco_target_markets_customers_link?
+      link_target_customers(id, target_customer_ids) if AppConst::CR_PROD.link_target_markets_to_target_customers?
 
       repo.update_target_market(id, res)
       instance = target_market(id)

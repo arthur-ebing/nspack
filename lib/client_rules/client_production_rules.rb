@@ -281,10 +281,10 @@ module Crossbeams
       setting(:capture_product_setup_class)
     end
 
-    def kromco_target_markets_customers_link?(explain: false)
-      return 'Is the client Kromco, and do they need to link target_markets and target_customers?' if explain
+    def link_target_markets_to_target_customers?(explain: false)
+      return 'Link target_markets to target_customers' if explain
 
-      setting(:link_target_markets_to_target_customers) && client_code == 'kr'
+      setting(:link_target_markets_to_target_customers)
     end
   end
 end

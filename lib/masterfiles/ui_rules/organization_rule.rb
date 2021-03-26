@@ -4,7 +4,6 @@ module UiRules
   class OrganizationRule < Base
     def generate_rules
       @repo = MasterfilesApp::PartyRepo.new
-      @tm_repo = MasterfilesApp::TargetMarketRepo.new
       make_form_object
       apply_form_values
 
@@ -64,12 +63,7 @@ module UiRules
                     options: @repo.for_select_roles,
                     selected: @form_object.role_ids,
                     caption: 'Roles',
-                    required: false },
-        target_market_ids: { renderer: :multi,
-                             options: @tm_repo.for_select_target_markets,
-                             selected: @form_object.target_market_ids,
-                             invisible: !show_target_markets_link(@form_object.role_names),
-                             caption: 'Target Markets' }
+                    required: false }
       }
     end
 
@@ -85,8 +79,7 @@ module UiRules
                                     long_description: nil,
                                     vat_number: nil,
                                     specialised_role_names: [],
-                                    role_ids: [],
-                                    target_market_ids: [])
+                                    role_ids: [])
     end
 
     private
@@ -102,7 +95,7 @@ module UiRules
       return false if role_names.nil_or_empty?
 
       show = role_names.include?(AppConst::ROLE_TARGET_CUSTOMER)
-      show = false unless AppConst::CR_PROD.kromco_target_markets_customers_link?
+      show = false unless AppConst::CR_PROD.link_target_markets_to_target_customers?
       show
     end
   end

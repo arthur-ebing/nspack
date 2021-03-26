@@ -9,6 +9,5 @@ module MasterfilesApp
     required(:vat_number).maybe(Types::StrippedString)
     required(:role_ids).maybe(:array).each(:integer)
     # required(:active).filled(:bool)
-    optional(:target_market_ids).maybe(:array).each(:integer)
   end
 end

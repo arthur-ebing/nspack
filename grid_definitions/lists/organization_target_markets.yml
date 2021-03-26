@@ -1,0 +1,10 @@
+---
+:dataminer_definition: target_markets
+:multiselect:
+  :target_markets:
+    :url: "/masterfiles/parties/organizations/$:id$/link_target_markets"
+    :preselect: "SELECT target_market_id AS id FROM target_markets_target_customers
+                 JOIN party_roles ON party_roles.id = target_customer_party_role_id
+                 WHERE organization_id = $:id$"
+    :section_caption: "SELECT 'Link ' || long_description || ' target markets' FROM organizations WHERE id = $:id$"
+    :multiselect_save_method: remote

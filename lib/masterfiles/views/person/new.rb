@@ -20,7 +20,6 @@ module Masterfiles
               form.add_field :surname
               form.add_field :vat_number
               form.add_field :role_ids
-              form.add_field :target_market_ids
             end
           end
 
