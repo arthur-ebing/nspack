@@ -702,6 +702,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.on 'packed_tm_group_changed' do
         if params[:changed_value].blank? || params[:reworks_run_sequence_marketing_variety_id].blank?
           customer_varieties = []
+          target_markets = []
         else
           packed_tm_group_id = params[:changed_value]
           marketing_variety_id = params[:reworks_run_sequence_marketing_variety_id]
