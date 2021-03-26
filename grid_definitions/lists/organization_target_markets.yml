@@ -8,3 +8,4 @@
                  WHERE organization_id = $:id$"
     :section_caption: "SELECT 'Link ' || long_description || ' target markets' FROM organizations WHERE id = $:id$"
     :multiselect_save_method: remote
+    :can_be_cleared: true

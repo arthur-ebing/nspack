@@ -57,8 +57,6 @@ module MasterfilesApp
     end
 
     def link_target_markets(id, target_market_ids)
-      return validation_failed_response(OpenStruct.new(messages: { target_market_ids: ['You did not choose any target_markets'] })) if target_market_ids.empty?
-
       party_id = repo.get(:organizations, id, :party_id)
       target_customer_party_role_id = repo.party_role_id_from_role_and_party_id(AppConst::ROLE_TARGET_CUSTOMER, party_id)
       repo.transaction do
