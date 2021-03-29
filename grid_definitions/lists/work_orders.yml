@@ -1,0 +1,28 @@
+---
+:dataminer_definition: work_orders
+:actions:
+- :url: "/production/orders/work_orders/$:id$"
+  :text: view
+  :icon: view-show
+  :title: false
+  :popup: true
+- :url: "/production/orders/work_orders/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: false
+  :hide_if_true: completed
+- :url: "/production/orders/work_orders/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:conditions:
+  :standard:
+    - :col: work_orders.marketing_order_id
+      :op: =
+      :val: $:marketing_order_id$
+  :completed:
+    - :col: work_orders.completed
+      :op: =
+      :val: true

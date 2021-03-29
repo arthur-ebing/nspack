@@ -1,0 +1,12 @@
+---
+:dataminer_definition: work_order_items
+:conditions:
+  :standard:
+    - :col: work_order_items.work_order_id
+      :op: =
+      :val: $:work_order_id$
+:edit_rules:
+  :url: "/production/orders/work_order_items/$:id$"
+  :editable_fields:
+    carton_qty_required:
+      :editor: :numeric

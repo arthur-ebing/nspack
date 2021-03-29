@@ -1,0 +1,7 @@
+---
+:dataminer_definition: product_setup_templates
+:multiselect:
+  :standard:
+    :url: "/production/orders/work_orders/$:id$/manage_items"
+    :multiselect_save_method: remote
+    :preselect: "SELECT id FROM product_setup_templates WHERE id IN ($:work_order_item_templates$)"

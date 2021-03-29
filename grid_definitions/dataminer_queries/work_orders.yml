@@ -1,0 +1,206 @@
+---
+:caption: Work Orders
+:sql: SELECT "work_orders"."id", "work_orders"."marketing_order_id", "work_orders"."carton_qty_required",
+  "work_orders"."carton_qty_produced", "work_orders"."start_date", "work_orders"."end_date",
+  "work_orders"."active", "work_orders"."completed", "work_orders"."completed_at",
+  "marketing_orders"."order_number", fn_current_status('work_orders', "work_orders"."id")
+  AS status FROM "work_orders" LEFT JOIN "marketing_orders" ON "marketing_orders"."id"
+  = "work_orders"."marketing_order_id"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: work_orders.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marketing_order_id:
+    :name: marketing_order_id
+    :sequence_no: 2
+    :caption: Marketing order
+    :namespaced_name: work_orders.marketing_order_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  carton_qty_required:
+    :name: carton_qty_required
+    :sequence_no: 3
+    :caption: Carton qty required
+    :namespaced_name: work_orders.carton_qty_required
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  carton_qty_produced:
+    :name: carton_qty_produced
+    :sequence_no: 4
+    :caption: Carton qty produced
+    :namespaced_name: work_orders.carton_qty_produced
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  start_date:
+    :name: start_date
+    :sequence_no: 5
+    :caption: Start date
+    :namespaced_name: work_orders.start_date
+    :data_type: :date
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  end_date:
+    :name: end_date
+    :sequence_no: 6
+    :caption: End date
+    :namespaced_name: work_orders.end_date
+    :data_type: :date
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 7
+    :caption: Active
+    :namespaced_name: work_orders.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  completed:
+    :name: completed
+    :sequence_no: 8
+    :caption: Completed
+    :namespaced_name: work_orders.completed
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  completed_at:
+    :name: completed_at
+    :sequence_no: 9
+    :caption: Completed at
+    :namespaced_name: work_orders.completed_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  order_number:
+    :name: order_number
+    :sequence_no: 10
+    :caption: Order number
+    :namespaced_name: marketing_orders.order_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 11
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: work_orders.marketing_order_id
+  :caption: Marketing order
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT order_number, id FROM marketing_orders ORDER BY order_number
+- :column: work_orders.completed
+  :caption: Complete
+  :data_type: :boolean
+  :control_type: :text
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+

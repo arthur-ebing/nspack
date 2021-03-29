@@ -1,0 +1,30 @@
+---
+:dataminer_definition: marketing_orders
+:actions:
+- :url: "/production/orders/marketing_orders/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: false
+- :url: "/production/orders/marketing_orders/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: false
+  :hide_if_true: completed
+- :url: "/production/orders/marketing_orders/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :separator: true
+- :url: "/development/statuses/list/marketing_orders/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:conditions:
+  :completed:
+    - :col: marketing_orders.completed
+      :op: =
+      :val: true
