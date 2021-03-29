@@ -17,6 +17,7 @@
   :icon: delete
   :is_delete: true
   :popup: true
+  :hide_if_true: completed
 - :separator: true
 - :url: "/development/statuses/list/marketing_orders/$:id$"
   :text: status

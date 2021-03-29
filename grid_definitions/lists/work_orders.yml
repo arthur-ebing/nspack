@@ -17,6 +17,7 @@
   :icon: delete
   :is_delete: true
   :popup: true
+  :hide_if_true: completed
 :conditions:
   :standard:
     - :col: work_orders.marketing_order_id
