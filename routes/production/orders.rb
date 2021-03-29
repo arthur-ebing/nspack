@@ -196,6 +196,18 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           undo_grid_inline_edit(message: res.message, message_type: :warning)
         end
       end
+
+      r.is do
+        r.delete do    # DELETE
+          interactor.assert_work_order_item_permission!(:delete, id)
+          res = interactor.delete_work_order_item(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
     end
   end
 end

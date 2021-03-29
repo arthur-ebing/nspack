@@ -1,5 +1,11 @@
 ---
 :dataminer_definition: work_order_items
+:actions:
+  - :url: "/production/orders/work_order_items/$:id$"
+    :text: delete
+    :icon: delete
+    :is_delete: true
+    :popup: true
 :conditions:
   :standard:
     - :col: work_order_items.work_order_id

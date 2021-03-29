@@ -98,8 +98,28 @@ module ProductionApp
       failed_response(e.message)
     end
 
+    def delete_work_order_item(id) # rubocop:disable Metrics/AbcSize
+      name = repo.find_work_order_item(id).id
+      repo.transaction do
+        repo.delete_work_order_item(id)
+        log_status(:work_order_items, id, 'DELETED')
+        log_transaction
+      end
+      success_response("Deleted work order item #{name}")
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue Sequel::ForeignKeyConstraintViolation => e
+      puts e.message
+      failed_response("Unable to delete work order item. It is still referenced#{e.message.partition('referenced').last}")
+    end
+
     def assert_permission!(task, id = nil)
       res = TaskPermissionCheck::WorkOrder.call(task, id)
+      raise Crossbeams::TaskNotPermittedError, res.message unless res.success
+    end
+
+    def assert_work_order_item_permission!(task, id = nil)
+      res = TaskPermissionCheck::WorkOrderItem.call(task, id)
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 
