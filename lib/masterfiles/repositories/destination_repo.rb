@@ -68,12 +68,9 @@ module MasterfilesApp
     end
 
     def delete_country(id)
-      dependents = DB[:target_markets_for_countries].where(destination_country_id: id).select_map(:id)
-      return { error: 'This country is associated to Target Markets' } unless dependents.empty?
-
+      DB[:target_markets_for_countries].where(destination_country_id: id).delete
       DB[:destination_cities].where(destination_country_id: id).delete
       DB[:destination_countries].where(id: id).delete
-      { success: true }
     end
 
     def create_country(region_id, attrs)

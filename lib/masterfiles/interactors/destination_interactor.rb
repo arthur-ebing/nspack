@@ -11,10 +11,11 @@ module MasterfilesApp
         id = repo.create_region(res)
       end
       instance = region(id)
-      success_response("Created destination region #{instance.destination_region_name}",
-                       instance)
+      success_response("Created destination region #{instance.destination_region_name}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { destination_region_name: ['This destination region already exists'] }))
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def update_region(id, params)
@@ -25,21 +26,21 @@ module MasterfilesApp
         repo.update_region(id, res)
       end
       instance = region(id)
-      success_response("Updated destination region #{instance.destination_region_name}",
-                       instance)
+      success_response("Updated destination region #{instance.destination_region_name}", instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def delete_region(id)
       name = region(id).destination_region_name
-      res = {}
       repo.transaction do
-        res = repo.delete_region(id)
+        repo.delete_region(id)
       end
-      if res[:error]
-        failed_response(res[:error])
-      else
-        success_response("Deleted destination region #{name}")
-      end
+      success_response("Deleted destination region #{name}")
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue Sequel::ForeignKeyConstraintViolation => e
+      failed_response("Unable to delete destination region. It is still referenced#{e.message.partition('referenced').last}")
     end
 
     def create_country(id, params)
@@ -54,6 +55,8 @@ module MasterfilesApp
       success_response("Created destination country #{instance.country_name}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { country_name: ['This destination country already exists'] }))
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def update_country(id, params)
@@ -65,19 +68,20 @@ module MasterfilesApp
       end
       instance = country(id)
       success_response("Updated destination country #{instance.country_name}", instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def delete_country(id)
       name = country(id).country_name
-      res = {}
       repo.transaction do
-        res = repo.delete_country(id)
+        repo.delete_country(id)
       end
-      if res[:error]
-        failed_response(res[:error])
-      else
-        success_response("Deleted destination country #{name}")
-      end
+      success_response("Deleted destination country #{name}")
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue Sequel::ForeignKeyConstraintViolation => e
+      failed_response("Unable to delete destination country. It is still referenced#{e.message.partition('referenced').last}")
     end
 
     def create_city(id, params)
@@ -92,6 +96,8 @@ module MasterfilesApp
       success_response("Created destination city #{instance.city_name}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { city_name: ['This destination city already exists'] }))
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def update_city(id, params)
@@ -103,6 +109,8 @@ module MasterfilesApp
       end
       instance = city(id)
       success_response("Updated destination city #{instance.city_name}", instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def delete_city(id)
@@ -111,6 +119,10 @@ module MasterfilesApp
         repo.delete_city(id)
       end
       success_response("Deleted destination city #{name}")
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue Sequel::ForeignKeyConstraintViolation => e
+      failed_response("Unable to delete destination city. It is still referenced#{e.message.partition('referenced').last}")
     end
 
     private
