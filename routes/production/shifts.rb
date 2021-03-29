@@ -231,8 +231,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                        end
         jasper_params = JasperParams.new(report_name,
                                          current_user.login_name,
-                                         FromDateTime: DateTime.parse(attrs[:from_date]).strftime('%Y-%m-%d %H:%M:%S'),
-                                         ToDateTime: DateTime.parse(attrs[:to_date]).strftime('%Y-%m-%d %H:%M:%S'),
+                                         FromDateTime: Time.parse(attrs[:from_date]),
+                                         ToDateTime: Time.parse(attrs[:to_date]),
                                          WorkerIds: multiselect_grid_choices(params))
         jasper_params.mode = :csv
         res = CreateJasperReport.call(jasper_params)
