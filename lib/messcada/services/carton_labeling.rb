@@ -61,8 +61,8 @@ module MesscadaApp
 
       attrs = setup_data[:production_run_data].merge(setup_data[:setup_data]).reject { |k, _| k == :id }
       @pick_ref = UtilityFunctions.calculate_pick_ref(packhouse_no)
-      attrs = attrs.merge(pick_ref: pick_ref)
-      attrs = attrs.merge(target_customer_party_role_id: target_customer_party_role)
+      attrs = attrs.merge(pick_ref: pick_ref,
+                          target_customer_party_role_id: target_customer_party_role)
       @personnel_number = nil
 
       if system_resource.group_incentive
