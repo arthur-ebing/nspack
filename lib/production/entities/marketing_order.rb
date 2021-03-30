@@ -7,8 +7,8 @@ module ProductionApp
     attribute :season_id, Types::Integer
     attribute :order_number, Types::String
     attribute :order_reference, Types::String
-    attribute :carton_qty_required, Types::Decimal
-    attribute :carton_qty_produced, Types::Decimal
+    attribute :carton_qty_required, Types::Integer
+    attribute :carton_qty_produced, Types::Integer
     attribute :completed, Types::Bool
     attribute :completed_at, Types::DateTime
   end

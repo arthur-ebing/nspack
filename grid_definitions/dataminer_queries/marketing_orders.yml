@@ -96,9 +96,9 @@
     :sequence_no: 6
     :caption: Carton qty required
     :namespaced_name: marketing_orders.carton_qty_required
-    :data_type: :number
+    :data_type: :integer
     :width: 
-    :format: :delimited_1000
+    :format:
     :hide: false
     :pinned: 
     :groupable: true
@@ -112,9 +112,9 @@
     :sequence_no: 7
     :caption: Carton qty produced
     :namespaced_name: marketing_orders.carton_qty_produced
-    :data_type: :number
+    :data_type: :integer
     :width: 
-    :format: :delimited_1000
+    :format:
     :hide: false
     :pinned: 
     :groupable: true

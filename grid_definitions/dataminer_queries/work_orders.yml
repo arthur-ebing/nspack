@@ -47,9 +47,9 @@
     :sequence_no: 3
     :caption: Carton qty required
     :namespaced_name: work_orders.carton_qty_required
-    :data_type: :number
+    :data_type: :integer
     :width: 
-    :format: :delimited_1000
+    :format:
     :hide: false
     :pinned: 
     :groupable: true
@@ -63,9 +63,9 @@
     :sequence_no: 4
     :caption: Carton qty produced
     :namespaced_name: work_orders.carton_qty_produced
-    :data_type: :number
+    :data_type: :integer
     :width: 
-    :format: :delimited_1000
+    :format:
     :hide: false
     :pinned: 
     :groupable: true

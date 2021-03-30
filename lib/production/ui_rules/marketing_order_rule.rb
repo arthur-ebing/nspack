@@ -57,7 +57,7 @@ module UiRules
                      prompt: true },
         order_number: { required: true },
         order_reference: { required: true },
-        carton_qty_required: { required: true },
+        carton_qty_required: { renderer: :integer, required: true },
         carton_qty_produced: { renderer: :label },
         completed: { renderer: :label, as_boolean: true },
         completed_at: { disabled: true }

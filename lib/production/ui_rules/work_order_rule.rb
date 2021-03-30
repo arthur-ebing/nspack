@@ -50,7 +50,7 @@ module UiRules
         start_date: { renderer: :date, required: true },
         end_date: { renderer: :date, required: true },
         active: { renderer: :checkbox },
-        carton_qty_required: { required: true },
+        carton_qty_required: { renderer: :integer, required: true },
         carton_qty_produced: { renderer: :label },
         completed: { renderer: :label, as_boolean: true },
         completed_at: { renderer: :label, format: :without_timezone_or_seconds }
