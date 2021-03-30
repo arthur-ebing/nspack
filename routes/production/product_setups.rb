@@ -388,6 +388,17 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                      options_array: target_markets)])
       end
 
+      r.on 'target_market_changed' do
+        target_customers = if params[:changed_value].blank?
+                             []
+                           else
+                             interactor.for_select_target_customer_party_roles(params[:changed_value])
+                           end
+        json_actions([OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'product_setup_target_customer_party_role_id',
+                                     options_array: target_customers)])
+      end
+
       r.on 'marketing_variety_changed' do
         if params[:changed_value].blank? || params[:product_setup_packed_tm_group_id].blank?
           customer_varieties = []

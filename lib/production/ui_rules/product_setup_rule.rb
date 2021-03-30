@@ -2,9 +2,11 @@
 
 module UiRules
   class ProductSetupRule < Base # rubocop:disable Metrics/ClassLength
-    def generate_rules
+    def generate_rules # rubocop:disable Metrics/AbcSize
       @repo = ProductionApp::ProductSetupRepo.new
       @fruit_size_repo = MasterfilesApp::FruitSizeRepo.new
+      @party_repo = MasterfilesApp::PartyRepo.new
+      @tm_repo = MasterfilesApp::TargetMarketRepo.new
       make_form_object
       apply_form_values
 
@@ -30,9 +32,10 @@ module UiRules
       standard_pack_code_id_label = @repo.get(:standard_pack_codes, @form_object.standard_pack_code_id, :standard_pack_code)
       fruit_actual_counts_for_pack_id_label = @fruit_size_repo.find_fruit_actual_counts_for_pack(@form_object.fruit_actual_counts_for_pack_id)&.actual_count_for_pack
       fruit_size_reference_id_label = @fruit_size_repo.find_fruit_size_reference(@form_object.fruit_size_reference_id)&.size_reference
-      marketing_org_party_role_id_label = MasterfilesApp::PartyRepo.new.find_party_role(@form_object.marketing_org_party_role_id)&.party_name
+      marketing_org_party_role_id_label = @party_repo.find_party_role(@form_object.marketing_org_party_role_id)&.party_name
       packed_tm_group_id_label = @repo.get(:target_market_groups, @form_object.packed_tm_group_id, :target_market_group_name)
       target_market_id_label = @repo.get(:target_markets, @form_object.target_market_id, :target_market_name)
+      target_customer_label = @party_repo.fn_party_role_name(@form_object.target_customer_party_role_id)
       mark_id_label = @repo.get(:marks, @form_object.mark_id, :mark_code)
       inventory_code_id_label = MasterfilesApp::FruitRepo.new.find_inventory_code(@form_object.inventory_code_id)&.inventory_code
       pallet_format_id_label = @repo.get(:pallet_formats, @form_object.pallet_format_id, :description)
@@ -86,6 +89,9 @@ module UiRules
       fields[:target_market_id] = { renderer: :label,
                                     with_value: target_market_id_label,
                                     caption: 'Target Market' }
+      fields[:target_customer_party_role_id] = { renderer: :label,
+                                                 with_value: target_customer_label,
+                                                 caption: 'Target Customer' }
       fields[:mark_id] = { renderer: :label,
                            with_value: mark_id_label,
                            caption: 'Mark' }
@@ -142,7 +148,7 @@ module UiRules
       cultivar_id = product_setup_template&.cultivar_id
       cultivar_id_label = product_setup_template&.cultivar_name
       commodity_id = @form_object[:commodity_id].nil_or_empty? ? @repo.get_commodity_id(cultivar_group_id, cultivar_id) : @form_object.commodity_id
-      default_mkting_org_id = @form_object[:marketing_org_party_role_id].nil_or_empty? ? MasterfilesApp::PartyRepo.new.find_party_role_from_party_name_for_role(AppConst::CR_PROD.default_marketing_org, AppConst::ROLE_MARKETER) : @form_object[:marketing_org_party_role_id]
+      default_mkting_org_id = @form_object[:marketing_org_party_role_id].nil_or_empty? ? @party_repo.find_party_role_from_party_name_for_role(AppConst::CR_PROD.default_marketing_org, AppConst::ROLE_MARKETER) : @form_object[:marketing_org_party_role_id]
       {
         product_setup_template: { renderer: :label,
                                   with_value: product_setup_template_id_label,
@@ -233,7 +239,7 @@ module UiRules
                     searchable: true,
                     remove_search_for_small_list: false },
         marketing_org_party_role_id: { renderer: :select,
-                                       options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_MARKETER),
+                                       options: @party_repo.for_select_party_roles(AppConst::ROLE_MARKETER),
                                        selected: default_mkting_org_id,
                                        caption: 'Marketing Org',
                                        required: true,
@@ -241,22 +247,29 @@ module UiRules
                                        searchable: true,
                                        remove_search_for_small_list: false },
         packed_tm_group_id: { renderer: :select,
-                              options: MasterfilesApp::TargetMarketRepo.new.for_select_packed_tm_groups,
-                              disabled_options: MasterfilesApp::TargetMarketRepo.new.for_select_inactive_tm_groups,
+                              options: @tm_repo.for_select_packed_tm_groups,
+                              disabled_options: @tm_repo.for_select_inactive_tm_groups,
                               caption: 'Packed TM Group',
                               required: true,
                               prompt: 'Select Packed TM Group',
                               searchable: true,
                               remove_search_for_small_list: false },
         target_market_id: { renderer: :select,
-                            options: MasterfilesApp::TargetMarketRepo.new.for_select_packed_group_tms(
+                            options: @tm_repo.for_select_packed_group_tms(
                               where: { target_market_group_id: @form_object.packed_tm_group_id }
                             ),
-                            disabled_options: MasterfilesApp::TargetMarketRepo.new.for_select_inactive_target_markets,
+                            disabled_options: @tm_repo.for_select_inactive_target_markets,
                             caption: 'Target Market',
                             prompt: 'Select Target Market',
                             searchable: true,
                             remove_search_for_small_list: false },
+        target_customer_party_role_id: { renderer: :select,
+                                         options: @party_repo.for_select_party_roles(AppConst::ROLE_TARGET_CUSTOMER,
+                                                                                     where: { id: @tm_repo.target_market_target_customer_ids(@form_object.target_market_id) }),
+                                         caption: 'Target Customer',
+                                         prompt: 'Select Target Customer',
+                                         searchable: true,
+                                         remove_search_for_small_list: false },
         sell_by_code: {},
         mark_id: { renderer: :select,
                    options: MasterfilesApp::MarketingRepo.new.for_select_marks,
@@ -359,6 +372,7 @@ module UiRules
                                     marketing_org_party_role_id: nil,
                                     packed_tm_group_id: nil,
                                     target_market_id: nil,
+                                    target_customer_party_role_id: nil,
                                     mark_id: nil,
                                     inventory_code_id: nil,
                                     pallet_format_id: nil,
@@ -401,6 +415,8 @@ module UiRules
         behaviour.dropdown_change :packed_tm_group_id,
                                   notify: [{ url: '/production/product_setups/product_setups/packed_tm_group_changed',
                                              param_keys: %i[product_setup_marketing_variety_id] }]
+        behaviour.dropdown_change :target_market_id,
+                                  notify: [{ url: '/production/product_setups/product_setups/target_market_changed' }]
         behaviour.dropdown_change :pallet_stack_type_id,
                                   notify: [{ url: '/production/product_setups/product_setups/pallet_stack_type_changed',
                                              param_keys: %i[product_setup_pallet_base_id] }]

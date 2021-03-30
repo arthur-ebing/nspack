@@ -86,6 +86,12 @@ module ProductionApp
       )
     end
 
+    def for_select_target_customer_party_roles(target_market_id)
+      target_market_target_customer_ids = MasterfilesApp::TargetMarketRepo.new.target_market_target_customer_ids(target_market_id)
+      MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_TARGET_CUSTOMER,
+                                                           where: { id: target_market_target_customer_ids })
+    end
+
     def for_select_pallet_formats(pallet_base_id, pallet_stack_type_id)
       MasterfilesApp::PackagingRepo.new.for_select_pallet_formats(
         where: { pallet_base_id: pallet_base_id, pallet_stack_type_id: pallet_stack_type_id }

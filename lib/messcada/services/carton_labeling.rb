@@ -62,6 +62,7 @@ module MesscadaApp
       attrs = setup_data[:production_run_data].merge(setup_data[:setup_data]).reject { |k, _| k == :id }
       @pick_ref = UtilityFunctions.calculate_pick_ref(packhouse_no)
       attrs = attrs.merge(pick_ref: pick_ref)
+      attrs = attrs.merge(target_customer_party_role_id: target_customer_party_role)
       @personnel_number = nil
 
       if system_resource.group_incentive
@@ -91,6 +92,10 @@ module MesscadaApp
 
     def phc
       repo.find_resource_phc(setup_data[:production_run_data][:production_line_id]) || repo.find_resource_phc(setup_data[:production_run_data][:packhouse_resource_id])
+    end
+
+    def target_customer_party_role
+      setup_data[:production_run_data][:target_customer_party_role_id] || setup_data[:setup_data][:target_customer_party_role_id]
     end
 
     def resolve_marketing_attrs # rubocop:disable Metrics/AbcSize

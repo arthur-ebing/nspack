@@ -127,6 +127,7 @@ module ProductionApp
       standard_pack_code_id = create_standard_pack
       create_basic_packs_standard_packs(standard_pack_id: standard_pack_code_id,
                                         basic_pack_id: basic_pack_code_id)
+      target_customer_party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_TARGET_CUSTOMER)
 
       {
         id: 1,
@@ -164,7 +165,8 @@ module ProductionApp
         target_market_id: target_market_id,
         description: 'ABC',
         gtin_code: 'ABC',
-        rmt_class_id: rmt_class_id
+        rmt_class_id: rmt_class_id,
+        target_customer_party_role_id: target_customer_party_role_id
       }
     end
 
