@@ -3,8 +3,6 @@
 module ProductionApp
   class PackingSpecificationItem < Dry::Struct
     attribute :id, Types::Integer
-    attribute :packing_specification_id, Types::Integer
-    attribute :packing_specification, Types::String
     attribute :description, Types::String
     attribute :pm_bom_id, Types::Integer
     attribute :pm_bom, Types::String

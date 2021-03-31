@@ -86,9 +86,4 @@ module ProductionApp
   ProductionRunTemplateSchema = Dry::Schema.Params do
     required(:product_setup_template_id).filled(:integer)
   end
-
-  ProductionRunPackingSpecificationSchema = Dry::Schema.Params do
-    required(:product_setup_template_id).filled(:integer)
-    required(:packing_specification_id).filled(:integer)
-  end
 end

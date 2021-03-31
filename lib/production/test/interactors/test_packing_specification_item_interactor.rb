@@ -37,10 +37,10 @@ module ProductionApp
     end
 
     def test_create_packing_specification_item_fail
-      attrs = fake_packing_specification_item(packing_specification_id: nil).to_h.reject { |k, _| k == :id }
+      attrs = fake_packing_specification_item(product_setup_id: nil).to_h.reject { |k, _| k == :id }
       res = interactor.create_packing_specification_item(attrs)
       refute res.success, 'should fail validation'
-      assert_equal ['must be filled'], res.errors[:packing_specification_id]
+      assert_equal ['must be filled'], res.errors[:product_setup_id]
     end
 
     def test_update_packing_specification_item
@@ -75,8 +75,6 @@ module ProductionApp
 
     def packing_specification_item_attrs
       repo = BaseRepo.new
-      packing_specification_id = create_packing_specification
-      product_setup_template_id = repo.get(:packing_specifications, packing_specification_id, :product_setup_template_id)
       pm_bom_id = create_pm_bom
       pm_mark_id = create_pm_mark
       mark_id = repo.get(:pm_marks, pm_mark_id, :mark_id)
@@ -88,8 +86,7 @@ module ProductionApp
 
       {
         id: 1,
-        packing_specification_id: packing_specification_id,
-        product_setup_template_id: product_setup_template_id,
+        product_setup_template_id: 1,
         packing_specification: 'ABC',
         description: Faker::Lorem.unique.word,
         pm_bom_id: pm_bom_id,

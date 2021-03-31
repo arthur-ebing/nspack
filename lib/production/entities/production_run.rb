@@ -90,7 +90,5 @@ module ProductionApp
     attribute :allow_cultivar_group_mixing, Types::Bool
     attribute :legacy_data, Types::Hash.optional
     attribute :legacy_bintip_criteria, Types::Hash.optional
-    attribute :packing_specification_id, Types::Integer
-    attribute :packing_specification_code, Types::String
   end
 end
