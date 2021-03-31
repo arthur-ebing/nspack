@@ -5,6 +5,7 @@ module UiRules
     def generate_rules
       @repo = ProductionApp::PackingSpecificationRepo.new
       @bom_repo = MasterfilesApp::BomRepo.new
+      @setup_repo = ProductionApp::ProductSetupRepo.new
       make_form_object
       apply_form_values
 
@@ -17,7 +18,6 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      fields[:packing_specification] = { renderer: :label, caption: 'Packing Specification' }
       fields[:product_setup] = { renderer: :label,  caption: 'Product Setup' }
       fields[:description] = { renderer: :label }
       fields[:pm_bom] = { renderer: :label,  caption: 'PKG BOM' }
@@ -33,25 +33,22 @@ module UiRules
 
     def common_fields # rubocop:disable Metrics/AbcSize
       {
-        packing_specification: { renderer: :label,
-                                 caption: 'Packing Specification',
-                                 hide_on_load: @mode == :new },
-        packing_specification_id: { renderer: :select,
-                                    caption: 'Packing Specification',
-                                    options: @repo.for_select_packing_specifications,
-                                    disabled_options: @repo.for_select_inactive_packing_specifications,
-                                    prompt: true,
-                                    required: true,
-                                    hide_on_load: @mode == :edit },
+        product_setup_template_id: { renderer: :select,
+                                     caption: 'Product Setup Template',
+                                     options: @setup_repo.for_select_product_setup_templates,
+                                     disabled_options: @setup_repo.for_select_inactive_product_setup_templates,
+                                     prompt: true,
+                                     required: true,
+                                     hide_on_load: @mode == :edit },
         product_setup: { renderer: :label,
                          caption: 'Product Setup',
                          hide_on_load: @mode == :new },
         product_setup_id: { renderer: :select,
                             caption: 'Product Setup',
-                            options: ProductionApp::ProductSetupRepo.new.for_select_product_setups(
+                            options: @setup_repo.for_select_product_setups(
                               where: { product_setup_template_id: @form_object.product_setup_template_id }
                             ),
-                            disabled_options: ProductionApp::ProductSetupRepo.new.for_select_inactive_product_setups,
+                            disabled_options: @setup_repo.for_select_inactive_product_setups,
                             prompt: true,
                             required: true,
                             hide_on_load: @mode == :edit },
@@ -133,7 +130,7 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(packing_specification_id: nil,
+      @form_object = OpenStruct.new(product_setup_template_id: nil,
                                     description: nil,
                                     pm_bom_id: nil,
                                     pm_mark_id: nil,
@@ -141,7 +138,6 @@ module UiRules
                                     product_setup_id: nil,
                                     std_fruit_size_count_id: nil,
                                     basic_pack_code_id: nil,
-                                    product_setup_template_id: nil,
                                     tu_labour_product_id: nil,
                                     ru_labour_product_id: nil,
                                     fruit_sticker_ids: nil,
@@ -153,7 +149,7 @@ module UiRules
 
     def add_behaviours
       behaviours do |behaviour|
-        behaviour.dropdown_change :packing_specification_id, notify: [{ url: '/production/packing_specifications/packing_specification_items/packing_specification_changed' }]
+        behaviour.dropdown_change :product_setup_template_id, notify: [{ url: '/production/packing_specifications/packing_specification_items/product_setup_template_changed' }]
         behaviour.dropdown_change :product_setup_id, notify: [{ url: '/production/packing_specifications/packing_specification_items/product_setup_changed' }]
       end
     end

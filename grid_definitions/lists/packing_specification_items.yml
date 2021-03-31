@@ -47,8 +47,8 @@
   :text: Refresh Packing Specification Items
   :style: :button
 :conditions:
-  :packing_specification:
-    - :col: packing_specification_items.packing_specification_id
+  :product_setup:
+    - :col: packing_specification_items.product_setup_id
       :op: "="
       :val: "$:id$"
 :edit_rules:

@@ -91,16 +91,7 @@ module UiRules
                                              param_values: { run_id: @options[:id] },
                                              hidden_fields: %i[product_setup_template_id],
                                              show_field: :template_name,
-                                             caption: 'Select Template',
-                                             initially_visible: !@rules[:use_packing_specifications] }
-      fields[:packing_specification_id] = { renderer: :lookup,
-                                            lookup_name: :packing_specifications_for_runs,
-                                            lookup_key: :standard,
-                                            param_values: { run_id: @options[:id] },
-                                            hidden_fields: %i[packing_specification_id],
-                                            show_field: :packing_specification_code,
-                                            caption: 'Select Packing Specification',
-                                            initially_visible: @rules[:use_packing_specifications]  }
+                                             caption: 'Select Template' }
     end
 
     def set_stage_fields
@@ -263,10 +254,6 @@ module UiRules
         product_setup_template_id: { renderer: :label,
                                      with_value: product_setup_template_name,
                                      caption: 'Product setup template' },
-        packing_specification_id: { renderer: :label,
-                                    with_value: packing_specification_code,
-                                    caption: 'Packing Specification',
-                                    initially_visible: @rules[:use_packing_specifications] },
         cloned_from_run_id: { renderer: :label,
                               with_value: cloned_run_label,
                               caption: 'Cloned from run' },
@@ -396,12 +383,6 @@ module UiRules
       return '' if @form_object.product_setup_template_id.nil_or_empty?
 
       @form_object.template_name
-    end
-
-    def packing_specification_code
-      return '' if @form_object.packing_specification_id.nil_or_empty?
-
-      @form_object.packing_specification_code
     end
 
     def add_new_behaviours

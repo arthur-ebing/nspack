@@ -2,16 +2,6 @@
 
 module ProductionApp
   class PackingSpecificationRepo < BaseRepo # rubocop:disable Metrics/ClassLength
-    build_for_select :packing_specifications,
-                     label: :packing_specification_code,
-                     value: :id,
-                     order_by: :packing_specification_code
-    build_inactive_select :packing_specifications,
-                          label: :packing_specification_code,
-                          value: :id,
-                          order_by: :packing_specification_code
-    crud_calls_for :packing_specifications, name: :packing_specification
-
     build_for_select :packing_specification_items,
                      label: :description,
                      value: :id,
@@ -22,34 +12,10 @@ module ProductionApp
                           order_by: :description
     crud_calls_for :packing_specification_items, name: :packing_specification_item, exclude: [:update]
 
-    def find_packing_specification(id)
-      hash = find_with_association(
-        :packing_specifications, id,
-        parent_tables: [{ parent_table: :product_setup_templates,
-                          columns: %i[template_name packhouse_resource_id production_line_id],
-                          flatten_columns: { template_name: :product_setup_template,
-                                             packhouse_resource_id: :packhouse_resource_id,
-                                             production_line_id: :production_line_id } },
-                        { parent_table: :cultivar_groups,
-                          columns: [:cultivar_group_code],
-                          flatten_columns: { cultivar_group_code: :cultivar_group_code } }],
-        lookup_functions: [{ function: :fn_current_status,
-                             args: ['packing_specifications', :id],
-                             col_name: :status }]
-      )
-      return nil unless hash
-
-      hash[:packhouse] = get(:plant_resources, hash[:packhouse_resource_id], :plant_resource_code)
-      hash[:line] = get(:plant_resources, hash[:production_line_id], :plant_resource_code)
-      PackingSpecification.new(hash)
-    end
-
     def find_packing_specification_item(id)
       query = <<~SQL
         SELECT
           packing_specification_items.id,
-          packing_specification_items.packing_specification_id,
-          packing_specifications.packing_specification_code AS packing_specification,
           packing_specification_items.description,
           packing_specification_items.pm_bom_id,
           pm_boms.bom_code AS pm_bom,
@@ -59,7 +25,7 @@ module ProductionApp
           product_setups.basic_pack_code_id AS basic_pack_id,
           fn_pkg_mark(pm_marks.id) AS pm_mark,
           packing_specification_items.product_setup_id,
-          packing_specifications.product_setup_template_id,
+          product_setups.product_setup_template_id,
           fn_product_setup_code(packing_specification_items.product_setup_id) AS product_setup,
           packing_specification_items.tu_labour_product_id,
           pm_products_tu.erp_code AS tu_labour_product,
@@ -85,7 +51,6 @@ module ProductionApp
           fn_current_status('packing_specification_items', packing_specification_items.id) AS status,
           fn_packing_specification_code(packing_specification_items.id) AS packing_specification_item_code
         FROM packing_specification_items
-        JOIN packing_specifications ON packing_specifications.id = packing_specification_items.packing_specification_id
         JOIN product_setups ON product_setups.id = packing_specification_items.product_setup_id
         LEFT JOIN pm_boms ON pm_boms.id = packing_specification_items.pm_bom_id
         LEFT JOIN pm_marks ON pm_marks.id = packing_specification_items.pm_mark_id
@@ -136,18 +101,16 @@ module ProductionApp
     end
 
     def refresh_packing_specification_items(user)
-      packing_specifications = select_values(:packing_specifications,
-                                             %i[id product_setup_template_id])
-      packing_specifications.each do |packing_specification_id, product_setup_template_id|
+      select_values(:product_setup_templates, :id).each do |product_setup_template_id|
         product_setup_ids = select_values(:product_setups,
                                           :id,
                                           { product_setup_template_id: product_setup_template_id })
-        existing_ids = select_values(:packing_specification_items,
-                                     :product_setup_id,
-                                     { packing_specification_id: packing_specification_id })
+        existing_ids = DB[:packing_specification_items]
+                       .join(:product_setups, id: :product_setup_id)
+                       .where(product_setup_template_id: product_setup_template_id)
+                       .select_map(:product_setup_id)
         (product_setup_ids - existing_ids).each do |product_setup_id|
           item_id = create_packing_specification_item(
-            packing_specification_id: packing_specification_id,
             product_setup_id: product_setup_id,
             pm_bom_id: get(:product_setups, product_setup_id, :pm_bom_id),
             pm_mark_id: get(:product_setups, product_setup_id, :pm_mark_id),

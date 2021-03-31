@@ -344,16 +344,8 @@ module ProductionApp
       success_response('ok', repo.find_hash(:product_setup_templates, id))
     end
 
-    def selected_packing_specification(id)
-      success_response('ok', repo.find_hash(:packing_specifications, id))
-    end
-
     def update_template(id, params) # rubocop:disable Metrics/AbcSize
-      res = if AppConst::CR_PROD.use_packing_specifications?
-              validate_production_run_packing_specification_params(params)
-            else
-              validate_production_run_template_params(params)
-            end
+      res = validate_production_run_template_params(params)
 
       return validation_failed_response(res) if res.failure?
 
@@ -781,10 +773,6 @@ module ProductionApp
 
     def validate_production_run_template_params(params)
       ProductionRunTemplateSchema.call(params)
-    end
-
-    def validate_production_run_packing_specification_params(params)
-      ProductionRunPackingSpecificationSchema.call(params)
     end
 
     def validate_product_resource_allocation(params)

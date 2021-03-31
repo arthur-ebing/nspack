@@ -215,11 +215,7 @@ module ProductionApp
                                                    { parent_table: :plant_resources,
                                                      foreign_key: :production_line_id,
                                                      columns: [:plant_resource_code],
-                                                     flatten_columns: { plant_resource_code: :line_code } },
-                                                   { parent_table: :packing_specifications,
-                                                     foreign_key: :packing_specification_id,
-                                                     columns: [:packing_specification_code],
-                                                     flatten_columns: { packing_specification_code: :packing_specification_code } }],
+                                                     flatten_columns: { plant_resource_code: :line_code } }],
                                    lookup_functions: [{ function: :fn_production_run_code,
                                                         args: [:id],
                                                         col_name: :production_run_code },
@@ -325,7 +321,7 @@ module ProductionApp
       qry = <<~SQL
         SELECT packing_specification_items.id, product_setup_id
         FROM packing_specification_items
-        JOIN packing_specifications ON packing_specifications.id = packing_specification_items.packing_specification_id
+        JOIN product_setups ON product_setups.id = packing_specification_items.product_setup_id
         WHERE product_setup_template_id = (SELECT product_setup_template_id FROM production_runs WHERE id = #{run_id})
          AND fn_packing_specification_code(packing_specification_items.id) = '#{packing_specification_item_code}'
       SQL
