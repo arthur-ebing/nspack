@@ -73,7 +73,6 @@ module RawMaterialsApp
       params = params.merge(production_run_rebin_id: production_run_id)
 
       params = calc_rebin_params(params)
-      return failed_response('Max delivery for run could not be found') if params[:rmt_delivery_id].nil_or_empty?
 
       res = validate_rmt_rebin_params(params)
       return validation_failed_response(res) if res.failure?
