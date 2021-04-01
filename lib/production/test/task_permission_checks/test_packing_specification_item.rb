@@ -9,8 +9,6 @@ module ProductionApp
     def entity(attrs = {})
       base_attrs = {
         id: 1,
-        packing_specification_id: 1,
-        packing_specification: 'ABC',
         description: Faker::Lorem.unique.word,
         pm_bom_id: 1,
         pm_bom: 'ABC',

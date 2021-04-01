@@ -3,14 +3,12 @@
 module ProductionApp
   module PackingSpecificationFactory
     def create_packing_specification_item(opts = {}) # rubocop:disable Metrics/AbcSize
-      packing_specification_id = create_packing_specification
       pm_bom_id = create_pm_bom
       pm_mark_id = create_pm_mark
       product_setup_id = create_product_setup
       pm_product_id = create_pm_product
 
       default = {
-        packing_specification_id: packing_specification_id,
         description: Faker::Lorem.unique.word,
         pm_bom_id: pm_bom_id,
         pm_mark_id: pm_mark_id,
@@ -26,20 +24,6 @@ module ProductionApp
         updated_at: '2010-01-01 12:00'
       }
       DB[:packing_specification_items].insert(default.merge(opts))
-    end
-
-    def create_packing_specification(opts = {})
-      product_setup_template_id = create_product_setup_template
-
-      default = {
-        product_setup_template_id: product_setup_template_id,
-        packing_specification_code: Faker::Lorem.unique.word,
-        description: Faker::Lorem.word,
-        active: true,
-        created_at: '2010-01-01 12:00',
-        updated_at: '2010-01-01 12:00'
-      }
-      DB[:packing_specifications].insert(default.merge(opts))
     end
 
     # def create_product_setup_template(opts = {})

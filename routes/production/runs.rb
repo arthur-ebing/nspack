@@ -735,13 +735,7 @@ class Nspack < Roda
             [
               OpenStruct.new(type: :replace_input_value,
                              dom_id: 'production_run_product_setup_template_id',
-                             value: res.instance[:product_setup_template_id]),
-              OpenStruct.new(type: :replace_input_value,
-                             dom_id: 'production_run_packing_specification_id',
-                             value: res.instance[:id]),
-              OpenStruct.new(type: :replace_input_value,
-                             dom_id: 'production_run_packing_specification_code',
-                             value: res.instance[:packing_specification_code])
+                             value: res.instance[:product_setup_template_id])
             ]
           )
         else

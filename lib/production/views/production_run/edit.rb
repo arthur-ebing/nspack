@@ -52,7 +52,6 @@ module Production
                 form.row do |row|
                   row.column do |col|
                     col.add_field :product_setup_template_id
-                    col.add_field :packing_specification_id
                     col.add_field :cloned_from_run_id
                     col.add_field :active_run_stage
                     col.fold_up do |fold|

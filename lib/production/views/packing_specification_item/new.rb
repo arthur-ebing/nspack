@@ -16,8 +16,7 @@ module Production
               form.caption 'New Packing Specification Item'
               form.action '/production/packing_specifications/packing_specification_items'
               form.remote! if remote
-              form.add_field :packing_specification_id
-              form.add_field :packing_specification
+              form.add_field :product_setup_template_id
               form.add_field :product_setup_id
               form.add_field :product_setup
               form.add_field :description

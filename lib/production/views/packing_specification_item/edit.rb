@@ -17,10 +17,8 @@ module Production
               form.action "/production/packing_specifications/packing_specification_items/#{id}"
               form.remote!
               form.method :update
-              form.add_field :packing_specification
               form.add_field :product_setup
               form.add_field :description
-              form.add_field :packing_specification_id
               form.add_field :product_setup_id
               form.add_field :pm_bom_id
               form.add_field :pm_mark_id

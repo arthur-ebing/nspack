@@ -3,11 +3,10 @@
 module ProductionApp
   PackingSpecificationItemSchema = Dry::Schema.Params do
     optional(:id).filled(:integer)
-    required(:packing_specification_id).filled(:integer)
     required(:description).maybe(Types::StrippedString)
     required(:pm_bom_id).maybe(:integer)
     required(:pm_mark_id).maybe(:integer)
-    required(:product_setup_id).maybe(:integer)
+    required(:product_setup_id).filled(:integer)
     required(:tu_labour_product_id).maybe(:integer)
     required(:ru_labour_product_id).maybe(:integer)
     required(:ri_labour_product_id).maybe(:integer)

@@ -3,91 +3,6 @@
 # rubocop:disable Metrics/BlockLength
 class Nspack < Roda # rubocop:disable Metrics/ClassLength
   route 'packing_specifications', 'production' do |r|
-    # PACKING SPECIFICATIONS
-    # --------------------------------------------------------------------------
-    r.on 'packing_specifications', Integer do |id|
-      interactor = ProductionApp::PackingSpecificationInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-
-      # Check for notfound:
-      r.on !interactor.exists?(:packing_specifications, id) do
-        handle_not_found(r)
-      end
-
-      r.on 'edit' do   # EDIT
-        check_auth!('packing specifications', 'edit')
-        interactor.assert_permission!(:edit, id)
-        show_partial { Production::PackingSpecifications::PackingSpecification::Edit.call(id) }
-      end
-
-      r.is do
-        r.get do       # SHOW
-          check_auth!('packing specifications', 'read')
-          show_partial_or_page(r) { Production::PackingSpecifications::PackingSpecification::Show.call(id) }
-        end
-        r.patch do     # UPDATE
-          res = interactor.update_packing_specification(id, params[:packing_specification])
-          if res.success
-            row_keys = %i[
-              product_setup_template_id
-              product_setup_template
-              packing_specification_code
-              description
-              status
-              active
-            ]
-            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
-          else
-            re_show_form(r, res) do
-              Production::PackingSpecifications::PackingSpecification::Edit.call(
-                id,
-                form_values: params[:packing_specification],
-                form_errors: res.errors
-              )
-            end
-          end
-        end
-
-        r.delete do    # DELETE
-          check_auth!('packing specifications', 'delete')
-          interactor.assert_permission!(:delete, id)
-          res = interactor.delete_packing_specification(id)
-          if res.success
-            delete_grid_row(id, notice: res.message)
-          else
-            show_json_error(res.message, status: 200)
-          end
-        end
-      end
-    end
-
-    r.on 'packing_specifications' do
-      interactor = ProductionApp::PackingSpecificationInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-
-      r.on 'product_setup_template_changed' do
-        value = "#{interactor.find_product_setup_template(params[:changed_value]).template_name} SPECIFICATION" unless params[:changed_value].nil_or_empty?
-        json_replace_input_value('packing_specification_packing_specification_code', value)
-      end
-
-      r.on 'new' do    # NEW
-        check_auth!('packing specifications', 'new')
-        show_partial_or_page(r) { Production::PackingSpecifications::PackingSpecification::New.call(remote: fetch?(r)) }
-      end
-
-      r.post do        # CREATE
-        res = interactor.create_packing_specification(params[:packing_specification])
-        if res.success
-          flash[:notice] = res.message
-          redirect_via_json "/list/packing_specification_items/with_params?key=packing_specification&id=#{res.instance.id}&packing_specification=#{res.instance.packing_specification_code}"
-        else
-          re_show_form(r, res, url: '/production/packing_specifications/packing_specifications/new') do
-            Production::PackingSpecifications::PackingSpecification::New.call(form_values: params[:packing_specification],
-                                                                              form_errors: res.errors,
-                                                                              remote: fetch?(r))
-          end
-        end
-      end
-    end
-
     # PACKING SPECIFICATION ITEMS
     # --------------------------------------------------------------------------
     r.on 'packing_specification_items', Integer do |id|
@@ -139,8 +54,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         res = interactor.inline_update_packing_specification_item(id, params)
         if res.success
           row_keys = %i[
-            packing_specification_id
-            packing_specification
             description
             pm_bom_id
             pm_bom
@@ -174,8 +87,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           res = interactor.update_packing_specification_item(id, params[:packing_specification_item])
           if res.success
             row_keys = %i[
-              packing_specification_id
-              packing_specification
               description
               pm_bom_id
               pm_bom
@@ -221,12 +132,10 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     r.on 'packing_specification_items' do
       interactor = ProductionApp::PackingSpecificationItemInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
-      r.on 'packing_specification_changed' do
+      r.on 'product_setup_template_changed' do
         actions = []
         unless params[:changed_value].nil_or_empty?
-          repo = MasterfilesApp::BomRepo.new
-          product_setup_template_id = repo.get(:packing_specifications, params[:changed_value], :product_setup_template_id)
-          product_setup_list = ProductionApp::ProductSetupRepo.new.for_select_product_setups(where: { product_setup_template_id: product_setup_template_id })
+          product_setup_list = ProductionApp::ProductSetupRepo.new.for_select_product_setups(where: { product_setup_template_id: params[:changed_value] })
           actions << OpenStruct.new(type: :replace_select_options, dom_id: 'packing_specification_item_product_setup_id', options_array: product_setup_list)
         end
         json_actions(actions)
