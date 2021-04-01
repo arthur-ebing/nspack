@@ -27,7 +27,7 @@ CREATE TABLE audit.logged_actions
 )
     WITH (
         OIDS=FALSE
-    );
+    ) ;
 ALTER TABLE audit.logged_actions
     OWNER TO postgres;
 GRANT ALL ON TABLE audit.logged_actions TO postgres;
