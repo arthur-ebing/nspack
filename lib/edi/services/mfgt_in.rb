@@ -27,7 +27,7 @@ module EdiApp
     def create_mfgt_records # rubocop:disable Metrics/AbcSize
       repo.transaction do
         @edi_records.each do |params|
-          res = EdiMfgtInSchema.call(resolve_edi_record(params))
+          res = EdiMfgtInContract.new.call(resolve_edi_record(params))
           raise Crossbeams::InfoError, validation_failed_response(res) if res.failure?
 
           attrs = { transaction_number: res[:transaction_number],
@@ -55,7 +55,6 @@ module EdiApp
       attrs[:mark_code] = params[:mark]
       attrs[:size_count_code] = params[:size_count]
       attrs[:inventory_code] = params[:inv_code]
-      attrs[:target_market_code] = params[:targ_mkt]
       attrs[:marketing_org_party_role_id] = get_marketing_org_id(params[:orgzn])
       attrs[:commodity_id] = get_masterfile_match_or_variant(:commodities, code: params[:commodity])
       attrs[:marketing_variety_id] = get_masterfile_match_or_variant(:marketing_varieties, marketing_variety_code: params[:variety])
@@ -63,9 +62,7 @@ module EdiApp
       attrs[:mark_id] = get_masterfile_match_or_variant(:marks, mark_code: params[:mark])
       attrs[:grade_id] = get_masterfile_match_or_variant(:grades, grade_code: params[:grade])
       attrs[:inventory_code_id] = get_masterfile_match_or_variant(:inventory_codes, inventory_code: params[:inv_code])
-      attrs[:packed_tm_group_id] = EdiApp::PoInRepo.new.find_packed_tm_group_id(params[:targ_mkt])
-      attrs[:std_fruit_size_count_id] = find_std_fruit_size_count_id(params[:size_count], attrs[:commodity_id])
-      attrs
+      resolve_size_count_attrs(params, attrs)
     end
 
     def convert_date_val(val)
@@ -88,6 +85,27 @@ module EdiApp
 
       _col, val = args.first
       id = repo.get_variant_id(table_name, val)
+      id
+    end
+
+    def resolve_size_count_attrs(params, attrs)
+      fruit_actual_counts_for_pack_id = find_fruit_actual_counts_for_pack_id(params, attrs)
+      attrs[:fruit_actual_counts_for_pack_id] = fruit_actual_counts_for_pack_id
+      return attrs unless fruit_actual_counts_for_pack_id.nil_or_empty?
+
+      attrs[:fruit_size_reference_id] = get_masterfile_match_or_variant(:fruit_size_references, size_reference: params[:size_count])
+      attrs
+    end
+
+    def find_fruit_actual_counts_for_pack_id(params, attrs)
+      basic_pack_code_id = EdiApp::PoInRepo.new.find_basic_pack_id(attrs[:standard_pack_code_id])
+      std_fruit_size_count_id = find_std_fruit_size_count_id(params[:size_count], attrs[:commodity_id])
+      id = repo.get_id(:fruit_actual_counts_for_packs, { basic_pack_code_id: basic_pack_code_id,
+                                                         std_fruit_size_count_id: std_fruit_size_count_id,
+                                                         actual_count_for_pack: params[:size_count] })
+      return id unless id.nil?
+
+      id = repo.get_variant_id(:fruit_actual_counts_for_packs, params[:size_count]) if id.nil?
       id
     end
 

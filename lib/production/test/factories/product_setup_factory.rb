@@ -85,7 +85,6 @@ module ProductionApp
         mark_code: Faker::Lorem.word,
         size_count_code: Faker::Lorem.word,
         inventory_code: Faker::Lorem.word,
-        target_market_code: Faker::Lorem.word,
         active: true,
         created_at: '2010-01-01 12:00',
         updated_at: '2010-01-01 12:00',
@@ -96,8 +95,8 @@ module ProductionApp
         mark_id: opts[:mark_id],
         grade_id: opts[:grade_id],
         inventory_code_id: opts[:inventory_code_id],
-        packed_tm_group_id: opts[:packed_tm_group_id],
-        std_fruit_size_count_id: opts[:std_fruit_size_count_id]
+        fruit_actual_counts_for_pack_id: opts[:fruit_actual_counts_for_pack_id],
+        fruit_size_reference_id: opts[:fruit_size_reference_id]
       }
       DB[:gtins].insert(default)
     end

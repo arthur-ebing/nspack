@@ -274,18 +274,19 @@ module ProductionApp
       find_gtin_code(gtin_id)
     end
 
-    def resolve_gtin_attrs(attrs)
+    def resolve_gtin_attrs(attrs) # rubocop:disable Metrics/AbcSize
       std_fruit_size_count_id = attrs[:std_fruit_size_count_id].nil_or_empty? ? find_setup_std_fruit_size_count_id(attrs[:fruit_size_reference_id], attrs[:fruit_actual_counts_for_pack_id]) : attrs[:std_fruit_size_count_id]
       commodity_id = attrs[:commodity_id].nil_or_empty? ? find_size_count_commodity(std_fruit_size_count_id) : attrs[:commodity_id]
+      fruit_size_reference_id = attrs[:fruit_size_reference_id]
       attrs = attrs.slice(:marketing_variety_id,
                           :marketing_org_party_role_id,
                           :standard_pack_code_id,
                           :mark_id,
                           :grade_id,
                           :inventory_code_id,
-                          :packed_tm_group_id)
-      attrs[:std_fruit_size_count_id] = std_fruit_size_count_id
+                          :fruit_actual_counts_for_pack_id)
       attrs[:commodity_id] = commodity_id
+      attrs[:fruit_size_reference_id] = fruit_size_reference_id if attrs[:fruit_actual_counts_for_pack_id].nil_or_empty?
       attrs
     end
 
@@ -308,7 +309,7 @@ module ProductionApp
     def get_gtin_id(attrs)
       DB[:gtins]
         .where(attrs)
-        .where(Sequel.lit('? between date_from and date_to', Time.now)) # value BETWEEN low AND high
+        .where(Sequel.lit('? between date_from and COALESCE(date_to::timestamp, current_timestamp)', Time.now)) # value BETWEEN low AND high
         .get(:id)
     end
 

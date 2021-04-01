@@ -601,7 +601,7 @@ module ProductionApp
     def recalc_gtin_code?(params)
       recalc = AppConst::CR_PROD.use_gtins?
       gtin_fields = %i[std_fruit_size_count_id marketing_variety_id marketing_org_party_role_id standard_pack_code_id
-                       mark_id grade_id inventory_code_id packed_tm_group_id]
+                       mark_id grade_id inventory_code_id fruit_actual_counts_for_pack_id fruit_size_reference_id]
       recalc = false unless gtin_fields.any? { |k| params.key?(k) }
       recalc
     end
