@@ -1,0 +1,12 @@
+---
+:dataminer_definition: work_orders
+:actions:
+  - :url: "/list/view_work_order_items_list/with_params?key=standard&work_order_id=$:id$"
+    :text: items
+    :icon: list
+    :popup: true
+:conditions:
+  :standard:
+    - :col: work_orders.marketing_order_id
+      :op: =
+      :val: $:marketing_order_id$

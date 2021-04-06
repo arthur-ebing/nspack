@@ -25,14 +25,6 @@ module ProductionApp
     crud_calls_for :work_orders, name: :work_order, wrapper: WorkOrder
     crud_calls_for :marketing_orders, name: :marketing_order, wrapper: MarketingOrder
 
-    def for_select_marketing_orders
-      query = <<~SQL
-        SELECT order_number || ' - ' || carton_qty_required as custormer_number, id
-        FROM marketing_orders
-      SQL
-      DB[query].select_map(%i[custormer_number id])
-    end
-
     def find_work_order_product_setup_templates(work_order_id)
       DB[:work_order_items]
         .join(:product_setups, id: :product_setup_id)
@@ -49,6 +41,15 @@ module ProductionApp
         .select_map(:product_setup_id).uniq
     end
 
+    def find_work_order_flat(id) # rubocop:disable Metrics/AbcSize
+      DB[:work_orders]
+        .join(:marketing_orders, id: :marketing_order_id)
+        .where(Sequel[:work_orders][:id] => id)
+        .select(Sequel[:work_orders][:id], :marketing_order_id, :start_date, :end_date, :order_number,
+                Sequel[:work_orders][:completed], Sequel[:work_orders][:completed_at], Sequel[:work_orders][:active],
+                Sequel.function(:fn_current_status, 'work_orders', Sequel[:work_orders][:id]).as(:status)).first
+    end
+
     def find_work_order_item_flat(id) # rubocop:disable Metrics/AbcSize
       DB[:work_order_items]
         .join(:product_setups, id: :product_setup_id)
@@ -59,6 +60,14 @@ module ProductionApp
         .select(Sequel[:work_order_items][:id], :template_name, :work_order_id, :product_setup_id, Sequel.function(:fn_product_setup_code, :product_setup_id).as(:product_setup_code), Sequel[:work_order_items][:carton_qty_required],
                 Sequel[:work_order_items][:carton_qty_produced], Sequel[:work_order_items][:completed], Sequel[:work_order_items][:completed_at],
                 Sequel.function(:fn_current_status, 'work_order_items', Sequel[:work_order_items][:id]).as(:status)).first
+    end
+
+    def marketing_order_work_order_items(id)
+      DB[:work_order_items]
+        .join(:work_orders, id: Sequel[:work_order_items][:work_order_id])
+        .join(:marketing_orders, id: :marketing_order_id)
+        .where(Sequel[:marketing_orders][:id] => id)
+        .select(Sequel[:work_order_items][:id]).all
     end
 
     def find_work_order_items_by_templates(ids)

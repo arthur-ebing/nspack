@@ -1,0 +1,7 @@
+---
+:dataminer_definition: cumulative_work_order_items
+:conditions:
+  :standard:
+    - :col: marketing_orders.id
+      :op: =
+      :val: $:marketing_order_id$

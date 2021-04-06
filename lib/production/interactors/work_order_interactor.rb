@@ -12,8 +12,8 @@ module ProductionApp
         log_status(:work_orders, id, 'CREATED')
         log_transaction
       end
-      instance = work_order(id)
-      success_response("Created work order #{instance.id}", instance)
+      instance = repo.find_work_order_flat(id)
+      success_response("Created work order #{instance[:id]}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { id: ['This work order already exists'] }))
     rescue Crossbeams::InfoError => e

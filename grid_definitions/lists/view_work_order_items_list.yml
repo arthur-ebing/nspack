@@ -1,0 +1,7 @@
+---
+:dataminer_definition: work_order_items
+:conditions:
+  :standard:
+    - :col: work_order_items.work_order_id
+      :op: =
+      :val: $:work_order_id$

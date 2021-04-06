@@ -7,8 +7,6 @@ module ProductionApp
     required(:season_id).filled(:integer)
     required(:order_number).filled(Types::StrippedString)
     required(:order_reference).maybe(Types::StrippedString)
-    required(:carton_qty_required).maybe(:integer)
-    optional(:carton_qty_produced).maybe(:integer)
     optional(:completed).maybe(:bool)
     optional(:completed_at).maybe(:time)
   end

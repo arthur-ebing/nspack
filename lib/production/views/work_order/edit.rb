@@ -28,8 +28,6 @@ module Production
                 form.add_field :start_date
                 form.add_field :end_date
                 form.add_field :active
-                form.add_field :carton_qty_required
-                form.add_field :carton_qty_produced
                 form.add_field :completed
                 form.add_field :completed_at
                 form.no_submit! if rules[:completed]
@@ -44,7 +42,7 @@ module Production
 
               section.add_grid('work_order_items',
                                "/list/work_order_items/grid?key=standard&work_order_id=#{id}",
-                               caption: 'Work Orders')
+                               caption: 'Work Order Items')
             end
           end
 

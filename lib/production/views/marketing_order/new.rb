@@ -20,8 +20,6 @@ module Production
               form.add_field :season_id
               form.add_field :order_number
               form.add_field :order_reference
-              form.add_field :carton_qty_required
-              # form.add_field :carton_qty_produced
               # form.add_field :completed
               # form.add_field :completed_at
             end

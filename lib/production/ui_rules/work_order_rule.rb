@@ -14,6 +14,7 @@ module UiRules
 
       build_confirm_message if @mode == :confirm
       set_edit_fields_for_completed if form_object.completed
+      set_new_fields_for_parent if @options[:marketing_order_id]
       set_show_fields if %i[show reopen].include? @mode
 
       form_name 'work_order'
@@ -33,8 +34,6 @@ module UiRules
       fields[:marketing_order_id] = { renderer: :label, with_value: marketing_order_id_label, caption: 'Marketing Order' }
       fields[:start_date] = { renderer: :label }
       fields[:end_date] = { renderer: :label }
-      fields[:carton_qty_required] = { renderer: :label }
-      fields[:carton_qty_produced] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
       fields[:completed] = { renderer: :label, as_boolean: true }
       fields[:completed_at] = { renderer: :label, format: :without_timezone_or_seconds }
@@ -44,14 +43,16 @@ module UiRules
       set_show_fields
     end
 
+    def set_new_fields_for_parent
+      fields[:marketing_order_id] = { renderer: :select, options: @repo.for_select_marketing_orders(where: { id: @options[:marketing_order_id] }), caption: 'Marketing Order', required: true }
+    end
+
     def common_fields
       {
         marketing_order_id: { renderer: :select, options: @repo.for_select_marketing_orders, caption: 'Marketing Order', required: true, prompt: true },
         start_date: { renderer: :date, required: true },
         end_date: { renderer: :date, required: true },
         active: { renderer: :checkbox },
-        carton_qty_required: { renderer: :integer, required: true },
-        carton_qty_produced: { renderer: :label },
         completed: { renderer: :label, as_boolean: true },
         completed_at: { renderer: :label, format: :without_timezone_or_seconds }
       }
@@ -68,8 +69,6 @@ module UiRules
 
     def make_new_form_object
       @form_object = OpenStruct.new(marketing_order_id: nil,
-                                    carton_qty_required: nil,
-                                    carton_qty_produced: nil,
                                     start_date: nil,
                                     end_date: nil,
                                     completed: nil,

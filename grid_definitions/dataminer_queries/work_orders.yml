@@ -1,7 +1,6 @@
 ---
 :caption: Work Orders
-:sql: SELECT "work_orders"."id", "work_orders"."marketing_order_id", "work_orders"."carton_qty_required",
-  "work_orders"."carton_qty_produced", "work_orders"."start_date", "work_orders"."end_date",
+:sql: SELECT "work_orders"."id", "work_orders"."marketing_order_id", "work_orders"."start_date", "work_orders"."end_date",
   "work_orders"."active", "work_orders"."completed", "work_orders"."completed_at",
   "marketing_orders"."order_number", fn_current_status('work_orders', "work_orders"."id")
   AS status FROM "work_orders" LEFT JOIN "marketing_orders" ON "marketing_orders"."id"
@@ -18,7 +17,7 @@
     :data_type: :integer
     :width: 
     :format: 
-    :hide: true
+    :hide: false
     :pinned: 
     :groupable: true
     :group_by_seq: 
@@ -37,38 +36,6 @@
     :hide: true
     :pinned: 
     :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  carton_qty_required:
-    :name: carton_qty_required
-    :sequence_no: 3
-    :caption: Carton qty required
-    :namespaced_name: work_orders.carton_qty_required
-    :data_type: :integer
-    :width: 
-    :format:
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  carton_qty_produced:
-    :name: carton_qty_produced
-    :sequence_no: 4
-    :caption: Carton qty produced
-    :namespaced_name: work_orders.carton_qty_produced
-    :data_type: :integer
-    :width: 
-    :format:
-    :hide: false
-    :pinned: 
-    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false

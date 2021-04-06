@@ -2,7 +2,6 @@
 :caption: Marketing Orders
 :sql: SELECT "marketing_orders"."id", "marketing_orders"."customer_party_role_id",
   "marketing_orders"."season_id", "marketing_orders"."order_number", "marketing_orders"."order_reference",
-  "marketing_orders"."carton_qty_required", "marketing_orders"."carton_qty_produced",
   "marketing_orders"."completed", "marketing_orders"."completed_at", fn_party_role_name("marketing_orders"."customer_party_role_id")
   AS customer_party_role, "seasons"."season_code", fn_current_status('marketing_orders',
   "marketing_orders"."id") AS status FROM "marketing_orders" JOIN "seasons" ON "seasons"."id"
@@ -83,38 +82,6 @@
     :data_type: :string
     :width: 
     :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  carton_qty_required:
-    :name: carton_qty_required
-    :sequence_no: 6
-    :caption: Carton qty required
-    :namespaced_name: marketing_orders.carton_qty_required
-    :data_type: :integer
-    :width: 
-    :format:
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  carton_qty_produced:
-    :name: carton_qty_produced
-    :sequence_no: 7
-    :caption: Carton qty produced
-    :namespaced_name: marketing_orders.carton_qty_produced
-    :data_type: :integer
-    :width: 
-    :format:
     :hide: false
     :pinned: 
     :groupable: true

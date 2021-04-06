@@ -4,8 +4,6 @@ module ProductionApp
   WorkOrderSchema = Dry::Schema.Params do
     optional(:id).filled(:integer)
     optional(:marketing_order_id).maybe(:integer)
-    required(:carton_qty_required).maybe(:integer)
-    optional(:carton_qty_produced).maybe(:integer)
     required(:start_date).maybe(:date)
     required(:end_date).maybe(:date)
     optional(:completed).maybe(:bool)

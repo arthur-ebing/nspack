@@ -1,0 +1,88 @@
+---
+:caption: Cumulative Work Order Items
+:sql: SELECT fn_product_setup_code(product_setups.id) AS product_setup_code,
+  sum("work_order_items"."carton_qty_required") as carton_qty_required, sum("work_order_items"."carton_qty_produced") as carton_qty_produced
+  , string_agg(("work_order_items"."work_order_id"||''), ',') As work_orders
+  FROM "marketing_orders"
+  JOIN "work_orders" ON "work_orders"."marketing_order_id"= "marketing_orders"."id"
+  JOIN "work_order_items" ON "work_order_items"."work_order_id"="work_orders"."id"
+  JOIN "product_setups" ON "product_setups"."id" = "work_order_items"."product_setup_id"
+  JOIN "product_setup_templates" ON "product_setup_templates"."id"="product_setups"."product_setup_template_id"
+  GROUP BY product_setup_code
+:limit:
+:offset:
+:external_settings: {}
+:columns:
+  product_setup_code:
+    :name: product_setup_code
+    :sequence_no: 1
+    :caption: Product setup code
+    :namespaced_name:
+    :data_type: :string
+    :width: 680
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  carton_qty_required:
+    :name: carton_qty_required
+    :sequence_no: 2
+    :caption: Carton qty required
+    :namespaced_name: carton_qty_required
+    :data_type: :integer
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  carton_qty_produced:
+    :name: carton_qty_produced
+    :sequence_no: 3
+    :caption: Carton qty produced
+    :namespaced_name: carton_qty_produced
+    :data_type: :integer
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  work_orders:
+    :name: work_orders
+    :sequence_no: 10
+    :caption: Work Orders
+    :namespaced_name:
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: marketing_orders.id
+  :caption: marketing order
+  :data_type: :integer
+  :control_type: :list
+  :default_value:
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT id, id FROM marketing_orders ORDER BY id

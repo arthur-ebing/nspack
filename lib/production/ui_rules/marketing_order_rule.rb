@@ -10,6 +10,7 @@ module UiRules
       apply_form_values
 
       @rules[:completed] = form_object.completed
+      @rules[:hide_cumulative_work_order_items] = @repo.marketing_order_work_order_items(@options[:id]).empty?
 
       common_values_for_fields common_fields
 
@@ -19,19 +20,13 @@ module UiRules
       form_name 'marketing_order'
     end
 
-    def set_show_fields # rubocop:disable Metrics/AbcSize
-      # customer_party_role_id_label = ProductionApp::PartyRoleRepo.new.find_party_role(@form_object.customer_party_role_id)&.id
-      # customer_party_role_id_label = @repo.find(:party_roles, ProductionApp::PartyRole, @form_object.customer_party_role_id)&.id
+    def set_show_fields
       customer_party_role_id_label = @repo.get(:party_roles, @form_object.customer_party_role_id, :id)
-      # season_id_label = ProductionApp::SeasonRepo.new.find_season(@form_object.season_id)&.season_code
-      # season_id_label = @repo.find(:seasons, ProductionApp::Season, @form_object.season_id)&.season_code
       season_id_label = @repo.get(:seasons, @form_object.season_id, :season_code)
       fields[:customer_party_role_id] = { renderer: :label, with_value: customer_party_role_id_label, caption: 'Customer Party Role' }
       fields[:season_id] = { renderer: :label, with_value: season_id_label, caption: 'Season' }
       fields[:order_number] = { renderer: :label }
       fields[:order_reference] = { renderer: :label }
-      fields[:carton_qty_required] = { renderer: :label }
-      fields[:carton_qty_produced] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
       fields[:completed] = { renderer: :label, as_boolean: true }
       fields[:completed_at] = { renderer: :label, format: :without_timezone_or_seconds }
@@ -57,8 +52,6 @@ module UiRules
                      prompt: true },
         order_number: { required: true },
         order_reference: { required: true },
-        carton_qty_required: { renderer: :integer, required: true },
-        carton_qty_produced: { renderer: :label },
         completed: { renderer: :label, as_boolean: true },
         completed_at: { disabled: true }
       }
@@ -78,18 +71,8 @@ module UiRules
                                     season_id: nil,
                                     order_number: nil,
                                     order_reference: nil,
-                                    carton_qty_required: nil,
-                                    carton_qty_produced: nil,
                                     completed: nil,
                                     completed_at: nil)
     end
-
-    # private
-
-    # def add_approve_behaviours
-    #   behaviours do |behaviour|
-    #     behaviour.enable :reject_reason, when: :approve_action, changes_to: ['r']
-    #   end
-    # end
   end
 end

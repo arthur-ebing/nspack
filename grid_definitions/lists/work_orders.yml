@@ -5,7 +5,7 @@
   :text: view
   :icon: view-show
   :title: false
-  :popup: true
+  :popup: false
 - :url: "/production/orders/work_orders/$:id$/edit"
   :text: edit
   :icon: edit
@@ -18,6 +18,10 @@
   :is_delete: true
   :popup: true
   :hide_if_true: completed
+- :url: "/list/view_work_order_items_list/with_params?key=standard&work_order_id=$:id$"
+  :text: items
+  :icon: list
+  :popup: true
 :conditions:
   :standard:
     - :col: work_orders.marketing_order_id

@@ -18,6 +18,40 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         show_partial_or_page(r) { Production::Orders::MarketingOrder::Edit.call(id) }
       end
 
+      r.on 'new_work_order' do   # rubocop:disable Metrics/BlockLength
+        r.get do
+          interactor.assert_permission!(:edit, id)
+          show_partial_or_page(r) { Production::Orders::WorkOrder::New.call(marketing_order_id: id, remote: fetch?(r)) }
+        end
+
+        r.post do
+          interactor = ProductionApp::WorkOrderInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+          res = interactor.create_work_order(params[:work_order])
+          if res.success
+            row_keys = %i[
+              id
+              marketing_order_id
+              start_date
+              end_date
+              active
+              completed
+              completed_at
+              order_number
+              status
+            ]
+            add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                         notice: res.message)
+          else
+            re_show_form(r, res, url: "/production/orders/marketing_orders/#{id}/new_work_order") do
+              Production::Orders::WorkOrder::New.call(form_values: params[:work_order],
+                                                      form_errors: res.errors,
+                                                      remote: fetch?(r),
+                                                      marketing_order_id: id)
+            end
+          end
+        end
+      end
+
       r.is do
         r.get do       # SHOW
           check_auth!('orders', 'read')
@@ -128,7 +162,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.is do
         r.get do       # SHOW
           check_auth!('orders', 'read')
-          show_partial { Production::Orders::WorkOrder::Show.call(id) }
+          show_partial_or_page(r) { Production::Orders::WorkOrder::Show.call(id) }
         end
         r.patch do     # UPDATE
           res = interactor.update_work_order(id, params[:work_order])
