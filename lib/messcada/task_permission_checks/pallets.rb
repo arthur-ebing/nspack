@@ -3,12 +3,13 @@
 module MesscadaApp
   module TaskPermissionCheck
     class Pallets < BaseService # rubocop:disable Metrics/ClassLength
-      attr_reader :tasks, :pallet_numbers, :repo, :load_id
+      attr_reader :tasks, :pallet_numbers, :pallet_ids, :repo, :load_id
       def initialize(tasks, pallet_numbers, load_id = nil)
         @tasks = Array(tasks)
         @repo = MesscadaRepo.new
         @inspection_repo = FinishedGoodsApp::GovtInspectionRepo.new
         @pallet_numbers = Array(pallet_numbers)
+        @pallet_ids = @repo.select_values(:pallets, :pallet_id, pallet_number: Array(pallet_numbers)).uniq
         @load_id = load_id
       end
 
@@ -51,7 +52,7 @@ module MesscadaApp
       private
 
       def exists_check
-        pallets_exists = repo.select_values(:pallets, :pallet_number, pallet_number: pallet_numbers)
+        pallets_exists = repo.select_values(:pallets, :pallet_number, pallet_id: pallet_ids)
         errors = pallet_numbers - pallets_exists
         return failed_response "Pallet: #{errors.join(', ')} doesn't exist." unless errors.empty?
 
@@ -59,28 +60,28 @@ module MesscadaApp
       end
 
       def not_scrapped_check
-        errors = repo.select_values(:pallets, :pallet_number, pallet_number: pallet_numbers, scrapped: true)
+        errors = repo.select_values(:pallets, :pallet_number, pallet_id: pallet_ids, scrapped: true)
         return failed_response "Pallet: #{errors.join(', ')} has been scrapped." unless errors.empty?
 
         all_ok
       end
 
       def not_shipped_check
-        errors = repo.select_values(:pallets, :pallet_number, pallet_number: pallet_numbers, shipped: true)
+        errors = repo.select_values(:pallets, :pallet_number, pallet_id: pallet_ids, shipped: true)
         return failed_response "Pallet: #{errors.join(', ')} already shipped." unless errors.empty?
 
         all_ok
       end
 
       def shipped_check
-        errors = repo.select_values(:pallets, :pallet_number, pallet_number: pallet_numbers, shipped: false)
+        errors = repo.select_values(:pallets, :pallet_number, pallet_id: pallet_ids, shipped: false)
         return failed_response "Pallet: #{errors.join(', ')} not shipped." unless errors.empty?
 
         all_ok
       end
 
       def in_stock_check
-        errors = repo.select_values(:pallets, :pallet_number, pallet_number: pallet_numbers, in_stock: false)
+        errors = repo.select_values(:pallets, :pallet_number, pallet_id: pallet_ids, in_stock: false)
         return failed_response "Pallet: #{errors.join(', ')} not in stock." unless errors.empty?
 
         all_ok
@@ -120,7 +121,7 @@ module MesscadaApp
         return all_ok unless repo.get(:loads, load_id, :rmt_load)
 
         not_rmt_grade_ids = repo.select_values(:grades, :id, rmt_grade: false)
-        errors = repo.select_values(:pallet_sequences, :pallet_number, pallet_number: pallet_numbers, grade_id: not_rmt_grade_ids).uniq
+        errors = repo.select_values(:pallet_sequences, :pallet_number, pallet_id: pallet_ids, grade_id: not_rmt_grade_ids).uniq
         return failed_response "Pallet: #{errors.join(', ')} does not have a RMT grade." unless errors.empty?
 
         all_ok
@@ -129,7 +130,7 @@ module MesscadaApp
       def not_failed_otmc_check
         return success_response('failed otmc check bypassed') if AppConst::BYPASS_QUALITY_TEST_LOAD_CHECK
 
-        passed_pallets = repo.select_values(:pallet_sequences, :pallet_number, pallet_number: pallet_numbers, failed_otmc_results: nil).uniq
+        passed_pallets = repo.select_values(:pallet_sequences, :pallet_number, pallet_id: pallet_ids, failed_otmc_results: nil).uniq
         errors = pallet_numbers - passed_pallets
         return failed_response "Pallet: #{errors.join(', ')} failed a OTMC test." unless errors.empty?
 
@@ -144,21 +145,21 @@ module MesscadaApp
       end
 
       def inspected_check
-        errors = @repo.select_values(:pallets, :pallet_number, pallet_number: pallet_numbers, inspected: false).uniq
+        errors = @repo.select_values(:pallets, :pallet_number, pallet_id: pallet_ids, inspected: false).uniq
         return failed_response "Pallet: #{errors.join(', ')}, not previously inspected." unless errors.empty?
 
         all_ok
       end
 
       def not_inspected_check
-        errors = @repo.select_values(:pallets, :pallet_number, pallet_number: pallet_numbers, inspected: true).uniq
+        errors = @repo.select_values(:pallets, :pallet_number, pallet_id: pallet_ids, inspected: true).uniq
         return failed_response "Pallet: #{errors.join(', ')}, has already been inspected." unless errors.empty?
 
         all_ok
       end
 
       def verification_passed_check
-        failed_pallets = @repo.select_values(:pallet_sequences, :pallet_number, pallet_number: pallet_numbers, verification_passed: false).uniq
+        failed_pallets = @repo.select_values(:pallet_sequences, :pallet_number, pallet_id: pallet_ids, verification_passed: false).uniq
         return failed_response "Pallet: #{failed_pallets.join(', ')}, verification not passed." unless failed_pallets.empty?
 
         all_ok
@@ -167,7 +168,7 @@ module MesscadaApp
       def pallet_weight_check
         return all_ok unless AppConst::PALLET_WEIGHT_REQUIRED_FOR_INSPECTION
 
-        errors = @repo.select_values(:pallets, :pallet_number, pallet_number: pallet_numbers, gross_weight: nil).uniq
+        errors = @repo.select_values(:pallets, :pallet_number, pallet_id: pallet_ids, gross_weight: nil).uniq
         return failed_response "Pallet: #{errors.join(', ')}, gross weight not filled." unless errors.empty?
 
         all_ok
@@ -193,7 +194,7 @@ module MesscadaApp
       end
 
       def not_have_individual_cartons_check
-        errors = repo.select_values(:pallets, :pallet_number, pallet_number: pallet_numbers, has_individual_cartons: true)
+        errors = repo.select_values(:pallets, :pallet_number, pallet_id: pallet_ids, has_individual_cartons: true)
         return failed_response "Pallet: #{errors.join(', ')} has individual cartons, ." unless errors.empty?
 
         all_ok
