@@ -9,7 +9,7 @@ module MesscadaApp
         @repo = MesscadaRepo.new
         @inspection_repo = FinishedGoodsApp::GovtInspectionRepo.new
         @pallet_numbers = Array(pallet_numbers)
-        @pallet_ids = @repo.select_values(:pallets, :pallet_id, pallet_number: Array(pallet_numbers)).uniq
+        @pallet_ids = @repo.select_values(:pallets, :id, pallet_number: Array(pallet_numbers)).uniq
         @load_id = load_id
       end
 
