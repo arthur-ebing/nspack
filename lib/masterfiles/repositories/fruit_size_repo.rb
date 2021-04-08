@@ -213,7 +213,7 @@ module MasterfilesApp
       DB[:std_fruit_size_counts].where(id: id).delete
     end
 
-    def find_fruit_actual_counts_for_pack(id)
+    def find_fruit_actual_counts_for_pack(id) # rubocop:disable Metrics/AbcSize
       hash = find_with_association(:fruit_actual_counts_for_packs, id,
                                    parent_tables: [{ parent_table: :std_fruit_size_counts,
                                                      columns: [:size_count_description],
@@ -232,6 +232,9 @@ module MasterfilesApp
 
       hash[:standard_packs] = hash[:standard_pack_codes].map { |r| r[:standard_pack_code] }.sort.join(',')
       hash[:size_references] = hash[:fruit_size_references].map { |r| r[:size_reference] }.sort.join(',')
+      hash[:standard_pack_code_ids] = hash[:standard_pack_code_ids].to_a
+      hash[:size_reference_ids] = hash[:size_reference_ids].to_a
+
       FruitActualCountsForPack.new(hash)
     end
 

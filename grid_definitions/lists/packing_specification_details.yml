@@ -1,0 +1,105 @@
+---
+:dataminer_definition: packing_specification_details
+:actions:
+- :url: "/production/packing_specifications/packing_specification_items/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+- :url: "/production/packing_specifications/wizard/setup?packing_specification_item_id=$:id$&product_setup_id=$:product_setup_id$&mode=edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :hide_if_true: in_production
+  :auth:
+    :function: production
+    :program: product setups
+    :permission: edit
+- :url: "/production/packing_specifications/wizard/setup?packing_specification_item_id=$:id$&product_setup_id=$:product_setup_id$&mode=edit"
+  :text: edit active run setup
+  :icon: edit
+  :title: Edit Active Run Setup
+  :prompt: Are you sure you want to Edit this Active Run Setup?
+  :hide_if_false: in_production
+  :auth:
+    :function: production
+    :program: product setups
+    :permission: edit
+- :url: "/production/packing_specifications/wizard/setup?packing_specification_item_id=$:id$&product_setup_id=$:product_setup_id$"
+  :text: clone
+  :icon: copy
+  :title: Clone
+  :auth:
+    :function: production
+    :program: product setups
+    :permission: edit
+- :url: "/production/packing_specifications/packing_specification_items/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+  :hide_if_true: in_production
+- :url: "/production/packing_specifications/packing_specification_items/$:id$/activate"
+  :text: activate
+  :icon: check-square
+  :prompt: Are you sure you want to Activate this Packing Specification?
+  :hide_if_true: active
+  :auth:
+    :function: production
+    :program: product setups
+    :permission: edit
+- :url: "/production/packing_specifications/packing_specification_items/$:id$/deactivate"
+  :text: de-activate
+  :icon: close-outline
+  :prompt: Are you sure you want to De-activate this Packing Specification?
+  :hide_if_false: active
+  :hide_if_true: in_production
+  :auth:
+    :function: production
+    :program: product setups
+    :permission: edit
+:captions:
+  :conditions:
+    :active: Active Packing Specification
+    :in_production: Packing Specification in Production
+:conditions:
+  :standard:
+  - :col: product_setup_template_id
+    :op: "="
+    :val: "$:product_setup_template_id$"
+  :active:
+  - :col: packing_specification_items.active
+    :op: "="
+    :val: "$:active$"
+  :in_production:
+  - :col: production_runs.running
+    :op: "="
+    :val: "$:in_production$"
+:hide_for_client:
+  hb:
+  - bom_code
+  - fg_marks
+  - gtin_code
+  um:
+  - bom_code
+  - fg_marks
+  - gtin_code
+  ud:
+  - bom_code
+  - fg_marks
+  - gtin_code
+  sr:
+  - bom_code
+  - fg_marks
+  - gtin_code
+  srp:
+  - bom_code
+  - fg_marks
+  - gtin_code
+  hl:
+  - bom_code
+  - fg_marks
+  - gtin_code
+  sr2:
+  - bom_code
+  - fg_marks
+  - gtin_code

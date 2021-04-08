@@ -6,16 +6,14 @@
   :icon: view-show
   :title: View
   :popup: true
-- :url: "/production/packing_specifications/packing_specification_items/$:id$/edit"
+- :url: "/production/packing_specifications/wizard/setup?packing_specification_item_id=$:id$&product_setup_id=$:product_setup_id$&mode=edit"
   :text: edit
   :icon: edit
   :title: Edit
-  :popup: true
-- :url: "/production/packing_specifications/packing_specification_items/$:id$/clone"
+- :url: "/production/packing_specifications/wizard/setup?packing_specification_item_id=$:id$&product_setup_id=$:product_setup_id$"
   :text: clone
   :icon: copy
   :title: Clone
-  :popup: true
 - :url: "/production/packing_specifications/packing_specification_items/$:id$"
   :text: delete
   :icon: delete
@@ -36,19 +34,13 @@
   :icon: information-solid
   :title: Status
   :popup: true
-:page_controls:
-- :control_type: :link
-  :url: "/production/packing_specifications/packing_specification_items/new"
-  :text: New Packing Specification Item
-  :style: :button
-  :behaviour: :popup
-- :control_type: :link
-  :url: "/production/packing_specifications/packing_specification_items/refresh"
-  :text: Refresh Packing Specification Items
-  :style: :button
 :conditions:
   :product_setup:
     - :col: packing_specification_items.product_setup_id
+      :op: "="
+      :val: "$:id$"
+  :product_setup_template:
+    - :col: product_setups.product_setup_template_id
       :op: "="
       :val: "$:id$"
 :edit_rules:

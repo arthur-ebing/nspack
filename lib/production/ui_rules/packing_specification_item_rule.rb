@@ -9,17 +9,25 @@ module UiRules
       make_form_object
       apply_form_values
 
-      common_values_for_fields common_fields
-
       set_show_fields if %i[show].include? @mode
-      add_behaviours if %i[new edit].include? @mode
+
+      if %i[new edit].include? @mode
+        common_values_for_fields common_fields
+        add_behaviours
+      end
 
       form_name 'packing_specification_item'
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      fields[:product_setup] = { renderer: :label,  caption: 'Product Setup' }
-      fields[:description] = { renderer: :label }
+      form_object_merge!(@setup_repo.find_product_setup(@form_object.product_setup_id))
+      form_object_merge!(@repo.extend_packing_specification(@form_object))
+      @form_object.to_h.each do |k, _|
+        fields[k] = { renderer: :label }
+      end
+
+      fields[:packed_tm_group] = { renderer: :label, caption: 'Packed TM Group' }
+      fields[:pallet_label_name] = { renderer: :label, caption: 'Pallet Label' }
       fields[:pm_bom] = { renderer: :label,  caption: 'PKG BOM' }
       fields[:pm_mark] = { renderer: :label,  caption: 'PKG Mark' }
       fields[:tu_labour_product] = { renderer: :label, caption: 'TU Labour Product' }
@@ -28,7 +36,6 @@ module UiRules
       fields[:fruit_stickers] = { renderer: :label, caption: 'Fruit Stickers' }
       fields[:tu_stickers] = { renderer: :label, caption: 'TU Stickers' }
       fields[:ru_stickers] = { renderer: :label, caption: 'RU Stickers' }
-      fields[:active] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize
@@ -126,7 +133,7 @@ module UiRules
         return
       end
 
-      @form_object = @repo.find_packing_specification_item(@options[:id])
+      form_object_merge!(@repo.find_packing_specification_item(@options[:id]))
     end
 
     def make_new_form_object
@@ -151,6 +158,12 @@ module UiRules
       behaviours do |behaviour|
         behaviour.dropdown_change :product_setup_template_id, notify: [{ url: '/production/packing_specifications/packing_specification_items/product_setup_template_changed' }]
         behaviour.dropdown_change :product_setup_id, notify: [{ url: '/production/packing_specifications/packing_specification_items/product_setup_changed' }]
+      end
+    end
+
+    def form_object_merge!(params)
+      params.to_h.each do |k, v|
+        @form_object[k] = v
       end
     end
   end

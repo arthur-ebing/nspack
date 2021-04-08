@@ -70,12 +70,11 @@ module ProductionApp
     def activate_product_setup_template(id)
       repo.transaction do
         repo.activate_product_setup_template(id)
-        log_status('product_setup_templates', id, 'ACTIVATED')
+        log_status(:product_setup_templates, id, 'ACTIVATED')
         log_transaction
       end
       instance = product_setup_template(id)
-      success_response("Activated product setup template #{instance.template_name}",
-                       instance)
+      success_response("Activated product setup template #{instance.template_name}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -83,12 +82,11 @@ module ProductionApp
     def deactivate_product_setup_template(id)
       repo.transaction do
         repo.deactivate_product_setup_template(id)
-        log_status('product_setup_templates', id, 'DEACTIVATED')
+        log_status(:product_setup_templates, id, 'DEACTIVATED')
         log_transaction
       end
       instance = product_setup_template(id)
-      success_response("De-activated product setup template #{instance.template_name}",
-                       instance)
+      success_response("De-activated product setup template #{instance.template_name}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

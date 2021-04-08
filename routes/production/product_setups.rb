@@ -22,7 +22,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.on 'manage' do   # EDIT
         check_auth!('product setups', 'edit')
         interactor.assert_permission!(:edit, id)
-        show_partial_or_page(r) { Production::ProductSetups::ProductSetupTemplate::Manage.call(id, back_url: back_button_url) }
+        show_partial_or_page(r) { Production::ProductSetups::ProductSetupTemplate::Manage.call(id) }
       end
 
       r.on 'activate' do

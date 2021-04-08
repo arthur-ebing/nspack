@@ -2,27 +2,26 @@
 :caption: Packing Specification Items
 :sql: "SELECT\r\n    packing_specification_items.id,\r\n    product_setups.product_setup_template_id,\r\n
   \   product_setup_templates.template_name AS packing_specification,\r\n    packing_specification_items.product_setup_id,\r\n
-  \   fn_product_setup_code(packing_specification_items.product_setup_id) AS product_setup,\r\n
-  \   packing_specification_items.description,\r\n    packing_specification_items.legacy_data
+  \   fn_product_setup_code(packing_specification_items.product_setup_id) AS product_setup,\r\n\r\n
+  \   packing_specification_items.pm_bom_id,\r\n    pm_boms.bom_code AS pm_bom,\r\n
+  \   packing_specification_items.pm_mark_id,\r\n    marks.mark_code ||'_'|| array_to_string(pm_marks.packaging_marks,
+  '_') AS pm_mark,\r\n\r\n    packing_specification_items.description,\r\n    packing_specification_items.legacy_data
   \ ->> 'extended_fg_code' AS extended_fg_code,\r\n    packing_specification_items.legacy_data
-  \ ->> 'extended_fg_id' AS extended_fg_id,\r\n    packing_specification_items.pm_bom_id,\r\n
-  \   pm_boms.bom_code AS pm_bom,\r\n    packing_specification_items.pm_mark_id,\r\n
-  \   marks.mark_code ||'_'|| array_to_string(pm_marks.packaging_marks, '_') AS pm_mark,\r\n\r\n
-  \   pm_products_tu.product_code AS tu_labour_product,\r\n    pm_products_ru.product_code
-  AS ru_labour_product,\r\n    pm_products_ri.product_code AS ri_labour_product,\r\n\r\n
-  \   (SELECT product_code FROM pm_products WHERE pm_products.id = fruit_sticker_ids[1]
-  ) AS fruit_sticker_1,\r\n    (SELECT product_code FROM pm_products WHERE pm_products.id
-  = fruit_sticker_ids[2] ) AS fruit_sticker_2,\r\n\r\n    (SELECT product_code FROM
-  pm_products WHERE pm_products.id = tu_sticker_ids[1] ) AS tu_sticker_1,\r\n    (SELECT
-  product_code FROM pm_products WHERE pm_products.id = tu_sticker_ids[2] ) AS tu_sticker_2,\r\n\r\n
-  \   (SELECT product_code FROM pm_products WHERE pm_products.id = ru_sticker_ids[1]
-  ) AS ru_sticker_1,\r\n    (SELECT product_code FROM pm_products WHERE pm_products.id
-  = ru_sticker_ids[2] ) AS ru_sticker_2,\r\n\r\n    packing_specification_items.active,\r\n
-  \   packing_specification_items.created_at,\r\n    packing_specification_items.updated_at,\r\n
-  \   fn_current_status('packing_specification_items', packing_specification_items.id)
-  AS status\r\n\r\nFROM packing_specification_items\r\n         JOIN product_setups
-  ON packing_specification_items.product_setup_id = product_setups.id\r\n         JOIN
-  product_setup_templates ON product_setup_templates.id = product_setups.product_setup_template_id\r\n
+  \ ->> 'extended_fg_id' AS extended_fg_id,\r\n\r\n    pm_products_tu.product_code
+  AS tu_labour_product,\r\n    pm_products_ru.product_code AS ru_labour_product,\r\n
+  \   pm_products_ri.product_code AS ri_labour_product,\r\n\r\n    (SELECT product_code
+  FROM pm_products WHERE pm_products.id = fruit_sticker_ids[1] ) AS fruit_sticker_1,\r\n
+  \   (SELECT product_code FROM pm_products WHERE pm_products.id = fruit_sticker_ids[2]
+  ) AS fruit_sticker_2,\r\n\r\n    (SELECT product_code FROM pm_products WHERE pm_products.id
+  = tu_sticker_ids[1] ) AS tu_sticker_1,\r\n    (SELECT product_code FROM pm_products
+  WHERE pm_products.id = tu_sticker_ids[2] ) AS tu_sticker_2,\r\n\r\n    (SELECT product_code
+  FROM pm_products WHERE pm_products.id = ru_sticker_ids[1] ) AS ru_sticker_1,\r\n
+  \   (SELECT product_code FROM pm_products WHERE pm_products.id = ru_sticker_ids[2]
+  ) AS ru_sticker_2,\r\n\r\n    packing_specification_items.active,\r\n    packing_specification_items.created_at,\r\n
+  \   packing_specification_items.updated_at,\r\n    fn_current_status('packing_specification_items',
+  packing_specification_items.id) AS status\r\n\r\nFROM packing_specification_items\r\n
+  \        JOIN product_setups ON packing_specification_items.product_setup_id = product_setups.id\r\n
+  \        JOIN product_setup_templates ON product_setup_templates.id = product_setups.product_setup_template_id\r\n
   \        LEFT JOIN pm_boms ON pm_boms.id = packing_specification_items.pm_bom_id\r\n
   \        LEFT JOIN pm_marks ON pm_marks.id = packing_specification_items.pm_mark_id\r\n
   \        LEFT JOIN marks ON marks.id = pm_marks.mark_id\r\n         LEFT JOIN pm_products
@@ -114,57 +113,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  description:
-    :name: description
-    :sequence_no: 6
-    :caption: Description
-    :namespaced_name: packing_specification_items.description
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  extended_fg_code:
-    :name: extended_fg_code
-    :sequence_no: 7
-    :caption: Extended FG code
-    :namespaced_name: 
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  extended_fg_id:
-    :name: extended_fg_id
-    :sequence_no: 8
-    :caption: Extended FG id
-    :namespaced_name: 
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   pm_bom_id:
     :name: pm_bom_id
-    :sequence_no: 9
+    :sequence_no: 6
     :caption: PKG BOM id
     :namespaced_name: packing_specification_items.pm_bom_id
     :data_type: :integer
@@ -180,7 +131,7 @@
     :group_max: false
   pm_bom:
     :name: pm_bom
-    :sequence_no: 10
+    :sequence_no: 7
     :caption: PKG BOM
     :namespaced_name: pm_boms.bom_code
     :data_type: :string
@@ -196,7 +147,7 @@
     :group_max: false
   pm_mark_id:
     :name: pm_mark_id
-    :sequence_no: 11
+    :sequence_no: 8
     :caption: PKG Mark id
     :namespaced_name: packing_specification_items.pm_mark_id
     :data_type: :integer
@@ -212,8 +163,56 @@
     :group_max: false
   pm_mark:
     :name: pm_mark
-    :sequence_no: 12
+    :sequence_no: 9
     :caption: PKG Mark
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  description:
+    :name: description
+    :sequence_no: 10
+    :caption: Description
+    :namespaced_name: packing_specification_items.description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  extended_fg_code:
+    :name: extended_fg_code
+    :sequence_no: 11
+    :caption: Extended FG code
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  extended_fg_id:
+    :name: extended_fg_id
+    :sequence_no: 12
+    :caption: Extended FG id
     :namespaced_name: 
     :data_type: :string
     :width: 
@@ -475,3 +474,11 @@
   :ordered_list: true
   :ui_priority: 1
   :list_def: SELECT product_code, id FROM pm_products ORDER BY product_code
+- :column: product_setups.product_setup_template_id
+  :caption: Packing Specification Template Id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

@@ -14,6 +14,15 @@
     :function: production
     :program: product setups
     :permission: edit
+- :url: "/production/packing_specifications/wizard/setup?&product_setup_id=$:id$&mode=edit"
+  :text: edit wizard
+  :icon: edit
+  :title: Edit
+  :hide_if_true: in_production
+  :auth:
+    :function: production
+    :program: product setups
+    :permission: edit
 - :url: "/production/product_setups/product_setups/$:id$/edit_active_run_setup"
   :text: edit active run setup
   :icon: edit
@@ -24,8 +33,26 @@
     :function: production
     :program: product setups
     :permission: edit
+- :url: "/production/packing_specifications/wizard/setup?&product_setup_id=$:id$&mode=edit"
+  :text: edit active run setup wizard
+  :icon: edit
+  :title: Edit Active Run Setup
+  :prompt: Are you sure you want to Edit this Active Run Setup?
+  :hide_if_false: in_production
+  :auth:
+    :function: production
+    :program: product setups
+    :permission: edit
 - :url: "/production/product_setups/product_setups/$:id$/clone"
   :text: clone
+  :icon: copy
+  :title: Clone
+  :auth:
+    :function: production
+    :program: product setups
+    :permission: edit
+- :url: "/production/packing_specifications/wizard/setup?&product_setup_id=$:id$"
+  :text: clone wizard
   :icon: copy
   :title: Clone
   :auth:
@@ -61,6 +88,10 @@
 - :control_type: :link
   :url: "/production/product_setups/product_setup_templates/$:product_setups.product_setup_template_id$/product_setups/new"
   :text: New Product Setup
+  :style: :button
+- :control_type: :link
+  :url: "/production/packing_specifications/wizard/setup?product_setup_template_id=$:product_setups.product_setup_template_id$"
+  :text: New Product Setup Wizard
   :style: :button
 :captions:
   :conditions:

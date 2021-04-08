@@ -1,11 +1,21 @@
 # frozen_string_literal: true
 
 module ProductionApp
-  class PackingSpecificationItemInteractor < BaseInteractor
-    def refresh_packing_specification_items
-      repo.transaction do
-        repo.refresh_packing_specification_items(@user)
-        log_transaction
+  class PackingSpecificationItemInteractor < BaseInteractor  # rubocop:disable Metrics/ClassLength
+    def refresh_packing_specification_items # rubocop:disable Metrics/AbcSize
+      repo.select_values(:product_setup_templates, :id).each do |product_setup_template_id|
+        product_setup_ids = repo.select_values(:product_setups,
+                                               :id,
+                                               { product_setup_template_id: product_setup_template_id })
+        existing_ids = repo.select_values(:packing_specification_items,
+                                          :product_setup_id)
+        (product_setup_ids - existing_ids).each do |product_setup_id|
+          create_packing_specification_item(
+            product_setup_id: product_setup_id,
+            pm_bom_id: repo.get(:product_setups, product_setup_id, :pm_bom_id),
+            pm_mark_id: repo.get(:product_setups, product_setup_id, :pm_mark_id)
+          )
+        end
       end
       success_response('Created packing specification items')
     rescue Crossbeams::InfoError => e
@@ -19,7 +29,7 @@ module ProductionApp
       id = nil
       repo.transaction do
         id = repo.create_packing_specification_item(res)
-        check!(:duplicates, id)
+        check!(:create, id)
         ProductionApp::Job::CalculateExtendedFgCodesForPackingSpecs.enqueue(id) if AppConst::CR_FG.lookup_extended_fg_code?
 
         log_status(:packing_specification_items, id, 'CREATED')
@@ -28,7 +38,7 @@ module ProductionApp
       instance = packing_specification_item(id)
       success_response("Created packing specification item #{instance.description}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { description: ['This packing specification item already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { pm_bom_id: ['This packing specification item already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -39,7 +49,7 @@ module ProductionApp
 
       repo.transaction do
         repo.update_packing_specification_item(id, res)
-        check!(:duplicates, id)
+        check!(:edit, id)
         ProductionApp::Job::CalculateExtendedFgCodesForPackingSpecs.enqueue(id) if AppConst::CR_FG.lookup_extended_fg_code?
 
         log_transaction
@@ -53,7 +63,7 @@ module ProductionApp
     def inline_update_packing_specification_item(id, params)
       repo.transaction do
         repo.inline_update_packing_specification_item(id, params)
-        check!(:duplicates, id)
+        check!(:edit, id)
 
         log_transaction
       end
@@ -76,6 +86,30 @@ module ProductionApp
       failed_response(e.message)
     rescue Sequel::ForeignKeyConstraintViolation => e
       failed_response("Unable to delete packing specification item. It is still referenced#{e.message.partition('referenced').last}")
+    end
+
+    def activate_packing_specification_item(id)
+      repo.transaction do
+        repo.activate(:packing_specification_items, id)
+        log_status(:packing_specification_items, id, 'ACTIVATED')
+        log_transaction
+      end
+      instance = packing_specification_item(id)
+      success_response("Activated packing specification item #{instance.description}", instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def deactivate_packing_specification_item(id)
+      repo.transaction do
+        repo.deactivate(:packing_specification_items, id)
+        log_status(:packing_specification_items, id, 'DEACTIVATED')
+        log_transaction
+      end
+      instance = packing_specification_item(id)
+      success_response("De-activated packing specification item #{instance.description}", instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def refresh_extended_fg_code(id)
@@ -107,6 +141,10 @@ module ProductionApp
 
     def for_select_packing_spec_pm_boms(where: {})
       MasterfilesApp::BomRepo.new.for_select_packing_spec_pm_boms(where: where).map { |row| row[0] }.unshift('')
+    end
+
+    def stepper(step_key)
+      @stepper ||= PackingSpecificationWizardStepper.new(step_key, @user, @context.request_ip)
     end
 
     private

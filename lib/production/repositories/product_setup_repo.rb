@@ -2,9 +2,16 @@
 
 module ProductionApp
   class ProductSetupRepo < BaseRepo # rubocop:disable Metrics/ClassLength
-    build_for_select :product_setup_templates, label: :template_name, value: :id, order_by: :template_name
-    build_inactive_select :product_setup_templates, label: :template_name, value: :id, order_by: :template_name
+    build_for_select :product_setup_templates,
+                     label: :template_name,
+                     value: :id,
+                     order_by: :template_name
+    build_inactive_select :product_setup_templates,
+                          label: :template_name,
+                          value: :id,
+                          order_by: :template_name
     crud_calls_for :product_setup_templates, name: :product_setup_template
+    crud_calls_for :product_setups, name: :product_setup, exclude: [:delete]
 
     def for_select_product_setups(where: {}, active: true)
       DB[:product_setups]
@@ -18,32 +25,31 @@ module ProductionApp
       for_select_product_setups(where: where, active: false)
     end
 
-    crud_calls_for :product_setups, name: :product_setup
-
     def find_product_setup_template(id)
-      find_with_association(:product_setup_templates,
-                            id,
-                            parent_tables: [{ parent_table: :cultivar_groups,
-                                              columns: [:cultivar_group_code],
-                                              flatten_columns: { cultivar_group_code: :cultivar_group_code } },
-                                            { parent_table: :cultivars,
-                                              columns: [:cultivar_name],
-                                              flatten_columns: { cultivar_name: :cultivar_name } },
-                                            { parent_table: :plant_resources,
-                                              columns: [:plant_resource_code],
-                                              foreign_key: :packhouse_resource_id,
-                                              flatten_columns: { plant_resource_code: :packhouse_resource_code } },
-                                            { parent_table: :plant_resources,
-                                              columns: [:plant_resource_code],
-                                              foreign_key: :production_line_id,
-                                              flatten_columns: { plant_resource_code: :production_line_code } },
-                                            { parent_table: :season_groups,
-                                              columns: [:season_group_code],
-                                              flatten_columns: { season_group_code: :season_group_code } },
-                                            { parent_table: :seasons,
-                                              columns: [:season_code],
-                                              flatten_columns: { season_code: :season_code } }],
-                            wrapper: ProductSetupTemplate)
+      find_with_association(
+        :product_setup_templates, id,
+        parent_tables: [{ parent_table: :cultivar_groups,
+                          columns: [:cultivar_group_code],
+                          flatten_columns: { cultivar_group_code: :cultivar_group_code } },
+                        { parent_table: :cultivars,
+                          columns: [:cultivar_name],
+                          flatten_columns: { cultivar_name: :cultivar_name } },
+                        { parent_table: :plant_resources,
+                          columns: [:plant_resource_code],
+                          foreign_key: :packhouse_resource_id,
+                          flatten_columns: { plant_resource_code: :packhouse_resource_code } },
+                        { parent_table: :plant_resources,
+                          columns: [:plant_resource_code],
+                          foreign_key: :production_line_id,
+                          flatten_columns: { plant_resource_code: :production_line_code } },
+                        { parent_table: :season_groups,
+                          columns: [:season_group_code],
+                          flatten_columns: { season_group_code: :season_group_code } },
+                        { parent_table: :seasons,
+                          columns: [:season_code],
+                          flatten_columns: { season_code: :season_code } }],
+        wrapper: ProductSetupTemplate
+      )
     end
 
     def find_product_setup(id)
@@ -76,7 +82,7 @@ module ProductionApp
         ).map { |r| [r[:plant_resource_code], r[:id]] }
     end
 
-    def for_select_packhouse_lines(packhouse_id)  # rubocop:disable Metrics/AbcSize
+    def for_select_packhouse_lines(packhouse_id) # rubocop:disable Metrics/AbcSize
       DB[:plant_resources]
         .join(:tree_plant_resources, descendant_plant_resource_id: :id)
         .join(:plant_resource_types, id: Sequel[:plant_resources][:plant_resource_type_id])
@@ -89,7 +95,7 @@ module ProductionApp
         ).map { |r| [r[:plant_resource_code], r[:id]] }
     end
 
-    def for_select_template_cultivar_commodities(cultivar_group_id, cultivar_id)  # rubocop:disable Metrics/AbcSize
+    def for_select_template_cultivar_commodities(cultivar_group_id, cultivar_id) # rubocop:disable Metrics/AbcSize
       DB[:product_setup_templates]
         .join(:cultivar_groups, id: :cultivar_group_id)
         .join(:cultivars, cultivar_group_id: :id)
@@ -105,7 +111,7 @@ module ProductionApp
         .map { |r| [r[:code], r[:id]] }
     end
 
-    def get_commodity_id(cultivar_group_id, cultivar_id)  # rubocop:disable Metrics/AbcSize
+    def get_commodity_id(cultivar_group_id, cultivar_id) # rubocop:disable Metrics/AbcSize
       DB[:product_setup_templates]
         .join(:cultivar_groups, id: :cultivar_group_id)
         .join(:cultivars, cultivar_group_id: :id)
@@ -142,9 +148,9 @@ module ProductionApp
         SELECT treatments.treatment_code
         FROM product_setups
         JOIN treatments ON treatments.id = ANY (product_setups.treatment_ids)
-        WHERE product_setups.id = #{id}
+        WHERE product_setups.id = ?
       SQL
-      DB[query].order(:treatment_code).select_map(:treatment_code)
+      DB[query, id].order(:treatment_code).select_map(:treatment_code)
     end
 
     def activate_product_setup_template(id)
@@ -182,6 +188,11 @@ module ProductionApp
 
     def deactivate_product_setup(id)
       deactivate(:product_setups, id)
+    end
+
+    def delete_product_setup(id)
+      DB[:packing_specification_items].where(product_setup_id: id).delete
+      delete(:product_setups, id)
     end
 
     def clone_product_setup_template(id, args)
@@ -291,6 +302,8 @@ module ProductionApp
     end
 
     def find_setup_std_fruit_size_count_id(fruit_size_reference_id, fruit_actual_counts_for_pack_id)
+      return nil unless fruit_size_reference_id && fruit_actual_counts_for_pack_id
+
       query = <<~SQL
         SELECT std_fruit_size_count_id
         FROM fruit_actual_counts_for_packs
@@ -317,7 +330,7 @@ module ProductionApp
       DB[:gtins].where(id: id).get(:gtin_code)
     end
 
-    def for_select_cultivar_group_marketing_varieties(cultivar_group_id)  # rubocop:disable Metrics/AbcSize
+    def for_select_cultivar_group_marketing_varieties(cultivar_group_id) # rubocop:disable Metrics/AbcSize
       DB[:marketing_varieties]
         .join(:marketing_varieties_for_cultivars, marketing_variety_id: :id)
         .join(:cultivars, id: :cultivar_id)
@@ -443,6 +456,16 @@ module ProductionApp
       fg_code_components << prod_setup_organisation(prod_setup[:id])
       fg_code_components << packing_specification_item_fg_marks(packing_specification_item_id).reverse.join(packaging_marks_join)
       fg_code_components.join('_')
+    end
+
+    def lookup_existing_product_setup_id(res)
+      args = res.to_h
+      treatment_ids = args.delete(:treatment_ids)
+
+      select_values(:product_setups, %i[id treatment_ids], args).each do |id, check_ids|
+        return id if Array(check_ids).to_set == Array(treatment_ids).to_set
+      end
+      nil
     end
   end
 end

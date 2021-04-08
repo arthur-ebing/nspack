@@ -13,6 +13,22 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         handle_not_found(r)
       end
 
+      r.on 'activate' do
+        check_auth!('packing specifications', 'edit')
+        interactor.assert_permission!(:activate, id)
+        res = interactor.activate_packing_specification_item(id)
+        flash[res.success ? :notice : :error] = res.message
+        r.redirect request.referer
+      end
+
+      r.on 'deactivate' do
+        check_auth!('packing specifications', 'edit')
+        interactor.assert_permission!(:deactivate, id)
+        res = interactor.deactivate_packing_specification_item(id)
+        flash[res.success ? :notice : :error] = res.message
+        r.redirect request.referer
+      end
+
       r.on 'refresh_extended_fg_code' do
         res = interactor.refresh_extended_fg_code(id)
         flash[res.success ? :notice : :error] = res.message
@@ -81,41 +97,9 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.is do
         r.get do       # SHOW
           check_auth!('packing specifications', 'read')
-          show_partial { Production::PackingSpecifications::PackingSpecificationItem::Show.call(id) }
+          show_partial_or_page(r) { Production::PackingSpecifications::PackingSpecification::Show.call(id, back_url: back_button_url) }
         end
-        r.patch do     # UPDATE
-          res = interactor.update_packing_specification_item(id, params[:packing_specification_item])
-          if res.success
-            row_keys = %i[
-              description
-              pm_bom_id
-              pm_bom
-              pm_mark_id
-              pm_mark
-              product_setup_id
-              product_setup
-              tu_labour_product
-              ru_labour_product
-              ri_labour_product
-              fruit_sticker_1
-              fruit_sticker_2
-              tu_sticker_1
-              tu_sticker_2
-              ru_sticker_1
-              ru_sticker_2
-              status
-            ]
-            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
-          else
-            re_show_form(r, res) do
-              Production::PackingSpecifications::PackingSpecificationItem::Edit.call(
-                id,
-                form_values: params[:packing_specification_item],
-                form_errors: res.errors
-              )
-            end
-          end
-        end
+
         r.delete do    # DELETE
           check_auth!('packing specifications', 'delete')
           interactor.assert_permission!(:delete, id)
@@ -159,22 +143,101 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         flash[res.success ? :notice : :error] = res.message
         r.redirect '/list/packing_specification_items'
       end
+    end
 
-      r.on 'new' do    # NEW
-        check_auth!('packing specifications', 'new')
-        show_partial_or_page(r) { Production::PackingSpecifications::PackingSpecificationItem::New.call(form_values: params, remote: fetch?(r)) }
+    # PACKING SPECIFICATION WIZARD
+    # --------------------------------------------------------------------------
+    r.on 'wizard' do
+      interactor = ProductionApp::PackingSpecificationItemInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      setup_interactor = ProductionApp::ProductSetupInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      stepper = interactor.stepper(:packing_specification_wizard)
+
+      r.on 'change', String, String, String do |change_rule, change_mode, change_field|
+        args = stepper.form_state.merge(params)
+        handle_ui_change(change_rule.to_sym, change_mode.to_sym, args, { field: change_field.to_sym })
       end
 
-      r.post do        # CREATE
-        res = interactor.create_packing_specification_item(params[:packing_specification_item])
+      r.on 'cancel' do
+        referer = stepper.referer
+        stepper.cancel
+
+        r.redirect referer
+      end
+
+      r.on 'setup' do
+        p params
+        stepper.setup(params.merge(referer: request.referer))
+        r.redirect '/production/packing_specifications/wizard'
+      end
+
+      r.on 'previous' do
+        stepper.previous
+        show_partial_or_page(r) do
+          stepper.form.call(
+            form_values: stepper.form_state
+          )
+        end
+      end
+
+      r.on 'new' do
+        res = stepper.current(params[:packing_specification_wizard])
+        params = stepper.form_state
         if res.success
-          flash[:notice] = res.message
-          redirect_via_json(request.referer || '/')
-        else
-          re_show_form(r, res, url: '/production/packing_specifications/packing_specification_items/new') do
-            Production::PackingSpecifications::PackingSpecificationItem::New.call(form_values: params[:packing_specification_item],
-                                                                                  form_errors: res.errors,
-                                                                                  remote: fetch?(r))
+          res = setup_interactor.create_product_setup(params)
+          if res.success
+            params[:product_setup_id] = res.instance.id
+            res = interactor.create_packing_specification_item(params) if AppConst::CR_PROD.use_packing_specifications?
+            if res.success
+              flash[:notice] = res.message
+              r.redirect stepper.referer
+            end
+          end
+        end
+        re_show_form(r, res, url: '/production/packing_specifications/wizard') do
+          stepper.form.call(form_values: params, form_errors: res.errors)
+        end
+      end
+
+      r.on 'edit' do
+        check_auth!('packing specifications', 'edit')
+        res = stepper.current(params[:packing_specification_wizard])
+        params = stepper.form_state
+        if res.success
+          res = setup_interactor.update_product_setup(params[:product_setup_id], params)
+          if res.success
+            params[:product_setup_id] = res.instance.id
+            res = interactor.update_packing_specification_item(params[:packing_specification_item_id], params) if AppConst::CR_PROD.use_packing_specifications?
+            if res.success
+              flash[:notice] = res.message
+              r.redirect stepper.referer
+            end
+          end
+        end
+        re_show_form(r, res, url: '/production/packing_specifications/wizard') do
+          stepper.form.call(form_values: params, form_errors: res.errors)
+        end
+      end
+
+      r.is do
+        r.get do
+          check_auth!('packing specifications', 'new')
+          stepper.current(params)
+          show_partial_or_page(r) do
+            stepper.form.call(form_values: stepper.form_state)
+          end
+        end
+
+        r.post do
+          res = stepper.current(params[:packing_specification_wizard])
+          if res.success
+            stepper.next
+            show_partial_or_page(r) do
+              stepper.form.call(form_values: stepper.current.instance)
+            end
+          else
+            re_show_form(r, res, url: '/production/packing_specifications/wizard') do
+              stepper.form.call(form_values: res.instance, form_errors: res.errors)
+            end
           end
         end
       end

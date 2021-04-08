@@ -277,6 +277,15 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
     DB[table_name].where(id: id).delete
   end
 
+  # Reactivate a record.
+  # Sets the +active+ column to true.
+  #
+  # @param table_name [Symbol] the db table name.
+  # @param id [Integer] the id of the record.
+  def activate(table_name, id)
+    DB[table_name].where(id: id).update(active: true)
+  end
+
   # Deactivate a record.
   # Sets the +active+ column to false.
   #

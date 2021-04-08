@@ -43,7 +43,7 @@ module UiRules
       @mode        = mode
       @authorizer  = authorizer
       @options     = options
-      @form_object = nil
+      @form_object = OpenStruct.new
       @inflector   = Dry::Inflector.new
       @rules       = { fields: {} }
       @params      = {}

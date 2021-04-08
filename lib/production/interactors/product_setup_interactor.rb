@@ -6,7 +6,10 @@ module ProductionApp
       res = validate_product_setup_params(params)
       return validation_failed_response(res) if res.failure?
 
-      id = nil
+      id = repo.lookup_existing_product_setup_id(res)
+      instance = product_setup(id)
+      return success_response("Found existing product setup #{instance.product_setup_code}", instance) if instance
+
       repo.transaction do
         id = repo.create_product_setup(res)
         log_status(:product_setups, id, 'CREATED')
