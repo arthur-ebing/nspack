@@ -26,7 +26,12 @@ module ProductionApp
       res = validate_packing_specification_item_params(params)
       return validation_failed_response(res) if res.failure?
 
-      id = nil
+      id = repo.look_for_existing_packing_specification_item_id(res)
+      if id
+        instance = packing_specification_item(id)
+        success_response("Found existing packing specification item #{instance.description}", instance)
+      end
+
       repo.transaction do
         id = repo.create_packing_specification_item(res)
         check!(:create, id)
@@ -46,6 +51,12 @@ module ProductionApp
     def update_packing_specification_item(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_packing_specification_item_params(params)
       return validation_failed_response(res) if res.failure?
+
+      existing_id = repo.look_for_existing_packing_specification_item_id(res)
+      if existing_id
+        instance = packing_specification_item(existing_id)
+        success_response("Found existing packing specification item #{instance.description}", instance)
+      end
 
       repo.transaction do
         repo.update_packing_specification_item(id, res)

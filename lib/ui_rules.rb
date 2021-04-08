@@ -43,7 +43,7 @@ module UiRules
       @mode        = mode
       @authorizer  = authorizer
       @options     = options
-      @form_object = OpenStruct.new
+      @form_object = nil
       @inflector   = Dry::Inflector.new
       @rules       = { fields: {} }
       @params      = {}
@@ -192,6 +192,17 @@ module UiRules
                           else
                             v
                           end
+      end
+    end
+
+    def form_object_merge!(params)
+      ok_type = { NilClass => true, Hash => true, OpenStruct => true }
+      raise Crossbeams::FrameworkError, 'Cannot call "form_object_merge!" - @form_object is not mutable' unless ok_type[@form_object.class]
+
+      @form_object ||= OpenStruct.new
+
+      params.to_h.each do |k, v|
+        @form_object[k] = v
       end
     end
   end

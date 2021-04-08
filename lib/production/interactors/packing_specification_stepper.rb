@@ -11,14 +11,14 @@ module ProductionApp
     def setup(opts = {}) # rubocop:disable Metrics/AbcSize
       clear
       form_state = opts
-      form_state[:mode] ||= 'new'
+      form_state[:mode] ||= :new
       form_state[:mode] = form_state[:mode].to_sym
       form_state.merge!(ProductionApp::ProductSetupRepo.new.find_product_setup(form_state[:product_setup_id]).to_h)
       form_state.merge!(ProductionApp::PackingSpecificationRepo.new.find_packing_specification_item(form_state[:packing_specification_item_id]).to_h)
 
       form_state[:step] ||= 0
       form_state[:steps] = %w[Fruit Marketing Treatments Pallet]
-      form_state[:steps] = %w[Fruit Marketing Treatments Pallet Packaging] if AppConst::CR_PROD.use_packing_specifications?
+      form_state[:steps] << 'Packaging' if AppConst::CR_PROD.use_packing_specifications?
       write(form_state)
     end
 
@@ -31,7 +31,7 @@ module ProductionApp
     end
 
     def step
-      [[0, form_state[:step]].max, max_step].min
+      [form_state[:step], max_step].min
     end
 
     def max_step
@@ -60,8 +60,21 @@ module ProductionApp
       @form_state ||= read || {}
     end
 
+    def form
+      forms = [
+        Production::PackingSpecifications::PackingSpecification::WizardFruit,
+        Production::PackingSpecifications::PackingSpecification::WizardMarketing,
+        Production::PackingSpecifications::PackingSpecification::WizardTreatment,
+        Production::PackingSpecifications::PackingSpecification::WizardPackaging,
+        Production::PackingSpecifications::PackingSpecification::WizardPackingSpecification
+      ]
+      forms[step]
+    end
+
+    private
+
     def res # rubocop:disable Metrics/AbcSize
-      extend_form_state
+      extend_form_state if step == max_step
 
       contracts = [
         ProductSetupWizardFruitContract,
@@ -70,8 +83,6 @@ module ProductionApp
         ProductSetupWizardPackagingContract,
         ProductSetupWizardPackingSpecificationContract
       ]
-      return success_response('Validation passed', form_state) if contracts[step].nil?
-
       res = contracts[step].new.call(form_state)
       form_state.merge!(res.to_h)
 
@@ -94,19 +105,6 @@ module ProductionApp
         form_state[:submit_caption] = 'Next'
       end
     end
-
-    def form
-      forms = [
-        Production::PackingSpecifications::PackingSpecification::WizardFruit,
-        Production::PackingSpecifications::PackingSpecification::WizardMarketing,
-        Production::PackingSpecifications::PackingSpecification::WizardTreatment,
-        Production::PackingSpecifications::PackingSpecification::WizardPackaging,
-        Production::PackingSpecifications::PackingSpecification::WizardPackingSpecification
-      ]
-      forms[step]
-    end
-
-    private
 
     def compact_header
       columns = %i[product_setup_template cultivar_group cultivar]

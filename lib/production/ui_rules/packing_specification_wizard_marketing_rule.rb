@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class PackingSpecificationWizardMarketingRule < Base # rubocop:disable Metrics/ClassLength
+  class PackingSpecificationWizardMarketingRule < Base
     def generate_rules
       form_name 'packing_specification_wizard'
 
@@ -68,13 +68,12 @@ module UiRules
       @marketing_repo = MasterfilesApp::MarketingRepo.new
 
       apply_form_values
-      form_object_merge!(@repo.extend_packing_specification(@form_object))
 
       @form_object[:marketing_org_party_role_id] ||= @party_repo.find_party_role_from_party_name_for_role(AppConst::CR_PROD.default_marketing_org, AppConst::ROLE_MARKETER)
-      @form_object
     end
 
     def make_header_table
+      form_object_merge!(@repo.extend_packing_specification(@form_object))
       compact_header(UtilityFunctions.symbolize_keys(@form_object.compact_header))
     end
 
@@ -99,7 +98,8 @@ module UiRules
       end
     end
 
-    def packed_tm_group_changed
+    def packed_tm_group_changed # rubocop:disable Metrics/AbcSize
+      form_object_merge!(params)
       @form_object[:packed_tm_group_id] = params[:changed_value].to_i
       @form_object[:marketing_variety_id] = params[:packing_specification_wizard_marketing_variety_id].to_i
       fields = common_fields
@@ -110,12 +110,6 @@ module UiRules
                     OpenStruct.new(type: :replace_select_options,
                                    dom_id: 'packing_specification_wizard_target_market_id',
                                    options_array: fields[:target_market_id][:options])])
-    end
-
-    def form_object_merge!(params)
-      params.to_h.each do |k, v|
-        @form_object[k] = v
-      end
     end
   end
 end

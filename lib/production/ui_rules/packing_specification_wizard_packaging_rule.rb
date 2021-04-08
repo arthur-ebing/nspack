@@ -53,11 +53,10 @@ module UiRules
       @repo = ProductionApp::PackingSpecificationRepo.new
       @packaging_repo = MasterfilesApp::PackagingRepo.new
       apply_form_values
-      form_object_merge!(@repo.extend_packing_specification(@form_object))
-      @form_object
     end
 
     def make_header_table
+      form_object_merge!(@repo.extend_packing_specification(@form_object))
       compact_header(UtilityFunctions.symbolize_keys(@form_object.compact_header))
     end
 
@@ -86,6 +85,7 @@ module UiRules
     end
 
     def pallet_stack_type_changed
+      form_object_merge!(params)
       @form_object[:pallet_stack_type_id] = params[:changed_value].to_i
       @form_object[:pallet_base_id] = params[:packing_specification_wizard_pallet_base_id].to_i
       fields = common_fields
@@ -96,7 +96,7 @@ module UiRules
     end
 
     def pallet_format_changed
-      p params
+      form_object_merge!(params)
       @form_object[:pallet_format_id] = params[:changed_value].to_i
       @form_object[:basic_pack_code_id] = params[:basic_pack_code_id].to_i
       fields = common_fields
@@ -104,12 +104,6 @@ module UiRules
       json_actions([OpenStruct.new(type: :replace_select_options,
                                    dom_id: 'packing_specification_wizard_cartons_per_pallet_id',
                                    options_array: fields[:cartons_per_pallet_id][:options])])
-    end
-
-    def form_object_merge!(params)
-      params.to_h.each do |k, v|
-        @form_object[k] = v
-      end
     end
   end
 end

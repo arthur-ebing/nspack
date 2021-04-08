@@ -83,20 +83,11 @@ module UiRules
       @repo = ProductionApp::PackingSpecificationRepo.new
       @bom_repo = MasterfilesApp::BomRepo.new
       apply_form_values
-      form_object_merge!(@repo.extend_packing_specification(@form_object))
-      @form_object
     end
 
     def make_header_table
+      form_object_merge!(@repo.extend_packing_specification(@form_object))
       compact_header(UtilityFunctions.symbolize_keys(@form_object.compact_header))
-    end
-
-    private
-
-    def form_object_merge!(params)
-      params.to_h.each do |k, v|
-        @form_object[k] = v
-      end
     end
   end
 end

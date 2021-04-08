@@ -22,7 +22,7 @@ module UiRules
     def set_show_fields # rubocop:disable Metrics/AbcSize
       form_object_merge!(@setup_repo.find_product_setup(@form_object.product_setup_id))
       form_object_merge!(@repo.extend_packing_specification(@form_object))
-      @form_object.to_h.each do |k, _|
+      @form_object.to_h.each_key do |k|
         fields[k] = { renderer: :label }
       end
 
@@ -155,15 +155,12 @@ module UiRules
     private
 
     def add_behaviours
+      url = '/production/packing_specifications/packing_specification_items'
       behaviours do |behaviour|
-        behaviour.dropdown_change :product_setup_template_id, notify: [{ url: '/production/packing_specifications/packing_specification_items/product_setup_template_changed' }]
-        behaviour.dropdown_change :product_setup_id, notify: [{ url: '/production/packing_specifications/packing_specification_items/product_setup_changed' }]
-      end
-    end
-
-    def form_object_merge!(params)
-      params.to_h.each do |k, v|
-        @form_object[k] = v
+        behaviour.dropdown_change :product_setup_template_id,
+                                  notify: [{ url: "#{url}/product_setup_template_changed" }]
+        behaviour.dropdown_change :product_setup_id,
+                                  notify: [{ url: "#{url}/product_setup_changed" }]
       end
     end
   end

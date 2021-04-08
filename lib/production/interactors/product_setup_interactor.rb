@@ -6,9 +6,11 @@ module ProductionApp
       res = validate_product_setup_params(params)
       return validation_failed_response(res) if res.failure?
 
-      id = repo.lookup_existing_product_setup_id(res)
-      instance = product_setup(id)
-      return success_response("Found existing product setup #{instance.product_setup_code}", instance) if instance
+      id = repo.look_for_existing_product_setup_id(res)
+      if id
+        instance = product_setup(id)
+        return success_response("Found existing product setup #{instance.product_setup_code}", instance)
+      end
 
       repo.transaction do
         id = repo.create_product_setup(res)
@@ -26,6 +28,12 @@ module ProductionApp
     def update_product_setup(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_product_setup_params(params)
       return validation_failed_response(res) if res.failure?
+
+      existing_id = repo.look_for_existing_product_setup_id(res)
+      if existing_id
+        instance = product_setup(existing_id)
+        return success_response("Found existing product setup #{instance.product_setup_code}", instance)
+      end
 
       repo.transaction do
         repo.update_product_setup(id, res)

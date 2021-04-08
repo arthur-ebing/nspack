@@ -458,7 +458,7 @@ module ProductionApp
       fg_code_components.join('_')
     end
 
-    def lookup_existing_product_setup_id(res)
+    def look_for_existing_product_setup_id(res)
       args = res.to_h
       treatment_ids = args.delete(:treatment_ids)
 

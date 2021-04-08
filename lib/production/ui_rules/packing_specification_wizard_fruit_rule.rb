@@ -99,10 +99,8 @@ module UiRules
       apply_form_values
       form_object_merge!(@repo.extend_packing_specification(@form_object))
 
-      @requires_standard_counts ||= @form_object.requires_standard_counts
+      @requires_standard_counts ||= @repo.get(:commodities, @form_object.commodity_id, :requires_standard_counts) || true
       @basic_equals_standard_pack = AppConst::CR_MF.basic_pack_equals_standard_pack?
-
-      @form_object
     end
 
     def make_header_table
@@ -143,8 +141,8 @@ module UiRules
     end
 
     def commodity_changed # rubocop:disable Metrics/AbcSize
+      form_object_merge!(params)
       @form_object[:commodity_id] = params[:changed_value].to_i
-      @form_object[:product_setup_template_id] = params[:product_setup_template_id].to_i
       fields = common_fields
 
       json_actions([OpenStruct.new(type: :replace_select_options,
@@ -157,12 +155,10 @@ module UiRules
                                    dom_id: 'packing_specification_wizard_std_fruit_size_count_id_field_wrapper'),
                     OpenStruct.new(type: fields[:fruit_actual_counts_for_pack_id][:hide_on_load] ? :hide_element : :show_element,
                                    dom_id: 'packing_specification_wizard_fruit_actual_counts_for_pack_id_field_wrapper')])
-      # OpenStruct.new(type: :set_required,
-      #                dom_id: 'packing_specification_wizard_fruit_size_reference_id',
-      #                required: fields[:fruit_size_reference_id][:required]))
     end
 
-    def basic_pack_changed
+    def basic_pack_changed # rubocop:disable Metrics/AbcSize
+      form_object_merge!(params)
       @form_object[:basic_pack_code_id] = params[:changed_value].to_i
       @form_object[:commodity_id] = params[:packing_specification_wizard_commodity_id].to_i
       @form_object[:std_fruit_size_count_id] = params[:packing_specification_wizard_std_fruit_size_count_id].to_i
@@ -173,7 +169,8 @@ module UiRules
                                    options_array: fields[:fruit_actual_counts_for_pack_id][:options])])
     end
 
-    def std_fruit_size_count_changed
+    def std_fruit_size_count_changed # rubocop:disable Metrics/AbcSize
+      form_object_merge!(params)
       @form_object[:std_fruit_size_count_id] = params[:changed_value].to_i
       @form_object[:commodity_id] = params[:packing_specification_wizard_commodity_id].to_i
       @form_object[:basic_pack_code_id] = params[:packing_specification_wizard_basic_pack_code_id].to_i
@@ -185,6 +182,7 @@ module UiRules
     end
 
     def actual_count_changed
+      form_object_merge!(params)
       @form_object[:fruit_actual_counts_for_pack_id] = params[:changed_value].to_i
       fields = common_fields
 
@@ -194,12 +192,6 @@ module UiRules
                     OpenStruct.new(type: :replace_select_options,
                                    dom_id: 'packing_specification_wizard_fruit_size_reference_id',
                                    options_array: fields[:fruit_size_reference_id][:options])])
-    end
-
-    def form_object_merge!(params)
-      params.to_h.each do |k, v|
-        @form_object[k] = v
-      end
     end
   end
 end

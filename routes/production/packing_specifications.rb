@@ -165,7 +165,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'setup' do
-        p params
         stepper.setup(params.merge(referer: request.referer))
         r.redirect '/production/packing_specifications/wizard'
       end

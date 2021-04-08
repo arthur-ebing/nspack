@@ -108,13 +108,9 @@ module ProductionApp
       update(:packing_specification_items, id, attrs)
     end
 
-    def get(table_name, id, column)
-      return nil if id.nil_or_empty?
-
-      DB[table_name].where(id: id.to_i).get(column)
-    end
-
     def extend_packing_specification(hash) # rubocop:disable Metrics/AbcSize
+      return nil if hash.nil?
+
       hash[:step] ||= 4
       product_setup_template = ProductionApp::ProductSetupRepo.new.find_product_setup_template(hash[:product_setup_template_id])
       hash[:product_setup_template] = get(:product_setup_templates, hash[:product_setup_template_id], :template_name)
@@ -126,7 +122,6 @@ module ProductionApp
       return hash if hash[:step] < 1
 
       hash[:commodity_id] ||= ProductionApp::ProductSetupRepo.new.get_commodity_id(hash[:cultivar_group_id], hash[:cultivar_id])
-      hash[:requires_standard_counts] ||= get(:commodities, hash[:commodity_id], :requires_standard_counts) || true
       hash[:commodity] = get(:commodities, hash[:commodity_id], :code)
       hash[:marketing_variety] = get(:marketing_varieties, hash[:marketing_variety_id], :marketing_variety_code)
       hash[:std_fruit_size_count] = MasterfilesApp::FruitSizeRepo.new.find_std_fruit_size_count(hash[:std_fruit_size_count_id])&.size_count_value
@@ -178,13 +173,13 @@ module ProductionApp
       code
     end
 
-    def lookup_existing_packing_specification_item_id(res) # rubocop:disable Metrics/AbcSize
+    def look_for_existing_packing_specification_item_id(res) # rubocop:disable Metrics/AbcSize
       args = res.to_h
       fruit_ids = args.delete(:fruit_sticker_ids)
       tu_ids = args.delete(:tu_sticker_ids)
       ru_ids = args.delete(:ru_sticker_ids)
 
-      select_values(:packing_specification_item, %i[id fruit_sticker_ids tu_sticker_ids ru_sticker_ids], args).each do |id, fruit, tu, ru|
+      select_values(:packing_specification_items, %i[id fruit_sticker_ids tu_sticker_ids ru_sticker_ids], args).each do |id, fruit, tu, ru|
         return id if (Array(fruit).to_set == Array(fruit_ids).to_set) && (Array(tu).to_set == Array(tu_ids).to_set) && (Array(ru).to_set == Array(ru_ids).to_set)
       end
       nil
