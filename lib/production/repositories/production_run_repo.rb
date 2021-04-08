@@ -101,6 +101,11 @@ module ProductionApp
       DB[query, id].first
     end
 
+    def find_carton_label_attrs_by_id(id)
+      query = MesscadaApp::DatasetCartonLabel.call('WHERE carton_labels.id = ?')
+      DB[query, id].first
+    end
+
     def find_pallet_sequence_attrs(pallet_id, seq_number)
       filters = ['WHERE pallet_sequences.pallet_id = ?']
       filters << '  AND pallet_sequences.pallet_sequence_number = ?'

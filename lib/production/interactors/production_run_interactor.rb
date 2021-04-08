@@ -271,6 +271,10 @@ module ProductionApp
       repo.find_pallet_sequence_attrs_by_id(id)
     end
 
+    def find_carton_label_attrs_by_id(id)
+      repo.find_carton_label_attrs_by_id(id)
+    end
+
     def find_pallet_sequence_attrs(pallet_id, seq_number)
       repo.find_pallet_sequence_attrs(pallet_id, seq_number)
     end
