@@ -418,18 +418,6 @@ module MesscadaApp
       JSON.parse(res.instance.body)
     end
 
-    # def create_pallet_and_sequences(pallet, pallet_sequence)
-    #   id = DB[:pallets].insert(pallet)
-    #
-    #   pallet_sequence = pallet_sequence.merge(pallet_params(id))
-    #   DB[:pallet_sequences].insert(pallet_sequence)
-    #
-    #   log_status('pallets', id, AppConst::PALLETIZED_NEW_PALLET)
-    #   # ProductionApp::RunStatsUpdateJob.enqueue(production_run_id, 'PALLET_CREATED')
-    #
-    #   { success: true }
-    # end
-
     def pallet_params(pallet_id)
       {
         pallet_id: pallet_id,
@@ -441,10 +429,6 @@ module MesscadaApp
       DB[:pallets].where(id: id).get(:pallet_number)
     end
 
-    # def find_rmt_container_type_tare_weight(rmt_container_type_id)
-    #   DB[:rmt_container_types].where(id: rmt_container_type_id).map { |o| o[:tare_weight] }.first
-    # end
-    #
     def get_rmt_bin_setup_reqs(bin_id)
       DB[<<~SQL, bin_id].first
         SELECT b.id, b.farm_id, b.orchard_id, b.cultivar_id
@@ -471,16 +455,6 @@ module MesscadaApp
       #   WHERE r.id = ?", run_id].first
     end
 
-    # def get_pallet_by_carton_label_id(carton_label_id)
-    #   pallet = DB["select p.pallet_number
-    #       from pallets p
-    #       join pallet_sequences ps on p.id = ps.pallet_id
-    #       join cartons c on c.id = ps.scanned_from_carton_id
-    #       join carton_labels cl on cl.id = c.carton_label_id
-    #       where cl.id = ?", carton_label_id].first
-    #   return pallet[:pallet_number] unless pallet.nil?
-    # end
-
     def get_pallet_sequence_id_from_carton_label(carton_label_id)
       pallet_sequence_id = carton_label_carton_palletizing_sequence(carton_label_id)
       pallet_sequence_id = carton_label_scanned_from_carton_sequence(carton_label_id) if pallet_sequence_id.nil?
@@ -488,16 +462,6 @@ module MesscadaApp
     end
 
     def find_pallet_by_carton_number(carton_label_id)
-      # FIXME: This is dodgy..... Returns pallet or a string...
-      # carton_equals_pallet = carton_label_carton_equals_pallet(carton_number)
-      # return carton_number if carton_equals_pallet
-      #
-      # pallet_sequence_id = if !carton_equals_pallet && AppConst::USE_CARTON_PALLETIZING
-      #                        get_value(:cartons, :pallet_sequence_id, carton_label_id: carton_number)
-      #                      else
-      #                        DB[:pallet_sequences].join(:cartons, id: :scanned_from_carton_id).where(carton_label_id: carton_number).select_map(Sequel[:pallet_sequences][:id]).first
-      #                      end
-
       pallet_sequence_id = get_pallet_sequence_id_from_carton_label(carton_label_id)
       pallet_id = get(:pallet_sequences, pallet_sequence_id, :pallet_id)
       find_pallet_flat(pallet_id)
