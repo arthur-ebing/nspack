@@ -14,26 +14,26 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'edit' do   # EDIT
-        check_auth!('product setups', 'edit')
+        check_auth!(['product setups', 'packing specifications'], 'edit')
         interactor.assert_permission!(:edit, id)
         show_partial_or_page(r) { Production::ProductSetups::ProductSetupTemplate::Edit.call(id) }
       end
 
       r.on 'manage' do   # EDIT
-        check_auth!('product setups', 'edit')
+        check_auth!(['product setups', 'packing specifications'], 'edit')
         interactor.assert_permission!(:edit, id)
         show_partial_or_page(r) { Production::ProductSetups::ProductSetupTemplate::Manage.call(id) }
       end
 
       r.on 'activate' do
-        check_auth!('product setups', 'edit')
+        check_auth!(['product setups', 'packing specifications'], 'edit')
         interactor.assert_permission!(:activate, id)
         interactor.activate_product_setup_template(id)
         redirect_to_last_grid(r)
       end
 
       r.on 'deactivate' do
-        check_auth!('product setups', 'edit')
+        check_auth!(['product setups', 'packing specifications'], 'edit')
         interactor.assert_permission!(:deactivate, id)
         interactor.deactivate_product_setup_template(id)
         redirect_to_last_grid(r)
@@ -41,13 +41,13 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
       r.on 'clone_product_setup_template' do
         r.on 'clone' do
-          check_auth!('product setups', 'edit')
+          check_auth!(['product setups', 'packing specifications'], 'edit')
           interactor.assert_permission!(:edit, id)
           show_partial_or_page(r) { Production::ProductSetups::ProductSetupTemplate::Clone.call(id) }
         end
 
         r.post do
-          check_auth!('product setups', 'edit')
+          check_auth!(['product setups', 'packing specifications'], 'edit')
           interactor.assert_permission!(:edit, id)
           res = interactor.clone_product_setup_template(id, params[:product_setup_template])
           redirect_to_last_grid(r)
@@ -64,7 +64,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         interactor = ProductionApp::ProductSetupInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
         r.on 'new' do    # NEW
-          check_auth!('product setups', 'new')
+          check_auth!(['product setups', 'packing specifications'], 'new')
           show_partial_or_page(r) { Production::ProductSetups::ProductSetup::New.call(id, back_url: back_button_url, remote: fetch?(r)) }
         end
         r.post do        # CREATE
@@ -86,7 +86,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
       r.is do
         r.get do       # SHOW
-          check_auth!('product setups', 'read')
+          check_auth!(['product setups', 'packing specifications'], 'read')
           show_partial_or_page(r) { Production::ProductSetups::ProductSetupTemplate::Show.call(id) }
         end
         r.patch do     # UPDATE
@@ -109,7 +109,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           end
         end
         r.delete do    # DELETE
-          check_auth!('product setups', 'delete')
+          check_auth!(['product setups', 'packing specifications'], 'delete')
           interactor.assert_permission!(:delete, id)
           res = interactor.delete_product_setup_template(id)
           if res.success
@@ -189,7 +189,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'new' do    # NEW
-        check_auth!('product setups', 'new')
+        check_auth!(['product setups', 'packing specifications'], 'new')
         show_partial_or_page(r) { Production::ProductSetups::ProductSetupTemplate::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
@@ -230,19 +230,19 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'edit' do   # EDIT
-        check_auth!('product setups', 'edit')
+        check_auth!(['product setups', 'packing specifications'], 'edit')
         interactor.assert_permission!(:edit, id)
         show_partial_or_page(r) { Production::ProductSetups::ProductSetup::Edit.call(id, back_url: back_button_url) }
       end
 
       r.on 'edit_active_run_setup' do   # EDIT Active Run Setup
-        check_auth!('product setups', 'edit')
+        check_auth!(['product setups', 'packing specifications'], 'edit')
         interactor.assert_permission!(:edit, id)
         show_partial_or_page(r) { Production::ProductSetups::ProductSetup::Edit.call(id, back_url: back_button_url) }
       end
 
       r.on 'clone' do   # CLONE
-        check_auth!('product setups', 'edit')
+        check_auth!(['product setups', 'packing specifications'], 'edit')
         interactor.assert_permission!(:edit, id)
         res = interactor.clone_product_setup(id)
         flash[:notice] = res.message
@@ -250,7 +250,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'activate' do
-        check_auth!('product setups', 'edit')
+        check_auth!(['product setups', 'packing specifications'], 'edit')
         interactor.assert_permission!(:activate, id)
         res = interactor.activate_product_setup(id)
         flash[:notice] = res.message
@@ -258,7 +258,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'deactivate' do
-        check_auth!('product setups', 'edit')
+        check_auth!(['product setups', 'packing specifications'], 'edit')
         interactor.assert_permission!(:deactivate, id)
         res = interactor.deactivate_product_setup(id)
         flash[:notice] = res.message
@@ -267,7 +267,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
       r.is do
         r.get do       # SHOW
-          check_auth!('product setups', 'read')
+          check_auth!(['product setups', 'packing specifications'], 'read')
           show_partial_or_page(r) { Production::ProductSetups::ProductSetup::Show.call(id, back_url: back_button_url) }
         end
         r.patch do     # UPDATE
@@ -285,7 +285,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           end
         end
         r.delete do    # DELETE
-          check_auth!('product setups', 'delete')
+          check_auth!(['product setups', 'packing specifications'], 'delete')
           interactor.assert_permission!(:delete, id)
           res = interactor.delete_product_setup(id)
           if res.success

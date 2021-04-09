@@ -52,12 +52,12 @@ class Nspack < Roda
       r.on 'grid' do
         if params && !params.empty?
           render_data_grid_rows(id,
-                                ->(function, program, permission) { auth_blocked?(function, program, permission) },
+                                ->(function, program, permission) { auth_blocked?(function, program.split(','), permission) },
                                 ->(args) { Crossbeams::Config::UserPermissions.can_user?(current_user, *args) },
                                 params)
         else
           render_data_grid_rows(id,
-                                ->(function, program, permission) { auth_blocked?(function, program, permission) },
+                                ->(function, program, permission) { auth_blocked?(function, program.split(','), permission) },
                                 ->(args) { Crossbeams::Config::UserPermissions.can_user?(current_user, *args) })
         end
       rescue StandardError => e
@@ -66,7 +66,7 @@ class Nspack < Roda
 
       r.on 'grid_multi', String do |key|
         render_data_grid_multiselect_rows(id,
-                                          ->(function, program, permission) { auth_blocked?(function, program, permission) },
+                                          ->(function, program, permission) { auth_blocked?(function, program.split(','), permission) },
                                           ->(*args) { Crossbeams::Config::UserPermissions.can_user?(current_user, *args) },
                                           key,
                                           params)
@@ -91,7 +91,7 @@ class Nspack < Roda
 
       r.on 'grid' do
         render_data_grid_lookup_rows(id,
-                                     ->(function, program, permission) { auth_blocked?(function, program, permission) },
+                                     ->(function, program, permission) { auth_blocked?(function, program.split(','), permission) },
                                      ->(*args) { Crossbeams::Config::UserPermissions.can_user?(current_user, *args) },
                                      key,
                                      params)
@@ -121,7 +121,7 @@ class Nspack < Roda
       end
 
       r.on 'grid' do
-        render_search_grid_rows(id, params, ->(function, program, permission) { auth_blocked?(function, program, permission) })
+        render_search_grid_rows(id, params, ->(function, program, permission) { auth_blocked?(function, program.split(','), permission) })
       rescue StandardError => e
         show_json_exception(e)
       end

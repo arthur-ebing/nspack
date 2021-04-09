@@ -10,15 +10,27 @@
   :text: edit
   :icon: edit
   :title: Edit
+  :auth:
+    :function: production
+    :program: packing specifications
+    :permission: edit
 - :url: "/production/packing_specifications/wizard/setup?packing_specification_item_id=$:id$&product_setup_id=$:product_setup_id$"
   :text: clone
   :icon: copy
   :title: Clone
+  :auth:
+    :function: production
+    :program: packing specifications
+    :permission: new
 - :url: "/production/packing_specifications/packing_specification_items/$:id$"
   :text: delete
   :icon: delete
   :is_delete: true
   :popup: true
+  :auth:
+    :function: production
+    :program: packing specifications
+    :permission: delete
 - :separator: true
 - :url: "/production/packing_specifications/packing_specification_items/$:id$/refresh_extended_fg_code"
   :text: refresh extended fg code
