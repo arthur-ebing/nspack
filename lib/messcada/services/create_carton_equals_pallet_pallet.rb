@@ -89,7 +89,7 @@ module MesscadaApp
     end
 
     def validate_pallet_params(params)
-      PalletSchema.call(params)
+      PalletContract.new.call(params)
     end
 
     def create_pallet_sequence
