@@ -37,7 +37,6 @@ module MesscadaApp
     attribute :plt_line_resource_id, Types::Integer
     attribute :nett_weight, Types::Decimal
     attribute :load_id, Types::Integer
-    attribute? :cooled, Types::Bool
     attribute :palletizing_bay_resource_id, Types::Integer
     attribute? :has_individual_cartons, Types::Bool
     attribute :temp_tail, Types::String
@@ -90,7 +89,6 @@ module MesscadaApp
     attribute :plt_line_resource_id, Types::Integer
     attribute :nett_weight, Types::Decimal
     attribute :load_id, Types::Integer
-    attribute :cooled, Types::Bool
     attribute :fruit_sticker_pm_product_2_id, Types::Integer
     attribute :temp_tail, Types::String
     attribute :depot_pallet, Types::Bool

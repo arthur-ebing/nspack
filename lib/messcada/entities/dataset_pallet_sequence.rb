@@ -171,7 +171,10 @@ module MesscadaApp
           load_containers.internal_container_code AS internal_container,
           cargo_temperatures.temperature_code AS temp_code,
           load_vehicles.vehicle_number,
-          pallets.cooled,
+          CASE
+            WHEN (pallets.first_cold_storage_at IS NULL) THEN false
+            ELSE true
+          END AS cooled,
           fn_party_role_name(loads.consignee_party_role_id) AS consignee,
           fn_party_role_name(loads.final_receiver_party_role_id) AS final_receiver,
           fn_party_role_name(loads.exporter_party_role_id) AS exporter,

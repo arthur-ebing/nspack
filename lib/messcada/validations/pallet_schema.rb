@@ -37,7 +37,6 @@ module MesscadaApp
     required(:plt_line_resource_id).maybe(:integer)
     optional(:nett_weight).maybe(:decimal)
     optional(:load_id).maybe(:integer)
-    optional(:cooled).maybe(:bool)
     optional(:palletizing_bay_resource_id).maybe(:integer)
     optional(:has_individual_cartons).maybe(:bool)
   end

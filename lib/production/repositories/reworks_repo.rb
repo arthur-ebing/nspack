@@ -277,7 +277,7 @@ module ProductionApp
     end
 
     def clone_pallet(pallet, sequence_ids, user_name)
-      pallet_rejected_fields = %i[id pallet_number build_status shipped in_stock inspected cooled depot_pallet allocated
+      pallet_rejected_fields = %i[id pallet_number build_status shipped in_stock inspected depot_pallet allocated
                                   partially_palletized reinspected scrapped shipped_at scrapped_at govt_first_inspection_at
                                   govt_reinspection_at stock_created_at gross_weight_measured_at allocated_at intake_created_at
                                   first_cold_storage_at nett_weight gross_weight]

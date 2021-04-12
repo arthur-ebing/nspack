@@ -122,7 +122,6 @@ module MesscadaApp
         plt_line_resource_id: line_resource_id,
         nett_weight: 1.0,
         load_id: nil,
-        cooled: false,
         fruit_sticker_pm_product_2_id: pm_product_id2,
         last_govt_inspection_pallet_id: 1,
         temp_tail: 'ABC',
