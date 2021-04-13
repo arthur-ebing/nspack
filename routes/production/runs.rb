@@ -971,7 +971,7 @@ class Nspack < Roda
           ]
           update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
         else
-          re_show_form(r, res) { Production::Runs::ProductionRun::SelectProductSetup.call(id, form_values: params[:product_resource_allocation], form_errors: res.errors) }
+          re_show_form(r, res) { Production::Runs::ProductResourceAllocation::Edit.call(id, form_values: params[:product_resource_allocation], form_errors: res.errors) }
         end
       end
 
