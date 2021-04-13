@@ -92,11 +92,13 @@ module ProductionApp
 
       def close_check
         return failed_response 'Run is not yet complete' unless entity.completed
+        return failed_response 'Run has been closed' if entity.closed
 
         all_ok
       end
 
       def re_configure_check
+        return failed_response 'This is not an active run' unless entity.running
         return failed_response 'Run is already re-configuring' if entity.reconfiguring
 
         all_ok
@@ -104,6 +106,7 @@ module ProductionApp
 
       def complete_run_stage_check
         return failed_response 'This is not an active run' unless entity.running
+        return failed_response 'Run is already re-configuring' if entity.reconfiguring
 
         if entity.tipping
           complete_tipping_stage_check
