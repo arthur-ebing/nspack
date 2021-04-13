@@ -614,6 +614,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
     Organizations: { table_name: 'organizations', column_name: 'short_description' },
     PUCs: { table_name: 'pucs', column_name: 'puc_code' },
     Packed_TM_Group: { table_name: 'target_market_groups', column_name: 'target_market_group_name' },
+    Plant_Resources: { table_name: 'plant_resources', column_name: 'plant_resource_code' },
     Ports: { table_name: 'ports', column_name: 'port_code' },
     RMT_Classes: { table_name: 'rmt_classes', column_name: 'rmt_class_code' },
     RMT_Delivery_Destinations: { table_name: 'rmt_delivery_destinations', column_name: 'delivery_destination_code' },
