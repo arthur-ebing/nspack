@@ -14,6 +14,6 @@ module ProductionApp
     required(:product_setup_id).maybe(:integer)
     required(:label_template_id).maybe(:integer)
     required(:packing_method_id).filled(:integer)
-    required(:packing_specification_item_id).maybe(:integer)
+    optional(:packing_specification_item_id).maybe(:integer)
   end
 end
