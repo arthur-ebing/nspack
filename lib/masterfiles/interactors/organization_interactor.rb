@@ -20,7 +20,7 @@ module MasterfilesApp
     end
 
     def update_organization(id, params) # rubocop:disable Metrics/AbcSize
-      res = validate_organization_params(params)
+      res = EditOrganizationSchema.call(params)
       return validation_failed_response(res) if res.failure?
 
       repo.transaction do
