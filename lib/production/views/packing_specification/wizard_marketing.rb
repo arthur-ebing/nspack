@@ -46,6 +46,7 @@ module Production
                   col.add_field :marketing_org_party_role_id
                   col.add_field :packed_tm_group_id
                   col.add_field :target_market_id
+                  col.add_field :target_customer_party_role_id
                   col.add_field :sell_by_code
                   col.add_field :mark_id
                   col.add_field :product_chars

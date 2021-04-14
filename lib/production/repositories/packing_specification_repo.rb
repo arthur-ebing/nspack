@@ -139,6 +139,7 @@ module ProductionApp
       hash[:marketing_org_description] = get(:organizations, marketing_org_party_role&.organization_id, :short_description)
       hash[:packed_tm_group] = get(:target_market_groups, hash[:packed_tm_group_id], :target_market_group_name)
       hash[:target_market] = get(:target_markets, hash[:target_market_id], :target_market_name)
+      hash[:target_customer] = DB.get(Sequel.function(:fn_party_role_name, hash[:target_customer_party_role_id]))
       hash[:mark] = get(:marks, hash[:mark_id], :mark_code)
       hash[:inventory_code] = get(:inventory_codes, hash[:inventory_code_id], :inventory_code)
       hash[:customer_variety] = MasterfilesApp::MarketingRepo.new.find_customer_variety(hash[:customer_variety_id])&.variety_as_customer_variety

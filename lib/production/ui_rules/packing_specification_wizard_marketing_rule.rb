@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class PackingSpecificationWizardMarketingRule < Base
+  class PackingSpecificationWizardMarketingRule < Base # rubocop:disable Metrics/ClassLength
     def generate_rules
       form_name 'packing_specification_wizard'
 
@@ -32,6 +32,11 @@ module UiRules
                             disabled_options: @target_repo.for_select_inactive_target_markets,
                             prompt: true,
                             caption: 'Target Market' },
+        target_customer_party_role_id: { renderer: :select,
+                                         options: @party_repo.for_select_party_roles(AppConst::ROLE_TARGET_CUSTOMER),
+                                         invisible: !AppConst::CR_PROD.link_target_markets_to_target_customers?,
+                                         prompt: true,
+                                         caption: 'Target Customer' },
         sell_by_code: {},
         mark_id: { renderer: :select,
                    options: @marketing_repo.for_select_marks,

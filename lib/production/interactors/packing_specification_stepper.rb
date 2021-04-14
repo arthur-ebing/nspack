@@ -113,7 +113,7 @@ module ProductionApp
                       fruit_actual_counts_for_pack standard_pack fruit_size_reference class grade]
       end
       if step >= 2
-        columns += %i[marketing_org packed_tm_group target_market sell_by_code mark product_chars
+        columns += %i[marketing_org packed_tm_group target_market target_customer sell_by_code mark product_chars
                       inventory_code customer_variety client_product_code client_size_reference
                       marketing_order_number]
       end

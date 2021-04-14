@@ -53,6 +53,7 @@ module Production
                     fold.add_field :marketing_org
                     fold.add_field :packed_tm_group
                     fold.add_field :target_market
+                    fold.add_field :target_customer
                     fold.add_field :sell_by_code
                     fold.add_field :mark
                     fold.add_field :product_chars
