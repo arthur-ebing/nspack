@@ -70,7 +70,7 @@ module MasterfilesApp
     end
 
     def link_countries(target_market_id, country_ids)
-      return nil unless country_ids
+      country_ids = [] if country_ids.nil?
 
       existing_ids      = target_market_country_ids(target_market_id)
       old_ids           = existing_ids - country_ids

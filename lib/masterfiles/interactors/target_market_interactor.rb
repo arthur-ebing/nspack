@@ -138,18 +138,11 @@ module MasterfilesApp
     end
 
     def link_countries(target_market_id, country_ids)
-      return failed_response('You have not selected any countries') unless country_ids
-
       repo.transaction do
         repo.link_countries(target_market_id, country_ids)
       end
 
-      existing_ids = repo.target_market_country_ids(target_market_id)
-      if existing_ids.eql?(country_ids.sort)
-        success_response('Countries linked successfully')
-      else
-        failed_response('Some countries were not linked')
-      end
+      success_response('Countries linked successfully')
     end
 
     def link_tm_groups(target_market_id, tm_group_ids)

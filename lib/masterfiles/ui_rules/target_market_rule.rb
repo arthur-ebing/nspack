@@ -32,7 +32,7 @@ module UiRules
       {
         target_market_name: { required: true, caption: 'Target Market Name' },
         tm_group_ids: { renderer: :multi, options: @repo.for_select_tm_groups, selected: @form_object.tm_group_ids, caption: 'Groups', required: true },
-        country_ids: { renderer: :multi, options: @destination_repo.for_select_destination_countries, selected: @form_object.country_ids, caption: 'Countries', required: true },
+        country_ids: { renderer: :multi, options: @destination_repo.for_select_destination_countries, selected: @form_object.country_ids, caption: 'Countries' },
         description: {},
         inspection_tm: { renderer: :checkbox },
         target_customer_ids: { renderer: :multi,

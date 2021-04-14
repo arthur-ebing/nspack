@@ -91,6 +91,7 @@ module UiRules
                                     caption: 'Target Market' }
       fields[:target_customer_party_role_id] = { renderer: :label,
                                                  with_value: target_customer_label,
+                                                 invisible: !AppConst::CR_PROD.link_target_markets_to_target_customers?,
                                                  caption: 'Target Customer' }
       fields[:mark_id] = { renderer: :label,
                            with_value: mark_id_label,
@@ -264,8 +265,8 @@ module UiRules
                             searchable: true,
                             remove_search_for_small_list: false },
         target_customer_party_role_id: { renderer: :select,
-                                         options: @party_repo.for_select_party_roles(AppConst::ROLE_TARGET_CUSTOMER,
-                                                                                     where: { id: @tm_repo.target_market_target_customer_ids(@form_object.target_market_id) }),
+                                         options: @party_repo.for_select_party_roles(AppConst::ROLE_TARGET_CUSTOMER),
+                                         invisible: !AppConst::CR_PROD.link_target_markets_to_target_customers?,
                                          caption: 'Target Customer',
                                          prompt: 'Select Target Customer',
                                          searchable: true,
@@ -415,8 +416,8 @@ module UiRules
         behaviour.dropdown_change :packed_tm_group_id,
                                   notify: [{ url: '/production/product_setups/product_setups/packed_tm_group_changed',
                                              param_keys: %i[product_setup_marketing_variety_id] }]
-        behaviour.dropdown_change :target_market_id,
-                                  notify: [{ url: '/production/product_setups/product_setups/target_market_changed' }]
+        # behaviour.dropdown_change :target_market_id,
+        #                           notify: [{ url: '/production/product_setups/product_setups/target_market_changed' }]
         behaviour.dropdown_change :pallet_stack_type_id,
                                   notify: [{ url: '/production/product_setups/product_setups/pallet_stack_type_changed',
                                              param_keys: %i[product_setup_pallet_base_id] }]
