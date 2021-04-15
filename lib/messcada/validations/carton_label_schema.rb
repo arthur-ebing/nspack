@@ -63,6 +63,7 @@ module MesscadaApp
       optional(:fruit_sticker_ids).maybe(:array).maybe { each(:integer) }
       optional(:tu_sticker_ids).maybe(:array).maybe { each(:integer) }
       optional(:target_customer_party_role_id).maybe(:integer)
+      optional(:legacy_carton_number).maybe(Types::StrippedString)
     end
 
     rule(:fruit_size_reference_id, :fruit_actual_counts_for_pack_id) do
