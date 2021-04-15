@@ -15,7 +15,7 @@ module FinishedGoodsApp
                           label: :id,
                           value: :id,
                           order_by: :id
-    crud_calls_for :govt_inspection_sheets, name: :govt_inspection_sheet
+    crud_calls_for :govt_inspection_sheets, name: :govt_inspection_sheet, exclude: [:create]
 
     build_for_select :govt_inspection_pallets,
                      label: :failure_remarks,
@@ -53,8 +53,6 @@ module FinishedGoodsApp
       hash[:allocated] = exists?(:govt_inspection_pallets, govt_inspection_sheet_id: id)
       hash[:passed_pallets] = exists?(:govt_inspection_pallets, govt_inspection_sheet_id: id, inspected: true, passed: true)
       hash[:failed_pallets] = exists?(:govt_inspection_pallets, govt_inspection_sheet_id: id, inspected: true, passed: false)
-      # hash[:consignment_note_number] = DB.get(Sequel.function(:fn_consignment_note_number, id))
-      hash[:consignment_note_number] = "#{AppConst::CLIENT_CODE.upcase}#{id.to_s.rjust(10 - AppConst::CLIENT_CODE.length, '0')}"
       hash[:inspection_billing] = DB.get(Sequel.function(:fn_party_role_name, hash[:inspection_billing_party_role_id]))
       hash[:exporter] = DB.get(Sequel.function(:fn_party_role_name, hash[:exporter_party_role_id]))
       inspector_party_role_id = get(:inspectors, hash[:inspector_id], :inspector_party_role_id)
@@ -157,6 +155,13 @@ module FinishedGoodsApp
         update(:pallets, pallet_id, params)
         log_status(:pallets, pallet_id, 'INSPECTION REOPENED', user_name: user.user_name)
       end
+    end
+
+    def create_govt_inspection_sheet(res)
+      id = create(:govt_inspection_sheets, res.to_h)
+      consignment_note_number = "#{AppConst::CLIENT_CODE.upcase}#{id.to_s.rjust(10 - AppConst::CLIENT_CODE.length, '0')}"
+      update(:govt_inspection_sheets, id, consignment_note_number: consignment_note_number)
+      id
     end
 
     def get_last(table_name, column, args = {})

@@ -5,8 +5,7 @@
   \                              AS exporter,\r\n       fn_party_role_name(inspector_party_role_id)
   \                             AS inspector,\r\n       inspectors.inspector_code,\r\n
   \      fn_party_role_name(inspection_billing_party_role_id)                     AS
-  inspection_billing,\r\n       fn_consignment_note_number(govt_inspection_sheets.id)
-  \                   AS consignment_note_number,\r\n       booking_reference,\r\n
+  inspection_billing,\r\n       govt_inspection_sheets.consignment_note_number,\r\n       booking_reference,\r\n
   \      inspection_point,\r\n       destination_region_name AS destination_region,\r\n
   \      results_captured,\r\n       results_captured_at,\r\n       api_results_received,\r\n
   \      completed,\r\n       completed_at,\r\n       govt_inspection_sheets.inspected,\r\n

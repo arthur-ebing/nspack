@@ -212,8 +212,8 @@ module MesscadaApp
           COALESCE(pallets.govt_reinspection_at, pallets.govt_first_inspection_at)::date AS inspection_date,
           COALESCE(pallets.edi_in_consignment_note_number,
               CASE
-                  WHEN NOT pallets.govt_inspection_passed THEN fn_consignment_note_number(govt_inspection_sheets.id) || 'F'::text
-                  WHEN pallets.govt_inspection_passed THEN fn_consignment_note_number(govt_inspection_sheets.id)
+                  WHEN NOT pallets.govt_inspection_passed THEN govt_inspection_sheets.consignment_note_number || 'F'::text
+                  WHEN pallets.govt_inspection_passed THEN govt_inspection_sheets.consignment_note_number
                   ELSE ''::text
               END) AS addendum_manifest,
           pallets.repacked,
@@ -227,7 +227,7 @@ module MesscadaApp
           pallet_sequences.created_by,
           pallet_sequences.verified_by,
           fn_edi_size_count(standard_pack_codes.use_size_ref_for_edi, commodities.use_size_ref_for_edi, fruit_size_references.edi_out_code, fruit_size_references.size_reference, fruit_actual_counts_for_packs.actual_count_for_pack) AS edi_size_count,
-          fn_consignment_note_number(govt_inspection_sheets.id) AS consignment_note_number,
+          govt_inspection_sheets.consignment_note_number,
           'DN'::text || loads.id::text AS dispatch_note,
           loads.edi_file_name AS po_file_name,
           palletizing_bays.plant_resource_code AS palletizing_bay,
