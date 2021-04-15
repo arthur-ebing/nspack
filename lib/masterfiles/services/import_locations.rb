@@ -48,13 +48,17 @@ module MasterfilesApp
 
     private
 
-    def import_locations # rubocop:disable Metrics/AbcSize
+    def import_locations # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      line = 0
+      curr_row = nil
       lkp_types = Hash[repo.for_select_location_types]
       lkp_storage = Hash[repo.for_select_location_storage_types]
       lkp_assign = Hash[repo.for_select_location_assignments]
       lkp_stg_def = Hash[repo.for_select_location_storage_definitions]
       lookups = {}
       csv_data.each do |row| # rubocop:disable Metrics/BlockLength
+        line += 1
+        curr_row = row
         short_code = row['location_short_code'] || next_short_code(row['primary_storage_type'])
         if row['parent_location'].nil?
           lookups[row['location_long_code']] = repo.create_root_location(
@@ -93,6 +97,13 @@ module MasterfilesApp
         end
         # Add any extra stg/asign
       end
+    rescue StandardError => e
+      puts '---------------------------------------------------'
+      puts 'ERROR'
+      p line
+      p curr_row
+      puts '---------------------------------------------------'
+      raise e
     end
 
     def next_short_code(storage_code)
