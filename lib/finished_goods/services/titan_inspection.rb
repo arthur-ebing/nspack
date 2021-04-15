@@ -3,7 +3,7 @@
 module FinishedGoodsApp
   class TitanInspection < BaseService # rubocop:disable Metrics/ClassLength
     attr_reader :govt_inspection_sheet_id, :task, :user, :repo,
-                :govt_inspection_sheet, :inspection_message_id, :consignment_number,
+                :govt_inspection_sheet, :inspection_message_id,
                 :header, :http, :payload
 
     def initialize(govt_inspection_sheet_id, task, user)
@@ -12,7 +12,6 @@ module FinishedGoodsApp
       @user = user
 
       @govt_inspection_sheet_id = govt_inspection_sheet_id
-      @consignment_number = DB.get(Sequel.function(:fn_consignment_note_number, govt_inspection_sheet_id))
     end
 
     MODES = {
@@ -197,7 +196,7 @@ module FinishedGoodsApp
 
     def request_results_call
       auth_token_call if header.nil?
-      url = "#{AppConst::TITAN_ENVIRONMENT}/pi/ProductInspection/InspectionResult?consignmentNumber=#{consignment_number}"
+      url = "#{AppConst::TITAN_ENVIRONMENT}/pi/ProductInspection/InspectionResult?consignmentNumber=#{@govt_inspection_sheet.consignment_note_number}"
 
       res = http.request_get(url, header)
       log_titan_request('Results', res)

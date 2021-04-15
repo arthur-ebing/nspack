@@ -53,7 +53,8 @@ module FinishedGoodsApp
       hash[:allocated] = exists?(:govt_inspection_pallets, govt_inspection_sheet_id: id)
       hash[:passed_pallets] = exists?(:govt_inspection_pallets, govt_inspection_sheet_id: id, inspected: true, passed: true)
       hash[:failed_pallets] = exists?(:govt_inspection_pallets, govt_inspection_sheet_id: id, inspected: true, passed: false)
-      hash[:consignment_note_number] = DB.get(Sequel.function(:fn_consignment_note_number, id))
+      # hash[:consignment_note_number] = DB.get(Sequel.function(:fn_consignment_note_number, id))
+      hash[:consignment_note_number] = "#{AppConst::CLIENT_CODE.upcase}#{id.to_s.rjust(10 - AppConst::CLIENT_CODE.length, '0')}"
       hash[:inspection_billing] = DB.get(Sequel.function(:fn_party_role_name, hash[:inspection_billing_party_role_id]))
       hash[:exporter] = DB.get(Sequel.function(:fn_party_role_name, hash[:exporter_party_role_id]))
       inspector_party_role_id = get(:inspectors, hash[:inspector_id], :inspector_party_role_id)
