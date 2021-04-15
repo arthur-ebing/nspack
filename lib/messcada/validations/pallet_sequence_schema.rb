@@ -66,10 +66,14 @@ module MesscadaApp
       optional(:fruit_sticker_ids).maybe(:array).maybe { each(:integer) }
       optional(:tu_sticker_ids).maybe(:array).maybe { each(:integer) }
       optional(:target_customer_party_role_id).maybe(:integer)
+      optional(:depot_pallet).maybe(:bool)
     end
 
     rule(:fruit_size_reference_id, :fruit_actual_counts_for_pack_id) do
       base.failure 'must provide either fruit_size_reference or fruit_actual_count' unless values[:fruit_size_reference_id] || values[:fruit_actual_counts_for_pack_id]
+    end
+    rule(:packhouse_resource_id, :production_line_id) do # depot_pltseq_ph_line_check
+      base.failure 'must be a depot_pallet or provide packhouse_resource_id and production_line_id' unless values[:depot_pallet] || (values[:packhouse_resource_id] && values[:production_line_id])
     end
   end
 end
