@@ -11,6 +11,11 @@ module UiRules
 
       set_show_fields if %i[show].include? @mode
 
+      if @mode == :scan_bins
+        make_scan_bins_header_table
+        set_scan_bins_fields
+      end
+
       add_behaviours
 
       form_name 'bin_load_product'
@@ -83,6 +88,30 @@ module UiRules
       }
     end
 
+    def make_scan_bins_header_table(columns = nil, display_columns = 3)
+      compact_header(columns: columns || %i[qty_bins cultivar_group_code cultivar_name container_material_type_code
+                                            container_material_owner farm_code puc_code orchard_code rmt_class_code],
+                     display_columns: display_columns,
+                     header_captions: {
+                       cultivar_group_code: 'Cultivar Group',
+                       cultivar_name: 'Cultivar',
+                       container_material_type_code: 'Material Type',
+                       container_material_owner: 'Material Owner',
+                       farm_code: 'Farm',
+                       puc_code: 'Puc',
+                       orchard_code: 'Orchard',
+                       rmt_class_code: 'Class'
+                     })
+    end
+
+    def set_scan_bins_fields
+      fields[:bin_ids] = { renderer: :textarea,
+                           rows: 12,
+                           placeholder: 'Scan bins here',
+                           caption: 'Rmt Bins',
+                           required: true }
+    end
+
     def make_form_object
       if @mode == :new
         make_new_form_object
@@ -90,6 +119,7 @@ module UiRules
       end
 
       @form_object = @repo.find_bin_load_product_flat(@options[:id])
+      @form_object = OpenStruct.new(@form_object.to_h.merge(bin_ids: nil)) if @mode == :scan_bins
     end
 
     def make_new_form_object

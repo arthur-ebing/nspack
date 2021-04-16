@@ -52,7 +52,7 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def allocate_bin_load_product(id, params) # rubocop:disable Metrics/AbcSize
+    def allocate_bin_load_product(id, params, scanned = false) # rubocop:disable Metrics/AbcSize
       res = AllocateBinLoadProductSchema.call(params)
       return validation_failed_response(res) if res.failure?
 
@@ -60,7 +60,7 @@ module RawMaterialsApp
       current_allocation = repo.select_values(:rmt_bins, :id, bin_load_product_id: id)
 
       repo.transaction do
-        repo.unallocate_bins(current_allocation - new_allocation, @user)
+        repo.unallocate_bins(current_allocation - new_allocation, @user) unless scanned
         repo.allocate_bins(id, new_allocation - current_allocation, @user)
 
         log_transaction
@@ -87,6 +87,13 @@ module RawMaterialsApp
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 
+    def allocate_scanned_bin_load_product(bin_load_product_id, params)
+      res = validate_scanned_bins(bin_load_product_id, params)
+      return validation_failed_response(res) unless res.success
+
+      allocate_bin_load_product(bin_load_product_id, { bin_ids: res.instance[:bin_ids] }, true)
+    end
+
     private
 
     def repo
@@ -99,6 +106,24 @@ module RawMaterialsApp
 
     def validate_bin_load_product_params(params)
       BinLoadProductSchema.call(params)
+    end
+
+    def validate_scanned_bins(bin_load_product_id, params) # rubocop:disable Metrics/AbcSize
+      bin_ids = params[:bin_ids].split(/\n|,/).map(&:strip).reject(&:empty?)
+      bin_ids = bin_ids.map { |x| x.gsub(/['"]/, '') }
+
+      invalid_bin_ids = bin_ids.reject { |x| x.match(/\A\d+\Z/) }
+      return OpenStruct.new(success: false, messages: { bin_ids: ["#{invalid_bin_ids.join(', ')} must be numeric"] }, bin_ids: bin_ids) unless invalid_bin_ids.nil_or_empty?
+
+      existing_bin_ids = repo.rmt_bins_exists?(bin_ids)
+      missing_bin_ids = (bin_ids.map(&:to_i) - existing_bin_ids)
+      return OpenStruct.new(success: false, messages: { bin_ids: ["#{missing_bin_ids.join(', ')} doesn't exist"] }, bin_ids: bin_ids) unless missing_bin_ids.nil_or_empty?
+
+      bin_load_bin_ids = repo.rmt_bins_matching_bin_load(:bin_id, bin_load_product_id: bin_load_product_id, bin_id: bin_ids)
+      mismatch_load_bin_ids = (existing_bin_ids - bin_load_bin_ids)
+      return OpenStruct.new(success: false, messages: { bin_ids: ["#{mismatch_load_bin_ids.join(', ')} doesn't match bin load"] }, bin_ids: bin_ids) unless mismatch_load_bin_ids.nil_or_empty?
+
+      OpenStruct.new(success: true, instance: { bin_ids: bin_ids })
     end
   end
 end

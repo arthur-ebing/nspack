@@ -75,6 +75,7 @@ module RawMaterialsApp
       query = "#{query} AND UPPER(rmt_bins.bin_asset_number) = UPPER('#{args[:bin_asset_number]}')" unless args[:bin_asset_number].nil?
       query = "#{query} AND bin_load_products.bin_load_id = #{args[:bin_load_id]}" unless args[:bin_load_id].nil?
       query = "#{query} AND bin_load_products.id = #{args[:bin_load_product_id]}" unless args[:bin_load_product_id].nil?
+      query = "#{query} AND rmt_bins.id IN (#{args[:bin_id].join(',')})" unless args[:bin_id].nil_or_empty?
 
       DB[query].map { |q| q[column] }.uniq.first(100)
     end
@@ -172,6 +173,10 @@ module RawMaterialsApp
         update(:rmt_deliveries, rmt_delivery_id, shipped: false)
         log_status(:rmt_deliveries, rmt_delivery_id, 'DELIVERY UNSHIPPED', user_name: user.user_name)
       end
+    end
+
+    def rmt_bins_exists?(bin_ids)
+      DB[:rmt_bins].where(id: bin_ids).select_map(:id)
     end
   end
 end

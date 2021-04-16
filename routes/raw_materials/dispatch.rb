@@ -219,6 +219,26 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         show_partial_or_page(r) { RawMaterials::Dispatch::BinLoadProduct::Allocate.call(id) }
       end
 
+      r.on 'scan_bins' do
+        r.get do
+          check_auth!('dispatch', 'edit')
+          show_partial_or_page(r) { RawMaterials::Dispatch::BinLoadProduct::ScanBins.call(id) }
+        end
+        r.patch do
+          res = interactor.allocate_scanned_bin_load_product(id, params[:bin_load_product])
+          if res.success
+            flash[:notice] = res.message
+            r.redirect "/raw_materials/dispatch/bin_load_products/#{id}/allocate"
+          else
+            re_show_form(r, res, url: "/raw_materials/dispatch/bin_load_products/#{id}/scan_bins") do
+              RawMaterials::Dispatch::BinLoadProduct::ScanBins.call(id,
+                                                                    form_values: params[:bin_load_product],
+                                                                    form_errors: res.errors)
+            end
+          end
+        end
+      end
+
       r.on 'allocate_multiselect' do
         check_auth!('dispatch', 'edit')
         interactor.assert_permission!(:edit, id)

@@ -39,6 +39,10 @@ module RawMaterials
                                   text: 'Back',
                                   url: "/raw_materials/dispatch/bin_loads/#{ui_rule.form_object.bin_load_id}",
                                   style: :back_button)
+              section.add_control(control_type: :link,
+                                  text: 'Scan Bins',
+                                  url: "/raw_materials/dispatch/bin_load_products/#{id}/scan_bins",
+                                  style: :button)
             end
             page.add_notice 'Use the checkboxes to select bins from the grid below afterwards press Save selection to allocate.'
             page.section do |section|
