@@ -598,14 +598,6 @@ module ProductionApp
       recalc
     end
 
-    def recalc_gtin_code?(params)
-      recalc = AppConst::CR_PROD.use_gtins?
-      gtin_fields = %i[std_fruit_size_count_id marketing_variety_id marketing_org_party_role_id standard_pack_code_id
-                       mark_id grade_id inventory_code_id fruit_actual_counts_for_pack_id fruit_size_reference_id]
-      recalc = false unless gtin_fields.any? { |k| params.key?(k) }
-      recalc
-    end
-
     def update_pallet_sequence_record(sequence_id, reworks_run_type_id, res, batch_pallet_numbers = nil)  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       batch_update = batch_pallet_numbers.nil_or_empty? ? false : true
       before_attrs = sequence_setup_attrs(sequence_id).sort.to_h
@@ -621,7 +613,7 @@ module ProductionApp
       end
 
       changed_attrs = changed_attrs.merge(marketing_attrs(attrs.merge(repo.find_sequence_farm_attrs(sequence_id)))) if recalc_marketing_attrs?(changed_attrs)
-      changed_attrs = changed_attrs.merge(gtin_code: prod_setup_repo.find_gtin_code_for_update(pallet_sequence(sequence_id))) if recalc_gtin_code?(changed_attrs)
+      changed_attrs = changed_attrs.merge(gtin_code: prod_setup_repo.find_gtin_code_for_update(pallet_sequence(sequence_id))) if prod_setup_repo.recalc_gtin_code?(changed_attrs)
       return failed_response('Changed attributes cannot be empty') if changed_attrs.nil_or_empty?
 
       before_descriptions_state = sequence_setup_data(sequence_id)
