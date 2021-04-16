@@ -370,11 +370,11 @@ module MasterfilesApp
       query = <<~SQL
         SELECT max(locations.location_short_code)
         FROM locations
-        WHERE locations.location_short_code LIKE '01%';
+        WHERE locations.location_short_code LIKE '#{prefix}%';
       SQL
 
       last_val = DB[query].single_value
-      code = last_val ? last_val.succ : (prefix + 'AAA')
+      code = last_val ? last_val.succ : (prefix + '_AAA')
 
       success_response('ok', code)
     end
