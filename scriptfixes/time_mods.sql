@@ -767,8 +767,8 @@ CREATE OR REPLACE VIEW public.vw_pallet_sequence_flat AS
     COALESCE(p.govt_reinspection_at, p.govt_first_inspection_at) AS inspection_date,
     COALESCE(p.edi_in_consignment_note_number,
         CASE
-            WHEN NOT p.govt_inspection_passed THEN lpad(govt_inspection_pallets.govt_inspection_sheet_id::text, 10, '0'::text) || 'F'::text
-            WHEN p.govt_inspection_passed THEN lpad(govt_inspection_pallets.govt_inspection_sheet_id::text, 10, '0'::text)
+            WHEN NOT p.govt_inspection_passed THEN govt_inspection_sheets.consignment_note_number || 'F'::text
+            WHEN p.govt_inspection_passed THEN govt_inspection_sheets.consignment_note_number
             ELSE ''::text
         END) AS addendum_manifest
    FROM pallets p
