@@ -9,19 +9,18 @@ module MasterfilesApp
       id = nil
       repo.transaction do
         id = repo.create_orchard(res)
-        log_status('orchards', id, 'CREATED')
+        log_status(:orchards, id, 'CREATED')
         log_transaction
       end
       instance = orchard(id)
-      success_response("Created orchard #{instance.orchard_code}",
-                       instance)
+      success_response("Created orchard #{instance.orchard_code}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { orchard_code: ['This orchard already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
-    def update_orchard(id, params)
+    def update_orchard(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_orchard_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -30,8 +29,9 @@ module MasterfilesApp
         log_transaction
       end
       instance = orchard(id)
-      success_response("Updated orchard #{instance.orchard_code}",
-                       instance)
+      success_response("Updated orchard #{instance.orchard_code}", instance)
+    rescue Sequel::UniqueConstraintViolation
+      validation_failed_response(OpenStruct.new(messages: { orchard_code: ['This orchard already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -40,7 +40,7 @@ module MasterfilesApp
       name = orchard(id).orchard_code
       repo.transaction do
         repo.delete_orchard(id)
-        log_status('orchards', id, 'DELETED')
+        log_status(:orchards, id, 'DELETED')
         log_transaction
       end
       success_response("Deleted orchard #{name}")
