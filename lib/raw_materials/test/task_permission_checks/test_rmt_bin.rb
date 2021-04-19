@@ -21,6 +21,7 @@ module RawMaterialsApp
         rmt_container_material_type_id: 1, # rmt_container_material_type_id,
         cultivar_group_id: 1, # cultivar_group_id,
         puc_id: 1, # puc_id,
+        rmt_size_id: 1, # rmt_size_id,
         status: Faker::Lorem.unique.word,
         exit_ref: 'ABC',
         qty_bins: 1,
@@ -41,6 +42,7 @@ module RawMaterialsApp
         bin_tipped_date_time: '2010-01-01 12:00',
         exit_ref_date_time: '2010-01-01 12:00',
         rebin_created_at: '2010-01-01 12:00',
+        created_at: '2010-01-01 12:00',
         active: true,
         scrapped: false,
         scrapped_at: '2010-01-01 12:00'

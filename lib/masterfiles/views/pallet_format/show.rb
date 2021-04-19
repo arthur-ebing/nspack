@@ -17,6 +17,7 @@ module Masterfiles
               form.add_field :pallet_base_id
               form.add_field :pallet_stack_type_id
               form.add_field :active
+              form.add_field :bin
             end
           end
 

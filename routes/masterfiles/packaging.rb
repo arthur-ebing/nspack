@@ -189,6 +189,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
               pallet_base_code
               stack_type_code
               active
+              bin
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
@@ -223,6 +224,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             pallet_base_code
             stack_type_code
             active
+            bin
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)

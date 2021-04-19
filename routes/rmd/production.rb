@@ -40,7 +40,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.post do
           res = interactor.scan_pallet_or_carton_number(params[:pallet_inquiry])
           if res.success
-            r.redirect("/rmd/production/pallet_inquiry/scan_pallet_sequence/#{res.instance.pallet_sequence_ids.first}")
+            r.redirect("/rmd/production/pallet_inquiry/view_pallet/#{res.instance.id}")
           else
             store_locally(:errors, errors: res.errors, error_message: unwrap_failed_response(res))
             r.redirect('/rmd/production/pallet_inquiry/scan_pallet')
@@ -51,48 +51,53 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       # --------------------------------------------------------------------------
       # PALLET SEQUENCE
       # --------------------------------------------------------------------------
-      r.on 'scan_pallet_sequence', Integer do |id|
-        pallet_sequence = interactor.find_pallet_sequence_attrs(id)
-        ps_ids = interactor.find_pallet_sequences_from_same_pallet(id) # => [1,2,3,4]
+      r.on 'view_pallet', Integer do |id|
+        pallet_sequences = MesscadaApp::MesscadaRepo.new.find_pallet_sequences_by_pallet(id).sort_by { |s| s[:id] }
+        single_pallet_sequences_view = {}
+        pallet_sequences[0].each_key do |k|
+          if %i[gross_weight nett_weight sequence_nett_weight].include?(k)
+            single_pallet_sequences_view.store(k, pallet_sequences.sort_by { |s| s[:id] }.map { |s| s[k].to_f }.compact.uniq.join(', '))
+          else
+            single_pallet_sequences_view.store(k, pallet_sequences.sort_by { |s| s[:id] }.map { |s| s[k] }.compact.uniq.join(', '))
+          end
+        end
 
         form = Crossbeams::RMDForm.new({},
                                        form_name: :pallet,
                                        scan_with_camera: @rmd_scan_with_camera,
-                                       caption: "View Pallet #{pallet_sequence[:pallet_number]}",
-                                       step_and_total: [ps_ids.index(id) + 1, ps_ids.length],
+                                       caption: "View Pallet #{single_pallet_sequences_view[:pallet_number]}",
                                        reset_button: false,
                                        no_submit: true,
                                        action: '/')
-        fields_for_rmd_pallet_sequence_display(form, pallet_sequence)
+        fields_for_rmd_pallet_sequence_display(form, single_pallet_sequences_view)
         form.add_csrf_tag csrf_tag
         form.add_label(:verification_result,
                        'Verification Result',
-                       pallet_sequence[:verification_result])
+                       single_pallet_sequences_view[:verification_result])
         form.add_label(:verification_failure_reason,
                        'Verification Failure Reason',
-                       pallet_sequence[:verification_failure_reason])
+                       single_pallet_sequences_view[:verification_failure_reason])
         if AppConst::REQUIRE_FRUIT_STICKER_AT_PALLET_VERIFICATION
           form.add_label(:fruit_sticker,
                          'Fruit Sticker',
-                         pallet_sequence[:fruit_sticker])
+                         single_pallet_sequences_view[:fruit_sticker])
         end
         form.add_label(:gross_weight,
                        'Plt Gross',
-                       pallet_sequence[:gross_weight])
+                       single_pallet_sequences_view[:gross_weight])
         form.add_label(:nett_weight,
                        'Plt Nett',
-                       pallet_sequence[:nett_weight])
+                       single_pallet_sequences_view[:nett_weight])
         form.add_label(:sequence_nett_weight,
                        'Seq Nett',
-                       pallet_sequence[:sequence_nett_weight])
+                       single_pallet_sequences_view[:sequence_nett_weight])
         form.add_label(:allocated,
                        'Allocated',
-                       pallet_sequence[:allocated])
+                       single_pallet_sequences_view[:allocated])
         form.add_label(:in_stock,
                        'In stock',
-                       pallet_sequence[:in_stock])
-        fields_for_rmd_allocated_pallet_sequence_display(form, pallet_sequence) if pallet_sequence[:allocated]
-        form.add_prev_next_nav('/rmd/production/pallet_inquiry/scan_pallet_sequence/$:id$', ps_ids, id)
+                       single_pallet_sequences_view[:in_stock])
+        fields_for_rmd_allocated_pallet_sequence_display(form, single_pallet_sequences_view) if single_pallet_sequences_view[:allocated].include?('true')
         view(inline: form.render, layout: :layout_rmd)
       end
     end

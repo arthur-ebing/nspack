@@ -1,6 +1,6 @@
 ---
 :caption: Pallet Formats
-:sql: SELECT "pallet_formats"."id", "pallet_formats"."description", "pallet_formats"."pallet_base_id",
+:sql: SELECT "pallet_formats"."id", "pallet_formats"."description", "pallet_formats"."pallet_base_id", "pallet_formats"."bin",
   "pallet_formats"."pallet_stack_type_id", "pallet_bases"."pallet_base_code", "pallet_stack_types"."stack_type_code", "pallet_formats"."active"
   FROM "pallet_formats" JOIN "pallet_bases" ON "pallet_bases"."id" = "pallet_formats"."pallet_base_id"
   JOIN "pallet_stack_types" ON "pallet_stack_types"."id" = "pallet_formats"."pallet_stack_type_id"
@@ -109,6 +109,22 @@
     :sequence_no: 7
     :caption: Active
     :namespaced_name: pallet_formats.active
+    :data_type: :boolean
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  bin:
+    :name: bin
+    :sequence_no: 8
+    :caption: Bin
+    :namespaced_name: pallet_formats.bin
     :data_type: :boolean
     :width:
     :format:

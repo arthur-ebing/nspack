@@ -10,5 +10,6 @@ module MasterfilesApp
     required(:height_mm).maybe(:integer)
     required(:footprint_code).maybe(Types::StrippedString)
     optional(:standard_pack_ids).maybe(:array).maybe { each(:integer) }
+    optional(:bin).filled(:bool)
   end
 end

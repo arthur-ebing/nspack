@@ -6,5 +6,6 @@ module MasterfilesApp
     required(:description).filled(Types::StrippedString)
     required(:pallet_base_id).filled(:integer)
     required(:pallet_stack_type_id).filled(:integer)
+    optional(:bin).filled(:bool)
   end
 end

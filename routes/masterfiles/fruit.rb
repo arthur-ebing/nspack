@@ -395,6 +395,7 @@ class Nspack < Roda
               height_mm
               footprint_code
               standard_pack_codes
+              bin
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
@@ -454,6 +455,7 @@ class Nspack < Roda
             active
             footprint_code
             standard_pack_codes
+            bin
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)

@@ -70,6 +70,14 @@ module RawMaterialsApp
       DB[:rmt_classes].insert(default.merge(opts))
     end
 
+    def create_rmt_size(opts = {})
+      default = {
+        size_code: Faker::Lorem.unique.word,
+        description: Faker::Lorem.word
+      }
+      DB[:rmt_sizes].insert(default.merge(opts))
+    end
+
     def create_location_type(opts = {})
       default = {
         location_type_code: Faker::Lorem.word,

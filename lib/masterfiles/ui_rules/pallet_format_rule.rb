@@ -21,6 +21,7 @@ module UiRules
       fields[:pallet_base_id] = { renderer: :label, with_value: pallet_base_id_label, caption: 'Pallet Base' }
       fields[:pallet_stack_type_id] = { renderer: :label, with_value: pallet_stack_type_id_label, caption: 'Pallet Stack Type' }
       fields[:active] = { renderer: :label, as_boolean: true }
+      fields[:bin] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields
@@ -35,7 +36,8 @@ module UiRules
                                 options: @repo.for_select_pallet_stack_types,
                                 disabled_options: @repo.for_select_inactive_pallet_stack_types,
                                 caption: 'pallet stack type',
-                                required: true }
+                                required: true },
+        bin: { renderer: :checkbox }
       }
     end
 

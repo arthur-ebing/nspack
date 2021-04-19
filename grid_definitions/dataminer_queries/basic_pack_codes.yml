@@ -1,6 +1,6 @@
 ---
 :caption: Basic Packs
-:sql: "SELECT basic_pack_codes.id,\r\n       basic_pack_codes.basic_pack_code,\r\n
+:sql: "SELECT basic_pack_codes.id,\r\n       basic_pack_codes.basic_pack_code,\r\n       basic_pack_codes.bin,\r\n
   \      basic_pack_codes.description,\r\n       basic_pack_codes.length_mm,\r\n       basic_pack_codes.width_mm,\r\n
   \      basic_pack_codes.height_mm,\r\n       basic_pack_codes.footprint_code,\r\n
   \      ARRAY_AGG(standard_pack_codes.standard_pack_code) AS standard_pack_codes,\r\n
@@ -186,6 +186,22 @@
     :pinned: 
     :groupable: true
     :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  bin:
+    :name: bin
+    :sequence_no: 12
+    :caption: Bin
+    :namespaced_name: pallet_formats.bin
+    :data_type: :boolean
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false

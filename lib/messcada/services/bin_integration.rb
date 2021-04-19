@@ -43,6 +43,25 @@ module MesscadaApp
       bintip_criteria_passed?
     end
 
+    def bin_attributes # rubocop:disable Metrics/AbcSize
+      res = repo.fetch_bin_from_external_system(bin_number)
+      return res unless res.success
+
+      bin_attrs = { bin_asset_number: res.instance['bin_number'], nett_weight: res.instance['weight'], bin_fullness: 'Full', qty_bins: 1,
+                    bin_received_date_time: res.instance['bin_receive_date_time'], rmt_container_type_id: repo.get_value(:rmt_container_types, :id, container_type_code: 'BIN') }
+
+      mf_res = lookup_masterfiles({ farm_code: res.instance['farm_code'], orchard_code: res.instance['orchard_code'], product_class_code: res.instance['product_class_code'],
+                                    size_code: res.instance['size_code'], rmt_variety_code: res.instance['rmt_variety_code'], season_code: res.instance['season_code'],
+                                    location_code: res.instance['location_code'], commodity_code: res.instance['commodity_code'], puc_code: res.instance['puc_code'] })
+      return mf_res unless mf_res.success
+
+      bin_attrs.merge!(mf_res.instance)
+
+      bin_columns = %w[bin_number weight is_half_bin bin_receive_date_time orchard_code farm_code product_class_code rmt_variety_code season_code size_code location_code commodity_id]
+      bin_attrs[:legacy_data] = res.instance.delete_if { |k, _v| bin_columns.include?(k) }.to_json
+      success_response('ok', { bin_attrs: bin_attrs, delivery_number: res.instance['delivery_number'] })
+    end
+
     private
 
     def bintip_criteria_passed? # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
@@ -79,25 +98,6 @@ module MesscadaApp
       end
 
       success_response('ok')
-    end
-
-    def bin_attributes # rubocop:disable Metrics/AbcSize
-      res = repo.fetch_bin_from_external_system(bin_number)
-      return res unless res.success
-
-      bin_attrs = { bin_asset_number: res.instance['bin_number'], nett_weight: res.instance['weight'], bin_fullness: 'Full', qty_bins: 1,
-                    bin_received_date_time: res.instance['bin_receive_date_time'], rmt_container_type_id: repo.get_value(:rmt_container_types, :id, container_type_code: 'BIN') }
-
-      mf_res = lookup_masterfiles({ farm_code: res.instance['farm_code'], orchard_code: res.instance['orchard_code'], product_class_code: res.instance['product_class_code'],
-                                    size_code: res.instance['size_code'], rmt_variety_code: res.instance['rmt_variety_code'], season_code: res.instance['season_code'],
-                                    location_code: res.instance['location_code'], commodity_code: res.instance['commodity_code'], puc_code: res.instance['puc_code'] })
-      return mf_res unless mf_res.success
-
-      bin_attrs.merge!(mf_res.instance)
-
-      bin_columns = %w[bin_number weight is_half_bin bin_receive_date_time orchard_code farm_code product_class_code rmt_variety_code season_code size_code location_code commodity_id]
-      bin_attrs[:legacy_data] = res.instance.delete_if { |k, _v| bin_columns.include?(k) }.to_json
-      success_response('ok', { bin_attrs: bin_attrs, delivery_number: res.instance['delivery_number'] })
     end
 
     def delivery_attributes(delivery_number) # rubocop:disable Metrics/AbcSize

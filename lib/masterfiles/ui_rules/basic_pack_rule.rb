@@ -23,6 +23,7 @@ module UiRules
       fields[:width_mm] = { renderer: :label, caption: 'Width (mm)' }
       fields[:height_mm] = { renderer: :label, caption: 'Height (mm)' }
       fields[:active] = { renderer: :label, as_boolean: true }
+      fields[:bin] = { renderer: :label, as_boolean: true }
       fields[:footprint_code] = { renderer: :label }
       fields[:standard_pack_codes] = { renderer: :list,
                                        caption: 'Standard Packs',
@@ -43,7 +44,8 @@ module UiRules
                              options: @repo.for_select_standard_packs,
                              selected: @form_object.standard_pack_ids,
                              hide_on_load: AppConst::CR_MF.basic_pack_equals_standard_pack?,
-                             required: false }
+                             required: false },
+        bin: { renderer: :checkbox }
       }
     end
 

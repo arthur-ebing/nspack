@@ -300,5 +300,12 @@ module MasterfilesApp
         .where(is_standard_carton: true)
         .all
     end
+
+    def find_fruit_size_ref_by_rmt_size(rmt_size_id)
+      DB[:fruit_size_references]
+        .join(:rmt_sizes, size_code: :size_reference)
+        .where(Sequel[:rmt_sizes][:id] => rmt_size_id)
+        .get(Sequel[:fruit_size_references][:id])
+    end
   end
 end

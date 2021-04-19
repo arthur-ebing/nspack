@@ -173,6 +173,241 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.redirect('/rmd/raw_materials/receive_bin')
       end
     end
+
+    # --------------------------------------------------------------------------
+    # BINS TO PALLETS
+    # --------------------------------------------------------------------------
+    r.on 'convert_bins_to_pallets' do
+      r.get do
+        retrieve_from_local_store(:bin_scans)
+        retrieve_from_local_store(:bin_seqs)
+        retrieve_from_local_store('1'.to_sym)
+        retrieve_from_local_store('2'.to_sym)
+        retrieve_from_local_store('3'.to_sym)
+
+        repo = MasterfilesApp::PackagingRepo.new
+        form_state = retrieve_from_local_store(:form_state)
+        error = retrieve_from_local_store(:error)
+        form_state.merge!(error_message: error[:message], errors:  error[:errors]) unless error.nil?
+
+        form = Crossbeams::RMDForm.new(form_state,
+                                       form_name: :bins,
+                                       scan_with_camera: @rmd_scan_with_camera,
+                                       caption: 'Scan Bins',
+                                       action: '/rmd/raw_materials/convert_bins_to_pallets',
+                                       button_caption: 'Submit')
+
+        form.add_field(:bin_asset_number1, 'Bin Number 1', scan: 'key248_all', scan_type: :bin_asset, submit_form: false, required: true)
+        form.add_field(:bin_asset_number2, 'Bin Number 2', scan: 'key248_all', scan_type: :bin_asset, submit_form: false, required: false)
+        form.add_field(:bin_asset_number3, 'Bin Number 3', scan: 'key248_all', scan_type: :bin_asset, submit_form: false, required: false)
+        form.add_select(:pallet_format_id,
+                        'Pallet Format',
+                        items: repo.for_select_pallet_formats(where: { bin: true }),
+                        value: repo.get_value(:pallet_formats, :id, description: AppConst::DEFAULT_BIN_PALLET_FORMAT),
+                        required: true,
+                        prompt: true)
+
+        form.add_csrf_tag csrf_tag
+        view(inline: form.render, layout: :layout_rmd)
+      end
+
+      r.post do
+        interactor = RawMaterialsApp::RmtBinInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+        res = interactor.convert_bins_to_pallets(params[:bins])
+        if res.success
+          store_locally(:bin_scans, params[:bins])
+          store_locally(:bin_seqs, res.instance[:bins])
+          r.redirect('/rmd/raw_materials/bin_pallet_sequence_info_collect_nav/1')
+        else
+          store_locally(:error, message: res.message,  errors: res.errors)
+          store_locally(:form_state, params[:bins])
+          r.redirect('/rmd/raw_materials/convert_bins_to_pallets')
+        end
+      end
+    end
+
+    r.on 'bin_pallet_sequence_info_collect_nav', Integer do |id|
+      r.get do
+        repo = ProductionApp::ResourceRepo.new
+        fruit_size_repo = MasterfilesApp::FruitSizeRepo.new
+        cultivar_repo = MasterfilesApp::CultivarRepo.new
+        fruit_repo = MasterfilesApp::FruitRepo.new
+        party_repo = MasterfilesApp::PartyRepo.new
+        if (form_state = retrieve_from_local_store(id.to_s.to_sym))
+          store_locally(id.to_s.to_sym, form_state)
+        else
+          form_state = { sell_by_code: AppConst::DEFAULT_BIN_SELL_BY_CODE }
+        end
+
+        bin_scans = retrieve_from_local_store(:bin_scans)
+        bin_asset_number = bin_scans["bin_asset_number#{id}".to_sym]
+        bin = repo.where(:rmt_bins, RawMaterialsApp::RmtBin, bin_asset_number: bin_asset_number)
+        store_locally(:bin_scans, bin_scans)
+
+        error = retrieve_from_local_store(:error)
+        form_state.merge!(error_message: error[:message]) unless error.nil?
+
+        bin_seqs = retrieve_from_local_store(:bin_seqs)
+        form_state.store(:bin_asset_number, bin.bin_asset_number)
+        store_locally(:bin_seqs, bin_seqs)
+        form = Crossbeams::RMDForm.new(form_state,
+                                       form_name: :pallet_info,
+                                       scan_with_camera: @rmd_scan_with_camera,
+                                       caption: 'Capture Bin Pallet Sequence Info',
+                                       step_and_total: [bin_seqs.index(id) + 1, bin_seqs.length],
+                                       reset_button: false,
+                                       no_submit: false,
+                                       button_caption: 'Save',
+                                       action: "/rmd/raw_materials/bin_pallet_sequence_info_collect_nav/#{id}")
+
+        form.add_select(:production_line_id, 'Production Line',
+                        items: repo.for_select_plant_resources_of_type('LINE'),
+                        value: repo.get_bin_production_line(bin.bin_asset_number),
+                        prompt: true,
+                        required: true)
+        form.add_select(:basic_pack_code_id,
+                        'Basic Pack',
+                        items: fruit_size_repo.for_select_basic_packs(where: { bin: true }),
+                        value: repo.get_value(:basic_pack_codes, :id, basic_pack_code: AppConst::DEFAULT_BASIC_PACK),
+                        required: true,
+                        prompt: true)
+        form.add_select(:marketing_variety_id,
+                        'Marketing Variety',
+                        items: bin.cultivar_id ? cultivar_repo.for_select_cultivar_marketing_varieties(bin.cultivar_id) : cultivar_repo.for_select_cultivar_group_marketing_varieties(bin.cultivar_group_id),
+                        value: cultivar_repo.find_marketing_variety_by_cultivar_code(bin.cultivar_id),
+                        required: true,
+                        prompt: true)
+        form.add_select(:grade_id,
+                        'Grade',
+                        items: repo.select_values(:grades, %i[grade_code id], rmt_grade: true),
+                        value: bin.rmt_class_id && (grade_id = fruit_repo.find_grade_by_rmt_class(bin.rmt_class_id)) ? grade_id : repo.get_value(:grades, :id, grade_code: AppConst::DEFAULT_BIN_GRADE),
+                        required: true,
+                        prompt: true)
+        form.add_select(:fruit_size_ref_id,
+                        'Size Ref',
+                        items: fruit_size_repo.for_select_fruit_size_references,
+                        value: bin.rmt_size_id && (fruit_size_ref_id = fruit_size_repo.find_fruit_size_ref_by_rmt_size(bin.rmt_size_id)) ? fruit_size_ref_id : repo.get_value(:fruit_size_references, :id, size_reference: AppConst::BIN_UNKNOWN_SIZE_REF),
+                        required: true,
+                        prompt: true)
+        form.add_select(:packed_tm_group_id,
+                        'Packed TM Group',
+                        items: MasterfilesApp::TargetMarketRepo.new.for_select_packed_tm_groups,
+                        value: EdiApp::PoInRepo.new.find_packed_tm_group_id(AppConst::DEFAULT_BIN_PACKED_TM_GROUP),
+                        required: true,
+                        prompt: true)
+        form.add_select(:marketing_party_role_id,
+                        'Marketing Org',
+                        items: party_repo.for_select_party_roles(AppConst::ROLE_MARKETER),
+                        value: party_repo.find_party_role_from_org_code_for_role(AppConst::DEFAULT_MARKETING_ORG, AppConst::ROLE_MARKETER),
+                        required: true,
+                        prompt: true)
+        form.add_select(:mark_id,
+                        'Mark',
+                        items: MasterfilesApp::MarketingRepo.new.for_select_marks,
+                        value: repo.get_value(:marks, :id, mark_code: AppConst::DEFAULT_BIN_MARK),
+                        required: true,
+                        prompt: true)
+        form.add_select(:inventory_code_id,
+                        'Inventory Code',
+                        items: fruit_repo.for_select_inventory_codes,
+                        value: repo.get_value(:inventory_codes, :id, inventory_code: AppConst::DEFAULT_BIN_INVENTORY_CODE),
+                        required: true,
+                        prompt: true)
+        form.add_field(:sell_by_code, 'Sell By Code', required: true)
+        form.add_field(:bin_asset_number, 'Bin Number1', required: true, hide_on_load: true)
+        form.add_prev_next_nav('/rmd/raw_materials/bin_pallet_sequence_info_collect_nav/$:id$', bin_seqs, id)
+        form.add_button('Covert To Pallet', '/rmd/raw_materials/convert_bins_to_pallets_complete')
+        form.add_csrf_tag csrf_tag
+        view(inline: form.render, layout: :layout_rmd)
+      end
+
+      r.post do
+        store_locally(id.to_s.to_sym, params[:pallet_info])
+        r.redirect("/rmd/raw_materials/bin_pallet_sequence_info_collect_nav/#{id}")
+      end
+    end
+
+    r.on 'convert_bins_to_pallets_complete' do
+      r.post do
+        interactor = RawMaterialsApp::RmtBinInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+        bins_info = []
+        (bin_seqs = retrieve_from_local_store(:bin_seqs)).sort.each do |id|
+          store_locally(:bin_seqs, bin_seqs)
+          if (bin_info = retrieve_from_local_store(id.to_s.to_sym)).nil?
+            store_locally(:error, message: "Pallet Info for Bin #{id} has not been captured yet")
+            r.redirect("/rmd/raw_materials/bin_pallet_sequence_info_collect_nav/#{id}")
+          end
+          bins_info << bin_info
+          store_locally(id.to_s.to_sym, bin_info)
+        end
+
+        bin_scans = retrieve_from_local_store(:bin_scans)
+        pallet_format_id = bin_scans[:pallet_format_id]
+        res = interactor.create_pallet_from_bins(pallet_format_id, bins_info)
+        if res.success
+          r.redirect("/rmd/raw_materials/print_bins_pallet/#{res.instance[:pallet_id]}")
+        else
+          store_locally(:bin_scans, bin_scans)
+          store_locally(:error, message: "Error: #{unwrap_failed_response(res)}")
+          r.redirect('/rmd/raw_materials/bin_pallet_sequence_info_collect_nav/1')
+        end
+      end
+    end
+
+    r.on 'print_bins_pallet', Integer do |id|
+      r.get do
+        pallet_sequences = MesscadaApp::MesscadaRepo.new.find_pallet_sequences_by_pallet(id).sort_by { |s| s[:id] }
+        single_pallet_sequences_view = {}
+        pallet_sequences[0].each_key do |k|
+          single_pallet_sequences_view.store(k, pallet_sequences.sort_by { |s| s[:id] }.map { |s| s[k] }.compact.uniq.join(', '))
+        end
+        form_state = { no_of_prints: 4 }
+        error = retrieve_from_local_store(:error)
+        form_state.merge!(error_message: error[:message]) unless error.nil?
+
+        form = Crossbeams::RMDForm.new(form_state,
+                                       form_name: :pallet,
+                                       scan_with_camera: @rmd_scan_with_camera,
+                                       caption: "Print Pallet #{single_pallet_sequences_view[:pallet_number]}",
+                                       notes: retrieve_from_local_store(:flash_notice),
+                                       reset_button: false,
+                                       action: "/rmd/raw_materials/print_bins_pallet/#{id}",
+                                       button_caption: 'Print')
+
+        fields_for_rmd_pallet_sequence_display(form, single_pallet_sequences_view)
+
+        form.add_field(:no_of_prints,
+                       'Qty To Print',
+                       required: false,
+                       prompt: true,
+                       data_type: :number)
+        form.add_select(:printer,
+                        'Printer',
+                        items: LabelApp::PrinterRepo.new.select_printers_for_application(AppConst::PRINT_APP_PALLET),
+                        value: LabelApp::PrinterRepo.new.default_printer_for_application(AppConst::PRINT_APP_PALLET),
+                        required: false)
+        form.add_select(:pallet_label_name,
+                        'Pallet Label',
+                        value: ProductionApp::ProductionRunRepo.new.find_pallet_label_name_by_resource_allocation_id(pallet_sequences[0][:resource_allocation_id]),
+                        items: ProductionApp::ProductionRunRepo.new.find_pallet_labels,
+                        required: false)
+        form.add_csrf_tag csrf_tag
+        view(inline: form.render, layout: :layout_rmd)
+      end
+
+      r.post do
+        prod_interactor = ProductionApp::ProductionRunInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+        res = prod_interactor.print_pallet_label(id, params[:pallet])
+        if res.success
+          store_locally(:flash_notice, 'Labels For Pallet Printed Successfully')
+        else
+          store_locally(:error, message: unwrap_failed_response(res))
+        end
+        r.redirect("/rmd/raw_materials/print_bins_pallet/#{id}")
+      end
+    end
   end
 
   # --------------------------------------------------------------------------

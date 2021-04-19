@@ -9,6 +9,7 @@ module RawMaterialsApp
     attribute :orchard_id, Types::Integer
     attribute :farm_id, Types::Integer
     attribute :rmt_class_id, Types::Integer
+    attribute :rmt_size_id, Types::Integer
     attribute :rmt_material_owner_party_role_id, Types::Integer
     attribute :rmt_container_type_id, Types::Integer
     attribute :rmt_container_material_type_id, Types::Integer
@@ -32,6 +33,7 @@ module RawMaterialsApp
     attribute :bin_received_date_time, Types::DateTime
     attribute :bin_tipped_date_time, Types::DateTime
     attribute :exit_ref_date_time, Types::DateTime
+    attribute :created_at, Types::DateTime
     attribute :rebin_created_at, Types::DateTime
     attribute :scrapped_at, Types::DateTime
     attribute? :scrapped, Types::Bool
@@ -46,6 +48,7 @@ module RawMaterialsApp
     attribute :orchard_id, Types::Integer
     attribute :farm_id, Types::Integer
     attribute :rmt_class_id, Types::Integer
+    attribute :rmt_size_id, Types::Integer
     attribute :rmt_material_owner_party_role_id, Types::Integer
     attribute :rmt_container_type_id, Types::Integer
     attribute :rmt_container_material_type_id, Types::Integer
@@ -70,6 +73,7 @@ module RawMaterialsApp
     attribute :bin_received_date_time, Types::DateTime
     attribute :bin_tipped_date_time, Types::DateTime
     attribute :exit_ref_date_time, Types::DateTime
+    attribute :created_at, Types::DateTime
     attribute :rebin_created_at, Types::DateTime
     attribute :scrapped_at, Types::DateTime
     attribute? :scrapped, Types::Bool

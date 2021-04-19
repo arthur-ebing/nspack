@@ -96,6 +96,7 @@ module RawMaterialsApp
       cultivar_group_id = create_cultivar_group
       puc_id = create_puc
       location_id = create_location
+      rmt_size_id = create_rmt_size
 
       {
         id: 1,
@@ -111,6 +112,7 @@ module RawMaterialsApp
         cultivar_group_id: cultivar_group_id,
         location_id: location_id,
         puc_id: puc_id,
+        rmt_size_id: rmt_size_id,
         status: Faker::Lorem.unique.word,
         exit_ref: 'ABC',
         qty_bins: 1,
@@ -130,6 +132,7 @@ module RawMaterialsApp
         bin_tipped_date_time: '2010-01-01 12:00',
         exit_ref_date_time: '2010-01-01 12:00',
         rebin_created_at: '2010-01-01 12:00',
+        created_at: '2010-01-01 12:00',
         active: true,
         scrapped: false,
         scrapped_at: '2010-01-01 12:00'

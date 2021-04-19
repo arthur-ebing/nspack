@@ -9,5 +9,6 @@ module MasterfilesApp
     attribute :pallet_base_code, Types::String
     attribute :stack_type_code, Types::String
     attribute? :active, Types::Bool
+    attribute? :bin, Types::Bool
   end
 end

@@ -12,5 +12,6 @@ module MasterfilesApp
     attribute :standard_pack_ids, Types::Array
     attribute :standard_pack_codes, Types::Array
     attribute? :active, Types::Bool
+    attribute? :bin, Types::Bool
   end
 end

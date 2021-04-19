@@ -409,5 +409,24 @@ module RawMaterialsApp
     def rebin_label_printing_instance(id)
       DB[:vw_rebin_label].where(id: id).first
     end
+
+    def find_pallet_sequences_for_by_bin_assets(bin_asset_numbers)
+      DB[:rmt_bins]
+        .join(:pallet_sequences, source_bin_id: :id)
+        .where(bin_asset_number: bin_asset_numbers)
+        .select_map(:bin_asset_number)
+    end
+
+    def get_line_packhouse_resource(line_resource_id) # rubocop:disable Metrics/AbcSize
+      DB[Sequel[:plant_resources].as(:l)]
+        .join(:tree_plant_resources, descendant_plant_resource_id: :id)
+        .join(Sequel[:plant_resources].as(:p), id: :ancestor_plant_resource_id)
+        .join(Sequel[:plant_resource_types].as(:tp), id: Sequel[:p][:plant_resource_type_id])
+        .where(Sequel[:l][:id] => line_resource_id)
+        .where(Sequel[:tp][:plant_resource_type_code] => Crossbeams::Config::ResourceDefinitions::PACKHOUSE)
+        .select(Sequel[:p][:id], Sequel[:p][:location_id])
+        .first
+        .to_h
+    end
   end
 end

@@ -22,6 +22,7 @@ module Masterfiles
               form.add_field :width_mm
               form.add_field :height_mm
               form.add_field :footprint_code
+              form.add_field :bin
               form.add_field :standard_pack_ids
             end
           end

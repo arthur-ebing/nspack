@@ -218,6 +218,16 @@ module RawMaterialsApp
       error
     end
 
+    def validate_bins_exist(params)
+      error = {}
+      scans = params.find_all { |k, _v| k.to_s.include?('bin_asset_number') }.map { |b| b[1] }
+      existing_bins = repo.select_values(:rmt_bins, :bin_asset_number, bin_asset_number: scans)
+      params.find_all { |_k, v| (scans - existing_bins).include?(v) }.each do |k, _v|
+        error.store(k, ['Bin does not exist'])
+      end
+      error
+    end
+
     def create_rmt_bins(delivery_id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       res = validate_bin_asset_numbers_duplicate_scans(params)
       return validation_failed_response(OpenStruct.new(message: 'Validation Error', messages: res)) unless res.empty?
@@ -251,6 +261,65 @@ module RawMaterialsApp
       success_response('Bins Scanned Successfully',
                        delivery)
     rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def create_bins_for_kr(missing_bins) # rubocop:disable Metrics/AbcSize
+      missing_bins.each do |b|
+        res = MesscadaApp::BinIntegration.new(b, nil).bin_attributes
+        return res unless res.success
+
+        res.instance[:bin_attrs].delete_if { |k, _v| [:commodity_id].include?(k) }
+        id = RawMaterialsApp::RmtDeliveryRepo.new.create_rmt_bin(res.instance[:bin_attrs])
+        repo.log_status(:rmt_bins, id, 'BIN CREATED FROM EXTERNAL SYSTEM')
+      end
+
+      ok_response
+    end
+
+    def validate_bins_already_converted(params)
+      error = {}
+      scans = params.find_all { |k, _v| k.to_s.include?('bin_asset_number') }.map { |b| b[1] }
+      bins_already_converted = repo.find_pallet_sequences_for_by_bin_assets(scans)
+      params.find_all { |_k, v| bins_already_converted.include?(v) }.each do |k, _v|
+        error.store(k, ['Bin has already been converted'])
+      end
+      error
+    end
+
+    def convert_bins_to_pallets(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      params.delete_if { |k, v| v.nil_or_empty? || k.to_s.include?('scan_field') }
+      res = validate_bin_asset_numbers_duplicate_scans(params)
+      return validation_failed_response(OpenStruct.new(message: 'Validation Error', messages: res)) unless res.empty?
+
+      repo.transaction do
+        unless (errors = validate_bins_exist(params)).empty?
+          return validation_failed_response(OpenStruct.new(message: 'Validation Error', messages: errors)) unless AppConst::CLIENT_CODE == 'kr'
+
+          res = create_bins_for_kr(params.find_all { |k, _v| errors.keys.include?(k) }.map { |b| b[1] })
+          raise res.message unless res.success
+        end
+
+        res = validate_bins_already_converted(params)
+        return validation_failed_response(OpenStruct.new(message: 'Validation Error', messages: res)) unless res.empty?
+
+        bins = []
+        bins << 1 if params.key?(:bin_asset_number1)
+        bins << 2 if params.key?(:bin_asset_number2)
+        bins << 3 if params.key?(:bin_asset_number3)
+        success_response('ok', bins: bins)
+      end
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      failed_response(e.message)
+    end
+
+    def create_pallet_from_bins(pallet_format_id, bins_info)
+      RawMaterialsApp::CreatePalletInfoFromBins.call(@user.user_name, pallet_format_id, bins_info)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
       failed_response(e.message)
     end
 

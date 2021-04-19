@@ -39,6 +39,13 @@ module ProductionApp
       for_select_plant_resources(where: { plant_resource_type_id: type[:id] })
     end
 
+    def get_bin_production_line(bin_asset_number)
+      DB[:production_runs]
+        .join(:rmt_bins, production_run_rebin_id: :id)
+        .where(bin_asset_number: bin_asset_number)
+        .get(:production_line_id)
+    end
+
     def for_select_plant_resource_codes(plant_resource_type_code) # rubocop:disable Metrics/AbcSize
       type = where_hash(:plant_resource_types, plant_resource_type_code: plant_resource_type_code, active: true)
       return [] if type.nil?

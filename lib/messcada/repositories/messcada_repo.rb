@@ -514,6 +514,11 @@ module MesscadaApp
       DB[query, id].first
     end
 
+    def find_pallet_sequences_by_pallet(id)
+      query = MesscadaApp::DatasetPalletSequence.call('WHERE pallet_sequences.pallet_id = ?')
+      DB[query, id].all
+    end
+
     def update_pallet_sequence_verification_result(pallet_sequence_id, params)
       nett_weight_upd = ", nett_weight=#{params[:nett_weight]} " if params[:nett_weight]
       upd = "UPDATE pallet_sequences SET verified=true,verified_at='#{Time.now}',verified_by='#{params[:verified_by]}',verification_result = '#{params[:verification_result]}', verification_passed=#{params[:verification_result] != 'failed'}, pallet_verification_failure_reason_id = #{(params[:verification_result] != 'failed' ? 'Null' : "'#{params[:verification_failure_reason]}'")} #{nett_weight_upd} WHERE id = #{pallet_sequence_id};"

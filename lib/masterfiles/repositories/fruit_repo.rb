@@ -82,5 +82,12 @@ module MasterfilesApp
           :treatment_code
         ).map { |r| ["#{r[:treatment_type_code]} - #{r[:treatment_code]}", r[:id]] }
     end
+
+    def find_grade_by_rmt_class(rmt_class_id)
+      DB[:grades]
+        .join(:rmt_classes, rmt_class_code: :grade_code)
+        .where(Sequel[:rmt_classes][:id] => rmt_class_id)
+        .get(Sequel[:grades][:id])
+    end
   end
 end

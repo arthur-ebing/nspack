@@ -158,6 +158,36 @@ module MasterfilesApp
         .select_map(:marketing_variety_code)
     end
 
+    def for_select_cultivar_marketing_varieties(id)
+      DB[:marketing_varieties]
+        .join(:marketing_varieties_for_cultivars, marketing_variety_id: :id)
+        .select(Sequel[:marketing_varieties][:id], :marketing_variety_code)
+        .where(cultivar_id: id)
+        .order(:marketing_variety_code)
+        .map(%i[marketing_variety_code id])
+    end
+
+    def for_select_cultivar_group_marketing_varieties(id)
+      DB[:marketing_varieties]
+        .join(:marketing_varieties_for_cultivars, marketing_variety_id: :id)
+        .join(:cultivars, id: :cultivar_id)
+        .select(Sequel[:marketing_varieties][:id], :marketing_variety_code)
+        .where(cultivar_group_id: id)
+        .order(:marketing_variety_code)
+        .map(%i[marketing_variety_code id])
+    end
+
+    def find_marketing_variety_by_cultivar_code(cultivar_id)
+      query = <<~SQL
+        SELECT id
+        FROM marketing_varieties
+        WHERE marketing_variety_code IN (SELECT cultivar_name
+                                         from cultivars
+                                         where id = ? )
+      SQL
+      DB[query, cultivar_id].get(:id)
+    end
+
     def find_production_run_cultivar(production_run_id)
       DB[:cultivars]
         .join(:production_runs, cultivar_id: :id)
