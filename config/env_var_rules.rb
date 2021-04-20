@@ -15,7 +15,6 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { CAPTURE_CONTAINER_MATERIAL: 'Type of bin at delivery eg. Wood, Plastic (Required for empty bin control)' },
     { CAPTURE_CONTAINER_MATERIAL_OWNER: 'Capture container material owner at delivery eg. Chep (Required for empty bin control)' },
     { USE_DELIVERY_DESTINATION: 'Intended destination for a delivery of rmt_fruit eg. degreening or PH1' },
-    { DEFAULT_RMT_DELIVERY_VALUES: 'Default the new_delivery form values to the latest delivery created. Default must be true' },
     { CAPTURE_DAMAGED_BINS: 'Optional capture at delivery' },
     { HIDE_INTAKE_TRIP_SHEET_ON_GOVT_INSPECTION_SHEET: 'Determines if tripsheet can be created or not' },
     { CAPTURE_EMPTY_BINS: 'Optional capture at delivery' },

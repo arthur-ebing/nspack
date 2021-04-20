@@ -360,7 +360,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       interactor = RawMaterialsApp::RmtDeliveryInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('deliveries', 'new')
-        latest_delivery = RawMaterialsApp::RmtDeliveryRepo.new.latest_delivery&.merge!(date_picked: Time.now, date_delivered: Time.now) if AppConst::DEFAULT_RMT_DELIVERY_VALUES
+        latest_delivery = RawMaterialsApp::RmtDeliveryRepo.new.latest_delivery&.merge!(date_picked: Time.now, date_delivered: Time.now) if AppConst::CR_RMT.defaults_for_new_rmt_delivery?
         show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::New.call(form_values: latest_delivery, remote: fetch?(r)) }
       end
 

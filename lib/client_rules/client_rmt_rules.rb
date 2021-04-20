@@ -8,11 +8,13 @@ module Crossbeams
       hb: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             delivery_capture_container_material: false,
-            delivery_capture_container_material_owner: false },
+            delivery_capture_container_material_owner: false,
+            set_defaults_for_new_rmt_delivery: true },
       hl: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             delivery_capture_container_material: false,
-            delivery_capture_container_material_owner: false },
+            delivery_capture_container_material_owner: false,
+            set_defaults_for_new_rmt_delivery: true },
       kr: { bin_pallet_conversion_defaults: { pallet_format: 'xx',
                                               basic_pack: 'xx',
                                               grade: 'xx',
@@ -24,28 +26,39 @@ module Crossbeams
                                               sell_by_code: 'xx' },
             delivery_capture_inner_bins: false,
             delivery_capture_container_material: true,
-            delivery_capture_container_material_owner: true },
+            delivery_capture_container_material_owner: true,
+            set_defaults_for_new_rmt_delivery: true },
       um: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             delivery_capture_container_material: false,
-            delivery_capture_container_material_owner: false },
+            delivery_capture_container_material_owner: false,
+            set_defaults_for_new_rmt_delivery: true },
       ud: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             delivery_capture_container_material: true,
-            delivery_capture_container_material_owner: true },
+            delivery_capture_container_material_owner: true,
+            set_defaults_for_new_rmt_delivery: false },
       sr: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             delivery_capture_container_material: true,
-            delivery_capture_container_material_owner: true },
+            delivery_capture_container_material_owner: true,
+            set_defaults_for_new_rmt_delivery: true },
       sr2: { bin_pallet_conversion_defaults: {},
              delivery_capture_inner_bins: false,
              delivery_capture_container_material: true,
-             delivery_capture_container_material_owner: true }
+             delivery_capture_container_material_owner: true,
+             set_defaults_for_new_rmt_delivery: true }
     }.freeze
 
     def initialize(client_code)
       super
       @settings = CLIENT_SETTINGS.fetch(client_code.to_sym)
+    end
+
+    def defaults_for_new_rmt_delivery?(explain: false)
+      return 'Should the defaults for new_delivery be set to the values of the latest delivery.' if explain
+
+      setting(:set_defaults_for_new_rmt_delivery)
     end
 
     def default_bin_pallet_value(code, explain: false)
