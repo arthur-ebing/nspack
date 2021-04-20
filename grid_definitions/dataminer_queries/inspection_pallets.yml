@@ -1,0 +1,172 @@
+---
+:caption: Inspection Pallets
+:sql: "WITH sq AS (\r\n    SELECT\r\n        inspection_types.inspection_type_code
+  AS inspection_type,\r\n        inspections.pallet_id,\r\n        pallets.pallet_number,\r\n
+  \       target_markets.target_market_name AS target_market,\r\n        fn_party_role_name
+  (pallet_sequences.target_customer_party_role_id) AS target_customer,\r\n        grades.grade_code
+  AS grade,\r\n        inspections.inspector_id IS NOT NULL AS inspected,\r\n        fn_party_role_name
+  (inspector_party_role_id) AS inspector,\r\n        inspections.passed\r\n    FROM\r\n
+  \       inspections\r\n        JOIN inspection_types ON inspection_types.id = inspections.inspection_type_id\r\n
+  \       LEFT JOIN inspectors ON inspectors.id = inspections.inspector_id\r\n        JOIN
+  pallets ON pallets.id = inspections.pallet_id\r\n        JOIN pallet_sequences ON
+  pallets.id = pallet_sequences.pallet_id\r\n        LEFT JOIN target_markets ON pallet_sequences.target_market_id
+  = target_markets.id\r\n        LEFT JOIN grades ON pallet_sequences.grade_id = grades.id\r\n
+  \   ORDER BY\r\n        inspections.updated_at DESC\r\n)\r\nSELECT\r\n    pallets.pallet_number,\r\n
+  \   pallets.id AS pallet_id,\r\n    ( SELECT array_agg(DISTINCT inspection_type)
+  FROM sq WHERE pallets.id = sq.pallet_id AND passed AND inspected) AS passed,\r\n
+  \   ( SELECT array_agg(DISTINCT inspection_type) FROM sq WHERE pallets.id = sq.pallet_id
+  AND NOT passed AND inspected) AS failed,\r\n    ( SELECT array_agg(DISTINCT inspection_type)
+  FROM sq WHERE pallets.id = sq.pallet_id AND NOT inspected) AS not_inspected,\r\n
+  \   array_agg(DISTINCT target_market) AS pallet_target_markets,\r\n    array_agg(DISTINCT
+  target_customer) AS pallet_target_customers,\r\n    array_agg(DISTINCT grade) AS
+  pallet_grades,\r\n    array_agg(DISTINCT inspector) AS inspectors\r\nFROM\r\n    pallets\r\n
+  \   JOIN sq ON pallets.id = sq.pallet_id\r\nGROUP BY\r\n    pallets.id,\r\n    pallets.pallet_number"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  pallet_number:
+    :name: pallet_number
+    :sequence_no: 1
+    :caption: Pallet number
+    :namespaced_name: pallets.pallet_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_id:
+    :name: pallet_id
+    :sequence_no: 2
+    :caption: pallet_id
+    :namespaced_name: pallets.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  passed:
+    :name: passed
+    :sequence_no: 3
+    :caption: Passed
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  failed:
+    :name: failed
+    :sequence_no: 4
+    :caption: Failed
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  not_inspected:
+    :name: not_inspected
+    :sequence_no: 5
+    :caption: Not inspected
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_target_markets:
+    :name: pallet_target_markets
+    :sequence_no: 6
+    :caption: Target Markets
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_target_customers:
+    :name: pallet_target_customers
+    :sequence_no: 7
+    :caption: Target Customers
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_grades:
+    :name: pallet_grades
+    :sequence_no: 8
+    :caption: Grades
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inspectors:
+    :name: inspectors
+    :sequence_no: 9
+    :caption: Inspectors
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions: []

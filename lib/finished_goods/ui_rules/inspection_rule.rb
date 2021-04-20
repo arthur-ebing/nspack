@@ -10,6 +10,7 @@ module UiRules
       common_values_for_fields common_fields
 
       set_show_fields if %i[show].include? @mode
+      set_new_fields if %i[new].include? @mode
       add_behaviours if %i[edit].include? @mode
 
       form_name 'inspection'
@@ -25,6 +26,10 @@ module UiRules
       fields[:passed] = { renderer: :label, as_boolean: true }
       fields[:remarks] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
+    end
+
+    def set_new_fields
+      fields[:pallet_number] = { renderer: :select, options: @repo.for_select_pallets }
     end
 
     def common_fields

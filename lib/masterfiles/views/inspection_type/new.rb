@@ -24,8 +24,11 @@ module Masterfiles
                   col.add_field :passed_default
                 end
                 row.column do |col|
-                  col.add_field :applies_to_all_tm_groups
-                  col.add_field :applicable_tm_group_ids
+                  col.add_field :applies_to_all_tms
+                  col.add_field :applicable_tm_ids
+
+                  col.add_field :applies_to_all_tm_customers
+                  col.add_field :applicable_tm_customer_ids
 
                   col.add_field :applies_to_all_grades
                   col.add_field :applicable_grade_ids

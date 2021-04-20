@@ -14,6 +14,11 @@ module FinishedGoodsApp
                           order_by: :remarks
     crud_calls_for :inspections, name: :inspection, wrapper: Inspection, exclude: %i[create]
 
+    build_for_select :pallets,
+                     label: :pallet_number,
+                     value: :pallet_number,
+                     order_by: :pallet_number
+
     def find_inspection(id)
       hash = find_with_association(:inspections, id,
                                    parent_tables: [{ parent_table: :inspection_types,
@@ -39,16 +44,23 @@ module FinishedGoodsApp
       return nil unless pallet_id
 
       hash = { pallet_id: pallet_id, pallet_number: pallet_number }
-      hash[:tm_group_ids] = select_values(:pallet_sequences, :packed_tm_group_id, pallet_id: hash[:pallet_id])
-      hash[:grade_ids] = select_values(:pallet_sequences, :grade_id, pallet_id: hash[:pallet_id])
+
+      ds = DB[:pallet_sequences].where(pallet_id: hash[:pallet_id])
+      hash[:tm_ids] = ds.select_map(:target_market_id)
+      hash[:tm_customer_ids] = ds.select_map(:target_customer_party_role_id)
+      hash[:grade_ids] = ds.select_map(:grade_id)
+
       hash[:inspection_type_ids] = []
       hash[:passed_default] = []
 
+      p hash
+
       select_values(:inspection_types, :id, active: true).each do |inspection_type_id|
         inspection_type = MasterfilesApp::QualityRepo.new.find_inspection_type(inspection_type_id)
-        match_tm = (inspection_type.applicable_tm_group_ids & hash[:tm_group_ids]).any?
+        match_tm = (inspection_type.applicable_tm_ids & hash[:tm_ids]).any?
+        match_tm_customer = (inspection_type.applicable_tm_customer_ids & hash[:tm_customer_ids]).any?
         match_grade = (inspection_type.applicable_grade_ids & hash[:grade_ids]).any?
-        if match_tm & match_grade
+        if match_tm | match_grade | match_tm_customer
           hash[:inspection_type_ids] << inspection_type_id
           hash[:passed_default] << inspection_type.passed_default
         end

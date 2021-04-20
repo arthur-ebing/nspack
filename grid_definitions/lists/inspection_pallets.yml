@@ -1,0 +1,14 @@
+---
+:dataminer_definition: inspection_pallets
+:actions:
+- :url: "/list/inspections/with_params?key=standard&pallet_id=$:pallet_id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: false
+:page_controls:
+- :control_type: :link
+  :url: "/finished_goods/inspection/inspections/new"
+  :text: Inspection
+  :style: :button
+  :behaviour: :popup

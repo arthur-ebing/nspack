@@ -404,8 +404,10 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
               inspection_failure_type_id
               failure_type_code
               passed_default
-              applicable_tm_group_ids
-              applicable_tm_groups
+              applicable_tm_ids
+              applicable_tms
+              applicable_tm_customer_ids
+              applicable_tm_customers
               applicable_grade_ids
               applicable_grades
             ]
@@ -430,36 +432,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     r.on 'inspection_types' do
       interactor = MasterfilesApp::InspectionTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
-      r.on 'applies_to_all_tm_groups' do
-        actions = []
-        actions << OpenStruct.new(type: params[:changed_value] == 'f' ? :show_element : :hide_element,
-                                  dom_id: 'inspection_type_applicable_tm_group_ids_field_wrapper')
-        actions << OpenStruct.new(type: :replace_input_value, dom_id: 'inspection_type_applicable_tm_group_ids', value: [])
-        json_actions(actions)
-      end
-
-      r.on 'applies_to_all_cultivars' do
-        actions = []
-        actions << OpenStruct.new(type: params[:changed_value] == 'f' ? :show_element : :hide_element,
-                                  dom_id: 'inspection_type_applicable_cultivar_ids_field_wrapper')
-        actions << OpenStruct.new(type: :replace_input_value, dom_id: 'inspection_type_applicable_cultivar_ids', value: [])
-        json_actions(actions)
-      end
-
-      r.on 'applies_to_all_orchards' do
-        actions = []
-        actions << OpenStruct.new(type: params[:changed_value] == 'f' ? :show_element : :hide_element,
-                                  dom_id: 'inspection_type_applicable_orchard_ids_field_wrapper')
-        actions << OpenStruct.new(type: :replace_input_value, dom_id: 'inspection_type_applicable_orchard_ids', value: [])
-        json_actions(actions)
-      end
-
-      r.on 'applies_to_all_grades' do
-        actions = []
-        actions << OpenStruct.new(type: params[:changed_value] == 'f' ? :show_element : :hide_element,
-                                  dom_id: 'inspection_type_applicable_grade_ids_field_wrapper')
-        actions << OpenStruct.new(type: :replace_input_value, dom_id: 'inspection_type_applicable_grade_ids', value: [])
-        json_actions(actions)
+      r.on 'change', String, String do |change_mode, change_field|
+        handle_ui_change(:inspection_type, change_mode.to_sym, params, { field: change_field.to_sym })
       end
 
       r.on 'new' do    # NEW
@@ -477,8 +451,10 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             inspection_failure_type_id
             failure_type_code
             passed_default
-            applicable_tm_group_ids
-            applicable_tm_groups
+            applicable_tm_ids
+            applicable_tms
+            applicable_tm_customer_ids
+            applicable_tm_customers
             applicable_grade_ids
             applicable_grades
             active

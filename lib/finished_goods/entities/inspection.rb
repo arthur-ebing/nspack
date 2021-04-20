@@ -23,7 +23,8 @@ module FinishedGoodsApp
     attribute :pallet_number, Types::String
     attribute :inspection_type_ids, Types::Array
     attribute :passed_default, Types::Array
-    attribute :tm_group_ids, Types::Array
+    attribute :tm_ids, Types::Array
+    attribute :tm_customer_ids, Types::Array
     attribute :grade_ids, Types::Array
   end
 

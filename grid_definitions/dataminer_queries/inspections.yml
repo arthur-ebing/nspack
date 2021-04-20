@@ -6,10 +6,11 @@
   AS inspector,\r\n    inspections.inspection_failure_reason_ids,\r\n    (SELECT array_agg(ifr.failure_reason
   ORDER BY ifr.failure_reason)\r\n     FROM inspection_failure_reasons ifr\r\n     WHERE
   ifr.id = ANY(inspections.inspection_failure_reason_ids)\r\n    ) AS failure_reasons,\r\n
-  \   inspections.passed,\r\n    inspections.remarks,\r\n    inspections.active,\r\n
-  \   inspections.created_at,\r\n    inspections.updated_at,\r\n    fn_current_status('inspections',
-  inspections.id) AS status\r\nFROM inspections\r\nJOIN inspection_types ON inspection_types.id
-  = inspections.inspection_type_id\r\nLEFT JOIN inspectors ON inspectors.id = inspections.inspector_id\r\nJOIN
+  \   inspections.passed AND inspections.inspector_id IS NOT NULL AS passed,\r\n    inspections.remarks,\r\n
+  \   inspections.active,\r\n    inspections.created_at,\r\n    inspections.updated_at,\r\n
+  \   fn_current_status('inspections', inspections.id) AS status\r\nFROM inspections\r\n
+  \        JOIN inspection_types ON inspection_types.id = inspections.inspection_type_id\r\n
+  \        LEFT JOIN inspectors ON inspectors.id = inspections.inspector_id\r\n         JOIN
   pallets ON pallets.id = inspections.pallet_id\r\n\r\nORDER BY inspections.updated_at
   DESC"
 :limit: 
@@ -180,7 +181,7 @@
     :name: passed
     :sequence_no: 11
     :caption: Passed
-    :namespaced_name: inspections.passed
+    :namespaced_name: 
     :data_type: :boolean
     :width: 
     :format: 

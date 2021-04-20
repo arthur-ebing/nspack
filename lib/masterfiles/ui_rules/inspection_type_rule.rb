@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class InspectionTypeRule < Base
+  class InspectionTypeRule < Base  # rubocop:disable Metrics/ClassLength
     def generate_rules
       @repo = MasterfilesApp::QualityRepo.new
       make_form_object
@@ -22,10 +22,15 @@ module UiRules
       fields[:failure_type_code] = { renderer: :label, caption: 'Inspection Failure Type' }
       fields[:passed_default] = { renderer: :label, as_boolean: true }
 
-      fields[:applies_to_all_tm_groups] = { renderer: :label, caption: 'Applies To All TM Groups',
-                                            as_boolean: true }
-      fields[:applicable_tm_groups] = { renderer: :label, caption: 'Applicable TM Groups',
-                                        with_value: @form_object.applicable_tm_groups.join(', ') }
+      fields[:applies_to_all_tms] = { renderer: :label, caption: 'Applies To All Target Markets',
+                                      as_boolean: true }
+      fields[:applicable_tms] = { renderer: :label, caption: 'Applicable Target Markets',
+                                  with_value: @form_object.applicable_tms.join(', ') }
+
+      fields[:applies_to_all_tm_customers] = { renderer: :label, caption: 'Applies To All TM Customers',
+                                               as_boolean: true }
+      fields[:applicable_tm_customers] = { renderer: :label, caption: 'Applicable TM Customers',
+                                           with_value: @form_object.applicable_tm_customers.join(', ') }
 
       fields[:applies_to_all_grades] = { renderer: :label, as_boolean: true }
       fields[:applicable_grades] = { renderer: :label, with_value: @form_object.applicable_grades.join(', ') }
@@ -33,7 +38,7 @@ module UiRules
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
-    def common_fields
+    def common_fields # rubocop:disable Metrics/AbcSize
       {
         inspection_type_code: { required: true },
         description: {},
@@ -43,11 +48,17 @@ module UiRules
                                       required: true },
         passed_default: { renderer: :checkbox },
 
-        applies_to_all_tm_groups: { renderer: :checkbox, caption: 'Applies to all TM Groups' },
-        applicable_tm_group_ids: { renderer: :multi, caption: 'Target Market Groups',
-                                   options: MasterfilesApp::TargetMarketRepo.new.for_select_tm_groups,
-                                   selected: @form_object.applicable_tm_group_ids,
-                                   hide_on_load: @form_object.applies_to_all_tm_groups },
+        applies_to_all_tms: { renderer: :checkbox, caption: 'Applies to all Target Markets' },
+        applicable_tm_ids: { renderer: :multi, caption: 'Target Markets',
+                             options: MasterfilesApp::TargetMarketRepo.new.for_select_target_markets,
+                             selected: @form_object.applicable_tm_ids,
+                             hide_on_load: @form_object.applies_to_all_tms },
+
+        applies_to_all_tm_customers: { renderer: :checkbox, caption: 'Applies to all TM Customers' },
+        applicable_tm_customer_ids: { renderer: :multi, caption: 'Target Market Customers',
+                                      options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_TARGET_CUSTOMER),
+                                      selected: @form_object.applicable_tm_customer_ids,
+                                      hide_on_load: @form_object.applies_to_all_tm_customers },
 
         applies_to_all_grades: { renderer: :checkbox, caption: 'Applies to all Grades' },
         applicable_grade_ids: { renderer: :multi, caption: 'Grades',
@@ -72,19 +83,59 @@ module UiRules
                                     inspection_failure_type_id: nil,
                                     match_all: true,
                                     passed_default: false,
-                                    applies_to_all_tm_groups: true,
-                                    applicable_tm_group_ids: nil,
+                                    applies_to_all_tms: true,
+                                    applicable_tm_ids: nil,
+                                    applies_to_all_tm_customers: true,
+                                    applicable_tm_customer_ids: nil,
                                     applies_to_all_grades: true,
                                     applicable_grade_ids: nil)
+    end
+
+    def handle_behaviour
+      changed = {
+        applies_to_all_tms: :applies_to_all_tms,
+        applies_to_all_tm_customers: :applies_to_all_tm_customers,
+        applies_to_all_grades: :applies_to_all_grades
+      }
+      changed = changed[@options[:field]]
+      return unhandled_behaviour! if changed.nil?
+
+      send(changed)
     end
 
     private
 
     def add_behaviours
+      url = "/masterfiles/quality/inspection_types/change/#{@mode}"
       behaviours do |behaviour|
-        behaviour.input_change :applies_to_all_tm_groups, notify: [{ url: '/masterfiles/quality/inspection_types/applies_to_all_tm_groups' }]
-        behaviour.input_change :applies_to_all_grades, notify: [{ url: '/masterfiles/quality/inspection_types/applies_to_all_grades' }]
+        behaviour.input_change :applies_to_all_tms, notify: [{ url: "#{url}/applies_to_all_tms" }]
+        behaviour.input_change :applies_to_all_tm_customers, notify: [{ url: "#{url}/applies_to_all_tm_customers" }]
+        behaviour.input_change :applies_to_all_grades, notify: [{ url: "#{url}/applies_to_all_grades" }]
       end
+    end
+
+    def applies_to_all_tms
+      actions = []
+      actions << OpenStruct.new(type: params[:changed_value] == 'f' ? :show_element : :hide_element,
+                                dom_id: 'inspection_type_applicable_tm_ids_field_wrapper')
+      actions << OpenStruct.new(type: :replace_input_value, dom_id: 'inspection_type_applicable_tm_ids', value: [])
+      json_actions(actions)
+    end
+
+    def applies_to_all_tm_customers
+      actions = []
+      actions << OpenStruct.new(type: params[:changed_value] == 'f' ? :show_element : :hide_element,
+                                dom_id: 'inspection_type_applicable_tm_customer_ids_field_wrapper')
+      actions << OpenStruct.new(type: :replace_input_value, dom_id: 'inspection_type_applicable_tm_customer_ids', value: [])
+      json_actions(actions)
+    end
+
+    def applies_to_all_grades
+      actions = []
+      actions << OpenStruct.new(type: params[:changed_value] == 'f' ? :show_element : :hide_element,
+                                dom_id: 'inspection_type_applicable_grade_ids_field_wrapper')
+      actions << OpenStruct.new(type: :replace_input_value, dom_id: 'inspection_type_applicable_grade_ids', value: [])
+      json_actions(actions)
     end
   end
 end

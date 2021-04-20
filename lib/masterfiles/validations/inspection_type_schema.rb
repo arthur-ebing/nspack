@@ -7,8 +7,10 @@ module MasterfilesApp
     required(:description).maybe(Types::StrippedString)
     required(:inspection_failure_type_id).filled(:integer)
     required(:passed_default).maybe(:bool)
-    required(:applies_to_all_tm_groups).maybe(:bool)
-    required(:applicable_tm_group_ids).maybe(:array).maybe { each(:integer) }
+    required(:applies_to_all_tms).maybe(:bool)
+    required(:applicable_tm_ids).maybe(:array).maybe { each(:integer) }
+    required(:applies_to_all_tm_customers).maybe(:bool)
+    required(:applicable_tm_customer_ids).maybe(:array).maybe { each(:integer) }
     required(:applies_to_all_grades).maybe(:bool)
     required(:applicable_grade_ids).maybe(:array).maybe { each(:integer) }
   end
