@@ -140,12 +140,14 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     args.target_market_id = DB[:target_markets_for_groups].where(target_market_group_id: args.packed_tm_group_id).get(:target_market_id)
     @errors << "target_markets_for_groups masterfile not found, args: target_market_group_id: #{args.packed_tm_group_id} for target_market_id" unless args.target_market_id
 
-    organization_id = get_id_or_error(:organizations, short_description: args.target_customer)
-    role_id = get_id_or_error(:roles, name: AppConst::ROLE_TARGET_CUSTOMER)
-    args.target_customer_party_role_id = get_id_or_error(:party_roles,
-                                                         organization_id: organization_id,
-                                                         role_id: role_id)
-    @errors << "target_customer_party_role_id masterfile not found, for #{args.target_customer}" unless args.target_customer_party_role_id
+    unless args.target_customer.nil_or_empty?
+      organization_id = get_id_or_error(:organizations, short_description: args.target_customer)
+      role_id = get_id_or_error(:roles, name: AppConst::ROLE_TARGET_CUSTOMER)
+      args.target_customer_party_role_id = get_id_or_error(:party_roles,
+                                                           organization_id: organization_id,
+                                                           role_id: role_id)
+      @errors << "target_customer_party_role_id masterfile not found, for #{args.target_customer}" unless args.target_customer_party_role_id
+    end
 
     args.basic_pack_code_id = get_id_or_error(:basic_pack_codes,
                                               footprint_code: args.basic_pack_code,
