@@ -74,6 +74,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   CR_FG = Crossbeams::ClientFgRules.new(CLIENT_CODE)
   CR_EDI = Crossbeams::ClientEdiRules.new(CLIENT_CODE)
   CR_MF = Crossbeams::ClientMfRules.new(CLIENT_CODE)
+  CR_RMT = Crossbeams::ClientRmtRules.new(CLIENT_CODE)
 
   # labeling cached setup data path
   LABELING_CACHED_DATA_FILEPATH = File.expand_path('../tmp/run_cache', __dir__)
