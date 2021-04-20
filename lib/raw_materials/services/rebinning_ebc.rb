@@ -9,10 +9,10 @@ module RawMaterialsApp
     #   [String] user_name
     # }] opts
     def initialize(rmt_container_material_owner_id, opts = {})
-      @repo = EmptyBinsRepo.new
+      @repo = BinAssetsRepo.new
 
       @owner_id = rmt_container_material_owner_id
-      @location_id = @repo.onsite_empty_bin_location_id
+      @location_id = @repo.onsite_bin_asset_location_id
       @quantity = 1
 
       @ref_no = @opts[:ref_no]
@@ -23,7 +23,7 @@ module RawMaterialsApp
     end
 
     def call
-      DestroyEmptyBins.call(@owner_id, @location_id, @quantity, @opts)
+      DestroyBinAssets.call(@owner_id, @location_id, @quantity, @opts)
     end
   end
 end

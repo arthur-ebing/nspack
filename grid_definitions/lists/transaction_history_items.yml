@@ -1,11 +1,11 @@
 ---
-:dataminer_definition: empty_bin_transaction_items
+:dataminer_definition: bin_asset_transaction_items
 :conditions:
   :standard:
-    - :col: empty_bin_transaction_items.empty_bin_transaction_id
+    - :col: bin_asset_transaction_items.bin_asset_transaction_id
       :op: =
-      :val: $:empty_bin_transaction_id$
+      :val: $:bin_asset_transaction_id$
   :history:
-    - :col: empty_bin_transaction_items.id
+    - :col: bin_asset_transaction_items.id
       :op: IN
       :val: $:history_ids$

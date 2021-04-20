@@ -1,0 +1,8 @@
+---
+:dataminer_definition: bin_asset_transactions
+:actions:
+- :url: "/raw_materials/bin_assets/bin_asset_transactions/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true

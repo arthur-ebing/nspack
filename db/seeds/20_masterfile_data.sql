@@ -95,7 +95,7 @@ INSERT INTO reworks_run_types (run_type, description) VALUES('UNTIP BINS', 'Unti
 INSERT INTO reworks_run_types (run_type, description) VALUES('RECALC BIN NETT WEIGHT', 'Recalc Bin Nett Weight') ON CONFLICT DO NOTHING;
 
 -- LOCATION TYPES
-INSERT INTO location_types (location_type_code, short_code, hierarchical) VALUES('EMPTY_BIN', 'EMPTY_BIN', 'f') ON CONFLICT DO NOTHING;
+INSERT INTO location_types (location_type_code, short_code, hierarchical) VALUES('BIN_ASSET', 'BIN_ASSET', 'f') ON CONFLICT DO NOTHING;
 
 -- LOCATION STORAGE TYPES
 INSERT INTO location_storage_types (storage_type_code) VALUES('PALLETS') ON CONFLICT DO NOTHING;
@@ -125,6 +125,18 @@ INSERT INTO location_storage_types (storage_type_code) VALUES('UNTIPPED_BIN') ON
 INSERT INTO location_assignments (assignment_code) VALUES('UNTIPPED_BIN') ON CONFLICT DO NOTHING;
 INSERT INTO locations (primary_storage_type_id, location_type_id, primary_assignment_id, location_long_code, location_description, location_short_code, can_be_moved, can_store_stock, virtual_location)
 VALUES ((SELECT id FROM location_storage_types WHERE storage_type_code = 'UNTIPPED_BIN'), (SELECT id FROM location_types WHERE location_type_code = 'UNTIPPED_BIN'), (SELECT id FROM location_assignments WHERE assignment_code = 'UNTIPPED_BIN'), 'UNTIPPED_BIN', 'UNTIPPED_BIN', 'UNTIPPED_BIN', true, true, true) ON CONFLICT DO NOTHING;
+
+-- ONSITE EMPTY BIN LOCATION (Not part of locations tree)
+INSERT INTO location_storage_types (storage_type_code) VALUES('EMPTY_BINS') ON CONFLICT DO NOTHING;
+INSERT INTO location_assignments (assignment_code) VALUES('EMPTY_BIN_STORAGE') ON CONFLICT DO NOTHING;
+INSERT INTO locations (primary_storage_type_id, location_type_id, primary_assignment_id, location_long_code, location_description, location_short_code, can_be_moved, can_store_stock, virtual_location)
+VALUES ((SELECT id FROM location_storage_types WHERE storage_type_code = 'EMPTY_BINS'), (SELECT id FROM location_types WHERE location_type_code = 'BIN_ASSET'), (SELECT id FROM location_assignments WHERE assignment_code = 'EMPTY_BIN_STORAGE'), 'ONSITE_EMPTY_BIN', 'ONSITE_EMPTY_BIN', 'ONSITE_EMPTY_BIN', true, true, true) ON CONFLICT DO NOTHING;
+
+-- ONSITE FULL BIN LOCATION (Not part of locations tree)
+INSERT INTO location_storage_types (storage_type_code) VALUES('FULL_BINS') ON CONFLICT DO NOTHING;
+INSERT INTO location_assignments (assignment_code) VALUES('FULL_BIN_STORAGE') ON CONFLICT DO NOTHING;
+INSERT INTO locations (primary_storage_type_id, location_type_id, primary_assignment_id, location_long_code, location_description, location_short_code, can_be_moved, can_store_stock, virtual_location)
+VALUES ((SELECT id FROM location_storage_types WHERE storage_type_code = 'FULL_BINS'), (SELECT id FROM location_types WHERE location_type_code = 'BIN_ASSET'), (SELECT id FROM location_assignments WHERE assignment_code = 'FULL_BIN_STORAGE'), 'ONSITE_FULL_BIN', 'ONSITE_FULL_BIN', 'ONSITE_FULL_BIN', true, true, true) ON CONFLICT DO NOTHING;
 
 -- BUSINESS PROCESSES
 INSERT INTO business_processes(process, description) VALUES('MOVE_PALLET', 'ADHOC individual FG Pallet movements') ON CONFLICT DO NOTHING;

@@ -6,10 +6,10 @@ module RawMaterialsApp
     # @param [String] ref_no
     # @param [Integer] rmt_container_material_owner_id
     def initialize(ref_no, rmt_container_material_owner_id)
-      @repo = EmptyBinsRepo.new
+      @repo = BinAssetsRepo.new
 
       @asset_type_id = @repo.get_id(:asset_transaction_types, transaction_type_code: 'BIN_TIP')
-      @to_location_id = @repo.onsite_empty_bin_location_id
+      @to_location_id = @repo.onsite_bin_asset_location_id
       @ref_no = ref_no
       @bin_sets = [{ rmt_container_material_owner_id: rmt_container_material_owner_id, quantity_bins: 1 }]
 
@@ -20,7 +20,7 @@ module RawMaterialsApp
     end
 
     def call
-      CreateEmptyBins.call(@asset_type_id, @to_location_id, @ref_no, @bin_sets, @opts)
+      CreateBinAssets.call(@asset_type_id, @to_location_id, @ref_no, @bin_sets, @opts)
     end
   end
 end

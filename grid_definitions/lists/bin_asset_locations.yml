@@ -1,0 +1,9 @@
+---
+:dataminer_definition: bin_asset_locations
+:actions:
+- :url: "/raw_materials/bin_assets/location_transaction_history/$:location_id$"
+  :text: transaction history
+  :icon: view-column
+  :title: Transaction History
+  :popup: true
+  :hide_if_false: transaction_history
