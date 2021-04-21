@@ -28,9 +28,9 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
 
         success_response('Import Completed')
       else
-        puts 'Import failed'
+        puts 'Import failed: missing masterfiles'
         @errors.uniq.each { |error| p error }
-        raise Crossbeams::InfoError, 'Import failed'
+        raise Crossbeams::InfoError, 'Import failed: missing masterfiles'
       end
     end
   end
