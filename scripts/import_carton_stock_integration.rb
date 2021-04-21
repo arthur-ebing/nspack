@@ -69,7 +69,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
       params[:pallet_sequence_id] = create_pallet_sequence(params)
       carton_numbers = params[:carton_numbers].split('|')
       carton_numbers.each do |carton_number|
-        params.merge!(legacy_carton_number: carton_number)
+        params[legacy_carton_number: carton_number]
 
         params[:carton_label_id] = create_carton_label(params)
         create_carton(params)
@@ -99,7 +99,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
                            extended_fg_id: hash.delete(:extended_fg_id),
                            bin_id: hash.delete(:bin_id),
                            pallet_id: hash.delete(:legacy_pallet_id),
-                           production_run_id: hash.delete(:production_run_id) }
+                           production_run_id: hash.delete(:legacy_production_run_id) }
 
     args = OpenStruct.new(hash)
     args.production_run_id = @production_run_id
