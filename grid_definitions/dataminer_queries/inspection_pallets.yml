@@ -5,13 +5,14 @@
   \       target_markets.target_market_name AS target_market,\r\n        fn_party_role_name
   (pallet_sequences.target_customer_party_role_id) AS target_customer,\r\n        grades.grade_code
   AS grade,\r\n        inspections.inspector_id IS NOT NULL AS inspected,\r\n        fn_party_role_name
-  (inspector_party_role_id) AS inspector,\r\n        inspections.passed\r\n    FROM\r\n
-  \       inspections\r\n        JOIN inspection_types ON inspection_types.id = inspections.inspection_type_id\r\n
-  \       LEFT JOIN inspectors ON inspectors.id = inspections.inspector_id\r\n        JOIN
-  pallets ON pallets.id = inspections.pallet_id\r\n        JOIN pallet_sequences ON
-  pallets.id = pallet_sequences.pallet_id\r\n        LEFT JOIN target_markets ON pallet_sequences.target_market_id
-  = target_markets.id\r\n        LEFT JOIN grades ON pallet_sequences.grade_id = grades.id\r\n
-  \   ORDER BY\r\n        inspections.updated_at DESC\r\n)\r\nSELECT\r\n    pallets.pallet_number,\r\n
+  (inspector_party_role_id) AS inspector,\r\n        inspections.passed,\r\n        inspections.created_at\r\n
+  \   FROM\r\n        inspections\r\n            JOIN inspection_types ON inspection_types.id
+  = inspections.inspection_type_id\r\n            LEFT JOIN inspectors ON inspectors.id
+  = inspections.inspector_id\r\n            JOIN pallets ON pallets.id = inspections.pallet_id\r\n
+  \           JOIN pallet_sequences ON pallets.id = pallet_sequences.pallet_id\r\n
+  \           LEFT JOIN target_markets ON pallet_sequences.target_market_id = target_markets.id\r\n
+  \           LEFT JOIN grades ON pallet_sequences.grade_id = grades.id\r\n    ORDER
+  BY\r\n        inspections.updated_at DESC\r\n)\r\nSELECT\r\n    pallets.pallet_number,\r\n
   \   pallets.id AS pallet_id,\r\n    ( SELECT array_agg(DISTINCT inspection_type)
   FROM sq WHERE pallets.id = sq.pallet_id AND passed AND inspected) AS passed,\r\n
   \   ( SELECT array_agg(DISTINCT inspection_type) FROM sq WHERE pallets.id = sq.pallet_id
@@ -19,8 +20,10 @@
   FROM sq WHERE pallets.id = sq.pallet_id AND NOT inspected) AS not_inspected,\r\n
   \   array_agg(DISTINCT target_market) AS pallet_target_markets,\r\n    array_agg(DISTINCT
   target_customer) AS pallet_target_customers,\r\n    array_agg(DISTINCT grade) AS
-  pallet_grades,\r\n    array_agg(DISTINCT inspector) AS inspectors\r\nFROM\r\n    pallets\r\n
-  \   JOIN sq ON pallets.id = sq.pallet_id\r\nGROUP BY\r\n    pallets.id,\r\n    pallets.pallet_number"
+  pallet_grades,\r\n    array_agg(DISTINCT inspector) AS inspectors,\r\n    pallets.shipped_at,\r\n
+  \   pallets.created_at,\r\n    min(sq.created_at) AS first_inspected_at\r\nFROM\r\n
+  \   pallets\r\n        JOIN sq ON pallets.id = sq.pallet_id\r\nGROUP BY\r\n    pallets.id,\r\n
+  \   pallets.pallet_number"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -159,6 +162,54 @@
     :caption: Inspectors
     :namespaced_name: 
     :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  shipped_at:
+    :name: shipped_at
+    :sequence_no: 10
+    :caption: Shipped at
+    :namespaced_name: pallets.shipped_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 11
+    :caption: Created at
+    :namespaced_name: pallets.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  first_inspected_at:
+    :name: first_inspected_at
+    :sequence_no: 12
+    :caption: First inspected at
+    :namespaced_name: 
+    :data_type: :datetime
     :width: 
     :format: 
     :hide: false
