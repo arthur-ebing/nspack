@@ -56,7 +56,6 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
       res = failed_response("failed to create pallet: #{params[:pallet_number]}")
     end
     params[:pallet_id] = create_pallet(params)
-
     pallet_rows.each_with_index do |sequence, index|
       pallet_sequence_number = index + 1
       params.merge!(sequence)
@@ -99,6 +98,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     hash[:legacy_data] = { extended_fg_code: hash.delete(:extended_fg_code),
                            extended_fg_id: hash.delete(:extended_fg_id),
                            bin_id: hash.delete(:bin_id),
+                           pallet_id: hash.delete(:legacy_pallet_id),
                            production_run_id: hash.delete(:production_run_id) }
 
     args = OpenStruct.new(hash)
@@ -128,7 +128,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     @errors << "marketing_org_party_role_id masterfile not found, for #{args.marketing_org}" unless args.marketing_org_party_role_id
 
     args.marketing_orchard_id = create_registered_orchard(args.to_h)
-    args.marketing_puc_id = args.puc_id
+    args.marketing_puc_id = get_id_or_error(:pucs, puc_code: args.marketing_puc)
     args.marketing_variety_id = get_id_or_error(:marketing_varieties,
                                                 marketing_variety_code: args.marketing_variety)
 
@@ -224,7 +224,8 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
 
   def get_mf_ids_for_pallet(hash) # rubocop:disable Metrics/AbcSize
     @errors = []
-    hash[:legacy_data] = { load_id: hash.delete('load_id'),
+    hash[:legacy_data] = { pallet_id: hash['legacy_pallet_id'],
+                           load_id: hash.delete('load_id'),
                            inspection_pallet_number: hash.delete('inspection_pallet_number'),
                            load_order_id: hash.delete('load_order_id') }
 
@@ -245,13 +246,14 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     args.plt_packhouse_resource_id = get_id_or_error(:plant_resources, plant_resource_code: args.packhouse_code)
     args.plt_line_resource_id = get_id_or_error(:plant_resources, plant_resource_code: args.production_line_code)
 
-    args.in_stock = args.inspection_result.upcase == 'PASSED'
+    args.in_stock = args.inspection_result.to_s.upcase == 'PASSED'
     args.govt_first_inspection_at = args.inspected_at
     args.stock_created_at = args.intake_date
     args.intake_created_at = args.intake_date
     args.first_cold_storage_at = args.cold_date
     args.palletized = true
-    args.partially_palletized = args.build_status.upcase != 'FULL'
+    @errors << "build_status is not FULL or PARTIAL, given value: #{args.build_status}" unless %w[FULL PARTIAL].include? args.build_status.to_s.upcase
+    args.partially_palletized = args.build_status.to_s.upcase != 'FULL'
     if args.partially_palletized
       args.partially_palletized_at = args.palletized_at
       args.palletized_at = nil
