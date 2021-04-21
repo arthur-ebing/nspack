@@ -98,6 +98,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     @errors = []
     hash[:legacy_data] = { extended_fg_code: hash.delete(:extended_fg_code),
                            extended_fg_id: hash.delete(:extended_fg_id),
+                           bin_id: hash.delete(:bin_id),
                            production_run_id: hash.delete(:production_run_id) }
 
     args = OpenStruct.new(hash)
@@ -269,13 +270,15 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
   end
 
   def create_registered_orchard(params)
-    # Yes this is really happening we are creating registered_orchards as needed. In source data trust, we must.
+    existing_id = @repo.get_id(:registered_orchards, params.to_h)
+    return existing_id if existing_id
+
     params[:marketing_orchard] = true
     params[:description] = nil
     res = MasterfilesApp::RegisteredOrchardSchema.call(params)
     raise Crossbeams::InfoError, "can't create_registered_orchard #{validation_failed_response(res).errors}" if res.failure?
 
-    @repo.get_id_or_create(:registered_orchards, res.to_h)
+    @repo.create(:registered_orchards, res.to_h)
   end
 
   def create_carton_label(params)

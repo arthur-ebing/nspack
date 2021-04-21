@@ -51,6 +51,7 @@ module MesscadaApp
       optional(:palletizing_bay_resource_id).maybe(:integer)
       optional(:has_individual_cartons).maybe(:bool)
       optional(:nett_weight_externally_calculated).maybe(:bool)
+      optional(:legacy_data).maybe(:hash)
     end
 
     rule(:plt_packhouse_resource_id, :plt_line_resource_id) do
