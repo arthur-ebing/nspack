@@ -42,6 +42,12 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
 
     @previous_errors = []
     table['pallet_number'].uniq.sort.each do |pallet_number|
+      pallet_id = @repo.get_id(:pallets, pallet_number: pallet_number)
+      if pallet_id
+        @errors << "Pallet #{pallet_number} already exists"
+        next
+      end
+
       pallet_rows = table.select { |row| row['pallet_number'] == pallet_number }
       res = process_pallet(pallet_rows)
       puts res.message
