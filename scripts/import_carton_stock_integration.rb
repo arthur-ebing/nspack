@@ -24,7 +24,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
       infodump
       if @errors.empty?
         puts 'Import Completed'
-        raise Crossbeams::InfoError, 'Debug mode: Import Completed' if debug_mode
+        raise Crossbeams::InfoError, 'Debug mode: Import Completed successfully, but not committed' if debug_mode
 
         success_response('Import Completed')
       else
