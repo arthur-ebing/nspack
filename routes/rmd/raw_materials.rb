@@ -190,6 +190,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         error = retrieve_from_local_store(:error)
         form_state.merge!(error_message: error[:message], errors:  error[:errors]) unless error.nil?
 
+        default_pallet_format = AppConst::CR_RMT.default_bin_pallet_value(:pallet_format)
+
         form = Crossbeams::RMDForm.new(form_state,
                                        form_name: :bins,
                                        scan_with_camera: @rmd_scan_with_camera,
@@ -203,7 +205,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         form.add_select(:pallet_format_id,
                         'Pallet Format',
                         items: repo.for_select_pallet_formats(where: { bin: true }),
-                        value: repo.get_value(:pallet_formats, :id, description: AppConst::DEFAULT_BIN_PALLET_FORMAT),
+                        value: repo.pallet_formats_for_pallet_base_and_stack_type(default_pallet_format[:pallet_base], default_pallet_format[:stack_type]),
                         required: true,
                         prompt: true)
 
@@ -236,7 +238,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         if (form_state = retrieve_from_local_store(id.to_s.to_sym))
           store_locally(id.to_s.to_sym, form_state)
         else
-          form_state = { sell_by_code: AppConst::DEFAULT_BIN_SELL_BY_CODE }
+          form_state = { sell_by_code: AppConst::CR_RMT.default_bin_pallet_value(:sell_by_code) }
         end
 
         bin_scans = retrieve_from_local_store(:bin_scans)
@@ -268,7 +270,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         form.add_select(:basic_pack_code_id,
                         'Basic Pack',
                         items: fruit_size_repo.for_select_basic_packs(where: { bin: true }),
-                        value: repo.get_value(:basic_pack_codes, :id, basic_pack_code: AppConst::DEFAULT_BASIC_PACK),
+                        value: repo.get_value(:basic_pack_codes, :id, basic_pack_code: AppConst::CR_RMT.default_bin_pallet_value(:basic_pack)),
                         required: true,
                         prompt: true)
         form.add_select(:marketing_variety_id,
@@ -280,37 +282,37 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         form.add_select(:grade_id,
                         'Grade',
                         items: repo.select_values(:grades, %i[grade_code id], rmt_grade: true),
-                        value: bin.rmt_class_id && (grade_id = fruit_repo.find_grade_by_rmt_class(bin.rmt_class_id)) ? grade_id : repo.get_value(:grades, :id, grade_code: AppConst::DEFAULT_BIN_GRADE),
+                        value: bin.rmt_class_id && (grade_id = fruit_repo.find_grade_by_rmt_class(bin.rmt_class_id)) ? grade_id : repo.get_value(:grades, :id, grade_code: AppConst::CR_RMT.default_bin_pallet_value(:grade)),
                         required: true,
                         prompt: true)
         form.add_select(:fruit_size_ref_id,
                         'Size Ref',
                         items: fruit_size_repo.for_select_fruit_size_references,
-                        value: bin.rmt_size_id && (fruit_size_ref_id = fruit_size_repo.find_fruit_size_ref_by_rmt_size(bin.rmt_size_id)) ? fruit_size_ref_id : repo.get_value(:fruit_size_references, :id, size_reference: AppConst::BIN_UNKNOWN_SIZE_REF),
+                        value: bin.rmt_size_id && (fruit_size_ref_id = fruit_size_repo.find_fruit_size_ref_by_rmt_size(bin.rmt_size_id)) ? fruit_size_ref_id : repo.get_value(:fruit_size_references, :id, size_reference: AppConst::CR_RMT.default_bin_pallet_value(:unknown_size_ref)),
                         required: true,
                         prompt: true)
         form.add_select(:packed_tm_group_id,
                         'Packed TM Group',
                         items: MasterfilesApp::TargetMarketRepo.new.for_select_packed_tm_groups,
-                        value: EdiApp::PoInRepo.new.find_packed_tm_group_id(AppConst::DEFAULT_BIN_PACKED_TM_GROUP),
+                        value: EdiApp::PoInRepo.new.find_packed_tm_group_id(AppConst::CR_RMT.default_bin_pallet_value(:packed_tm_group)),
                         required: true,
                         prompt: true)
         form.add_select(:marketing_party_role_id,
                         'Marketing Org',
                         items: party_repo.for_select_party_roles(AppConst::ROLE_MARKETER),
-                        value: party_repo.find_party_role_from_org_code_for_role(AppConst::DEFAULT_MARKETING_ORG, AppConst::ROLE_MARKETER),
+                        value: party_repo.find_party_role_from_org_code_for_role(AppConst::CR_RMT.default_bin_pallet_value(:marketing_org), AppConst::ROLE_MARKETER),
                         required: true,
                         prompt: true)
         form.add_select(:mark_id,
                         'Mark',
                         items: MasterfilesApp::MarketingRepo.new.for_select_marks,
-                        value: repo.get_value(:marks, :id, mark_code: AppConst::DEFAULT_BIN_MARK),
+                        value: repo.get_value(:marks, :id, mark_code: AppConst::CR_RMT.default_bin_pallet_value(:mark)),
                         required: true,
                         prompt: true)
         form.add_select(:inventory_code_id,
                         'Inventory Code',
                         items: fruit_repo.for_select_inventory_codes,
-                        value: repo.get_value(:inventory_codes, :id, inventory_code: AppConst::DEFAULT_BIN_INVENTORY_CODE),
+                        value: repo.get_value(:inventory_codes, :id, inventory_code: AppConst::CR_RMT.default_bin_pallet_value(:inventory_code)),
                         required: true,
                         prompt: true)
         form.add_field(:sell_by_code, 'Sell By Code', required: true)

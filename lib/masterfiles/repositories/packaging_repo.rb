@@ -134,6 +134,16 @@ module MasterfilesApp
       DB[qry].all.map { |p| ["#{p[:pallet_base_code]}_#{p[:stack_type_code]}", p[:id]] }
     end
 
+    def pallet_formats_for_pallet_base_and_stack_type(pallet_base, stack_type)
+      DB[:pallet_formats]
+        .join(:pallet_bases, id: :pallet_base_id)
+        .join(:pallet_stack_types, id: Sequel[:pallet_formats][:pallet_stack_type_id])
+        .where(pallet_base_code: pallet_base)
+        .where(stack_type_code: stack_type)
+        .order(Sequel[:pallet_formats][:description])
+        .get(Sequel[:pallet_formats][:id])
+    end
+
     def find_packing_method_by_code(packing_method_code)
       where(:packing_methods, PackingMethod, packing_method_code: packing_method_code)
     end
