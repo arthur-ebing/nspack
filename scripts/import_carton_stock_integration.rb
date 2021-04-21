@@ -18,21 +18,18 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     @errors = []
     @pallet_ids_created = []
     @pallet_sequence_ids_created = []
+    raise Crossbeams::InfoError, 'Invalid production_run_id' unless @repo.get_id(:production_runs, id: @production_run_id)
 
     DB.transaction do
       parse_csv
       infodump
-      if @errors.empty?
-        puts 'Import Completed'
-        raise Crossbeams::InfoError, 'Debug mode: Import Completed successfully, but not committed' if debug_mode
+      raise Crossbeams::InfoError, "Transaction not committed: please see log. \n#{@errors.uniq.join("\n")}" unless @errors.empty?
+      raise Crossbeams::InfoError, 'Debug mode: Import Completed successfully, transaction not committed' if debug_mode
 
-        success_response('Import Completed')
-      else
-        puts 'Import failed: missing masterfiles'
-        @errors.uniq.each { |error| p error }
-        raise Crossbeams::InfoError, 'Import failed: missing masterfiles'
-      end
+      success_response('Import Completed')
     end
+  rescue Crossbeams::InfoError => e
+    failed_response(e.message)
   end
 
   private
@@ -100,7 +97,6 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
   end
 
   def get_mf_ids_for_pallet_sequence(hash) # rubocop:disable Metrics/AbcSize
-    @errors = []
     hash[:legacy_data] = { extended_fg_code: hash.delete(:extended_fg_code),
                            extended_fg_id: hash.delete(:extended_fg_id),
                            bin_id: hash.delete(:bin_id),
@@ -229,7 +225,6 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
   end
 
   def get_mf_ids_for_pallet(hash) # rubocop:disable Metrics/AbcSize
-    @errors = []
     hash[:legacy_data] = { pallet_id: hash['legacy_pallet_id'],
                            load_id: hash.delete('load_id'),
                            inspection_pallet_number: hash.delete('inspection_pallet_number'),
@@ -374,6 +369,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
 
       Results:
       --------
+      If there are any errors the transaction would not have committed
       errors:
       #{@errors.uniq.join("\n")}
 
