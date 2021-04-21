@@ -270,7 +270,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
   end
 
   def create_registered_orchard(params)
-    existing_id = @repo.get_id(:registered_orchards, params.to_h)
+    existing_id = @repo.get_id(:registered_orchards, cultivar_code: params[:cultivar_code], puc_code: params[:puc_code])
     return existing_id if existing_id
 
     params[:marketing_orchard] = true
@@ -316,7 +316,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     res = MesscadaApp::PalletContract.new.call(params)
     return "can't create_pallet #{validation_failed_response(res).errors}" if res.failure?
 
-    id = DB[:pallets].insert(res.to_h)
+    id = @repo.create(:pallets, res.to_h)
     log_status(:pallets, id, @status)
     @pallet_ids_created << id
     id
