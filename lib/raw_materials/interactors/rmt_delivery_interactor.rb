@@ -80,7 +80,7 @@ module RawMaterialsApp
       return validation_failed_response(res) if res.failure?
 
       repo.transaction do
-        repo.update_rmt_delivery(id, res)
+        repo.update(:rmt_delivery, id, res.to_h)
         log_status(:rmt_deliveries, id, AppConst::RMT_BIN_RECEIPT_DATE_OVERRIDE)
 
         bin_ids = repo.select_values(:rmt_bins, :id, rmt_delivery_id: id)
@@ -144,6 +144,19 @@ module RawMaterialsApp
       instance = rmt_delivery(id)
 
       success_response('Delivery: Has Been Opened', instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def receive_delivery(id)
+      repo.transaction do
+        repo.update_rmt_delivery(id, date_delivered: Time.now, received: true)
+        log_status(:rmt_deliveries, id, 'DELIVERY_RECEIVED')
+        log_transaction
+      end
+      instance = rmt_delivery(id)
+
+      success_response('Delivery: Has Been Received', instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

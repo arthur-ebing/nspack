@@ -16,6 +16,11 @@
   :text: date received
   :icon: edit
   :popup: true
+- :url: "/raw_materials/deliveries/rmt_deliveries/$:id$/receive"
+  :text: receive delivery
+  :icon: edit
+  :hide_if_true: received
+  :prompt: You about to receive $:qty_bins$ bins belonging to this delivery. Are you sure?
 - :url: "/raw_materials/deliveries/rmt_deliveries/$:id$"
   :text: delete
   :icon: delete

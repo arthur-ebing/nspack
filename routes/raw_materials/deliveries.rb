@@ -75,6 +75,12 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.redirect("/list/rmt_deliveries/with_params?key=standard&id=#{id}")
       end
 
+      r.on 'receive' do
+        res = interactor.receive_delivery(id)
+        flash[res.success ? :notice : :error] = res.message
+        r.redirect('/list/rmt_deliveries')
+      end
+
       r.on 'reopen_delivery' do
         res = interactor.reopen_delivery(id)
         if res.success
