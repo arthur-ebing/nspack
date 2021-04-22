@@ -17,6 +17,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     @repo = BaseRepo.new
     @errors = []
     @pallet_ids_created = []
+    @pallets_created = []
     @pallet_sequence_ids_created = []
     raise Crossbeams::InfoError, 'Invalid production_run_id' unless @repo.get_id(:production_runs, id: @production_run_id)
 
@@ -322,6 +323,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     id = @repo.create(:pallets, res.to_h)
     log_status(:pallets, id, @status)
     @pallet_ids_created << id
+    @pallets_created << params[:pallet_number]
     id
   end
 
@@ -374,6 +376,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
       #{@errors.uniq.join("\n")}
 
       output:
+      pallets_created = #{@pallets_created}
       pallet_ids_created = #{@pallet_ids_created}
       pallet_sequence_ids_created = #{@pallet_sequence_ids_created}
 
