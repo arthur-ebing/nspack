@@ -1,8 +1,8 @@
 ---
 :caption: Farm PUC Orgs
-:sql: "SELECT CONCAT(farms_pucs.puc_id, '_', farms_pucs.farm_id) AS id, farms_pucs.puc_id,
-  farms_pucs.farm_id, pucs.puc_code, farms.farm_code\r\nFROM farms_pucs\r\nJOIN pucs
-  ON pucs.id = farms_pucs.puc_id\r\nJOIN farms ON farms.id = farms_pucs.farm_id\r\nLEFT
+:sql: "SELECT DISTINCT\r\nCONCAT(farms_pucs.puc_id, '_', farms_pucs.farm_id) AS id,
+  farms_pucs.puc_id, farms_pucs.farm_id, pucs.puc_code, farms.farm_code\r\nFROM farms_pucs\r\nJOIN
+  pucs ON pucs.id = farms_pucs.puc_id\r\nJOIN farms ON farms.id = farms_pucs.farm_id\r\nLEFT
   JOIN farm_puc_orgs ON farm_puc_orgs.puc_id = farms_pucs.puc_id AND farm_puc_orgs.farm_id
   = farms_pucs.farm_id"
 :limit: 
