@@ -3,9 +3,10 @@
 module EdiApp
   class PoOutRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     def po_header_row(load_id)
+      load_code = AppConst::CR_EDI.load_id_prefix.empty? ? 'loads.id' : "'#{AppConst::CR_EDI.load_id_prefix}' || loads.id::text"
       query = <<~SQL
         SELECT
-          loads.id AS load_id,
+          #{load_code} AS load_id,
           load_vehicles.vehicle_number AS load_ref,
           CASE WHEN load_containers.id IS NULL THEN 'R' ELSE 'F' END AS load_type,
           loads.shipped_at AS tk_date,
@@ -25,7 +26,7 @@ module EdiApp
           depots.depot_code AS locn_code,
           loads.customer_order_number AS master_ord,
           EXTRACT(YEAR FROM seasons.end_date)::integer AS season,
-          loads.id AS trip_no,
+          #{load_code} AS trip_no,
           COALESCE(pod_voyage_ports.ata, pod_voyage_ports.eta, loads.shipped_at) AS arr_date,
           COALESCE(pod_voyage_ports.ata, pod_voyage_ports.eta, loads.shipped_at) AS arr_time,
           COALESCE(pol_voyage_ports.atd, pol_voyage_ports.etd, loads.shipped_at) AS dep_date,
@@ -47,9 +48,10 @@ module EdiApp
     end
 
     def po_details(load_id)
+      load_code = AppConst::CR_EDI.load_id_prefix.empty? ? 'loads.id' : "'#{AppConst::CR_EDI.load_id_prefix}' || loads.id::text"
       query = <<~SQL
         SELECT
-          loads.id AS load_id,
+          #{load_code} AS load_id,
           load_containers.container_code AS container,
           loads.shipped_at AS stuff_date,
           cargo_temperatures.set_point_temperature AS temp_set,
@@ -58,7 +60,7 @@ module EdiApp
           pallet_bases.edi_out_pallet_base AS pallet_btype,
           vessels.vessel_code AS ship_name,
           fn_party_role_org_code(load_voyages.shipping_line_party_role_id) AS ship_line,
-          loads.id AS doc_no,
+          #{load_code} AS doc_no,
           fn_party_role_org_code(loads.exporter_party_role_id) AS sender,
           fn_party_role_org_code(load_voyages.shipper_party_role_id) AS agent,
           fn_party_role_org_code(load_voyages.shipper_party_role_id) AS ship_sender,

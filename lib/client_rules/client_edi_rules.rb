@@ -6,18 +6,25 @@ module Crossbeams
 
     CLIENT_SETTINGS = {
       hb: { install_location: 'HABATA',
+            load_id_prefix: '',
             ps_apply_substitutes: false },
       hl: { install_location: 'HABATA',
+            load_id_prefix: '',
             ps_apply_substitutes: false },
       kr: { install_location: '',
+            load_id_prefix: '',
             ps_apply_substitutes: false },
       um: { install_location: 'MATCOLD',
+            load_id_prefix: '',
             ps_apply_substitutes: false },
       ud: { install_location: 'UNIFRUT',
+            load_id_prefix: '',
             ps_apply_substitutes: false },
       sr: { install_location: 'SRKIRKW',
+            load_id_prefix: '',
             ps_apply_substitutes: false },
       sr2: { install_location: 'SRADDO',
+             load_id_prefix: 'A',
              ps_apply_substitutes: false }
     }.freeze
 
