@@ -183,7 +183,7 @@
               <field name="load_id" size="10" required="false"/>
               <field name="locn_code" size="7" map_to="location_code"  required="true" default="$:INSTALL_LOCATION$" />
               <field name="orgzn" size="2" map_to="organization_code"/>
-              <field name="cons_no" size="10" format="ZEROES" map_to="document_number"/>
+              <field name="cons_no" size="10" map_to="document_number"/>
               <field name="cons_type" size="2" map_to="document_type" default="DP" />
               <field name="cons_date" size="8" format="DATE"/>
               <field name="account" size="6" required="false" map_to="account_code"/>
@@ -248,7 +248,7 @@
                   <field name="ship_agent" size="2" required="false" trim="true" />
                   <field name="dest_type" size="2" required="false"/>
                   <field name="dest_locn" size="7" required="false"/>
-                  <field name="cons_no" size="10" format="ZEROES" map_to="consignment_note_number"/>
+                  <field name="cons_no" size="10" map_to="consignment_note_number"/>
                   <field name="container" size="11" required="false"/>
                   <field name="cont_split" size="1" required="false"/>
                   <field name="channel" size="1" map_to="channel" default="E"/>
