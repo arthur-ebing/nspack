@@ -292,7 +292,7 @@
                   <field name="tran_date" size="8" required="false" format="DATE" default="$:NOW$" />
                   <field name="tran_time" size="5" required="false" format="HM" default="$:NOW$" />
                   <field name="pallet_btype" size="1" map_to="pallet_base_code" map_to_table="depot_pallets"/>
-                  <field name="orig_cons" size="10" format="ZEROES" required="false"/>
+                  <field name="orig_cons" size="10" required="false"/>
                   <field name="ship_number" size="6" required="false" trim="true" />
                   <field name="temperature" size="6" format="TEMP" default="99.99" required="false"/>
                   <field name="combo_pallet_id" size="9" required="false"/>
