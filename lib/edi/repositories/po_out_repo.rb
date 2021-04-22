@@ -78,7 +78,7 @@ module EdiApp
           load_containers.verified_gross_weight AS container_gross_mass,
           fn_party_role_org_code(loads.exporter_party_role_id) AS responsible_party,
           CASE WHEN destination_countries.iso_country_code = 'ZA' THEN 'L' ELSE 'E' END AS channel,
-          #{load_code} AS id,
+          #{load_code} AS cons_no,
           loads.shipped_at AS cons_date,
           EXTRACT(YEAR FROM seasons.end_date)::integer AS season,
           loads.customer_order_number AS client_ref,
