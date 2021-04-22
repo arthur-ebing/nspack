@@ -310,7 +310,7 @@
                   <field name="stack_variance" size="1" required="false"/>
                   <field name="store_type" size="1" required="false"/>
                   <field name="batch_no" size="20" required="false" map_to="batch_code"/>
-                  <field name="waybill_no" size="10" format="ZEROES" required="false"/>
+                  <field name="waybill_no" size="10" required="false"/>
                   <field name="gtin" size="14" map_to="gtin_code" required="false" nullify_zeros="true" />
                   <field name="packh_code" size="7" required="false" map_to="packhouse_code"/>
                   <field name="steri_flag" size="2" required="false"/>
