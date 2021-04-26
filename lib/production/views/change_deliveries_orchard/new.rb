@@ -4,14 +4,14 @@ module Production
   module Reworks
     module ChangeDeliveriesOrchard
       class New
-        def self.call(reworks_run_type_id, form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
+        def self.call(reworks_run_type_id, form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
           ui_rule = UiRules::Compiler.new(:reworks_run, :new, form_values: form_values, reworks_run_type_id: reworks_run_type_id)
           rules   = ui_rule.compile
 
           if rules[:unscrap_pallet]
             grid = 'scrapped_pallets'
             grid_key = 'unscrap_reworks_pallets'
-          elsif rules[:tip_bins]
+          elsif rules[:tip_bins] || rules[:tip_mixed_orchards]
             grid = 'rmt_bins_reworks'
             grid_key = 'tip_bins_reworks'
           else
@@ -19,7 +19,7 @@ module Production
             grid_key = 'reworks_pallets'
           end
 
-          multi_select_caption = rules[:tip_bins] ? 'Bins' : 'Pallets'
+          multi_select_caption = rules[:tip_bins] || rules[:tip_mixed_orchards] ? 'Bins' : 'Pallets'
           layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
             page.form_values form_values

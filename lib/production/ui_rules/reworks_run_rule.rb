@@ -43,6 +43,7 @@ module UiRules
       @rules[:bulk_bin_run_update] = AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE == reworks_run_type_id_label
       @rules[:bulk_production_run_update] = @rules[:bulk_pallet_run_update] || @rules[:bulk_bin_run_update]
       @rules[:bulk_weigh_bins] = AppConst::RUN_TYPE_BULK_WEIGH_BINS == reworks_run_type_id_label
+      @rules[:tip_mixed_orchards] = AppConst::RUN_TYPE_TIP_MIXED_ORCHARDS == reworks_run_type_id_label
       @rules[:bin_run_type] = bin_run_type?
       @rules[:bulk_update_pallet_dates] = AppConst::RUN_TYPE_BULK_UPDATE_PALLET_DATES == reworks_run_type_id_label
 
@@ -137,10 +138,11 @@ module UiRules
       @rules[:bulk_bin_run_update] = AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE == reworks_run_type_id_label
       @rules[:bulk_production_run_update] = @rules[:bulk_pallet_run_update] || @rules[:bulk_bin_run_update]
       @rules[:bulk_weigh_bins] = AppConst::RUN_TYPE_BULK_WEIGH_BINS == reworks_run_type_id_label
+      @rules[:untip_bins] = AppConst::RUN_TYPE_UNTIP_BINS == reworks_run_type_id_label
+      @rules[:tip_mixed_orchards] = AppConst::RUN_TYPE_TIP_MIXED_ORCHARDS == reworks_run_type_id_label
       @rules[:bin_run_type] = bin_run_type?
       @rules[:show_allow_cultivar_group_mixing] = @rules[:allow_cultivar_group_mixing] && @rules[:bulk_production_run_update]
       @rules[:bulk_update_pallet_dates] = AppConst::RUN_TYPE_BULK_UPDATE_PALLET_DATES == reworks_run_type_id_label
-      @rules[:untip_bins] = AppConst::RUN_TYPE_UNTIP_BINS == reworks_run_type_id_label
 
       text_caption = if @rules[:single_pallet_edit]
                        'Pallet Number'
@@ -173,9 +175,9 @@ module UiRules
                               caption: text_area_caption }
                           end,
         production_run_id: { renderer: :integer,
-                             required: @rules[:tip_bins],
+                             required: @rules[:tip_bins] || @rules[:tip_mixed_orchards],
                              caption: 'Production Run Id',
-                             hide_on_load: @rules[:tip_bins] ? false : true },
+                             hide_on_load: @rules[:tip_bins] || @rules[:tip_mixed_orchards] ? false : true },
         allow_cultivar_mixing: { renderer: :checkbox,
                                  hide_on_load: @rules[:tip_bins] ? false : true },
         from_production_run_id: { renderer: :integer,
@@ -190,8 +192,8 @@ module UiRules
                          subtype: :integer,
                          required: true },
         gross_weight: { renderer: :numeric,
-                        caption: @rules[:tip_bins] ? 'Average Gross Weight' : 'Gross Weight',
-                        hide_on_load: @rules[:bulk_weigh_bins] || @rules[:tip_bins] ? false : true,
+                        caption: @rules[:tip_bins] || @rules[:tip_mixed_orchards] ? 'Average Gross Weight' : 'Gross Weight',
+                        hide_on_load: @rules[:bulk_weigh_bins] || @rules[:tip_bins] || @rules[:tip_mixed_orchards] ? false : true,
                         maxvalue: AppConst::MAX_BIN_WEIGHT  },
         avg_gross_weight: { renderer: :checkbox,
                             hide_on_load: @rules[:bulk_weigh_bins] ? false : true },
@@ -225,8 +227,8 @@ module UiRules
                                     allow_cultivar_mixing: true)
     end
 
-    def bin_run_type?  # rubocop:disable Metrics/CyclomaticComplexity
-      @rules[:tip_bins] || @rules[:weigh_rmt_bins] || @rules[:scrap_bin] || @rules[:unscrap_bin] || @rules[:bulk_bin_run_update] || @rules[:bulk_weigh_bins] || @rules[:untip_bins]
+    def bin_run_type?  # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      @rules[:tip_bins] || @rules[:weigh_rmt_bins] || @rules[:scrap_bin] || @rules[:unscrap_bin] || @rules[:bulk_bin_run_update] || @rules[:bulk_weigh_bins] || @rules[:untip_bins] || @rules[:tip_mixed_orchards]
     end
 
     def make_compact_details(affected_deliveries)
