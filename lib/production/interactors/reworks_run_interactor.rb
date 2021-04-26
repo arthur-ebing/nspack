@@ -320,6 +320,9 @@ module ProductionApp
       res = assert_reworks_in_stock_pallets_permissions(reworks_run_type, params[:pallets_selected])
       return validation_failed_response(res) unless res.success
 
+      params[:allow_orchard_mixing] = true if AppConst::RUN_TYPE_TIP_MIXED_ORCHARDS == reworks_run_type
+      params[:tip_orchard_mixing] =  AppConst::RUN_TYPE_TIP_MIXED_ORCHARDS == reworks_run_type
+
       res = validate_reworks_run_new_params(reworks_run_type, params)
       return validation_failed_response(res) if res.failure?
 
@@ -327,7 +330,8 @@ module ProductionApp
       attrs = res.to_h.merge(user: @user.user_name, make_changes: make_changes, pallets_affected: nil, pallet_sequence_id: nil, affected_sequences: nil)
       return success_response('ok', attrs.merge(display_page: display_page(reworks_run_type))) if make_changes
 
-      return manually_tip_bins(attrs) if AppConst::RUN_TYPE_TIP_BINS == reworks_run_type
+      return manually_tip_bins(attrs) if [AppConst::RUN_TYPE_TIP_BINS,
+                                          AppConst::RUN_TYPE_TIP_MIXED_ORCHARDS].include?(reworks_run_type)
 
       return manually_untip_bins(attrs) if AppConst::RUN_TYPE_UNTIP_BINS == reworks_run_type
 
@@ -359,7 +363,8 @@ module ProductionApp
            AppConst::RUN_TYPE_SCRAP_BIN,
           AppConst::RUN_TYPE_UNSCRAP_BIN,
           AppConst::RUN_TYPE_BULK_WEIGH_BINS,
-          AppConst::RUN_TYPE_UNTIP_BINS
+          AppConst::RUN_TYPE_UNTIP_BINS,
+        AppConst::RUN_TYPE_TIP_MIXED_ORCHARDS
         validate_rmt_bins(reworks_run_type, params[:pallets_selected])
       when AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE,
           AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE
@@ -877,7 +882,7 @@ module ProductionApp
 
       rw_res = nil
       repo.transaction do
-        repo.update_production_run(attrs[:production_run_id], allow_cultivar_mixing: attrs[:allow_cultivar_mixing]) if attrs[:allow_cultivar_mixing]
+        repo.update_production_run(attrs[:production_run_id], prod_run_attrs(attrs)) if attrs[:allow_cultivar_mixing] || attrs[:tip_orchard_mixing]
         rw_res = ProductionApp::ManuallyTipBins.call(attrs)
         return failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
 
@@ -889,12 +894,13 @@ module ProductionApp
 
         reworks_run_attrs = { user: @user.user_name, reworks_run_type_id: attrs[:reworks_run_type_id], pallets_selected: attrs[:pallets_selected],
                               pallets_affected: nil, pallet_sequence_id: nil, affected_sequences: nil, make_changes: false,
-                              allow_cultivar_mixing: attrs[:allow_cultivar_mixing] }
+                              allow_cultivar_mixing: attrs[:allow_cultivar_mixing], allow_orchard_mixing: attrs[:allow_orchard_mixing] }
         rw_res = create_reworks_run_record(reworks_run_attrs,
                                            nil,
                                            before: before_state.sort.to_h, after: manually_tip_bin_after_state(attrs, avg_gross_weight).sort.to_h)
         return failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
 
+        log_status(:production_runs, attrs[:production_run_id], AppConst::REWORKS_ORCHARD_MIX) if attrs[:tip_orchard_mixing]
         log_status(:reworks_runs, rw_res.instance[:reworks_run_id], AppConst::RMT_BIN_TIPPED_MANUALLY)
       end
       success_response('Rmt Bin tipped successfully', pallet_number: attrs[:pallets_selected])
@@ -906,7 +912,14 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def manually_tip_bin_before_state(attrs, avg_gross_weight = false)
+    def prod_run_attrs(attrs)
+      defaults = {}
+      defaults = defaults.merge!(allow_cultivar_mixing: attrs[:allow_cultivar_mixing]) if attrs[:allow_cultivar_mixing]
+      defaults = defaults.merge!(allow_orchard_mixing: attrs[:allow_orchard_mixing]) if attrs[:tip_orchard_mixing]
+      defaults
+    end
+
+    def manually_tip_bin_before_state(attrs, avg_gross_weight = false) # rubocop:disable Metrics/AbcSize
       defaults = { bin_tipped_date_time: nil,
                    production_run_tipped_id: nil,
                    exit_ref_date_time: nil,
@@ -916,10 +929,14 @@ module ProductionApp
       defaults = defaults.merge!(tipped_asset_number: nil, bin_asset_number: attrs[:pallets_selected].first) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
       defaults = defaults.merge!(allow_cultivar_mixing: production_run_allow_cultivar_mixing(attrs[:production_run_id])) if attrs[:allow_cultivar_mixing]
       defaults = defaults.merge!(manually_weigh_rmt_bin_state(attrs[:pallets_selected].first)) if avg_gross_weight
+      if attrs[:tip_orchard_mixing]
+        defaults = defaults.merge!(tip_orchard_mixing: false,
+                                   allow_orchard_mixing: repo.get(:production_runs, attrs[:production_run_id], :allow_orchard_mixing))
+      end
       defaults
     end
 
-    def manually_tip_bin_after_state(attrs, avg_gross_weight = false)
+    def manually_tip_bin_after_state(attrs, avg_gross_weight = false) # rubocop:disable Metrics/AbcSize
       defaults = { bin_tipped_date_time: Time.now,
                    production_run_tipped_id: attrs[:production_run_id],
                    exit_ref_date_time: Time.now,
@@ -929,6 +946,10 @@ module ProductionApp
       defaults = defaults.merge!(tipped_asset_number: attrs[:pallets_selected].first, bin_asset_number: nil) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
       defaults = defaults.merge!(allow_cultivar_mixing: attrs[:allow_cultivar_mixing]) if attrs[:allow_cultivar_mixing]
       defaults = defaults.merge!(manually_weigh_rmt_bin_state(attrs[:pallets_selected].first)) if avg_gross_weight
+      if attrs[:tip_orchard_mixing]
+        defaults = defaults.merge!(tip_orchard_mixing: attrs[:tip_orchard_mixing],
+                                   allow_orchard_mixing: attrs[:allow_orchard_mixing])
+      end
       defaults
     end
 
@@ -1459,7 +1480,8 @@ module ProductionApp
            AppConst::RUN_TYPE_UNTIP_BINS,
            AppConst::RUN_TYPE_RECALC_NETT_WEIGHT,
            AppConst::RUN_TYPE_BULK_WEIGH_BINS,
-           AppConst::RUN_TYPE_BULK_UPDATE_PALLET_DATES
+           AppConst::RUN_TYPE_BULK_UPDATE_PALLET_DATES,
+        AppConst::RUN_TYPE_TIP_MIXED_ORCHARDS
         false
       else
         true
@@ -1536,7 +1558,7 @@ module ProductionApp
       missing_rmt_bins = (rmt_bins - existing_rmt_bins.map(&:to_s))
       return OpenStruct.new(success: false, messages: { pallets_selected: ["#{missing_rmt_bins.join(', ')} doesn't exist"] }, pallets_selected: rmt_bins) unless missing_rmt_bins.nil_or_empty?
 
-      if AppConst::RUN_TYPE_TIP_BINS == reworks_run_type
+      if [AppConst::RUN_TYPE_TIP_BINS, AppConst::RUN_TYPE_TIP_MIXED_ORCHARDS].include?(reworks_run_type)
         tipped_bins = repo.tipped_bins?(rmt_bins)
         return OpenStruct.new(success: false, messages: { pallets_selected: ["#{tipped_bins.join(', ')} already tipped"] }, pallets_selected: rmt_bins) unless tipped_bins.nil_or_empty?
       end
@@ -1570,7 +1592,8 @@ module ProductionApp
           AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE,
           AppConst::RUN_TYPE_TIP_BINS,
           AppConst::RUN_TYPE_WEIGH_RMT_BINS,
-          AppConst::RUN_TYPE_BULK_WEIGH_BINS
+          AppConst::RUN_TYPE_BULK_WEIGH_BINS,
+          AppConst::RUN_TYPE_TIP_MIXED_ORCHARDS
 
         scrapped_bins = repo.scrapped_bins?(rmt_bins)
         return OpenStruct.new(success: false, messages: { pallets_selected: ["#{scrapped_bins.join(', ')} already scrapped"] }, pallets_selected: rmt_bins) unless scrapped_bins.nil_or_empty?
@@ -1618,10 +1641,11 @@ module ProductionApp
       when AppConst::RUN_TYPE_SCRAP_PALLET,
            AppConst::RUN_TYPE_SCRAP_BIN # WHY NOT ReworksRunScrapBinSchema ????
         ReworksRunScrapPalletsSchema.call(params)
-      when AppConst::RUN_TYPE_TIP_BINS
+      when AppConst::RUN_TYPE_TIP_BINS,
+           AppConst::RUN_TYPE_TIP_MIXED_ORCHARDS
         ReworksRunTipBinsSchema.call(params)
       when AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE,
-          AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE
+           AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE
         ReworksRunBulkProductionRunUpdateSchema.call(params)
       when AppConst::RUN_TYPE_BULK_WEIGH_BINS
         ReworksBulkWeighBinsSchema.call(params)
