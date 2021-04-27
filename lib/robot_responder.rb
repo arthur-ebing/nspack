@@ -47,20 +47,20 @@ module Crossbeams
     def long_message(msg)
       return msg if msg.nil_or_empty?
 
-      if msg.include?(AppConst::ROBOT_MSG_SEP)
+      if msg.to_s.include?(AppConst::ROBOT_MSG_SEP)
         msg.split(AppConst::ROBOT_MSG_SEP).first.sub('Validation error - ', '')
       else
-        msg.sub('Validation error - ', '')
+        msg.to_s.sub('Validation error - ', '')
       end
     end
 
     def short_message(msg)
       return msg if msg.nil_or_empty?
 
-      if msg.include?(AppConst::ROBOT_MSG_SEP)
+      if msg.to_s.include?(AppConst::ROBOT_MSG_SEP)
         msg.split(AppConst::ROBOT_MSG_SEP).last.sub('Validation error - ', '')
       else
-        msg.sub('Validation error - ', '')
+        msg.to_s.sub('Validation error - ', '')
       end
     end
 
