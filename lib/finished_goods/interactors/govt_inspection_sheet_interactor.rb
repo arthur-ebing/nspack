@@ -349,7 +349,7 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def validate_offload_vehicle(vehicle_job_id, location, location_scan_field) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+    def validate_offload_vehicle(vehicle_job_id, location_id) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       res = UtilityFunctions.validate_integer_length(:vehicle_job_id, vehicle_job_id)
       return failed_response('Invalid barcode. Perhaps a pallet was scanned?') if res.failure?
 
@@ -359,10 +359,9 @@ module FinishedGoodsApp
       return failed_response('Tripsheet has already been offloaded') if vehicle_job[:offloaded_at]
       return failed_response('Vehicle not loaded') unless vehicle_job[:loaded_at]
 
-      location_id = locn_repo.resolve_location_id_from_scan(location, location_scan_field)
-      return failed_response('Location does not exist') unless !location_id.nil_or_empty? && repo.exists?(:locations, id: location_id)
-
       location = locn_repo.find_location(location_id)
+      return failed_response('Location does not exist') if location.nil?
+
       return failed_response('Location does not store pallets') unless location[:storage_type_code] == 'PALLETS'
       return failed_response("Incorrect location scanned. Scanned tripsheet is destined for:#{locn_repo.find_location(vehicle_job[:planned_location_to_id])[:location_long_code]}") unless location_id == vehicle_job[:planned_location_to_id]
 
