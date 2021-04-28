@@ -216,6 +216,10 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # Constants for rmt_bins exit_ref
   BIN_EXIT_REF_UNSCRAPPED = 'BIN UNSCRAPPED'
 
+  # Constants for bin fullness
+  BIN_FULL = 'Full'
+  BIN_FULLNESS_OPTIONS = %w[Quarter Half Three\ Quarters Full].freeze
+
   # Constants for dispatch:
   DEFAULT_CARGO_TEMP_ON_ARRIVAL = ENV['DEFAULT_CARGO_TEMP_ON_ARRIVAL']
 

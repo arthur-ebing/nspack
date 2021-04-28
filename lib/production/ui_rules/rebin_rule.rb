@@ -30,7 +30,7 @@ module UiRules
         cultivar_name: { renderer: :label },
         cultivar_group_code: { renderer: :label },
         season_code: { renderer: :label },
-        bin_fullness: { renderer: :select, options: ['Quarter', 'Half', 'Three Quarters', 'Full'], caption: 'Bin Fullness', required: true, prompt: true },
+        bin_fullness: { renderer: :select, options: AppConst::BIN_FULLNESS_OPTIONS, caption: 'Bin Fullness', required: true, prompt: true },
         nett_weight: {},
         rmt_container_material_type_id: { renderer: :select, options: !@form_object.rmt_container_type_id.nil_or_empty? ? MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_rmt_container_material_types(where: { rmt_container_type_id: @form_object.rmt_container_type_id }) : [],
                                           disabled_options: MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_inactive_rmt_container_material_types,
@@ -42,7 +42,7 @@ module UiRules
 
     def make_form_object
       default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE)
-      @form_object = OpenStruct.new(@repo.find_production_run_flat(@options[:production_run_id]).to_h.merge(qty_bins_to_create: nil, rmt_container_type_id: default_rmt_container_type[:id], bin_fullness: :Full))
+      @form_object = OpenStruct.new(@repo.find_production_run_flat(@options[:production_run_id]).to_h.merge(qty_bins_to_create: nil, rmt_container_type_id: default_rmt_container_type[:id], bin_fullness: AppConst::BIN_FULL))
     end
 
     def add_behaviours

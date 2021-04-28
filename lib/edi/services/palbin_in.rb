@@ -84,7 +84,7 @@ module EdiApp
                  rmt_class_id: get_masterfile_id(:rmt_classes, rmt_class_code: palbin[:grade]),
                  rmt_container_type_id: get_masterfile_id(:rmt_container_types, container_type_code: 'BIN'),
                  rmt_container_material_type_id: get_masterfile_value(:standard_pack_codes, :rmt_container_material_type_id, standard_pack_code: palbin[:pack]),
-                 bin_fullness: 'full',
+                 bin_fullness: AppConst::BIN_FULL,
                  qty_bins: 1,
                  gross_weight: palbin[:gross_weight],
                  nett_weight: palbin[:nett_weight] }

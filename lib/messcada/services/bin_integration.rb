@@ -47,7 +47,7 @@ module MesscadaApp
       res = repo.fetch_bin_from_external_system(bin_number)
       return res unless res.success
 
-      bin_attrs = { bin_asset_number: res.instance['bin_number'], nett_weight: res.instance['weight'], bin_fullness: 'Full', qty_bins: 1,
+      bin_attrs = { bin_asset_number: res.instance['bin_number'], nett_weight: res.instance['weight'], bin_fullness: AppConst::BIN_FULL, qty_bins: 1,
                     bin_received_date_time: res.instance['bin_receive_date_time'], rmt_container_type_id: repo.get_value(:rmt_container_types, :id, container_type_code: 'BIN') }
 
       mf_res = lookup_masterfiles({ farm_code: res.instance['farm_code'], orchard_code: res.instance['orchard_code'], product_class_code: res.instance['product_class_code'],
