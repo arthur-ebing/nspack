@@ -55,10 +55,10 @@ module UiRules
       fields[:year] = { renderer: :label, with_value: pol&.year, caption: 'Year' }
       fields[:final_destination_id] = { renderer: :label, with_value: final_destination, caption: 'Final Destination' }
       fields[:transfer_load] = { renderer: :label, as_boolean: true }
-      fields[:pod_port_id] = { renderer: :label, with_value: pod&.port_code, caption: 'POD Voyage Port' }
+      fields[:pod_port_id] = { renderer: :label, with_value: pod&.port_code, caption: 'Voyage POD' }
       fields[:eta] = { renderer: :label, caption: 'ETA' }
       fields[:ata] = { renderer: :label, caption: 'ATA' }
-      fields[:pol_port_id] = { renderer: :label, with_value: pol&.port_code, caption: 'POL Voyage Port' }
+      fields[:pol_port_id] = { renderer: :label, with_value: pol&.port_code, caption: 'Voyage POL' }
       fields[:etd] = { renderer: :label, caption: 'ETD' }
       fields[:atd] = { renderer: :label, caption: 'ATD' }
 
@@ -203,14 +203,14 @@ module UiRules
                        options: MasterfilesApp::PortRepo.new.for_select_ports(port_type_code: AppConst::PORT_TYPE_POL, voyage_type_id: @form_object.voyage_type_id),
                        disabled_options: MasterfilesApp::PortRepo.new.for_select_inactive_ports(port_type_code: AppConst::PORT_TYPE_POL, voyage_type_id: @form_object.voyage_type_id),
                        selected: FinishedGoodsApp::VoyagePortRepo.new.find_voyage_port_flat(@form_object.pol_voyage_port_id)&.port_id,
-                       caption: 'POL Voyage Port',
+                       caption: 'Voyage POL',
                        prompt: true,
                        required: true },
         pod_port_id: { renderer: :select,
                        options: MasterfilesApp::PortRepo.new.for_select_ports(port_type_code: AppConst::PORT_TYPE_POD, voyage_type_id: @form_object.voyage_type_id),
                        disabled_options: MasterfilesApp::PortRepo.new.for_select_inactive_ports(port_type_code: AppConst::PORT_TYPE_POD, voyage_type_id: @form_object.voyage_type_id),
                        selected: FinishedGoodsApp::VoyagePortRepo.new.find_voyage_port_flat(@form_object.pod_voyage_port_id)&.port_id,
-                       caption: 'POD Voyage Port',
+                       caption: 'Voyage POD',
                        prompt: true,
                        required: true },
 
