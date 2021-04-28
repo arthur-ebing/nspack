@@ -95,6 +95,21 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
+    # Phyto Data
+    # --------------------------------------------------------------------------
+    r.on 'accompanying_phyto', Integer do |id|
+      jasper_params = JasperParams.new('accompanying_phyto',
+                                       current_user.login_name,
+                                       load_id: id)
+      res = CreateJasperReport.call(jasper_params)
+
+      if res.success
+        change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
+      else
+        show_error(res.message, fetch?(r))
+      end
+    end
+
     # # VERIFIED GROSS MASS
     # # --------------------------------------------------------------------------
     # r.on 'verified_gross_mass', Integer do |id|
