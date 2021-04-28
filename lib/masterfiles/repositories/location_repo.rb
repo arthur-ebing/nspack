@@ -388,10 +388,10 @@ module MasterfilesApp
       DB[query, location_id].all
     end
 
-    def for_select_location_for_assignment
+    def for_select_location_for_assignment(assignment_code)
       DB[:locations]
         .join(:location_assignments, id: :primary_assignment_id)
-        .where(assignment_code: 'WAREHOUSE_RECEIVING_AREA')
+        .where(assignment_code: assignment_code)
         .select(Sequel[:locations][:id], :location_short_code)
         .map(%i[location_short_code id])
     end
