@@ -89,5 +89,12 @@ module MasterfilesApp
         .where(Sequel[:rmt_classes][:id] => rmt_class_id)
         .get(Sequel[:grades][:id])
     end
+
+    def find_rmt_class_by_grade(grade_id)
+      DB[:rmt_classes]
+        .join(:grades, grade_code: :rmt_class_code)
+        .where(Sequel[:grades][:id] => grade_id)
+        .get(Sequel[:rmt_classes][:id])
+    end
   end
 end

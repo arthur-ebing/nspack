@@ -307,5 +307,12 @@ module MasterfilesApp
         .where(Sequel[:rmt_sizes][:id] => rmt_size_id)
         .get(Sequel[:fruit_size_references][:id])
     end
+
+    def find_rmt_size_ref_by_fruit_size(fruit_size_reference_id)
+      DB[:rmt_sizes]
+        .join(:fruit_size_references, size_reference: :size_code)
+        .where(Sequel[:fruit_size_references][:id] => fruit_size_reference_id)
+        .get(Sequel[:rmt_sizes][:id])
+    end
   end
 end

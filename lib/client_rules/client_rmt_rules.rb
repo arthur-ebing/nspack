@@ -9,12 +9,14 @@ module Crossbeams
             delivery_capture_inner_bins: false,
             delivery_capture_container_material: false,
             delivery_capture_container_material_owner: false,
-            set_defaults_for_new_rmt_delivery: true },
+            set_defaults_for_new_rmt_delivery: true,
+            convert_carton_to_rebins: false },
       hl: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             delivery_capture_container_material: false,
             delivery_capture_container_material_owner: false,
-            set_defaults_for_new_rmt_delivery: true },
+            set_defaults_for_new_rmt_delivery: true,
+            convert_carton_to_rebins: false },
       kr: { bin_pallet_conversion_defaults: { pallet_format: { stack_type: 'BIN', pallet_base: 'S' },
                                               basic_pack: 'BX750',
                                               grade: 'SA',
@@ -27,32 +29,43 @@ module Crossbeams
             delivery_capture_inner_bins: false,
             delivery_capture_container_material: true,
             delivery_capture_container_material_owner: true,
-            set_defaults_for_new_rmt_delivery: true },
+            set_defaults_for_new_rmt_delivery: true,
+            convert_carton_to_rebins: false },
       um: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             delivery_capture_container_material: false,
             delivery_capture_container_material_owner: false,
-            set_defaults_for_new_rmt_delivery: true },
+            set_defaults_for_new_rmt_delivery: true,
+            convert_carton_to_rebins: false },
       ud: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             delivery_capture_container_material: true,
             delivery_capture_container_material_owner: true,
-            set_defaults_for_new_rmt_delivery: false },
+            set_defaults_for_new_rmt_delivery: false,
+            convert_carton_to_rebins: false },
       sr: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             delivery_capture_container_material: true,
             delivery_capture_container_material_owner: true,
-            set_defaults_for_new_rmt_delivery: true },
+            set_defaults_for_new_rmt_delivery: true,
+            convert_carton_to_rebins: false },
       sr2: { bin_pallet_conversion_defaults: {},
              delivery_capture_inner_bins: false,
              delivery_capture_container_material: true,
              delivery_capture_container_material_owner: true,
-             set_defaults_for_new_rmt_delivery: true }
+             set_defaults_for_new_rmt_delivery: true,
+             convert_carton_to_rebins: true }
     }.freeze
 
     def initialize(client_code)
       super
       @settings = CLIENT_SETTINGS.fetch(client_code.to_sym)
+    end
+
+    def convert_carton_to_rebins?(explain: false)
+      return 'Should bin_tipping convert carton to rebin and then tip it' if explain
+
+      setting(:convert_carton_to_rebins) && client_code == 'sr2'
     end
 
     def defaults_for_new_rmt_delivery?(explain: false)
