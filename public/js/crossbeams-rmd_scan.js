@@ -5,6 +5,11 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
   const publicAPIs = { bypassRules: false };
 
   const txtShow = document.getElementById('txtShow');
+  const form = document.querySelector('form'); // Only one form on an RMD page...
+  const wifiIcon = document.getElementById('wifiIcon');
+  const offlineMsg = document.getElementById('offlineMsg');
+  const stdMsg = 'You are currently offline. Please check network settings and re-connect.';
+  const subMsg = 'Attempting to process transation - waiting for connection. Please re-connect.';
   const menu = document.getElementById('rmd_menu');
   const logout = document.getElementById('logout');
   const offlineStatus = document.getElementById('rmd-offline-status');
@@ -13,6 +18,9 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
   const cameraLight = document.getElementById('cameraLight');
   let cameraLightState = false;
   let webSocket;
+  let wifiConnected = true;
+  let subTime;
+  let subCount = 0;
 
   //
   // Methods
@@ -32,7 +40,9 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
         node.disabled = false;
       });
       publicAPIs.logit('Online: network connection restored');
+      wifiConnected = true;
     } else {
+      wifiConnected = false;
       offlineStatus.style.display = '';
       if (menu) {
         menu.disabled = true;
@@ -97,11 +107,47 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
   };
 
   /**
+   * Handle form submission, delaying if the connection is not available.
+   * @returns {void}
+   */
+
+  const formSubmitter = () => {
+    // Note this might not work if the OS does not trigger on/offline events in the browser...
+    // In that case we will need to trigger fetch requests to check the connection.
+    if (wifiConnected) {
+      if (subTime) {
+        clearTimeout(subTime);
+      }
+      wifiIcon.classList.remove('wifiWait');
+      offlineMsg.innerHTML = stdMsg;
+      form.submit();
+    } else {
+      subCount += 1;
+      publicAPIs.logit(`Attempting submit ${subCount}...`);
+      wifiIcon.classList.add('wifiWait');
+      offlineMsg.innerHTML = subMsg;
+      subTime = setTimeout(() => {
+        formSubmitter();
+      }, 500);
+    }
+  }
+
+  /**
    * Event listeners for the RMD page.
    */
   const setupListeners = () => {
     window.addEventListener('online', updateOnlineStatus);
     window.addEventListener('offline', updateOnlineStatus);
+
+    if (form) {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        subCount = 0;
+        formSubmitter();
+        return false;
+      });
+    }
+
     if (menu) {
       menu.addEventListener('change', (event) => {
         if (event.target.value !== '') {
@@ -261,7 +307,8 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
             }
             cnt += 1;
             if (e.dataset.submitForm) {
-              e.form.submit();
+              subCount = 0;
+              formSubmitter();
             }
           }
         });

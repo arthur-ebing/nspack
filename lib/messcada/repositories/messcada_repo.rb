@@ -549,6 +549,16 @@ module MesscadaApp
       DB[query, run_id].first[:bins_tipped]
     end
 
+    def find_rebin_pallet_sequences(pallet_number)
+      query = <<~SQL
+        SELECT s.*, p.gross_weight
+        FROM pallet_sequences s
+        JOIN pallets p on p.id=s.pallet_id
+        WHERE s.pallet_number = ?
+      SQL
+      DB[query, pallet_number].all
+    end
+
     def display_lines_for(device)
       server_ip = URI.parse(AppConst::LABEL_SERVER_URI).host
       mtype = DB[:mes_modules]
@@ -731,6 +741,19 @@ module MesscadaApp
 
       scanned_cartons = get(:pallet_sequences, pallet_sequence_ids, :scanned_from_carton_id)
       !scanned_cartons.nil_or_empty?
+    end
+
+    def can_pallet_become_rebin?(pallet_number) # rubocop:disable Metrics/AbcSize
+      !DB[:cartons]
+        .select(:carton_label_id)
+        .join(:carton_labels, id: :carton_label_id)
+        .join(:standard_pack_codes, id: :standard_pack_code_id)
+        .join(:grades, id: Sequel[:carton_labels][:grade_id])
+        .join(:pallet_sequences, id: Sequel[:cartons][:pallet_sequence_id])
+        .where(Sequel[:pallet_sequences][:pallet_number] => pallet_number)
+        .where(bin: true)
+        .where(rmt_grade: true)
+        .empty?
     end
   end
 end

@@ -377,7 +377,7 @@
               const grids = dlgContent.querySelectorAll('[data-grid]');
               grids.forEach((grid) => {
                 const gridId = grid.getAttribute('id');
-                const gridEvent = new CustomEvent('gridLoad', { detail: gridId });
+                const gridEvent = new CustomEvent('crossbeams-grid-load', { detail: gridId });
                 document.dispatchEvent(gridEvent);
               });
               crossbeamsUtils.setDialogFocus(dlgContent);

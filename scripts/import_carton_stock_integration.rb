@@ -102,10 +102,16 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
                            extended_fg_id: hash.delete(:extended_fg_id),
                            bin_id: hash.delete(:bin_id),
                            pallet_id: hash.delete(:legacy_pallet_id),
-                           production_run_id: hash.delete(:legacy_production_run_id) }
+                           production_run_id: hash.delete(:legacy_production_run_id),
+                           shift_id: hash.delete(:shift_id) }
 
     args = OpenStruct.new(hash)
     args.production_run_id = @production_run_id
+    args.commodity_code = args.extended_fg_code.slice(0..1)
+    args.commodity_id = get_id_or_error(:commodities, code: args.commodity_code)
+    args.season_id = get_id_or_error(:seasons,
+                                     season_year: args.season,
+                                     commodity_id: args.commodity_id)
 
     args.farm_id = get_id_or_error(:farms, farm_code: args.farm_code)
     args.puc_id = get_id_or_error(:pucs, puc_code: args.puc_code)
@@ -232,11 +238,6 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
                            load_order_id: hash.delete('load_order_id') }
 
     args = OpenStruct.new(hash)
-    args.commodity_code = args.extended_fg_code.slice(0..1)
-    args.commodity_id = get_id_or_error(:commodities, code: args.commodity_code)
-    args.season_id = get_id_or_error(:seasons,
-                                     season_year: args.season,
-                                     commodity_id: args.commodity_id)
 
     args.location_id = get_id_or_error(:locations, location_long_code: args.location_code)
     args.fruit_sticker_pm_product_id = nil

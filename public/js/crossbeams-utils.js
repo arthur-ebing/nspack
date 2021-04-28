@@ -302,7 +302,7 @@ const crossbeamsUtils = {
     const grids = dlg.querySelectorAll('[data-grid]');
     grids.forEach((grid) => {
       const gridId = grid.getAttribute('id');
-      const gridEvent = new CustomEvent('gridLoad', { detail: gridId });
+      const gridEvent = new CustomEvent('crossbeams-grid-load', { detail: gridId });
       document.dispatchEvent(gridEvent);
     });
     const sortable = Array.from(dlg.getElementsByTagName('input')).filter(a => a.dataset && a.dataset.sortablePrefix);
@@ -335,7 +335,7 @@ const crossbeamsUtils = {
     const grids = dlg.querySelectorAll('[data-grid]');
     grids.forEach((grid) => {
       const gridId = grid.getAttribute('id');
-      const gridEvent = new CustomEvent('gridLoad', { detail: gridId });
+      const gridEvent = new CustomEvent('crossbeams-grid-load', { detail: gridId });
       document.dispatchEvent(gridEvent);
     });
     const sortable = Array.from(dlg.getElementsByTagName('input')).filter(a => a.dataset && a.dataset.sortablePrefix);
@@ -1557,7 +1557,7 @@ const crossbeamsUtils = {
         const grids = contentDiv.querySelectorAll('[data-grid]');
         grids.forEach((grid) => {
           const gridId = grid.getAttribute('id');
-          const gridEvent = new CustomEvent('gridLoad', { detail: gridId });
+          const gridEvent = new CustomEvent('crossbeams-grid-load', { detail: gridId });
           document.dispatchEvent(gridEvent);
         });
         const sortable = Array.from(contentDiv.getElementsByTagName('input')).filter(a => a.dataset && a.dataset.sortablePrefix);

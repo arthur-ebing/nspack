@@ -52,6 +52,8 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
     optional(:make_changes).maybe(:bool)
     required(:allow_cultivar_mixing).maybe(:bool)
     required(:gross_weight).maybe(:decimal)
+    optional(:allow_orchard_mixing).maybe(:bool)
+    optional(:tip_orchard_mixing).maybe(:bool)
   end
 
   ReworksRunPrintBarcodeSchema = Dry::Schema.Params do

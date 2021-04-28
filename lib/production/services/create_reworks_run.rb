@@ -76,7 +76,7 @@ module ProductionApp
     end
 
     def rmt_bin_change?
-      AppConst::RUN_TYPE_TIP_BINS == reworks_run_type[:run_type] || AppConst::RUN_TYPE_UNTIP_BINS == reworks_run_type[:run_type] || AppConst::RUN_TYPE_WEIGH_RMT_BINS == reworks_run_type[:run_type] || AppConst::RUN_TYPE_BULK_WEIGH_BINS == reworks_run_type[:run_type]
+      AppConst::RUN_TYPE_TIP_BINS == reworks_run_type[:run_type] || AppConst::RUN_TYPE_UNTIP_BINS == reworks_run_type[:run_type] || AppConst::RUN_TYPE_WEIGH_RMT_BINS == reworks_run_type[:run_type] || AppConst::RUN_TYPE_BULK_WEIGH_BINS == reworks_run_type[:run_type] || AppConst::RUN_TYPE_TIP_MIXED_ORCHARDS == reworks_run_type[:run_type]
     end
 
     def recalc_nett_weight?

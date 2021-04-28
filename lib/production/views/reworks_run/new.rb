@@ -11,7 +11,7 @@ module Production
           if rules[:unscrap_pallet]
             grid = 'scrapped_pallets'
             grid_key = 'unscrap_reworks_pallets'
-          elsif rules[:tip_bins]
+          elsif rules[:tip_bins] || rules[:tip_mixed_orchards]
             grid = 'rmt_bins_reworks'
             grid_key = 'tip_bins_reworks'
           elsif rules[:untip_bins]
