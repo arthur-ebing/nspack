@@ -34,7 +34,7 @@ module RawMaterialsApp
         production_run_tipped_id: 1,
         location_id: 1,
         bin_tipping_plant_resource_id: 1,
-        bin_fullness: 1.0,
+        bin_fullness: AppConst::BIN_FULL,
         nett_weight: 1.0,
         gross_weight: 1.0,
         bin_tipped: false,

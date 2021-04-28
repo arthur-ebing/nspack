@@ -657,7 +657,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       # --------------------------------------------------------------------------
       r.on 'create_rebin' do
         r.get do
-          form_state = { bin_fullness: :Full }
+          form_state = { bin_fullness: AppConst::BIN_FULL }
           error = retrieve_from_local_store(:errors)
           notice = retrieve_from_local_store(:flash_notice)
           if (details = retrieve_from_local_store(:form_state))
@@ -696,7 +696,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           form.add_label(:cultivar, 'Cultivar', form_state[:cultivar_name])
           form.add_label(:cultivar_group, 'Cultivar Group', form_state[:cultivar_group_code])
           form.add_label(:season, 'Season', form_state[:season_code])
-          form.add_select(:bin_fullness, 'Bin Fullness', items: %w[Quarter Half Three\ Quarters Full], prompt: true)
+          form.add_select(:bin_fullness, 'Bin Fullness', items: AppConst::BIN_FULLNESS_OPTIONS, prompt: true)
 
           form.add_select(:rmt_container_material_type_id, 'Container Material Type',
                           items: MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_rmt_container_material_types(where: { rmt_container_type_id: default_rmt_container_type[:id] }),
@@ -794,7 +794,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           form.add_label(:cultivar, 'Cultivar', form_state[:cultivar_name])
           form.add_label(:cultivar_group, 'Cultivar Group', form_state[:cultivar_group_code])
           form.add_label(:season, 'Season', form_state[:season_code])
-          form.add_select(:bin_fullness, 'Bin Fullness', items: %w[Quarter Half Three\ Quarters Full], prompt: true)
+          form.add_select(:bin_fullness, 'Bin Fullness', items: AppConst::BIN_FULLNESS_OPTIONS, prompt: true)
 
           form.add_select(:rmt_container_material_type_id, 'Container Material Type',
                           items: MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_rmt_container_material_types(where: { rmt_container_type_id: default_rmt_container_type[:id] }),
@@ -985,7 +985,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         form.add_label(:orchard_code, 'Orchard', bin[:orchard_code])
         form.add_label(:cultivar_name, 'Cultivar', bin[:cultivar_name])
         form.add_field(:qty_bins, 'Qty Bins', hide_on_load: true)
-        form.add_select(:bin_fullness, 'Bin Fullness', items: %w[Quarter Half Three\ Quarters Full], prompt: true)
+        form.add_select(:bin_fullness, 'Bin Fullness', items: AppConst::BIN_FULLNESS_OPTIONS, prompt: true)
         form.add_select(:rmt_container_type_id, 'Container Type', items: MasterfilesApp::RmtContainerTypeRepo.new.for_select_rmt_container_types, value: bin[:rmt_container_type_id], required: true, prompt: true)
 
         if capture_container_material
@@ -1111,7 +1111,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         notice = retrieve_from_local_store(:flash_notice)
         rmt_container_material_type_id = retrieve_from_local_store(:rmt_container_material_type_id)
         rmt_material_owner_party_role_id = retrieve_from_local_store(:rmt_material_owner_party_role_id)
-        form_state = { bin_fullness: :Full, qty_bins: 1, rmt_container_material_type_id: rmt_container_material_type_id, rmt_material_owner_party_role_id: rmt_material_owner_party_role_id }
+        form_state = { bin_fullness: AppConst::BIN_FULL, qty_bins: 1, rmt_container_material_type_id: rmt_container_material_type_id, rmt_material_owner_party_role_id: rmt_material_owner_party_role_id }
         error = retrieve_from_local_store(:errors)
         form_state.merge!(error_message: error[:message], errors: error[:errors]) unless error.nil?
         form = Crossbeams::RMDForm.new(form_state,
@@ -1223,7 +1223,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
       r.on 'set_bin_level', Integer do |id|
         notice = retrieve_from_local_store(:flash_notice)
-        form_state = { bin_fullness: :Full }
+        form_state = { bin_fullness: AppConst::BIN_FULL }
 
         error = retrieve_from_local_store(:errors)
         form_state.merge!(error_message: error[:message], errors: error[:errors]) unless error.nil?
@@ -1239,7 +1239,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                        button_caption: 'Finish')
 
         form.add_field(:bin_asset_number, 'Asset Number', scan: 'key248_all', scan_type: :bin_asset, required: true, submit_form: false)
-        form.add_select(:bin_fullness, 'Bin Fullness', items: %w[Quarter Half Three\ Quarters Full], prompt: true)
+        form.add_select(:bin_fullness, 'Bin Fullness', items: AppConst::BIN_FULLNESS_OPTIONS, prompt: true)
         form.add_button('Next Bin', "/rmd/rmt_deliveries/rmt_bins/set_bin_level_next/#{id}")
         form.add_csrf_tag csrf_tag
         view(inline: form.render, layout: :layout_rmd)
@@ -1354,7 +1354,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     bin_delivery = {} if !bin_delivery && AppConst::USE_PERMANENT_RMT_BIN_BARCODES
     if bin_delivery
       default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE)
-      details = retrieve_from_local_store(:bin) || { bin_fullness: :Full } # cultivar_id: bin_delivery[:cultivar_id],
+      details = retrieve_from_local_store(:bin) || { bin_fullness: AppConst::BIN_FULL }
 
       capture_inner_bins = AppConst::DELIVERY_CAPTURE_INNER_BINS && !default_rmt_container_type[:id].nil? && !MasterfilesApp::RmtContainerTypeRepo.new.find_rmt_container_type(default_rmt_container_type[:id])&.rmt_inner_container_type_id
       capture_container_material = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL
@@ -1397,7 +1397,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       else
         form.add_label(:qty_inner_bins, 'Qty Inner Bins', '1', '1', hide_on_load: true)
       end
-      form.add_select(:bin_fullness, 'Bin Fullness', items: %w[Quarter Half Three\ Quarters Full], prompt: true)
+      form.add_select(:bin_fullness, 'Bin Fullness', items: AppConst::BIN_FULLNESS_OPTIONS, prompt: true)
       form.add_field(:gross_weight, 'Gross Weight', required: false)
 
       if capture_container_material

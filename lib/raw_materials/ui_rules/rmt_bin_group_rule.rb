@@ -31,7 +31,7 @@ module UiRules
     def common_fields # rubocop:disable Metrics/AbcSize
       {
         bin_asset_number: { renderer: :label },
-        bin_fullness: { renderer: :select, options: ['Quarter', 'Half', 'Three Quarters', 'Full'], caption: 'Bin Fullness', required: true, prompt: true },
+        bin_fullness: { renderer: :select, options: AppConst::BIN_FULLNESS_OPTIONS, caption: 'Bin Fullness', required: true, prompt: true },
         nett_weight: {},
         rmt_container_type_id: { renderer: :select, options: MasterfilesApp::RmtContainerTypeRepo.new.for_select_rmt_container_types, required: true, prompt: true },
         rmt_class_id: { renderer: :select, options: MasterfilesApp::FruitRepo.new.for_select_rmt_classes, required: true, prompt: true },
@@ -85,7 +85,7 @@ module UiRules
                                     production_run_rebin_id: nil,
                                     production_run_tipped_id: nil,
                                     bin_tipping_plant_resource_id: nil,
-                                    bin_fullness: 'Full',
+                                    bin_fullness: AppConst::BIN_FULL,
                                     nett_weight: nil,
                                     gross_weight: nil,
                                     bin_tipped: nil,
