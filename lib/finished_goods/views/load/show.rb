@@ -47,6 +47,11 @@ module FinishedGoods
                                     visible: AppConst::CLIENT_CODE == 'ud',
                                     style: :button)
                 section.add_control(control_type: :link,
+                                    text: 'Phyto Data',
+                                    url: "/finished_goods/reports/accompanying_phyto/#{id}",
+                                    loading_window: true,
+                                    style: :button)
+                section.add_control(control_type: :link,
                                     text: 'Verified Gross Mass',
                                     url: "/finished_goods/reports/verified_gross_mass/#{id}",
                                     visible: ui_rule.form_object.container,
