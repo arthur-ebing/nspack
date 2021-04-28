@@ -129,15 +129,15 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
 
     args.product_resource_allocation_id = nil
 
-    organization_id = get_id_or_error(:organizations, short_description: args.marketing_org)
+    args.organization_id = get_id_or_error(:organizations, short_description: args.marketing_org)
     role_id = get_id_or_error(:roles, name: AppConst::ROLE_MARKETER)
     args.marketing_org_party_role_id = get_id_or_error(:party_roles,
-                                                       organization_id: organization_id,
+                                                       organization_id: args.organization_id,
                                                        role_id: role_id)
     @errors << "marketing_org_party_role_id masterfile not found, for #{args.marketing_org}" unless args.marketing_org_party_role_id
 
-    args.marketing_orchard_id = create_registered_orchard(args.to_h)
-    args.marketing_puc_id = get_id_or_error(:pucs, puc_code: args.marketing_puc)
+    args.marketing_orchard_id = find_or_create_marketing_orchard(args)
+    args.marketing_puc_id = find_or_create_marketing_puc(args)
     args.marketing_variety_id = get_id_or_error(:marketing_varieties,
                                                 marketing_variety_code: args.marketing_variety)
 
@@ -274,16 +274,32 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     args.to_h
   end
 
-  def create_registered_orchard(params)
-    existing_id = @repo.get_id(:registered_orchards, cultivar_code: params[:cultivar_code], puc_code: params[:puc_code])
+  def find_or_create_marketing_orchard(args)
+    attrs = args.to_h
+    existing_id = @repo.get_id(:registered_orchards,
+                               { cultivar_code: attrs[:cultivar_code], puc_code: attrs[:marketing_puc], marketing_orchard: true })
     return existing_id if existing_id
 
-    params[:marketing_orchard] = true
-    params[:description] = nil
-    res = MasterfilesApp::RegisteredOrchardSchema.call(params)
-    raise Crossbeams::InfoError, "can't create_registered_orchard #{validation_failed_response(res).errors}" if res.failure?
+    attrs[:puc_code] = attrs[:marketing_puc]
+    attrs[:marketing_orchard] = true
+    attrs[:description] = nil
+    res = MasterfilesApp::RegisteredOrchardSchema.call(attrs)
+    raise Crossbeams::InfoError, "can't create_marketing_orchard #{validation_failed_response(res).errors}" if res.failure?
 
     @repo.create(:registered_orchards, res.to_h)
+  end
+
+  def find_or_create_marketing_puc(args)
+    attrs = args.to_h
+    marketing_puc_id = get_id_or_error(:pucs, puc_code: attrs[:marketing_puc])
+
+    existing_id = @repo.get_value(:farm_puc_orgs,
+                                  :puc_id,
+                                  { organization_id: attrs[:organization_id], farm_id: attrs[:farm_id], puc_id: marketing_puc_id })
+    return existing_id if existing_id
+
+    @repo.create(:farm_puc_orgs,
+                 { organization_id: attrs[:organization_id], farm_id: attrs[:farm_id], puc_id: marketing_puc_id })
   end
 
   def create_carton_label(params)
@@ -347,7 +363,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
   end
 
   def get_variant_id(table_name, args) # rubocop:disable Metrics/AbcSize
-    params = args.clone
+    params = args.to_h
     id = @repo.get_id(table_name, params)
     return id unless id.nil?
 
