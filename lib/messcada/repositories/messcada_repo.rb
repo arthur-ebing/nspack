@@ -743,8 +743,9 @@ module MesscadaApp
       !scanned_cartons.nil_or_empty?
     end
 
-    def pallet_rebin?(pallet_number) # rubocop:disable Metrics/AbcSize
+    def can_pallet_become_rebin?(pallet_number) # rubocop:disable Metrics/AbcSize
       !DB[:cartons]
+        .select(:carton_label_id)
         .join(:carton_labels, id: :carton_label_id)
         .join(:standard_pack_codes, id: :standard_pack_code_id)
         .join(:grades, id: Sequel[:carton_labels][:grade_id])
