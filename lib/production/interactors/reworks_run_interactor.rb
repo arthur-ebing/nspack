@@ -232,7 +232,7 @@ module ProductionApp
                               pallets_selected: "{ #{attrs[:pallets_selected].join(',')} }",
                               pallets_affected: "{ #{attrs[:pallets_selected].join(',')} }",
                               changes_made: res[:changes_made] }
-        reworks_run_attrs = reworks_run_attrs.merge!(allow_cultivar_group_mixing: attrs[:allow_cultivar_group_mixing]) if attrs[:allow_cultivar_group_mixing]
+        reworks_run_attrs = reworks_run_attrs.merge(allow_cultivar_group_mixing: attrs[:allow_cultivar_group_mixing]) if attrs[:allow_cultivar_group_mixing]
 
         id = repo.create_reworks_run(reworks_run_attrs)
         resolve_log_reworks_runs_status_and_transaction(reworks_run_type, id, res[:children])
@@ -713,7 +713,7 @@ module ProductionApp
         repo.update_pallet_sequence(sequence_id, after_attrs)
         after_descriptions_state = production_run_description_changes(attrs[:production_run_id], vw_flat_sequence_data(sequence_id))
         change_descriptions = { before: before_descriptions_state.sort.to_h, after: after_descriptions_state.sort.to_h }
-        rw_res = create_reworks_run_record(reworks_run_attrs.merge!(allow_cultivar_group_mixing: attrs[:allow_cultivar_group_mixing]),
+        rw_res = create_reworks_run_record(reworks_run_attrs.merge(allow_cultivar_group_mixing: attrs[:allow_cultivar_group_mixing]),
                                            AppConst::REWORKS_ACTION_CHANGE_PRODUCTION_RUN,
                                            before: before_attrs.sort.to_h, after: after_attrs.sort.to_h, change_descriptions: change_descriptions)
         return failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
@@ -914,8 +914,8 @@ module ProductionApp
 
     def prod_run_attrs(attrs)
       defaults = {}
-      defaults = defaults.merge!(allow_cultivar_mixing: attrs[:allow_cultivar_mixing]) if attrs[:allow_cultivar_mixing]
-      defaults = defaults.merge!(allow_orchard_mixing: attrs[:allow_orchard_mixing]) if attrs[:tip_orchard_mixing]
+      defaults[:allow_cultivar_mixing] = true if attrs[:allow_cultivar_mixing]
+      defaults[:allow_orchard_mixing] = true if attrs[:tip_orchard_mixing]
       defaults
     end
 
@@ -926,12 +926,12 @@ module ProductionApp
                    bin_tipped: false,
                    exit_ref: nil,
                    tipped_manually: false }
-      defaults = defaults.merge!(tipped_asset_number: nil, bin_asset_number: attrs[:pallets_selected].first) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
-      defaults = defaults.merge!(allow_cultivar_mixing: production_run_allow_cultivar_mixing(attrs[:production_run_id])) if attrs[:allow_cultivar_mixing]
-      defaults = defaults.merge!(manually_weigh_rmt_bin_state(attrs[:pallets_selected].first)) if avg_gross_weight
+      defaults = defaults.merge(tipped_asset_number: nil, bin_asset_number: attrs[:pallets_selected].first) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+      defaults = defaults.merge(allow_cultivar_mixing: production_run_allow_cultivar_mixing(attrs[:production_run_id])) if attrs[:allow_cultivar_mixing]
+      defaults = defaults.merge(manually_weigh_rmt_bin_state(attrs[:pallets_selected].first)) if avg_gross_weight
       if attrs[:tip_orchard_mixing]
-        defaults = defaults.merge!(tip_orchard_mixing: false,
-                                   allow_orchard_mixing: repo.get(:production_runs, attrs[:production_run_id], :allow_orchard_mixing))
+        defaults = defaults.merge(tip_orchard_mixing: false,
+                                  allow_orchard_mixing: repo.get(:production_runs, attrs[:production_run_id], :allow_orchard_mixing))
       end
       defaults
     end
@@ -943,12 +943,12 @@ module ProductionApp
                    bin_tipped: true,
                    exit_ref: 'TIPPED',
                    tipped_manually: true }
-      defaults = defaults.merge!(tipped_asset_number: attrs[:pallets_selected].first, bin_asset_number: nil) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
-      defaults = defaults.merge!(allow_cultivar_mixing: attrs[:allow_cultivar_mixing]) if attrs[:allow_cultivar_mixing]
-      defaults = defaults.merge!(manually_weigh_rmt_bin_state(attrs[:pallets_selected].first)) if avg_gross_weight
+      defaults = defaults.merge(tipped_asset_number: attrs[:pallets_selected].first, bin_asset_number: nil) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+      defaults = defaults.merge(allow_cultivar_mixing: attrs[:allow_cultivar_mixing]) if attrs[:allow_cultivar_mixing]
+      defaults = defaults.merge(manually_weigh_rmt_bin_state(attrs[:pallets_selected].first)) if avg_gross_weight
       if attrs[:tip_orchard_mixing]
-        defaults = defaults.merge!(tip_orchard_mixing: attrs[:tip_orchard_mixing],
-                                   allow_orchard_mixing: attrs[:allow_orchard_mixing])
+        defaults = defaults.merge(tip_orchard_mixing: attrs[:tip_orchard_mixing],
+                                  allow_orchard_mixing: attrs[:allow_orchard_mixing])
       end
       defaults
     end
@@ -963,7 +963,7 @@ module ProductionApp
                        bin_tipped: false,
                        exit_ref: nil,
                        tipped_manually: false }
-      change_attrs = change_attrs.merge!(asset_number_attrs(res)) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+      change_attrs = change_attrs.merge(asset_number_attrs(res)) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
 
       rw_res = nil
       repo.transaction do
@@ -1008,8 +1008,8 @@ module ProductionApp
                 exit_ref: 'TIPPED',
                 tipped_manually: true }
       if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
-        attrs = attrs.merge!({ tipped_asset_number: res[:tipped_asset_number],
-                               bin_asset_number: res[:bin_asset_number] })
+        attrs = attrs.merge({ tipped_asset_number: res[:tipped_asset_number],
+                              bin_asset_number: res[:bin_asset_number] })
       end
       attrs
     end
