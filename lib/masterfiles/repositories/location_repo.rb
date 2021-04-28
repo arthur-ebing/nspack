@@ -388,6 +388,14 @@ module MasterfilesApp
       DB[query, location_id].all
     end
 
+    def for_select_location_for_assignment
+      DB[:locations]
+        .join(:location_assignments, id: :primary_assignment_id)
+        .where(assignment_code: 'WAREHOUSE_RECEIVING_AREA')
+        .select(Sequel[:locations][:id], :location_short_code)
+        .map(%i[location_short_code id])
+    end
+
     private
 
     def sql_for_missing_str_values(values, table, column)

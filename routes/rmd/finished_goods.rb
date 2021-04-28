@@ -23,13 +23,18 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                        button_caption: 'Submit')
 
         form.add_field(:vehicle_job, 'Tripsheet Number', scan: 'key248_all', scan_type: :vehicle_job, submit_form: false, required: true, lookup: false)
-        form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location, submit_form: false, required: true, lookup: true)
+        # form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location, submit_form: false, required: true, lookup: true)
+        form.add_select(:location,
+                        'Location',
+                        items: MasterfilesApp::LocationRepo.new.for_select_location_for_assignment,
+                        required: true,
+                        prompt: true)
         form.add_csrf_tag csrf_tag
         view(inline: form.render, layout: :layout_rmd)
       end
 
       r.post do
-        res = interactor.validate_offload_vehicle(params[:vehicle][:vehicle_job], params[:vehicle][:location], params[:vehicle][:location_scan_field])
+        res = interactor.validate_offload_vehicle(params[:vehicle][:vehicle_job], params[:vehicle][:location])
 
         if res.success
           store_locally(:flash_notice, res.message)
