@@ -489,7 +489,7 @@ const crossbeamsGridEvents = {
             const grids = dlgContent.querySelectorAll('[data-grid]');
             grids.forEach((grid) => {
               const newGridId = grid.getAttribute('id');
-              const gridEvent = new CustomEvent('gridLoad', { detail: newGridId });
+              const gridEvent = new CustomEvent('crossbeams-grid-load', { detail: newGridId });
               document.dispatchEvent(gridEvent);
             });
             const sortable = Array.from(dlgContent.getElementsByTagName('input')).filter(a => a.dataset && a.dataset.sortablePrefix);
@@ -1672,7 +1672,7 @@ const crossbeamsGridStaticLoader = {
     let event = null;
     grids.forEach((grid) => {
       gridId = grid.getAttribute('id');
-      event = new CustomEvent('gridLoad', { detail: gridId });
+      event = new CustomEvent('crossbeams-grid-load', { detail: gridId });
       document.dispatchEvent(event);
     });
   };
@@ -1916,7 +1916,7 @@ const crossbeamsGridStaticLoader = {
     listenForGrid();
   });
 
-  document.addEventListener('gridLoad', (gridId) => {
+  document.addEventListener('crossbeams-grid-load', (gridId) => {
     makeGrid(gridId);
   });
 
