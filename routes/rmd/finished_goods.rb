@@ -26,7 +26,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         # form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location, submit_form: false, required: true, lookup: true)
         form.add_select(:location,
                         'Location',
-                        items: MasterfilesApp::LocationRepo.new.for_select_location_for_assignment,
+                        items: MasterfilesApp::LocationRepo.new.for_select_location_for_assignment('WAREHOUSE_RECEIVING_AREA'),
                         required: true,
                         prompt: true)
         form.add_csrf_tag csrf_tag
