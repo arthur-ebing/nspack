@@ -45,24 +45,44 @@ module RawMaterialsApp
 
     def validate_pallet_sequences_attrs # rubocop:disable Metrics/AbcSize
       instances = []
-      bins.size.times do |i|
+      bins.size.times do |i| # rubocop:disable Metrics/BlockLength
         production_line_packhouse_resource = repo.get_line_packhouse_resource(bins[i][:production_line_id])
         bin_info = bins[i]
         bin = repo.where(:rmt_bins, RawMaterialsApp::RmtBin, bin_asset_number: bin_info[:bin_asset_number])
         puc_id = bin.puc_id || repo.get_value(:production_runs, :puc_id, id: bin.production_run_rebin_id)
         orchard_id = bin.orchard_id || repo.get_value(:production_runs, :orchard_id, id: bin.production_run_rebin_id)
-        attrs = { pallet_sequence_number: i + 1, production_run_id: bin.production_run_rebin_id,
-                  farm_id: bin.farm_id || repo.get_value(:production_runs, :farm_id, id: bin.production_run_rebin_id), puc_id: puc_id,
-                  orchard_id: orchard_id, marketing_puc_id: puc_id, marketing_orchard_id: orchard_id, cultivar_id: bin.cultivar_id,
+        attrs = { pallet_sequence_number: i + 1,
+                  production_run_id: bin.production_run_rebin_id,
+                  farm_id: bin.farm_id || repo.get_value(:production_runs, :farm_id, id: bin.production_run_rebin_id),
+                  puc_id: puc_id,
+                  orchard_id: orchard_id,
+                  marketing_puc_id: puc_id,
+                  marketing_orchard_id: repo.registered_orchard_by_puc_orchard_and_cultivar(puc_id, orchard_id, bin.cultivar_id),
+                  cultivar_id: bin.cultivar_id,
                   cultivar_group_id: repo.get_value(:cultivars, :cultivar_group_id, id: bin.cultivar_id),
-                  basic_pack_code_id: bin_info[:basic_pack_code_id], packhouse_resource_id: production_line_packhouse_resource[:id],
-                  production_line_id: bins[i][:production_line_id], season_id: bin.season_id, marketing_variety_id: bin_info[:marketing_variety_id],
+                  basic_pack_code_id: bin_info[:basic_pack_code_id],
+                  packhouse_resource_id: production_line_packhouse_resource[:id],
+                  production_line_id: bins[i][:production_line_id],
+                  season_id: bin.season_id,
+                  marketing_variety_id: bin_info[:marketing_variety_id],
                   standard_pack_code_id: @prod_setup_repo.basic_pack_standard_pack_code_id(bin_info[:basic_pack_code_id]),
-                  fruit_size_reference_id: bin_info[:fruit_size_ref_id], marketing_org_party_role_id: bin_info[:marketing_party_role_id],
-                  packed_tm_group_id: bin_info[:packed_tm_group_id], mark_id: bin_info[:mark_id], inventory_code_id: bin_info[:inventory_code_id], pallet_format_id: pallet_format_id,
+                  fruit_size_reference_id: bin_info[:fruit_size_ref_id],
+                  marketing_org_party_role_id: bin_info[:marketing_party_role_id],
+                  packed_tm_group_id: bin_info[:packed_tm_group_id],
+                  mark_id: bin_info[:mark_id],
+                  inventory_code_id: bin_info[:inventory_code_id],
+                  pallet_format_id: pallet_format_id,
                   cartons_per_pallet_id: repo.get_value(:cartons_per_pallet, :id, pallet_format_id: pallet_format_id, basic_pack_id: bin_info[:basic_pack_code_id]),
-                  carton_quantity: 1, verification_result: 'PASSED', verified_at: @palletized_at, nett_weight: bin.nett_weight, verified: true, verification_passed: true,
-                  grade_id: bin_info[:grade_id], sell_by_code: bin_info[:sell_by_code], rmt_class_id: bin.rmt_class_id, source_bin_id: bin.id }
+                  carton_quantity: 1,
+                  verification_result: 'PASSED',
+                  verified_at: @palletized_at,
+                  nett_weight: bin.nett_weight,
+                  verified: true,
+                  verification_passed: true,
+                  grade_id: bin_info[:grade_id],
+                  sell_by_code: bin_info[:sell_by_code],
+                  rmt_class_id: bin.rmt_class_id,
+                  source_bin_id: bin.id }
         gtin_code = @prod_setup_repo.find_gtin_code_for_update(attrs) if @prod_setup_repo.recalc_gtin_code?(attrs)
         attrs.store(:gtin_code, gtin_code)
         res = validate_pallet_sequence_params(attrs)

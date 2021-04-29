@@ -428,5 +428,14 @@ module RawMaterialsApp
         .first
         .to_h
     end
+
+    def registered_orchard_by_puc_orchard_and_cultivar(puc_id, orchard_id, cultivar_id) # rubocop:disable Metrics/AbcSize
+      DB[:registered_orchards]
+        .join(:pucs, puc_code: :puc_code)
+        .join(:orchards, orchard_code: Sequel[:registered_orchards][:orchard_code])
+        .join(:cultivars, cultivar_code: Sequel[:registered_orchards][:cultivar_code])
+        .where(marketing_orchard: true, Sequel[:pucs][:id] => puc_id, Sequel[:orchards][:id] => orchard_id, Sequel[:cultivars][:id] => cultivar_id)
+        .get(Sequel[:registered_orchards][:id])
+    end
   end
 end
