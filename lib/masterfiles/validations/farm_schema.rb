@@ -10,4 +10,10 @@ module MasterfilesApp
     required(:description).maybe(Types::StrippedString)
     optional(:puc_id).filled(:integer)
   end
+
+  FarmPucOrgSchema = Dry::Schema.Params do
+    required(:puc_id).filled(:integer)
+    required(:farm_id).filled(:integer)
+    required(:organization_id).filled(:integer)
+  end
 end
