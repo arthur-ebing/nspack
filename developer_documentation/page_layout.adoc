@@ -187,7 +187,7 @@ These are the methods used in building a page layout.
 
 |add_control
 |page_control_definition (Hash)
-|Add a control (link / button) to the section.
+|Add a control (link / button / dropdown button) to the section.
 
 |show_border!
 |None
@@ -281,7 +281,7 @@ These are the methods used in building a page layout.
 
 |add_control
 |page_control_definition (Hash)
-|Add a control (link / button) to the section.
+|Add a control (link / button / dropdown button) to the section.
 
 |render
 |

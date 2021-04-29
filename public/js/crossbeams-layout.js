@@ -251,14 +251,20 @@
         crossbeamsUtils.confirm({
           prompt: event.target.dataset.prompt,
           okFunc: () => {
-            // console.log('to call HREF', event.target.href); // TODO: is this a fetch/std call?
-            // SHOULD actually be a POST, not a GET?
-            window.location = event.target.href;
+            if (event.target.dataset.popupDialog) {
+              if (event.target.dataset.gridId) {
+                crossbeamsUtils.recordGridIdForPopup(event.target.dataset.gridId);
+              }
+              crossbeamsUtils.popupDialog(event.target.text, event.target.href);
+            } else {
+              // SHOULD actually be a POST, not a GET?
+              window.location = event.target.href;
+            }
           },
         });
       }
       // Open modal dialog
-      if (event.target.dataset && event.target.dataset.popupDialog) {
+      if (event.target.dataset && event.target.dataset.popupDialog && !event.target.dataset.prompt) {
         if (event.target.dataset.gridId) {
           crossbeamsUtils.recordGridIdForPopup(event.target.dataset.gridId);
         }
