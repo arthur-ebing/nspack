@@ -471,6 +471,9 @@ class AppConst # rubocop:disable Metrics/ClassLength
   INSTALL_LOCATION = ENV.fetch('INSTALL_LOCATION')
   raise "Install location #{INSTALL_LOCATION} cannot be more than 7 characters in length" if INSTALL_LOCATION.length > 7
 
+  ONSITE_EMPTY_BIN_LOCATION = 'ONSITE_EMPTY_BIN'
+  ONSITE_FULL_BIN_LOCATION = 'ONSITE_FULL_BIN'
+
   # Loads:
   DEFAULT_EXPORTER = ENV['DEFAULT_EXPORTER']
   DEFAULT_INSPECTION_BILLING = ENV['DEFAULT_INSPECTION_BILLING']
@@ -722,7 +725,6 @@ class AppConst # rubocop:disable Metrics/ClassLength
                               rebin: 'REBIN' }.freeze
 
   # Bin Control
-  ONSITE_EMPTY_BIN_LOCATION = ENV['ONSITE_EMPTY_BIN_LOCATION']
   MAX_BINS_ON_LOAD = ENV['MAX_BINS_ON_LOAD'] || 50
 
   # Complete Pallet
