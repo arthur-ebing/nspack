@@ -25,6 +25,7 @@ module RawMaterialsApp
     optional(:scrapped).maybe(:bool)
     optional(:scrapped_at).maybe(:time)
     optional(:scrapped_bin_asset_number).maybe(Types::StrippedString)
+    optional(:scrapped_rmt_delivery_id).maybe(:integer)
   end
 
   RmtRebinBinSchema = Dry::Schema.Params do # rubocop:disable Metrics/BlockLength
@@ -56,9 +57,10 @@ module RawMaterialsApp
     optional(:converted_from_pallet_sequence_id).maybe(:integer)
     optional(:cultivar_group_id).maybe(:integer)
     optional(:rmt_size_id).maybe(:integer)
+    optional(:scrapped_rmt_delivery_id).maybe(:integer)
   end
 
-  UpdateRmtRebinBinSchema = Dry::Schema.Params do
+  UpdateRmtRebinBinSchema = Dry::Schema.Params do # rubocop:disable Metrics/BlockLength
     optional(:id).filled(:integer)
     required(:orchard_id).filled(:integer)
     optional(:rmt_delivery_id).filled(:integer)
@@ -85,5 +87,6 @@ module RawMaterialsApp
     optional(:scrapped_at).maybe(:time)
     optional(:scrapped_bin_asset_number).maybe(Types::StrippedString)
     optional(:is_rebin).maybe(:bool)
+    optional(:scrapped_rmt_delivery_id).maybe(:integer)
   end
 end

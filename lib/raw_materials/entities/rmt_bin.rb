@@ -38,6 +38,7 @@ module RawMaterialsApp
     attribute :scrapped_at, Types::DateTime
     attribute? :scrapped, Types::Bool
     attribute? :active, Types::Bool
+    attribute :scrapped_rmt_delivery_id, Types::Integer
   end
 
   class RmtBinFlat < Dry::Struct
@@ -90,6 +91,7 @@ module RawMaterialsApp
     attribute :location_long_code, Types::String
     attribute? :status, Types::String
     attribute? :asset_number, Types::String
+    attribute :scrapped_rmt_delivery_id, Types::Integer
     # attribute :container_material_owner_code, Types::String
   end
 end

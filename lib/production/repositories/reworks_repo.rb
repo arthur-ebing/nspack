@@ -743,23 +743,28 @@ module ProductionApp
       #           exit_ref_date_time: Time.now)
       upd = "UPDATE rmt_bins SET scrap_remarks = '#{params[:remarks]}', scrap_reason_id = #{params[:scrap_reason_id]},
              scrapped_at = '#{Time.now}', scrapped = true, exit_ref = 'SCRAPPED', exit_ref_date_time = '#{Time.now}',
-             scrapped_bin_asset_number = bin_asset_number, bin_asset_number = null
+             scrapped_bin_asset_number = bin_asset_number, bin_asset_number = null,
+             scrapped_rmt_delivery_id = rmt_delivery_id, rmt_delivery_id = null
              WHERE id IN (#{params[:pallets_selected].join(',')});"
       DB[upd].update
     end
 
     def unscrapped_bin_bulk_update(params)
-      DB[:rmt_bins]
-        .where(id: params[:pallets_selected])
-        .update(scrapped: false,
-                scrapped_at: nil,
-                unscrapped_at: Time.now,
-                exit_ref: nil,
-                exit_ref_date_time: nil,
-                scrap_remarks: nil,
-                scrap_reason_id: nil)
-
-      upd = ''
+      # DB[:rmt_bins]
+      #   .where(id: params[:pallets_selected])
+      #   .update(scrapped: false,
+      #           scrapped_at: nil,
+      #           unscrapped_at: Time.now,
+      #           exit_ref: nil,
+      #           exit_ref_date_time: nil,
+      #           scrap_remarks: nil,
+      #           scrap_reason_id: nil)
+      #
+      # upd = ''
+      upd = "UPDATE rmt_bins SET scrapped = false, scrapped_at = null, unscrapped_at = '#{Time.now}',
+             exit_ref = null, exit_ref_date_time = null, scrap_remarks = '', scrap_reason_id = null,
+             rmt_delivery_id = scrapped_rmt_delivery_id, scrapped_rmt_delivery_id = null
+             WHERE id IN (#{params[:pallets_selected].join(',')});"
       params[:pallets_selected].each { |bin_id| upd << update_bin_asset_number(bin_id.to_i) }
       DB[upd].update
     end
