@@ -117,10 +117,6 @@ Sequel.migration do
   end
 
   down do
-    alter_table(:rmt_bins) do
-      drop_column :scrapped_rmt_delivery_id
-    end
-
     run <<~SQL
       DROP VIEW public.vw_rmt_bins_flat;
       CREATE OR REPLACE VIEW public.vw_rmt_bins_flat AS
@@ -230,5 +226,8 @@ Sequel.migration do
           OWNER TO postgres;
 
     SQL
+    alter_table(:rmt_bins) do
+      drop_column :scrapped_rmt_delivery_id
+    end
   end
 end
