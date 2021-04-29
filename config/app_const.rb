@@ -221,7 +221,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   BIN_FULLNESS_OPTIONS = %w[Quarter Half Three\ Quarters Full].freeze
 
   # Constants for location assignments:
-  WAREHOUSE_RECEIVING_AREA = WAREHOUSE_RECEIVING_AREA
+  WAREHOUSE_RECEIVING_AREA = 'WAREHOUSE_RECEIVING_AREA'
 
   # Constants for dispatch:
   DEFAULT_CARGO_TEMP_ON_ARRIVAL = ENV['DEFAULT_CARGO_TEMP_ON_ARRIVAL']
