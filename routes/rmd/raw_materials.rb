@@ -190,7 +190,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         error = retrieve_from_local_store(:error)
         form_state.merge!(error_message: error[:message], errors:  error[:errors]) unless error.nil?
 
-        default_pallet_format = AppConst::CR_RMT.default_bin_pallet_value(:pallet_format)
+        default_pallet_format = AppConst::CR_RMT.default_bin_pallet_value(:pallet_format).to_h
 
         form = Crossbeams::RMDForm.new(form_state,
                                        form_name: :bins,
@@ -318,7 +318,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         form.add_field(:sell_by_code, 'Sell By Code', required: true)
         form.add_field(:bin_asset_number, 'Bin Number1', required: true, hide_on_load: true)
         form.add_prev_next_nav('/rmd/raw_materials/bin_pallet_sequence_info_collect_nav/$:id$', bin_seqs, id)
-        form.add_button('Covert To Pallet', '/rmd/raw_materials/convert_bins_to_pallets_complete')
+        form.add_button('Convert To Pallet', '/rmd/raw_materials/convert_bins_to_pallets_complete')
         form.add_csrf_tag csrf_tag
         view(inline: form.render, layout: :layout_rmd)
       end

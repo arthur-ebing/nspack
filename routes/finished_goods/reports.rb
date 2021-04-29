@@ -62,11 +62,26 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     # ADDENDUM
     # --------------------------------------------------------------------------
-    r.on 'addendum', Integer do |id|
+    r.on 'addendum', Integer, String do |id, place|
       jasper_params = JasperParams.new('addendum',
                                        current_user.login_name,
                                        load_id: id,
-                                       place_of_issue: AppConst::ADDENDUM_PLACE_OF_ISSUE)
+                                       place_of_issue: place)
+      res = CreateJasperReport.call(jasper_params)
+
+      if res.success
+        change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
+      else
+        show_error(res.message, fetch?(r))
+      end
+    end
+
+    # Phyto Data
+    # --------------------------------------------------------------------------
+    r.on 'accompanying_phyto', Integer do |id|
+      jasper_params = JasperParams.new('accompanying_phyto',
+                                       current_user.login_name,
+                                       load_id: id)
       res = CreateJasperReport.call(jasper_params)
 
       if res.success

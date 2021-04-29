@@ -8,6 +8,7 @@ link:/developer_documentation/start.adoc[Back to documentation home]
 The following renderers that do not bind to fields in a form are available:
 
 * <<Link>>
+* <<DropdownButton>>
 * <<HelpLink>>
 * <<Text>>
 * <<List>>
@@ -87,6 +88,96 @@ section.add_control(control_type: :link, text: 'Do something', url: '/path/to/so
 |n/a
 
 |options - :visible
+|Set this to `false` to render the link hidden (with style: `visiblity:hidden`).
+|`Boolean`
+|`true`
+
+|===
+
+=== DropdownButton
+
+This page control displays a button in a page. When the mouse hovers over it, a list of links drops down for selection.
+
+e.g.
+[source,ruby]
+----
+section.add_control(control_type: :dropdown_button, text: 'Do something', style: :action_button,
+                    items: [
+                      { url: '/path/to/something', text: 'xxx' },
+                      { url: '/path/to/something', text: 'yyy', loading_window: true },
+                      { url: '/path/to/something', text: 'xxx', behaviour: :popup, prompt: true }
+                    ])
+----
+
+|===
+|attribute |description |possible values |default
+
+|options - :text
+|The button text
+|any text
+|None. must be provided.
+
+|options - :style
+|How the button is styled - as a normal button or a back button (renders in blue with a left-pointing arrow glyph) or an action button (renders in green).
+|`:button`, `:small_button`, `:action_button` or `:back_button`.
+|`:button`
+
+|options - :icon
+|Icon to appear to the left of the button caption. Not applicable for `style: :back_button` option.
+|`Symbol`. Can be any of the link:/development/layout_icons[Layout icon] names.
+|n/a
+
+|options - :css_class
+|Extra class string to add to the button's class.
+|`String`.
+|n/a
+
+|options - :id
+|Provide the id for the button's parent `div` so that you can refer to it in the DOM via javascript. Make sure it is unique in the page.
+|`String`.
+|n/a
+
+|options - :visible
+|Set this to `false` to render the button hidden (with style: `visiblity:hidden`).
+|`Boolean`
+|`true`
+
+|item options - :url
+|The url to be called.
+|a valid endpoint.
+|None. must be provided.
+
+|item options - :text
+|The item's text
+|any text
+|None. must be provided.
+
+|item options - :behaviour
+|How the link behaves when clicked. Can open the url in a new page, can open the url in a popup dialog or can replace an already-open dialog.
+|`:direct`, `:popup` or `:replace_dialog`.
+|`:direct`
+
+|item options - :grid_id
+|Provide the id of a grid whose rows you want to update/add to via a JSON response.
+|`String`.
+|n/a
+
+|item options - :prompt
+|Prompt user with a confirm message. Only continue if user chooses to go ahead.
+|`String` or `true`/`false`. If `true` or `Y`, prompt will be "Are you sure?" -- otherwise the prompt will be the provided string.
+|n/a
+
+|item options - :loading_window
+|Load the link in a new window that shows a loading animation while waiting for the action to return a new url.
+|`true` or `false`.
+|n/a
+
+|item options - :id
+|Provide the id for the anchor so that you can refer to it in the DOM via javascript. Make sure it is unique in the page. This allows you dynamically show/hide an item.
+|`String`.
+|n/a
+
+|item options - :visible
 |Set this to `false` to render the link hidden (with style: `visiblity:hidden`).
 |`Boolean`
 |`true`
