@@ -139,6 +139,9 @@ INSERT INTO location_assignments (assignment_code) VALUES('FULL_BIN_STORAGE') ON
 INSERT INTO locations (primary_storage_type_id, location_type_id, primary_assignment_id, location_long_code, location_description, location_short_code, can_be_moved, can_store_stock, virtual_location)
 VALUES ((SELECT id FROM location_storage_types WHERE storage_type_code = 'FULL_BINS'), (SELECT id FROM location_types WHERE location_type_code = 'BIN_ASSET'), (SELECT id FROM location_assignments WHERE assignment_code = 'FULL_BIN_STORAGE'), 'ONSITE_FULL_BIN', 'ONSITE_FULL_BIN', 'ONSITE_FULL_BIN', true, true, true) ON CONFLICT DO NOTHING;
 
+-- LOCATION_ASSIGNMENT for offload vehicle
+INSERT INTO location_assignments (assignment_code) VALUES('WAREHOUSE_RECEIVING_AREA') ON CONFLICT DO NOTHING;
+
 -- BUSINESS PROCESSES
 INSERT INTO business_processes(process, description) VALUES('MOVE_PALLET', 'ADHOC individual FG Pallet movements') ON CONFLICT DO NOTHING;
 INSERT INTO business_processes(process, description) VALUES('MOVE_BIN', 'ADHOC RMT individual Bin movements') ON CONFLICT DO NOTHING;
@@ -194,6 +197,3 @@ INSERT INTO currencies (currency, description) VALUES ('RUB' , 'Russian Ruble') 
 INSERT INTO currencies (currency, description) VALUES ('CNY' , 'Chinese Yuan') ON CONFLICT DO NOTHING;
 INSERT INTO currencies (currency, description) VALUES ('AUD' , 'Australian Dollar') ON CONFLICT DO NOTHING;
 INSERT INTO currencies (currency, description) VALUES ('NZD' , 'New Zealand Dollar') ON CONFLICT DO NOTHING;
-
--- OFFLOAD VEHICLE
-INSERT INTO location_assignments (assignment_code) VALUES('WAREHOUSE_RECEIVING_AREA') ON CONFLICT DO NOTHING;
