@@ -57,6 +57,17 @@ module FinishedGoods
                                     text: 'Phyto Data',
                                     url: "/finished_goods/reports/accompanying_phyto/#{id}",
                                     loading_window: true,
+                                    visible: AppConst::CLIENT_CODE != 'ud',
+                                    style: :button)
+                section.add_control(control_type: :link,
+                                    text: 'Addendum',
+                                    url: "/finished_goods/reports/addendum_place_of_issue/#{id}",
+                                    visible: AppConst::CLIENT_CODE == 'ud',
+                                    style: :button)
+                section.add_control(control_type: :link,
+                                    text: 'Phyto Data',
+                                    url: "/finished_goods/reports/accompanying_phyto/#{id}",
+                                    loading_window: true,
                                     style: :button)
                 section.add_control(control_type: :link,
                                     text: 'Verified Gross Mass',
