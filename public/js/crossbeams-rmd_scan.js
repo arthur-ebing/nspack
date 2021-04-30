@@ -6,6 +6,7 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
 
   const txtShow = document.getElementById('txtShow');
   const form = document.querySelector('form'); // Only one form on an RMD page...
+  let buttonAction;
   const wifiIcon = document.getElementById('wifiIcon');
   const offlineMsg = document.getElementById('offlineMsg');
   const stdMsg = 'You are currently offline. Please check network settings and re-connect.';
@@ -119,6 +120,9 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
         clearTimeout(subTime);
       }
       wifiIcon.classList.remove('wifiWait');
+      if (buttonAction) {
+        form.action = buttonAction;
+      }
       offlineMsg.innerHTML = stdMsg;
       form.submit();
     } else {
@@ -130,7 +134,7 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
         formSubmitter();
       }, 500);
     }
-  }
+  };
 
   /**
    * Event listeners for the RMD page.
@@ -141,6 +145,10 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
 
     if (form) {
       form.addEventListener('submit', (e) => {
+        // Store the action from the button if the form has more than one button (and this button submits to a different URL).
+        if (e.submitter.attributes.formaction) {
+          buttonAction = e.submitter.attributes.formaction.value;
+        }
         e.preventDefault();
         subCount = 0;
         formSubmitter();
@@ -356,8 +364,7 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
     publicAPIs.rules = rules;
     publicAPIs.bypassRules = bypassRules;
     publicAPIs.expectedScanTypes = Array.from(document.querySelectorAll('[data-scan-rule]')).map(a => a.dataset.scanRule);
-    publicAPIs.expectedScanTypes =
-      publicAPIs.expectedScanTypes.filter((it, i, ar) => ar.indexOf(it) === i);
+    publicAPIs.expectedScanTypes = publicAPIs.expectedScanTypes.filter((it, i, ar) => ar.indexOf(it) === i);
 
     setupListeners();
 
