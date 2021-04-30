@@ -15,7 +15,7 @@ module UiRules
 
     def common_fields
       { location_to_id: { renderer: :select,
-                          options: MasterfilesApp::LocationRepo.new.find_warehouse_pallets_locations,
+                          options: MasterfilesApp::LocationRepo.new.for_select_location_for_assignment(AppConst::WAREHOUSE_RECEIVING_AREA),
                           caption: 'Location',
                           required: true } }
     end

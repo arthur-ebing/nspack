@@ -35,8 +35,8 @@ module UiRules
                                                       quantity_bins: nil))
     end
 
-    def onsite_bin_asset_location_id
-      @repo.onsite_bin_asset_location_id
+    def onsite_empty_bin_asset_location_id
+      @repo.onsite_bin_asset_location_id_for_location_code(AppConst::ONSITE_EMPTY_BIN_LOCATION)
     end
 
     def make_header

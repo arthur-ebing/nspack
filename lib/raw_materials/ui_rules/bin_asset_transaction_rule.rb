@@ -43,7 +43,7 @@ module UiRules
                                       required: true },
         bin_asset_to_location_id: { renderer: :select,
                                     options: @repo.for_select_bin_asset_locations,
-                                    selected: onsite_bin_asset_location_id,
+                                    selected: onsite_empty_bin_asset_location_id,
                                     caption: 'To Location',
                                     required: true },
         create: { renderer: :hidden, value: true },
@@ -62,7 +62,7 @@ module UiRules
                                       required: true },
         bin_asset_to_location_id: { renderer: :select,
                                     options: @repo.for_select_bin_asset_locations,
-                                    selected: onsite_bin_asset_location_id,
+                                    selected: onsite_empty_bin_asset_location_id,
                                     caption: 'To Location',
                                     required: true },
         fruit_reception_delivery_id: { renderer: :select,
@@ -77,9 +77,9 @@ module UiRules
     def issue_bin_assets_fields
       fields = {
         business_process_id: { renderer: :hidden, value: issue_process_id },
-        bin_asset_from_location_id: { renderer: :hidden, value: onsite_bin_asset_location_id },
+        bin_asset_from_location_id: { renderer: :hidden, value: onsite_empty_bin_asset_location_id },
         bin_asset_to_location_id: { renderer: :select,
-                                    options: @repo.for_select_bin_asset_locations.reject { |r| r[1] == onsite_bin_asset_location_id },
+                                    options: @repo.for_select_bin_asset_locations.reject { |r| r[1] == onsite_empty_bin_asset_location_id },
                                     caption: 'To Location',
                                     required: true },
         truck_registration_number: {}
@@ -107,7 +107,7 @@ module UiRules
 
     def make_new_form_object
       @form_object = OpenStruct.new(rmt_container_material_owner: nil,
-                                    bin_asset_from_location_id: (@mode == :issue ? onsite_bin_asset_location_id : nil),
+                                    bin_asset_from_location_id: (@mode == :issue ? onsite_empty_bin_asset_location_id : nil),
                                     bin_asset_to_location_id: nil,
                                     asset_transaction_type_id: asset_transaction_type,
                                     fruit_reception_delivery_id: nil,
@@ -143,8 +143,8 @@ module UiRules
       end
     end
 
-    def onsite_bin_asset_location_id
-      @repo.onsite_bin_asset_location_id
+    def onsite_empty_bin_asset_location_id
+      @repo.onsite_bin_asset_location_id_for_location_code(AppConst::ONSITE_EMPTY_BIN_LOCATION)
     end
 
     def receive_process_id

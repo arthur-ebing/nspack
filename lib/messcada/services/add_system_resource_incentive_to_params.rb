@@ -56,7 +56,7 @@ module MesscadaApp
 
     def validate_personnel_number(personnel_number)
       contract_worker_id = repo.contract_worker_id_from_personnel_number(personnel_number)
-      return failed_response('This personnel number doess not exist') if contract_worker_id.nil?
+      return failed_response('This personnel number does not exist') if contract_worker_id.nil?
 
       success_response('ok', { personnel_identifier_id: nil, contract_worker_id: contract_worker_id, identifier: nil })
     end

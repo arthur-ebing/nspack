@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/NoSoft-SA/crossbeams-dataminer.git
-  revision: 9faad3957e198fa9b330820b2e4de3b159a93991
+  revision: fd7a8b353709f98bc24fb5bc225a71d8021fee05
   specs:
     crossbeams-dataminer (0.2.0)
       pg_query (= 1.1.0)

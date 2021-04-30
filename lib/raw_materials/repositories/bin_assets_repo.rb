@@ -77,11 +77,9 @@ module RawMaterialsApp
                             wrapper: OwnerBinType)
     end
 
-    def onsite_bin_asset_location_id
-      return nil unless AppConst::ONSITE_EMPTY_BIN_LOCATION
-
+    def onsite_bin_asset_location_id_for_location_code(location_code)
       DB[:locations].where(
-        location_long_code: AppConst::ONSITE_EMPTY_BIN_LOCATION
+        location_long_code: location_code
       ).join(:location_types, id: :location_type_id).where(
         location_type_code: AppConst::LOCATION_TYPES_BIN_ASSET
       ).get(Sequel[:locations][:id])
