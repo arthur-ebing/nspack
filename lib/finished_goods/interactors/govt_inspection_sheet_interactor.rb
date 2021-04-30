@@ -363,7 +363,7 @@ module FinishedGoodsApp
       return failed_response('Location does not exist') if location.nil?
 
       return failed_response('Location does not store pallets') unless location[:storage_type_code] == 'PALLETS'
-      return failed_response("Incorrect location scanned. Scanned tripsheet is destined for:#{locn_repo.find_location(vehicle_job[:planned_location_to_id])[:location_long_code]}") unless location_id == vehicle_job[:planned_location_to_id]
+      return failed_response("Incorrect location scanned. Scanned tripsheet is destined for:#{locn_repo.find_location(vehicle_job[:planned_location_to_id])[:location_long_code]}") unless location_id.to_i == vehicle_job[:planned_location_to_id]
 
       success_response('')
     rescue Crossbeams::InfoError => e
