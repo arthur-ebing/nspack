@@ -116,9 +116,9 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     args.farm_id = get_id_or_error(:farms, farm_code: args.farm_code)
     args.puc_id = get_id_or_error(:pucs, puc_code: args.puc_code)
     args.orchard_id = get_id_or_error(:orchards,
-                                      orchard_code: args.orchard_code,
-                                      puc_id: args.puc_id,
-                                      farm_id: args.farm_id)
+                                      { orchard_code: args.orchard_code,
+                                        puc_id: args.puc_id,
+                                        farm_id: args.farm_id })
 
     args.cultivar_code = args.rmt_variety
     args.cultivar_id = get_id_or_error(:cultivars,
@@ -284,7 +284,10 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     attrs[:marketing_orchard] = true
     attrs[:description] = nil
     res = MasterfilesApp::RegisteredOrchardSchema.call(attrs)
-    raise Crossbeams::InfoError, "can't create_marketing_orchard #{validation_failed_response(res).errors}" if res.failure?
+    if res.failure?
+      @errors << "can't create_registered_orchards #{validation_failed_response(res).errors}"
+      return
+    end
 
     @repo.create(:registered_orchards, res.to_h)
   end
@@ -298,15 +301,23 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
                                   { organization_id: attrs[:organization_id], farm_id: attrs[:farm_id], puc_id: marketing_puc_id })
     return existing_id if existing_id
 
-    @repo.create(:farm_puc_orgs,
-                 { organization_id: attrs[:organization_id], farm_id: attrs[:farm_id], puc_id: marketing_puc_id })
+    res = MasterfilesApp::FarmPucOrgSchema.call(attrs)
+    if res.failure?
+      @errors << "can't create_farm_puc_orgs #{validation_failed_response(res).errors}"
+      return
+    end
+
+    @repo.create(:farm_puc_orgs, res)
   end
 
   def create_carton_label(params)
     res = MesscadaApp::CartonLabelContract.new.call(params)
-    return "can't create_carton_label #{validation_failed_response(res).errors}" if res.failure?
+    if res.failure?
+      @errors << "can't create_carton_label #{validation_failed_response(res).errors}"
+      return
+    end
 
-    id = @repo.create(:carton_labels, res.to_h)
+    id = @repo.create(:carton_labels, res)
     log_status(:carton_labels, id, @status)
 
     @repo.create(:legacy_barcodes, carton_label_id: id, legacy_carton_number: params[:legacy_carton_number])
@@ -315,9 +326,12 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
 
   def create_carton(params)
     res = MesscadaApp::CartonSchema.call(params)
-    return "can't create_carton #{validation_failed_response(res).errors}" if res.failure?
+    if res.failure?
+      @errors << "can't create_carton #{validation_failed_response(res).errors}"
+      return
+    end
 
-    id = @repo.create(:cartons, res.to_h)
+    id = @repo.create(:cartons, res)
     log_status(:cartons, id, @status)
 
     id
@@ -325,9 +339,12 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
 
   def create_pallet_sequence(params)
     res = MesscadaApp::PalletSequenceContract.new.call(params)
-    return "can't create_pallet_sequence #{validation_failed_response(res).errors}" if res.failure?
+    if res.failure?
+      @errors << "can't create_pallet_sequence #{validation_failed_response(res).errors}"
+      return
+    end
 
-    id = @repo.create(:pallet_sequences, res.to_h)
+    id = @repo.create(:pallet_sequences, res)
     log_status(:pallet_sequences, id, @status)
     @pallet_sequence_ids_created << id
     id
@@ -335,9 +352,12 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
 
   def create_pallet(params)
     res = MesscadaApp::PalletContract.new.call(params)
-    return "can't create_pallet #{validation_failed_response(res).errors}" if res.failure?
+    if res.failure?
+      @errors << "can't create_pallet #{validation_failed_response(res).errors}"
+      return
+    end
 
-    id = @repo.create(:pallets, res.to_h)
+    id = @repo.create(:pallets, res)
     log_status(:pallets, id, @status)
     @pallet_ids_created << id
     @pallets_created << params[:pallet_number]
@@ -363,7 +383,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
   end
 
   def get_variant_id(table_name, args) # rubocop:disable Metrics/AbcSize
-    params = args.to_h
+    params = args.to_h.clone
     id = @repo.get_id(table_name, params)
     return id unless id.nil?
 

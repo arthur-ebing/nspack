@@ -1042,7 +1042,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
         form.add_select(:planned_location_id,
                         'Planned Location',
-                        items: MasterfilesApp::LocationRepo.new.find_warehouse_pallets_locations,
+                        items: MasterfilesApp::LocationRepo.new.for_select_location_for_assignment(AppConst::WAREHOUSE_RECEIVING_AREA),
+                        prompt: true,
                         required: true)
         form.add_csrf_tag csrf_tag
         view(inline: form.render, layout: :layout_rmd)

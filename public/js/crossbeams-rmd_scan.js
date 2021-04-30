@@ -6,7 +6,6 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
 
   const txtShow = document.getElementById('txtShow');
   const form = document.querySelector('form'); // Only one form on an RMD page...
-  let buttonAction;
   const wifiIcon = document.getElementById('wifiIcon');
   const offlineMsg = document.getElementById('offlineMsg');
   const stdMsg = 'You are currently offline. Please check network settings and re-connect.';
@@ -121,7 +120,6 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
       }
       wifiIcon.classList.remove('wifiWait');
       offlineMsg.innerHTML = stdMsg;
-      form.action = buttonAction;
       form.submit();
     } else {
       subCount += 1;
@@ -132,7 +130,7 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
         formSubmitter();
       }, 500);
     }
-  };
+  }
 
   /**
    * Event listeners for the RMD page.
@@ -143,8 +141,6 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
 
     if (form) {
       form.addEventListener('submit', (e) => {
-        // Store the action from the button in case the form has more than one button (can submit to different URLs).
-        buttonAction = e.submitter.formAction;
         e.preventDefault();
         subCount = 0;
         formSubmitter();
