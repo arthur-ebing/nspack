@@ -145,7 +145,11 @@ module MesscadaApp
 
       res = nil
       repo.transaction do
-        res = repo.logout_worker(params[:system_resource][:contract_worker_id])
+        res = if params[:system_resource][:contract_worker_id]
+                repo.logout_worker(params[:system_resource][:contract_worker_id])
+              else
+                repo.logout_device(params[:device])
+              end
       end
       res
     rescue StandardError => e
