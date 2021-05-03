@@ -94,6 +94,7 @@ INSERT INTO reworks_run_types (run_type, description) VALUES('BULK UPDATE PALLET
 INSERT INTO reworks_run_types (run_type, description) VALUES('UNTIP BINS', 'Untip Bins') ON CONFLICT DO NOTHING;
 INSERT INTO reworks_run_types (run_type, description) VALUES('RECALC BIN NETT WEIGHT', 'Recalc Bin Nett Weight') ON CONFLICT DO NOTHING;
 INSERT INTO reworks_run_types (run_type, description) VALUES('TIP MIXED ORCHARDS', 'Tip Mixed Orchards') ON CONFLICT DO NOTHING;
+INSERT INTO reworks_run_types (run_type, description) VALUES('BINS TO PLT CONVERSION', 'Convert Bins To Pallets') ON CONFLICT DO NOTHING;
 
 -- LOCATION TYPES
 INSERT INTO location_types (location_type_code, short_code, hierarchical) VALUES('BIN_ASSET', 'BIN_ASSET', 'f') ON CONFLICT DO NOTHING;
@@ -168,6 +169,7 @@ INSERT INTO user_email_groups (mail_group) VALUES('edi_notifiers') ON CONFLICT D
 
 -- SCRAP_REASONS --
 INSERT INTO scrap_reasons(scrap_reason, description) VALUES ('REPACKED', 'Repacked') ON CONFLICT DO NOTHING;
+INSERT INTO scrap_reasons(scrap_reason, description) VALUES ('BINS_CONVERTED_TO_PALLETS', 'Convert Bins To Pallets') ON CONFLICT DO NOTHING;
 
 -- PACKING_METHODS --
 INSERT INTO packing_methods (packing_method_code, description, actual_count_reduction_factor) VALUES('NORMAL', 'Normal', 1) ON CONFLICT DO NOTHING;

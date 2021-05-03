@@ -1,5 +1,5 @@
 module RawMaterialsApp
-  class CreatePalletInfoFromBins < BaseService
+  class CreatePalletInfoFromBins < BaseService # rubocop:disable Metrics/ClassLength
     attr_accessor :repo, :user_name, :rep_bin, :pallet_format_id, :bins
 
     def initialize(user_name, pallet_format_id, bins_info)
@@ -30,11 +30,22 @@ module RawMaterialsApp
       @palletized_at = Time.now
       production_line_resource = ProductionApp::ResourceRepo.new.find_plant_resource(bins[0][:production_line_id])
       production_line_packhouse_resource = repo.get_line_packhouse_resource(production_line_resource.id)
-      pallet_attrs = { location_id: production_line_packhouse_resource[:location_id], shipped: false, in_stock: true, inspected: false,
-                       stock_created_at: rep_bin.created_at, phc: production_line_resource.resource_properties ? production_line_resource.resource_properties['phc'] : nil,
-                       gross_weight: repo.select_values(:rmt_bins, :gross_weight, bin_asset_number: bins.map { |b| b[:bin_asset_number] }).sum,
-                       partially_palletized: false, palletized_at: @palletized_at, allocated: false, reinspected: false, scrapped: false, pallet_format_id: pallet_format_id,
-                       plt_line_resource_id: production_line_resource.id, plt_packhouse_resource_id: production_line_packhouse_resource[:id], re_calculate_nett_weight: false, repacked: false, has_individual_cartons: false,
+      gross_weight = repo.select_values(:rmt_bins, :gross_weight, bin_asset_number: bins.map { |b| b[:bin_asset_number] }).sum(&:to_i)
+      pallet_attrs = { location_id: production_line_packhouse_resource[:location_id],
+                       shipped: false,
+                       in_stock: true,
+                       inspected: false,
+                       stock_created_at: rep_bin.created_at,
+                       phc: production_line_resource.resource_properties ? production_line_resource.resource_properties['phc'] : nil,
+                       gross_weight: !gross_weight.zero? ? gross_weight : nil,
+                       partially_palletized: false,
+                       palletized_at: @palletized_at,
+                       allocated: false,
+                       reinspected: false,
+                       scrapped: false,
+                       pallet_format_id: pallet_format_id,
+                       plt_line_resource_id: production_line_resource.id, plt_packhouse_resource_id: production_line_packhouse_resource[:id],
+                       re_calculate_nett_weight: false, repacked: false, has_individual_cartons: false,
                        nett_weight_externally_calculated: true }
 
       res = validate_pallet_params(pallet_attrs)
@@ -105,6 +116,21 @@ module RawMaterialsApp
       repo.log_multiple_statuses(:pallet_sequences, seq_ids, AppConst::CREATED_FROM_BIN)
       bin_ids = repo.select_values(:rmt_bins, :id, bin_asset_number: bins.map { |b| b[:bin_asset_number] })
       repo.log_multiple_statuses(:rmt_bins, bin_ids, AppConst::CONVERTED_TO_PALLET)
+
+      reworks_repo = ProductionApp::ReworksRepo.new
+      scrap_reason = repo.get_value(:scrap_reasons, :id, scrap_reason: AppConst::REWORKS_BINS_CONVERTED_TO_PALLETS_SCRAP_REASON)
+      remarks = 'Bin converted to Pallet'
+      reworks_repo.scrapped_bin_bulk_update(remarks: remarks, scrap_reason_id: scrap_reason, pallets_selected: bin_ids)
+      reworks_repo.create_reworks_run(user: user_name,
+                                      reworks_run_type_id: repo.get_value(:reworks_run_types, :id, run_type: AppConst::RUN_TYPE_BINS_TO_PLT_CONVERSION),
+                                      scrap_reason_id: scrap_reason,
+                                      remarks: remarks,
+                                      pallets_selected: "{ #{bin_ids.join(',')} }",
+                                      pallets_affected: "{ #{bin_ids.join(',')} }",
+                                      changes_made: nil,
+                                      bins_scrapped: "{ #{bin_ids.join(',')} }",
+                                      pallets_unscrapped: nil)
+      repo.log_multiple_statuses(:rmt_bins, bin_ids, AppConst::REWORKS_SCRAPPED_STATUS)
 
       { pallet_id: pallet_id, pallet_sequence_ids: seq_ids }
     end
