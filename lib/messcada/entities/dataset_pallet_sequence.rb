@@ -106,6 +106,9 @@ module MesscadaApp
           floor(fn_calc_age_days(pallets.id, COALESCE(pallets.govt_reinspection_at, pallets.govt_first_inspection_at), pallet_sequences.created_at)) AS pack_to_inspect_age,
           floor(fn_calc_age_days(pallets.id, pallets.first_cold_storage_at, COALESCE(pallets.govt_reinspection_at, pallets.govt_first_inspection_at))) AS inspect_to_cold_age,
           floor(fn_calc_age_days(pallets.id, COALESCE(pallets.first_cold_storage_at, COALESCE(pallets.shipped_at, pallets.scrapped_at)), COALESCE(pallets.govt_reinspection_at, pallets.govt_first_inspection_at))) AS inspect_to_exit_warm_age,
+          floor(fn_calc_age_days(pallets.id, pallets.verified_at, pallets.palletized_at)) AS palletized_to_verified_age,
+          floor(fn_calc_age_days(pallets.id, pallets.govt_first_inspection_at, pallets.verified_at)) AS verified_to_inspected_age,
+          floor(fn_calc_age_days(pallets.id, pallets.stock_created_at, pallets.govt_first_inspection_at)) AS inspected_to_in_stock_age,
           pallets.first_cold_storage_at,
           pallets.first_cold_storage_at::date AS first_cold_storage_date,
           pallets.govt_inspection_passed,
@@ -171,10 +174,7 @@ module MesscadaApp
           load_containers.internal_container_code AS internal_container,
           cargo_temperatures.temperature_code AS temp_code,
           load_vehicles.vehicle_number,
-          CASE
-            WHEN (pallets.first_cold_storage_at IS NULL) THEN false
-            ELSE true
-          END AS cooled,
+          pallets.first_cold_storage_at IS NOT NULL AS cooled,
           fn_party_role_name(loads.consignee_party_role_id) AS consignee,
           fn_party_role_name(loads.final_receiver_party_role_id) AS final_receiver,
           fn_party_role_name(loads.exporter_party_role_id) AS exporter,

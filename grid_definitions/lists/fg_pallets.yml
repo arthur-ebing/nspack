@@ -13,29 +13,29 @@
     :shipped: Shipped Pallets
 :conditions:
   :standard:
-  - :col: id
+  - :col: vw_pallets.id
     :op: "="
     :val: "$:id$"
   :active:
-  - :col: active
+  - :col: vw_pallets.active
     :op: "="
     :val: "$:active$"
   :allocated_stock:
-  - :col: in_stock
+  - :col: vw_pallets.in_stock
     :op: "="
     :val: "$:in_stock$"
-  - :col: allocated
+  - :col: vw_pallets.allocated
     :op: "="
     :val: "$:allocated$"
   :shipped:
-  - :col: shipped
+  - :col: vw_pallets.shipped
     :op: "="
     :val: "$:shipped$"
   :shipped_depot_pallet:
-  - :col: shipped
+  - :col: vw_pallets.shipped
     :op: "="
     :val: true
-  - :col: depot_pallet
+  - :col: vw_pallets.depot_pallet
     :op: "="
     :val: true
 :hide_for_client:

@@ -22,12 +22,12 @@
     :location_pallets: Location Pallets
 :conditions:
   :location_pallets:
-    - :col: shipped
+    - :col: vw_pallets.shipped
       :op: =
       :val: false
-    - :col: scrapped
+    - :col: vw_pallets.scrapped
       :op: =
       :val: false
-    - :col: location_id
+    - :col: vw_pallets.location_id
       :op: IN
       :val: $:location_ids$

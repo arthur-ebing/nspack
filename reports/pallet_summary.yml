@@ -1,24 +1,27 @@
 ---
 :caption: Pallet Summary
-:sql: "SELECT\r\n    ps.created_at::date AS date,\r\n    ps.packhouse_code,\r\n    ps.cultivar_code,\r\n
-  \   ps.standard_pack_code,\r\n\r\n    COUNT(DISTINCT CASE WHEN l.shipped THEN p.load_id
-  END) AS shipped_load_qty,\r\n    COUNT(DISTINCT CASE WHEN NOT l.shipped THEN p.load_id
-  END) AS allocated_load_qty,\r\n       \r\n    COUNT(DISTINCT CASE WHEN l.shipped
-  THEN p.pallet_id END) AS shipped_pallet_qty,\r\n    COUNT(DISTINCT CASE WHEN NOT
-  l.shipped THEN p.pallet_id END) AS allocated_pallet_qty,\r\n    COUNT(DISTINCT CASE
-  WHEN p.load_id IS NULL AND ps.verified THEN p.pallet_id END) AS verified_pallet_qty,\r\n
-  \   COUNT(DISTINCT CASE WHEN p.load_id IS NULL AND NOT ps.verified THEN p.pallet_id
-  END) AS unverified_pallet_qty,\r\n    COUNT(DISTINCT p.pallet_id) AS total_pallet_qty,\r\n
-  \      \r\n    SUM(CASE WHEN l.shipped THEN ps.sequence_carton_quantity ELSE 0 END)
-  AS shipped_carton_qty,\r\n    SUM(CASE WHEN NOT l.shipped THEN ps.sequence_carton_quantity
-  ELSE 0 END) AS allocated_carton_qty,\r\n    SUM(CASE WHEN p.load_id IS NULL AND
-  ps.verified THEN ps.sequence_carton_quantity ELSE 0 END) AS verified_carton_qty,\r\n
-  \   SUM(CASE WHEN p.load_id IS NULL AND NOT ps.verified THEN ps.sequence_carton_quantity
-  ELSE 0 END) AS unverified_carton_qty,\r\n    SUM(ps.sequence_carton_quantity) AS
-  total_carton_qty\r\n\r\nFROM vw_pallet_sequences ps\r\n         JOIN vw_pallets
-  p ON p.pallet_id = ps.pallet_id\r\n         LEFT JOIN vw_loads l ON p.load_id =
-  l.load_id\r\n\r\nGROUP BY\r\n    ps.created_at::date,\r\n    ps.packhouse_code,\r\n
-  \   ps.cultivar_code,\r\n    ps.standard_pack_code"
+:sql: "SELECT\r\n    vw_pallet_sequences.created_at::date AS date,\r\n    vw_pallet_sequences.packhouse,\r\n
+  \   vw_pallet_sequences.cultivar,\r\n    vw_pallet_sequences.standard_pack,\r\n\r\n
+  \   COUNT(DISTINCT CASE WHEN vw_loads.shipped THEN vw_pallets.load_id END) AS shipped_load_qty,\r\n
+  \   COUNT(DISTINCT CASE WHEN NOT vw_loads.shipped THEN vw_pallets.load_id END) AS
+  allocated_load_qty,\r\n\r\n    COUNT(DISTINCT CASE WHEN vw_loads.shipped THEN vw_pallets.pallet_id
+  END) AS shipped_pallet_qty,\r\n    COUNT(DISTINCT CASE WHEN NOT vw_loads.shipped
+  THEN vw_pallets.pallet_id END) AS allocated_pallet_qty,\r\n    COUNT(DISTINCT CASE
+  WHEN vw_pallets.load_id IS NULL AND vw_pallet_sequences.verified THEN vw_pallets.pallet_id
+  END) AS verified_pallet_qty,\r\n    COUNT(DISTINCT CASE WHEN vw_pallets.load_id
+  IS NULL AND NOT vw_pallet_sequences.verified THEN vw_pallets.pallet_id END) AS unverified_pallet_qty,\r\n
+  \   COUNT(DISTINCT vw_pallets.pallet_id) AS total_pallet_qty,\r\n\r\n    SUM(CASE
+  WHEN vw_loads.shipped THEN vw_pallet_sequences.carton_quantity ELSE 0 END) AS shipped_carton_qty,\r\n
+  \   SUM(CASE WHEN NOT vw_loads.shipped THEN vw_pallet_sequences.carton_quantity
+  ELSE 0 END) AS allocated_carton_qty,\r\n    SUM(CASE WHEN vw_pallets.load_id IS
+  NULL AND vw_pallet_sequences.verified THEN vw_pallet_sequences.carton_quantity ELSE
+  0 END) AS verified_carton_qty,\r\n    SUM(CASE WHEN vw_pallets.load_id IS NULL AND
+  NOT vw_pallet_sequences.verified THEN vw_pallet_sequences.carton_quantity ELSE 0
+  END) AS unverified_carton_qty,\r\n    SUM(vw_pallet_sequences.carton_quantity) AS
+  total_carton_qty\r\n\r\nFROM vw_pallet_sequences\r\nJOIN vw_pallets ON vw_pallets.pallet_id
+  = vw_pallet_sequences.pallet_id\r\nLEFT JOIN vw_loads ON vw_pallets.load_id = vw_loads.load_id\r\n\r\nGROUP
+  BY\r\n    vw_pallet_sequences.created_at::date,\r\n    vw_pallet_sequences.packhouse,\r\n
+  \   vw_pallet_sequences.cultivar,\r\n    vw_pallet_sequences.standard_pack"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -39,49 +42,49 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  packhouse_code:
-    :name: packhouse_code
+  packhouse:
+    :name: packhouse
     :sequence_no: 2
-    :caption: Packhouse code
-    :namespaced_name: ps.packhouse_code
+    :caption: Packhouse
+    :namespaced_name: vw_pallet_sequences.packhouse
     :data_type: :string
-    :width: 150
+    :width: 
     :format: 
     :hide: false
     :pinned: 
-    :groupable: true
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
-  cultivar_code:
-    :name: cultivar_code
+  cultivar:
+    :name: cultivar
     :sequence_no: 3
-    :caption: Cultivar code
-    :namespaced_name: ps.cultivar_code
+    :caption: Cultivar
+    :namespaced_name: vw_pallet_sequences.cultivar
     :data_type: :string
-    :width: 120
+    :width: 
     :format: 
     :hide: false
     :pinned: 
-    :groupable: true
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
-  standard_pack_code:
-    :name: standard_pack_code
+  standard_pack:
+    :name: standard_pack
     :sequence_no: 4
-    :caption: Standard pack code
-    :namespaced_name: ps.standard_pack_code
+    :caption: Standard pack
+    :namespaced_name: vw_pallet_sequences.standard_pack
     :data_type: :string
-    :width: 150
+    :width: 
     :format: 
     :hide: false
     :pinned: 
-    :groupable: true
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -280,7 +283,7 @@
     :group_min: false
     :group_max: false
 :query_parameter_definitions:
-- :column: ps.created_at::date
+- :column: vw_pallet_sequences.created_at::date
   :caption: Date
   :data_type: :date
   :control_type: :list
@@ -288,28 +291,28 @@
   :ordered_list: true
   :ui_priority: 1
   :list_def: SELECT DISTINCT created_at::date from vw_pallet_sequences ORDER BY created_at::date
-- :column: ps.cultivar_code
-  :caption: Cultivar code
+- :column: vw_pallet_sequences.cultivar
+  :caption: Cultivar
   :data_type: :string
   :control_type: :list
   :default_value: 
   :ordered_list: true
   :ui_priority: 2
-  :list_def: SELECT DISTINCT cultivar_code from vw_pallet_sequences ORDER BY cultivar_code
-- :column: ps.packhouse_code
-  :caption: Packhouse code
+  :list_def: SELECT DISTINCT cultivar from vw_pallet_sequences ORDER BY cultivar
+- :column: vw_pallet_sequences.packhouse
+  :caption: Packhouse
   :data_type: :string
   :control_type: :list
   :default_value: 
   :ordered_list: true
   :ui_priority: 3
-  :list_def: SELECT DISTINCT packhouse_code from vw_pallet_sequences ORDER BY packhouse_code
-- :column: ps.standard_pack_code
-  :caption: Standard pack code
+  :list_def: SELECT DISTINCT packhouse from vw_pallet_sequences ORDER BY packhouse
+- :column: vw_pallet_sequences.standard_pack
+  :caption: Standard pack
   :data_type: :string
   :control_type: :list
   :default_value: 
   :ordered_list: true
   :ui_priority: 4
-  :list_def: SELECT DISTINCT standard_pack_code from vw_pallet_sequences ORDER BY
-    standard_pack_code
+  :list_def: SELECT DISTINCT standard_pack from vw_pallet_sequences ORDER BY
+    standard_pack

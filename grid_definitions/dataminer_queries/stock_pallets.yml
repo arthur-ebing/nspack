@@ -1,53 +1,75 @@
 ---
 :caption: Stock Pallets
-:sql: "SELECT DISTINCT ON (pallet_number, zero_load_id)\r\n    id,\r\n    pallet_id,\r\n
-  \   status,\r\n    pallet_number,\r\n    pallet_sequence_number,\r\n    has_individual_cartons,\r\n
-  \   ( SELECT array_agg(DISTINCT vpf.target_customer) AS array_agg\r\n       FROM
-  vw_pallet_sequence_flat vpf\r\n       WHERE vpf.pallet_id = vw_pallet_sequence_flat.pallet_id\r\n
-  \      GROUP BY vpf.pallet_id) AS target_customers,\r\n    location,\r\n    cultivar,\r\n
-  \   carton_quantity,\r\n    pallet_carton_quantity,\r\n    cpp AS cartons_per_pallet,\r\n
-  \   pallet_size,\r\n    pallet_age,\r\n    stock_age,\r\n    cold_age,\r\n    ambient_age,\r\n
-  \   pack_to_inspect_age,\r\n    inspect_to_cold_age,\r\n    inspect_to_exit_warm_age,\r\n
-  \   created_at,\r\n    palletized_at,\r\n    govt_first_inspection_at,\r\n    govt_inspection_passed,\r\n
-  \   inspected_dest_country,\r\n    shipped_at,\r\n    govt_reinspection_at,\r\n
-  \   allocated_at,\r\n    verified_at,\r\n    allocated,\r\n    load_id,\r\n    shipped,\r\n
-  \   in_stock,\r\n    inspected,\r\n    palletized,\r\n    production_run_id,\r\n
-  \   farm_group,\r\n    farm,\r\n    puc,\r\n    orchard,\r\n    marketing_puc,\r\n
-  \   marketing_orchard,\r\n    commodity,\r\n    marketing_variety,\r\n    grade,\r\n
-  \   rmt_grade,\r\n    std_size,\r\n    actual_count,\r\n    size_ref,\r\n    count_group,\r\n
-  \   std_pack,\r\n    packed_tm_group,\r\n    target_market,\r\n    bom,\r\n    pm_bom_system_code,\r\n
-  \   mark,\r\n    packaging_marks,\r\n    inventory_code,\r\n    fruit_sticker,\r\n
-  \   fruit_sticker_2,\r\n    marketing_org,\r\n    pallet_base,\r\n    stack_type,\r\n
-  \   gross_weight,\r\n    nett_weight,\r\n    sequence_nett_weight,\r\n    basic_pack,\r\n
-  \   packhouse,\r\n    line,\r\n    palletizing_bay,\r\n    pick_ref,\r\n    phc,\r\n
-  \   verification_result,\r\n    scrapped_at,\r\n    scrapped,\r\n    partially_palletized,\r\n
-  \   reinspected,\r\n    verified,\r\n    verification_passed,\r\n    build_status,\r\n
-  \   zero_load_id,\r\n    temp_tail,\r\n    depot_pallet,\r\n    edi_in_file,\r\n
-  \   edi_in_consignment_note_number,\r\n    packed_at,\r\n    packed_date,\r\n    packed_week,\r\n
-  \   repacked,\r\n    repacked_at,\r\n    repacked_from_pallet_id,\r\n    failed_otmc_results,\r\n
-  \   failed_otmc,\r\n    created_by,\r\n    verified_by,\r\n    edi_size_count,\r\n
-  \   target_customer_party_role_id,\r\n    target_customer,\r\n    consignment_note_number,\r\n
-  \   sequence_count,\r\n    active,\r\n    CASE\r\n        WHEN fn_pallet_verification_failed(pallet_id)
-  THEN 'error'\r\n        ELSE colour_rule\r\n        END AS colour_rule\r\nFROM vw_pallet_sequence_flat\r\nORDER
-  BY zero_load_id DESC, pallet_number DESC"
+:sql: "SELECT DISTINCT ON (vw_pallets.pallet_id, vw_pallets.pallet_number, zero_load_id)\r\n
+  \   vw_pallet_sequences.id AS id,\r\n    vw_pallets.pallet_id,\r\n    vw_pallets.status,\r\n
+  \   vw_pallets.pallet_number,\r\n    aggregated.pallet_sequence_numbers,\r\n    aggregated.count
+  AS seq_count,\r\n    vw_pallets.individual_cartons,\r\n    aggregated.target_customers,\r\n
+  \   vw_pallets.location,\r\n    aggregated.cultivar_names,\r\n    vw_pallets.carton_quantity,\r\n
+  \   aggregated.carton_quantities,\r\n    aggregated.nett_weights,\r\n    aggregated.cartons_per_pallets,\r\n
+  \   vw_pallets.pallet_age,\r\n    vw_pallets.stock_age,\r\n    vw_pallets.cold_age,\r\n
+  \   vw_pallets.ambient_age,\r\n    vw_pallets.pack_to_inspect_age,\r\n    vw_pallets.inspect_to_cold_age,\r\n
+  \   vw_pallets.inspect_to_exit_warm_age,\r\n    vw_pallets.palletized_to_verified_age,\r\n
+  \   vw_pallets.verified_to_inspected_age,\r\n    vw_pallets.inspected_to_in_stock_age,\r\n
+  \   vw_pallets.palletized_at,\r\n    vw_pallets.govt_first_inspection_at,\r\n    vw_pallets.govt_inspection_passed,\r\n
+  \   vw_pallets.inspected_dest_country,\r\n    vw_pallets.shipped_at,\r\n    vw_pallets.govt_reinspection_at,\r\n
+  \   vw_pallets.allocated_at,\r\n    aggregated.verified_at,\r\n    vw_pallets.allocated,\r\n
+  \   vw_pallets.load_id,\r\n    vw_pallets.zero_load_id,\r\n    vw_pallets.shipped,\r\n
+  \   vw_pallets.in_stock,\r\n    vw_pallets.inspected,\r\n    vw_pallets.palletized,\r\n
+  \   aggregated.production_runs,\r\n    aggregated.farm_groups,\r\n    aggregated.farms,\r\n
+  \   aggregated.pucs,\r\n    aggregated.orchards,\r\n    aggregated.commodities,\r\n
+  \   aggregated.marketing_varieties,\r\n    aggregated.marketing_pucs,\r\n    aggregated.marketing_orchards,\r\n
+  \   aggregated.grades,\r\n    aggregated.rmt_grades,\r\n    aggregated.standard_sizes,\r\n
+  \   aggregated.actual_counts,\r\n    aggregated.size_references,\r\n    aggregated.count_groups,\r\n
+  \   aggregated.basic_packs,\r\n    aggregated.standard_packs,\r\n    aggregated.packed_tm_groups,\r\n
+  \   aggregated.target_markets,\r\n    aggregated.bom_codes,\r\n    aggregated.system_codes,\r\n
+  \   aggregated.marks,\r\n    aggregated.packaging_marks,\r\n    aggregated.inventory_codes,\r\n
+  \   vw_pallets.fruit_sticker,\r\n    vw_pallets.fruit_sticker_2,\r\n    aggregated.marketing_orgs,\r\n
+  \   vw_pallets.pallet_base,\r\n    vw_pallets.stack_type,\r\n    vw_pallets.gross_weight,\r\n
+  \   vw_pallets.nett_weight,\r\n    aggregated.packhouses,\r\n    aggregated.lines,\r\n
+  \   vw_pallets.palletizing_bay,\r\n    aggregated.pick_references,\r\n    vw_pallets.phc,\r\n
+  \   aggregated.verification_results,\r\n    vw_pallets.scrapped_at,\r\n    vw_pallets.scrapped,\r\n
+  \   vw_pallets.partially_palletized,\r\n    vw_pallets.reinspected,\r\n    aggregated.verified,\r\n
+  \   aggregated.verifications_passed,\r\n    fn_pallet_verification_failed(vw_pallets.pallet_id)
+  AS pallet_verification_failed,\r\n    vw_pallets.build_status,\r\n    vw_pallets.temp_tail,\r\n
+  \   vw_pallets.depot_pallet,\r\n    vw_pallets.edi_in_file,\r\n    vw_pallets.edi_in_consignment_note_number,\r\n
+  \   aggregated.packed_at,\r\n    aggregated.packed_dates,\r\n    aggregated.packed_weeks,\r\n
+  \   aggregated.repacked,\r\n    aggregated.repacked_at,\r\n    aggregated.repacked_from_pallet_ids,\r\n
+  \   aggregated.failed_otmc_results,\r\n    aggregated.failed_otmc,\r\n    aggregated.created_by,\r\n
+  \   aggregated.verified_by,\r\n    aggregated.edi_size_counts,\r\n    vw_pallets.consignment_note_number,\r\n
+  \   vw_pallets.created_at,\r\n    vw_pallets.active,\r\n    CASE\r\n        WHEN
+  vw_pallets.scrapped THEN 'warning'\r\n        WHEN vw_pallets.shipped THEN 'inactive'\r\n
+  \       WHEN vw_pallets.allocated THEN 'ready'\r\n        WHEN vw_pallets.in_stock
+  THEN 'ok'\r\n        WHEN vw_pallets.palletized OR vw_pallets.partially_palletized
+  THEN 'inprogress'\r\n        WHEN vw_pallets.inspected AND NOT vw_pallets.govt_inspection_passed
+  THEN 'error'\r\n        WHEN fn_pallet_verification_failed(vw_pallets.pallet_id)
+  THEN 'error'\r\n    END AS colour_rule,\r\n    -- Parameters\r\n    vw_pallet_sequences.packed_tm_group,\r\n
+  \   vw_pallet_sequences.rmt_grade,\r\n    vw_pallet_sequences.production_run_id\r\n\r\nFROM
+  vw_pallets\r\nJOIN vw_pallet_sequences ON vw_pallets.pallet_id = vw_pallet_sequences.pallet_id\r\nLEFT
+  JOIN vw_pallet_sequences_aggregated aggregated ON aggregated.pallet_id = vw_pallets.pallet_id\r\n\r\nORDER
+  BY zero_load_id DESC, pallet_number DESC;"
 :limit: 
 :offset: 
 :external_settings:
   :render_url: 
   :colour_key:
+    warning: Scrapped
+    inactive: Shipped
+    ready: Allocated
+    ok: In Stock
+    inprogress: Partially Palletized
     error: Failed inspection and/or failed verifications Pallets
 :columns:
   id:
     :name: id
     :sequence_no: 1
     :caption: Id
-    :namespaced_name: id
+    :namespaced_name: vw_pallet_sequences.id
     :data_type: :integer
     :width: 
     :format: 
     :hide: true
     :pinned: 
-    :groupable: true
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -57,7 +79,7 @@
     :name: pallet_id
     :sequence_no: 2
     :caption: Pallet
-    :namespaced_name: pallet_id
+    :namespaced_name: vw_pallets.pallet_id
     :data_type: :integer
     :width: 
     :format: 
@@ -73,9 +95,9 @@
     :name: status
     :sequence_no: 3
     :caption: Status
-    :namespaced_name: status
+    :namespaced_name: vw_pallets.status
     :data_type: :string
-    :width: 120
+    :width: 
     :format: 
     :hide: false
     :pinned: 
@@ -89,7 +111,7 @@
     :name: pallet_number
     :sequence_no: 4
     :caption: Pallet number
-    :namespaced_name: pallet_number
+    :namespaced_name: vw_pallets.pallet_number
     :data_type: :string
     :width: 150
     :format: 
@@ -101,27 +123,43 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  pallet_sequence_number:
-    :name: pallet_sequence_number
+  pallet_sequence_numbers:
+    :name: pallet_sequence_numbers
     :sequence_no: 5
     :caption: Seq
-    :namespaced_name: pallet_sequence_number
-    :data_type: :integer
+    :namespaced_name: aggregated.pallet_sequence_numbers
+    :data_type: :string
     :width: 70
     :format: 
     :hide: false
-    :pinned: left
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
-  has_individual_cartons:
-    :name: has_individual_cartons
+  seq_count:
+    :name: seq_count
     :sequence_no: 6
+    :caption: Seq count
+    :namespaced_name: aggregated.count
+    :data_type: :string
+    :width: 50
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  individual_cartons:
+    :name: individual_cartons
+    :sequence_no: 7
     :caption: Individual Cartons?
-    :namespaced_name: has_individual_cartons
+    :namespaced_name: vw_pallets.individual_cartons
     :data_type: :boolean
     :width: 100
     :format: 
@@ -135,9 +173,9 @@
     :group_max: false
   target_customers:
     :name: target_customers
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Target customers
-    :namespaced_name: 
+    :namespaced_name: aggregated.target_customers
     :data_type: :string
     :width: 200
     :format: 
@@ -151,9 +189,9 @@
     :group_max: false
   location:
     :name: location
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Location
-    :namespaced_name: location
+    :namespaced_name: vw_pallets.location
     :data_type: :string
     :width: 150
     :format: 
@@ -165,13 +203,13 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  cultivar:
-    :name: cultivar
-    :sequence_no: 9
-    :caption: Cultivar
-    :namespaced_name: cultivar
+  cultivar_names:
+    :name: cultivar_names
+    :sequence_no: 10
+    :caption: Cultivars
+    :namespaced_name: aggregated.cultivar_names
     :data_type: :string
-    :width: 100
+    :width: 
     :format: 
     :hide: false
     :pinned: 
@@ -183,43 +221,11 @@
     :group_max: false
   carton_quantity:
     :name: carton_quantity
-    :sequence_no: 10
-    :caption: Ctn Qty
-    :namespaced_name: carton_quantity
-    :data_type: :integer
-    :width: 90
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  pallet_carton_quantity:
-    :name: pallet_carton_quantity
     :sequence_no: 11
-    :caption: Plt Ctn Qty
-    :namespaced_name: pallet_carton_quantity
-    :data_type: :number
-    :width: 110
-    :format: :delimited_1000
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  cartons_per_pallet:
-    :name: cartons_per_pallet
-    :sequence_no: 12
-    :caption: CPP
-    :namespaced_name: cpp
-    :data_type: :number
-    :width: 100
+    :caption: Carton quantity
+    :namespaced_name: vw_pallets.carton_quantity
+    :data_type: :string
+    :width: 
     :format: 
     :hide: false
     :pinned: 
@@ -229,14 +235,46 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  pallet_size:
-    :name: pallet_size
+  carton_quantities:
+    :name: carton_quantities
+    :sequence_no: 12
+    :caption: Carton quantities
+    :namespaced_name: aggregated.carton_quantities
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  nett_weights:
+    :name: nett_weights
     :sequence_no: 13
-    :caption: Plt size
-    :namespaced_name: pallet_size
-    :data_type: :number
+    :caption: Nett weights
+    :namespaced_name: aggregated.nett_weights
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cartons_per_pallets:
+    :name: cartons_per_pallets
+    :sequence_no: 14
+    :caption: Cartons per pallet
+    :namespaced_name: aggregated.cartons_per_pallets
+    :data_type: :string
     :width: 100
-    :format: :delimited_1000
+    :format: 
     :hide: false
     :pinned: 
     :groupable: false
@@ -247,9 +285,9 @@
     :group_max: false
   pallet_age:
     :name: pallet_age
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: Plt age
-    :namespaced_name: pallet_age
+    :namespaced_name: vw_pallets.pallet_age
     :data_type: :integer
     :width: 100
     :format: 
@@ -263,9 +301,9 @@
     :group_max: false
   stock_age:
     :name: stock_age
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Stock age
-    :namespaced_name: stock_age
+    :namespaced_name: vw_pallets.stock_age
     :data_type: :integer
     :width: 100
     :format: 
@@ -279,9 +317,9 @@
     :group_max: false
   cold_age:
     :name: cold_age
-    :sequence_no: 16
+    :sequence_no: 17
     :caption: Cold age
-    :namespaced_name: cold_age
+    :namespaced_name: vw_pallets.cold_age
     :data_type: :integer
     :width: 100
     :format: 
@@ -295,9 +333,9 @@
     :group_max: false
   ambient_age:
     :name: ambient_age
-    :sequence_no: 17
+    :sequence_no: 18
     :caption: Ambient age
-    :namespaced_name: ambient_age
+    :namespaced_name: vw_pallets.ambient_age
     :data_type: :integer
     :width: 100
     :format: 
@@ -311,9 +349,9 @@
     :group_max: false
   pack_to_inspect_age:
     :name: pack_to_inspect_age
-    :sequence_no: 18
+    :sequence_no: 19
     :caption: Pack to inspect age
-    :namespaced_name: pack_to_inspect_age
+    :namespaced_name: vw_pallets.pack_to_inspect_age
     :data_type: :integer
     :width: 100
     :format: 
@@ -327,9 +365,9 @@
     :group_max: false
   inspect_to_cold_age:
     :name: inspect_to_cold_age
-    :sequence_no: 19
+    :sequence_no: 20
     :caption: Inspect to cold age
-    :namespaced_name: inspect_to_cold_age
+    :namespaced_name: vw_pallets.inspect_to_cold_age
     :data_type: :integer
     :width: 100
     :format: 
@@ -343,9 +381,9 @@
     :group_max: false
   inspect_to_exit_warm_age:
     :name: inspect_to_exit_warm_age
-    :sequence_no: 20
+    :sequence_no: 21
     :caption: Inspect to exit warm age
-    :namespaced_name: inspect_to_exit_warm_age
+    :namespaced_name: vw_pallets.inspect_to_exit_warm_age
     :data_type: :integer
     :width: 100
     :format: 
@@ -357,15 +395,47 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  created_at:
-    :name: created_at
-    :sequence_no: 21
-    :caption: Created at
-    :namespaced_name: created_at
-    :data_type: :datetime
-    :width: 150
+  palletized_to_verified_age:
+    :name: palletized_to_verified_age
+    :sequence_no: 22
+    :caption: Palletized to verified age
+    :namespaced_name: vw_pallets.palletized_to_verified_age
+    :data_type: :string
+    :width: 
     :format: 
-    :hide: true
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  verified_to_inspected_age:
+    :name: verified_to_inspected_age
+    :sequence_no: 23
+    :caption: Verified to inspected age
+    :namespaced_name: vw_pallets.verified_to_inspected_age
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inspected_to_in_stock_age:
+    :name: inspected_to_in_stock_age
+    :sequence_no: 24
+    :caption: Inspected to in stock age
+    :namespaced_name: vw_pallets.inspected_to_in_stock_age
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
     :pinned: 
     :groupable: false
     :group_by_seq: 
@@ -375,9 +445,9 @@
     :group_max: false
   palletized_at:
     :name: palletized_at
-    :sequence_no: 22
+    :sequence_no: 25
     :caption: Palletized at
-    :namespaced_name: palletized_at
+    :namespaced_name: vw_pallets.palletized_at
     :data_type: :datetime
     :width: 150
     :format: 
@@ -391,9 +461,9 @@
     :group_max: false
   govt_first_inspection_at:
     :name: govt_first_inspection_at
-    :sequence_no: 23
+    :sequence_no: 26
     :caption: Govt first inspection at
-    :namespaced_name: govt_first_inspection_at
+    :namespaced_name: vw_pallets.govt_first_inspection_at
     :data_type: :datetime
     :width: 150
     :format: 
@@ -407,9 +477,9 @@
     :group_max: false
   govt_inspection_passed:
     :name: govt_inspection_passed
-    :sequence_no: 24
+    :sequence_no: 27
     :caption: Govt inspection passed
-    :namespaced_name: govt_inspection_passed
+    :namespaced_name: vw_pallets.govt_inspection_passed
     :data_type: :boolean
     :width: 100
     :format: 
@@ -423,9 +493,9 @@
     :group_max: false
   inspected_dest_country:
     :name: inspected_dest_country
-    :sequence_no: 25
+    :sequence_no: 28
     :caption: Inspected dest country
-    :namespaced_name: inspected_dest_country
+    :namespaced_name: vw_pallets.inspected_dest_country
     :data_type: :string
     :width: 120
     :format: 
@@ -439,9 +509,9 @@
     :group_max: false
   shipped_at:
     :name: shipped_at
-    :sequence_no: 26
+    :sequence_no: 29
     :caption: Shipped at
-    :namespaced_name: shipped_at
+    :namespaced_name: vw_pallets.shipped_at
     :data_type: :datetime
     :width: 150
     :format: 
@@ -455,9 +525,9 @@
     :group_max: false
   govt_reinspection_at:
     :name: govt_reinspection_at
-    :sequence_no: 27
+    :sequence_no: 30
     :caption: Govt reinspection at
-    :namespaced_name: govt_reinspection_at
+    :namespaced_name: vw_pallets.govt_reinspection_at
     :data_type: :datetime
     :width: 150
     :format: 
@@ -471,9 +541,9 @@
     :group_max: false
   allocated_at:
     :name: allocated_at
-    :sequence_no: 28
+    :sequence_no: 31
     :caption: Allocated at
-    :namespaced_name: allocated_at
+    :namespaced_name: vw_pallets.allocated_at
     :data_type: :datetime
     :width: 150
     :format: 
@@ -487,10 +557,10 @@
     :group_max: false
   verified_at:
     :name: verified_at
-    :sequence_no: 29
+    :sequence_no: 32
     :caption: Verified at
-    :namespaced_name: verified_at
-    :data_type: :datetime
+    :namespaced_name: aggregated.verified_at
+    :data_type: :string
     :width: 150
     :format: 
     :hide: false
@@ -503,9 +573,9 @@
     :group_max: false
   allocated:
     :name: allocated
-    :sequence_no: 30
+    :sequence_no: 33
     :caption: Allocated
-    :namespaced_name: allocated
+    :namespaced_name: vw_pallets.allocated
     :data_type: :boolean
     :width: 90
     :format: 
@@ -519,9 +589,9 @@
     :group_max: false
   load_id:
     :name: load_id
-    :sequence_no: 31
+    :sequence_no: 34
     :caption: Load
-    :namespaced_name: load_id
+    :namespaced_name: vw_pallets.load_id
     :data_type: :integer
     :width: 90
     :format: 
@@ -533,11 +603,27 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  zero_load_id:
+    :name: zero_load_id
+    :sequence_no: 35
+    :caption: Zero load
+    :namespaced_name: vw_pallets.zero_load_id
+    :data_type: :string
+    :width: 70
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   shipped:
     :name: shipped
-    :sequence_no: 32
+    :sequence_no: 36
     :caption: Shipped
-    :namespaced_name: shipped
+    :namespaced_name: vw_pallets.shipped
     :data_type: :boolean
     :width: 90
     :format: 
@@ -551,9 +637,9 @@
     :group_max: false
   in_stock:
     :name: in_stock
-    :sequence_no: 33
+    :sequence_no: 37
     :caption: In stock
-    :namespaced_name: in_stock
+    :namespaced_name: vw_pallets.in_stock
     :data_type: :boolean
     :width: 90
     :format: 
@@ -567,9 +653,9 @@
     :group_max: false
   inspected:
     :name: inspected
-    :sequence_no: 34
+    :sequence_no: 38
     :caption: Inspected
-    :namespaced_name: inspected
+    :namespaced_name: vw_pallets.inspected
     :data_type: :boolean
     :width: 90
     :format: 
@@ -583,9 +669,9 @@
     :group_max: false
   palletized:
     :name: palletized
-    :sequence_no: 35
+    :sequence_no: 39
     :caption: Palletized
-    :namespaced_name: palletized
+    :namespaced_name: vw_pallets.palletized
     :data_type: :boolean
     :width: 90
     :format: 
@@ -597,77 +683,13 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  production_run_id:
-    :name: production_run_id
-    :sequence_no: 36
-    :caption: Run
-    :namespaced_name: production_run_id
-    :data_type: :integer
-    :width: 80
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  farm_group:
-    :name: farm_group
-    :sequence_no: 37
-    :caption: Farm group
-    :namespaced_name: farm_group
-    :data_type: :string
-    :width: 100
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  farm:
-    :name: farm
-    :sequence_no: 38
-    :caption: Farm
-    :namespaced_name: farm
-    :data_type: :string
-    :width: 100
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  puc:
-    :name: puc
-    :sequence_no: 39
-    :caption: PUC
-    :namespaced_name: puc
-    :data_type: :string
-    :width: 80
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  orchard:
-    :name: orchard
+  production_runs:
+    :name: production_runs
     :sequence_no: 40
-    :caption: Orch
-    :namespaced_name: orchard
+    :caption: Production runs
+    :namespaced_name: aggregated.production_runs
     :data_type: :string
-    :width: 80
+    :width: 
     :format: 
     :hide: false
     :pinned: 
@@ -677,13 +699,13 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  marketing_puc:
-    :name: marketing_puc
+  farm_groups:
+    :name: farm_groups
     :sequence_no: 41
-    :caption: Marketing puc
-    :namespaced_name: marketing_puc
+    :caption: Farm groups
+    :namespaced_name: aggregated.farm_groups
     :data_type: :string
-    :width: 80
+    :width: 
     :format: 
     :hide: false
     :pinned: 
@@ -693,13 +715,13 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  marketing_orchard:
-    :name: marketing_orchard
+  farms:
+    :name: farms
     :sequence_no: 42
-    :caption: Marketing orchard
-    :namespaced_name: marketing_orchard
+    :caption: Farms
+    :namespaced_name: aggregated.farms
     :data_type: :string
-    :width: 80
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -709,13 +731,13 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  commodity:
-    :name: commodity
+  pucs:
+    :name: pucs
     :sequence_no: 43
-    :caption: Comm
-    :namespaced_name: commodity
+    :caption: PUCs
+    :namespaced_name: aggregated.pucs
     :data_type: :string
-    :width: 80
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -725,27 +747,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  marketing_variety:
-    :name: marketing_variety
+  orchards:
+    :name: orchards
     :sequence_no: 44
-    :caption: Mkt Var
-    :namespaced_name: marketing_variety
-    :data_type: :string
-    :width: 90
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  grade:
-    :name: grade
-    :sequence_no: 45
-    :caption: Grade
-    :namespaced_name: grade
+    :caption: Orchards
+    :namespaced_name: aggregated.orchards
     :data_type: :string
     :width: 80
     :format: 
@@ -757,13 +763,29 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  rmt_grade:
-    :name: rmt_grade
+  commodities:
+    :name: commodities
+    :sequence_no: 45
+    :caption: Commodities
+    :namespaced_name: aggregated.commodities
+    :data_type: :string
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marketing_varieties:
+    :name: marketing_varieties
     :sequence_no: 46
-    :caption: RMT grade
-    :namespaced_name: rmt_grade
-    :data_type: :boolean
-    :width: 100
+    :caption: Marketing Varieties
+    :namespaced_name: aggregated.marketing_varieties
+    :data_type: :string
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -773,13 +795,13 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  std_size:
-    :name: std_size
+  marketing_pucs:
+    :name: marketing_pucs
     :sequence_no: 47
-    :caption: Std size
-    :namespaced_name: std_size
-    :data_type: :integer
-    :width: 90
+    :caption: Marketing PUCs
+    :namespaced_name: aggregated.marketing_pucs
+    :data_type: :string
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -789,13 +811,13 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  actual_count:
-    :name: actual_count
+  marketing_orchards:
+    :name: marketing_orchards
     :sequence_no: 48
-    :caption: Actual count
-    :namespaced_name: actual_count
-    :data_type: :integer
-    :width: 90
+    :caption: Marketing orchards
+    :namespaced_name: aggregated.marketing_orchards
+    :data_type: :string
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -805,11 +827,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  size_ref:
-    :name: size_ref
+  grades:
+    :name: grades
     :sequence_no: 49
-    :caption: Size ref
-    :namespaced_name: size_ref
+    :caption: Grades
+    :namespaced_name: aggregated.grades
     :data_type: :string
     :width: 90
     :format: 
@@ -821,13 +843,13 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  count_group:
-    :name: count_group
+  rmt_grades:
+    :name: rmt_grades
     :sequence_no: 50
-    :caption: Count group
-    :namespaced_name: count_group
-    :data_type: :string
-    :width: 120
+    :caption: RMT grades
+    :namespaced_name: aggregated.rmt_grades
+    :data_type: :boolean
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -837,27 +859,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  std_pack:
-    :name: std_pack
+  standard_sizes:
+    :name: standard_sizes
     :sequence_no: 51
-    :caption: Std pack
-    :namespaced_name: std_pack
-    :data_type: :string
-    :width: 90
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  packed_tm_group:
-    :name: packed_tm_group
-    :sequence_no: 52
-    :caption: Packed Tm
-    :namespaced_name: packed_tm_group
+    :caption: Standard sizes
+    :namespaced_name: aggregated.standard_sizes
     :data_type: :string
     :width: 100
     :format: 
@@ -869,13 +875,29 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  target_market:
-    :name: target_market
+  actual_counts:
+    :name: actual_counts
+    :sequence_no: 52
+    :caption: Actual counts
+    :namespaced_name: aggregated.actual_counts
+    :data_type: :string
+    :width: 90
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  size_references:
+    :name: size_references
     :sequence_no: 53
-    :caption: Target market
-    :namespaced_name: target_market
+    :caption: Size references
+    :namespaced_name: aggregated.size_references
     :data_type: :string
-    :width: 120
+    :width: 90
     :format: 
     :hide: false
     :pinned: 
@@ -885,11 +907,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  bom:
-    :name: bom
+  count_groups:
+    :name: count_groups
     :sequence_no: 54
-    :caption: Bom
-    :namespaced_name: bom
+    :caption: Count groups
+    :namespaced_name: aggregated.count_groups
     :data_type: :string
     :width: 120
     :format: 
@@ -901,11 +923,59 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  pm_bom_system_code:
-    :name: pm_bom_system_code
+  basic_packs:
+    :name: basic_packs
     :sequence_no: 55
-    :caption: Bom system code
-    :namespaced_name: pm_bom_system_code
+    :caption: Basic packs
+    :namespaced_name: aggregated.basic_packs
+    :data_type: :string
+    :width: 90
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  standard_packs:
+    :name: standard_packs
+    :sequence_no: 56
+    :caption: Standard packs
+    :namespaced_name: aggregated.standard_packs
+    :data_type: :string
+    :width: 90
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packed_tm_groups:
+    :name: packed_tm_groups
+    :sequence_no: 57
+    :caption: Packed tm groups
+    :namespaced_name: aggregated.packed_tm_groups
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  target_markets:
+    :name: target_markets
+    :sequence_no: 58
+    :caption: Target markets
+    :namespaced_name: aggregated.target_markets
     :data_type: :string
     :width: 120
     :format: 
@@ -917,11 +987,43 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  mark:
-    :name: mark
-    :sequence_no: 56
-    :caption: Mark
-    :namespaced_name: mark
+  bom_codes:
+    :name: bom_codes
+    :sequence_no: 59
+    :caption: Bom codes
+    :namespaced_name: aggregated.bom_codes
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  system_codes:
+    :name: system_codes
+    :sequence_no: 60
+    :caption: System codes
+    :namespaced_name: aggregated.system_codes
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marks:
+    :name: marks
+    :sequence_no: 61
+    :caption: Marks
+    :namespaced_name: aggregated.marks
     :data_type: :string
     :width: 80
     :format: 
@@ -935,9 +1037,9 @@
     :group_max: false
   packaging_marks:
     :name: packaging_marks
-    :sequence_no: 57
+    :sequence_no: 62
     :caption: Packaging marks
-    :namespaced_name: packaging_marks
+    :namespaced_name: aggregated.packaging_marks
     :data_type: :string
     :width: 120
     :format: 
@@ -949,11 +1051,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  inventory_code:
-    :name: inventory_code
-    :sequence_no: 58
-    :caption: Inv Code
-    :namespaced_name: inventory_code
+  inventory_codes:
+    :name: inventory_codes
+    :sequence_no: 63
+    :caption: Inventory codes
+    :namespaced_name: aggregated.inventory_codes
     :data_type: :string
     :width: 100
     :format: 
@@ -967,9 +1069,9 @@
     :group_max: false
   fruit_sticker:
     :name: fruit_sticker
-    :sequence_no: 59
+    :sequence_no: 64
     :caption: Fruit sticker
-    :namespaced_name: fruit_sticker
+    :namespaced_name: vw_pallets.fruit_sticker
     :data_type: :string
     :width: 120
     :format: 
@@ -983,9 +1085,9 @@
     :group_max: false
   fruit_sticker_2:
     :name: fruit_sticker_2
-    :sequence_no: 60
+    :sequence_no: 65
     :caption: Fruit sticker 2
-    :namespaced_name: fruit_sticker_2
+    :namespaced_name: vw_pallets.fruit_sticker_2
     :data_type: :string
     :width: 120
     :format: 
@@ -997,11 +1099,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  marketing_org:
-    :name: marketing_org
-    :sequence_no: 61
-    :caption: Mkting Org
-    :namespaced_name: marketing_org
+  marketing_orgs:
+    :name: marketing_orgs
+    :sequence_no: 66
+    :caption: Marketing orgs
+    :namespaced_name: aggregated.marketing_orgs
     :data_type: :string
     :width: 120
     :format: 
@@ -1015,9 +1117,9 @@
     :group_max: false
   pallet_base:
     :name: pallet_base
-    :sequence_no: 62
+    :sequence_no: 67
     :caption: Base
-    :namespaced_name: pallet_base
+    :namespaced_name: vw_pallets.pallet_base
     :data_type: :string
     :width: 70
     :format: 
@@ -1031,9 +1133,9 @@
     :group_max: false
   stack_type:
     :name: stack_type
-    :sequence_no: 63
+    :sequence_no: 68
     :caption: Stack
-    :namespaced_name: stack_type
+    :namespaced_name: vw_pallets.stack_type
     :data_type: :string
     :width: 80
     :format: 
@@ -1047,11 +1149,11 @@
     :group_max: false
   gross_weight:
     :name: gross_weight
-    :sequence_no: 64
+    :sequence_no: 69
     :caption: Gross weight
-    :namespaced_name: gross_weight
+    :namespaced_name: vw_pallets.gross_weight
     :data_type: :number
-    :width: 
+    :width: 80
     :format: :delimited_1000
     :hide: false
     :pinned: 
@@ -1063,11 +1165,11 @@
     :group_max: false
   nett_weight:
     :name: nett_weight
-    :sequence_no: 65
+    :sequence_no: 70
     :caption: Nett weight
-    :namespaced_name: nett_weight
+    :namespaced_name: vw_pallets.nett_weight
     :data_type: :number
-    :width: 
+    :width: 80
     :format: :delimited_1000
     :hide: false
     :pinned: 
@@ -1077,27 +1179,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  sequence_nett_weight:
-    :name: sequence_nett_weight
-    :sequence_no: 66
-    :caption: Seq nett weight
-    :namespaced_name: sequence_nett_weight
-    :data_type: :number
-    :width: 
-    :format: :delimited_1000
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  basic_pack:
-    :name: basic_pack
-    :sequence_no: 67
-    :caption: Basic pack
-    :namespaced_name: basic_pack
+  packhouses:
+    :name: packhouses
+    :sequence_no: 71
+    :caption: Packhouses
+    :namespaced_name: aggregated.packhouses
     :data_type: :string
     :width: 120
     :format: 
@@ -1109,29 +1195,13 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  packhouse:
-    :name: packhouse
-    :sequence_no: 68
-    :caption: Packhouse
-    :namespaced_name: packhouse
+  lines:
+    :name: lines
+    :sequence_no: 72
+    :caption: Lines
+    :namespaced_name: aggregated.lines
     :data_type: :string
-    :width: 100
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  line:
-    :name: line
-    :sequence_no: 69
-    :caption: Line
-    :namespaced_name: line
-    :data_type: :string
-    :width: 100
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -1143,9 +1213,9 @@
     :group_max: false
   palletizing_bay:
     :name: palletizing_bay
-    :sequence_no: 70
+    :sequence_no: 73
     :caption: Palletizing bay
-    :namespaced_name: palletizing_bay
+    :namespaced_name: vw_pallets.palletizing_bay
     :data_type: :string
     :width: 120
     :format: 
@@ -1157,13 +1227,13 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  pick_ref:
-    :name: pick_ref
-    :sequence_no: 71
-    :caption: Pick ref
-    :namespaced_name: pick_ref
+  pick_references:
+    :name: pick_references
+    :sequence_no: 74
+    :caption: Pick references
+    :namespaced_name: aggregated.pick_references
     :data_type: :string
-    :width: 90
+    :width: 
     :format: 
     :hide: false
     :pinned: 
@@ -1175,9 +1245,9 @@
     :group_max: false
   phc:
     :name: phc
-    :sequence_no: 72
+    :sequence_no: 75
     :caption: PHC
-    :namespaced_name: phc
+    :namespaced_name: vw_pallets.phc
     :data_type: :string
     :width: 80
     :format: 
@@ -1189,13 +1259,13 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  verification_result:
-    :name: verification_result
-    :sequence_no: 73
-    :caption: Verification result
-    :namespaced_name: verification_result
+  verification_results:
+    :name: verification_results
+    :sequence_no: 76
+    :caption: Verification results
+    :namespaced_name: aggregated.verification_results
     :data_type: :string
-    :width: 100
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -1207,9 +1277,9 @@
     :group_max: false
   scrapped_at:
     :name: scrapped_at
-    :sequence_no: 74
+    :sequence_no: 77
     :caption: Scrapped at
-    :namespaced_name: scrapped_at
+    :namespaced_name: vw_pallets.scrapped_at
     :data_type: :datetime
     :width: 150
     :format: 
@@ -1223,9 +1293,9 @@
     :group_max: false
   scrapped:
     :name: scrapped
-    :sequence_no: 75
+    :sequence_no: 78
     :caption: Scrapped
-    :namespaced_name: scrapped
+    :namespaced_name: vw_pallets.scrapped
     :data_type: :boolean
     :width: 90
     :format: 
@@ -1239,9 +1309,9 @@
     :group_max: false
   partially_palletized:
     :name: partially_palletized
-    :sequence_no: 76
+    :sequence_no: 79
     :caption: Partially palletized
-    :namespaced_name: partially_palletized
+    :namespaced_name: vw_pallets.partially_palletized
     :data_type: :boolean
     :width: 90
     :format: 
@@ -1255,9 +1325,9 @@
     :group_max: false
   reinspected:
     :name: reinspected
-    :sequence_no: 77
+    :sequence_no: 80
     :caption: Reinspected
-    :namespaced_name: reinspected
+    :namespaced_name: vw_pallets.reinspected
     :data_type: :boolean
     :width: 90
     :format: 
@@ -1271,9 +1341,9 @@
     :group_max: false
   verified:
     :name: verified
-    :sequence_no: 78
+    :sequence_no: 81
     :caption: Verified
-    :namespaced_name: verified
+    :namespaced_name: aggregated.verified
     :data_type: :boolean
     :width: 90
     :format: 
@@ -1285,11 +1355,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  verification_passed:
-    :name: verification_passed
-    :sequence_no: 79
-    :caption: Verification passed
-    :namespaced_name: verification_passed
+  verifications_passed:
+    :name: verifications_passed
+    :sequence_no: 82
+    :caption: Verifications passed
+    :namespaced_name: aggregated.verifications_passed
     :data_type: :boolean
     :width: 100
     :format: 
@@ -1301,11 +1371,27 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  pallet_verification_failed:
+    :name: pallet_verification_failed
+    :sequence_no: 83
+    :caption: Pallet verification failed
+    :namespaced_name: 
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   build_status:
     :name: build_status
-    :sequence_no: 80
+    :sequence_no: 84
     :caption: Build status
-    :namespaced_name: build_status
+    :namespaced_name: vw_pallets.build_status
     :data_type: :string
     :width: 100
     :format: 
@@ -1317,27 +1403,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  zero_load_id:
-    :name: zero_load_id
-    :sequence_no: 81
-    :caption: Zero load
-    :namespaced_name: zero_load_id
-    :data_type: :string
-    :width: 70
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   temp_tail:
     :name: temp_tail
-    :sequence_no: 82
+    :sequence_no: 85
     :caption: Temp tail
-    :namespaced_name: temp_tail
+    :namespaced_name: vw_pallets.temp_tail
     :data_type: :string
     :width: 120
     :format: 
@@ -1351,9 +1421,9 @@
     :group_max: false
   depot_pallet:
     :name: depot_pallet
-    :sequence_no: 83
+    :sequence_no: 86
     :caption: Depot pallet
-    :namespaced_name: depot_pallet
+    :namespaced_name: vw_pallets.depot_pallet
     :data_type: :boolean
     :width: 150
     :format: 
@@ -1367,9 +1437,9 @@
     :group_max: false
   edi_in_file:
     :name: edi_in_file
-    :sequence_no: 84
+    :sequence_no: 87
     :caption: EDI in file
-    :namespaced_name: edi_in_file
+    :namespaced_name: vw_pallets.edi_in_file
     :data_type: :string
     :width: 150
     :format: 
@@ -1383,9 +1453,9 @@
     :group_max: false
   edi_in_consignment_note_number:
     :name: edi_in_consignment_note_number
-    :sequence_no: 85
+    :sequence_no: 88
     :caption: EDI Cons
-    :namespaced_name: edi_in_consignment_note_number
+    :namespaced_name: vw_pallets.edi_in_consignment_note_number
     :data_type: :string
     :width: 120
     :format: 
@@ -1399,10 +1469,10 @@
     :group_max: false
   packed_at:
     :name: packed_at
-    :sequence_no: 86
+    :sequence_no: 89
     :caption: Packed at
-    :namespaced_name: packed_at
-    :data_type: :datetime
+    :namespaced_name: aggregated.packed_at
+    :data_type: :string
     :width: 150
     :format: 
     :hide: false
@@ -1413,12 +1483,12 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  packed_date:
-    :name: packed_date
-    :sequence_no: 87
-    :caption: Packed date
-    :namespaced_name: packed_date
-    :data_type: :date
+  packed_dates:
+    :name: packed_dates
+    :sequence_no: 90
+    :caption: Packed dates
+    :namespaced_name: aggregated.packed_dates
+    :data_type: :string
     :width: 150
     :format: 
     :hide: false
@@ -1429,11 +1499,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  packed_week:
-    :name: packed_week
-    :sequence_no: 88
-    :caption: Packed week
-    :namespaced_name: packed_week
+  packed_weeks:
+    :name: packed_weeks
+    :sequence_no: 91
+    :caption: Packed weeks
+    :namespaced_name: aggregated.packed_weeks
     :data_type: :string
     :width: 120
     :format: 
@@ -1447,11 +1517,11 @@
     :group_max: false
   repacked:
     :name: repacked
-    :sequence_no: 89
+    :sequence_no: 92
     :caption: Repacked
-    :namespaced_name: repacked
-    :data_type: :boolean
-    :width: 80
+    :namespaced_name: aggregated.repacked
+    :data_type: :string
+    :width: 
     :format: 
     :hide: false
     :pinned: 
@@ -1463,11 +1533,11 @@
     :group_max: false
   repacked_at:
     :name: repacked_at
-    :sequence_no: 90
+    :sequence_no: 93
     :caption: Repacked at
-    :namespaced_name: repacked_at
-    :data_type: :datetime
-    :width: 150
+    :namespaced_name: aggregated.repacked_at
+    :data_type: :string
+    :width: 
     :format: 
     :hide: false
     :pinned: 
@@ -1477,12 +1547,12 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  repacked_from_pallet_id:
-    :name: repacked_from_pallet_id
-    :sequence_no: 91
-    :caption: Repacked from pallet
-    :namespaced_name: repacked_from_pallet_id
-    :data_type: :integer
+  repacked_from_pallet_ids:
+    :name: repacked_from_pallet_ids
+    :sequence_no: 94
+    :caption: Repacked from pallet ids
+    :namespaced_name: aggregated.repacked_from_pallet_ids
+    :data_type: :string
     :width: 150
     :format: 
     :hide: false
@@ -1495,10 +1565,10 @@
     :group_max: false
   failed_otmc_results:
     :name: failed_otmc_results
-    :sequence_no: 92
-    :caption: Failed otmc results
-    :namespaced_name: failed_otmc_results
-    :data_type: :string
+    :sequence_no: 95
+    :caption: Failed OTMC results
+    :namespaced_name: aggregated.failed_otmc_results
+    :data_type: :boolean
     :width: 150
     :format: 
     :hide: false
@@ -1511,10 +1581,10 @@
     :group_max: false
   failed_otmc:
     :name: failed_otmc
-    :sequence_no: 93
-    :caption: Failed otmc
-    :namespaced_name: failed_otmc
-    :data_type: :string
+    :sequence_no: 96
+    :caption: Failed OTMC
+    :namespaced_name: aggregated.failed_otmc
+    :data_type: :boolean
     :width: 120
     :format: 
     :hide: false
@@ -1527,9 +1597,9 @@
     :group_max: false
   created_by:
     :name: created_by
-    :sequence_no: 94
+    :sequence_no: 97
     :caption: Created by
-    :namespaced_name: created_by
+    :namespaced_name: aggregated.created_by
     :data_type: :string
     :width: 120
     :format: 
@@ -1543,59 +1613,27 @@
     :group_max: false
   verified_by:
     :name: verified_by
-    :sequence_no: 95
-    :caption: Verified by
-    :namespaced_name: verified_by
-    :data_type: :string
-    :width: 120
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  edi_size_count:
-    :name: edi_size_count
-    :sequence_no: 96
-    :caption: EDI size count
-    :namespaced_name: edi_size_count
-    :data_type: :string
-    :width: 120
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  target_customer_party_role_id:
-    :name: target_customer_party_role_id
-    :sequence_no: 97
-    :caption: Target customer party role
-    :namespaced_name: target_customer_party_role_id
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  target_customer:
-    :name: target_customer
     :sequence_no: 98
-    :caption: Target customer
-    :namespaced_name: target_customer
+    :caption: Verified by
+    :namespaced_name: aggregated.verified_by
     :data_type: :string
     :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  edi_size_counts:
+    :name: edi_size_counts
+    :sequence_no: 99
+    :caption: Edi size counts
+    :namespaced_name: aggregated.edi_size_counts
+    :data_type: :string
+    :width: 
     :format: 
     :hide: false
     :pinned: 
@@ -1607,9 +1645,9 @@
     :group_max: false
   consignment_note_number:
     :name: consignment_note_number
-    :sequence_no: 99
+    :sequence_no: 100
     :caption: Cons Note number
-    :namespaced_name: consignment_note_number
+    :namespaced_name: vw_pallets.consignment_note_number
     :data_type: :string
     :width: 120
     :format: 
@@ -1621,13 +1659,13 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  sequence_count:
-    :name: sequence_count
-    :sequence_no: 100
-    :caption: Sequence count
-    :namespaced_name: sequence_count
-    :data_type: :string
-    :width: 
+  created_at:
+    :name: created_at
+    :sequence_no: 101
+    :caption: Created at
+    :namespaced_name: vw_pallets.created_at
+    :data_type: :datetime
+    :width: 150
     :format: 
     :hide: true
     :pinned: 
@@ -1639,11 +1677,11 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 101
+    :sequence_no: 102
     :caption: Active
-    :namespaced_name: active
+    :namespaced_name: vw_pallets.active
     :data_type: :boolean
-    :width: 80
+    :width: 
     :format: 
     :hide: false
     :pinned: 
@@ -1655,7 +1693,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 102
+    :sequence_no: 103
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
@@ -1669,8 +1707,56 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  packed_tm_group:
+    :name: packed_tm_group
+    :sequence_no: 104
+    :caption: Packed tm group
+    :namespaced_name: vw_pallet_sequences.packed_tm_group
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_grade:
+    :name: rmt_grade
+    :sequence_no: 105
+    :caption: Rmt grade
+    :namespaced_name: vw_pallet_sequences.rmt_grade
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  production_run_id:
+    :name: production_run_id
+    :sequence_no: 106
+    :caption: Production run
+    :namespaced_name: vw_pallet_sequences.production_run_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
 :query_parameter_definitions:
-- :column: id
+- :column: vw_pallet_sequences.id
   :caption: Id
   :data_type: :integer
   :control_type: :text
@@ -1678,7 +1764,7 @@
   :ordered_list: false
   :ui_priority: 1
   :list_def: 
-- :column: pallet_number
+- :column: vw_pallets.pallet_number
   :caption: Pallet number
   :data_type: :string
   :control_type: :text
@@ -1686,7 +1772,7 @@
   :ordered_list: false
   :ui_priority: 2
   :list_def: 
-- :column: in_stock
+- :column: vw_pallets.in_stock
   :caption: In Stock?
   :data_type: :boolean
   :control_type: :list
@@ -1696,7 +1782,7 @@
   :list_def:
   - true
   - false
-- :column: allocated
+- :column: vw_pallets.allocated
   :caption: Allocated?
   :data_type: :boolean
   :control_type: :list
@@ -1706,7 +1792,7 @@
   :list_def:
   - true
   - false
-- :column: scrapped
+- :column: vw_pallets.scrapped
   :caption: Scrapped?
   :data_type: :boolean
   :control_type: :list
@@ -1716,7 +1802,7 @@
   :list_def:
   - true
   - false
-- :column: inspected
+- :column: vw_pallets.inspected
   :caption: Inspected?
   :data_type: :boolean
   :control_type: :list
@@ -1726,7 +1812,7 @@
   :list_def:
   - true
   - false
-- :column: reinspected
+- :column: vw_pallets.reinspected
   :caption: Reinspected?
   :data_type: :boolean
   :control_type: :list
@@ -1736,7 +1822,7 @@
   :list_def:
   - true
   - false
-- :column: palletized
+- :column: vw_pallets.palletized
   :caption: Palletized?
   :data_type: :boolean
   :control_type: :list
@@ -1746,7 +1832,7 @@
   :list_def:
   - true
   - false
-- :column: partially_palletized
+- :column: vw_pallets.partially_palletized
   :caption: Partially Palletized?
   :data_type: :boolean
   :control_type: :list
@@ -1756,7 +1842,7 @@
   :list_def:
   - true
   - false
-- :column: pallet_verification_failed
+- :column: vw_pallets.pallet_verification_failed
   :caption: Pallet Verified?
   :data_type: :boolean
   :control_type: :list
@@ -1766,7 +1852,7 @@
   :list_def:
   - true
   - false
-- :column: govt_inspection_passed
+- :column: vw_pallets.govt_inspection_passed
   :caption: Govt inspection passed?
   :data_type: :boolean
   :control_type: :list
@@ -1776,7 +1862,7 @@
   :list_def:
   - true
   - false
-- :column: active
+- :column: vw_pallets.active
   :caption: Active?
   :data_type: :boolean
   :control_type: :list
@@ -1786,7 +1872,7 @@
   :list_def:
   - true
   - false
-- :column: load_id
+- :column: vw_pallets.load_id
   :caption: load_id
   :data_type: :integer
   :control_type: :text
@@ -1794,7 +1880,7 @@
   :ordered_list: false
   :ui_priority: 12
   :list_def: 
-- :column: zero_load_id
+- :column: vw_pallets.zero_load_id
   :caption: zero_load_id
   :data_type: :integer
   :control_type: :text
@@ -1802,7 +1888,7 @@
   :ordered_list: false
   :ui_priority: 13
   :list_def: 
-- :column: shipped
+- :column: vw_pallets.shipped
   :caption: Shipped?
   :data_type: :boolean
   :control_type: :list
@@ -1810,7 +1896,7 @@
   :ordered_list: false
   :ui_priority: 14
   :list_def: true, false
-- :column: packed_tm_group
+- :column: vw_pallet_sequences.packed_tm_group
   :caption: Packed TM Group
   :data_type: :string
   :control_type: :text
@@ -1818,7 +1904,7 @@
   :ordered_list: false
   :ui_priority: 15
   :list_def: 
-- :column: depot_pallet
+- :column: vw_pallets.depot_pallet
   :caption: Depot Pallet
   :data_type: :boolean
   :control_type: :text
@@ -1826,7 +1912,7 @@
   :ordered_list: false
   :ui_priority: 16
   :list_def: 
-- :column: production_run_id
+- :column: vw_pallet_sequences.production_run_id
   :caption: Production run Id
   :data_type: :integer
   :control_type: :text
@@ -1834,7 +1920,7 @@
   :ordered_list: false
   :ui_priority: 17
   :list_def: 
-- :column: failed_otmc_results
+- :column: vw_pallets.failed_otmc_results
   :caption: Failed OTMC Results
   :data_type: :string
   :control_type: :text
@@ -1842,7 +1928,7 @@
   :ordered_list: false
   :ui_priority: 18
   :list_def: 
-- :column: failed_otmc
+- :column: vw_pallets.failed_otmc
   :caption: Failed OTMC?
   :data_type: :boolean
   :control_type: :text
@@ -1850,7 +1936,7 @@
   :ordered_list: false
   :ui_priority: 19
   :list_def: 
-- :column: repacked
+- :column: vw_pallets.repacked
   :caption: Repacked?
   :data_type: :boolean
   :control_type: :text
@@ -1858,7 +1944,7 @@
   :ordered_list: false
   :ui_priority: 20
   :list_def: 
-- :column: target_customer_party_role_id
+- :column: vw_pallet_sequences.target_customer_party_role_id
   :caption: Target Customer Party Role Id
   :data_type: :integer
   :control_type: :text
@@ -1866,7 +1952,7 @@
   :ordered_list: false
   :ui_priority: 21
   :list_def: 
-- :column: rmt_grade
+- :column: aggregated.rmt_grade
   :caption: RMT Grade
   :data_type: :boolean
   :control_type: :text
@@ -1874,8 +1960,8 @@
   :ordered_list: false
   :ui_priority: 1
   :list_def: 
-- :column: sequence_count
-  :caption: Sequence Count
+- :column: aggregated.count
+  :caption: Count
   :data_type: :integer
   :control_type: :text
   :default_value: 
