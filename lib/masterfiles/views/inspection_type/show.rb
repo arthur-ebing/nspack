@@ -30,6 +30,9 @@ module Masterfiles
 
                   col.add_field :applies_to_all_grades
                   col.add_field :applicable_grades
+
+                  col.add_field :applies_to_all_marketing_org_party_roles
+                  col.add_field :applicable_marketing_org_party_roles
                 end
               end
             end

@@ -35,6 +35,11 @@ module UiRules
       fields[:applies_to_all_grades] = { renderer: :label, as_boolean: true }
       fields[:applicable_grades] = { renderer: :label, with_value: @form_object.applicable_grades.join(', ') }
 
+      fields[:applies_to_all_marketing_org_party_roles] = { renderer: :label, caption: 'Applies To All Marketing ORGs',
+                                                            as_boolean: true }
+      fields[:applicable_marketing_org_party_roles] = { renderer: :label, caption: 'Applicable Marketing ORGs',
+                                                        with_value: @form_object.applicable_grades.join(', ') }
+
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
@@ -64,7 +69,13 @@ module UiRules
         applicable_grade_ids: { renderer: :multi, caption: 'Grades',
                                 options: MasterfilesApp::FruitRepo.new.for_select_grades,
                                 selected: @form_object.applicable_grade_ids,
-                                hide_on_load: @form_object.applies_to_all_grades }
+                                hide_on_load: @form_object.applies_to_all_grades },
+
+        applies_to_all_marketing_org_party_roles: { renderer: :checkbox, caption: 'Applies to all Marketing ORGs' },
+        applicable_marketing_org_party_role_ids: { renderer: :multi, caption: 'Marketing ORGs',
+                                                   options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_MARKETER),
+                                                   selected: @form_object.applicable_marketing_org_party_role_ids,
+                                                   hide_on_load: @form_object.applies_to_all_marketing_org_party_roles }
       }
     end
 
@@ -88,14 +99,18 @@ module UiRules
                                     applies_to_all_tm_customers: true,
                                     applicable_tm_customer_ids: nil,
                                     applies_to_all_grades: true,
-                                    applicable_grade_ids: nil)
+                                    applicable_grade_ids: nil,
+                                    applies_to_all_marketing_org_party_roles: true,
+                                    applicable_marketing_org_party_role_ids: nil)
     end
 
     def handle_behaviour
       changed = {
         applies_to_all_tms: :applies_to_all_tms,
         applies_to_all_tm_customers: :applies_to_all_tm_customers,
-        applies_to_all_grades: :applies_to_all_grades
+        applies_to_all_grades: :applies_to_all_grades,
+        applies_to_all_marketing_org_party_roles: :applies_to_all_marketing_org_party_roles
+
       }
       changed = changed[@options[:field]]
       return unhandled_behaviour! if changed.nil?
@@ -111,6 +126,7 @@ module UiRules
         behaviour.input_change :applies_to_all_tms, notify: [{ url: "#{url}/applies_to_all_tms" }]
         behaviour.input_change :applies_to_all_tm_customers, notify: [{ url: "#{url}/applies_to_all_tm_customers" }]
         behaviour.input_change :applies_to_all_grades, notify: [{ url: "#{url}/applies_to_all_grades" }]
+        behaviour.input_change :applies_to_all_marketing_org_party_roles, notify: [{ url: "#{url}/applies_to_all_marketing_org_party_roles" }]
       end
     end
 
@@ -135,6 +151,14 @@ module UiRules
       actions << OpenStruct.new(type: params[:changed_value] == 'f' ? :show_element : :hide_element,
                                 dom_id: 'inspection_type_applicable_grade_ids_field_wrapper')
       actions << OpenStruct.new(type: :replace_input_value, dom_id: 'inspection_type_applicable_grade_ids', value: [])
+      json_actions(actions)
+    end
+
+    def applies_to_all_marketing_org_party_roles
+      actions = []
+      actions << OpenStruct.new(type: params[:changed_value] == 'f' ? :show_element : :hide_element,
+                                dom_id: 'inspection_type_applicable_marketing_org_party_role_ids_field_wrapper')
+      actions << OpenStruct.new(type: :replace_input_value, dom_id: 'inspection_type_applicable_marketing_org_party_role_ids', value: [])
       json_actions(actions)
     end
   end

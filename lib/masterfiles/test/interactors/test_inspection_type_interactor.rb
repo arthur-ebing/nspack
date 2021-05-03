@@ -81,6 +81,9 @@ module MasterfilesApp
         applies_to_all_grades: false,
         applicable_grade_ids: [1, 2, 3],
         applicable_grades: %w[A B C],
+        applies_to_all_marketing_org_party_roles: false,
+        applicable_marketing_org_party_role_ids: [1, 2, 3],
+        applicable_marketing_org_party_roles: %w[A B C],
         active: true
       }
     end

@@ -10,7 +10,10 @@
   party_roles\r\n           WHERE id = ANY (coalesced.applicable_tm_customer_ids))
   \        applicable_tm_customers,\r\n\r\n       coalesced.applicable_grade_ids,\r\n
   \      (\r\n           SELECT array_agg(grade_code)\r\n           FROM grades\r\n
-  \          WHERE id = ANY (coalesced.applicable_grade_ids))            applicable_grades,\r\n
+  \          WHERE id = ANY (coalesced.applicable_grade_ids))            applicable_grades,\r\n\r\n
+  \      coalesced.applicable_marketing_org_party_role_ids,\r\n       (\r\n           SELECT
+  array_agg(fn_party_role_name(id))\r\n           FROM party_roles\r\n           WHERE
+  id = ANY (coalesced.applicable_marketing_org_party_role_ids))         applicable_marketing_org_party_roles,\r\n
   \      inspection_types.active,\r\n       inspection_types.created_at,\r\n       inspection_types.updated_at,\r\n
   \      fn_current_status('inspection_types', inspection_types.id) AS status\r\nFROM
   inspection_types\r\n         JOIN inspection_failure_types ON inspection_failure_types.id
@@ -23,8 +26,12 @@
   inspection_types.applicable_tm_customer_ids\r\n               END applicable_tm_customer_ids,\r\n
   \          CASE\r\n               WHEN inspection_types.applies_to_all_grades THEN
   (SELECT array_agg(id) FROM grades)\r\n               ELSE inspection_types.applicable_grade_ids\r\n
-  \              END applicable_grade_ids\r\n    FROM inspection_types) coalesced
-  ON coalesced.id = inspection_types.id"
+  \              END applicable_grade_ids,\r\n           CASE\r\n               WHEN
+  inspection_types.applies_to_all_marketing_org_party_roles THEN (SELECT array_agg(id)
+  FROM party_roles WHERE role_id = (select id from roles where name = 'MARKETER'))\r\n
+  \              ELSE inspection_types.applicable_marketing_org_party_role_ids\r\n
+  \              END applicable_marketing_org_party_role_ids\r\n\r\n    FROM inspection_types)
+  coalesced ON coalesced.id = inspection_types.id"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -130,7 +137,7 @@
     :sequence_no: 7
     :caption: Applicable tm ids
     :namespaced_name: coalesced.applicable_tm_ids
-    :data_type: :integer_array
+    :data_type: :string
     :width: 
     :format: 
     :hide: true
@@ -162,7 +169,7 @@
     :sequence_no: 9
     :caption: Applicable tm customer ids
     :namespaced_name: coalesced.applicable_tm_customer_ids
-    :data_type: :integer_array
+    :data_type: :string
     :width: 
     :format: 
     :hide: true
@@ -194,7 +201,7 @@
     :sequence_no: 11
     :caption: Applicable grade ids
     :namespaced_name: coalesced.applicable_grade_ids
-    :data_type: :integer_array
+    :data_type: :string
     :width: 
     :format: 
     :hide: true
@@ -221,9 +228,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  applicable_marketing_org_party_role_ids:
+    :name: applicable_marketing_org_party_role_ids
+    :sequence_no: 13
+    :caption: Applicable marketing org party role ids
+    :namespaced_name: coalesced.applicable_marketing_org_party_role_ids
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  applicable_marketing_org_party_roles:
+    :name: applicable_marketing_org_party_roles
+    :sequence_no: 14
+    :caption: Applicable Marketing ORGs
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   active:
     :name: active
-    :sequence_no: 13
+    :sequence_no: 15
     :caption: Active
     :namespaced_name: inspection_types.active
     :data_type: :boolean
@@ -239,7 +278,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 14
+    :sequence_no: 16
     :caption: Created at
     :namespaced_name: inspection_types.created_at
     :data_type: :datetime
@@ -255,7 +294,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 15
+    :sequence_no: 17
     :caption: Updated at
     :namespaced_name: inspection_types.updated_at
     :data_type: :datetime
@@ -271,7 +310,7 @@
     :group_max: false
   status:
     :name: status
-    :sequence_no: 16
+    :sequence_no: 18
     :caption: Status
     :namespaced_name: 
     :data_type: :string

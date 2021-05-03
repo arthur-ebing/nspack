@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   module InspectionFactory
-    def create_inspection_type(opts = {})
+    def create_inspection_type(opts = {}) # rubocop:disable Metrics/AbcSize
       inspection_failure_type_id = create_inspection_failure_type
 
       default = {
@@ -15,6 +15,8 @@ module MasterfilesApp
         applicable_tm_customer_ids: BaseRepo.new.array_for_db_col([1, 2, 3]),
         applies_to_all_grades: false,
         applicable_grade_ids: BaseRepo.new.array_for_db_col([1, 2, 3]),
+        applies_to_all_marketing_org_party_roles: false,
+        applicable_marketing_org_party_role_ids: BaseRepo.new.array_for_db_col([1, 2, 3]),
         passed_default: false,
         active: true,
         created_at: '2010-01-01 12:00',

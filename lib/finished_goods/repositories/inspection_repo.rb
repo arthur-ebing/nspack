@@ -50,7 +50,7 @@ module FinishedGoodsApp
       hash[:tm_ids] = ds.select_map(:target_market_id)
       hash[:tm_customer_ids] = ds.select_map(:target_customer_party_role_id)
       hash[:grade_ids] = ds.select_map(:grade_id)
-
+      hash[:marketing_org_party_role_ids] = ds.select_map(:marketing_org_party_role_id)
       hash[:inspection_type_ids] = []
       hash[:passed_default] = []
 
@@ -59,7 +59,9 @@ module FinishedGoodsApp
         match_tm = (inspection_type.applicable_tm_ids & hash[:tm_ids]).any?
         match_tm_customer = (inspection_type.applicable_tm_customer_ids & hash[:tm_customer_ids]).any?
         match_grade = (inspection_type.applicable_grade_ids & hash[:grade_ids]).any?
-        if match_tm | match_grade | match_tm_customer
+        match_marketing_org_party_role = (inspection_type.applicable_marketing_org_party_role_ids & hash[:marketing_org_party_role_ids]).any?
+
+        if match_tm | match_grade | match_tm_customer | match_marketing_org_party_role
           hash[:inspection_type_ids] << inspection_type_id
           hash[:passed_default] << inspection_type.passed_default
         end

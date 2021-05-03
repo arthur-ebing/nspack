@@ -73,14 +73,22 @@ module MasterfilesApp
       return nil if hash.nil?
 
       role_id = get_id(:roles, name: AppConst::ROLE_TARGET_CUSTOMER)
+      hash[:applicable_tm_customer_ids] ||= []
       hash[:applicable_tm_customer_ids] = select_values(:party_roles, :id, role_id: role_id) if hash[:applies_to_all_tm_customers]
       hash[:applicable_tm_customers] = hash[:applicable_tm_customer_ids].to_a.map { |i| DB.get(Sequel.function(:fn_party_role_name, i)) }
 
+      hash[:applicable_tm_ids] ||= []
       hash[:applicable_tm_ids] = select_values(:target_markets, :id) if hash[:applies_to_all_tms]
       hash[:applicable_tms] = select_values(:target_markets, :target_market_name, id: hash[:applicable_tm_ids].to_a)
 
+      hash[:applicable_grade_ids] ||= []
       hash[:applicable_grade_ids] = select_values(:grades, :id) if hash[:applies_to_all_grades]
       hash[:applicable_grades] = select_values(:grades, :grade_code, id: hash[:applicable_grade_ids].to_a)
+
+      role_id = get_id(:roles, name: AppConst::ROLE_MARKETER)
+      hash[:applicable_marketing_org_party_role_ids] ||= []
+      hash[:applicable_marketing_org_party_role_ids] = select_values(:party_roles, :id, role_id: role_id) if hash[:applies_to_all_marketing_org_party_roles]
+      hash[:applicable_marketing_org_party_roles] = hash[:applicable_marketing_org_party_role_ids].to_a.map { |i| DB.get(Sequel.function(:fn_party_role_name, i)) }
 
       InspectionType.new(hash)
     end

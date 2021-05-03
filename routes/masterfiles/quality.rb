@@ -410,6 +410,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
               applicable_tm_customers
               applicable_grade_ids
               applicable_grades
+              applicable_marketing_org_party_role_ids
+              applicable_marketing_org_party_roles
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
@@ -457,6 +459,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             applicable_tm_customers
             applicable_grade_ids
             applicable_grades
+            applicable_marketing_org_party_role_ids
+            applicable_marketing_org_party_roles
             active
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),

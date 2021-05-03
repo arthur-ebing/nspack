@@ -20,6 +20,10 @@ module MasterfilesApp
     attribute :applies_to_all_grades, Types::Bool
     attribute :applicable_grade_ids, Types::Array
     attribute :applicable_grades, Types::Array
+
+    attribute :applies_to_all_marketing_org_party_roles, Types::Bool
+    attribute :applicable_marketing_org_party_role_ids, Types::Array
+    attribute :applicable_marketing_org_party_roles, Types::Array
     attribute? :active, Types::Bool
   end
 end

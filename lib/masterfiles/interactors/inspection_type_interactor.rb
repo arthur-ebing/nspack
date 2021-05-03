@@ -68,6 +68,7 @@ module MasterfilesApp
       params[:applicable_tm_ids] = nil if params[:applicable_tm_ids].nil_or_empty?
       params[:applicable_tm_customer_ids] = nil if params[:applicable_tm_customer_ids].nil_or_empty?
       params[:applicable_grade_ids] = nil if params[:applicable_grade_ids].nil_or_empty?
+      params[:applicable_marketing_org_party_role_ids] = nil if params[:applicable_marketing_org_party_role_ids].nil_or_empty?
       InspectionTypeSchema.call(params)
     end
   end
