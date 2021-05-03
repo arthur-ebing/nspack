@@ -93,12 +93,12 @@ module MesscadaApp
       ok_response
     end
 
-    def logout_device(device) # rubocop:disable Metrics/AbcSize
+    def logout_device(device)
       # 1. find the logged-in worker idS
+      system_resource_id = DB[:system_resources].where(system_resource_code: device).get(:id)
       contract_worker_ids = DB[:system_resource_logins].where(system_resource_id: system_resource_id, active: true).select_map(:contract_worker_id)
 
       # 2. Logout
-      system_resource_id = DB[:system_resources].where(system_resource_code: device).get(:id)
       DB[:system_resource_logins]
         .where(system_resource_id: system_resource_id)
         .update(last_logout_at: Time.now,

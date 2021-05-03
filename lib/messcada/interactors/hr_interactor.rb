@@ -59,7 +59,7 @@ module MesscadaApp
     end
 
     def login_with_identifier(params) # rubocop:disable Metrics/AbcSize
-      return ok_response unless params[:system_resource][:login]
+      return failed_response("Login not set: #{params[:device]}") unless params[:system_resource][:login]
 
       name = repo.contract_worker_name(params[:identifier])
 
@@ -132,7 +132,9 @@ module MesscadaApp
       success_response("Packer moved from group #{prev_group_incentive_id} to group #{system_resource[:group_incentive_id]}", contract_worker: contract_worker_name)
     end
 
-    def logout(params) # rubocop:disable Metrics/AbcSize
+    def logout(params) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
+      return failed_response("Login not set: #{params[:device]}") unless params[:system_resource][:login] && params[:system_resource][:logoff]
+
       name = repo.contract_worker_name(params[:identifier])
       return failed_response("#{params[:identifier]} not assigned") if name.nil_or_empty?
 
@@ -160,6 +162,8 @@ module MesscadaApp
     end
 
     def login_with_no(params) # rubocop:disable Metrics/AbcSize
+      return failed_response("Login not set: #{params[:device]}") unless params[:system_resource][:login]
+
       name = repo.contract_worker_name_by_no(params[:identifier])
       return failed_response("#{params[:identifier]} is not a valid personnel number") if name.nil_or_empty?
 
@@ -176,6 +180,8 @@ module MesscadaApp
     end
 
     def logout_with_no(params) # rubocop:disable Metrics/AbcSize
+      return failed_response("Login not set: #{params[:device]}") unless params[:system_resource][:login] && params[:system_resource][:logoff]
+
       name = repo.contract_worker_name_by_no(params[:identifier])
       return failed_response("#{params[:identifier]} is not a valid personnel number") if name.nil_or_empty?
 
