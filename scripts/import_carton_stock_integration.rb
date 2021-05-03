@@ -24,8 +24,8 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     DB.transaction do
       parse_csv
       infodump
-      raise Crossbeams::InfoError, "Transaction not committed: please see log. \n#{@errors.uniq.join("\n")}" unless @errors.empty?
-      raise Crossbeams::InfoError, 'Debug mode: Import Completed successfully, transaction not committed' if debug_mode
+      raise Crossbeams::InfoError, 'Transaction not committed: please see log.' unless @errors.empty?
+      raise Crossbeams::InfoError, 'Debug mode: Import Completed successfully, transaction not committed.' if debug_mode
 
       success_response('Import Completed')
     end
@@ -47,54 +47,42 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
       end
 
       pallet_rows = table.select { |row| row['pallet_number'] == pallet_number }
-      res = process_pallet(pallet_rows)
-      puts res.message
+      process_pallet(pallet_rows)
     end
   end
 
   def process_pallet(pallet_rows) # rubocop:disable Metrics/AbcSize
-    res = nil
+    @pallet_errors = []
     params = get_mf_ids_for_pallet(pallet_rows.first.to_h)
-    unless @errors.empty?
-      print_error(params[:pallet_number])
-      res = failed_response("failed to create pallet: #{params[:pallet_number]}")
-    end
+
     params[:pallet_id] = create_pallet(params)
+    raise Crossbeams::InfoError, "failed to create pallet: #{params[:pallet_number]}" unless @pallet_errors.empty?
+
     pallet_rows.each_with_index do |sequence, index|
       pallet_sequence_number = index + 1
       params.merge!(sequence)
       params[:pallet_sequence_number] = pallet_sequence_number
       params = get_mf_ids_for_pallet_sequence(params)
-      unless @errors.empty?
-        print_error(params[:pallet_number])
-        res = failed_response("failed to create pallet sequence: #{params[:pallet_number]}_#{pallet_sequence_number}")
-      end
-
       params[:pallet_sequence_id] = create_pallet_sequence(params)
+      raise Crossbeams::InfoError, "failed to create pallet sequence: #{params[:pallet_number]}_#{pallet_sequence_number}" unless @pallet_errors.empty?
+
       carton_numbers = params[:carton_numbers].split('|')
       carton_numbers.each do |carton_number|
         params[:legacy_carton_number] = carton_number
 
         params[:carton_label_id] = create_carton_label(params)
         create_carton(params)
+        raise Crossbeams::InfoError, "failed to create carton: #{carton_number}" unless @pallet_errors.empty?
       end
     end
-    return res if res
 
     success_response("Created Pallet:#{params[:pallet_number]}")
   rescue Crossbeams::InfoError => e
-    print_error(params[:pallet_number])
+    puts failed_response(e).message
+    @pallet_errors.each { |error| puts error }
+    puts ''
+    @errors << @pallet_errors
     failed_response(e)
-  end
-
-  def print_error(pallet_number)
-    new_errors = @errors.uniq - @previous_errors
-    unless new_errors.empty?
-      puts pallet_number
-      new_errors.uniq.each { |error| puts error }
-      puts ''
-    end
-    @previous_errors = @errors.uniq
   end
 
   def get_mf_ids_for_pallet_sequence(hash) # rubocop:disable Metrics/AbcSize
@@ -134,7 +122,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     args.marketing_org_party_role_id = get_id_or_error(:party_roles,
                                                        organization_id: args.organization_id,
                                                        role_id: role_id)
-    @errors << "marketing_org_party_role_id masterfile not found, for #{args.marketing_org}" unless args.marketing_org_party_role_id
+    @pallet_errors << "marketing_org_party_role_id masterfile not found, for #{args.marketing_org}" unless args.marketing_org_party_role_id
 
     args.marketing_orchard_id = find_or_create_marketing_orchard(args)
     args.marketing_puc_id = find_or_create_marketing_puc(args)
@@ -145,10 +133,10 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     args.packed_tm_group_id = DB[:destination_regions_tm_groups]
                               .where(destination_region_id: args.destination_region_id)
                               .get(:target_market_group_id)
-    @errors << "destination_regions_tm_groups masterfile not found, args: destination_region_id: #{args.destination_region_id} for packed_tm_group_id" unless args.packed_tm_group_id
+    @pallet_errors << "destination_regions_tm_groups masterfile not found, args: destination_region_id: #{args.destination_region_id} for packed_tm_group_id" unless args.packed_tm_group_id
 
     args.target_market_id = DB[:target_markets_for_groups].where(target_market_group_id: args.packed_tm_group_id).get(:target_market_id)
-    @errors << "target_markets_for_groups masterfile not found, args: target_market_group_id: #{args.packed_tm_group_id} for target_market_id" unless args.target_market_id
+    @pallet_errors << "target_markets_for_groups masterfile not found, args: target_market_group_id: #{args.packed_tm_group_id} for target_market_id" unless args.target_market_id
 
     unless args.target_customer.nil_or_empty?
       organization_id = get_id_or_error(:organizations, short_description: args.target_customer)
@@ -156,7 +144,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
       args.target_customer_party_role_id = get_id_or_error(:party_roles,
                                                            organization_id: organization_id,
                                                            role_id: role_id)
-      @errors << "target_customer_party_role_id masterfile not found, for #{args.target_customer}" unless args.target_customer_party_role_id
+      @pallet_errors << "target_customer_party_role_id masterfile not found, for #{args.target_customer}" unless args.target_customer_party_role_id
     end
 
     args.basic_pack_code_id = get_id_or_error(:basic_pack_codes,
@@ -255,7 +243,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     args.intake_created_at = args.intake_date
     args.first_cold_storage_at = args.cold_date
     args.palletized = true
-    @errors << "build_status is not FULL or PARTIAL, given value: #{args.build_status}" unless %w[FULL PARTIAL].include? args.build_status.to_s.upcase
+    @pallet_errors << "build_status is not FULL or PARTIAL, given value: #{args.build_status}" unless %w[FULL PARTIAL].include? args.build_status.to_s.upcase
     args.partially_palletized = args.build_status.to_s.upcase != 'FULL'
     if args.partially_palletized
       args.partially_palletized_at = args.palletized_at
@@ -285,7 +273,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     attrs[:description] = nil
     res = MasterfilesApp::RegisteredOrchardSchema.call(attrs)
     if res.failure?
-      @errors << "can't create_registered_orchards #{validation_failed_response(res).errors}"
+      @pallet_errors << "can't create_registered_orchards #{validation_failed_response(res).errors}"
       return
     end
 
@@ -303,7 +291,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
 
     res = MasterfilesApp::FarmPucOrgSchema.call(attrs)
     if res.failure?
-      @errors << "can't create_farm_puc_orgs #{validation_failed_response(res).errors}"
+      @pallet_errors << "can't create_farm_puc_orgs #{validation_failed_response(res).errors}"
       return
     end
 
@@ -313,7 +301,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
   def create_carton_label(params)
     res = MesscadaApp::CartonLabelContract.new.call(params)
     if res.failure?
-      @errors << "can't create_carton_label #{validation_failed_response(res).errors}"
+      @pallet_errors << "can't create_carton_label #{validation_failed_response(res).errors}"
       return
     end
 
@@ -327,7 +315,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
   def create_carton(params)
     res = MesscadaApp::CartonSchema.call(params)
     if res.failure?
-      @errors << "can't create_carton #{validation_failed_response(res).errors}"
+      @pallet_errors << "can't create_carton #{validation_failed_response(res).errors}"
       return
     end
 
@@ -340,7 +328,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
   def create_pallet_sequence(params)
     res = MesscadaApp::PalletSequenceContract.new.call(params)
     if res.failure?
-      @errors << "can't create_pallet_sequence #{validation_failed_response(res).errors}"
+      @pallet_errors << "can't create_pallet_sequence #{validation_failed_response(res).errors}"
       return
     end
 
@@ -353,7 +341,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
   def create_pallet(params)
     res = MesscadaApp::PalletContract.new.call(params)
     if res.failure?
-      @errors << "can't create_pallet #{validation_failed_response(res).errors}"
+      @pallet_errors << "can't create_pallet #{validation_failed_response(res).errors}"
       return
     end
 
@@ -366,7 +354,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
 
   def get_id_or_error(table_name, args)
     id = get_variant_id(table_name, args)
-    @errors << "#{table_name} masterfile not found, args:#{args}" unless id
+    @pallet_errors << "#{table_name} masterfile not found, args:#{args}" unless id
 
     id
   end
