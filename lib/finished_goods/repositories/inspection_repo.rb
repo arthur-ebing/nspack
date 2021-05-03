@@ -44,6 +44,7 @@ module FinishedGoodsApp
       return nil unless pallet_id
 
       hash = { pallet_id: pallet_id, pallet_number: pallet_number }
+      hash[:palletized] = get(:pallets, pallet_id, :palletized)
 
       ds = DB[:pallet_sequences].where(pallet_id: hash[:pallet_id])
       hash[:tm_ids] = ds.select_map(:target_market_id)
@@ -52,8 +53,6 @@ module FinishedGoodsApp
 
       hash[:inspection_type_ids] = []
       hash[:passed_default] = []
-
-      p hash
 
       select_values(:inspection_types, :id, active: true).each do |inspection_type_id|
         inspection_type = MasterfilesApp::QualityRepo.new.find_inspection_type(inspection_type_id)
@@ -68,9 +67,11 @@ module FinishedGoodsApp
       PalletForInspection.new(hash)
     end
 
-    def create_inspection(params)
-      pallet = find_pallet_for_inspection(params[:pallet_number] || params)
-      raise Crossbeams::InfoError, 'Pallet not found' unless pallet
+    def create_inspection(params) # rubocop:disable Metrics/AbcSize
+      pallet_number = params[:pallet_number] || params
+      pallet = find_pallet_for_inspection(pallet_number)
+      raise Crossbeams::InfoError, "Pallet: #{pallet_number} not found" unless pallet
+      raise Crossbeams::InfoError, "Pallet: #{pallet_number} not palletized" unless pallet.palletized
 
       ids = []
       pallet.inspection_type_ids.each do |inspection_type_id|

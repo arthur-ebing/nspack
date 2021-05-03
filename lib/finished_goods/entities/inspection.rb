@@ -21,6 +21,7 @@ module FinishedGoodsApp
   class PalletForInspection < Dry::Struct
     attribute :pallet_id, Types::Integer
     attribute :pallet_number, Types::String
+    attribute :palletized, Types::Bool
     attribute :inspection_type_ids, Types::Array
     attribute :passed_default, Types::Array
     attribute :tm_ids, Types::Array
