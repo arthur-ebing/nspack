@@ -4,7 +4,7 @@
   \   row_data_id,\r\n    event_id,\r\n    transaction_id,\r\n    user_name,\r\n    route_url,\r\n
   \   request_ip,\r\n    status,\r\n    transaction_at,\r\n    action,\r\n    COALESCE(changed_fields,
   row_data) AS changed_fields,\r\n    bin_asset_number,\r\n    farm_code,\r\n    puc_code,\r\n
-  \   orchard_code,\r\n    cultivar_code,\r\n    bin_fullness,\r\n    location_id,\r\n
+  \   orchard_code,\r\n    cultivar_code,\r\n    bin_fullness,\r\n    sq.location_id,\r\n
   \   bin_loads.id AS bin_load_id,\r\n    bin_load_product_id,\r\n    rmt_container_material_types.container_material_type_code
   AS container_material_type,\r\n    fn_party_role_name (sq.rmt_material_owner_party_role_id::int)
   AS rmt_material_owner,\r\n    production_run_tipped_id,\r\n    gross_weight,\r\n

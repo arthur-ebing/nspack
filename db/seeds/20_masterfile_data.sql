@@ -98,10 +98,12 @@ INSERT INTO reworks_run_types (run_type, description) VALUES('BINS TO PLT CONVER
 
 -- LOCATION TYPES
 INSERT INTO location_types (location_type_code, short_code, hierarchical) VALUES('BIN_ASSET', 'BIN_ASSET', 'f') ON CONFLICT DO NOTHING;
+INSERT INTO location_types (location_type_code, short_code, hierarchical) VALUES('FARM', 'FARM', 'f') ON CONFLICT DO NOTHING;
 
 -- LOCATION STORAGE TYPES
 INSERT INTO location_storage_types (storage_type_code) VALUES('PALLETS') ON CONFLICT DO NOTHING;
 INSERT INTO location_storage_types (storage_type_code) VALUES('RMT_PALLETS') ON CONFLICT DO NOTHING;
+INSERT INTO location_storage_types (storage_type_code) VALUES('BIN_ASSET') ON CONFLICT DO NOTHING;
 
 -- IN-TRANSIT LOCATION (Not part of locations tree)
 INSERT INTO location_types (location_type_code, short_code, hierarchical) VALUES('IN_TRANSIT', 'IN_TRANSIT', 'f') ON CONFLICT DO NOTHING;

@@ -277,6 +277,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
               owner_party_role
               pdn_region_production_region_code
               active
+              location_long_code
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
@@ -316,6 +317,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             owner_party_role
             pdn_region_production_region_code
             active
+            location_long_code
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)

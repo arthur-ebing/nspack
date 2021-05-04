@@ -2,10 +2,10 @@
 
 module MasterfilesApp
   module LocationFactory
-    def create_location(opts = {})
-      location_storage_type_id = create_location_storage_type
-      location_type_id = create_location_type
-      location_assignment_id = create_location_assignment
+    def create_location(opts = {}) # rubocop:disable Metrics/AbcSize
+      location_storage_type_id = create_location_storage_type(storage_type_code: opts.delete(:storage_type_code))
+      location_type_id = create_location_type(location_type_code: opts.delete(:location_type_code))
+      location_assignment_id = create_location_assignment(assignment_code: opts.delete(:assignment_code))
       location_storage_definition_id = create_location_storage_definition
 
       default = {
@@ -31,8 +31,9 @@ module MasterfilesApp
     end
 
     def create_location_storage_type(opts = {})
+      opts[:storage_type_code] ||= Faker::Lorem.unique.word
+
       default = {
-        storage_type_code: Faker::Lorem.unique.word,
         created_at: '2010-01-01 12:00',
         updated_at: '2010-01-01 12:00',
         location_short_code_prefix: Faker::Lorem.word
@@ -41,8 +42,9 @@ module MasterfilesApp
     end
 
     def create_location_type(opts = {})
+      opts[:location_type_code] ||= Faker::Lorem.unique.word
+
       default = {
-        location_type_code: Faker::Lorem.unique.word,
         short_code: Faker::Lorem.word,
         created_at: '2010-01-01 12:00',
         updated_at: '2010-01-01 12:00',
@@ -53,8 +55,9 @@ module MasterfilesApp
     end
 
     def create_location_assignment(opts = {})
+      opts[:assignment_code] ||= Faker::Lorem.unique.word
+
       default = {
-        assignment_code: Faker::Lorem.unique.word,
         created_at: '2010-01-01 12:00',
         updated_at: '2010-01-01 12:00'
       }

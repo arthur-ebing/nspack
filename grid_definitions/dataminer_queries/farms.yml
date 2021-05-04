@@ -1,20 +1,22 @@
 ---
 :caption: Farms
-:sql: "SELECT\r\n  DISTINCT  farms.id,\r\n    farms.owner_party_role_id,\r\n    farms.pdn_region_id,\r\n string_agg(DISTINCT farm_section_name::text, ', '::text) AS sections,
-  \   farms.farm_group_id,\r\n  fn_masterfile_variants('farms', farms.id)
-  AS variant_codes,\r\n       farms.farm_code,\r\n    farms.description,\r\n    (SELECT
-  string_agg(pucs.puc_code, ', ')\r\n     FROM pucs\r\n     JOIN farms_pucs ON pucs.id
-  = farms_pucs.puc_id\r\n     WHERE farm_id = farms.id) AS puc_codes,\r\n    farm_groups.farm_group_code,\r\n
-  \   fn_party_role_name (farms.owner_party_role_id) AS owner_party_role,\r\n    production_regions.production_region_code
-  AS pdn_region_production_region_code,\r\n    fn_current_status ('farms', farms.id)
-  AS status,\r\n    farms.active,\r\n    farms.created_at,\r\n    farms.updated_at\r\nFROM
-  farms\r\nLEFT JOIN farm_groups ON farm_groups.id = farms.farm_group_id\r\nLEFT JOIN
-  production_regions ON production_regions.id = farms.pdn_region_id LEFT JOIN orchards ON orchards.farm_id = farms.id
-  LEFT JOIN farm_sections ON farm_sections.id = orchards.farm_section_id
-
-  GROUP BY farms.id, farms.owner_party_role_id, farms.pdn_region_id, farms.farm_group_id, farms.farm_code, farms.description
-  , puc_codes, farm_groups.farm_group_code, owner_party_role, production_regions.production_region_code, status, farms.active, farms.created_at
-  , farms.updated_at "
+:sql: "SELECT\r\n  DISTINCT  farms.id,\r\n    farms.owner_party_role_id,\r\n    farms.pdn_region_id,\r\n
+  \   string_agg(DISTINCT farm_section_name::text, ', '::text) AS sections,\r\n    farms.farm_group_id,\r\n
+  \   fn_masterfile_variants('farms', farms.id) AS variant_codes,\r\n    farms.farm_code,\r\n
+  \   farms.description,\r\n    (SELECT string_agg(pucs.puc_code, ', ')\r\n     FROM
+  pucs\r\n     JOIN farms_pucs ON pucs.id = farms_pucs.puc_id\r\n     WHERE farm_id
+  = farms.id) AS puc_codes,\r\n    farm_groups.farm_group_code,\r\n    fn_party_role_name
+  (farms.owner_party_role_id) AS owner_party_role,\r\n    production_regions.production_region_code
+  AS pdn_region_production_region_code,\r\n    locations.location_long_code,\r\n    fn_current_status
+  ('farms', farms.id) AS status,\r\n    farms.active,\r\n    farms.created_at,\r\n
+  \   farms.updated_at\r\nFROM farms\r\nLEFT JOIN farm_groups ON farm_groups.id =
+  farms.farm_group_id\r\nLEFT JOIN production_regions ON production_regions.id = farms.pdn_region_id
+  LEFT JOIN orchards ON orchards.farm_id = farms.id LEFT JOIN farm_sections ON farm_sections.id
+  = orchards.farm_section_id\r\nLEFT JOIN locations ON locations.id = farms.location_id\r\nGROUP
+  BY farms.id, farms.owner_party_role_id, farms.pdn_region_id, farms.farm_group_id,
+  farms.farm_code, farms.description , puc_codes, farm_groups.farm_group_code, owner_party_role,
+  production_regions.production_region_code, status, farms.active, farms.created_at
+  , farms.updated_at, locations.location_long_code"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -67,9 +69,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  sections:
+    :name: sections
+    :sequence_no: 4
+    :caption: Sections
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   farm_group_id:
     :name: farm_group_id
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Farm group
     :namespaced_name: farms.farm_group_id
     :data_type: :integer
@@ -83,9 +101,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  variant_codes:
+    :name: variant_codes
+    :sequence_no: 6
+    :caption: Variant codes
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   farm_code:
     :name: farm_code
-    :sequence_no: 5
+    :sequence_no: 7
     :caption: Farm code
     :namespaced_name: farms.farm_code
     :data_type: :string
@@ -99,41 +133,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  variant_codes:
-    :name: variant_codes
-    :sequence_no: 6
-    :caption: Variant codes
-    :namespaced_name:
-    :data_type: :string
-    :width:
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  sections:
-    :name: sections
-    :sequence_no: 6
-    :caption: Sections
-    :namespaced_name: sections
-    :data_type: :string
-    :width:
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   description:
     :name: description
-    :sequence_no: 6
+    :sequence_no: 8
     :caption: Description
     :namespaced_name: farms.description
     :data_type: :string
@@ -149,7 +151,7 @@
     :group_max: false
   puc_codes:
     :name: puc_codes
-    :sequence_no: 7
+    :sequence_no: 9
     :caption: PUC codes
     :namespaced_name: 
     :data_type: :string
@@ -165,7 +167,7 @@
     :group_max: false
   farm_group_code:
     :name: farm_group_code
-    :sequence_no: 8
+    :sequence_no: 10
     :caption: Farm group code
     :namespaced_name: farm_groups.farm_group_code
     :data_type: :string
@@ -181,7 +183,7 @@
     :group_max: false
   owner_party_role:
     :name: owner_party_role
-    :sequence_no: 9
+    :sequence_no: 11
     :caption: Farm owner
     :namespaced_name: 
     :data_type: :string
@@ -197,7 +199,7 @@
     :group_max: false
   pdn_region_production_region_code:
     :name: pdn_region_production_region_code
-    :sequence_no: 10
+    :sequence_no: 12
     :caption: Prod region code
     :namespaced_name: production_regions.production_region_code
     :data_type: :string
@@ -211,9 +213,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  location_long_code:
+    :name: location_long_code
+    :sequence_no: 13
+    :caption: Location long code
+    :namespaced_name: locations.location_long_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   status:
     :name: status
-    :sequence_no: 11
+    :sequence_no: 14
     :caption: Status
     :namespaced_name: 
     :data_type: :string
@@ -229,7 +247,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 12
+    :sequence_no: 15
     :caption: Active
     :namespaced_name: farms.active
     :data_type: :boolean
@@ -245,7 +263,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 13
+    :sequence_no: 16
     :caption: Created at
     :namespaced_name: farms.created_at
     :data_type: :datetime
@@ -261,7 +279,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 14
+    :sequence_no: 17
     :caption: Updated at
     :namespaced_name: farms.updated_at
     :data_type: :datetime

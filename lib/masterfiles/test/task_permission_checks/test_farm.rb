@@ -19,7 +19,9 @@ module MasterfilesApp
         farms_pucs_ids: [1, 2],
         farm_group_code: 'ABC',
         owner_party_role: 'ABC',
-        pdn_region_production_region_code: 'ABC'
+        pdn_region_production_region_code: 'ABC',
+        location_id: 1,
+        location_long_code: 'ABC'
       }
       MasterfilesApp::Farm.new(base_attrs.merge(attrs))
     end
