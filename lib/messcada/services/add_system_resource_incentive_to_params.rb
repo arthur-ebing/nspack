@@ -27,13 +27,27 @@ module MesscadaApp
       @button_packpoint = @resource_repo.packpoint_for_button(params[:device]) if has_button
     end
 
-    def call # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def call # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      raise Crossbeams::InfoError, "#{params[:device]} does not exist" if @button_packpoint.nil? && params[:packpoint].nil?
+
       @sys_res = resource_repo.system_resource_incentive_settings(device, params[:packpoint] || @button_packpoint, origin, params[:card_reader])
       return failed_response("#{device} is not configured") if sys_res.nil?
       return success_response('ok', merge_incentive_just_system_resource) if !sys_res.login && !sys_res.group_incentive
       return merge_incentive_contract_worker unless get_group_incentive && sys_res.group_incentive
 
       merge_incentive_group_incentive
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: "#{self.class.name} : #{e.message}", message: <<~STR)
+        params: #{params.inspect}
+        device: #{device}
+        origin: #{origin}
+        btnpck: #{@button_packpoint}
+
+        #{e.message}
+      STR
+      puts e.message
+      puts e.backtrace.join("\n")
+      failed_response(e.message)
     end
 
     private
