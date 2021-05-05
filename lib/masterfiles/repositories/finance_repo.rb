@@ -92,6 +92,17 @@ module MasterfilesApp
                           order_by: :id
     crud_calls_for :customer_payment_terms, name: :customer_payment_term
 
+    build_for_select :order_types,
+                     label: :order_type,
+                     value: :id,
+                     order_by: :order_type
+    build_inactive_select :order_types,
+                          label: :order_type,
+                          value: :id,
+                          order_by: :order_type
+
+    crud_calls_for :order_types, name: :order_type, wrapper: OrderType
+
     def find_customer_payment_term(id)
       hash = find_with_association(
         :customer_payment_terms, id

@@ -78,4 +78,10 @@ module MasterfilesApp
     required(:payment_term_id).filled(:integer)
     required(:customer_payment_term_set_id).filled(:integer)
   end
+
+  OrderTypeSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:order_type).filled(Types::StrippedString)
+    required(:description).maybe(Types::StrippedString)
+  end
 end

@@ -90,4 +90,11 @@ module MasterfilesApp
     attribute :customer_payment_term_set, Types::String
     attribute? :active, Types::Bool
   end
+
+  class OrderType < Dry::Struct
+    attribute :id, Types::Integer
+    attribute :order_type, Types::String
+    attribute :description, Types::String
+    attribute? :active, Types::Bool
+  end
 end

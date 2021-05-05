@@ -126,5 +126,16 @@ module MasterfilesApp
       }
       DB[:customer_payment_term_sets].insert(default.merge(opts))
     end
+
+    def create_order_type(opts = {})
+      default = {
+        order_type: Faker::Lorem.unique.word,
+        description: Faker::Lorem.word,
+        active: true,
+        created_at: '2010-01-01 12:00',
+        updated_at: '2010-01-01 12:00'
+      }
+      DB[:order_types].insert(default.merge(opts))
+    end
   end
 end
