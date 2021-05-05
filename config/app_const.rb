@@ -160,6 +160,12 @@ class AppConst # rubocop:disable Metrics/ClassLength
   CREATED_FROM_BIN = 'CREATED_FROM_BIN'
   CONVERTED_TO_REBIN = 'CONVERTED_TO_REBIN'
 
+  # Constants for bin_scan_mode:
+  SCAN_BINS_INDIVIDUALLY = 1
+  SCAN_BIN_GROUPS = 2
+  AUTO_ALLOCATE_BIN_NUMBERS = 3
+  BIN_SCAN_MODE_OPTIONS = [['Scan Bins Individually', SCAN_BINS_INDIVIDUALLY], ['Scan Bin Groups', SCAN_BIN_GROUPS], ['Auto Allocate Bin Numbers', AUTO_ALLOCATE_BIN_NUMBERS]].freeze
+
   # Constants for cartons:
   CARTON_TRANSFER = 'CARTON TRANSFER'
   SEQ_REMOVED_BY_CTN_TRANSFER = 'SEQUENCE REMOVED BY CARTON TRANSFER'

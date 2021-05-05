@@ -40,7 +40,7 @@ module RawMaterials
               section.form do |form|
                 form.caption 'Edit RMT Delivery'
                 form.action "/raw_materials/deliveries/rmt_deliveries/#{id}"
-                form.remote!
+                # form.remote! if remote
                 form.method :update
                 form.row do |row|
                   row.column do |col|
@@ -58,6 +58,7 @@ module RawMaterials
                   end
 
                   row.column do |col|
+                    col.add_field :bin_scan_mode
                     col.add_field :current
                     col.add_field :date_picked
                     col.add_field :received
@@ -67,7 +68,6 @@ module RawMaterials
                     col.add_field :batch_number
                     col.add_field :batch_number_updated_at
                     # col.add_field :keep_open
-                    # col.add_field :auto_allocate_asset_number
                   end
                 end
               end
@@ -76,15 +76,15 @@ module RawMaterials
             unless is_update
               page.section do |section|
                 bin_type = nil
-                if ui_rule.form_object.auto_allocate_asset_number
+                if ui_rule.form_object.bin_scan_mode == AppConst::AUTO_ALLOCATE_BIN_NUMBERS
                   section.add_control(control_type: :link,
-                                      text: 'Create Bin Groups',
+                                      text: 'Create Bin Groups(Auto Allocate)',
                                       url: "/raw_materials/deliveries/rmt_deliveries/#{id}/rmt_bins/create_bin_groups",
                                       style: :button,
                                       grid_id: 'rmt_bins_deliveries',
                                       behaviour: :popup)
                   bin_type = 'asset_number_'
-                elsif AppConst::BULK_BIN_ASSET_NUMBER_ENTRY && !ui_rule.form_object.auto_allocate_asset_number
+                elsif ui_rule.form_object.bin_scan_mode == AppConst::SCAN_BIN_GROUPS
                   section.add_control(control_type: :link,
                                       text: 'Scan Bin Groups',
                                       url: "/raw_materials/deliveries/rmt_deliveries/#{id}/rmt_bins/create_scanned_bin_groups",
@@ -92,7 +92,7 @@ module RawMaterials
                                       grid_id: 'rmt_bins_deliveries',
                                       behaviour: :popup)
                   bin_type = 'asset_number_'
-                elsif AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+                elsif ui_rule.form_object.bin_scan_mode == AppConst::SCAN_BINS_INDIVIDUALLY
                   section.add_control(control_type: :link,
                                       text: 'New RMT Bin',
                                       url: "/rmd/rmt_deliveries/rmt_bins/#{id}/new_delivery_bin",
