@@ -49,6 +49,8 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
       end
 
       pallet_rows = table.select { |row| row['pallet_number'] == pallet_number }
+      raise Crossbeams::InfoError, "Pallet number #{pallet_number} not found" if pallet_rows.empty?
+
       puts ''
       res = process_pallet(pallet_rows)
       puts res.message
