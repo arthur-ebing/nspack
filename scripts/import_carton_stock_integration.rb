@@ -57,6 +57,8 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
 
   def process_pallet(pallet_rows) # rubocop:disable Metrics/AbcSize
     @pallet_errors = []
+    params = {}
+
     pallet_rows.each_with_index do |sequence, index|
       params = get_mf_ids_for_pallet(sequence.to_h)
       if index.zero?
