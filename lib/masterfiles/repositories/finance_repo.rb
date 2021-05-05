@@ -149,6 +149,7 @@ module MasterfilesApp
       )
       return nil if hash.nil?
 
+      hash[:contact_people] = hash[:contact_person_ids].to_a.map { |i| DB.get(Sequel.function(:fn_party_role_name, i)) }
       Customer.new(hash)
     end
 

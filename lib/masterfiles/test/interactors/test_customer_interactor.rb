@@ -76,6 +76,8 @@ module MasterfilesApp
         default_currency: 'ZAR',
         customer_party_role_id: party_role_id,
         customer: 'ABC',
+        contact_person_ids: [party_role_id],
+        contact_people: %w[ABC],
         active: true,
         # organization
         short_description: 'ABC',

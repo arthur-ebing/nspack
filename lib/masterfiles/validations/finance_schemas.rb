@@ -16,12 +16,14 @@ module MasterfilesApp
     optional(:vat_number).maybe(Types::StrippedString)
     optional(:company_reg_no).maybe(Types::StrippedString)
     required(:default_currency_id).filled(:integer)
+    optional(:contact_person_ids).maybe(:array).each(:integer)
   end
 
   CustomerSchema = Dry::Schema.Params do
     optional(:id).filled(:integer)
     required(:default_currency_id).filled(:integer)
     required(:customer_party_role_id).filled(:integer)
+    optional(:contact_person_ids).maybe(:array).each(:integer)
   end
 
   DealTypeSchema = Dry::Schema.Params do
