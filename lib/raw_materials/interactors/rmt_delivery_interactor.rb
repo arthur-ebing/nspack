@@ -80,7 +80,7 @@ module RawMaterialsApp
       return validation_failed_response(res) if res.failure?
 
       repo.transaction do
-        repo.update(:rmt_delivery, id, res.to_h)
+        repo.update(:rmt_deliveries, id, res.to_h)
         log_status(:rmt_deliveries, id, AppConst::RMT_BIN_RECEIPT_DATE_OVERRIDE)
 
         bin_ids = repo.select_values(:rmt_bins, :id, rmt_delivery_id: id)
