@@ -384,12 +384,13 @@ module ProductionApp
           to_char(rmt_bins.bin_received_date_time, 'IW'::text)::integer AS delivery_week,
           cultivars.cultivar_name,
           SUM(CASE WHEN rmt_bins.bin_tipped THEN rmt_bins.qty_bins ELSE 0 END) AS qty_tipped,
-          SUM(CASE WHEN bin_load_products.bin_load_id IS NULL THEN rmt_bins.qty_bins ELSE 0 END) AS qty_bins,
-          SUM(CASE WHEN bin_load_products.bin_load_id IS NULL THEN 0 ELSE rmt_bins.qty_bins END) AS qty_shipped,
+          SUM(CASE WHEN bin_loads.id IS NULL OR bin_loads.shipped THEN 0 ELSE rmt_bins.qty_bins END) AS qty_bins,
+          SUM(CASE WHEN bin_loads.id IS NULL OR bin_loads.shipped THEN rmt_bins.qty_bins ELSE 0 END) AS qty_shipped,
           COUNT(DISTINCT rmt_bins.rmt_delivery_id) AS no_deliveries
         FROM rmt_bins
         LEFT JOIN cultivars ON cultivars.id = rmt_bins.cultivar_id
         LEFT JOIN bin_load_products ON bin_load_products.id = rmt_bins.bin_load_product_id
+        LEFT JOIN bin_loads ON bin_loads.id = bin_load_products.bin_load_id
         WHERE NOT rmt_bins.is_rebin
         GROUP BY 1, 2
       SQL
@@ -403,12 +404,13 @@ module ProductionApp
           rmt_bins.bin_received_date_time::date AS delivery_day,
           cultivars.cultivar_name,
           SUM(CASE WHEN rmt_bins.bin_tipped THEN rmt_bins.qty_bins ELSE 0 END) AS qty_tipped,
-          SUM(CASE WHEN bin_load_products.bin_load_id IS NULL THEN rmt_bins.qty_bins ELSE 0 END) AS qty_bins,
-          SUM(CASE WHEN bin_load_products.bin_load_id IS NULL THEN 0 ELSE rmt_bins.qty_bins END) AS qty_shipped,
+          SUM(CASE WHEN bin_loads.id IS NULL OR bin_loads.shipped THEN 0 ELSE rmt_bins.qty_bins END) AS qty_bins,
+          SUM(CASE WHEN bin_loads.id IS NULL OR bin_loads.shipped THEN rmt_bins.qty_bins ELSE 0 END) AS qty_shipped,
           COUNT(DISTINCT rmt_bins.rmt_delivery_id) AS no_deliveries
         FROM rmt_bins
         LEFT JOIN cultivars ON cultivars.id = rmt_bins.cultivar_id
         LEFT JOIN bin_load_products ON bin_load_products.id = rmt_bins.bin_load_product_id
+        LEFT JOIN bin_loads ON bin_loads.id = bin_load_products.bin_load_id
         WHERE NOT rmt_bins.is_rebin
         GROUP BY 1, 2
       SQL
@@ -426,8 +428,8 @@ module ProductionApp
           orchards.orchard_code,
           cultivars.cultivar_name,
           SUM(CASE WHEN rmt_bins.bin_tipped THEN rmt_bins.qty_bins ELSE 0 END) AS qty_tipped,
-          SUM(CASE WHEN bin_load_products.bin_load_id IS NULL THEN rmt_bins.qty_bins ELSE 0 END) AS qty_bins,
-          SUM(CASE WHEN bin_load_products.bin_load_id IS NULL THEN 0 ELSE rmt_bins.qty_bins END) AS qty_shipped,
+          SUM(CASE WHEN bin_loads.id IS NULL OR bin_loads.shipped THEN 0 ELSE rmt_bins.qty_bins END) AS qty_bins,
+          SUM(CASE WHEN bin_loads.id IS NULL OR bin_loads.shipped THEN rmt_bins.qty_bins ELSE 0 END) AS qty_shipped,
           COUNT(DISTINCT rmt_bins.rmt_delivery_id) AS no_deliveries
         FROM rmt_bins
         LEFT JOIN cultivars ON cultivars.id = rmt_bins.cultivar_id
@@ -435,6 +437,7 @@ module ProductionApp
         LEFT JOIN pucs ON pucs.id = rmt_bins.puc_id
         LEFT JOIN orchards ON orchards.id = rmt_bins.orchard_id
         LEFT JOIN bin_load_products ON bin_load_products.id = rmt_bins.bin_load_product_id
+        LEFT JOIN bin_loads ON bin_loads.id = bin_load_products.bin_load_id
         WHERE NOT rmt_bins.is_rebin
         GROUP BY to_char(rmt_bins.bin_received_date_time, 'YYYY'::text)::integer,
           to_char(rmt_bins.bin_received_date_time, 'IW'::text)::integer,
@@ -501,9 +504,10 @@ module ProductionApp
         LEFT JOIN orchards ON orchards.id = rmt_bins.orchard_id
         LEFT JOIN cultivars ON cultivars.id = rmt_bins.cultivar_id
         LEFT JOIN bin_load_products ON bin_load_products.id = rmt_bins.bin_load_product_id
+        LEFT JOIN bin_loads ON bin_loads.id = bin_load_products.bin_load_id
         WHERE DATE(bin_received_date_time) = ?
           AND NOT bin_tipped
-          AND bin_load_products.bin_load_id IS NULL
+          AND (bin_loads.id IS NULL OR NOT bin_loads.shipped)
         GROUP BY pucs.puc_code,
         orchards.orchard_code,
         cultivars.cultivar_name
@@ -556,8 +560,8 @@ module ProductionApp
           orchards.orchard_code,
           cultivars.cultivar_name,
           SUM(CASE WHEN rmt_bins.bin_tipped THEN rmt_bins.qty_bins ELSE 0 END) AS qty_tipped,
-          SUM(CASE WHEN bin_load_products.bin_load_id IS NULL THEN rmt_bins.qty_bins ELSE 0 END) AS qty_bins,
-          SUM(CASE WHEN bin_load_products.bin_load_id IS NULL THEN 0 ELSE rmt_bins.qty_bins END) AS qty_shipped,
+          SUM(CASE WHEN bin_loads.id IS NULL OR bin_loads.shipped THEN 0 ELSE rmt_bins.qty_bins END) AS qty_bins,
+          SUM(CASE WHEN bin_loads.id IS NULL OR bin_loads.shipped THEN rmt_bins.qty_bins ELSE 0 END) AS qty_shipped,
           COUNT(DISTINCT rmt_bins.rmt_delivery_id) AS no_deliveries
         FROM rmt_bins
         LEFT JOIN cultivars ON cultivars.id = rmt_bins.cultivar_id
@@ -565,6 +569,7 @@ module ProductionApp
         LEFT JOIN pucs ON pucs.id = rmt_bins.puc_id
         LEFT JOIN orchards ON orchards.id = rmt_bins.orchard_id
         LEFT JOIN bin_load_products ON bin_load_products.id = rmt_bins.bin_load_product_id
+        LEFT JOIN bin_loads ON bin_loads.id = bin_load_products.bin_load_id
         WHERE NOT rmt_bins.is_rebin
         GROUP BY rmt_bins.bin_received_date_time::date,
           farms.farm_code,
