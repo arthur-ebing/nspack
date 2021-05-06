@@ -60,13 +60,15 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
   def process_pallet(pallet_rows) # rubocop:disable Metrics/AbcSize
     @pallet_errors = []
     params = {}
+    pallet_id = nil
 
     pallet_rows.each_with_index do |sequence, index|
       params = get_mf_ids_for_pallet(sequence.to_h)
       if index.zero?
-        params[:pallet_id] = create_pallet(params)
+        pallet_id = create_pallet(params)
         raise Crossbeams::InfoError, "failed to create pallet: #{params[:pallet_number]}" unless @pallet_errors.empty?
       end
+      params[:pallet_id] = pallet_id
       params[:pallet_sequence_number] = index + 1
       params = get_mf_ids_for_pallet_sequence(params)
       params[:pallet_sequence_id] = create_pallet_sequence(params)
