@@ -62,6 +62,7 @@ module Production
                 <table style="width:100%">
                   <tr><td class="fw7 f4 tr">#{rec[:qty_bins] || 0}</td><td>bins</td></tr>
                   <tr><td class="fw7 f4 tr">#{rec[:qty_tipped] || 0}</td><td>tipped</td></tr>
+                  <tr><td class="fw7 f4 tr">#{rec[:qty_shipped] || 0}</td><td>shipped</td></tr>
                 </table>
               </div>
             HTML
@@ -86,7 +87,8 @@ module Production
                 </table>
                 <div class="tc pa2 mb2" style="background: linear-gradient(90deg, #8ABDEA #{percentage.to_i}%, #e6f4f1 #{percentage.to_i}%);">
                   <span class="fw6 f2 mid-gray ">#{percentage.to_i}%</span><br>
-                <table style="width:100%"><tr><td>#{rec[:qty_bins] || 0} bins</td><td>#{rec[:qty_tipped] || 0} tipped</td></tr></table></div>
+                <table style="width:100%"><tr><td>#{rec[:qty_bins] || 0} bins</td><td>#{rec[:qty_tipped] || 0} tipped</td></tr>
+                <tr><td colspan="2" class="tr">#{rec[:qty_shipped] || 0} shipped</td></tr></table></div>
               </div>
             HTML
           end
