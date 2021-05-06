@@ -16,6 +16,7 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
+      @options ||= {}
       fields[:orchard_id] = { renderer: :label,
                               with_value: MasterfilesApp::FarmRepo.new.find_orchard(@form_object.orchard_id)&.orchard_code,
                               caption: 'Orchard' }
