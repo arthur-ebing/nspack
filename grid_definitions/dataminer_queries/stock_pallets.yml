@@ -1905,13 +1905,13 @@
   :ui_priority: 15
   :list_def: 
 - :column: vw_pallets.depot_pallet
-  :caption: Depot Pallet
+  :caption: Depot Pallet?
   :data_type: :boolean
   :control_type: :text
   :default_value: 
   :ordered_list: false
   :ui_priority: 16
-  :list_def: 
+  :list_def:  true, false
 - :column: vw_pallet_sequences.production_run_id
   :caption: Production run Id
   :data_type: :integer
@@ -1935,7 +1935,7 @@
   :default_value: 
   :ordered_list: false
   :ui_priority: 19
-  :list_def: 
+  :list_def:  true, false
 - :column: vw_pallets.repacked
   :caption: Repacked?
   :data_type: :boolean
@@ -1943,7 +1943,7 @@
   :default_value: 
   :ordered_list: false
   :ui_priority: 20
-  :list_def: 
+  :list_def:  true, false
 - :column: vw_pallet_sequences.target_customer_party_role_id
   :caption: Target Customer Party Role Id
   :data_type: :integer
@@ -1952,14 +1952,14 @@
   :ordered_list: false
   :ui_priority: 21
   :list_def: 
-- :column: aggregated.rmt_grade
-  :caption: RMT Grade
+- :column: aggregated.rmt_grades
+  :caption: RMT Grade?
   :data_type: :boolean
   :control_type: :text
   :default_value: 
   :ordered_list: false
   :ui_priority: 1
-  :list_def: 
+  :list_def:  true, false
 - :column: aggregated.count
   :caption: Count
   :data_type: :integer
@@ -1967,4 +1967,4 @@
   :default_value: 
   :ordered_list: false
   :ui_priority: 1
-  :list_def: 
+  :list_def:

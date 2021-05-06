@@ -117,12 +117,12 @@ module MesscadaApp
         all_ok
       end
 
-      def rmt_grade_check
-        return all_ok unless repo.get(:loads, load_id, :rmt_load)
+      def rmt_grade_check # rubocop:disable Metrics/AbcSize
+        raise ArgumentError, 'Load_id nil!' if load_id.nil?
 
-        not_rmt_grade_ids = repo.select_values(:grades, :id, rmt_grade: false)
-        errors = repo.select_values(:pallet_sequences, :pallet_number, pallet_id: pallet_ids, grade_id: not_rmt_grade_ids).uniq
-        return failed_response "Pallet: #{errors.join(', ')} does not have a RMT grade." unless errors.empty?
+        invalid_grade_ids = repo.select_values(:grades, :id, rmt_grade: !repo.get(:loads, load_id, :rmt_load))
+        errors = repo.select_values(:pallet_sequences, :pallet_number, pallet_id: pallet_ids, grade_id: invalid_grade_ids).uniq
+        return failed_response "Pallet: #{errors.join(', ')} does not have the correct RMT grade." unless errors.empty?
 
         all_ok
       end

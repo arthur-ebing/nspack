@@ -167,7 +167,10 @@ module UiRules
                     disabled_options: MasterfilesApp::DepotRepo.new.for_select_inactive_depots,
                     caption: 'Depot',
                     required: true },
-        rmt_load: { renderer: :checkbox, as_boolean: true },
+        rmt_load: { renderer: :checkbox,
+                    caption: 'RMT Load',
+                    hide_on_load: @form_object.allocated,
+                    as_boolean: true },
         exporter_certificate_code: {},
         edi_file_name: { renderer: :label },
         shipped_at: { renderer: rules[:can_unship] ? :datetime : :label,
@@ -230,7 +233,7 @@ module UiRules
 
         # Allocate Pallets
         pallet_list: { renderer: :textarea, rows: 12,
-                       placeholder: 'Paste pallet numbers here',
+                       placeholder: 'Paste here',
                        caption: 'Allocate',
                        required: true },
         # Temp Tail

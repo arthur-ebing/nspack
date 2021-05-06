@@ -25,6 +25,7 @@
   - in_stock
   - export_pack
   - unallocated_stock
+  - unallocated_bin_stock
   - scrapped
   - failed_inspections
   - failed_verifications
@@ -41,6 +42,7 @@
     :export_pack: Export Pack Pallets
     :in_stock: Pallets in stock
     :unallocated_stock: Unallocated Pallets
+    :unallocated_bin_stock: Unallocated Bins
     :scrapped: Scrapped Pallets
     :failed_inspections: Failed Inspections Pallets
     :failed_verifications: Failed Verifications Pallets
@@ -121,7 +123,7 @@
   - :col: vw_pallets.zero_load_id
     :op: IN
     :val: "$:id$,0"
-  - :col: vw_pallet_sequences.rmt_grade
+  - :col: aggregated.rmt_grades
     :op: =
     :val: false
   :unallocated_bin_stock:
@@ -134,7 +136,7 @@
   - :col: aggregated.count
     :op: =
     :val: 1
-  - :col: vw_pallet_sequences.rmt_grade
+  - :col: aggregated.rmt_grades
     :op: =
     :val: true
   :on_load:
@@ -190,8 +192,7 @@
   :allocate_bins:
     :url: "/finished_goods/dispatch/loads/$:id$/allocate"
     :preselect: SELECT pallet_sequences.id FROM pallet_sequences JOIN pallets ON pallet_sequences.pallet_id = pallets.id WHERE load_id = $:id$
-    :section_caption: SELECT 'Assign pallets to load ' || order_number FROM loads
-      WHERE id = $:id$
+    :section_caption: SELECT 'Assign pallets to load ' || order_number FROM loads WHERE id = $:id$
     :multiselect_save_method: remote
     :can_be_cleared: true
     :conditions: unallocated_bin_stock
