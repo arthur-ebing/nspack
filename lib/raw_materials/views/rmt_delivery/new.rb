@@ -32,6 +32,7 @@ module RawMaterials
                   col.add_field :quantity_bins_with_fruit
                 end
                 row.column do |col|
+                  col.add_field :bin_scan_mode
                   col.add_field :current
                   col.add_field :date_picked
                   col.add_field :received
@@ -39,7 +40,6 @@ module RawMaterials
                   # col.add_field :delivery_tipped
                   # col.add_field :tipping_complete_date_time
                   # col.add_field :keep_open
-                  col.add_field :auto_allocate_asset_number
                 end
               end
             end

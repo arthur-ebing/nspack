@@ -4,10 +4,10 @@
   \   farm_code,\r\n    puc_code,\r\n    orchard_code,\r\n    rmt_delivery_id,\r\n
   \   delivery_destination_code,\r\n    container_material_type_code,\r\n    SUM(qty_bins)
   AS total_onstock_bins,\r\n    SUM(nett_weight) AS total_onstock_weight\r\nFROM vw_bins\r\nWHERE
-  NOT bin_tipped\r\nAND production_run_rebin_id IS NULL\r\nGROUP BY\r\n    bin_received_date,\r\n
-  \   cultivar_name,\r\n    cultivar_description,\r\n    farm_code,\r\n    puc_code,\r\n
-  \   orchard_code,\r\n    rmt_delivery_id,\r\n    delivery_destination_code,\r\n
-  \   container_material_type_code"
+  NOT bin_tipped\r\nAND bin_asset_number IS NOT NULL\r\nAND production_run_rebin_id
+  IS NULL\r\nGROUP BY\r\n    bin_received_date,\r\n    cultivar_name,\r\n    cultivar_description,\r\n
+  \   farm_code,\r\n    puc_code,\r\n    orchard_code,\r\n    rmt_delivery_id,\r\n
+  \   delivery_destination_code,\r\n    container_material_type_code"
 :limit: 
 :offset: 
 :external_settings:

@@ -14,6 +14,7 @@ module MasterfilesApp
       assert_respond_to repo, :for_select_payment_term_types
       assert_respond_to repo, :for_select_payment_terms
       assert_respond_to repo, :for_select_customer_payment_terms
+      assert_respond_to repo, :for_select_order_types
     end
 
     def test_crud_calls
@@ -26,6 +27,7 @@ module MasterfilesApp
       test_crud_calls_for :payment_term_types, name: :payment_term_type, wrapper: PaymentTermType
       test_crud_calls_for :payment_terms, name: :payment_term, wrapper: PaymentTerm
       test_crud_calls_for :customer_payment_terms, name: :customer_payment_term, wrapper: CustomerPaymentTerm
+      test_crud_calls_for :order_types, name: :order_type, wrapper: OrderType
     end
 
     private

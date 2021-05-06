@@ -63,8 +63,8 @@ module UiRules
                                    as_boolean: true }
       fields[:keep_open] = { renderer: :label,
                              as_boolean: true }
-      fields[:auto_allocate_asset_number] = { renderer: :label,
-                                              as_boolean: true }
+      fields[:bin_scan_mode] = { renderer: :label,
+                                 with_value: AppConst::BIN_SCAN_MODE_OPTIONS.find { |m| m[1] == @form_object.bin_scan_mode }[0] }
       fields[:active] = { renderer: :label,
                           as_boolean: true }
       fields[:batch_number] = { renderer: :label }
@@ -124,6 +124,10 @@ module UiRules
         current_date_delivered: { renderer: :label,
                                   with_value: @form_object.date_delivered,
                                   caption: 'Current Received date' },
+        bin_scan_mode: { renderer: :select,
+                         options: AppConst::BIN_SCAN_MODE_OPTIONS,
+                         required: true,
+                         prompt: true },
         current: { renderer: :checkbox,
                    caption: 'Set As Current' },
         delivery_tipped: { renderer: :label,
@@ -136,8 +140,6 @@ module UiRules
         quantity_bins_with_fruit: { renderer: :integer,
                                     caption: 'Qty Bins With Fruit',
                                     minvalue: 0 },
-        auto_allocate_asset_number: { renderer: :checkbox,
-                                      hide_on_load: !AppConst::ALLOW_AUTO_BIN_ASSET_NUMBER_ALLOCATION },
         batch_number: { renderer: :label },
         batch_number_updated_at: { renderer: :label }
       }
@@ -169,7 +171,7 @@ module UiRules
                                     date_delivered: Time.now,
                                     received: true,
                                     tipping_complete_date_time: nil,
-                                    auto_allocate_asset_number: AppConst::ALLOW_AUTO_BIN_ASSET_NUMBER_ALLOCATION)
+                                    bin_scan_mode: nil)
     end
 
     private

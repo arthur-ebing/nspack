@@ -19,6 +19,7 @@ module UiRules
       pdn_region_id_label = @repo.find_hash(:production_regions, @form_object.pdn_region_id)[:production_region_code]
       farm_group_id_label = @repo.find_farm_group(@form_object.farm_group_id)&.farm_group_code
       puc_id_label = @repo.find_puc(@form_object.puc_id)&.puc_code
+      location_id_label = @repo.get(:locations, @form_object.location_id, :location_long_code)
       fields[:owner_party_role_id] = { renderer: :label,
                                        with_value: owner_party_role_id_label,
                                        caption: 'Farm Owner' }
@@ -36,6 +37,10 @@ module UiRules
       fields[:active] = { renderer: :label, as_boolean: true }
       fields[:pucs] = { renderer: :list, items: farm_puc_codes }
       fields[:orchards] = { renderer: :list, items: farm_orchard_codes }
+      fields[:location_id] = { renderer: :label,
+                               with_value: location_id_label,
+                               caption: 'Location',
+                               invisible: !AppConst::CR_RMT.create_farm_location?  }
     end
 
     def common_fields
@@ -87,7 +92,8 @@ module UiRules
                                     farm_code: nil,
                                     description: nil,
                                     active: true,
-                                    puc_id: nil)
+                                    puc_id: nil,
+                                    location_id: nil)
     end
 
     private

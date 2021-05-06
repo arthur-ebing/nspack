@@ -84,7 +84,10 @@ module MasterfilesApp
                                                    { parent_table: :production_regions,
                                                      columns: [:production_region_code],
                                                      foreign_key: :pdn_region_id,
-                                                     flatten_columns: { production_region_code: :pdn_region_production_region_code } }],
+                                                     flatten_columns: { production_region_code: :pdn_region_production_region_code } },
+                                                   { parent_table: :locations,
+                                                     columns: [:location_long_code],
+                                                     flatten_columns: { location_long_code: :location_long_code } }],
                                    lookup_functions: [{ function: :fn_party_role_name,
                                                         args: [:owner_party_role_id],
                                                         col_name: :owner_party_role }])
@@ -349,6 +352,17 @@ module MasterfilesApp
     def delete_farm_section(id)
       DB[:orchards].where(farm_section_id: id).update(farm_section_id: nil)
       DB[:farm_sections].where(id: id).delete
+    end
+
+    def create_farm_location(farm_id, params)
+      attrs = { primary_storage_type_id: get_id(:location_storage_types, storage_type_code: AppConst::STORAGE_TYPE_BIN_ASSET),
+                location_type_id: get_id(:location_types, location_type_code: AppConst::LOCATION_TYPES_FARM),
+                primary_assignment_id: get_id(:location_assignments, assignment_code: AppConst::EMPTY_BIN_STORAGE),
+                location_long_code: params[:farm_code],
+                location_description: params[:farm_code],
+                location_short_code: params[:farm_code] }
+      location_id = DB[:locations].insert(attrs)
+      update(:farms, farm_id, location_id: location_id)
     end
   end
 end

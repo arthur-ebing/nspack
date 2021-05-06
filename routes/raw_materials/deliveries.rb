@@ -123,7 +123,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::Edit.call(id) }
       end
 
-      r.is do
+      r.is do # rubocop:disable Metrics/BlockLength
         r.get do       # SHOW
           check_auth!('deliveries', 'read')
           show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::Show.call(id, back_url: back_button_url) }
@@ -132,9 +132,13 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.patch do     # UPDATE
           res = interactor.update_rmt_delivery(id, params[:rmt_delivery])
           if res.success
-            show_partial(notice: 'Delivery Updated') { RawMaterials::Deliveries::RmtDelivery::Edit.call(id, is_update: true) }
+            flash[:notice] = 'Delivery Updated Successfully'
+            r.redirect("/raw_materials/deliveries/rmt_deliveries/#{id}/edit")
           else
-            re_show_form(r, res) { RawMaterials::Deliveries::RmtDelivery::Edit.call(id, is_update: true, form_values: params[:rmt_delivery], form_errors: res.errors) }
+            re_show_form(r, res, url: "/raw_materials/deliveries/rmt_deliveries/#{id}/edit") do
+              RawMaterials::Deliveries::RmtDelivery::Edit.call(id, form_values: params[:rmt_delivery],
+                                                                   form_errors: res.errors)
+            end
           end
         end
 

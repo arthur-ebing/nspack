@@ -9,6 +9,7 @@ module MasterfilesApp
     required(:farm_code).filled(Types::StrippedString)
     required(:description).maybe(Types::StrippedString)
     optional(:puc_id).filled(:integer)
+    optional(:location_id).maybe(:integer)
   end
 
   FarmPucOrgSchema = Dry::Schema.Params do

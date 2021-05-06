@@ -107,6 +107,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             row_keys = %i[
               default_currency_id
               default_currency
+              contact_people
               customer_party_role_id
               customer
               active
@@ -171,6 +172,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             id
             default_currency_id
             default_currency
+            contact_people
             customer_party_role_id
             customer
             active
@@ -738,6 +740,76 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             Masterfiles::Finance::CustomerPaymentTerm::New.call(form_values: params[:customer_payment_term],
                                                                 form_errors: res.errors,
                                                                 remote: fetch?(r))
+          end
+        end
+      end
+    end
+
+    # ORDER TYPES
+    # --------------------------------------------------------------------------
+    r.on 'order_types', Integer do |id|
+      interactor = MasterfilesApp::OrderTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:order_types, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('finance', 'edit')
+        interactor.assert_permission!(:edit, id)
+        show_partial { Masterfiles::Finance::OrderType::Edit.call(id) }
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('finance', 'read')
+          show_partial { Masterfiles::Finance::OrderType::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_order_type(id, params[:order_type])
+          if res.success
+            update_grid_row(id, changes: { order_type: res.instance[:order_type], description: res.instance[:description] },
+                                notice: res.message)
+          else
+            re_show_form(r, res) { Masterfiles::Finance::OrderType::Edit.call(id, form_values: params[:order_type], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('finance', 'delete')
+          interactor.assert_permission!(:delete, id)
+          res = interactor.delete_order_type(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+
+    r.on 'order_types' do
+      interactor = MasterfilesApp::OrderTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      r.on 'new' do    # NEW
+        check_auth!('finance', 'new')
+        show_partial_or_page(r) { Masterfiles::Finance::OrderType::New.call(remote: fetch?(r)) }
+      end
+      r.post do        # CREATE
+        res = interactor.create_order_type(params[:order_type])
+        if res.success
+          row_keys = %i[
+            id
+            order_type
+            description
+            active
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
+        else
+          re_show_form(r, res, url: '/masterfiles/finance/order_types/new') do
+            Masterfiles::Finance::OrderType::New.call(form_values: params[:order_type],
+                                                      form_errors: res.errors,
+                                                      remote: fetch?(r))
           end
         end
       end

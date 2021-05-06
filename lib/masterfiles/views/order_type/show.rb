@@ -2,20 +2,19 @@
 
 module Masterfiles
   module Finance
-    module Customer
+    module OrderType
       class Show
         def self.call(id)
-          ui_rule = UiRules::Compiler.new(:customer, :show, id: id)
+          ui_rule = UiRules::Compiler.new(:order_type, :show, id: id)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form do |form|
-              # form.caption 'Customer'
+              # form.caption 'Order Type'
               form.view_only!
-              form.add_field :customer
-              form.add_field :default_currency
-              form.add_field :contact_people
+              form.add_field :order_type
+              form.add_field :description
               form.add_field :active
             end
           end

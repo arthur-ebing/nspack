@@ -12,6 +12,8 @@ module MasterfilesApp
     attribute :id, Types::Integer
     attribute :default_currency_id, Types::Integer
     attribute :default_currency, Types::String
+    attribute :contact_person_ids, Types::Array
+    attribute :contact_people, Types::Array
     attribute :customer_party_role_id, Types::Integer
     attribute :customer, Types::String
     attribute? :active, Types::Bool
@@ -88,6 +90,13 @@ module MasterfilesApp
     attribute :payment_term, Types::String
     attribute :customer_payment_term_set_id, Types::Integer
     attribute :customer_payment_term_set, Types::String
+    attribute? :active, Types::Bool
+  end
+
+  class OrderType < Dry::Struct
+    attribute :id, Types::Integer
+    attribute :order_type, Types::String
+    attribute :description, Types::String
     attribute? :active, Types::Bool
   end
 end

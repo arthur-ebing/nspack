@@ -13,5 +13,7 @@ module MasterfilesApp
     attribute :owner_party_role, Types::String
     attribute :pdn_region_production_region_code, Types::String
     attribute? :active, Types::Bool
+    attribute :location_id, Types::Integer
+    attribute :location_long_code, Types::String
   end
 end

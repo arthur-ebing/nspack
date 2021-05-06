@@ -10,13 +10,15 @@ module Crossbeams
             delivery_capture_container_material: false,
             delivery_capture_container_material_owner: false,
             set_defaults_for_new_rmt_delivery: true,
-            convert_carton_to_rebins: false },
+            convert_carton_to_rebins: false,
+            create_farm_location: false  },
       hl: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             delivery_capture_container_material: false,
             delivery_capture_container_material_owner: false,
             set_defaults_for_new_rmt_delivery: true,
-            convert_carton_to_rebins: false },
+            convert_carton_to_rebins: false,
+            create_farm_location: false  },
       kr: { bin_pallet_conversion_defaults: { pallet_format: { stack_type: 'BIN', pallet_base: 'S' },
                                               basic_pack: 'BX750',
                                               grade: 'SA',
@@ -30,31 +32,36 @@ module Crossbeams
             delivery_capture_container_material: true,
             delivery_capture_container_material_owner: true,
             set_defaults_for_new_rmt_delivery: true,
-            convert_carton_to_rebins: false },
+            convert_carton_to_rebins: false,
+            create_farm_location: false  },
       um: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             delivery_capture_container_material: false,
             delivery_capture_container_material_owner: false,
             set_defaults_for_new_rmt_delivery: true,
-            convert_carton_to_rebins: false },
+            convert_carton_to_rebins: false,
+            create_farm_location: false },
       ud: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             delivery_capture_container_material: true,
             delivery_capture_container_material_owner: true,
             set_defaults_for_new_rmt_delivery: false,
-            convert_carton_to_rebins: false },
+            convert_carton_to_rebins: false,
+            create_farm_location: true  },
       sr: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             delivery_capture_container_material: true,
             delivery_capture_container_material_owner: true,
             set_defaults_for_new_rmt_delivery: true,
-            convert_carton_to_rebins: false },
+            convert_carton_to_rebins: false,
+            create_farm_location: false  },
       sr2: { bin_pallet_conversion_defaults: {},
              delivery_capture_inner_bins: false,
              delivery_capture_container_material: true,
              delivery_capture_container_material_owner: true,
              set_defaults_for_new_rmt_delivery: true,
-             convert_carton_to_rebins: true }
+             convert_carton_to_rebins: true,
+             create_farm_location: true  }
     }.freeze
 
     def initialize(client_code)
@@ -96,6 +103,12 @@ module Crossbeams
       return 'Should the owner of the bin type be recorded.' if explain
 
       setting(:delivery_capture_container_material_owner)
+    end
+
+    def create_farm_location?(explain: false)
+      return 'Create a location record for farm.' if explain
+
+      setting(:create_farm_location)
     end
   end
 end

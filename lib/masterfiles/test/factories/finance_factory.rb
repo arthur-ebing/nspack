@@ -72,6 +72,7 @@ module MasterfilesApp
       default = {
         default_currency_id: currency_id,
         customer_party_role_id: party_role_id,
+        contact_person_ids: BaseRepo.new.array_for_db_col([party_role_id]),
         active: true,
         created_at: '2010-01-01 12:00',
         updated_at: '2010-01-01 12:00'
@@ -125,6 +126,17 @@ module MasterfilesApp
         updated_at: '2010-01-01 12:00'
       }
       DB[:customer_payment_term_sets].insert(default.merge(opts))
+    end
+
+    def create_order_type(opts = {})
+      default = {
+        order_type: Faker::Lorem.unique.word,
+        description: Faker::Lorem.word,
+        active: true,
+        created_at: '2010-01-01 12:00',
+        updated_at: '2010-01-01 12:00'
+      }
+      DB[:order_types].insert(default.merge(opts))
     end
   end
 end

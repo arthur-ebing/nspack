@@ -6,7 +6,7 @@ module RawMaterialsApp
       delivery = find_rmt_delivery(id)
       return failed_response("Delivery: #{id} does not exist") unless delivery
       return failed_response("Delivery: #{id} has already been tipped") if delivery[:delivery_tipped]
-      return failed_response("Action not allowed - #{id} is an auto bin allocation delivery") if delivery[:auto_allocate_asset_number]
+      return failed_response("Action not allowed - #{id} is an auto bin allocation delivery") if delivery[:bin_scan_mode] == AppConst::AUTO_ALLOCATE_BIN_NUMBERS
       return failed_response("quantity_bins_with_fruit has not yet been set for delivery:#{id}") unless delivery[:quantity_bins_with_fruit]
 
       return failed_response("All #{delivery[:quantity_bins_with_fruit]} bins have already been received(scanned)")  unless delivery[:quantity_bins_with_fruit] > RawMaterialsApp::RmtDeliveryRepo.new.delivery_bin_count(id)

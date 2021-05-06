@@ -12,6 +12,8 @@ module MasterfilesApp
         id: 1,
         default_currency_id: 1,
         default_currency: 'ZAR',
+        contact_person_ids: [1, 2, 3],
+        contact_people: %w[A B C],
         customer_party_role_id: 1,
         customer: 'ABC',
         active: true

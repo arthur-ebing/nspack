@@ -10,6 +10,7 @@ module MasterfilesApp
       repo.transaction do
         response = repo.create_farm(res)
         id = response
+        repo.create_farm_location(id, res) if AppConst::CR_RMT.create_farm_location?
         log_status(:farms, id, 'CREATED')
         log_transaction
       end
@@ -21,13 +22,17 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def update_farm(id, params)
+    def update_farm(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_farm_params(params)
       return validation_failed_response(res) if res.failure?
 
       attrs = res.to_h
+      location_attrs = { location_short_code: attrs[:farm_code],
+                         location_long_code: attrs[:farm_code],
+                         location_description: attrs[:farm_code] }
       repo.transaction do
         repo.update_farm(id, attrs)
+        location_repo.update_location(farm_location_id(id), location_attrs) if AppConst::CR_RMT.create_farm_location?
         log_transaction
       end
       instance = farm(id)
@@ -40,6 +45,7 @@ module MasterfilesApp
       name = farm(id).farm_code
       repo.transaction do
         repo.delete_farm(id)
+        location_repo.delete_location(farm_location_id(id)) if AppConst::CR_RMT.create_farm_location?
         log_status(:farms, id, 'DELETED')
         log_transaction
       end
@@ -128,6 +134,10 @@ module MasterfilesApp
       @repo ||= FarmRepo.new
     end
 
+    def location_repo
+      @location_repo ||= LocationRepo.new
+    end
+
     def farm(id)
       repo.find_farm(id)
     end
@@ -142,6 +152,10 @@ module MasterfilesApp
 
     def validate_farm_section_params(params)
       FarmSectionSchema.call(params)
+    end
+
+    def farm_location_id(farm_id)
+      repo.get(:farms, farm_id, :location_id)
     end
   end
 end

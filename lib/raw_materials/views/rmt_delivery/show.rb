@@ -45,6 +45,7 @@ module RawMaterials
                     col.add_field :qty_damaged_bins
                     col.add_field :qty_empty_bins
                     col.add_field :quantity_bins_with_fruit
+                    col.add_field :bin_scan_mode
                   end
 
                   row.column do |col|
@@ -55,7 +56,6 @@ module RawMaterials
                     col.add_field :delivery_tipped
                     col.add_field :tipping_complete_date_time
                     col.add_field :keep_open
-                    col.add_field :auto_allocate_asset_number
                     col.add_field :active
                     col.add_field :batch_number
                     col.add_field :batch_number_updated_at

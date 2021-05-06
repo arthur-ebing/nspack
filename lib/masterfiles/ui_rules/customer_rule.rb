@@ -20,6 +20,10 @@ module UiRules
     def set_show_fields
       fields[:default_currency] = { renderer: :label,
                                     caption: 'Default Currency' }
+      fields[:contact_people] = { renderer: :list,
+                                  caption: 'Contact People',
+                                  hide_on_load: @form_object.contact_people.empty?,
+                                  items: @form_object.contact_people }
       fields[:customer] = { renderer: :label,
                             caption: 'Customer' }
       fields[:active] = { renderer: :label,
@@ -35,6 +39,10 @@ module UiRules
                                options: @repo.for_select_currencies,
                                disabled_options: @repo.for_select_inactive_currencies,
                                caption: 'Default Currency' },
+        contact_person_ids: { renderer: :multi,
+                              options: @party_repo.for_select_party_roles(AppConst::ROLE_CUSTOMER_CONTACT_PERSON),
+                              selected: @form_object.contact_person_ids,
+                              caption: 'Contact People' },
         customer: { caption: 'Customer',
                     renderer: :label,
                     hide_on_load: @mode == :new },
@@ -66,7 +74,7 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(default_currency_id: nil,
+      @form_object = OpenStruct.new(default_currency_id: @repo.get_id(:currencies, currency: 'ZAR'),
                                     customer_party_role_id: nil)
     end
 

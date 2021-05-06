@@ -5,7 +5,7 @@ module RawMaterialsApp
     optional(:id).filled(:integer)
     required(:orchard_id).filled(:integer)
     required(:rmt_delivery_id).filled(:integer)
-    required(:rmt_class_id).filled(:integer)
+    optional(:rmt_class_id).maybe(:integer)
     required(:season_id).filled(:integer)
     required(:cultivar_id).filled(:integer)
     required(:puc_id).filled(:integer)

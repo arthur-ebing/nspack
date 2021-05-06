@@ -47,6 +47,7 @@ INSERT INTO roles (name) VALUES ('TRANSPORTER') ON CONFLICT DO NOTHING;
 INSERT INTO roles (name, specialised) VALUES ('INSPECTOR', true) ON CONFLICT DO NOTHING;
 INSERT INTO roles (name, specialised) VALUES ('SUPPLIER', true) ON CONFLICT DO NOTHING;
 INSERT INTO roles (name, specialised) VALUES ('CUSTOMER', true) ON CONFLICT DO NOTHING;
+INSERT INTO roles (name) VALUES ('CUSTOMER_CONTACT_PERSON') ON CONFLICT DO NOTHING;
 
 -- TARGET MARKET GROUP TYPES
 INSERT INTO target_market_group_types (target_market_group_type_code) VALUES('PACKED') ON CONFLICT DO NOTHING;
@@ -98,10 +99,12 @@ INSERT INTO reworks_run_types (run_type, description) VALUES('BINS TO PLT CONVER
 
 -- LOCATION TYPES
 INSERT INTO location_types (location_type_code, short_code, hierarchical) VALUES('BIN_ASSET', 'BIN_ASSET', 'f') ON CONFLICT DO NOTHING;
+INSERT INTO location_types (location_type_code, short_code, hierarchical) VALUES('FARM', 'FARM', 'f') ON CONFLICT DO NOTHING;
 
 -- LOCATION STORAGE TYPES
 INSERT INTO location_storage_types (storage_type_code) VALUES('PALLETS') ON CONFLICT DO NOTHING;
 INSERT INTO location_storage_types (storage_type_code) VALUES('RMT_PALLETS') ON CONFLICT DO NOTHING;
+INSERT INTO location_storage_types (storage_type_code) VALUES('BIN_ASSET') ON CONFLICT DO NOTHING;
 
 -- IN-TRANSIT LOCATION (Not part of locations tree)
 INSERT INTO location_types (location_type_code, short_code, hierarchical) VALUES('IN_TRANSIT', 'IN_TRANSIT', 'f') ON CONFLICT DO NOTHING;

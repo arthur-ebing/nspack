@@ -20,6 +20,7 @@ module Masterfiles
               form.add_field :customer
               form.add_field :customer_party_role_id
               form.add_field :default_currency_id
+              form.add_field :contact_person_ids
             end
           end
 
