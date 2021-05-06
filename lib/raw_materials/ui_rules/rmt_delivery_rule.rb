@@ -65,7 +65,7 @@ module UiRules
       fields[:keep_open] = { renderer: :label,
                              as_boolean: true }
       fields[:bin_scan_mode] = { renderer: :label,
-                                 with_value: AppConst::BIN_SCAN_MODE_OPTIONS.find { |m| m[1] == @form_object.bin_scan_mode }[0] }
+                                 with_value: @form_object.bin_scan_mode.nil? ? @form_object.bin_scan_mode : AppConst::BIN_SCAN_MODE_OPTIONS.find { |m| m[1] == @form_object.bin_scan_mode }[0] }
       fields[:active] = { renderer: :label,
                           as_boolean: true }
       fields[:batch_number] = { renderer: :label }
