@@ -4,7 +4,7 @@ module MesscadaApp
   class PalletSequenceContract < Dry::Validation::Contract
     params do # rubocop:disable Metrics/BlockLength
       optional(:id).filled(:integer)
-      required(:pallet_id).filled(:integer)
+      optional(:pallet_id).maybe(:integer)
       optional(:pallet_number).filled(Types::StrippedString)
       optional(:pallet_sequence_number).filled(:integer)
       required(:production_run_id).filled(:integer)
