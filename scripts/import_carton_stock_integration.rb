@@ -97,6 +97,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
                            bin_id: hash.delete(:bin_id),
                            pallet_id: hash.delete(:legacy_pallet_id),
                            production_run_id: hash.delete(:legacy_production_run_id),
+                           pc_code: hash.delete(:pc_code),
                            shift_id: hash.delete(:shift_id) }
 
     args = OpenStruct.new(hash)
@@ -205,10 +206,10 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     composition_level_2_id = get_id_or_error(:pm_products, product_code: args.unit_pack_product)
     composition_level_3_id = get_id_or_error(:pm_products, product_code: level_3_product_code)
     composition_level_1_ = DB[:pm_boms_products].where(pm_product_id: composition_level_1_id).select_map(:pm_bom_id)
-    composition_level_2_ = DB[:pm_boms_products].where(pm_product_id: composition_level_2_id).select_map(:pm_bom_id)
+    composition_level_2_ = DB[:pm_boms_products].where(pm_product_id: composition_level_2_id, quantity: args.units_per_carton).select_map(:pm_bom_id)
     composition_level_3_ = DB[:pm_boms_products].where(pm_product_id: composition_level_3_id).select_map(:pm_bom_id)
     pm_bom_ids = composition_level_1_ & composition_level_2_ & composition_level_3_
-    @pallet_errors << "pm_bom_id masterfile not found: pallet_number: #{args.pallet_number}_#{args.pallet_sequence_number}" unless pm_bom_ids.length == 1
+    @pallet_errors << "pm_bom_id masterfile. Found #{pm_bom_ids.length} matching pm_boms for sequence_number: #{args.pallet_number}_#{args.pallet_sequence_number}" if pm_bom_ids.length != 1
     pm_bom_ids.first
   end
 
