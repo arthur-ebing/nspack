@@ -93,6 +93,25 @@ This example of `order_items.yml` list file will return different rows for the f
 <1> Key is `standard`, uses `WHERE order_id = 1`
 <2> Key is `customer`, uses `WHERE customer_id = 5 AND NOT active`
 
+=== Conditions: valid operators
+
+The list of possible operators is below. Note that some operators are case-sensitive -- particularly `is_null` and `not_null`.
+
+=:: Equals the `val`.
+>=:: Greater than or equal to the `val`.
+< =:: Less than or equal to the `val`.
+<>:: Not equal to the `val`.
+>:: Greater than the `val`.
+<:: Less than the `val`.
+between:: Between values -- the `val` must be two values separated by a comma.
+starts_with:: Starts with the `val`.
+ends_with:: Ends with the `val`.
+contains:: Contains the `val`.
+in:: Is any of a list -- the `val` must be a comma-separated list.
+is_null:: Is blank -- **NB.** the `val` must also be `is_null`.
+not_null:: Is not blank -- **NB.** the `val` must also be `not_null`.
+
+
 === Special parameters for limit and offset
 
 You can limit the number of rows returned by using the parameters `_limit` and `_offset`.
