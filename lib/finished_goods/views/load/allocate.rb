@@ -13,6 +13,7 @@ module FinishedGoods
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
+            palbin = ui_rule.form_object.rmt_load ? 'Bin' : 'Pallet'
             page.section do |section|
               section.add_control(control_type: :link,
                                   text: 'Back',
@@ -21,7 +22,7 @@ module FinishedGoods
             end
             page.form do |form|
               form.action "/finished_goods/dispatch/loads/#{id}/allocate"
-              form.submit_captions 'Allocate pasted pallets'
+              form.submit_captions "Allocate pasted #{palbin}s"
               form.method :update
               form.row do |row|
                 row.column do |col|
@@ -36,11 +37,12 @@ module FinishedGoods
                 end
               end
             end
-            page.add_notice 'Use the checkboxes and save selection button to select pallets from the grid below. - Or add pallets by listing pallet numbers in the box above and pressing Allocate pasted pallets.'
+
+            page.add_notice "Use the checkboxes and save selection button to select #{palbin}s from the grid below. - Or add #{palbin}s by listing #{palbin} numbers in the box above and pressing Allocate pasted #{palbin}s."
             page.section do |section|
               section.add_grid('stock_pallets',
                                '/list/stock_pallets/grid_multi',
-                               caption: 'Choose Pallets',
+                               caption: "Choose #{palbin}s",
                                is_multiselect: true,
                                can_be_cleared: true,
                                multiselect_url: "/finished_goods/dispatch/loads/#{id}/allocate_multiselect",
