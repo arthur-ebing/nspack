@@ -4,11 +4,12 @@ module MesscadaApp
   # Take params, lookup system resource and some related attributes
   # and merge them into the params as { system_resource: SystemResourceWithIncentive }.
   class AddSystemResourceIncentiveToParams < BaseService
-    attr_reader :params, :get_group_incentive, :sys_res, :repo, :resource_repo, :device, :origin
+    attr_reader :params, :get_group_incentive, :sys_res, :repo, :resource_repo, :device, :origin, :has_button
 
     def initialize(params, has_button: false, get_group_incentive: true) # rubocop:disable Metrics/AbcSize
       super()
       @params = params
+      @has_button = has_button
       @device = if has_button
                   ar = params[:device].split('-')
                   ar.take(ar.length - 1).join('-')
@@ -28,7 +29,9 @@ module MesscadaApp
     end
 
     def call # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
-      raise Crossbeams::InfoError, "#{params[:device]} does not exist" if @button_packpoint.nil? && params[:packpoint].nil?
+      # If a button was pressed, make sure it has been defined as a system resource or packpoint.
+      # (button could be defined in the robot config, but not in the system_resources table)
+      raise Crossbeams::InfoError, "#{params[:device]} does not exist" if has_button && @button_packpoint.nil? && params[:packpoint].nil?
 
       @sys_res = resource_repo.system_resource_incentive_settings(device, params[:packpoint] || @button_packpoint, origin, params[:card_reader])
       return failed_response("#{device} is not configured") if sys_res.nil?
