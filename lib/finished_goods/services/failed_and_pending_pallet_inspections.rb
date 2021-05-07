@@ -24,15 +24,14 @@ module FinishedGoodsApp
     private
 
     def check_errors
-      errors = {}
-      failed_inspections.each { |failed| errors[failed.to_sym] = ['failed inspection'] }
-      pending_inspections.each { |pending| errors[pending.to_sym] = ['inspection still pending'] }
-      return success_response('Inspections: Pallet passed.', { pallet_number: pallet_number }) if errors.empty?
+      failed = failed_inspections
+      pending = pending_inspections
+      return success_response('Inspections: Pallet passed.', { pallet_number: pallet_number }) if (failed + pending).empty?
 
       OpenStruct.new(success: false,
                      instance: { pallet_number: pallet_number },
-                     errors: errors,
-                     message: 'Validation error')
+                     errors: { failed: failed, pending: pending },
+                     message: 'Inspections Failed')
     end
 
     def failed_inspections
