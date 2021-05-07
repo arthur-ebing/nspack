@@ -5,6 +5,9 @@
     - :col: bin_tipped
       :op: =
       :val: false
+    - :col: bin_asset_number
+      :op: not_null
+      :val: not_null
   :scrap_bins_reworks:
     - :col: scrapped
       :op: =
