@@ -9,6 +9,11 @@
   :text: manage
   :icon: edit
   :hide_if_true: shipped
+- :url: "/raw_materials/dispatch/bin_loads/$:id$/shipped_at"
+  :text: date shipped
+  :icon: edit
+  :popup: true
+  :hide_if_false: shipped
 - :separator: true
 - :url: "/development/statuses/list/bin_loads/$:id$"
   :text: status

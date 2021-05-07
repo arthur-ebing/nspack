@@ -127,6 +127,17 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
+    def shipped_at_bin_load(id, params)
+      repo.transaction do
+        repo.update_bin_load(id, params)
+        log_transaction
+      end
+      instance = bin_load(id)
+      success_response("Updated Bin load: #{id}", instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def unship_bin_load(id)
       check!(:unship, id)
       repo.transaction do

@@ -32,6 +32,7 @@ module UiRules
     end
 
     def common_fields
+      shipped_at_renderer = @mode == :ship ? { renderer: :datetime } : { renderer: :label }
       {
         id: { renderer: :label,
               with_value: @form_object.id,
@@ -62,7 +63,7 @@ module UiRules
                     maxvalue: AppConst::MAX_BINS_ON_LOAD,
                     minvalue: 1,
                     required: true },
-        shipped_at: { renderer: :label, format: :without_timezone_or_seconds },
+        shipped_at: shipped_at_renderer.merge(format: :without_timezone_or_seconds),
         shipped: { renderer: :label, as_boolean: true },
         completed_at: { renderer: :label, format: :without_timezone_or_seconds },
         completed: { renderer: :label, as_boolean: true }
@@ -75,7 +76,8 @@ module UiRules
         return
       end
 
-      @form_object = @repo.find_bin_load_flat(@options[:id])
+      @form_object = OpenStruct.new(@repo.find_bin_load_flat(@options[:id]).to_h)
+      @form_object[:shipped_at] ||= Time.now if @mode == :ship
     end
 
     def make_new_form_object
@@ -109,6 +111,7 @@ module UiRules
                text: 'Edit',
                url: "/raw_materials/dispatch/bin_loads/#{id}/edit",
                prompt: 'Are you sure, you want to edit this load?',
+               visible: !@form_object.completed,
                icon: :edit }
       delete = { control_type: :link,
                  style: :action_button,
@@ -144,6 +147,7 @@ module UiRules
                style: :action_button,
                text: 'Ship',
                url: "/raw_materials/dispatch/bin_loads/#{id}/ship",
+               behaviour: :popup,
                icon: :checkon }
       unship = { control_type: :link,
                  style: :action_button,

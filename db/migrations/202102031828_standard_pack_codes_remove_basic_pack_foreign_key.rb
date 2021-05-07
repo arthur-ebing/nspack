@@ -6,7 +6,7 @@ Sequel.migration do
       index [:basic_pack_id, :standard_pack_id], name: :basic_packs_standard_packs_unique_code, unique: true
     end
 
-    run "INSERT INTO basic_packs_standard_packs (standard_pack_id, basic_pack_id) SELECT id, basic_pack_code_id FROM standard_pack_codes ON CONFLICT DO NOTHING;"
+    run "INSERT INTO basic_packs_standard_packs (standard_pack_id, basic_pack_id) SELECT id, basic_pack_code_id FROM standard_pack_codes WHERE basic_pack_code_id IS NOT NULL ON CONFLICT DO NOTHING;"
 
     alter_table(:standard_pack_codes) do
       drop_foreign_key :basic_pack_code_id

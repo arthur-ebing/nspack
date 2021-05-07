@@ -137,6 +137,25 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.redirect "/raw_materials/dispatch/bin_loads/#{id}"
       end
 
+      r.on 'shipped_at' do
+        r.get do       # SHIP
+          check_auth!('dispatch', 'edit')
+          show_partial_or_page(r) { RawMaterials::Dispatch::BinLoad::Ship.call(id) }
+        end
+
+        r.post do # UPDATE
+          res = interactor.shipped_at_bin_load(id, params[:bin_load])
+          if res.success
+            flash[:notice] = res.message
+            r.redirect '/list/bin_loads'
+          else
+            re_show_form(r, res, url: "/raw_materials/dispatch/bin_loads/#{id}/shipped_at") do
+              RawMaterials::Dispatch::BinLoad::Ship.call(id, form_values: params[:bin_load], form_errors: res.errors)
+            end
+          end
+        end
+      end
+
       r.on 'unship' do
         check_auth!('dispatch', 'edit')
         res = interactor.unship_bin_load(id)
