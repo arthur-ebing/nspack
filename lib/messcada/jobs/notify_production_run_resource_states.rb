@@ -5,7 +5,7 @@ module MesscadaApp
     class NotifyProductionRunResourceStates < BaseQueJob
       attr_reader :production_run_id, :xml, :repo
 
-      def run(production_run_id)
+      def run(production_run_id, user_name)
         @production_run_id = production_run_id
         @repo = ProductionApp::ProductionRunRepo.new
         res = send_notification_for_resource_states
@@ -19,11 +19,25 @@ module MesscadaApp
           STR
           ErrorMailer.send_error_email(subject: "#{self.class.name} failed to set button captions",
                                        message: msg)
+
+          send_message_bus_err(user_name, res)
         end
         finish
       end
 
       private
+
+      def send_message_bus_err(user_name, res)
+        login_name = @repo.get_value(:users, :login_name, user_name: user_name)
+
+        err = if res.instance[:refused]
+                'Robot button captions could not be set. The connection was refused'
+              else
+                "Robot button captions could not be set. The response from MesServer call: #{res.message}"
+              end
+
+        send_bus_message(err, message_type: :error, target_user: login_name)
+      end
 
       def send_notification_for_resource_states
         build_xml
