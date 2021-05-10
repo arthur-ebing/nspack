@@ -22,12 +22,25 @@
     :location_pallets: Location Pallets
 :conditions:
   :location_pallets:
-    - :col: vw_pallets.shipped
-      :op: =
-      :val: false
-    - :col: vw_pallets.scrapped
-      :op: =
-      :val: false
-    - :col: vw_pallets.location_id
-      :op: IN
-      :val: $:location_ids$
+  - :col: vw_pallets.shipped
+    :op: "="
+    :val: false
+  - :col: vw_pallets.scrapped
+    :op: "="
+    :val: false
+  - :col: vw_pallets.location_id
+    :op: IN
+    :val: "$:location_ids$"
+:hide_for_client:
+  hb:
+  - shipped_date
+  hl:
+  - shipped_date
+  um:
+  - shipped_date
+  sr:
+  - shipped_date
+  sr2:
+  - shipped_date
+  kr:
+  - shipped_date

@@ -24,18 +24,25 @@
   sr:
   - fruit_sticker
   - fruit_sticker_2
+  - shipped_date
   srp:
   - fruit_sticker
   - fruit_sticker_2
   sr2:
   - fruit_sticker
   - fruit_sticker_2
+  - shipped_date
   hb:
   - fruit_sticker
   - fruit_sticker_2
+  - shipped_date
   hl:
   - fruit_sticker
   - fruit_sticker_2
+  - shipped_date
   um:
   - fruit_sticker
   - fruit_sticker_2
+  - shipped_date
+  kr:
+  - shipped_date
