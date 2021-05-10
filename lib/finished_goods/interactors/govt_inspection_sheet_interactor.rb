@@ -197,7 +197,7 @@ module FinishedGoodsApp
           insp_res = FinishedGoodsApp::FailedAndPendingPalletInspections.call(pallet_number)
           return insp_res if !insp_res.success && insp_res.errors[:failed].nil_or_empty? && insp_res.errors[:pending].nil_or_empty?
 
-          dest_res = AppConst::CR_FG.valid_destination?(pallet_number, repo.tripsheet_destination(id), insp_res.errors, pallet[:load_id])
+          dest_res = AppConst::CR_FG.valid_tripsheet_pallet_destination(pallet_number, repo.tripsheet_destination(id), insp_res.errors, pallet[:load_id])
           return dest_res unless dest_res.success
 
           repo.create_vehicle_job_unit(res)

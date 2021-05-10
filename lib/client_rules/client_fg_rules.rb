@@ -81,19 +81,27 @@ module Crossbeams
       !AppConst::TITAN_ADDENDUM_API_USER_ID.nil?
     end
 
-    def valid_destination?(pallet_number, location, inspections, pallet_on_load, explain: false) # rubocop:disable Metrics/AbcSize,  Metrics/CyclomaticComplexity,  Metrics/PerceivedComplexity
+    def valid_tripsheet_pallet_destination(pallet_number, location, inspections, pallet_on_load, explain: false) # rubocop:disable Metrics/AbcSize,  Metrics/CyclomaticComplexity,  Metrics/PerceivedComplexity
       return 'Validate tripsheet pallet planned location.' if explain
 
-      err = nil
-      if !inspections[:failed].nil_or_empty? && setting(:valid_pallet_destination)[:failed].none? { |rule| !(location =~ rule).nil? }
-        err = "Invalid destination[#{location}]. Pallet[#{pallet_number}] has failed inspections: #{inspections[:failed].join(',')}"
-      elsif !inspections[:pending].nil_or_empty? && setting(:valid_pallet_destination)[:pending].none? { |rule| !(location =~ rule).nil? }
-        err = "Invalid destination[#{location}]. Pallet[#{pallet_number}] has pending inspections: #{inspections[:pending].join(',')}"
-      elsif !pallet_on_load.nil? && setting(:valid_pallet_destination)[:loaded].none? { |rule| !(location =~ rule).nil? }
-        err = "Invalid destination[#{location}]. Pallet[#{pallet_number}] loaded out"
-      end
+      state = if !inspections[:failed].nil_or_empty?
+                :failed
+              elsif !inspections[:pending].nil_or_empty?
+                :pending
+              elsif pallet_on_load
+                :loaded
+              end
+      return ok_response if state.nil? || setting(:valid_pallet_destination)[state].any? { |rule| !(location =~ rule).nil? }
 
-      err.nil? ? ok_response : failed_response(err)
+      err = case state
+            when :failed
+              "Invalid destination[#{location}]. Pallet[#{pallet_number}] has failed inspections: #{inspections[:failed].join(',')}"
+            when :pending
+              "Invalid destination[#{location}]. Pallet[#{pallet_number}] has pending inspections: #{inspections[:pending].join(',')}"
+            when :loaded
+              "Invalid destination[#{location}]. Pallet[#{pallet_number}] loaded out"
+            end
+      failed_response(err)
     end
   end
 end
