@@ -200,6 +200,8 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
   end
 
   def get_pm_bom_id(args) # rubocop:disable Metrics/AbcSize
+    args.units_per_carton = nil if args.units_per_carton == '*'
+
     level_1_product_code = "#{args.carton_pack_type}#{args.basic_pack_code}#{args.carton_pack_height}#{args.carton_pack_style}"
     level_3_product_code = "#{args.commodity_code}#{args.standard_count}"
     composition_level_1_id = get_id_or_error(:pm_products, product_code: level_1_product_code)
