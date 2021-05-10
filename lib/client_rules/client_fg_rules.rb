@@ -1,31 +1,41 @@
 # frozen_string_literal: true
 
+require File.join(File.expand_path('../../lib', __dir__), 'crossbeams_responses')
+
 module Crossbeams
   class ClientFgRules < BaseClientRules
     include Crossbeams::AutoDocumentation
+    include Crossbeams::Responses
 
     CLIENT_SETTINGS = {
       hb: { place_of_issue_for_addendum: 'PLZ',
             vgm_required: false,
-            integrate_extended_fg: false },
+            integrate_extended_fg: false,
+            valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } },
       hl: { place_of_issue_for_addendum: 'PLZ',
             vgm_required: false,
-            integrate_extended_fg: false },
+            integrate_extended_fg: false,
+            valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } },
       kr: { place_of_issue_for_addendum: 'CPT',
             vgm_required: true,
-            integrate_extended_fg: true },
+            integrate_extended_fg: true,
+            valid_pallet_destination: { failed: [/\AREWORKS$/], pending: [/\AREWORKS$/, /\ARA_10/, /\APACKHSE/], loaded: [/\APART_PALLETS/] } },
       um: { place_of_issue_for_addendum: nil,
             vgm_required: true,
-            integrate_extended_fg: false },
+            integrate_extended_fg: false,
+            valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } },
       ud: { place_of_issue_for_addendum: 'PLZ',
             vgm_required: true,
-            integrate_extended_fg: false },
+            integrate_extended_fg: false,
+            valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } },
       sr: { place_of_issue_for_addendum: 'PLZ',
             vgm_required: true,
-            integrate_extended_fg: false },
+            integrate_extended_fg: false,
+            valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } },
       sr2: { place_of_issue_for_addendum: 'PLZ',
              vgm_required: true,
-             integrate_extended_fg: false }
+             integrate_extended_fg: false,
+             valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } }
     }.freeze
     # ALLOW_EXPORT_PALLETS_TO_BYPASS_INSPECTION
     # CALCULATE_PALLET_DECK_POSITIONS
@@ -69,6 +79,21 @@ module Crossbeams
       return 'Enable TITAN addenda when API user is given.' if explain
 
       !AppConst::TITAN_ADDENDUM_API_USER_ID.nil?
+    end
+
+    def valid_destination?(pallet_number, location, inspections, pallet_on_load, explain: false) # rubocop:disable Metrics/AbcSize,  Metrics/CyclomaticComplexity,  Metrics/PerceivedComplexity
+      return 'Validate tripsheet pallet planned location.' if explain
+
+      err = nil
+      if !inspections[:failed].nil_or_empty? && setting(:valid_pallet_destination)[:failed].none? { |rule| !(location =~ rule).nil? }
+        err = "Invalid destination[#{location}]. Pallet[#{pallet_number}] has failed inspections: #{inspections[:failed].join(',')}"
+      elsif !inspections[:pending].nil_or_empty? && setting(:valid_pallet_destination)[:pending].none? { |rule| !(location =~ rule).nil? }
+        err = "Invalid destination[#{location}]. Pallet[#{pallet_number}] has pending inspections: #{inspections[:pending].join(',')}"
+      elsif !pallet_on_load.nil? && setting(:valid_pallet_destination)[:loaded].none? { |rule| !(location =~ rule).nil? }
+        err = "Invalid destination[#{location}]. Pallet[#{pallet_number}] loaded out"
+      end
+
+      err.nil? ? ok_response : failed_response(err)
     end
   end
 end

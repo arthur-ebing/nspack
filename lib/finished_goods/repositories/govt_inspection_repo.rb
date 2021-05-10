@@ -368,5 +368,29 @@ module FinishedGoodsApp
 
       args
     end
+
+    def valid_carton_for_pallet?(pallet_number, carton_number)
+      # exists?(:carton_labels, id: carton_number, pallet_number: pallet_number)
+      !DB[:pallets]
+        .join(:pallet_sequences, pallet_id: :id)
+        .join(:cartons, pallet_sequence_id: :id)
+        .join(:carton_labels, id: :carton_label_id)
+        .where(Sequel[:pallets][:pallet_number] => pallet_number, Sequel[:carton_labels][:id] => carton_number)
+        .empty?
+    end
+
+    def palletizing_bay_for_pallet(pallet_number)
+      DB[:palletizing_bay_states]
+        .join(:pallet_sequences, id: :pallet_sequence_id)
+        .where(pallet_number: pallet_number)
+        .get(:palletizing_robot_code)
+    end
+
+    def tripsheet_destination(vehicle_job_id)
+      DB[:vehicle_jobs]
+        .join(:locations, id: :planned_location_to_id)
+        .where(Sequel[:vehicle_jobs][:id] => vehicle_job_id)
+        .get(:location_long_code)
+    end
   end
 end

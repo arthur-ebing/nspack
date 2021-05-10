@@ -172,13 +172,14 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def create_pallet_vehicle_job_unit(id, pallet_number) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity,  Metrics/PerceivedComplexity
+    def create_pallet_vehicle_job_unit(id, pallet_number, carton_number = nil) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity,  Metrics/PerceivedComplexity
       pallet = ProductionApp::ProductionRunRepo.new.find_pallet_by_pallet_number(pallet_number)
       return failed_response('Pallet does not exist') unless pallet
       return failed_response('Pallet has been scrapped') if pallet[:scrapped]
       return failed_response('Pallet has been shipped') if pallet[:shipped]
       return failed_response("Pallet:#{pallet_number} belongs to another tripsheet") if repo.pallet_in_different_tripsheet?(pallet[:id], id)
       return failed_response("Cannot add:#{pallet_number}. Tripsheet has already been offloaded") if repo.get(:vehicle_jobs, id, :offloaded_at)
+      return failed_response("Pallet is still on bay: #{repo.palletizing_bay_for_pallet(pallet_number)}") if pallet[:has_individual_cartons] && !pallet[:palletized]
 
       pallet_stock_type_id = MesscadaApp::MesscadaRepo.new.find_stock_type('PALLET')[:id]
       res = validate_vehicle_job_unit_params(stock_item_id: pallet[:id], stock_type_id: pallet_stock_type_id, vehicle_job_id: id)
@@ -190,6 +191,15 @@ module FinishedGoodsApp
           repo.delete_vehicle_job_unit(vehicle_job_unit_id)
           msg = 'Removed From Tripsheet'
         else
+          return failed_response(nil, carton_required: true) if pallet[:has_individual_cartons] && AppConst::CLIENT_CODE == 'kr' && carton_number.nil?
+          return failed_response("invalid carton: #{carton_number} for pallet: #{pallet_number}", carton_required: true) if carton_number && !repo.valid_carton_for_pallet?(pallet_number, carton_number)
+
+          insp_res = FinishedGoodsApp::FailedAndPendingPalletInspections.call(pallet_number)
+          return insp_res if !insp_res.success && insp_res.errors[:failed].nil_or_empty? && insp_res.errors[:pending].nil_or_empty?
+
+          dest_res = AppConst::CR_FG.valid_destination?(pallet_number, repo.tripsheet_destination(id), insp_res.errors, pallet[:load_id])
+          return dest_res unless dest_res.success
+
           repo.create_vehicle_job_unit(res)
           log_status(:pallets, pallet[:id], 'ADDED TO TRIPSHEET')
           msg = 'Vehicle Job Created'

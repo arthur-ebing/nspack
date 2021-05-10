@@ -1158,7 +1158,23 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     r.on 'create_pallet_vehicle_job_unit', Integer do |id|
       interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
-      res = interactor.create_pallet_vehicle_job_unit(id, params[:pallet][:pallet_number])
+      res = interactor.create_pallet_vehicle_job_unit(id, params[:pallet][:pallet_number], params[:pallet][:carton_number])
+
+      if res.instance[:carton_required]
+        form_state = { pallet_number: params[:pallet][:pallet_number] }
+        form_state.merge!(error_message: res.message)
+        form = Crossbeams::RMDForm.new(form_state,
+                                       form_name: :pallet,
+                                       scan_with_camera: @rmd_scan_with_camera,
+                                       caption: 'Scan Tripsheet Pallet Carton',
+                                       action: "/rmd/finished_goods/create_pallet_vehicle_job_unit/#{id}",
+                                       button_caption: 'Submit')
+
+        form.add_field(:pallet_number, 'Pallet Number', required: false, hide_on_load: true)
+        form.add_field(:carton_number, 'Carton Number', data_type: :number, scan: 'key248_all', scan_type: :carton_label_id, submit_form: true, required: true)
+        form.add_csrf_tag csrf_tag
+        return view(inline: form.render, layout: :layout_rmd)
+      end
 
       store_locally(:error, unwrap_failed_response(res)) unless res.success
       r.redirect("/rmd/finished_goods/scan_tripsheet_pallet/#{id}")
