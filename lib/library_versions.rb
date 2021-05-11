@@ -15,7 +15,6 @@ class LibraryVersions
     sweetalert: %i[jsver sweetalert],
     sortable: %i[jsver sortable],
     konva: %i[jsver konva],
-    lodash: %i[jsver lodash],
     multi: %i[jsver multi],
     jasper: %i[jasper jasper]
   }.freeze
@@ -28,7 +27,6 @@ class LibraryVersions
     sweetalert: ->(s) { s.send :sweetalert_version },
     sortable: ->(s) { s.send :sortable_version },
     konva: ->(s) { s.send :konva_version },
-    lodash: ->(s) { s.send :lodash_version },
     multi: ->(s) { s.send :multi_version }
   }.freeze
 
@@ -108,12 +106,6 @@ class LibraryVersions
 
   def konva_version
     format_lib('Konva', File.readlines('public/js/konva.min.js', encoding: 'UTF-8')[1].chomp.split(' v').last)
-  end
-
-  def lodash_version
-    s = File.read('public/js/lodash.js', encoding: 'UTF-8')
-    m = s.match(/VERSION = '(.+)'/)
-    format_lib('Lodash', m.nil? ? 'UNKNOWN' : m[1])
   end
 
   def multi_version
