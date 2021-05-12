@@ -6,18 +6,31 @@
     :scrapped: Scrapped Pallet Sequences
 :conditions:
   :standard:
-    - :col: pallet_id
-      :op: =
-      :val: $:pallet_id$
+  - :col: pallet_id
+    :op: "="
+    :val: "$:pallet_id$"
   :pallet_number:
-    - :col: pallet_number
-      :op: =
-      :val: $:pallet_number$
+  - :col: pallet_number
+    :op: "="
+    :val: "$:pallet_number$"
   :active:
-    - :col: active
-      :op: =
-      :val: $:active$
+  - :col: active
+    :op: "="
+    :val: "$:active$"
   :scrapped:
-    - :col: scrapped
-      :op: =
-      :val: $:scrapped$
+  - :col: scrapped
+    :op: "="
+    :val: "$:scrapped$"
+:hide_for_client:
+  hb:
+  - shipped_date
+  hl:
+  - shipped_date
+  um:
+  - shipped_date
+  sr:
+  - shipped_date
+  sr2:
+  - shipped_date
+  kr:
+  - shipped_date
