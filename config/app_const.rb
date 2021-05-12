@@ -496,7 +496,6 @@ class AppConst # rubocop:disable Metrics/ClassLength
   SCRAP_LOCATION = 'SCRAP_PACKHSE'
   UNSCRAP_LOCATION = 'UNSCRAP_PACKHSE'
   UNTIP_LOCATION = 'UNTIPPED_BIN'
-  MAX_PALLETS_ON_LOAD = (ENV['MAX_PALLETS_ON_LOAD'] || 50).to_i
   TEMP_TAIL_REQUIRED_TO_SHIP = make_boolean('TEMP_TAIL_REQUIRED_TO_SHIP')
   # Constants for port types:
   PORT_TYPE_POL = 'POL'
@@ -736,9 +735,6 @@ class AppConst # rubocop:disable Metrics/ClassLength
                               issue: 'ISSUE_BINS',
                               bin_tip: 'BIN_TIP',
                               rebin: 'REBIN' }.freeze
-
-  # Bin Control
-  MAX_BINS_ON_LOAD = ENV['MAX_BINS_ON_LOAD'] || 50
 
   # Complete Pallet
   PLT_LABEL_QTY_TO_PRINT = 4

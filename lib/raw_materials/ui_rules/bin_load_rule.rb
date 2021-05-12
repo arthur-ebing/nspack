@@ -60,7 +60,7 @@ module UiRules
                          caption: 'Destination Depot',
                          required: true },
         qty_bins: { renderer: :integer,
-                    maxvalue: AppConst::MAX_BINS_ON_LOAD,
+                    maxvalue: AppConst::CR_FG.max_bin_count_for_load?,
                     minvalue: 1,
                     required: true },
         shipped_at: shipped_at_renderer.merge(format: :without_timezone_or_seconds),

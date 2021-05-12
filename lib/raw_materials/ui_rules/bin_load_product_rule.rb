@@ -41,7 +41,7 @@ module UiRules
                        with_value: @form_object.bin_load_id,
                        caption: 'Bin Load' },
         qty_bins: { renderer: :integer,
-                    maxvalue: AppConst::MAX_BINS_ON_LOAD,
+                    maxvalue: AppConst::CR_FG.max_bin_count_for_load?,
                     minvalue: 1,
                     required: true },
         cultivar_group_id: { renderer: :select,

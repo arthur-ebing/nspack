@@ -164,7 +164,7 @@ module FinishedGoodsApp
       DB[:pallet_sequences].where(id: new_pallet_sequence_ids).update(target_customer_party_role_id: target_customer_id)
     end
 
-    def allocate_pallets(load_id, pallet_numbers, user)
+    def allocate_pallets(load_id, pallet_numbers, user) # rubocop:disable Metrics/AbcSize
       return if pallet_numbers.nil_or_empty?
 
       pallet_ids = select_values(:pallets, :id, pallet_number: pallet_numbers)
@@ -172,7 +172,8 @@ module FinishedGoodsApp
       log_multiple_statuses(:pallets, pallet_ids, 'ALLOCATED', user_name: user.user_name)
 
       allocated_count = select_values(:pallets, :id, load_id: load_id).length
-      raise Crossbeams::InfoError, 'Allocation exceeded max pallets on load' if allocated_count > AppConst::MAX_PALLETS_ON_LOAD
+      max_count = get(:loads, load_id, :rmt_load) ? AppConst::CR_FG.max_bin_count_for_load? : AppConst::CR_FG.max_pallet_count_for_load?
+      raise Crossbeams::InfoError, 'Allocation exceeded max pallets on load' if allocated_count > max_count
 
       # updates load status allocated
       update(:loads, load_id, allocated: true, allocated_at: Time.now)
