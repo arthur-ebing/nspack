@@ -460,8 +460,8 @@ class App < Roda # rubocop:disable Metrics/ClassLength
               {
                 url: '/messcada/hr/logon_with_no?',
                 p1: 'device',
-                p2: 'identifier',
-                p3: null,
+                p2: 'card_reader',
+                p3: 'identifier',
                 p4: null,
                 p5: null,
                 p6: null,
@@ -469,8 +469,8 @@ class App < Roda # rubocop:disable Metrics/ClassLength
               {
                 url: '/messcada/hr/logoff_with_no?',
                 p1: 'device',
-                p2: 'identifier',
-                p3: null,
+                p2: 'card_reader',
+                p3: 'identifier',
                 p4: null,
                 p5: null,
                 p6: null,

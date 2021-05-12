@@ -21,7 +21,8 @@ class Nspack < Roda
     # messcada/palletize/scan_carton
     # --------------------------------------------------------------------------
     r.on 'scan_carton' do
-      res = interactor.scan_carton(params)
+      res = MesscadaApp::AddIdentifierToLoginWithNo.call(params)
+      res = interactor.scan_carton(res.instance) if res.success
       feedback = interactor.palletizing_robot_feedback(params[:device], res)
       Crossbeams::RobotResponder.new(feedback).render
     end
@@ -30,7 +31,8 @@ class Nspack < Roda
     # QC OUT - place the bay in state to scan a QC carton
     # --------------------------------------------------------------------------
     r.on 'qc_out' do
-      res = interactor.qc_out(params)
+      res = MesscadaApp::AddIdentifierToLoginWithNo.call(params)
+      res = interactor.qc_out(res.instance) if res.success
       feedback = interactor.palletizing_robot_feedback(params[:device], res)
       Crossbeams::RobotResponder.new(feedback).render
     end
@@ -39,7 +41,8 @@ class Nspack < Roda
     # RETURN TO BAY - place the bay in state to scan a carton from a partial pallet
     # --------------------------------------------------------------------------
     r.on 'return_to_bay' do
-      res = interactor.return_to_bay(params)
+      res = MesscadaApp::AddIdentifierToLoginWithNo.call(params)
+      res = interactor.return_to_bay(res.instance) if res.success
       feedback = interactor.palletizing_robot_feedback(params[:device], res)
       Crossbeams::RobotResponder.new(feedback).render
     end
@@ -48,7 +51,8 @@ class Nspack < Roda
     # REFRESH - Refresh the state of the bay
     # --------------------------------------------------------------------------
     r.on 'refresh' do
-      res = interactor.refresh(params)
+      res = MesscadaApp::AddIdentifierToLoginWithNo.call(params)
+      res = interactor.refresh(res.instance) if res.success
       feedback = interactor.palletizing_robot_feedback(params[:device], res)
       Crossbeams::RobotResponder.new(feedback).render
     end
@@ -57,7 +61,8 @@ class Nspack < Roda
     # COMPLETE - Complete the current pallet and empty the bay
     # --------------------------------------------------------------------------
     r.on 'complete' do
-      res = interactor.request_complete(params)
+      res = MesscadaApp::AddIdentifierToLoginWithNo.call(params)
+      res = interactor.request_complete(res.instance) if res.success
       feedback = interactor.palletizing_robot_feedback(params[:device], res)
       Crossbeams::RobotResponder.new(feedback).render
     end
@@ -66,7 +71,8 @@ class Nspack < Roda
     # COMPLETE PALLET - Complete the current pallet and empty the bay
     # --------------------------------------------------------------------------
     r.on 'complete_pallet' do
-      res = interactor.complete_pallet(params)
+      res = MesscadaApp::AddIdentifierToLoginWithNo.call(params)
+      res = interactor.complete_pallet(res.instance) if res.success
       feedback = interactor.palletizing_robot_feedback(params[:device], res)
       Crossbeams::RobotResponder.new(feedback).render
     end
@@ -75,7 +81,8 @@ class Nspack < Roda
     # COMPLETE AUTOPACK_PALLET
     # --------------------------------------------------------------------------
     r.on 'complete_autopack_pallet' do
-      res = interactor.complete_autopack_pallet(params)
+      res = MesscadaApp::AddIdentifierToLoginWithNo.call(params)
+      res = interactor.complete_autopack_pallet(res.instance) if res.success
       feedback = interactor.palletizing_robot_feedback(params[:device], res)
       Crossbeams::RobotResponder.new(feedback).render
     end
@@ -84,7 +91,8 @@ class Nspack < Roda
     # TRANSFER CARTON - Transfer carton to the current bay from an empty bay
     # --------------------------------------------------------------------------
     r.on 'empty_bay_carton_transfer' do
-      res = interactor.empty_bay_carton_transfer(params)
+      res = MesscadaApp::AddIdentifierToLoginWithNo.call(params)
+      res = interactor.empty_bay_carton_transfer(res.instance) if res.success
       feedback = interactor.palletizing_robot_feedback(params[:device], res)
       Crossbeams::RobotResponder.new(feedback).render
     end
@@ -93,7 +101,8 @@ class Nspack < Roda
     # TRANSFER CARTON - Transfer carton to the current bay
     # --------------------------------------------------------------------------
     r.on 'transfer_carton' do
-      res = interactor.transfer_carton(params)
+      res = MesscadaApp::AddIdentifierToLoginWithNo.call(params)
+      res = interactor.transfer_carton(res.instance) if res.success
       feedback = interactor.palletizing_robot_feedback(params[:device], res)
       Crossbeams::RobotResponder.new(feedback).render
     end

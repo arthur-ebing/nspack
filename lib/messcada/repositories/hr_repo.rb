@@ -38,12 +38,24 @@ module MesscadaApp
       DB[:personnel_identifiers].where(identifier: identifier).get(:id)
     end
 
+    def identifier_from_contract_worker_id(id)
+      DB[:contract_workers]
+        .join(:personnel_identifiers, id: :personnel_identifier_id)
+        .where(Sequel[:contract_workers][:id] => id)
+        .get(:identifier)
+    end
+
     def contract_worker_id_from_personnel_id(personnel_identifier_id)
       DB[:contract_workers].where(personnel_identifier_id: personnel_identifier_id).get(:id)
     end
 
     def contract_worker_id_from_personnel_number(personnel_number)
       DB[:contract_workers].where(personnel_number: personnel_number).get(:id)
+    end
+
+    def logged_in_worker_for_device(device, card_reader)
+      id = get_id(:system_resources, system_resource_code: device)
+      get_value(:system_resource_logins, :contract_worker_id, system_resource_id: id, card_reader: card_reader || '1')
     end
 
     # Record login event to system resource logins
