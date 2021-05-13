@@ -77,7 +77,9 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                                   line1: 'Cannot login',
                                                   line4: res.message)
                  end
-      Crossbeams::RobotResponder.new(feedback).render
+      resp = Crossbeams::RobotResponder.new(feedback)
+      resp.extra_elements = { identifier: res.instance[:identifier] } if res.success && res.instance[:identifier]
+      resp.render
     end
 
     r.on 'logoff_with_no' do

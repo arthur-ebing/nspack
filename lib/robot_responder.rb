@@ -2,7 +2,7 @@
 
 module Crossbeams
   class RobotResponder
-    attr_accessor :display_lines
+    attr_accessor :display_lines, :extra_elements
     attr_reader :robot_feedback
 
     def initialize(robot_feedback)
@@ -11,6 +11,7 @@ module Crossbeams
 
       @display_lines = AppConst::ROBOT_DISPLAY_LINES
       @display_lines = lookup_display_lines if @display_lines.zero?
+      @extra_elements = {}
     end
 
     def render
@@ -76,7 +77,7 @@ module Crossbeams
           <lcd1>#{short_message(@robot_feedback.msg || line1)}</lcd1>
           <lcd2>#{short_message(line2)}</lcd2>
           <lcd3>#{short_message(line3)}</lcd3>
-          <lcd4>#{short_message(line4)}</lcd4>#{confirmation}
+          <lcd4>#{short_message(line4)}</lcd4>#{confirmation}#{extra_render}
         </robot_feedback>
       XML
     end
@@ -95,7 +96,7 @@ module Crossbeams
           <lcd3>#{long_message(@robot_feedback.line3)}</lcd3>
           <lcd4>#{long_message(@robot_feedback.line4)}</lcd4>
           <lcd5>#{long_message(@robot_feedback.line5)}</lcd5>
-          <lcd6>#{long_message(@robot_feedback.line6)}</lcd6>#{confirmation}
+          <lcd6>#{long_message(@robot_feedback.line6)}</lcd6>#{confirmation}#{extra_render}
         </robot_feedback>
       XML
     end
@@ -110,6 +111,14 @@ module Crossbeams
             <no_url>#{@robot_feedback.no_url}</no_url>
           </confirm>
       XML
+    end
+
+    # Any key/values in the "extra_render" hash will be added to the XML as elements:
+    # { a: 'b', c: 'd' } => <a>b</a><c>d</c>
+    def extra_render
+      return '' if extra_elements.empty?
+
+      "\n  #{extra_elements.map { |e, v| "<#{e}>#{v}</#{e}>" }.join("\n  ")}"
     end
   end
 end

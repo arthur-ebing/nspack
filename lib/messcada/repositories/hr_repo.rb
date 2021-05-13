@@ -67,6 +67,11 @@ module MesscadaApp
       # Logout_from_group if applicable
       remove_login_from_group(system_resource[:contract_worker_id])
 
+      # The sysresource identifier can be null if the worker logged-in via personnel number instead of identifier,
+      # so lookup the identifier and return it...
+      identifier = system_resource[:identifier] || identifier_from_contract_worker_id(system_resource[:contract_worker_id])
+      raise Crossbeams::InfoError, "No identifier for #{name}" if identifier.nil?
+
       if exists?(:system_resource_logins, system_resource_id: system_resource[:id], card_reader: system_resource[:card_reader])
         DB[:system_resource_logins]
           .where(system_resource_id: system_resource[:id], card_reader: system_resource[:card_reader])
@@ -74,7 +79,7 @@ module MesscadaApp
                   active: true,
                   from_external_system: false,
                   login_at: Time.now,
-                  identifier: system_resource[:identifier])
+                  identifier: identifier)
       else
         DB[:system_resource_logins]
           .insert(system_resource_id: system_resource[:id],
@@ -83,10 +88,10 @@ module MesscadaApp
                   active: true,
                   from_external_system: false,
                   login_at: Time.now,
-                  identifier: system_resource[:identifier])
+                  identifier: identifier)
       end
 
-      success_response('Logged on', contract_worker: name)
+      success_response('Logged on', contract_worker: name, identifier: identifier)
     end
 
     def logout_worker(contract_worker_id)
