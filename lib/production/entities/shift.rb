@@ -9,6 +9,7 @@ module ProductionApp
     attribute :running_hours, Types::Decimal
     attribute :start_date_time, Types::DateTime
     attribute :end_date_time, Types::DateTime
+    attribute :packer, Types::Bool
     attribute? :active, Types::Bool
   end
 end

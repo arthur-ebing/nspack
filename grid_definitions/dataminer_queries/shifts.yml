@@ -4,9 +4,8 @@
   (shifts.shift_type_id) AS shift_type_code,\r\n    employment_types.employment_type_code,\r\n
   \   shifts.running_hours,\r\n    shifts.start_date_time,\r\n    shifts.end_date_time,\r\n
   \   fn_current_status ('shifts', shifts.id) AS status,\r\n    shifts.created_at,\r\n
-  \   shifts.updated_at,\r\n    shifts.active,\r\n    CASE WHEN employment_types.employment_type_code
-  = 'PACKERS' THEN\r\n             TRUE\r\n         ELSE\r\n             FALSE\r\n
-  \   END AS packer\r\nFROM shifts\r\nJOIN shift_types ON shift_types.id = shifts.shift_type_id\r\nJOIN
+  \   shifts.updated_at,\r\n    shifts.active,\r\n    (employment_types.employment_type_code
+  = 'PACKERS' ) AS packer\r\nFROM shifts\r\nJOIN shift_types ON shift_types.id = shifts.shift_type_id\r\nJOIN
   employment_types ON employment_types.id = shift_types.employment_type_id\r\nORDER
   BY\r\n    shifts.start_date_time DESC"
 :limit: 

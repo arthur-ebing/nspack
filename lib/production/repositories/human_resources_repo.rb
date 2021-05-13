@@ -8,20 +8,27 @@ module ProductionApp
                      no_active_check: true,
                      order_by: :remarks
 
-    crud_calls_for :shifts, name: :shift, wrapper: Shift
-    crud_calls_for :shift_exceptions, name: :shift_exception, wrapper: ShiftException
+    crud_calls_for :shifts, name: :shift, exclude: %i[create]
+    crud_calls_for :shift_exceptions, name: :shift_exception
 
     def find_shift(id)
-      find_with_association(:shifts, id,
-                            wrapper: Shift,
-                            parent_tables: [{
-                              parent_table: :employment_types,
-                              columns: [:employment_type_code],
-                              flatten_columns: { employment_type_code: :employment_type_code }
-                            }],
-                            lookup_functions: [{ function: :fn_shift_type_code,
-                                                 args: [:shift_type_id],
-                                                 col_name: :shift_type_code }])
+      hash = find_with_association(
+        :shifts, id,
+        parent_tables: [{ parent_table: :shift_types,
+                          columns: [:employment_type_id],
+                          flatten_columns: { employment_type_id: :employment_type_id } },
+                        { parent_table: :employment_types,
+                          foreign_key: :employment_type_id,
+                          columns: [:employment_type_code],
+                          flatten_columns: { employment_type_code: :employment_type_code } }],
+        lookup_functions: [{ function: :fn_shift_type_code,
+                             args: [:shift_type_id],
+                             col_name: :shift_type_code }]
+      )
+      return nil if hash.nil?
+
+      hash[:packer] = hash[:employment_type_code] == 'PACKERS'
+      Shift.new(hash)
     end
 
     def find_shift_exception(id)

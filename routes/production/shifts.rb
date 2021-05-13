@@ -148,6 +148,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             running_hours
             start_date_time
             end_date_time
+            packer
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)
