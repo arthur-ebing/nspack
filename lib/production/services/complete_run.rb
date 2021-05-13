@@ -38,7 +38,8 @@ module ProductionApp
 
     def delete_carton_label_cache
       FileUtils.mkpath(AppConst::LABELING_CACHED_DATA_FILEPATH)
-      File.delete(File.join(AppConst::LABELING_CACHED_DATA_FILEPATH, "line_#{production_run.production_line_id}.yml"))
+      fn = File.join(AppConst::LABELING_CACHED_DATA_FILEPATH, "line_#{production_run.production_line_id}.yml")
+      File.delete(fn) if File.exist?(fn)
     end
 
     def build_changeset
