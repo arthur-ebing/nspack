@@ -10,6 +10,7 @@ module ProductionApp
     attribute :start_date_time, Types::DateTime
     attribute :end_date_time, Types::DateTime
     attribute :packer, Types::Bool
+    attribute :status, Types::String
     attribute? :active, Types::Bool
   end
 end

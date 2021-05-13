@@ -23,7 +23,10 @@ module ProductionApp
                           flatten_columns: { employment_type_code: :employment_type_code } }],
         lookup_functions: [{ function: :fn_shift_type_code,
                              args: [:shift_type_id],
-                             col_name: :shift_type_code }]
+                             col_name: :shift_type_code },
+                           { function: :fn_current_status,
+                             args: ['shifts', :id],
+                             col_name: :status }]
       )
       return nil if hash.nil?
 
