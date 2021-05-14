@@ -30,9 +30,7 @@ class Nspack < Roda
           res = interactor.fg_pallet_weighing(bin_number: params[:pallet_number], gross_weight: params[:gross_weight], measurement_unit: params[:measurement_unit])
           return render_error_result(res) unless res.success
 
-          repo = LabelApp::PrinterRepo.new
-          printer = repo.robot_peripheral_printer(params[:device])
-          res = prod_run_interactor.print_pallet_label_from_sequence(seq1, pallet_label_name: AppConst::DEFAULT_PALLET_LABEL_NAME, printer: printer)
+          res = prod_run_interactor.print_pallet_label_from_sequence(seq1, params[:device], pallet_label_name: AppConst::DEFAULT_PALLET_LABEL_NAME)
           return render_error_result(res) unless res.success
 
           feedback = MesscadaApp::RobotFeedback.new(device: params[:device],
