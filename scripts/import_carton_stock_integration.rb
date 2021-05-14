@@ -22,11 +22,14 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     raise Crossbeams::InfoError, 'Invalid production_run_id' unless @repo.get_id(:production_runs, id: @production_run_id)
 
     DB.transaction do
+      DB['ALTER TABLE pallet_sequences DISABLE TRIGGER set_created_at'].first
+
       parse_csv
       infodump
       raise Crossbeams::InfoError, 'Transaction not committed: please see log.' unless @errors.empty?
       raise Crossbeams::InfoError, 'Debug mode: Import Completed successfully, transaction not committed.' if debug_mode
 
+      DB['ALTER TABLE pallet_sequences ENABLE TRIGGER set_created_at'].first
       success_response('Import Completed')
     end
   rescue Sequel::UniqueConstraintViolation => e
@@ -98,6 +101,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
                            pallet_id: hash.delete(:legacy_pallet_id),
                            production_run_id: hash.delete(:legacy_production_run_id),
                            pc_code: hash.delete(:pc_code),
+                           track_indicator_code: hash.delete(:track_indicator_code),
                            shift_id: hash.delete(:shift_id) }
 
     args = OpenStruct.new(hash)
@@ -194,6 +198,8 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     args.pallet_label_name = nil
     args.packing_method_id = get_id_or_error(:packing_methods, packing_method_code: 'NORMAL')
     args.product_chars = nil
+
+    args.created_at = args.seq_created_at
 
     args.to_h
   end

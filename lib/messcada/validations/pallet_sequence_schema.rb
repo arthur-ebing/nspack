@@ -70,6 +70,7 @@ module MesscadaApp
       optional(:legacy_data).maybe(:hash)
       optional(:marketing_puc_id).maybe(:integer)
       optional(:marketing_orchard_id).maybe(:integer)
+      optional(:created_at).maybe(:time)
     end
 
     rule(:fruit_size_reference_id, :fruit_actual_counts_for_pack_id) do
