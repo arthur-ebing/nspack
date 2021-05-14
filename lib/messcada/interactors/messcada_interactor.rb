@@ -375,6 +375,8 @@ module MesscadaApp
     rescue Crossbeams::InfoError => e
       ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message(__method__))
       failed_response(e.message)
+    rescue StandardError => e
+      failed_response(e.message)
     end
 
     def get_pallet_sequence_pallet_id(id)

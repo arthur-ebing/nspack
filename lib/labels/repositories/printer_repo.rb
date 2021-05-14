@@ -235,5 +235,21 @@ module LabelApp
     def find_rebin_labels
       MasterfilesApp::LabelTemplateRepo.new.for_select_label_templates(where: { application: AppConst::PRINT_APP_REBIN }).map { |nm, _| nm }
     end
+
+    def robot_peripheral_printer(device) # rubocop:disable Metrics/AbcSize
+      ar = device.split('-')
+      syscode = ar.take(ar.length - 1).join('-')
+
+      plant_id = DB[:plant_resources].where(system_resource_id: DB[:system_resources].where(system_resource_code: syscode).get(:id)).get(:id)
+
+      DB[:plant_resources_system_resources]
+        .join(:system_resources, id: :system_resource_id)
+        .join(:printers, printer_code: :system_resource_code)
+        .where(plant_resource_id: plant_id)
+        .where(plant_resource_type_id: DB[:plant_resource_types]
+                                                        .where(plant_resource_type_code: 'PRINTER')
+                                                        .get(:id))
+        .get(Sequel[:printers][:id])
+    end
   end
 end
