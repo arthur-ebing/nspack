@@ -52,6 +52,7 @@ module MesscadaApp
       optional(:has_individual_cartons).maybe(:bool)
       optional(:nett_weight_externally_calculated).maybe(:bool)
       optional(:legacy_data).maybe(:hash)
+      optional(:derived_weight).maybe(:bool)
     end
 
     rule(:plt_packhouse_resource_id, :plt_line_resource_id) do

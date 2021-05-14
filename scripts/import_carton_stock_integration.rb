@@ -277,6 +277,8 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     args.edi_in_consignment_note_number = args.consignment_note_number
     args.edi_in_inspection_point = args.inspection_point
 
+    args.derived_weight = true
+
     args.to_h
   end
 
