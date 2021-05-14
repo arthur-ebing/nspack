@@ -78,7 +78,7 @@ class ImportMasterfilesCsv < BaseScript # rubocop:disable Metrics/ClassLength
 
   private
 
-  MF_TABLE_DEFINATIONS = {
+  MF_TABLE_DEFINITIONS = {
     marketing_varieties: { rules: { table_column_names: %w[marketing_variety_code description], required_columns: %w[marketing_variety_code description] } },
     cultivars: { rules: { table_column_names: %w[commodity_id cultivar_group_id cultivar_name description], required_columns: %w[commodity_code cultivar_group_code cultivar_name description], lookup_columns: %w[commodity_id cultivar_group_id] } },
     marketing_varieties_for_cultivars: { rules: { table_column_names: %w[cultivar_id marketing_variety_id], required_columns: %w[cultivar_name marketing_variety_code], lookup_columns: %w[cultivar_id marketing_variety_id] } },
@@ -91,7 +91,7 @@ class ImportMasterfilesCsv < BaseScript # rubocop:disable Metrics/ClassLength
     fruit_actual_counts_for_packs: { rules: { table_column_names: %w[std_fruit_size_count_id basic_pack_code_id actual_count_for_pack standard_pack_code_ids size_reference_ids], required_columns: %w[commodity_code size_count_value basic_pack_code actual_count_for_pack], lookup_columns: %w[std_fruit_size_count_id basic_pack_code_id], lookup_arrays: %w[standard_pack_code_ids size_reference_ids] } }
   }.freeze
 
-  MF_COLUMN_LOOKUP_DEFINATIONS = {
+  MF_COLUMN_LOOKUP_DEFINITIONS = {
     commodity_id: { subquery: 'SELECT id FROM commodities WHERE code = ?', values: 'SELECT code FROM commodities WHERE id = ?' },
     cultivar_group_id: { subquery: 'SELECT id FROM cultivar_groups WHERE cultivar_group_code = ?', values: 'SELECT cultivar_group_code FROM cultivar_groups WHERE id = ?' },
     cultivar_id: { subquery: 'SELECT id FROM cultivars WHERE cultivar_name = ?', values: 'SELECT cultivar_name FROM cultivars WHERE id = ?' },
@@ -151,9 +151,9 @@ class ImportMasterfilesCsv < BaseScript # rubocop:disable Metrics/ClassLength
   end
 
   def set_table_definitions
-    return failed_response("No table definitions set for table : #{table_name}") if MF_TABLE_DEFINATIONS[table_name.to_sym].nil_or_empty?
+    return failed_response("No table definitions set for table : #{table_name}") if MF_TABLE_DEFINITIONS[table_name.to_sym].nil_or_empty?
 
-    @table_rules = MF_TABLE_DEFINATIONS[table_name.to_sym][:rules]
+    @table_rules = MF_TABLE_DEFINITIONS[table_name.to_sym][:rules]
 
     ok_response
   end
@@ -234,9 +234,9 @@ class ImportMasterfilesCsv < BaseScript # rubocop:disable Metrics/ClassLength
   def validate_column_lookup_value(row_data, col, val)
     return 'NULL' if val.to_s.nil_or_empty?
 
-    rec = DB[MF_COLUMN_LOOKUP_DEFINATIONS[col.to_sym][:subquery], *val]
+    rec = DB[MF_COLUMN_LOOKUP_DEFINITIONS[col.to_sym][:subquery], *val]
     create_record(row_data, col) if rec.empty?
-    "(#{DB[MF_COLUMN_LOOKUP_DEFINATIONS[col.to_sym][:subquery], *val].sql})"
+    "(#{DB[MF_COLUMN_LOOKUP_DEFINITIONS[col.to_sym][:subquery], *val].sql})"
   end
 
   def validate_column_lookup_array_value(col, val)  # rubocop:disable Metrics/AbcSize
@@ -244,12 +244,12 @@ class ImportMasterfilesCsv < BaseScript # rubocop:disable Metrics/ClassLength
 
     val = val.split('|').map(&:strip).reject(&:empty?)
 
-    qry = MF_COLUMN_LOOKUP_DEFINATIONS[col.to_sym][:values]
+    qry = MF_COLUMN_LOOKUP_DEFINITIONS[col.to_sym][:values]
     lkp_val = DB[qry, val.to_a].select_map
     if lkp_val.empty?
       "'{}'"
     else
-      "(#{DB[MF_COLUMN_LOOKUP_DEFINATIONS[col.to_sym][:subquery], lkp_val].sql})"
+      "(#{DB[MF_COLUMN_LOOKUP_DEFINITIONS[col.to_sym][:subquery], lkp_val].sql})"
     end
   end
 
@@ -299,9 +299,9 @@ class ImportMasterfilesCsv < BaseScript # rubocop:disable Metrics/ClassLength
 
   def create_record(row_data, col)  # rubocop:disable Metrics/AbcSize
     create_table = COLUMN_CSV_MAP[col.to_sym][:create_table].to_s
-    return failed_response("No table definitions set for table  : #{create_table}.") if MF_TABLE_DEFINATIONS[create_table.to_sym].nil_or_empty?
+    return failed_response("No table definitions set for table  : #{create_table}.") if MF_TABLE_DEFINITIONS[create_table.to_sym].nil_or_empty?
 
-    create_table_rules = MF_TABLE_DEFINATIONS[create_table.to_sym][:rules]
+    create_table_rules = MF_TABLE_DEFINITIONS[create_table.to_sym][:rules]
 
     param_vals = []
     column_names = COLUMN_CSV_MAP[col.to_sym][:params]
