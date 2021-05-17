@@ -65,7 +65,7 @@ module EdiApp
 
       notes = "Missing masterfiles for #{missing_masterfiles.uniq.join(", \n")}"
       missing_masterfiles_detected(notes)
-      raise Crossbeams::InfoError, 'Missing masterfiles'
+      raise Crossbeams::InfoError, notes
     end
 
     def parse_palbin_edi # rubocop:disable Metrics/AbcSize
