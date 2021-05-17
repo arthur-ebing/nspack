@@ -146,7 +146,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
                               .get(:target_market_group_id)
     @pallet_errors << "destination_regions_tm_groups masterfile not found, args: destination_region_id: #{args.destination_region_id} for packed_tm_group_id" unless args.packed_tm_group_id
 
-    args.target_market_id = get_target_market_id(args)
+    args.target_market_id = get_id_or_error(:target_markets, target_market_name: args.target_market)
 
     unless args.target_customer.nil_or_empty?
       organization_id = get_id_or_error(:organizations, short_description: args.target_customer)
@@ -202,16 +202,6 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     args.created_at = args.seq_created_at
 
     args.to_h
-  end
-
-  def get_target_market_id(args)
-    if args.target_market
-      target_market_id = get_id_or_error(:target_markets, target_market_name: args.target_market)
-    else
-      target_market_id = DB[:target_markets_for_groups].where(target_market_group_id: args.packed_tm_group_id).get(:target_market_id)
-      @pallet_errors << "target_markets_for_groups masterfile not found, args: target_market_group_id: #{args.packed_tm_group_id} for target_market_id" unless args.target_market_id
-    end
-    target_market_id
   end
 
   def get_pm_bom_id(args) # rubocop:disable Metrics/AbcSize
@@ -360,6 +350,8 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
   end
 
   def get_id_or_error(table_name, args)
+    return nil if (args.length == 1) && args.values.first.nil_or_empty?
+
     id = get_variant_id(table_name, args)
     @pallet_errors << "#{table_name} masterfile not found, args:#{args}" unless id
 
