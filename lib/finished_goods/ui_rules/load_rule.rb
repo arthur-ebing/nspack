@@ -302,6 +302,10 @@ module UiRules
 
     def add_controls # rubocop:disable Metrics/AbcSize
       id = @options[:id]
+      back = { control_type: :link,
+               text: 'Back',
+               url: '/list/loads',
+               style: :back_button }
       edit = { control_type: :link,
                style: :action_button,
                text: 'Edit',
@@ -386,28 +390,88 @@ module UiRules
                       prompt: 'Are you sure, you want to update the OTMC Results for this load?',
                       icon: :plus }
 
+      reports = add_report_links
+
       case @form_object.step
       when 0
+        instance_controls = [back, edit, delete]
         progress_controls = [allocate]
-        instance_controls = [edit, delete]
       when 1
+        instance_controls = [back, edit] + reports
         progress_controls = [allocate, truck_arrival]
-        instance_controls = [edit]
       when 2
+        instance_controls = [back, edit] + reports
         progress_controls = [allocate, edit_truck_arrival, delete_truck_arrival, load_truck]
-        instance_controls = [edit]
       when 3
+        instance_controls = [back, edit] + reports
         progress_controls = [unload_truck, delete_tail, tail, ship]
-        instance_controls = [edit]
       when 4
+        instance_controls = [back, edit] + reports
         progress_controls = [unship, addendum, update_otmc]
-        instance_controls = [edit]
       else
+        instance_controls = [back] + reports
         progress_controls = []
-        instance_controls = []
       end
 
       @form_object = OpenStruct.new(@form_object.to_h.merge(progress_controls: progress_controls, instance_controls: instance_controls))
+    end
+
+    def add_report_links # rubocop:disable Metrics/AbcSize
+      id = @options[:id]
+      reports = []
+      reports << { control_type: :link,
+                   text: 'Dispatch Note',
+                   url: "/finished_goods/reports/dispatch_note/#{id}",
+                   loading_window: true,
+                   style: :button }
+      reports << { control_type: :link,
+                   text: 'Dispatch Note - Summarised',
+                   url: "/finished_goods/reports/dispatch_note_summarised/#{id}",
+                   loading_window: true,
+                   style: :button }
+      reports << { control_type: :link,
+                   text: 'Dispatch Picklist',
+                   url: "/finished_goods/reports/picklist/#{id}",
+                   loading_window: true,
+                   style: :button }
+      if AppConst::CLIENT_CODE == 'ud'
+        reports << { control_type: :link,
+                     text: 'Addendum',
+                     url: "/finished_goods/reports/addendum_place_of_issue/#{id}",
+                     style: :button }
+      else
+        items = []
+        AppConst::ADDENDUM_PLACE_OF_ISSUE.split(',').each do |place|
+          items << { url: "/finished_goods/reports/addendum/#{id}/#{place}",
+                     text: place,
+                     icon: :printer,
+                     loading_window: true }
+        end
+        reports << if items.length == 1
+                     { control_type: :link,
+                       text: 'Addendum',
+                       url: items.first[:url],
+                       loading_window: true,
+                       style: :button }
+                   else
+                     { control_type: :dropdown_button,
+                       text: 'Addendum',
+                       items: items }
+                   end
+      end
+      reports <<  { control_type: :link,
+                    text: 'Phyto Data',
+                    url: "/finished_goods/reports/accompanying_phyto/#{id}",
+                    loading_window: true,
+                    visible: AppConst::CLIENT_CODE != 'ud',
+                    style: :button }
+      reports <<  { control_type: :link,
+                    text: 'Verified Gross Mass',
+                    url: "/finished_goods/reports/verified_gross_mass/#{id}",
+                    visible: @form_object.container,
+                    loading_window: true,
+                    style: :button }
+      reports
     end
 
     def add_behaviours

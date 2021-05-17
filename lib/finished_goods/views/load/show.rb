@@ -12,69 +12,8 @@ module FinishedGoods
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.section do |section|
-              section.add_control(control_type: :link,
-                                  text: 'Back',
-                                  url: '/list/loads',
-                                  style: :back_button)
               ui_rule.form_object.instance_controls.each do |control|
                 section.add_control(control)
-              end
-              if ui_rule.form_object.allocated
-                section.add_control(control_type: :link,
-                                    text: 'Dispatch Note',
-                                    url: "/finished_goods/reports/dispatch_note/#{id}",
-                                    loading_window: true,
-                                    style: :button)
-                section.add_control(control_type: :link,
-                                    text: 'Dispatch Note - Summarised',
-                                    url: "/finished_goods/reports/dispatch_note_summarised/#{id}",
-                                    loading_window: true,
-                                    style: :button)
-                section.add_control(control_type: :link,
-                                    text: 'Dispatch Picklist',
-                                    url: "/finished_goods/reports/picklist/#{id}",
-                                    loading_window: true,
-                                    style: :button)
-                section.add_control(control_type: :link,
-                                    text: 'Addendum',
-                                    url: "/finished_goods/reports/addendum/#{id}/#{AppConst::ADDENDUM_PLACE_OF_ISSUE}",
-                                    loading_window: true,
-                                    visible: AppConst::ADDENDUM_PLACE_OF_ISSUE.split(',').length == 1,
-                                    style: :button)
-                items = []
-                AppConst::ADDENDUM_PLACE_OF_ISSUE.split(',').each do  |place|
-                  items << { url: "/finished_goods/reports/addendum/#{id}/#{place}",
-                             text: place,
-                             icon: :printer,
-                             loading_window: true }
-                end
-                section.add_control(control_type: :dropdown_button,
-                                    text: 'Addendum',
-                                    visible: AppConst::ADDENDUM_PLACE_OF_ISSUE.split(',').length > 1,
-                                    items: items)
-
-                section.add_control(control_type: :link,
-                                    text: 'Phyto Data',
-                                    url: "/finished_goods/reports/accompanying_phyto/#{id}",
-                                    loading_window: true,
-                                    visible: AppConst::CLIENT_CODE != 'ud',
-                                    style: :button)
-                section.add_control(control_type: :link,
-                                    text: 'Addendum',
-                                    url: "/finished_goods/reports/addendum_place_of_issue/#{id}",
-                                    visible: AppConst::CLIENT_CODE == 'ud',
-                                    style: :button)
-                section.add_control(control_type: :link,
-                                    text: 'Phyto Data',
-                                    url: "/finished_goods/reports/accompanying_phyto/#{id}",
-                                    loading_window: true,
-                                    style: :button)
-                section.add_control(control_type: :link,
-                                    text: 'Verified Gross Mass',
-                                    url: "/finished_goods/reports/verified_gross_mass/#{id}",
-                                    visible: ui_rule.form_object.container,
-                                    loading_window: true,
-                                    style: :button)
               end
             end
             page.form do |form|
