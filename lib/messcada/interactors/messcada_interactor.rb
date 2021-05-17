@@ -389,6 +389,26 @@ module MesscadaApp
       repo.pallet_exists?(pallet_number)
     end
 
+    def pallet_weighing_for_labeling(user, params)  # rubocop:disable Metrics/AbcSize
+      res = if AppConst::COMBINE_CARTON_AND_PALLET_VERIFICATION
+              carton_to_be_verified(params)
+            else
+              pallet_to_be_verified(params)
+            end
+      return res unless res.success
+
+      repo.select_values(:pallet_sequences, :id, pallet_number: params[:pallet_number]).each do |id|
+        res = verify_pallet_sequence(id, user, verification_result: 'passed')
+        return res unless res.success
+      end
+
+      fg_pallet_weighing(bin_number: params[:pallet_number], gross_weight: params[:gross_weight], measurement_unit: params[:measurement_unit])
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      failed_response(e.message)
+    end
+
     def fg_pallet_weighing(params)  # rubocop:disable Metrics/AbcSize
       params[:bin_number] = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: params[:bin_number]).pallet_number
       res = FgPalletWeighingSchema.call(params)
