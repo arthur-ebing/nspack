@@ -25,6 +25,11 @@
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/finance/customer_payment_term_sets/new"
-  :text: New Customer Payment Term Set
+  :text: New Payment Term Set
   :style: :button
   :behaviour: :popup
+:conditions:
+  :customer:
+    - :col: customer_payment_term_sets.customer_id
+      :op: =
+      :val: "$:id$"

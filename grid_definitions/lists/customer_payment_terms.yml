@@ -28,3 +28,14 @@
   :text: New Customer Payment Term
   :style: :button
   :behaviour: :popup
+:conditions:
+  :customer_payment_term_set:
+    - :col: customer_payment_term_set_id
+      :op: =
+      :val: "$:id$"
+:multiselect:
+  :customer_payment_term_set:
+    :url: "/production/shifts/summary_reports/$:employment_type_code$/multiselect_contract_workers"
+    :multiselect_save_method: loading
+    :can_be_cleared: true
+    :conditions: customer_payment_term_set

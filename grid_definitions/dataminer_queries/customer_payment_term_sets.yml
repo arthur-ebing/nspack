@@ -1,6 +1,7 @@
 ---
 :caption: Customer Payment Term Sets
-:sql: "SELECT\r\n    customer_payment_term_sets.id,\r\n    customer_payment_term_sets.customer_id,\r\n
+:sql: "SELECT\r\n    customer_payment_term_sets.id,\r\n    ARRAY_AGG(payment_terms.short_description)
+  AS customer_payment_term_set,\r\n    customer_payment_term_sets.customer_id,\r\n
   \   fn_party_role_name(customers.customer_party_role_id) AS customer,\r\n    customer_payment_term_sets.incoterm_id,\r\n
   \   incoterms.incoterm,\r\n    customer_payment_term_sets.deal_type_id,\r\n    deal_types.deal_type,\r\n
   \   customer_payment_term_sets.active,\r\n    customer_payment_term_sets.created_at,\r\n
@@ -8,7 +9,11 @@
   customer_payment_term_sets.id) AS status\r\nFROM customer_payment_term_sets\r\nLEFT
   JOIN deal_types ON deal_types.id = customer_payment_term_sets.deal_type_id\r\nLEFT
   JOIN incoterms ON incoterms.id = customer_payment_term_sets.incoterm_id\r\nLEFT
-  JOIN customers ON customers.id = customer_payment_term_sets.customer_id"
+  JOIN customers ON customers.id = customer_payment_term_sets.customer_id\r\nLEFT
+  JOIN customer_payment_terms ON customer_payment_term_sets.id = customer_payment_terms.customer_payment_term_set_id\r\nLEFT
+  JOIN payment_terms on customer_payment_terms.payment_term_id = payment_terms.id\r\nGROUP
+  BY customer_payment_term_sets.id,\r\n         customers.customer_party_role_id,\r\n
+  \        incoterms.id,\r\n         deal_types.id"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -29,9 +34,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  customer_payment_term_set:
+    :name: customer_payment_term_set
+    :sequence_no: 2
+    :caption: Payment term set
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   customer_id:
     :name: customer_id
-    :sequence_no: 2
+    :sequence_no: 3
     :caption: Customer
     :namespaced_name: customer_payment_term_sets.customer_id
     :data_type: :string
@@ -47,7 +68,7 @@
     :group_max: false
   customer:
     :name: customer
-    :sequence_no: 3
+    :sequence_no: 4
     :caption: Customer
     :namespaced_name: 
     :data_type: :string
@@ -63,7 +84,7 @@
     :group_max: false
   incoterm_id:
     :name: incoterm_id
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Incoterm
     :namespaced_name: customer_payment_term_sets.incoterm_id
     :data_type: :integer
@@ -79,7 +100,7 @@
     :group_max: false
   incoterm:
     :name: incoterm
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Incoterm
     :namespaced_name: incoterms.incoterm
     :data_type: :string
@@ -95,7 +116,7 @@
     :group_max: false
   deal_type_id:
     :name: deal_type_id
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Deal type
     :namespaced_name: customer_payment_term_sets.deal_type_id
     :data_type: :integer
@@ -111,7 +132,7 @@
     :group_max: false
   deal_type:
     :name: deal_type
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Deal type
     :namespaced_name: deal_types.deal_type
     :data_type: :string
@@ -127,7 +148,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Active
     :namespaced_name: customer_payment_term_sets.active
     :data_type: :boolean
@@ -143,7 +164,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Created at
     :namespaced_name: customer_payment_term_sets.created_at
     :data_type: :datetime
@@ -159,7 +180,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Updated at
     :namespaced_name: customer_payment_term_sets.updated_at
     :data_type: :datetime
@@ -175,7 +196,7 @@
     :group_max: false
   status:
     :name: status
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Status
     :namespaced_name: 
     :data_type: :string
@@ -207,11 +228,20 @@
   :ui_priority: 1
   :list_def: SELECT deal_type, id FROM deal_types ORDER BY deal_type
 - :column: customer_payment_term_sets.target_customer_party_role_id
-  :caption: Target customer party role
+  :caption: Target customer
   :data_type: :integer
   :control_type: :list
   :default_value: 
   :ordered_list: false
   :ui_priority: 1
   :list_def: SELECT fn_party_role_name(id), id FROM party_roles WHERE role_id = (SELECT
-    id FROM roles WHERE name = 'ROLE_NAME_GOES_HERE')
+    id FROM roles WHERE name = 'TARGET CUSTOMER')
+- :column: customer_payment_term_sets.customer_id
+  :caption: Customer
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: SELECT fn_party_role_name(party_roles.id), customers.id FROM customers
+    JOIN party_roles ON party_roles.id = customers.customer_party_role_id

@@ -1,15 +1,15 @@
 ---
 :caption: Customer Payment Terms
-:sql: SELECT "customer_payment_terms"."id", "customer_payment_terms"."payment_term_id",
-  "customer_payment_terms"."customer_payment_term_set_id", "customer_payment_terms"."active",
-  "customer_payment_terms"."created_at", "customer_payment_terms"."updated_at", "customer_payment_term_sets"."id"
-  AS customer_payment_term_sets_id, "payment_terms"."short_description", fn_current_status('customer_payment_terms',
-  "customer_payment_terms"."id") AS status FROM "customer_payment_terms" JOIN "customer_payment_term_sets"
-  ON "customer_payment_term_sets"."id" = "customer_payment_terms"."customer_payment_term_set_id"
-  JOIN "payment_terms" ON "payment_terms"."id" = "customer_payment_terms"."payment_term_id"
+:sql: "SELECT\r\n   customer_payment_terms.id,\r\n   payment_term_id,\r\n   customer_payment_term_set_id,\r\n
+  \  payment_terms.short_description AS payment_term,\r\n   fn_current_status('customer_payment_terms',customer_payment_terms.id)
+  AS status,\r\n   customer_payment_terms.active,\r\n   customer_payment_terms.created_at,\r\n
+  \  customer_payment_terms.updated_at\r\n\r\nFROM customer_payment_terms\r\nJOIN
+  customer_payment_term_sets ON customer_payment_term_sets.id = customer_payment_terms.customer_payment_term_set_id\r\nJOIN
+  payment_terms ON payment_terms.id = customer_payment_terms.payment_term_id"
 :limit: 
 :offset: 
-:external_settings: {}
+:external_settings:
+  :render_url: 
 :columns:
   id:
     :name: id
@@ -31,7 +31,7 @@
     :name: payment_term_id
     :sequence_no: 2
     :caption: Payment term
-    :namespaced_name: customer_payment_terms.payment_term_id
+    :namespaced_name: payment_term_id
     :data_type: :integer
     :width: 
     :format: 
@@ -47,7 +47,7 @@
     :name: customer_payment_term_set_id
     :sequence_no: 3
     :caption: Customer payment term set
-    :namespaced_name: customer_payment_terms.customer_payment_term_set_id
+    :namespaced_name: customer_payment_term_set_id
     :data_type: :integer
     :width: 
     :format: 
@@ -59,9 +59,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  payment_term:
+    :name: payment_term
+    :sequence_no: 4
+    :caption: Payment term
+    :namespaced_name: payment_terms.short_description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 5
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   active:
     :name: active
-    :sequence_no: 4
+    :sequence_no: 6
     :caption: Active
     :namespaced_name: customer_payment_terms.active
     :data_type: :boolean
@@ -77,7 +109,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 5
+    :sequence_no: 7
     :caption: Created at
     :namespaced_name: customer_payment_terms.created_at
     :data_type: :datetime
@@ -93,61 +125,13 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 6
+    :sequence_no: 8
     :caption: Updated at
     :namespaced_name: customer_payment_terms.updated_at
     :data_type: :datetime
     :width: 
     :format: 
     :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  customer_payment_term_sets_id:
-    :name: customer_payment_term_sets_id
-    :sequence_no: 7
-    :caption: Customer payment term sets
-    :namespaced_name: customer_payment_term_sets.id
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  short_description:
-    :name: short_description
-    :sequence_no: 8
-    :caption: Short description
-    :namespaced_name: payment_terms.short_description
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  status:
-    :name: status
-    :sequence_no: 9
-    :caption: Status
-    :namespaced_name: 
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
     :pinned: 
     :groupable: false
     :group_by_seq: 
@@ -164,7 +148,7 @@
   :ordered_list: true
   :ui_priority: 1
   :list_def: SELECT short_description, id FROM payment_terms ORDER BY short_description
-- :column: customer_payment_terms.customer_payment_term_set_id
+- :column: customer_payment_term_set_id
   :caption: Customer payment term set
   :data_type: :integer
   :control_type: :list
@@ -172,11 +156,3 @@
   :ordered_list: true
   :ui_priority: 1
   :list_def: SELECT id, id FROM customer_payment_term_sets ORDER BY id
-- :column: customer_payment_term_sets.id
-  :caption: Customer payment term sets
-  :data_type: :string
-  :control_type: :text
-  :default_value: 
-  :ordered_list: false
-  :ui_priority: 1
-  :list_def: 

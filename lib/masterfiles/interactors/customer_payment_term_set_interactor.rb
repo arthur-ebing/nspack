@@ -48,6 +48,15 @@ module MasterfilesApp
       failed_response("Unable to delete customer payment term. It is still referenced#{e.message.partition('referenced').last}")
     end
 
+    def link_payment_terms(id, payment_term_ids)
+      repo.transaction do
+        repo.link_payment_terms(id, payment_term_ids)
+      end
+      success_response('Assignments linked successfully')
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def assert_permission!(task, id = nil)
       res = TaskPermissionCheck::CustomerPaymentTermSet.call(task, id)
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success

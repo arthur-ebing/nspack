@@ -9,23 +9,26 @@ module UiRules
 
       common_values_for_fields common_fields
 
-      set_show_fields if %i[show].include? @mode
+      set_show_fields
 
       form_name 'customer_payment_term_set'
     end
 
     def set_show_fields
-      fields[:incoterm] = { renderer: :label,
-                            caption: 'Incoterm' }
-      fields[:deal_type] = { renderer: :label,
-                             caption: 'Deal Type' }
-      fields[:customer] = { renderer: :label,
-                            caption: 'Customer' }
+      fields[:incoterm] = { renderer: :label }
+      fields[:deal_type] = { renderer: :label }
+      fields[:customer] = { renderer: :label }
+      fields[:payment_terms] = { renderer: :label, with_value: @form_object.customer_payment_term_set }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields
       {
+        customer_id: { renderer: :select,
+                       options: @repo.for_select_customers,
+                       disabled_options: @repo.for_select_customers(active: false),
+                       caption: 'Customer',
+                       hide_on_load: @mode == :edit },
         incoterm_id: { renderer: :select,
                        options: @repo.for_select_incoterms,
                        disabled_options: @repo.for_select_inactive_incoterms,
@@ -33,11 +36,7 @@ module UiRules
         deal_type_id: { renderer: :select,
                         options: @repo.for_select_deal_types,
                         disabled_options: @repo.for_select_inactive_deal_types,
-                        caption: 'Deal Type' },
-        customer_id: { renderer: :select,
-                       options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_CUSTOMER),
-                       disabled_options: MasterfilesApp::PartyRepo.new.for_select_inactive_party_roles(AppConst::ROLE_CUSTOMER),
-                       caption: 'Customer' }
+                        caption: 'Deal Type' }
       }
     end
 
@@ -53,7 +52,7 @@ module UiRules
     def make_new_form_object
       @form_object = OpenStruct.new(incoterm_id: nil,
                                     deal_type_id: nil,
-                                    target_customer_party_role_id: nil)
+                                    customer_id: nil)
     end
   end
 end

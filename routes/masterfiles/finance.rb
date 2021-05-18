@@ -355,6 +355,14 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         handle_not_found(r)
       end
 
+      r.on 'link_payment_terms' do
+        r.post do
+          res = interactor.link_payment_terms(id, multiselect_grid_choices(params))
+          flash[res.success ? :notice : :error] = res.message
+          redirect_to_last_grid(r)
+        end
+      end
+
       r.on 'edit' do   # EDIT
         check_auth!('finance', 'edit')
         interactor.assert_permission!(:edit, id)
@@ -370,12 +378,13 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           res = interactor.update_customer_payment_term_set(id, params[:customer_payment_term_set])
           if res.success
             row_keys = %i[
+              customer_payment_term_set
               incoterm_id
               incoterm
               deal_type_id
               deal_type
-              target_customer_party_role_id
-              target_customer
+              customer_id
+              customer
               status
               active
             ]
@@ -409,19 +418,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.post do        # CREATE
         res = interactor.create_customer_payment_term_set(params[:customer_payment_term_set])
         if res.success
-          row_keys = %i[
-            id
-            incoterm_id
-            incoterm
-            deal_type_id
-            deal_type
-            target_customer_party_role_id
-            target_customer
-            status
-            active
-          ]
-          add_grid_row(attrs: select_attributes(res.instance, row_keys),
-                       notice: res.message)
+          r.redirect "/masterfiles/finance/customer_payment_term_sets/#{res.instance.id}/edit"
         else
           re_show_form(r, res, url: '/masterfiles/finance/customer_payment_term_sets/new') do
             Masterfiles::Finance::CustomerPaymentTermSet::New.call(form_values: params[:customer_payment_term_set],
@@ -724,6 +721,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         check_auth!('finance', 'new')
         show_partial_or_page(r) { Masterfiles::Finance::CustomerPaymentTerm::New.call(remote: fetch?(r)) }
       end
+
       r.post do        # CREATE
         res = interactor.create_customer_payment_term(params[:customer_payment_term])
         if res.success

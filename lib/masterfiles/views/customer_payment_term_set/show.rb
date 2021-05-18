@@ -11,11 +11,12 @@ module Masterfiles
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form do |form|
-              # form.caption 'Customer Payment Term Set'
+              # form.caption 'Payment Term Set'
               form.view_only!
+              form.add_field :customer
               form.add_field :incoterm
               form.add_field :deal_type
-              form.add_field :customer
+              form.add_field :payment_terms
               form.add_field :active
             end
           end

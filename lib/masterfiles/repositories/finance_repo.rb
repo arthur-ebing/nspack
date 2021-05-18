@@ -12,14 +12,6 @@ module MasterfilesApp
                           order_by: :currency
     crud_calls_for :currencies, name: :currency, wrapper: Currency
 
-    build_for_select :customers,
-                     label: :id,
-                     value: :id,
-                     order_by: :id
-    build_inactive_select :customers,
-                          label: :id,
-                          value: :id,
-                          order_by: :id
     crud_calls_for :customers, name: :customer, exclude: [:delete]
 
     build_for_select :deal_types,
@@ -42,14 +34,6 @@ module MasterfilesApp
                           order_by: :incoterm
     crud_calls_for :incoterms, name: :incoterm
 
-    build_for_select :customer_payment_term_sets,
-                     label: :id,
-                     value: :id,
-                     order_by: :id
-    build_inactive_select :customer_payment_term_sets,
-                          label: :id,
-                          value: :id,
-                          order_by: :id
     crud_calls_for :customer_payment_term_sets, name: :customer_payment_term_set
 
     build_for_select :payment_term_date_types,
@@ -199,14 +183,47 @@ module MasterfilesApp
       return nil if hash.nil?
 
       hash[:customer] = DB.get(Sequel.function(:fn_party_role_name, hash[:customer_party_role_id]))
-      hash[:customer_payment_term_set] = "#{hash[:customer]}_#{hash[:incoterm]}_#{hash[:deal_type]}"
+      hash[:customer_payment_term_set] = for_select_customer_payment_term_sets(where: { Sequel[:customer_payment_term_sets][:id] => id }, active: nil).flatten.first
       CustomerPaymentTermSet.new(hash)
+    end
+
+    def for_select_customer_payment_term_sets(where: {}, exclude: {}, active: true) # rubocop:disable Metrics/AbcSize
+      ds = DB[:customer_payment_term_sets]
+           .join(:customer_payment_terms, customer_payment_term_set_id: :id)
+           .join(:payment_terms, id: :payment_term_id)
+           .where(where)
+           .exclude(exclude)
+      ds = ds.where(Sequel[:customer_payment_term_sets][:active] => active) unless active.nil?
+      array = ds.select_map([:short_description, Sequel[:customer_payment_term_sets][:id]])
+      hash = array.each_with_object({}) { |item, result| (result[item[1]] ||= []) << item[0] }
+      hash.map { |k, v| [v.join('_'), k] }
     end
 
     def delete_customer(id)
       customer_party_role_id = get(:customers, id, :customer_party_role_id)
       delete(:customers, id)
       MasterfilesApp::PartyRepo.new.delete_party_role(customer_party_role_id)
+    end
+
+    def for_select_customers(where: {}, exclude: {}, active: true)
+      DB[:customers]
+        .where(Sequel[:customers][:active] => active)
+        .where(where)
+        .exclude(exclude)
+        .select(:id, Sequel.function(:fn_party_role_name, :customer_party_role_id))
+        .map { |r| [r[:fn_party_role_name], r[:id]] }
+    end
+
+    def link_payment_terms(id, payment_term_ids)
+      existing_ids      = DB[:customer_payment_terms].where(customer_payment_term_set_id: id).select_map(:payment_term_id)
+      old_ids           = existing_ids - payment_term_ids
+      new_ids           = payment_term_ids - existing_ids
+
+      DB[:customer_payment_terms].where(customer_payment_term_set_id: id, payment_term_id: old_ids).delete
+
+      new_ids.each do |prog_id|
+        DB[:customer_payment_terms].insert(customer_payment_term_set_id: id, payment_term_id: prog_id)
+      end
     end
   end
 end

@@ -18,6 +18,11 @@ module Masterfiles
               form.add_field :contact_people
               form.add_field :active
             end
+            page.section do |section|
+              section.add_grid('customer_payment_term_sets',
+                               "/list/customer_payment_term_sets/grid?key=customer&id=#{id}",
+                               caption: 'Payment Term Sets')
+            end
           end
 
           layout

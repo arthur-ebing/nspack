@@ -13,12 +13,12 @@ module Masterfiles
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.caption 'New Customer Payment Term Set'
+              form.caption 'New Payment Term Set'
               form.action '/masterfiles/finance/customer_payment_term_sets'
               form.remote! if remote
+              form.add_field :customer_id
               form.add_field :incoterm_id
               form.add_field :deal_type_id
-              form.add_field :target_customer_party_role_id
             end
           end
 

@@ -28,3 +28,16 @@
   :text: New Payment Term
   :style: :button
   :behaviour: :popup
+:conditions:
+  :active:
+    - :col: payment_terms.active
+      :op: =
+      :val: true
+:multiselect:
+  :customer_payment_term_set:
+    :url: "/masterfiles/finance/customer_payment_term_sets/$:id$/link_payment_terms"
+    :preselect: SELECT payment_terms.id FROM payment_terms JOIN customer_payment_terms ON payment_terms.id = customer_payment_terms.payment_term_id WHERE customer_payment_term_set_id = $:id$
+    :section_caption: 'Assign payment terms to Set'
+    :multiselect_save_method: remote
+    :can_be_cleared: true
+    :conditions: active
