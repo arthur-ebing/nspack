@@ -89,15 +89,6 @@ class TestCustomerPaymentTermSetRoutes < RouteTester
     expect_permission_error
   end
 
-  def test_create_remotely
-    authorise_pass!
-    ensure_exists!(INTERACTOR)
-    row_vals = Hash.new(1)
-    INTERACTOR.any_instance.stubs(:create_customer_payment_term_set).returns(ok_response(instance: row_vals))
-    post_as_fetch 'masterfiles/finance/customer_payment_term_sets', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-    expect_json_add_to_grid(has_notice: true)
-  end
-
   def test_create_remotely_fail
     authorise_pass!
     ensure_exists!(INTERACTOR)
