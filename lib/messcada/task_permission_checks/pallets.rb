@@ -3,14 +3,13 @@
 module MesscadaApp
   module TaskPermissionCheck
     class Pallets < BaseService # rubocop:disable Metrics/ClassLength
-      attr_reader :tasks, :pallet_numbers, :pallet_ids, :repo, :load_id
-      def initialize(tasks, pallet_numbers, load_id = nil)
+      attr_reader :tasks, :pallet_ids, :repo, :load_id, :order_id
+      def initialize(tasks, args)
         @tasks = Array(tasks)
+        @args = args
         @repo = MesscadaRepo.new
-        @inspection_repo = FinishedGoodsApp::GovtInspectionRepo.new
-        @pallet_numbers = Array(pallet_numbers)
-        @pallet_ids = @repo.select_values(:pallets, :id, pallet_number: Array(pallet_numbers)).uniq
-        @load_id = load_id
+        @load_id = @args[:load_id]
+        @order_id = @args[:order_id]
       end
 
       CHECKS = {
@@ -30,12 +29,11 @@ module MesscadaApp
         pallet_weight: :pallet_weight_check,
         rmt_grade: :rmt_grade_check,
         allocate: :allocate_check,
-        not_have_individual_cartons: :not_have_individual_cartons_check
+        not_have_individual_cartons: :not_have_individual_cartons_check,
+        order_spec: :order_spec_check
       }.freeze
 
       def call
-        return failed_response 'Pallet number not given.' if pallet_numbers.nil_or_empty?
-
         res = exists_check
         return res unless res.success
 
@@ -51,10 +49,21 @@ module MesscadaApp
 
       private
 
-      def exists_check
-        pallets_exists = repo.select_values(:pallets, :pallet_number, id: pallet_ids)
-        errors = pallet_numbers - pallets_exists
-        return failed_response "Pallet: #{errors.join(', ')} doesn't exist." unless errors.empty?
+      def exists_check # rubocop:disable Metrics/AbcSize
+        if @args[:pallet_number]
+          @pallet_ids = repo.select_values(:pallets, :id, pallet_number: @args[:pallet_number])
+          pallets_exists = repo.select_values(:pallets, :pallet_number, id: pallet_ids)
+          errors = Array(@args[:pallet_number]) - pallets_exists
+          return failed_response "Pallet: #{errors.join(', ')} doesn't exist." unless errors.empty?
+        end
+
+        if @args[:pallet_id]
+          @pallet_ids = repo.select_values(:pallets, :id, pallet_number: @args[:pallet_id])
+          errors = Array(@args[:pallet_id]) - pallet_ids
+          return failed_response "Pallet id: #{errors.join(', ')} doesn't exist." unless errors.empty?
+        end
+
+        return failed_response 'No pallets where given to check.' if pallet_ids.nil_or_empty?
 
         all_ok
       end
@@ -88,30 +97,23 @@ module MesscadaApp
       end
 
       def nett_weight_check
-        pallets_with_nett_weight = repo.select_values(:pallets, :pallet_number, Sequel.lit('nett_weight IS NOT NULL'))
-        errors = pallet_numbers - pallets_with_nett_weight
+        errors = repo.select_values(:pallets, :pallet_number, id: pallet_ids, nett_weight: nil)
         return failed_response "Pallet: #{errors.join(', ')} does not have nett weight." unless errors.empty?
 
         all_ok
       end
 
       def gross_weight_check
-        pallets_with_gross_weight = repo.select_values(:pallets, :pallet_number, Sequel.lit('gross_weight IS NOT NULL'))
-        errors = pallet_numbers - pallets_with_gross_weight
+        errors = repo.select_values(:pallets, :pallet_number, id: pallet_ids, gross_weight: nil)
         return failed_response "Pallet: #{errors.join(', ')} does not have gross weight." unless errors.empty?
 
         all_ok
       end
 
       def not_on_load_check
-        pallets_on_load = if load_id.nil?
-                            []
-                          else
-                            repo.select_values(:pallets, :pallet_number, load_id: load_id)
-                          end
-        available_pallets = repo.select_values(:pallets, :pallet_number, load_id: nil)
+        raise ArgumentError, 'Load_id nil!' if load_id.nil?
 
-        errors = pallet_numbers - pallets_on_load - available_pallets
+        errors = DB[:pallets].where(id: pallet_ids).exclude(load_id: load_id).exclude(load_id: nil).select_map(:pallet_number)
         return failed_response "Pallet: #{errors.join(', ')} already allocated to other loads." unless errors.empty?
 
         all_ok
@@ -122,7 +124,7 @@ module MesscadaApp
 
         invalid_grade_ids = repo.select_values(:grades, :id, rmt_grade: !repo.get(:loads, load_id, :rmt_load))
         errors = repo.select_values(:pallet_sequences, :pallet_number, pallet_id: pallet_ids, grade_id: invalid_grade_ids).uniq
-        return failed_response "Pallet: #{errors.join(', ')} does not have the correct RMT grade." unless errors.empty?
+        return failed_response "Pallet: #{errors.join(', ')} does not have a valid RMT grade." unless errors.empty?
 
         all_ok
       end
@@ -130,15 +132,18 @@ module MesscadaApp
       def not_failed_otmc_check
         return success_response('failed otmc check bypassed') if AppConst::BYPASS_QUALITY_TEST_LOAD_CHECK
 
-        passed_pallets = repo.select_values(:pallet_sequences, :pallet_number, pallet_id: pallet_ids, failed_otmc_results: nil).uniq
-        errors = pallet_numbers - passed_pallets
+        errors = DB[:pallet_sequences].where(pallet_id: pallet_ids).exclude(failed_otmc_results: nil).select_map(:pallet_number)
         return failed_response "Pallet: #{errors.join(', ')} failed a OTMC test." unless errors.empty?
 
         all_ok
       end
 
       def not_on_inspection_sheet_check
-        errors, sheet = @inspection_repo.exists_on_inspection_sheet(pallet_numbers).first
+        ds = DB[:govt_inspection_pallets]
+        ds = ds.join(:govt_inspection_sheets, id: Sequel[:govt_inspection_pallets][:govt_inspection_sheet_id])
+        ds = ds.where(cancelled: false, pallet_id: pallet_ids)
+
+        errors, sheet = ds.select_map(%i[pallet_number govt_inspection_sheet_id]).first
         return failed_response "Pallet: #{errors} is already on inspection sheet #{sheet}." unless errors.nil_or_empty?
 
         all_ok
@@ -174,28 +179,36 @@ module MesscadaApp
         all_ok
       end
 
-      def allocate_check
-        res = not_on_load_check
-        return res unless res.success
-
-        res = not_shipped_check
-        return res unless res.success
-
-        res = in_stock_check
-        return res unless res.success
-
-        res = not_failed_otmc_check
-        return res unless res.success
-
-        res = rmt_grade_check
-        return res unless res.success
+      def not_have_individual_cartons_check
+        errors = repo.select_values(:pallets, :pallet_number, id: pallet_ids, has_individual_cartons: true)
+        return failed_response "Pallet: #{errors.join(', ')} has individual cartons." unless errors.empty?
 
         all_ok
       end
 
-      def not_have_individual_cartons_check
-        errors = repo.select_values(:pallets, :pallet_number, id: pallet_ids, has_individual_cartons: true)
-        return failed_response "Pallet: #{errors.join(', ')} has individual cartons, ." unless errors.empty?
+      def order_spec_check # rubocop:disable Metrics/AbcSize
+        return all_ok if order_id.nil?
+
+        packed_tm_group_id, marketing_org_party_role_id = repo.get(:orders, order_id, %i[packed_tm_group_id marketing_org_party_role_id])
+        ds = DB[:pallet_sequences].where(pallet_id: pallet_ids)
+        errors = ds.exclude(packed_tm_group_id: packed_tm_group_id).select_map(:pallet_number)
+        return failed_response "Pallet: #{errors.join(', ')} does not have the same Packed TM Group as order#{order_id}." unless errors.empty?
+
+        errors = ds.exclude(marketing_org_party_role_id: marketing_org_party_role_id).select_map(:pallet_number)
+        return failed_response "Pallet: #{errors.join(', ')} does not have the same Marketing Org as order#{order_id}." unless errors.empty?
+
+        all_ok
+      end
+
+      def allocate_check
+        tasks = %i[not_on_load not_shipped in_stock not_failed_otmc rmt_grade order_spec]
+        tasks.each do |task|
+          check = CHECKS[task]
+          raise ArgumentError, "Task \"#{task}\" is unknown for #{self.class}." if check.nil?
+
+          res = send(check)
+          return res unless res.success
+        end
 
         all_ok
       end

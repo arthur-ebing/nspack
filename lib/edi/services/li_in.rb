@@ -211,7 +211,7 @@ module EdiApp
     end
 
     def check_pallets(check, pallet_numbers, load_id = nil)
-      res = MesscadaApp::TaskPermissionCheck::Pallets.call(check, pallet_numbers, load_id)
+      res = MesscadaApp::TaskPermissionCheck::Pallets.call(check, pallet_number: pallet_numbers, load_id: load_id)
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
   end

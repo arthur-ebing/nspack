@@ -37,7 +37,7 @@ module ProductionApp
     private
 
     def validate
-      MesscadaApp::TaskPermissionCheck::Pallets.call(%i[exists not_scrapped not_shipped not_inspected], pallet_numbers.values)
+      MesscadaApp::TaskPermissionCheck::Pallets.call(%i[exists not_scrapped not_shipped not_inspected], pallet_number: pallet_numbers.values)
     end
 
     def scrap_src_pallets(pallet_numbers)

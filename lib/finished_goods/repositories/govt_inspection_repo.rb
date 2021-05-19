@@ -257,14 +257,6 @@ module FinishedGoodsApp
       update(:govt_inspection_pallets, id, attrs)
     end
 
-    def exists_on_inspection_sheet(pallet_numbers)
-      ds = DB[:govt_inspection_pallets]
-      ds = ds.join(:pallets, id: Sequel[:govt_inspection_pallets][:pallet_id])
-      ds = ds.join(:govt_inspection_sheets, id: Sequel[:govt_inspection_pallets][:govt_inspection_sheet_id])
-      ds = ds.where(cancelled: false, pallet_number: pallet_numbers)
-      ds.select_map(%i[pallet_number govt_inspection_sheet_id])
-    end
-
     def load_vehicle_job_units(vehicle_job_id)
       DB[:vehicle_job_units].where(vehicle_job_id: vehicle_job_id).update(loaded_at: Time.now)
     end

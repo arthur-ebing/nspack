@@ -1536,7 +1536,7 @@
     :sequence_no: 93
     :caption: Repacked
     :namespaced_name: aggregated.repacked
-    :data_type: :string
+    :data_type: :boolean
     :width: 
     :format: 
     :hide: false

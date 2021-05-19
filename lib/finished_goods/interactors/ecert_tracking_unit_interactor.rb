@@ -66,7 +66,7 @@ module FinishedGoodsApp
     end
 
     def check_pallets(check, pallet_numbers)
-      MesscadaApp::TaskPermissionCheck::Pallets.call(check, pallet_numbers)
+      MesscadaApp::TaskPermissionCheck::Pallets.call(check, pallet_number: pallet_numbers)
     end
   end
 end
