@@ -1,6 +1,7 @@
 ---
 :caption: Production Run Dashboard
-:sql: "SELECT production_runs.id, fn_production_run_code(production_runs.id) AS production_run_code,\r\nproduction_runs.active_run_stage,\r\nproduction_runs.started_at,\r\nproduction_run_stats.bins_tipped,
+:sql: "SELECT production_runs.id, fn_production_run_code(production_runs.id) AS production_run_code,\r\npackhouses.plant_resource_code
+  AS packhouse,\r\nlines.plant_resource_code AS line,\r\nproduction_runs.active_run_stage,\r\nproduction_runs.started_at,\r\nproduction_run_stats.bins_tipped,
   production_run_stats.bins_tipped_weight, production_run_stats.carton_labels_printed,
   \r\nproduction_run_stats.cartons_verified, production_run_stats.cartons_verified_weight,\r\nproduction_run_stats.pallets_palletized_full,
   production_run_stats.pallets_palletized_partial,\r\nproduction_run_stats.pallet_weight,\r\nproduction_run_stats.inspected_pallets,
@@ -8,7 +9,9 @@
   production_runs\r\nJOIN production_run_stats ON production_run_stats.production_run_id
   = production_runs.id\r\nJOIN farms ON farms.id = production_runs.farm_id\r\nLEFT
   JOIN orchards ON orchards.id = production_runs.orchard_id\r\nJOIN pucs ON pucs.id
-  = production_runs.puc_id\r\nWHERE running\r\n"
+  = production_runs.puc_id\r\nLEFT JOIN plant_resources packhouses ON packhouses.id
+  = production_runs.packhouse_resource_id\r\nLEFT JOIN plant_resources lines ON lines.id
+  = production_runs.production_line_id \r\nWHERE running\r\n"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -45,9 +48,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  packhouse:
+    :name: packhouse
+    :sequence_no: 3
+    :caption: Packhouse
+    :namespaced_name: packhouses.plant_resource_code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  line:
+    :name: line
+    :sequence_no: 4
+    :caption: Line
+    :namespaced_name: lines.plant_resource_code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   active_run_stage:
     :name: active_run_stage
-    :sequence_no: 3
+    :sequence_no: 5
     :caption: Active stage
     :namespaced_name: production_runs.active_run_stage
     :data_type: :string
@@ -63,7 +98,7 @@
     :group_max: false
   started_at:
     :name: started_at
-    :sequence_no: 4
+    :sequence_no: 6
     :caption: Started at
     :namespaced_name: production_runs.started_at
     :data_type: :datetime
@@ -79,7 +114,7 @@
     :group_max: false
   bins_tipped:
     :name: bins_tipped
-    :sequence_no: 5
+    :sequence_no: 7
     :caption: Bin tip
     :namespaced_name: production_run_stats.bins_tipped
     :data_type: :integer
@@ -95,7 +130,7 @@
     :group_max: false
   bins_tipped_weight:
     :name: bins_tipped_weight
-    :sequence_no: 6
+    :sequence_no: 8
     :caption: Bin weight
     :namespaced_name: production_run_stats.bins_tipped_weight
     :data_type: :number
@@ -111,7 +146,7 @@
     :group_max: false
   carton_labels_printed:
     :name: carton_labels_printed
-    :sequence_no: 7
+    :sequence_no: 9
     :caption: CTN lbls
     :namespaced_name: production_run_stats.carton_labels_printed
     :data_type: :integer
@@ -127,7 +162,7 @@
     :group_max: false
   cartons_verified:
     :name: cartons_verified
-    :sequence_no: 8
+    :sequence_no: 10
     :caption: CTN verified
     :namespaced_name: production_run_stats.cartons_verified
     :data_type: :integer
@@ -143,7 +178,7 @@
     :group_max: false
   cartons_verified_weight:
     :name: cartons_verified_weight
-    :sequence_no: 9
+    :sequence_no: 11
     :caption: CTN weight
     :namespaced_name: production_run_stats.cartons_verified_weight
     :data_type: :number
@@ -159,7 +194,7 @@
     :group_max: false
   pallets_palletized_full:
     :name: pallets_palletized_full
-    :sequence_no: 10
+    :sequence_no: 12
     :caption: Full palletize
     :namespaced_name: production_run_stats.pallets_palletized_full
     :data_type: :integer
@@ -175,7 +210,7 @@
     :group_max: false
   pallets_palletized_partial:
     :name: pallets_palletized_partial
-    :sequence_no: 11
+    :sequence_no: 13
     :caption: Partial palletize
     :namespaced_name: production_run_stats.pallets_palletized_partial
     :data_type: :integer
@@ -191,7 +226,7 @@
     :group_max: false
   pallet_weight:
     :name: pallet_weight
-    :sequence_no: 12
+    :sequence_no: 14
     :caption: Pallet weight
     :namespaced_name: production_run_stats.pallet_weight
     :data_type: :number
@@ -207,7 +242,7 @@
     :group_max: false
   inspected_pallets:
     :name: inspected_pallets
-    :sequence_no: 13
+    :sequence_no: 15
     :caption: Insp. Pall
     :namespaced_name: production_run_stats.inspected_pallets
     :data_type: :integer
@@ -223,7 +258,7 @@
     :group_max: false
   rebins_created:
     :name: rebins_created
-    :sequence_no: 14
+    :sequence_no: 16
     :caption: Rebins
     :namespaced_name: production_run_stats.rebins_created
     :data_type: :integer
@@ -239,7 +274,7 @@
     :group_max: false
   rebins_weight:
     :name: rebins_weight
-    :sequence_no: 15
+    :sequence_no: 17
     :caption: Rebin weight
     :namespaced_name: production_run_stats.rebins_weight
     :data_type: :number
@@ -255,7 +290,7 @@
     :group_max: false
   farm_code:
     :name: farm_code
-    :sequence_no: 16
+    :sequence_no: 18
     :caption: Farm code
     :namespaced_name: farms.farm_code
     :data_type: :string
@@ -271,7 +306,7 @@
     :group_max: false
   puc_code:
     :name: puc_code
-    :sequence_no: 17
+    :sequence_no: 19
     :caption: PUC code
     :namespaced_name: pucs.puc_code
     :data_type: :string
@@ -287,7 +322,7 @@
     :group_max: false
   orchard_code:
     :name: orchard_code
-    :sequence_no: 18
+    :sequence_no: 20
     :caption: Orchard code
     :namespaced_name: orchards.orchard_code
     :data_type: :string

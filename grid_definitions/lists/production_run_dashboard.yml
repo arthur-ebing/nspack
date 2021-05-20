@@ -1,9 +1,28 @@
 ---
 :dataminer_definition: production_run_dashboard
 :calculated_columns:
-  - :name: packout_percentage
-    :caption: Packout Ratio
-    :data_type: :number
-    :format: :delimited_1000
-    :expression: cartons_verified_weight / bins_tipped_weight
-    :position: 7
+- :name: packout_percentage
+  :caption: Packout Ratio
+  :data_type: :number
+  :format: :delimited_1000
+  :expression: cartons_verified_weight / bins_tipped_weight
+  :position: 7
+:hide_for_client:
+  hb:
+  - packhouse
+  - line
+  hl:
+  - packhouse
+  - line
+  um:
+  - packhouse
+  - line
+  sr:
+  - packhouse
+  - line
+  sr2:
+  - packhouse
+  - line
+  kr:
+  - packhouse
+  - line
