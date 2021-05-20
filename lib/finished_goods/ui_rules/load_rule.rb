@@ -416,7 +416,7 @@ module UiRules
       @form_object = OpenStruct.new(@form_object.to_h.merge(progress_controls: progress_controls, instance_controls: instance_controls))
     end
 
-    def add_report_links # rubocop:disable Metrics/AbcSize
+    def add_report_links
       id = @options[:id]
       reports = []
       reports << { control_type: :link,
@@ -434,31 +434,26 @@ module UiRules
                    url: "/finished_goods/reports/picklist/#{id}",
                    loading_window: true,
                    style: :button }
-      if AppConst::CLIENT_CODE == 'ud'
-        reports << { control_type: :link,
-                     text: 'Addendum',
-                     url: "/finished_goods/reports/addendum_place_of_issue/#{id}",
-                     style: :button }
-      else
-        items = []
-        AppConst::ADDENDUM_PLACE_OF_ISSUE.split(',').each do |place|
-          items << { url: "/finished_goods/reports/addendum/#{id}/#{place}",
-                     text: place,
-                     icon: :printer,
-                     loading_window: true }
-        end
-        reports << if items.length == 1
-                     { control_type: :link,
-                       text: 'Addendum',
-                       url: items.first[:url],
-                       loading_window: true,
-                       style: :button }
-                   else
-                     { control_type: :dropdown_button,
-                       text: 'Addendum',
-                       items: items }
-                   end
+
+      items = []
+      AppConst::ADDENDUM_PLACE_OF_ISSUE.split(',').each do |place|
+        items << { url: "/finished_goods/reports/addendum/#{id}/#{place}",
+                   text: place,
+                   icon: :printer,
+                   loading_window: true }
       end
+      reports << if items.length == 1
+                   { control_type: :link,
+                     text: 'Addendum',
+                     url: items.first[:url],
+                     loading_window: true,
+                     style: :button }
+                 else
+                   { control_type: :dropdown_button,
+                     text: 'Addendum',
+                     items: items }
+                 end
+
       reports <<  { control_type: :link,
                     text: 'Phyto Data',
                     url: "/finished_goods/reports/accompanying_phyto/#{id}",

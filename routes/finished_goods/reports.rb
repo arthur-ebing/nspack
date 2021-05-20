@@ -91,25 +91,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
-    r.on 'addendum_place_of_issue', Integer do |id|
-      r.get do
-        show_partial_or_page(r) { FinishedGoods::Dispatch::Report::AddendumPlaceOfIssue.call(id) }
-      end
-      r.post do
-        jasper_params = JasperParams.new('addendum',
-                                         current_user.login_name,
-                                         load_id: id,
-                                         place_of_issue: params[:addendum_place_of_issue][:place_of_issue])
-        res = CreateJasperReport.call(jasper_params)
-
-        if res.success
-          change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
-        else
-          show_error(res.message, fetch?(r))
-        end
-      end
-    end
-
     # Phyto Data
     # --------------------------------------------------------------------------
     r.on 'accompanying_phyto', Integer do |id|
