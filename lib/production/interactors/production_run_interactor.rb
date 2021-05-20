@@ -200,8 +200,7 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def print_pallet_label_from_sequence(pallet_sequence_id, device, params)
-      params.store(:printer,  LabelApp::PrinterRepo.new.robot_peripheral_printer(device))
+    def print_pallet_label_from_sequence(pallet_sequence_id, params)
       pallet_id = repo.get(:pallet_sequences, pallet_sequence_id, :pallet_id)
       print_pallet_label(pallet_id, params)
     end
