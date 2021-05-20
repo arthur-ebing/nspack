@@ -140,7 +140,6 @@ module MesscadaApp
 
       def not_on_inspection_sheet_check # rubocop:disable Metrics/AbcSize
         ds = DB[:govt_inspection_pallets]
-        ds = ds.join(:pallets, id: Sequel[:govt_inspection_pallets][:pallet_id])
         ds = ds.join(:govt_inspection_sheets, id: Sequel[:govt_inspection_pallets][:govt_inspection_sheet_id])
         ds = ds.join(:pallets, id: Sequel[:govt_inspection_pallets][:pallet_id])
         ds = ds.where(cancelled: false, pallet_id: pallet_ids)
