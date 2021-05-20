@@ -235,7 +235,7 @@ module ProductionApp
         SELECT EXISTS(
            SELECT product_setups.id FROM product_setups
            JOIN product_setup_templates ON product_setup_templates.id = product_setups.product_setup_template_id
-           WHERE product_setup_templates.template_name = '#{template_name}'
+           WHERE product_setup_templates.template_name = ?
            AND marketing_variety_id NOT IN (
               SELECT DISTINCT marketing_varieties.id
               FROM marketing_varieties
@@ -247,7 +247,7 @@ module ProductionApp
            )
         )
       SQL
-      DB[query].single_value
+      DB[query, template_name].single_value
     end
 
     def update_product_setup_template(id, attrs)
