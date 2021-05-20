@@ -223,7 +223,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # parent_table: Symbol - If no :columns array provided, returns all columns.
   #
   # Optional keys:
-  # columns: Array of Symbols - one for each desired column. If not present, all columns are returned
+  # columns: Array of Symbols - one for each desired column. If not present and there are no flatten_columns, all columns are returned
   # flatten_columns: Hash of Symbol => Symbol - key is the column in the parent and value is the new name to be used on the entity.
   # foreign_key: Symbol - name of the foreign key in the table that joins to the parent table's id column.
   #

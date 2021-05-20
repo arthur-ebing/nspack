@@ -111,17 +111,37 @@ Each Hash in the parent_tables array must include:
 
 Optional keys:
 
-* `columns`: Array of Symbols - one for each desired column. If not present, all columns are returned
-* `flatten_columns`: Hash of Symbol => Symbol - key is the column in the parent and value is the new name to be used on the entity.
-* `foreign_key`: Symbol - required if the foreign_key cnnot be inferred from the parent table name. e.g. `:admin_user_id` which points to `id` on the `users` table would be `foreign_key: :admin_user_id`.
+* `columns`: Array of Symbols - one for each desired column. If not present and there are no `flatten_columns`, all columns are returned
+* `flatten_columns`: Hash of Symbol => Symbol -- key is the column in the parent and value is the new name to be used on the entity.
+* `foreign_key`: Symbol - required if the foreign_key cannot be inferred from the parent table name. e.g. `:admin_user_id` which points to `id` on the `users` table would be `foreign_key: :admin_user_id`.
+
+NOTE: `columns` need not be provided if `flatten_columns` is given and all columns should be flattened. However you can provide columns and only flatten some of them. In this case the `flatten_columns` keys **must** be a sub-set of `columns`.
 
 examples:
 [source,ruby]
 ----
+# Return columns as sub-hash:
 find_with_association(:programs,
                       123,
                       parent_tables: [{ parent_table: :functional_areas,
                                         columns: [:functional_area_name] }])
+# => functional_areas: { functional_area_name: 'the name' }
+
+# All selected columns are to be flattened:
+find_with_association(:programs,
+                      123,
+                      parent_tables: [{ parent_table: :functional_areas,
+                                        flatten_columns: [functional_area_name: :func] }])
+# => func: 'the name'
+
+# Only one of the selected columns is to be flattened:
+find_with_association(:programs,
+                      123,
+                      parent_tables: [{ parent_table: :functional_areas,
+                                        columns: [:functional_are_name, :id]
+                                        flatten_columns: [functional_area_name: :func] }])
+# => functional_areas: { id: 123 },
+# => func: 'the name'
 ----
 
 === Lookup functions
