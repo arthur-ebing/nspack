@@ -1,0 +1,381 @@
+---
+:caption: Suggested Tip Runs For Bins
+:sql:
+  select id, bin_asset_number, bin_received_date_time, cultivar_name, farm_code, puc_code, orchard_code, rmt_delivery_id
+  , suggested_tip_run_id, matching_method
+  , CASE WHEN suggested_tip_run_id||''=matching_run_ids
+  THEN null
+  ELSE matching_run_ids   END AS matching_run_ids
+  , CASE WHEN suggested_tip_run_id is not null
+  THEN fn_production_run_code(suggested_tip_run_id)
+  ELSE null   END AS suggested_tip_run_code
+  , CASE WHEN suggested_tip_run_id is not null
+  THEN (select started_at from production_runs where id=suggested_tip_run_id)
+  ELSE null   END AS suggested_tip_run_start_date
+  ,cultivar_id, farm_id, puc_id, orchard_id
+  from (select id, bin_asset_number, bin_received_date_time, cultivar_name, farm_code, puc_code, orchard_code, rmt_delivery_id
+  ,cultivar_id, farm_id, puc_id, orchard_id
+  , CASE WHEN suggested_tip_run_id is not null
+  THEN suggested_tip_run_id
+  ELSE (select p.id
+  from production_runs p
+  where p.farm_id=untipped_bins.farm_id and p.orchard_id=untipped_bins.orchard_id and p.puc_id=untipped_bins.puc_id
+  and untipped_bins.bin_received_date_time < started_at
+  and ((started_at::timestamp::date - untipped_bins.bin_received_date_time::timestamp::date) between 0 and 2)
+  order by started_at desc
+  limit 1)
+  END AS suggested_tip_run_id
+  , CASE WHEN matching_run_ids is not null
+  THEN matching_run_ids
+  ELSE (select string_agg( distinct p.id||'', ', ')
+  from production_runs p
+  where p.farm_id=untipped_bins.farm_id and p.orchard_id=untipped_bins.orchard_id and p.puc_id=untipped_bins.puc_id
+  and untipped_bins.bin_received_date_time < started_at
+  and ((started_at::timestamp::date - untipped_bins.bin_received_date_time::timestamp::date) between 0 and 2) )
+  END AS matching_run_ids
+  , CASE WHEN suggested_tip_run_id is not null
+  THEN 'delivery runs'
+  ELSE 'runs only' END AS matching_method
+  from
+  (select b.*
+  , (select string_agg( distinct production_run_tipped_id||'', ', ')
+  from rmt_bins ib
+  left join production_runs p on p.id=ib.production_run_tipped_id
+  where ib.rmt_delivery_id=b.rmt_delivery_id
+  and ib.bin_tipped is true and ib.bin_tipped is not null
+  ) as matching_run_ids
+  , (select production_run_tipped_id
+  from
+  (select distinct ib.production_run_tipped_id
+  , ABS(started_at::timestamp::date - b.bin_received_date_time::timestamp::date) as days_appart
+  from rmt_bins ib
+  left join production_runs p on p.id=ib.production_run_tipped_id
+  where ib.rmt_delivery_id=b.rmt_delivery_id
+  and ib.bin_tipped is true and ib.bin_tipped is not null
+  order by days_appart asc
+  limit 1
+  ) as runs
+  ) as suggested_tip_run_id
+  from vw_bins b
+  where bin_tipped is false
+  ) as untipped_bins
+  ) as suggested_runs_for_bins
+:limit: 
+:offset: 
+:external_settings:
+  :render_url: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: id
+    :data_type: :integer
+    :width: 60
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  bin_asset_number:
+    :name: bin_asset_number
+    :sequence_no: 2
+    :caption: Bin Aasset Number
+    :namespaced_name: bin_asset_number
+    :data_type: :string
+    :width: 150
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  bin_received_date_time:
+    :name: bin_received_date_time
+    :sequence_no: 3
+    :caption: Bin Received Date Time
+    :namespaced_name:
+    :data_type: :datetime
+    :width: 170
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_name:
+    :name: cultivar_name
+    :sequence_no: 4
+    :caption: Cultivar
+    :namespaced_name: cultivar_name
+    :data_type: :string
+    :width: 90
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  farm_code:
+    :name: farm_code
+    :sequence_no: 5
+    :caption: Farm
+    :namespaced_name: farm_code
+    :data_type: :string
+    :width: 160
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  puc_code:
+    :name: puc_code
+    :sequence_no: 6
+    :caption: Puc
+    :namespaced_name: puc_code
+    :data_type: :string
+    :width: 90
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  orchard_code:
+    :name: orchard_code
+    :sequence_no: 7
+    :caption: Orchard
+    :namespaced_name: orchard_code
+    :data_type: :string
+    :width: 90
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_id:
+    :name: id
+    :sequence_no: 8
+    :caption: Cultivar
+    :namespaced_name: cultivar_id
+    :data_type: :integer
+    :width:
+    :format:
+    :hide: true
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  farm_id:
+    :name: id
+    :sequence_no: 9
+    :caption: Farm
+    :namespaced_name: farm_id
+    :data_type: :integer
+    :width:
+    :format:
+    :hide: true
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  puc_id:
+    :name: puc_id
+    :sequence_no: 8
+    :caption: Puc
+    :namespaced_name: puc_id
+    :data_type: :integer
+    :width:
+    :format:
+    :hide: true
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  orchard_id:
+    :name: orchard_id
+    :sequence_no: 9
+    :caption: Orchard
+    :namespaced_name: orchard_id
+    :data_type: :integer
+    :width:
+    :format:
+    :hide: true
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_delivery_id:
+    :name: rmt_delivery_id
+    :sequence_no: 10
+    :caption: Delivery
+    :namespaced_name: rmt_delivery_id
+    :data_type: :integer
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  suggested_tip_run_id:
+    :name: suggested_tip_run_id
+    :sequence_no: 11
+    :caption: Suggested Tip Run
+    :namespaced_name: suggested_tip_run_id
+    :data_type: :integer
+    :width: 200
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  matching_run_ids:
+    :name: matching_run_ids
+    :sequence_no: 12
+    :caption: Matching Runs
+    :namespaced_name: matching_run_ids
+    :data_type: :integer
+    :width: 150
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  suggested_tip_run_code:
+    :name: suggested_tip_run_code
+    :sequence_no: 13
+    :caption: Suggested Tip Run Code
+    :namespaced_name: suggested_tip_run_code
+    :data_type: :string
+    :width: 250
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  suggested_tip_run_start_date:
+    :name: suggested_tip_run_start_date
+    :sequence_no: 13
+    :caption: Suggested Tip Run Start Date
+    :namespaced_name:
+    :data_type: :datetime
+    :width: 200
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  matching_method:
+    :name: matching_method
+    :sequence_no: 14
+    :caption: Matching Method
+    :namespaced_name: matching_method
+    :data_type: :string
+    :width: 140
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: cultivar_id
+  :caption: Cultivar
+  :data_type: :integer
+  :control_type: :list
+  :default_value:
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT cultivar_name, id FROM cultivars ORDER BY cultivar_name
+- :column: puc_id
+  :caption: PUC
+  :data_type: :integer
+  :control_type: :list
+  :default_value:
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT puc_code, id FROM pucs ORDER BY puc_code
+- :column: orchard_id
+  :caption: Orchard
+  :data_type: :integer
+  :control_type: :list
+  :default_value:
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT orchard_code, id FROM orchards ORDER BY orchard_code
+- :column: rmt_delivery_id
+  :caption: Delivery Id
+  :data_type: :integer
+  :control_type: :text
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+- :column: bin_received_date_time
+  :caption: Received At
+  :data_type: :datetime
+  :control_type: :daterange
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+
