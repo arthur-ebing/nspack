@@ -455,10 +455,9 @@ module UiRules
                  end
 
       reports <<  { control_type: :link,
-                    text: 'Phyto Data',
+                    text: 'China Phyto Report',
                     url: "/finished_goods/reports/accompanying_phyto/#{id}",
                     loading_window: true,
-                    visible: AppConst::CLIENT_CODE != 'ud',
                     style: :button }
       reports <<  { control_type: :link,
                     text: 'Verified Gross Mass',
