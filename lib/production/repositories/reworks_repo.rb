@@ -280,7 +280,7 @@ module ProductionApp
       pallet_rejected_fields = %i[id pallet_number build_status shipped in_stock inspected depot_pallet allocated
                                   partially_palletized reinspected scrapped shipped_at scrapped_at govt_first_inspection_at
                                   govt_reinspection_at stock_created_at gross_weight_measured_at allocated_at intake_created_at
-                                  first_cold_storage_at nett_weight gross_weight]
+                                  first_cold_storage_at nett_weight gross_weight last_govt_inspection_pallet_id]
       repack_attrs = { repacked: true, palletized: true, repacked_at: Time.now, created_at: Time.now, updated_at: Time.now }
       attrs = pallet.to_h.merge(repack_attrs.to_h).reject { |k, _| pallet_rejected_fields.include?(k) }
       new_pallet_id = create(:pallets, attrs)
