@@ -1,5 +1,5 @@
 ---
-:caption: All Pallet Sequences
+:caption: All Pallet Sequences [Experimental]
 :sql: "SELECT\r\n    vw_pallet_sequences.pallet_sequence_id,\r\n    vw_pallet_sequences.pallet_number,\r\n
   \   vw_pallet_sequences.pallet_sequence_number,\r\n    vw_pallet_sequences.status,\r\n
   \   vw_pallet_sequences.target_customer_party_role_id,\r\n    vw_pallet_sequences.target_customer,\r\n
@@ -377,7 +377,7 @@
   puc:
     :name: puc
     :sequence_no: 18
-    :caption: Puc
+    :caption: PUC
     :namespaced_name: vw_pallet_sequences.puc
     :data_type: :string
     :width: 
@@ -731,9 +731,9 @@
     :sequence_no: 40
     :caption: Standard count
     :namespaced_name: vw_pallet_sequences.standard_count
-    :data_type: :number
+    :data_type: :integer
     :width: 
-    :format: :delimited_1000
+    :format: 
     :hide: false
     :pinned: 
     :groupable: true
@@ -747,10 +747,10 @@
     :sequence_no: 41
     :caption: Basic pack
     :namespaced_name: vw_pallet_sequences.basic_pack_id
-    :data_type: :string
+    :data_type: :integer
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :pinned: 
     :groupable: false
     :group_by_seq: 
@@ -779,10 +779,10 @@
     :sequence_no: 43
     :caption: Standard pack
     :namespaced_name: vw_pallet_sequences.standard_pack_id
-    :data_type: :string
+    :data_type: :integer
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :pinned: 
     :groupable: false
     :group_by_seq: 
@@ -843,7 +843,7 @@
     :sequence_no: 47
     :caption: EDI size count
     :namespaced_name: vw_pallet_sequences.edi_size_count
-    :data_type: :string
+    :data_type: :integer
     :width: 
     :format: 
     :hide: false
@@ -1209,7 +1209,7 @@
   pm_type:
     :name: pm_type
     :sequence_no: 70
-    :caption: Pm type
+    :caption: PKG Type
     :namespaced_name: vw_pallet_sequences.pm_type
     :data_type: :string
     :width: 
@@ -1241,7 +1241,7 @@
   pm_subtype:
     :name: pm_subtype
     :sequence_no: 72
-    :caption: Pm subtype
+    :caption: PKG Subtype
     :namespaced_name: vw_pallet_sequences.pm_subtype
     :data_type: :string
     :width: 
@@ -1259,7 +1259,7 @@
     :sequence_no: 73
     :caption: Carton quantity
     :namespaced_name: vw_pallet_sequences.carton_quantity
-    :data_type: :string
+    :data_type: :integer
     :width: 
     :format: 
     :hide: false
@@ -1675,7 +1675,7 @@
     :sequence_no: 99
     :caption: Repacked
     :namespaced_name: vw_pallet_sequences.repacked
-    :data_type: :string
+    :data_type: :boolean
     :width: 
     :format: 
     :hide: false
@@ -1691,9 +1691,9 @@
     :sequence_no: 100
     :caption: Repacked at
     :namespaced_name: vw_pallet_sequences.repacked_at
-    :data_type: :string
+    :data_type: :datetime
     :width: 
-    :format: 
+    :format: :datetime_with_secs
     :hide: false
     :pinned: 
     :groupable: false
@@ -2011,7 +2011,7 @@
     :sequence_no: 120
     :caption: Pallet carton quantity
     :namespaced_name: vw_pallets.carton_quantity
-    :data_type: :string
+    :data_type: :integer
     :width: 
     :format: 
     :hide: false
@@ -2633,7 +2633,7 @@
   inspected_dest_country:
     :name: inspected_dest_country
     :sequence_no: 159
-    :caption: Inspected dest country
+    :caption: Inspected destination country
     :namespaced_name: vw_pallets.inspected_dest_country
     :data_type: :string
     :width: 
@@ -2891,7 +2891,7 @@
     :sequence_no: 175
     :caption: Pallet scrapped
     :namespaced_name: vw_pallets.scrapped
-    :data_type: :string
+    :data_type: :boolean
     :width: 
     :format: 
     :hide: false
@@ -2907,9 +2907,9 @@
     :sequence_no: 176
     :caption: Pallet scrapped at
     :namespaced_name: vw_pallets.scrapped_at
-    :data_type: :string
+    :data_type: :datetime
     :width: 
-    :format: 
+    :format: :datetime_with_secs
     :hide: false
     :pinned: 
     :groupable: false
