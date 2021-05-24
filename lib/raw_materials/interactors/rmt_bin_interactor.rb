@@ -53,7 +53,7 @@ module RawMaterialsApp
       created_bins = []
       repo.transaction do
         params.delete(:qty_bins_to_create)
-        params[:location_id] = default_location_id unless params[:location_id]
+        params[:location_id] ||= AppConst::CR_RMT.default_delivery_location
         params[:rmt_class_id] = nil if params[:rmt_class_id].nil_or_empty?
         bin_asset_numbers.each do |bin_asset_number|
           params[:bin_asset_number] = bin_asset_number
@@ -158,7 +158,7 @@ module RawMaterialsApp
 
       delivery = find_rmt_delivery(delivery_id)
       params = params.merge(get_header_inherited_field(delivery, params[:rmt_container_type_id]))
-      params = params.merge(location_id: default_location_id) unless params[:location_id]
+      params[:location_id] ||= AppConst::CR_RMT.default_delivery_location
       res = validate_rmt_bin_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -228,7 +228,7 @@ module RawMaterialsApp
       error
     end
 
-    def create_rmt_bins(delivery_id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def create_rmt_bins(delivery_id, params) # rubocop:disable Metrics/AbcSize
       res = validate_bin_asset_numbers_duplicate_scans(params)
       return validation_failed_response(OpenStruct.new(message: 'Validation Error', messages: res)) unless res.empty?
 
@@ -243,7 +243,7 @@ module RawMaterialsApp
 
       submitted_bins = params.find_all { |k, _v| k.to_s.include?('bin_asset_number') }.map { |_k, v| v }
       params.delete_if { |k, _v| k.to_s.include?('bin_asset_number') }
-      params = params.merge(location_id: default_location_id) unless params[:location_id]
+      params[:location_id] ||= AppConst::CR_RMT.default_delivery_location
 
       res = validate_rmt_bin_params(params)
       return failed_response(unwrap_failed_response(validation_failed_response(res))) if res.failure?
@@ -591,12 +591,6 @@ module RawMaterialsApp
       params = params.merge(location_id: location_id)
 
       params
-    end
-
-    def default_location_id
-      return nil unless AppConst::DEFAULT_DELIVERY_LOCATION
-
-      repo.get_id(:locations, location_long_code: AppConst::DEFAULT_DELIVERY_LOCATION)
     end
 
     def repo

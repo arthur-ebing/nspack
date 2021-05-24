@@ -44,7 +44,7 @@ class TestCustomerPaymentTermSetRoutes < RouteTester
     row_vals = Hash.new(1)
     INTERACTOR.any_instance.stubs(:update_customer_payment_term_set).returns(ok_response(instance: row_vals))
     patch_as_fetch 'masterfiles/finance/customer_payment_term_sets/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-    expect_json_update_grid
+    expect_json_response
   end
 
   def test_update_fail

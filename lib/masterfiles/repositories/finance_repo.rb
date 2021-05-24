@@ -34,7 +34,7 @@ module MasterfilesApp
                           order_by: :incoterm
     crud_calls_for :incoterms, name: :incoterm
 
-    crud_calls_for :customer_payment_term_sets, name: :customer_payment_term_set
+    crud_calls_for :customer_payment_term_sets, name: :customer_payment_term_set, exclude: %i[update delete]
 
     build_for_select :payment_term_date_types,
                      label: :type_of_date,
@@ -93,8 +93,8 @@ module MasterfilesApp
       )
       return nil if hash.nil?
 
-      hash[:payment_term] = find_payment_term(hash[:payment_term_id]).payment_term
-      hash[:customer_payment_term_set] = find_customer_payment_term_set(hash[:customer_payment_term_set_id]).customer_payment_term_set
+      hash[:payment_term] = find_payment_term(hash[:payment_term_id])&.payment_term
+      hash[:customer_payment_term_set] = find_customer_payment_term_set(hash[:customer_payment_term_set_id])&.customer_payment_term_set
 
       CustomerPaymentTerm.new(hash)
     end
@@ -102,18 +102,19 @@ module MasterfilesApp
     def find_payment_term(id)
       hash = find_with_association(
         :payment_terms, id,
-        parent_tables: [{ parent_table: :payment_term_types,
-                          columns: %i[payment_term_type],
-                          foreign_key: :payment_term_type_id,
-                          flatten_columns: { payment_term_type: :payment_term_type } },
-                        { parent_table: :payment_term_date_types,
-                          columns: %i[type_of_date],
-                          foreign_key: :currency_id,
-                          flatten_columns: { type_of_date: :payment_term_date_type } }]
+        parent_tables: [{ parent_table: :payment_term_date_types,
+                          foreign_key: :payment_term_date_type_id,
+                          flatten_columns: { type_of_date: :payment_term_date_type } },
+                        { parent_table: :deal_types,
+                          foreign_key: :deal_type_id,
+                          flatten_columns: { deal_type: :deal_type } },
+                        { parent_table: :incoterms,
+                          foreign_key: :incoterm_id,
+                          flatten_columns: { incoterm: :incoterm } }]
       )
       return nil if hash.nil?
 
-      hash[:payment_term] = "#{hash[:payment_term_type]}_#{hash[:short_description]}"
+      hash[:payment_term] = "#{hash[:deal_type]}_#{hash[:incoterm]}_#{hash[:short_description]}"
       PaymentTerm.new(hash)
     end
 
@@ -224,6 +225,19 @@ module MasterfilesApp
       new_ids.each do |prog_id|
         DB[:customer_payment_terms].insert(customer_payment_term_set_id: id, payment_term_id: prog_id)
       end
+    end
+
+    def update_customer_payment_term_set(id, res)
+      hash = res.to_h
+      return if hash == find_hash(:customer_payment_term_sets, id).slice(*hash.keys)
+
+      DB[:customer_payment_terms].where(customer_payment_term_set_id: id).delete
+      update(:customer_payment_term_sets, id, hash)
+    end
+
+    def delete_customer_payment_term_set(id)
+      DB[:customer_payment_terms].where(customer_payment_term_set_id: id).delete
+      delete(:customer_payment_term_sets, id)
     end
   end
 end

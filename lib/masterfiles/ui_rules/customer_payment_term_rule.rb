@@ -15,14 +15,8 @@ module UiRules
     end
 
     def set_show_fields
-      # payment_term_id_label = MasterfilesApp::PaymentTermRepo.new.find_payment_term(@form_object.payment_term_id)&.short_description
-      # payment_term_id_label = @repo.find(:payment_terms, MasterfilesApp::PaymentTerm, @form_object.payment_term_id)&.short_description
-      payment_term_id_label = @repo.get(:payment_terms, @form_object.payment_term_id, :short_description)
-      # customer_payment_term_set_id_label = MasterfilesApp::CustomerPaymentTermSetRepo.new.find_customer_payment_term_set(@form_object.customer_payment_term_set_id)&.id
-      # customer_payment_term_set_id_label = @repo.find(:customer_payment_term_sets, MasterfilesApp::CustomerPaymentTermSet, @form_object.customer_payment_term_set_id)&.id
-      customer_payment_term_set_id_label = @repo.get(:customer_payment_term_sets, @form_object.customer_payment_term_set_id, :id)
-      fields[:payment_term_id] = { renderer: :label, with_value: payment_term_id_label, caption: 'Payment Term' }
-      fields[:customer_payment_term_set_id] = { renderer: :label, with_value: customer_payment_term_set_id_label, caption: 'Customer Payment Term Set' }
+      fields[:payment_term] = { renderer: :label }
+      fields[:customer_payment_term_set] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 

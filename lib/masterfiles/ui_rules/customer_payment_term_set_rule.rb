@@ -18,7 +18,6 @@ module UiRules
       fields[:incoterm] = { renderer: :label }
       fields[:deal_type] = { renderer: :label }
       fields[:customer] = { renderer: :label }
-      fields[:payment_terms] = { renderer: :label, with_value: @form_object.customer_payment_term_set }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 

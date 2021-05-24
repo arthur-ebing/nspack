@@ -17,11 +17,13 @@ module MasterfilesApp
     end
 
     def create_payment_term(opts = {})
-      payment_term_type_id = create_payment_term_type
+      incoterm_id = create_incoterm
+      deal_type_id = create_deal_type
       payment_term_date_type_id = create_payment_term_date_type
 
       default = {
-        payment_term_type_id: payment_term_type_id,
+        incoterm_id: incoterm_id,
+        deal_type_id: deal_type_id,
         payment_term_date_type_id: payment_term_date_type_id,
         short_description: Faker::Lorem.unique.word,
         long_description: Faker::Lorem.word,

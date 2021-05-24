@@ -33,6 +33,7 @@ module EdiApp
 
     def create_records # rubocop:disable Metrics/AbcSize
       repo.transaction do
+        location_id = AppConst::CR_RMT.pending_delivery_location
         parsed_bins.each do |attrs|
           delivery_attrs = { season_id: attrs[:season_id],
                              farm_id: attrs[:farm_id],
@@ -42,9 +43,11 @@ module EdiApp
                              received: false,
                              date_delivered: attrs[:bin_received_date_time],
                              reference_number: attrs.delete(:reference_number) }
-          rmt_delivery_id = repo.get_id_or_create_with_status(:rmt_deliveries, 'PALBIN_RECEIVED', delivery_attrs)
+          rmt_delivery_id = repo.get_id_or_create_with_status(:rmt_deliveries, 'PENDING_DELIVERY', delivery_attrs)
 
-          repo.get_id_or_create_with_status(:rmt_bins, 'PALBIN_RECEIVED', attrs.merge(rmt_delivery_id: rmt_delivery_id))
+          attrs[:location_id] = location_id
+          attrs[:rmt_delivery_id] = rmt_delivery_id
+          repo.get_id_or_create_with_status(:rmt_bins, 'PENDING_DELIVERY', attrs)
         end
       end
     end

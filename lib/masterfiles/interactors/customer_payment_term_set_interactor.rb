@@ -20,7 +20,7 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def update_customer_payment_term_set(id, params)
+    def update_customer_payment_term_set(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_customer_payment_term_set_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -30,6 +30,8 @@ module MasterfilesApp
       end
       instance = customer_payment_term_set(id)
       success_response("Updated customer payment term #{instance.id}", instance)
+    rescue Sequel::UniqueConstraintViolation
+      validation_failed_response(OpenStruct.new(messages: { incoterm_id: ['This customer payment term combination already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

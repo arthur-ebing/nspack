@@ -22,15 +22,6 @@ module Masterfiles
               form.add_field :incoterm_id
               form.add_field :deal_type_id
             end
-            page.section do |section|
-              section.add_grid('payment_terms',
-                               '/list/payment_terms/grid_multi',
-                               caption: 'Payment Terms',
-                               is_multiselect: true,
-                               multiselect_url: "/masterfiles/finance/customer_payment_term_sets/#{id}/link_payment_terms",
-                               multiselect_key: 'customer_payment_term_set',
-                               multiselect_params: { id: id })
-            end
           end
 
           layout

@@ -63,13 +63,16 @@ module MasterfilesApp
     private
 
     def payment_term_attrs
-      payment_term_type_id = create_payment_term_type
+      incoterm_id = create_incoterm
+      deal_type_id = create_deal_type
       payment_term_date_type_id = create_payment_term_date_type
 
       {
         id: 1,
-        payment_term_type_id: payment_term_type_id,
-        payment_term_type: 'ABC',
+        incoterm_id: incoterm_id,
+        incoterm: 'ABC',
+        deal_type_id: deal_type_id,
+        deal_type: 'ABC',
         payment_term: 'ABC',
         payment_term_date_type_id: payment_term_date_type_id,
         payment_term_date_type: 'ABC',
