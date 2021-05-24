@@ -153,6 +153,22 @@ module LabelApp
       get_value(:users, :login_name, user_name: name)
     end
 
+    def check_label_for_unset_variables(id) # rubocop:disable Metrics/AbcSize
+      label_json = get(:labels, id, :label_json)
+      hash = JSON.parse(label_json)
+      json = UtilityFunctions.symbolize_keys(hash)
+      return ok_response if json[:version].nil?
+
+      unset = false
+      json[:nodes].each do |node|
+        next unless node[:name] == 'variableBox'
+        next unless node[:varAttrs][:staticValue].nil?
+
+        unset = true if node[:varType] == 'unset'
+      end
+      unset ? failed_response('Cannot complete - this label has unset variables') : ok_response
+    end
+
     def archive_template(label_id, active: true, user_name: nil)
       template_id = DB[:label_templates].where(label_template_name: get_value(:labels, :label_name, id: label_id)).get(:id)
       return if template_id.nil?

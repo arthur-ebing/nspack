@@ -388,9 +388,14 @@ class Nspack < Roda
                 else
                   Sequel.blob(interactor.image_from_param(params[:imageString]))
                 end
+          xml = interactor.variable_xml_from_params(params)
+          puts '---'
+          puts xml
+          puts '---'
 
           changeset = { label_json: params[:label],
-                        variable_xml: params[:XMLString],
+                        # variable_xml: params[:XMLString],
+                        variable_xml: xml,
                         png_image: img }
 
           DB.transaction do
@@ -414,6 +419,14 @@ class Nspack < Roda
               else
                 Sequel.blob(interactor.image_from_param(params[:imageString]))
               end
+        # p params[:label]
+        # puts '>>> XML'
+        # puts '---'
+        xml = interactor.variable_xml_from_params(params)
+        puts '---'
+        puts xml
+        puts '---'
+        # GENERATE XML... (use gem?)
         changeset = { label_json: params[:label],
                       label_name: params[:labelName],
                       label_dimension: params[:labelDimension],
@@ -424,7 +437,9 @@ class Nspack < Roda
                       # category: extra_attributes[:category],
                       # sub_category: extra_attributes[:sub_category],
                       variable_set: extra_attributes[:variable_set],
-                      variable_xml: params[:XMLString],
+                      print_rotation: extra_attributes[:print_rotation].to_i,
+                      # variable_xml: params[:XMLString],
+                      variable_xml: xml,
                       png_image: img }
 
         id = nil
