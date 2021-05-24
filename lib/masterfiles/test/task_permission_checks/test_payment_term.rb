@@ -10,8 +10,10 @@ module MasterfilesApp
     def entity(attrs = {})
       base_attrs = {
         id: 1,
-        payment_term_type_id: 1,
-        payment_term_type: 'ABC',
+        incoterm_id: 1,
+        incoterm: 'ABC',
+        deal_type_id: 1,
+        deal_type: 'ABC',
         payment_term: 'ABC',
         payment_term_date_type_id: 1,
         payment_term_date_type: 'ABC',

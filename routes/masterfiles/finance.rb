@@ -30,7 +30,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             row_keys = %i[
               currency
               description
-              status
               active
             ]
             update_grid_row(id,
@@ -377,21 +376,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.patch do     # UPDATE
           res = interactor.update_customer_payment_term_set(id, params[:customer_payment_term_set])
           if res.success
-            row_keys = %i[
-              customer_payment_term_set
-              incoterm_id
-              incoterm
-              deal_type_id
-              deal_type
-              customer_id
-              customer
-              status
-              active
-            ]
-            update_grid_row(id,
-                            changes: select_attributes(res.instance, row_keys),
-                            grid_id: 'customer_payment_term_sets',
-                            notice: res.message)
+            flash[:notice] = res.message
+            r.redirect "/masterfiles/finance/customer_payment_term_sets/#{res.instance.id}"
           else
             re_show_form(r, res) { Masterfiles::Finance::CustomerPaymentTermSet::Edit.call(id, form_values: params[:customer_payment_term_set], form_errors: res.errors) }
           end
@@ -418,7 +404,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.post do        # CREATE
         res = interactor.create_customer_payment_term_set(params[:customer_payment_term_set])
         if res.success
-          r.redirect "/masterfiles/finance/customer_payment_term_sets/#{res.instance.id}/edit"
+          flash[:notice] = res.message
+          r.redirect "/masterfiles/finance/customer_payment_term_sets/#{res.instance.id}"
         else
           re_show_form(r, res, url: '/masterfiles/finance/customer_payment_term_sets/new') do
             Masterfiles::Finance::CustomerPaymentTermSet::New.call(form_values: params[:customer_payment_term_set],
@@ -612,8 +599,13 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           res = interactor.update_payment_term(id, params[:payment_term])
           if res.success
             row_keys = %i[
-              payment_term_type_id
+              payment_term
+              deal_type_id
+              deal_type
+              incoterm_id
+              incoterm
               payment_term_date_type_id
+              payment_term_date_type
               short_description
               long_description
               percentage
@@ -650,8 +642,13 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         if res.success
           row_keys = %i[
             id
-            payment_term_type_id
+            payment_term
+            deal_type_id
+            deal_type
+            incoterm_id
+            incoterm
             payment_term_date_type_id
+            payment_term_date_type
             short_description
             long_description
             percentage

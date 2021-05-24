@@ -1,14 +1,15 @@
 ---
 :caption: Payment Terms
-:sql: "SELECT\r\n   payment_terms.id,\r\n   payment_terms.short_description AS payment_term,\r\n
-  \  payment_terms.payment_term_type_id,\r\n   payment_term_types.payment_term_type,\r\n
-  \  payment_terms.payment_term_date_type_id,\r\n   payment_term_date_types.type_of_date,\r\n
-  \  payment_terms.short_description,\r\n   payment_terms.long_description,\r\n   payment_terms.percentage,\r\n
-  \  payment_terms.days,\r\n   payment_terms.amount_per_carton,\r\n   payment_terms.for_liquidation,\r\n
-  \  payment_terms.active,\r\n   payment_terms.created_at,\r\n   payment_terms.updated_at,\r\n
-  \  fn_current_status('payment_terms',payment_terms.id) AS status\r\nFROM payment_terms\r\n
-  \   JOIN payment_term_date_types ON payment_term_date_types.id = payment_terms.payment_term_date_type_id\r\n
-  \   JOIN payment_term_types ON payment_term_types.id = payment_terms.payment_term_type_id"
+:sql: "SELECT\r\n    payment_terms.id,\r\n    payment_terms.short_description AS payment_term,\r\n
+  \   payment_terms.deal_type_id,\r\n    deal_types.deal_type,\r\n    payment_terms.incoterm_id,\r\n
+  \   incoterms.incoterm,\r\n    payment_terms.payment_term_date_type_id,\r\n    payment_term_date_types.type_of_date
+  AS payment_term_date_type,\r\n    payment_terms.short_description,\r\n    payment_terms.long_description,\r\n
+  \   payment_terms.percentage,\r\n    payment_terms.days,\r\n    payment_terms.amount_per_carton,\r\n
+  \   payment_terms.for_liquidation,\r\n    payment_terms.active,\r\n    payment_terms.created_at,\r\n
+  \   payment_terms.updated_at,\r\n    fn_current_status('payment_terms',payment_terms.id)
+  AS status\r\nFROM payment_terms\r\nJOIN payment_term_date_types ON payment_term_date_types.id
+  = payment_terms.payment_term_date_type_id\r\nJOIN deal_types ON deal_types.id =
+  payment_terms.deal_type_id\r\nJOIN incoterms ON incoterms.id = payment_terms.incoterm_id"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -45,11 +46,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  payment_term_type_id:
-    :name: payment_term_type_id
+  deal_type_id:
+    :name: deal_type_id
     :sequence_no: 3
-    :caption: Payment term type
-    :namespaced_name: payment_terms.payment_term_type_id
+    :caption: Deal type
+    :namespaced_name: payment_terms.deal_type_id
     :data_type: :integer
     :width: 
     :format: 
@@ -61,17 +62,49 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  payment_term_type:
-    :name: payment_term_type
+  deal_type:
+    :name: deal_type
     :sequence_no: 4
-    :caption: Payment term type
-    :namespaced_name: payment_term_types.payment_term_type
+    :caption: Deal type
+    :namespaced_name: deal_types.deal_type
     :data_type: :string
     :width: 
     :format: 
     :hide: false
     :pinned: 
-    :groupable: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  incoterm_id:
+    :name: incoterm_id
+    :sequence_no: 5
+    :caption: Incoterm
+    :namespaced_name: payment_terms.incoterm_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  incoterm:
+    :name: incoterm
+    :sequence_no: 6
+    :caption: Incoterm
+    :namespaced_name: incoterms.incoterm
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -79,7 +112,7 @@
     :group_max: false
   payment_term_date_type_id:
     :name: payment_term_date_type_id
-    :sequence_no: 5
+    :sequence_no: 7
     :caption: Payment term date type
     :namespaced_name: payment_terms.payment_term_date_type_id
     :data_type: :integer
@@ -93,17 +126,17 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  type_of_date:
-    :name: type_of_date
-    :sequence_no: 6
-    :caption: Type of date
+  payment_term_date_type:
+    :name: payment_term_date_type
+    :sequence_no: 8
+    :caption: Payment term date type
     :namespaced_name: payment_term_date_types.type_of_date
     :data_type: :string
     :width: 
     :format: 
     :hide: false
     :pinned: 
-    :groupable: true
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -111,7 +144,7 @@
     :group_max: false
   short_description:
     :name: short_description
-    :sequence_no: 7
+    :sequence_no: 9
     :caption: Short description
     :namespaced_name: payment_terms.short_description
     :data_type: :string
@@ -127,7 +160,7 @@
     :group_max: false
   long_description:
     :name: long_description
-    :sequence_no: 8
+    :sequence_no: 10
     :caption: Long description
     :namespaced_name: payment_terms.long_description
     :data_type: :string
@@ -143,7 +176,7 @@
     :group_max: false
   percentage:
     :name: percentage
-    :sequence_no: 9
+    :sequence_no: 11
     :caption: Percentage
     :namespaced_name: payment_terms.percentage
     :data_type: :integer
@@ -159,7 +192,7 @@
     :group_max: false
   days:
     :name: days
-    :sequence_no: 10
+    :sequence_no: 12
     :caption: Days
     :namespaced_name: payment_terms.days
     :data_type: :integer
@@ -175,7 +208,7 @@
     :group_max: false
   amount_per_carton:
     :name: amount_per_carton
-    :sequence_no: 11
+    :sequence_no: 13
     :caption: Amount per carton
     :namespaced_name: payment_terms.amount_per_carton
     :data_type: :number
@@ -191,7 +224,7 @@
     :group_max: false
   for_liquidation:
     :name: for_liquidation
-    :sequence_no: 12
+    :sequence_no: 14
     :caption: For liquidation
     :namespaced_name: payment_terms.for_liquidation
     :data_type: :boolean
@@ -207,7 +240,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 13
+    :sequence_no: 15
     :caption: Active
     :namespaced_name: payment_terms.active
     :data_type: :boolean
@@ -223,7 +256,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 14
+    :sequence_no: 16
     :caption: Created at
     :namespaced_name: payment_terms.created_at
     :data_type: :datetime
@@ -239,7 +272,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 15
+    :sequence_no: 17
     :caption: Updated at
     :namespaced_name: payment_terms.updated_at
     :data_type: :datetime
@@ -255,7 +288,7 @@
     :group_max: false
   status:
     :name: status
-    :sequence_no: 16
+    :sequence_no: 18
     :caption: Status
     :namespaced_name: 
     :data_type: :string
@@ -270,26 +303,26 @@
     :group_min: false
     :group_max: false
 :query_parameter_definitions:
-- :column: payment_terms.payment_term_type_id
-  :caption: Payment term type
-  :data_type: :integer
-  :control_type: :list
-  :default_value: 
-  :ordered_list: true
-  :ui_priority: 1
-  :list_def: SELECT payment_term_type, id FROM payment_term_types ORDER BY payment_term_type
-- :column: payment_terms.payment_term_date_type_id
-  :caption: Payment term date type
-  :data_type: :integer
-  :control_type: :list
-  :default_value: 
-  :ordered_list: true
-  :ui_priority: 1
-  :list_def: SELECT type_of_date, id FROM payment_term_date_types ORDER BY type_of_date
 - :column: payment_terms.active
   :caption: Active
   :data_type: :boolean
   :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: payment_terms.incoterm_id
+  :caption: Incoterm Id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: payment_terms.deal_type_id
+  :caption: Deal Type Id
+  :data_type: :integer
+  :control_type: :text
   :default_value: 
   :ordered_list: false
   :ui_priority: 1

@@ -65,7 +65,8 @@ module MasterfilesApp
 
   PaymentTermSchema = Dry::Schema.Params do
     optional(:id).filled(:integer)
-    required(:payment_term_type_id).filled(:integer)
+    required(:incoterm_id).filled(:integer)
+    required(:deal_type_id).filled(:integer)
     required(:payment_term_date_type_id).filled(:integer)
     required(:short_description).filled(Types::StrippedString)
     required(:long_description).maybe(Types::StrippedString)

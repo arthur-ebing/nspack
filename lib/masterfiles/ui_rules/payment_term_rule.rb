@@ -15,10 +15,9 @@ module UiRules
     end
 
     def set_show_fields
-      fields[:payment_term_type] = { renderer: :label,
-                                     caption: 'Payment Term Type' }
-      fields[:payment_term_date_type] = { renderer: :label,
-                                          caption: 'Payment Term Date Type' }
+      fields[:incoterm] = { renderer: :label }
+      fields[:deal_type] = { renderer: :label }
+      fields[:payment_term_date_type] = { renderer: :label }
       fields[:short_description] = { renderer: :label }
       fields[:long_description] = { renderer: :label }
       fields[:percentage] = { renderer: :label }
@@ -32,11 +31,16 @@ module UiRules
 
     def common_fields
       {
-        payment_term_type_id: { renderer: :select,
-                                options: @repo.for_select_payment_term_types,
-                                disabled_options: @repo.for_select_inactive_payment_term_types,
-                                caption: 'Payment Term Type',
-                                required: true },
+        incoterm_id: { renderer: :select,
+                       options: @repo.for_select_incoterms,
+                       disabled_options: @repo.for_select_inactive_incoterms,
+                       caption: 'Incoterm',
+                       required: true },
+        deal_type_id: { renderer: :select,
+                        options: @repo.for_select_deal_types,
+                        disabled_options: @repo.for_select_inactive_deal_types,
+                        caption: 'Deal Type',
+                        required: true },
         payment_term_date_type_id: { renderer: :select,
                                      options: @repo.for_select_payment_term_date_types,
                                      disabled_options: @repo.for_select_inactive_payment_term_date_types,
@@ -61,7 +65,8 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(payment_term_type_id: nil,
+      @form_object = OpenStruct.new(incoterm_id: nil,
+                                    deal_type_id: nil,
                                     payment_term_date_type_id: nil,
                                     short_description: nil,
                                     long_description: nil,

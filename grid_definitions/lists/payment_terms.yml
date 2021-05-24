@@ -33,6 +33,12 @@
     - :col: payment_terms.active
       :op: =
       :val: true
+    - :col: payment_terms.incoterm_id
+      :op: =
+      :val: $:incoterm_id$
+    - :col: payment_terms.deal_type_id
+      :op: =
+      :val: $:deal_type_id$
 :multiselect:
   :customer_payment_term_set:
     :url: "/masterfiles/finance/customer_payment_term_sets/$:id$/link_payment_terms"

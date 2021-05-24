@@ -13,7 +13,8 @@ module Masterfiles
             page.form do |form|
               # form.caption 'Payment Term'
               form.view_only!
-              form.add_field :payment_term_type
+              form.add_field :incoterm
+              form.add_field :deal_type
               form.add_field :payment_term_date_type
               form.add_field :short_description
               form.add_field :long_description

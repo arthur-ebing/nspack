@@ -16,7 +16,8 @@ module Masterfiles
               form.caption 'New Payment Term'
               form.action '/masterfiles/finance/payment_terms'
               form.remote! if remote
-              form.add_field :payment_term_type_id
+              form.add_field :incoterm_id
+              form.add_field :deal_type_id
               form.add_field :payment_term_date_type_id
               form.add_field :short_description
               form.add_field :long_description

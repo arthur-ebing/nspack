@@ -15,7 +15,8 @@ module UiRules
     end
 
     def set_show_fields
-      fields[:currency] = { renderer: :label }
+      fields[:currency] = { renderer: :label,
+                            caption: 'Currency Code' }
       fields[:description] = { renderer: :label }
       fields[:active] = { renderer: :label,
                           as_boolean: true }
@@ -23,7 +24,7 @@ module UiRules
 
     def common_fields
       {
-        currency: {},
+        currency: { caption: 'Currency Code' },
         description: {}
       }
     end

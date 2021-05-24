@@ -70,8 +70,10 @@ module MasterfilesApp
 
   class PaymentTerm < Dry::Struct
     attribute :id, Types::Integer
-    attribute :payment_term_type_id, Types::Integer
-    attribute :payment_term_type, Types::String
+    attribute :deal_type_id, Types::Integer
+    attribute :deal_type, Types::String
+    attribute :incoterm_id, Types::Integer
+    attribute :incoterm, Types::String
     attribute :payment_term_date_type_id, Types::Integer
     attribute :payment_term_date_type, Types::String
     attribute :payment_term, Types::String
