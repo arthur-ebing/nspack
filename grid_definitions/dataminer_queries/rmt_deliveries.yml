@@ -1,7 +1,11 @@
 ---
 :caption: RMT Deliveries
-:sql: "SELECT\r\n    rmt_deliveries.id,\r\n    fn_current_status ('rmt_deliveries',
-  rmt_deliveries.id) AS status,\r\n    rmt_deliveries.date_delivered AS delivered_at,\r\n
+:sql: "SELECT\r\n    rmt_deliveries.id,\r\n
+  CASE WHEN rmt_deliveries.bin_scan_mode = 1 THEN 'Scan Bins Individually'
+  WHEN rmt_deliveries.bin_scan_mode = 2 THEN 'Scan Bin Groups'
+  WHEN rmt_deliveries.bin_scan_mode = 3 THEN 'Auto Allocate Bin Numbers'
+  END bin_scan_mode,\r\n
+  \   fn_current_status ('rmt_deliveries', rmt_deliveries.id) AS status,\r\n    rmt_deliveries.date_delivered AS delivered_at,\r\n
   \   rmt_deliveries.reference_number,\r\n    NOT (rmt_deliveries.keep_open OR rmt_deliveries.delivery_tipped)
   \ AS show_keep_delivery_open,\r\n\r\n    rmt_deliveries.season_id,\r\n    seasons.season_code,\r\n
   \   --\r\n    rmt_deliveries.farm_id,\r\n    farms.farm_code,\r\n    --\r\n    rmt_deliveries.puc_id,\r\n
@@ -333,6 +337,22 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  bin_scan_mode:
+    :name: bin_scan_mode
+    :sequence_no: 19
+    :caption: Bin Scan Mode
+    :namespaced_name: rmt_deliveries.bin_scan_mode
+    :data_type: :string
+    :width: 170
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   truck_registration_number:
     :name: truck_registration_number
     :sequence_no: 19
@@ -340,11 +360,11 @@
     :namespaced_name: rmt_deliveries.truck_registration_number
     :data_type: :string
     :width: 120
-    :format: 
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
