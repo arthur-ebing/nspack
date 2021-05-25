@@ -1,30 +1,33 @@
 ---
 :caption: Govt Inspection Pallets
-:sql: "SELECT\r\n    p.pallet_number,\r\n    govt_inspection_pallets.id,\r\n    govt_inspection_pallets.pallet_id,\r\n
-  \   govt_inspection_pallets.govt_inspection_sheet_id,\r\n    govt_inspection_sheets.completed,\r\n
-  \   govt_inspection_pallets.passed,\r\n    govt_inspection_pallets.inspected,\r\n
-  \   govt_inspection_pallets.inspected_at,\r\n    govt_inspection_pallets.failure_reason_id,\r\n
-  \   inspection_failure_reasons.failure_reason,\r\n    inspection_failure_reasons.description,\r\n
-  \   inspection_failure_reasons.main_factor,\r\n    inspection_failure_reasons.secondary_factor,\r\n
-  \   govt_inspection_pallets.failure_remarks,\r\n    govt_inspection_sheets.inspected
-  AS sheet_inspected,\r\n    p.gross_weight,\r\n    p.carton_quantity,\r\n    array_agg(DISTINCT
-  marketing_varieties.marketing_variety_code) AS marketing_varieties,\r\n    array_agg(DISTINCT
-  target_market_groups.target_market_group_name) AS packed_tm_groups,\r\n    pallet_bases.pallet_base_code
-  AS pallet_base,\r\n    govt_inspection_pallets.active,\r\n    govt_inspection_pallets.created_at,\r\n
-  \   govt_inspection_pallets.updated_at,\r\n    CASE WHEN govt_inspection_pallets.inspected\r\n
-  \       AND NOT govt_inspection_pallets.passed THEN\r\n        'error'\r\n    WHEN
-  govt_inspection_pallets.passed THEN\r\n        'ok'\r\n    END AS colour_rule\r\nFROM\r\n
-  \   govt_inspection_pallets\r\n    JOIN govt_inspection_sheets ON govt_inspection_sheets.id
-  = govt_inspection_pallets.govt_inspection_sheet_id\r\n    LEFT JOIN inspection_failure_reasons
-  ON inspection_failure_reasons.id = govt_inspection_pallets.failure_reason_id\r\n
-  \   LEFT JOIN pallets p ON p.id = govt_inspection_pallets.pallet_id\r\n    LEFT
-  JOIN pallet_sequences ps ON p.id = ps.pallet_id\r\n    LEFT JOIN marketing_varieties
-  ON marketing_varieties.id = ps.marketing_variety_id\r\n    LEFT JOIN target_market_groups
-  ON target_market_groups.id = ps.packed_tm_group_id\r\n    LEFT JOIN pallet_formats
-  ON pallet_formats.id = p.pallet_format_id\r\n    LEFT JOIN pallet_bases ON pallet_bases.id
-  = pallet_formats.pallet_base_id\r\nGROUP BY\r\n    govt_inspection_pallets.id,\r\n
-  \   govt_inspection_sheets.id,\r\n    p.id,\r\n    inspection_failure_reasons.id,\r\n
-  \   pallet_bases.id\r\nORDER BY\r\n    govt_inspection_pallets.id DESC"
+:sql: "SELECT\r\n    pallets.pallet_number,\r\n    govt_inspection_pallets.id,\r\n
+  \   govt_inspection_pallets.pallet_id,\r\n    govt_inspection_pallets.govt_inspection_sheet_id,\r\n
+  \   govt_inspection_sheets.completed,\r\n    govt_inspection_pallets.passed,\r\n
+  \   govt_inspection_pallets.inspected,\r\n    pallets.repacked,\r\n    govt_inspection_pallets.inspected_at,\r\n
+  \   govt_inspection_pallets.failure_reason_id,\r\n    inspection_failure_reasons.failure_reason,\r\n
+  \   inspection_failure_reasons.description,\r\n    inspection_failure_reasons.main_factor,\r\n
+  \   inspection_failure_reasons.secondary_factor,\r\n    govt_inspection_pallets.failure_remarks,\r\n
+  \   govt_inspection_sheets.inspected AS sheet_inspected,\r\n    pallets.gross_weight,\r\n
+  \   pallets.carton_quantity,\r\n    ARRAY_AGG(DISTINCT marketing_varieties.marketing_variety_code)
+  AS marketing_varieties,\r\n    ARRAY_AGG(DISTINCT target_market_groups.target_market_group_name)
+  AS packed_tm_groups,\r\n    pallet_bases.pallet_base_code AS pallet_base,\r\n\r\n
+  \   (SELECT ARRAY_AGG(DISTINCT pallet_sequences.pallet_number)\r\n    FROM pallet_sequences\r\n
+  \   WHERE repacked_from_pallet_id = govt_inspection_pallets.pallet_id\r\n    GROUP
+  BY repacked_from_pallet_id) AS repacked_to_pallets,\r\n\r\n    govt_inspection_pallets.active,\r\n
+  \   govt_inspection_pallets.created_at,\r\n    govt_inspection_pallets.updated_at,\r\n
+  \   CASE WHEN govt_inspection_pallets.inspected\r\n        AND NOT govt_inspection_pallets.passed
+  THEN\r\n             'error'\r\n         WHEN govt_inspection_pallets.passed THEN\r\n
+  \            'ok'\r\n        END AS colour_rule\r\nFROM govt_inspection_pallets\r\nJOIN
+  govt_inspection_sheets ON govt_inspection_sheets.id = govt_inspection_pallets.govt_inspection_sheet_id\r\nLEFT
+  JOIN inspection_failure_reasons ON inspection_failure_reasons.id = govt_inspection_pallets.failure_reason_id\r\nLEFT
+  JOIN pallets ON pallets.id = govt_inspection_pallets.pallet_id\r\nLEFT JOIN pallet_sequences
+  ON pallets.id = pallet_sequences.pallet_id\r\nLEFT JOIN marketing_varieties ON marketing_varieties.id
+  = pallet_sequences.marketing_variety_id\r\nLEFT JOIN target_market_groups ON target_market_groups.id
+  = pallet_sequences.packed_tm_group_id\r\nLEFT JOIN pallet_formats ON pallet_formats.id
+  = pallets.pallet_format_id\r\nLEFT JOIN pallet_bases ON pallet_bases.id = pallet_formats.pallet_base_id\r\nGROUP
+  BY\r\n    govt_inspection_pallets.id,\r\n    govt_inspection_sheets.id,\r\n    pallets.id,\r\n
+  \   inspection_failure_reasons.id,\r\n    pallet_bases.id\r\nORDER BY\r\n    govt_inspection_pallets.id
+  DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -36,7 +39,7 @@
     :name: pallet_number
     :sequence_no: 1
     :caption: Pallet number
-    :namespaced_name: p.pallet_number
+    :namespaced_name: pallets.pallet_number
     :data_type: :string
     :width: 
     :format: 
@@ -144,9 +147,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  repacked:
+    :name: repacked
+    :sequence_no: 8
+    :caption: Repacked
+    :namespaced_name: pallets.repacked
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   inspected_at:
     :name: inspected_at
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Inspected at
     :namespaced_name: govt_inspection_pallets.inspected_at
     :data_type: :datetime
@@ -162,7 +181,7 @@
     :group_max: false
   failure_reason_id:
     :name: failure_reason_id
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Failure reason
     :namespaced_name: govt_inspection_pallets.failure_reason_id
     :data_type: :integer
@@ -178,7 +197,7 @@
     :group_max: false
   failure_reason:
     :name: failure_reason
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Failure reason
     :namespaced_name: inspection_failure_reasons.failure_reason
     :data_type: :string
@@ -194,7 +213,7 @@
     :group_max: false
   description:
     :name: description
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Description
     :namespaced_name: inspection_failure_reasons.description
     :data_type: :string
@@ -210,7 +229,7 @@
     :group_max: false
   main_factor:
     :name: main_factor
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Main factor
     :namespaced_name: inspection_failure_reasons.main_factor
     :data_type: :boolean
@@ -226,7 +245,7 @@
     :group_max: false
   secondary_factor:
     :name: secondary_factor
-    :sequence_no: 13
+    :sequence_no: 14
     :caption: Secondary factor
     :namespaced_name: inspection_failure_reasons.secondary_factor
     :data_type: :boolean
@@ -242,7 +261,7 @@
     :group_max: false
   failure_remarks:
     :name: failure_remarks
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: Failure remarks
     :namespaced_name: govt_inspection_pallets.failure_remarks
     :data_type: :string
@@ -258,7 +277,7 @@
     :group_max: false
   sheet_inspected:
     :name: sheet_inspected
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Sheet inspected
     :namespaced_name: govt_inspection_sheets.inspected
     :data_type: :string
@@ -274,9 +293,9 @@
     :group_max: false
   gross_weight:
     :name: gross_weight
-    :sequence_no: 16
+    :sequence_no: 17
     :caption: Gross weight
-    :namespaced_name: p.gross_weight
+    :namespaced_name: pallets.gross_weight
     :data_type: :number
     :width: 
     :format: 
@@ -290,9 +309,9 @@
     :group_max: false
   carton_quantity:
     :name: carton_quantity
-    :sequence_no: 17
+    :sequence_no: 18
     :caption: Carton quantity
-    :namespaced_name: p.carton_quantity
+    :namespaced_name: pallets.carton_quantity
     :data_type: :string
     :width: 
     :format: 
@@ -306,7 +325,7 @@
     :group_max: false
   marketing_varieties:
     :name: marketing_varieties
-    :sequence_no: 18
+    :sequence_no: 19
     :caption: Marketing varieties
     :namespaced_name: 
     :data_type: :string
@@ -322,8 +341,8 @@
     :group_max: false
   packed_tm_groups:
     :name: packed_tm_groups
-    :sequence_no: 19
-    :caption: Packed tm groups
+    :sequence_no: 20
+    :caption: Packed TM groups
     :namespaced_name: 
     :data_type: :string
     :width: 
@@ -338,7 +357,7 @@
     :group_max: false
   pallet_base:
     :name: pallet_base
-    :sequence_no: 20
+    :sequence_no: 21
     :caption: Pallet base
     :namespaced_name: pallet_bases.pallet_base_code
     :data_type: :string
@@ -352,9 +371,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  repacked_to_pallets:
+    :name: repacked_to_pallets
+    :sequence_no: 22
+    :caption: Repacked to pallets
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   active:
     :name: active
-    :sequence_no: 21
+    :sequence_no: 23
     :caption: Active
     :namespaced_name: govt_inspection_pallets.active
     :data_type: :boolean
@@ -370,7 +405,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 22
+    :sequence_no: 24
     :caption: Created at
     :namespaced_name: govt_inspection_pallets.created_at
     :data_type: :datetime
@@ -386,7 +421,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 23
+    :sequence_no: 25
     :caption: Updated at
     :namespaced_name: govt_inspection_pallets.updated_at
     :data_type: :datetime
@@ -402,7 +437,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 24
+    :sequence_no: 26
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
