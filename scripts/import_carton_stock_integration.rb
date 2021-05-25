@@ -216,14 +216,10 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
 
     return nil unless args.depot_pallet
 
-    args = { orchard_code: args.orchard_code || 'UNKNOWN',
-             puc_id: args.puc_id,
-             farm_id: args.farm_id }
-
-    id = @repo.get_id(:orchards, args)
-    return id if id
-
-    @repo.create(:orchards, args)
+    args = { orchard_code: 'DEPOT_UNKNOWN',
+             farm_id: @repo.get_id(:farms, farm_code: 'DEPOT_UNKNOWN'),
+             puc_id: @repo.get_id_or_create(:pucs, puc_code: 'DEPOT_UNKNOWN') }
+    @repo.get_id_or_create(:orchards, args)
   end
 
   def get_pm_bom_id(args) # rubocop:disable Metrics/AbcSize
