@@ -248,9 +248,11 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     args.pallet_format_id = get_id_or_error(:pallet_formats,
                                             pallet_base_id: args.pallet_base_id,
                                             pallet_stack_type_id: args.pallet_stack_type_id)
-    args.plt_packhouse_resource_id = get_id_or_error(:plant_resources, plant_resource_code: args.packhouse_code)
-    args.plt_line_resource_id = get_id_or_error(:plant_resources, plant_resource_code: args.production_line_code)
-
+    args.depot_pallet = args.is_depot_pallet == 't'
+    unless args.depot_pallet
+      args.plt_packhouse_resource_id = get_id_or_error(:plant_resources, plant_resource_code: args.packhouse_code)
+      args.plt_line_resource_id = get_id_or_error(:plant_resources, plant_resource_code: args.production_line_code)
+    end
     args.in_stock = args.inspection_result.to_s.upcase == 'PASSED'
     args.govt_first_inspection_at = args.inspected_at
     args.stock_created_at = args.intake_date
@@ -269,7 +271,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     args.reinspected = false
     args.scrapped = false
     args.cooled = !args.cold_date.nil_or_empty?
-    args.depot_pallet = args.is_depot_pallet == 't'
+
     args.edi_in_consignment_note_number = args.consignment_note_number
     args.edi_in_inspection_point = args.inspection_point
 
