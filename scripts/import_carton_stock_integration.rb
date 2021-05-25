@@ -68,22 +68,25 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     pallet_rows.each_with_index do |sequence, index|
       params = get_mf_ids_for_pallet(sequence.to_h)
       if index.zero?
-        pallet_id = create_pallet(params)
-        raise Crossbeams::InfoError, "failed to create pallet: #{params[:pallet_number]}" unless @pallet_errors.empty?
+        res = create_pallet(params)
+        pallet_id = res.instance
+        raise Crossbeams::InfoError, res.message unless res.success
       end
       params[:pallet_id] = pallet_id
       params[:pallet_sequence_number] = index + 1
       params = get_mf_ids_for_pallet_sequence(params)
-      params[:pallet_sequence_id] = create_pallet_sequence(params)
-      raise Crossbeams::InfoError, "failed to create pallet sequence: #{params[:pallet_number]}_#{params[:pallet_sequence_number]}" unless @pallet_errors.empty?
+      res = create_pallet_sequence(params)
+      params[:pallet_sequence_id] = res.instance
+      raise Crossbeams::InfoError, "#{params[:pallet_number]}_#{params[:pallet_sequence_number]} #{res.message}" unless res.success
 
       carton_numbers = params[:carton_numbers].split('|')
       carton_numbers.each do |carton_number|
         params[:legacy_carton_number] = carton_number
+        res = create_carton_label(params)
+        params[:carton_label_id] = res.instance
+        raise Crossbeams::InfoError, res.message  unless res.success
 
-        params[:carton_label_id] = create_carton_label(params)
         create_carton(params)
-        raise Crossbeams::InfoError, "failed to create carton: #{carton_number}" unless @pallet_errors.empty?
       end
     end
 
@@ -114,10 +117,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
 
     args.farm_id = get_id_or_error(:farms, farm_code: args.farm_code)
     args.puc_id = get_id_or_error(:pucs, puc_code: args.puc_code)
-    args.orchard_id = get_id_or_error(:orchards,
-                                      { orchard_code: args.orchard_code,
-                                        puc_id: args.puc_id,
-                                        farm_id: args.farm_id })
+    args.orchard_id = get_orchard_id(args)
 
     args.cultivar_code = args.rmt_variety
     args.cultivar_id = get_id_or_error(:cultivars,
@@ -192,8 +192,10 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     args.gtin_code = args.gtin
     args.rmt_class_id = get_id_or_error(:rmt_classes, rmt_class_code: args.product_class_code)
 
-    args.packhouse_resource_id = get_id_or_error(:plant_resources, plant_resource_code: args.packhouse_code)
-    args.production_line_id = get_id_or_error(:plant_resources, plant_resource_code: args.production_line_code)
+    unless args.depot_pallet
+      args.packhouse_resource_id = get_id_or_error(:plant_resources, plant_resource_code: args.packhouse_code)
+      args.production_line_id = get_id_or_error(:plant_resources, plant_resource_code: args.production_line_code)
+    end
 
     args.pallet_label_name = nil
     args.packing_method_id = get_id_or_error(:packing_methods, packing_method_code: 'NORMAL')
@@ -202,6 +204,26 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     args.created_at = args.seq_created_at
 
     args.to_h
+  end
+
+  def get_orchard_id(args) # rubocop:disable Metrics/AbcSize
+    if !args.orchard_code.nil? & !args.puc_id.nil? & !args.farm_id
+      return get_id_or_error(:orchards,
+                             { orchard_code: args.orchard_code,
+                               puc_id: args.puc_id,
+                               farm_id: args.farm_id })
+    end
+
+    return nil unless args.depot_pallet
+
+    args = { orchard_code: args.orchard_code || 'UNKNOWN',
+             puc_id: args.puc_id,
+             farm_id: args.farm_id }
+
+    id = @repo.get_id(:orchards, args)
+    return id if id
+
+    @repo.create(:orchards, args)
   end
 
   def get_pm_bom_id(args) # rubocop:disable Metrics/AbcSize
@@ -286,6 +308,8 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
                                { cultivar_code: attrs[:cultivar_code], puc_code: attrs[:marketing_puc], marketing_orchard: true })
     return existing_id if existing_id
 
+    return nil if args.depot_pallet
+
     attrs[:puc_code] = attrs[:marketing_puc]
     attrs[:marketing_orchard] = true
     attrs[:description] = nil
@@ -295,16 +319,15 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     @repo.create(:registered_orchards, res.to_h)
   end
 
-  def find_or_create_marketing_puc(args)
-    attrs = args.to_h
+  def find_or_create_marketing_puc(params)
+    attrs = params.to_h
     marketing_puc_id = get_id_or_error(:pucs, puc_code: attrs[:marketing_puc])
 
-    existing_id = @repo.get_value(:farm_puc_orgs,
-                                  :puc_id,
-                                  { organization_id: attrs[:organization_id], farm_id: attrs[:farm_id], puc_id: marketing_puc_id })
+    args = { organization_id: attrs[:organization_id], farm_id: attrs[:farm_id], puc_id: marketing_puc_id }
+    existing_id = @repo.get_value(:farm_puc_orgs, :puc_id, args)
     return existing_id if existing_id
 
-    res = MasterfilesApp::FarmPucOrgSchema.call(attrs)
+    res = MasterfilesApp::FarmPucOrgSchema.call(args)
     raise Crossbeams::InfoError, "can't create_farm_puc_orgs #{validation_failed_response(res).errors}" if res.failure?
 
     @repo.create(:farm_puc_orgs, res)
@@ -312,43 +335,43 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
 
   def create_carton_label(params)
     res = MesscadaApp::CartonLabelContract.new.call(params)
-    raise Crossbeams::InfoError, "can't create_carton_label #{validation_failed_response(res).errors}" if res.failure?
+    return failed_response("can't create_carton_label #{validation_failed_response(res).errors}") if res.failure?
 
     id = @repo.create(:carton_labels, res)
     log_status(:carton_labels, id, @status)
 
     @repo.create(:legacy_barcodes, carton_label_id: id, legacy_carton_number: params[:legacy_carton_number])
-    id
+    success_response('Created carton label', id)
   end
 
   def create_carton(params)
     res = MesscadaApp::CartonSchema.call(params)
-    raise Crossbeams::InfoError, "can't create_carton #{validation_failed_response(res).errors}" if res.failure?
+    return failed_response("can't create_carton #{validation_failed_response(res).errors}") if res.failure?
 
     id = @repo.create(:cartons, res)
     log_status(:cartons, id, @status)
 
-    id
+    success_response('Created carton', id)
   end
 
   def create_pallet_sequence(params)
     res = MesscadaApp::PalletSequenceContract.new.call(params)
-    raise Crossbeams::InfoError, "can't create_pallet_sequence #{validation_failed_response(res).errors}" if res.failure?
+    return failed_response("can't create_pallet_sequence #{validation_failed_response(res).errors}") if res.failure?
 
     id = @repo.create(:pallet_sequences, res)
     log_status(:pallet_sequences, id, @status)
     @pallet_sequence_ids_created << id
-    id
+    success_response('Created pallet sequence', id)
   end
 
   def create_pallet(params)
     res = MesscadaApp::PalletContract.new.call(params)
-    raise Crossbeams::InfoError, "can't create_pallet #{validation_failed_response(res).errors}" if res.failure?
+    return failed_response("can't create_pallet #{validation_failed_response(res).errors}") if res.failure?
 
     id = @repo.create(:pallets, res)
     log_status(:pallets, id, @status)
     @pallet_ids_created << id
-    id
+    success_response('Created pallet', id)
   end
 
   def get_id_or_error(table_name, args)
