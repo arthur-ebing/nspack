@@ -62,3 +62,13 @@ Archive backups job will clear all but 31 days' db backups and on the 1st of eve
 # OR...
 0 4 * * * cd $HOME/bin && chruby-exec 2.5.5 -- ./archive_and_clear.rb $HOME/backup nspack_ud_`date +\%Y-\%m-\%d`.backup.bz2
 ----
+
+==== Calculate production run statistics
+
+This job runs every 2 minutes between 6am and 6pm and executes a function in the database.
+
+[source,bash]
+----
+# Calculate production run stats:
+*/2 6,7,8,9,10,11,12,13,14,15,16,17,18 * * * psql -v ON_ERROR_STOP=1 -c 'SELECT fn_production_run_stats_queue_worker();' -d nspack -U postgres
+----
