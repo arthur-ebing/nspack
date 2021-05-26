@@ -207,7 +207,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
   end
 
   def get_orchard_id(args) # rubocop:disable Metrics/AbcSize
-    if !args.orchard_code.nil? & !args.puc_id.nil? & !args.farm_id
+    if !args.orchard_code.nil_or_empty? & !args.puc_id.nil? & !args.farm_id
       return get_id_or_error(:orchards,
                              { orchard_code: args.orchard_code,
                                puc_id: args.puc_id,
