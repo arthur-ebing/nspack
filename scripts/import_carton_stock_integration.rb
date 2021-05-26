@@ -206,20 +206,14 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     args.to_h
   end
 
-  def get_orchard_id(args) # rubocop:disable Metrics/AbcSize
-    if !args.orchard_code.nil_or_empty? & !args.puc_id.nil? & !args.farm_id
-      return get_id_or_error(:orchards,
-                             { orchard_code: args.orchard_code,
-                               puc_id: args.puc_id,
-                               farm_id: args.farm_id })
+  def get_orchard_id(args)
+    if  args.depot_pallet
+      params = { orchard_code: 'DEPOT_UNKNOWN',
+                 farm_id: @repo.get_id(:farms, farm_code: 'DEPOT_UNKNOWN'),
+                 puc_id: @repo.get_id_or_create(:pucs, puc_code: 'DEPOT_UNKNOWN') }
+      return @repo.get_id_or_create(:orchards, params)
     end
-
-    return nil unless args.depot_pallet
-
-    args = { orchard_code: 'DEPOT_UNKNOWN',
-             farm_id: @repo.get_id(:farms, farm_code: 'DEPOT_UNKNOWN'),
-             puc_id: @repo.get_id_or_create(:pucs, puc_code: 'DEPOT_UNKNOWN') }
-    @repo.get_id_or_create(:orchards, args)
+    get_id_or_error(:orchards, { orchard_code: args.orchard_code, puc_id: args.puc_id, farm_id: args.farm_id })
   end
 
   def get_pm_bom_id(args) # rubocop:disable Metrics/AbcSize
