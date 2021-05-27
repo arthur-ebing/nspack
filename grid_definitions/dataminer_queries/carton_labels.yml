@@ -25,11 +25,11 @@
   AS target_market,\r\n  seasons.season_code,\r\n  pm_subtypes.subtype_code,\r\n  pm_types.pm_type_code,\r\n
   \ cartons_per_pallet.cartons_per_pallet,\r\n  pm_products.product_code,\r\n  cartons.gross_weight,\r\n
   \ cartons.nett_weight,\r\n  carton_labels.pick_ref,\r\n  cartons.pallet_sequence_id,\r\n
-  \ COALESCE(carton_labels.pallet_number, pallet_sequences.pallet_number) AS pallet_number,\r\n
-  \ pallet_sequences.pallet_sequence_number,\r\n  personnel_identifiers.identifier
-  AS personnel_identifier,\r\n  contract_workers.personnel_number,\r\n  packing_methods.packing_method_code,\r\n
-  \ palletizers.identifier AS palletizer_identifier,\r\n  concat(palletizer_contract_workers.first_name,
-  '_', palletizer_contract_workers.surname) AS palletizer_contract_worker,\r\n  palletizer_contract_workers.personnel_number
+  \ pallet_sequences.pallet_number,\r\n  pallet_sequences.pallet_sequence_number,\r\n
+  \ personnel_identifiers.identifier AS personnel_identifier,\r\n  contract_workers.personnel_number,\r\n
+  \ packing_methods.packing_method_code,\r\n  palletizers.identifier AS palletizer_identifier,\r\n
+  \ concat(palletizer_contract_workers.first_name, '_', palletizer_contract_workers.surname)
+  AS palletizer_contract_worker,\r\n  palletizer_contract_workers.personnel_number
   AS palletizer_personnel_number,\r\n  cartons.is_virtual,\r\n  marketing_pucs.puc_code
   AS marketing_puc,\r\n  registered_orchards.orchard_code AS marketing_orchard,\r\n
   \ carton_labels.rmt_bin_id,\r\n  carton_labels.dp_carton,\r\n  carton_labels.gtin_code,\r\n
@@ -883,7 +883,7 @@
     :name: pallet_number
     :sequence_no: 51
     :caption: Pallet number
-    :namespaced_name: 
+    :namespaced_name: pallet_sequences.pallet_number
     :data_type: :string
     :width: 150
     :format: 
@@ -1120,7 +1120,7 @@
     :group_min: false
     :group_max: false
 :query_parameter_definitions:
-- :column: carton_id
+- :column: cartons.id
   :caption: Carton Id
   :data_type: :integer
   :control_type: :text
@@ -1128,7 +1128,7 @@
   :ordered_list: false
   :ui_priority: 1
   :list_def: 
-- :column: carton_label_id
+- :column: carton_labels.id
   :caption: Carton Label Id
   :data_type: :integer
   :control_type: :text
@@ -1136,7 +1136,7 @@
   :ordered_list: false
   :ui_priority: 1
   :list_def: 
-- :column: production_run_id
+- :column: carton_labels.production_run_id
   :caption: Production Run Id
   :data_type: :integer
   :control_type: :list
@@ -1144,7 +1144,7 @@
   :ordered_list: false
   :ui_priority: 2
   :list_def: SELECT id FROM production_runs
-- :column: carton_label_created_at
+- :column: carton_labels.created_at
   :caption: Label created at
   :data_type: :date
   :control_type: :daterange
@@ -1152,7 +1152,7 @@
   :ordered_list: false
   :ui_priority: 3
   :list_def: 
-- :column: carton_verified_at
+- :column: cartons.created_at
   :caption: Label verified at
   :data_type: :date
   :control_type: :daterange
@@ -1160,8 +1160,8 @@
   :ordered_list: false
   :ui_priority: 4
   :list_def: 
-- :column: packhouce
-  :caption: Packhouce
+- :column: packhouses.plant_resource_code
+  :caption: Packhouse
   :data_type: :string
   :control_type: :list
   :default_value: 
@@ -1170,7 +1170,7 @@
   :list_def: SELECT plant_resources.plant_resource_code FROM plant_resources JOIN
     plant_resource_types ON plant_resource_types.id = plant_resources.plant_resource_type_id
     WHERE plant_resource_type_code = 'PACKHOUSE' ORDER BY plant_resource_code
-- :column: line
+- :column: lines.plant_resource_code
   :caption: Line
   :data_type: :string
   :control_type: :list
@@ -1180,7 +1180,7 @@
   :list_def: SELECT plant_resources.plant_resource_code FROM plant_resources JOIN
     plant_resource_types ON plant_resource_types.id = plant_resources.plant_resource_type_id
     WHERE plant_resource_type_code = 'LINE' ORDER BY plant_resource_code
-- :column: packpoint
+- :column: packpoints.plant_resource_code
   :caption: Packpoint
   :data_type: :string
   :control_type: :list
@@ -1191,7 +1191,7 @@
     JOIN system_resources ON system_resources.id = carton_labels.resource_id JOIN
     plant_resources ON plant_resources.system_resource_id = system_resources.id ORDER
     BY plant_resource_code
-- :column: print_device
+- :column: system_resources.system_resource_code
   :caption: Print Device
   :data_type: :string
   :control_type: :list
@@ -1201,7 +1201,7 @@
   :list_def: SELECT DISTINCT system_resources.system_resource_code FROM system_resources
     JOIN carton_labels ON system_resources.id = carton_labels.resource_id ORDER BY
     system_resource_code
-- :column: label_name
+- :column: carton_labels.label_name
   :caption: Label Name
   :data_type: :string
   :control_type: :list
@@ -1209,7 +1209,7 @@
   :ordered_list: true
   :ui_priority: 10
   :list_def: SELECT label_name FROM labels ORDER BY label_name
-- :column: farm_code
+- :column: farms.farm_code
   :caption: Farm Code
   :data_type: :string
   :control_type: :list
@@ -1217,7 +1217,7 @@
   :ordered_list: true
   :ui_priority: 11
   :list_def: SELECT farm_code FROM farms ORDER BY farm_code
-- :column: puc_code
+- :column: pucs.puc_code
   :caption: PUC Code
   :data_type: :string
   :control_type: :list
@@ -1225,7 +1225,7 @@
   :ordered_list: true
   :ui_priority: 12
   :list_def: SELECT puc_code FROM pucs ORDER BY puc_code
-- :column: orchard_code
+- :column: orchards.orchard_code
   :caption: Orchard Code
   :data_type: :string
   :control_type: :list
@@ -1233,23 +1233,7 @@
   :ordered_list: true
   :ui_priority: 13
   :list_def: SELECT orchard_code FROM orchards ORDER BY orchard_code
-- :column: label_age_hrs
-  :caption: Label age (hrs)
-  :data_type: :integer
-  :control_type: :text
-  :default_value: 
-  :ordered_list: false
-  :ui_priority: 5
-  :list_def: 
-- :column: carton_age_hrs
-  :caption: Carton age (hrs)
-  :data_type: :integer
-  :control_type: :text
-  :default_value: 
-  :ordered_list: false
-  :ui_priority: 5
-  :list_def: 
-- :column: pallet_number
+- :column: pallet_sequences.pallet_number
   :caption: Pallet Number
   :data_type: :string
   :control_type: :text
