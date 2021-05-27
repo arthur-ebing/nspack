@@ -29,7 +29,8 @@ module UiRules
         marketing_variety_id: { renderer: :select,
                                 options: @setup_repo.for_select_template_commodity_marketing_varieties(
                                   @form_object.product_setup_template_id,
-                                  @form_object.commodity_id
+                                  @form_object.commodity_id,
+                                  @form_object.cultivar_id
                                 ),
                                 disabled_options: MasterfilesApp::CultivarRepo.new.for_select_inactive_marketing_varieties,
                                 prompt: true,
