@@ -14,6 +14,26 @@ module SecurityApp
       RegisteredMobileDeviceSchema.call(params)
     end
 
+    def rmd_for_ip(ip_address)
+      instance = repo.find_by_ip_address(ip_address)
+      if instance
+        success_response('ok', instance)
+      else
+        failed_response('not set')
+      end
+    end
+
+    def setup_rmd(ip_address, params)
+      instance = repo.find_by_ip_address(ip_address)
+      if instance
+        res = validate_registered_mobile_device_params(instance.to_h.merge(params))
+        repo.update_registered_mobile_device(instance.id, res)
+      else
+        res = validate_registered_mobile_device_params(params.merge(ip_address: ip_address))
+        repo.create_registered_mobile_device(res)
+      end
+    end
+
     def create_registered_mobile_device(params)
       res = validate_registered_mobile_device_params(params)
       return validation_failed_response(res) if res.failure?

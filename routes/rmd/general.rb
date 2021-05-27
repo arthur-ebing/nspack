@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-class Nspack < Roda
+# rubocop:disable Metrics/BlockLength
+class Nspack < Roda # rubocop:disable Metrics/ClassLength
   # RMD USER MENU PAGE
   # --------------------------------------------------------------------------
   route 'home', 'rmd' do
@@ -97,5 +98,58 @@ class Nspack < Roda
         end
       end
     end
+
+    # RMD SETTINGS FOR CURRENT DEVICE
+    # --------------------------------------------------------------------------
+    r.on 'settings' do
+      interactor = SecurityApp::RegisteredMobileDeviceInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.get do
+        res = interactor.rmd_for_ip(request.ip)
+        if r.remaining_path == '/maintain'
+          new_edit = if res.success
+                       'Edit'
+                     else
+                       'Add new'
+                     end
+          notes = if res.success
+                    rmd_info_message("This device ip address is <strong>#{request.ip}</strong>")
+                  else
+                    rmd_info_message("This device ip address is <strong>#{request.ip}</strong><p class='light-red'>Note that for this device to remember its settings, the ip address must be assigned as a static value.</p>")
+                  end
+          form = Crossbeams::RMDForm.new(res.instance || {},
+                                         form_name: :rm_device,
+                                         notes: notes,
+                                         caption: "#{new_edit} Registered Mobile Device",
+                                         action: '/rmd/utilities/settings',
+                                         button_caption: res.success ? 'Update' : 'Save')
+          form.add_label(:ip, 'IP address', request.ip)
+          form.add_section_header('Options:')
+          form.add_toggle(:hybrid_device, 'Hybrid device?')
+          form.add_toggle(:scan_with_camera, 'Scan with camera?')
+          form.add_select(:start_page_program_function_id, 'Start Page', items: SecurityApp::MenuRepo.new.program_functions_for_rmd_select, prompt: true, required: false)
+        else
+          form = Crossbeams::RMDForm.new(res.instance || {},
+                                         form_name: :rm_device,
+                                         # notes: notes,
+                                         caption: 'Registered Mobile Device',
+                                         action: '/rmd/home',
+                                         button_caption: 'Home')
+          form.add_label(:ip, 'IP address', request.ip)
+          form.add_section_header('Options:')
+          form.add_label(:hybrid_device, 'Hybrid device?', res.instance[:hybrid_device] ? 'Y' : 'N', nil, value_class: 'tc', as_table_cell: true)
+          form.add_label(:scan_with_camera, 'Scan with camera?', res.instance[:scan_with_camera] ? 'Y' : 'N', nil, value_class: 'tc', as_table_cell: true)
+          form.add_label(:start_page, 'Start Page', res.instance[:start_page], nil, as_table_cell: true)
+        end
+        form.add_csrf_tag csrf_tag
+        view(inline: form.render, layout: :layout_rmd)
+      end
+
+      r.post do
+        interactor.setup_rmd(request.ip, params[:rm_device])
+        r.redirect '/rmd/utilities/settings'
+      end
+    end
   end
 end
+# rubocop:enable Metrics/BlockLength
