@@ -21,43 +21,26 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      fields[:inspector_id] = { renderer: :label,
-                                with_value: @form_object.inspector,
-                                caption: 'Inspector' }
-      fields[:inspection_billing_party_role_id] = { renderer: :label,
-                                                    with_value: @form_object.inspection_billing,
-                                                    caption: 'Inspection Billing' }
-      fields[:exporter_party_role_id] = { renderer: :label,
-                                          with_value: @form_object.exporter,
-                                          caption: 'Exporter' }
+      fields[:inspector] = { renderer: :label }
+      fields[:inspection_billing] = { renderer: :label }
+      fields[:exporter] = { renderer: :label }
       fields[:booking_reference] = { renderer: :label }
-      fields[:results_captured] = { renderer: :label,
-                                    as_boolean: true }
+      fields[:results_captured] = { renderer: :label, as_boolean: true }
       fields[:results_captured_at] = { renderer: :label }
-      fields[:api_results_received] = { renderer: :label,
-                                        as_boolean: true }
+      fields[:api_results_received] = { renderer: :label,  as_boolean: true }
       fields[:use_inspection_destination_for_load_out] = { renderer: :label,
-                                                           caption: 'Use Destination Region For Load Out',
+                                                           caption: 'Use Destination Region For Load Out EDI',
                                                            as_boolean: true }
-      fields[:completed] = { renderer: :label,
-                             as_boolean: true }
+      fields[:completed] = { renderer: :label,  as_boolean: true }
       fields[:completed_at] = { renderer: :label }
-      fields[:inspected] = { renderer: :label,
-                             as_boolean: true }
+      fields[:inspected] = { renderer: :label,  as_boolean: true }
       fields[:inspection_point] = { renderer: :label }
-      fields[:awaiting_inspection_results] = { renderer: :label,
-                                               as_boolean: true }
+      fields[:awaiting_inspection_results] = { renderer: :label, as_boolean: true }
       fields[:packed_tm_group_id] = { renderer: :label,
-                                      with_value: @form_object.packed_tm_group,
                                       caption: 'Packed TM Group' }
-      fields[:destination_region_id] = { renderer: :label,
-                                         with_value: @form_object.destination_region,
-                                         caption: 'Destination Region' }
-      fields[:destination_country_id] = { renderer: :label,
-                                          with_value: @form_object.destination_country,
-                                          caption: 'Destination Country' }
-      fields[:active] = { renderer: :label,
-                          as_boolean: true }
+      fields[:destination_region] = { renderer: :label }
+      fields[:destination_country] = { renderer: :label }
+      fields[:active] = { renderer: :label,  as_boolean: true }
       fields[:upn] = { renderer: :label, caption: 'UPN' }
       fields[:reinspection] = { renderer: :label,
                                 hide_on_load: !@form_object.reinspection,
@@ -91,7 +74,7 @@ module UiRules
         results_captured_at: { renderer: :date },
         api_results_received: { renderer: :checkbox },
         use_inspection_destination_for_load_out: { renderer: :checkbox,
-                                                   caption: 'Use Destination Region For Load Out' },
+                                                   caption: 'Use Destination Region For Load Out EDI' },
         completed: { renderer: :checkbox,
                      disabled: true },
         completed_at: { renderer: :date },
@@ -100,17 +83,23 @@ module UiRules
         inspection_point: {},
         awaiting_inspection_results: { renderer: :checkbox },
         packed_tm_group_id: { renderer: :select,
-                              options: MasterfilesApp::TargetMarketRepo.new.for_select_packed_tm_groups(where: { id: valid_tm_group_ids }),
+                              options: MasterfilesApp::TargetMarketRepo.new.for_select_packed_tm_groups(
+                                where: { id: valid_tm_group_ids }
+                              ),
                               disabled_options: MasterfilesApp::TargetMarketRepo.new.for_select_inactive_tm_groups,
                               caption: 'Packed TM Group',
                               required: true },
         destination_region_id: { renderer: :select,
-                                 options: MasterfilesApp::DestinationRepo.new.for_select_destination_regions(where: { id: valid_destination_region_ids }),
+                                 options: MasterfilesApp::DestinationRepo.new.for_select_destination_regions(
+                                   where: { id: valid_destination_region_ids }
+                                 ),
                                  disabled_options: MasterfilesApp::DestinationRepo.new.for_select_inactive_destination_regions,
                                  caption: 'Destination Region',
                                  required: true },
         destination_country_id: { renderer: :select,
-                                  options: MasterfilesApp::DestinationRepo.new.for_select_destination_countries(where: { destination_region_id: valid_destination_region_ids }),
+                                  options: MasterfilesApp::DestinationRepo.new.for_select_destination_countries(
+                                    where: { destination_region_id: valid_destination_region_ids }
+                                  ),
                                   disabled_options: MasterfilesApp::DestinationRepo.new.for_select_inactive_destination_countries,
                                   caption: 'Destination Country',
                                   prompt: true,
@@ -144,7 +133,7 @@ module UiRules
                                     results_captured: nil,
                                     results_captured_at: nil,
                                     api_results_received: nil,
-                                    use_inspection_destination_for_load_out: nil,
+                                    use_inspection_destination_for_load_out: AppConst::CR_FG.use_inspection_destination_for_load_out?,
                                     completed: nil,
                                     completed_at: nil,
                                     inspected: nil,

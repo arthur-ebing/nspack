@@ -95,9 +95,9 @@ module FinishedGoods
                 fold.caption 'Govt Inspection Sheet'
                 fold.row do |row|
                   row.column do |col|
-                    col.add_field :inspector_id
-                    col.add_field :inspection_billing_party_role_id
-                    col.add_field :exporter_party_role_id
+                    col.add_field :inspector
+                    col.add_field :inspection_billing
+                    col.add_field :exporter
                     col.add_field :booking_reference
                     col.add_field :created_by
                     col.add_field :upn
@@ -106,8 +106,9 @@ module FinishedGoods
                   row.column do |col|
                     col.add_field :consignment_note_number
                     col.add_field :inspection_point
-                    col.add_field :destination_region_id
-                    col.add_field :destination_country_id
+                    # col.add_field :packed_tm_group
+                    col.add_field :destination_region
+                    col.add_field :destination_country
                     col.add_field :use_inspection_destination_for_load_out
                     col.add_field :completed
                     col.add_field :inspected
