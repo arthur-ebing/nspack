@@ -224,6 +224,12 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     @current_user ||= DevelopmentApp::UserRepo.new.find(:users, DevelopmentApp::User, session[:act_as_user_id] || session[:user_id])
   end
 
+  def does_user_have_rmd_menu_items?
+    return false unless current_user
+
+    SecurityApp::MenuRepo.new.does_user_have_rmd_menu_items?(current_user, self.class.name)
+  end
+
   def user_homepage
     return nil unless current_user&.profile
     return nil if current_user.profile['homepage_id'].nil_or_empty?

@@ -155,6 +155,8 @@ class Nspack < Roda
       response.set_cookie('pre_login_path', r.fullpath) unless rodauth.logged_in? || r.path == '/login' || !request.get? || fetch?(r)
       rodauth.require_authentication
       r.redirect('/login') if current_user.nil? # Session might have the incorrect user_id
+      # Set a flag if the user should be able to access the RMD home menu
+      @user_has_rmd_menu_items = @registered_mobile_device || does_user_have_rmd_menu_items?
     end
 
     r.root do

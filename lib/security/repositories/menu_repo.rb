@@ -270,6 +270,24 @@ module SecurityApp
       DB[query].select_map { %i[menu_text id] }
     end
 
+    def does_user_have_rmd_menu_items?(user, webapp)
+      query = <<~SQL
+        SELECT f.id
+        FROM program_functions pf
+        JOIN programs p ON p.id = pf.program_id
+        JOIN programs_users pu ON pu.program_id = pf.program_id
+        JOIN programs_webapps pw ON pw.program_id = pf.program_id AND pw.webapp = '#{webapp}'
+        JOIN functional_areas f ON f.id = p.functional_area_id
+        WHERE pu.user_id = #{user.id}
+            AND f.active
+            AND p.active
+            AND pf.active
+            AND f.rmd_menu
+        LIMIT 1
+      SQL
+      !DB[query].all.empty?
+    end
+
     private
 
     def can_login_to_restricted_path?(user_id, prog_funcs)
