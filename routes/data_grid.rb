@@ -19,7 +19,7 @@
 # - url might not be a program function.
 #   = then ok to continue.
 #   = unless url was entered in browser (is there a difference in the referer?)
-class Nspack < Roda
+class Nspack < Roda # rubocop:disable Metrics/ClassLength
   # Generic grid lists.
   route('list') do |r|
     r.on :id do |id|
@@ -61,6 +61,9 @@ class Nspack < Roda
                                 ->(args) { Crossbeams::Config::UserPermissions.can_user?(current_user, *args) })
         end
       rescue StandardError => e
+        ErrorMailer.send_exception_email(e,
+                                         subject: "Grid error at #{request.path}",
+                                         message: "Route  : data_grid\nPath   : #{request.path}\nParams : #{params&.inspect}")
         show_json_exception(e)
       end
 
@@ -71,12 +74,18 @@ class Nspack < Roda
                                           key,
                                           params)
       rescue StandardError => e
+        ErrorMailer.send_exception_email(e,
+                                         subject: "Grid error at #{request.path}",
+                                         message: "Route  : data_grid_multi\nPath   : #{request.path}\nParams : #{params&.inspect}")
         show_json_exception(e)
       end
 
       r.on 'nested_grid' do
         render_data_grid_nested_rows(id)
       rescue StandardError => e
+        ErrorMailer.send_exception_email(e,
+                                         subject: "Grid error at #{request.path}",
+                                         message: "Route  : data_grid_nested\nPath   : #{request.path}\nParams : #{params&.inspect}")
         show_json_exception(e)
       end
     end
@@ -96,6 +105,9 @@ class Nspack < Roda
                                      key,
                                      params)
       rescue StandardError => e
+        ErrorMailer.send_exception_email(e,
+                                         subject: "Grid error at #{request.path}",
+                                         message: "Route  : data_grid_lookups\nPath   : #{request.path}\nParams : #{params&.inspect}")
         show_json_exception(e)
       end
     end
@@ -123,6 +135,9 @@ class Nspack < Roda
       r.on 'grid' do
         render_search_grid_rows(id, params, ->(function, program, permission) { auth_blocked?(function, program.split(','), permission) })
       rescue StandardError => e
+        ErrorMailer.send_exception_email(e,
+                                         subject: "Grid error at #{request.path}",
+                                         message: "Route  : data_grid_search\nPath   : #{request.path}\nParams : #{params&.inspect}")
         show_json_exception(e)
       end
 
