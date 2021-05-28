@@ -84,6 +84,7 @@ module EdiApp
           loads.customer_order_number AS client_ref,
           loads.customer_order_number AS order_no,
           (SELECT SUM(carton_quantity) FROM pallets p WHERE p.load_id = loads.id) AS cnts_on_truck,
+          ph_resource.plant_resource_code AS lot_no,
 
           depots.depot_code AS dest_locn,
           depots.depot_code AS orig_depot,
@@ -192,6 +193,7 @@ module EdiApp
         LEFT JOIN fruit_actual_counts_for_packs ON fruit_actual_counts_for_packs.id = pallet_sequences.fruit_actual_counts_for_pack_id
         JOIN pucs ON pucs.id = pallet_sequences.puc_id
         JOIN orchards ON orchards.id = pallet_sequences.orchard_id
+        LEFT JOIN plant_resources ph_resource ON ph_resource.id = pallet_sequences.packhouse_resource_id
         WHERE loads.id = ?
       SQL
       DB[query, load_id].all
