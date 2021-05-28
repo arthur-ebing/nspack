@@ -5,15 +5,15 @@
     :production_run_cartons: Cartons on Production Run
 :conditions:
   :standard:
-  - :col: carton_label_id
+  - :col: carton_labels.id
     :op: "="
     :val: "$:id$"
   :production_run_cartons:
-  - :col: production_run_id
+  - :col: carton_labels.production_run_id
     :op: "="
     :val: "$:id$"
   :cloned_cartons:
-  - :col: is_virtual
+  - :col: cartons.is_virtual
     :op: "="
     :val: true
 :hide_for_client:

@@ -1,24 +1,25 @@
 ---
 :caption: All Pallets - Grouped Sequences
-:sql: "SELECT\r\n    vw_pallets.pallet_id,\r\n    vw_pallets.status,\r\n    vw_pallets.pallet_number,\r\n
-  \   vw_pallets.pallet_verification_failed,\r\n    vw_pallets.in_stock,\r\n    vw_pallets.stock_created_at,\r\n
-  \   vw_pallets.exit_reference,\r\n    vw_pallets.location_id,\r\n    vw_pallets.location,\r\n
-  \   vw_pallets.pallet_format_id,\r\n    vw_pallets.pallet_base,\r\n    vw_pallets.stack_type,\r\n
-  \   vw_pallets.carton_quantity,\r\n    vw_pallets.individual_cartons,\r\n    vw_pallets.build_status,\r\n
-  \   vw_pallets.phc,\r\n    vw_pallets.intake_created_at,\r\n    vw_pallets.first_cold_storage_at,\r\n
-  \   vw_pallets.first_cold_storage_date,\r\n    vw_pallets.plt_packhouse_resource_id,\r\n
-  \   vw_pallets.packhouse,\r\n    vw_pallets.plt_line_resource_id,\r\n    vw_pallets.line,\r\n
-  \   vw_pallets.nett_weight,\r\n    vw_pallets.gross_weight,\r\n    vw_pallets.gross_weight_measured_at,\r\n
-  \   vw_pallets.palletized,\r\n    vw_pallets.partially_palletized,\r\n    vw_pallets.palletized_at,\r\n
-  \   vw_pallets.palletized_date,\r\n    vw_pallets.partially_palletized_at,\r\n    vw_pallets.partially_palletized_date,\r\n
-  \   vw_pallets.pallet_age,\r\n    vw_pallets.inspection_age,\r\n    vw_pallets.stock_age,\r\n
-  \   vw_pallets.cold_age,\r\n    vw_pallets.ambient_age,\r\n    vw_pallets.reinspection_age,\r\n
-  \   vw_pallets.pack_to_inspect_age,\r\n    vw_pallets.inspect_to_cold_age,\r\n    vw_pallets.inspect_to_exit_warm_age,\r\n
-  \   vw_pallets.palletized_to_verified_age,\r\n    vw_pallets.verified_to_inspected_age,\r\n
-  \   vw_pallets.inspected_to_in_stock_age,\r\n    vw_pallets.cooled,\r\n    vw_pallets.temp_tail,\r\n
-  \   vw_pallets.depot_pallet,\r\n    vw_pallets.fruit_sticker_pm_product_id,\r\n
-  \   vw_pallets.fruit_sticker,\r\n    vw_pallets.fruit_sticker_pm_product_2_id,\r\n
-  \   vw_pallets.fruit_sticker_2,\r\n    vw_pallets.inspected,\r\n    vw_pallets.last_govt_inspection_pallet_id,\r\n
+:sql: "SELECT DISTINCT ON (vw_pallets.pallet_number)\r\n    vw_pallets.pallet_id,\r\n
+  \   vw_pallets.status,\r\n    vw_pallets.pallet_number,\r\n    vw_pallets.pallet_verification_failed,\r\n
+  \   vw_pallets.in_stock,\r\n    vw_pallets.stock_created_at,\r\n    vw_pallets.exit_reference,\r\n
+  \   vw_pallets.location_id,\r\n    vw_pallets.location,\r\n    vw_pallets.pallet_format_id,\r\n
+  \   vw_pallets.pallet_base,\r\n    vw_pallets.stack_type,\r\n    vw_pallets.carton_quantity,\r\n
+  \   vw_pallets.individual_cartons,\r\n    vw_pallets.build_status,\r\n    vw_pallets.phc,\r\n
+  \   vw_pallets.intake_created_at,\r\n    vw_pallets.first_cold_storage_at,\r\n    vw_pallets.first_cold_storage_date,\r\n
+  \   vw_pallets.plt_packhouse_resource_id,\r\n    vw_pallets.packhouse,\r\n    vw_pallets.plt_line_resource_id,\r\n
+  \   vw_pallets.line,\r\n    vw_pallets.nett_weight,\r\n    vw_pallets.gross_weight,\r\n
+  \   vw_pallets.gross_weight_measured_at,\r\n    vw_pallets.palletized,\r\n    vw_pallets.partially_palletized,\r\n
+  \   vw_pallets.palletized_at,\r\n    vw_pallets.palletized_date,\r\n    vw_pallets.partially_palletized_at,\r\n
+  \   vw_pallets.partially_palletized_date,\r\n    vw_pallets.pallet_age,\r\n    vw_pallets.inspection_age,\r\n
+  \   vw_pallets.stock_age,\r\n    vw_pallets.cold_age,\r\n    vw_pallets.ambient_age,\r\n
+  \   vw_pallets.reinspection_age,\r\n    vw_pallets.pack_to_inspect_age,\r\n    vw_pallets.inspect_to_cold_age,\r\n
+  \   vw_pallets.inspect_to_exit_warm_age,\r\n    vw_pallets.palletized_to_verified_age,\r\n
+  \   vw_pallets.verified_to_inspected_age,\r\n    vw_pallets.inspected_to_in_stock_age,\r\n
+  \   vw_pallets.cooled,\r\n    vw_pallets.temp_tail,\r\n    vw_pallets.depot_pallet,\r\n
+  \   vw_pallets.fruit_sticker_pm_product_id,\r\n    vw_pallets.fruit_sticker,\r\n
+  \   vw_pallets.fruit_sticker_pm_product_2_id,\r\n    vw_pallets.fruit_sticker_2,\r\n
+  \   vw_pallets.inspected,\r\n    vw_pallets.last_govt_inspection_pallet_id,\r\n
   \   vw_pallets.govt_inspection_sheet_id,\r\n    vw_pallets.inspection_point,\r\n
   \   vw_pallets.inspected_dest_country,\r\n    vw_pallets.govt_first_inspection_at,\r\n
   \   vw_pallets.govt_first_inspection_date,\r\n    vw_pallets.govt_reinspection_at,\r\n
@@ -58,9 +59,11 @@
   THEN 'inprogress'\r\n        WHEN vw_pallets.inspected AND NOT vw_pallets.govt_inspection_passed
   THEN 'error'\r\n        WHEN fn_pallet_verification_failed(vw_pallets.pallet_id)
   THEN 'error'\r\n        WHEN aggregated.verified AND NOT aggregated.verifications_passed
-  THEN 'error'\r\n        END AS colour_rule,\r\n    vw_pallets.pallet_id AS id\r\n\r\nFROM
-  vw_pallets\r\nLEFT JOIN vw_pallet_sequences_aggregated aggregated ON aggregated.pallet_id
-  = vw_pallets.pallet_id\r\n\r\nORDER BY vw_pallets.pallet_number DESC;"
+  THEN 'error'\r\n        END AS colour_rule,\r\n    vw_pallets.pallet_id AS id,\r\n
+  \   pallet_sequences.production_run_id\r\n\r\n\r\nFROM vw_pallets\r\nLEFT JOIN vw_pallet_sequences_aggregated
+  aggregated ON aggregated.pallet_id = vw_pallets.pallet_id\r\nLEFT JOIN pallet_sequences
+  ON pallet_sequences.pallet_id = vw_pallets.pallet_id\r\n\r\nORDER BY vw_pallets.pallet_number
+  DESC;"
 :limit: 
 :offset: 
 :external_settings:
@@ -2441,6 +2444,22 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  production_run_id:
+    :name: production_run_id
+    :sequence_no: 149
+    :caption: Production run
+    :namespaced_name: pallet_sequences.production_run_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
 :query_parameter_definitions:
 - :column: vw_pallets.pallet_id
   :caption: Pallet Id
@@ -2469,6 +2488,14 @@
 - :column: vw_pallets.created_at
   :caption: Created at
   :data_type: :datetime
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: pallet_sequences.production_run_id
+  :caption: Production Run
+  :data_type: :integer
   :control_type: :text
   :default_value: 
   :ordered_list: false
