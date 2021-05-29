@@ -323,6 +323,9 @@ module DataminerApp
     def save_report_sql(id, params) # rubocop:disable Metrics/AbcSize
       report = repo.lookup_admin_report(id)
       report.sql = params[:report][:sql]
+
+      assert_columns_and_params_match(report)
+
       filename = repo.lookup_file_name(id, true)
       colour_key = calculate_colour_key(report)
       if colour_key.nil?
@@ -333,6 +336,8 @@ module DataminerApp
       yp = Crossbeams::Dataminer::YamlPersistor.new(filename)
       report.save(yp)
       success_response('SQL saved', report)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def calculate_colour_key(report)
@@ -604,6 +609,15 @@ module DataminerApp
     end
 
     private
+
+    def assert_columns_and_params_match(report)
+      # Check existing params vs report column names...
+      param_names = report.query_parameter_definitions.map(&:column)
+      col_names = report.columns.map { |nm, col| col.namespaced_name || nm }
+      param_names.each do |col|
+        raise Crossbeams::InfoError, %(Not saved - parameter "#{col}" is not defined in the changed SQL) unless col_names.include?(col)
+      end
+    end
 
     def list_search_yaml_file_name(key, file)
       dir = File.expand_path("../#{key}", ENV['GRID_QUERIES_LOCATION'])
