@@ -272,7 +272,11 @@ module DataminerApp
         }
       end
       page.row_defs = []
-      page.report.ordered_columns.each_with_index { |col, index| page.row_defs << col.to_hash.merge(id: index) }
+      page.has_id_col = false
+      page.report.ordered_columns.each_with_index do |col, index|
+        page.has_id_col = true if col.name == 'id'
+        page.row_defs << col.to_hash.merge(id: index)
+      end
 
       page.col_defs_params = Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
         mk.href_prompt "'/dataminer/admin/#{id}/parameter/delete/' + data.column + '|delete|Are you sure?|delete'", 'delete_link' #### => Does not handle cancel....
@@ -324,7 +328,7 @@ module DataminerApp
       report = repo.lookup_admin_report(id)
       report.sql = params[:report][:sql]
 
-      assert_columns_and_params_match(report)
+      assert_columns_and_params_match!(report)
 
       filename = repo.lookup_file_name(id, true)
       colour_key = calculate_colour_key(report)
@@ -610,7 +614,7 @@ module DataminerApp
 
     private
 
-    def assert_columns_and_params_match(report)
+    def assert_columns_and_params_match!(report)
       # Check existing params vs report column names...
       param_names = report.query_parameter_definitions.map(&:column)
       col_names = report.columns.map { |nm, col| col.namespaced_name || nm }

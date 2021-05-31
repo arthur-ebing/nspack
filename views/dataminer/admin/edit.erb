@@ -37,6 +37,12 @@
   <a href="#" onclick="crossbeamsUtils.toggleVisibility('sql_code');return false" class="crossbeams-button f6 link dim br2 ph3 pv2 dib white bg-silver"><%= Crossbeams::Layout::Icon.render(:info) %> Toggle SQL view</a>
   <a href='/dataminer/admin/<%= @page.id %>/change_sql/' class="crossbeams-button f6 link dim br2 ph3 pv2 dib white bg-silver"><%= Crossbeams::Layout::Icon.render(:edit) %> Change SQL</a>
   <a href='/dataminer/admin/<%= @page.id %>/reorder_columns/' class="crossbeams-button f6 link dim br2 ph3 pv2 dib white bg-silver"><%= Crossbeams::Layout::Icon.render(:sort) %> Re-order columns</a>
+<% unless @page.has_id_col %>
+  <%= Crossbeams::Layout::Notice.new({},
+                                     'Queries should preferably include a column named "id" with unique values.',
+                                     notice_type: :warning, within_field: false,
+                                     caption: 'There is no column named "id".').render %>
+<% end %>
   <pre id="sql_code" hidden><%= sql_to_highlight(@page.report.runnable_sql) %></pre>
 </section>
 
