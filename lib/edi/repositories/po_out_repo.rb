@@ -195,6 +195,7 @@ module EdiApp
         JOIN orchards ON orchards.id = pallet_sequences.orchard_id
         LEFT JOIN plant_resources ph_resource ON ph_resource.id = pallet_sequences.packhouse_resource_id
         WHERE loads.id = ?
+        ORDER BY pallet_sequences.pallet_number, pallet_sequences.pallet_sequence_number
       SQL
       DB[query, load_id].all
     end

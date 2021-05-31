@@ -89,6 +89,7 @@ module EdiApp
         LEFT JOIN pallet_bases ON pallet_bases.id = pallet_formats.pallet_base_id
         WHERE pallets.in_stock
           AND #{party_role_condition} = ?
+        ORDER BY pallet_sequences.pallet_number, pallet_sequences.pallet_sequence_number
       SQL
       DB[query, party_role_id].all
     end
