@@ -1005,5 +1005,11 @@ module ProductionApp
 
       get(:pallet_sequences, pallet_sequence_id, :scanned_from_carton_id)
     end
+
+    def packhouse_location_id_for_pallet(pallet_id)
+      DB[:plant_resources].where(id: DB[:pallets]
+                                       .where(id: pallet_id)
+                                       .get(:plt_packhouse_resource_id)).get(:location_id)
+    end
   end
 end

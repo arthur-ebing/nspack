@@ -2,18 +2,21 @@
 
 module FinishedGoodsApp
   class RepackPallet < BaseService
-    attr_reader :repo, :pallet_id, :pallet_number, :user_name, :multiple_pallets
+    attr_reader :repo, :pallet_id, :pallet_number, :user_name, :multiple_pallets,
+                :packhouse_location_id, :pallet_location_id, :new_pallet_id
 
     def initialize(pallet_id, user_name, multiple_pallets = false)
       @pallet_id = pallet_id
       @user_name = user_name
       @repo = ProductionApp::ReworksRepo.new
       @multiple_pallets = multiple_pallets
+      @packhouse_location_id = repo.packhouse_location_id_for_pallet(pallet_id)
     end
 
     def call
       pallet = find_pallet
       @pallet_number = pallet[:pallet_number]
+      @pallet_location_id = pallet[:location_id]
 
       res = repack_pallet
       raise Crossbeams::InfoError, unwrap_failed_response(res) unless res.success
@@ -32,7 +35,7 @@ module FinishedGoodsApp
       res = repo.repack_pallet(pallet_id, user_name)
       return res unless res.success
 
-      new_pallet_id = res.instance[:new_pallet_id]
+      @new_pallet_id = res.instance[:new_pallet_id]
       res = move_stock_pallet
       return res unless res.success
 
@@ -47,16 +50,27 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def move_stock_pallet
-      location_to_id = MasterfilesApp::LocationRepo.new.find_location_by_location_long_code(AppConst::SCRAP_LOCATION)&.id
-      return failed_response('Location does not exist') if location_to_id.nil_or_empty?
+    def move_stock_pallet # rubocop:disable Metrics/AbcSize
+      opts = { pallet_id => MasterfilesApp::LocationRepo.new.find_location_by_location_long_code(AppConst::SCRAP_LOCATION)&.id,
+               new_pallet_id => packhouse_location_id }
 
-      res = FinishedGoodsApp::MoveStockService.call(AppConst::PALLET_STOCK_TYPE, pallet_id, location_to_id, AppConst::REWORKS_MOVE_PALLET_BUSINESS_PROCESS, nil)
-      return res unless res.success
+      stock_pallet_ids.each do |pallet_id|
+        location_to_id = opts[pallet_id]
+        return failed_response('Location does not exist') if location_to_id.nil_or_empty?
+
+        res = FinishedGoodsApp::MoveStockService.call(AppConst::PALLET_STOCK_TYPE, pallet_id, location_to_id, AppConst::REWORKS_MOVE_PALLET_BUSINESS_PROCESS, nil)
+        return res unless res.success
+      end
 
       ok_response
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    end
+
+    def stock_pallet_ids
+      ids = Array(pallet_id)
+      ids << new_pallet_id unless pallet_location_id.to_i == packhouse_location_id.to_i
+      ids
     end
 
     def create_reworks_run  # rubocop:disable Metrics/AbcSize
