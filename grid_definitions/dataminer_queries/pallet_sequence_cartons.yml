@@ -26,8 +26,8 @@
   pallet_sequences ON pallet_sequences.id = cartons.pallet_sequence_id\r\nJOIN pallets
   ON pallets.id = pallet_sequences.pallet_id\r\nLEFT JOIN product_resource_allocations
   ON product_resource_allocations.id = carton_labels.product_resource_allocation_id\r\nLEFT
-  JOIN product_setups ON product_setups.id = product_resource_allocations.product_setup_id\r\nJOIN
-  product_setup_templates ON product_setup_templates.id = product_setups.product_setup_template_id\r\nLEFT
+  JOIN product_setups ON product_setups.id = product_resource_allocations.product_setup_id\r\nLEFT
+  JOIN product_setup_templates ON product_setup_templates.id = product_setups.product_setup_template_id\r\nLEFT
   JOIN plant_resources packpoints ON packpoints.id = carton_labels.resource_id\r\nLEFT
   JOIN plant_resources palletizing_bays ON palletizing_bays.id = cartons.palletizing_bay_resource_id\r\nLEFT
   JOIN system_resources ON packpoints.system_resource_id = system_resources.id\r\nJOIN
@@ -49,7 +49,7 @@
 :external_settings:
   :render_url: 
   :colour_key:
-    ok: Palletizing bay  determining carton
+    ok: Palletizing bay determining carton
 :columns:
   id:
     :name: id
@@ -488,7 +488,7 @@
     :sequence_no: 28
     :caption: Group incentive
     :namespaced_name: carton_labels.group_incentive_id
-    :data_type: :string
+    :data_type: :integer
     :width: 
     :format: 
     :hide: false
@@ -584,7 +584,7 @@
     :sequence_no: 34
     :caption: Dp carton?
     :namespaced_name: carton_labels.dp_carton
-    :data_type: :string
+    :data_type: :boolean
     :width: 80
     :format: 
     :hide: false
@@ -660,14 +660,6 @@
   :ordered_list: false
   :ui_priority: 2
   :list_def: SELECT id FROM production_runs
-- :column: carton_labels.created_at
-  :caption: Label created at
-  :data_type: :date
-  :control_type: :daterange
-  :default_value: 
-  :ordered_list: false
-  :ui_priority: 3
-  :list_def: 
 - :column: cartons.created_at
   :caption: Label verified at
   :data_type: :date
@@ -676,26 +668,6 @@
   :ordered_list: false
   :ui_priority: 4
   :list_def: 
-- :column: packhouses.plant_resource_code
-  :caption: Packhouce
-  :data_type: :string
-  :control_type: :list
-  :default_value: 
-  :ordered_list: true
-  :ui_priority: 6
-  :list_def: SELECT plant_resources.plant_resource_code FROM plant_resources JOIN
-    plant_resource_types ON plant_resource_types.id = plant_resources.plant_resource_type_id
-    WHERE plant_resource_type_code = 'PACKHOUSE' ORDER BY plant_resource_code
-- :column: lines.plant_resource_code
-  :caption: Line
-  :data_type: :string
-  :control_type: :list
-  :default_value: 
-  :ordered_list: true
-  :ui_priority: 7
-  :list_def: SELECT plant_resources.plant_resource_code FROM plant_resources JOIN
-    plant_resource_types ON plant_resource_types.id = plant_resources.plant_resource_type_id
-    WHERE plant_resource_type_code = 'LINE' ORDER BY plant_resource_code
 - :column: packpoints.plant_resource_code
   :caption: Packpoint
   :data_type: :string
@@ -725,55 +697,6 @@
   :ordered_list: true
   :ui_priority: 10
   :list_def: SELECT label_name FROM labels ORDER BY label_name
-- :column: farms.farm_code
-  :caption: Farm
-  :data_type: :string
-  :control_type: :list
-  :default_value: 
-  :ordered_list: true
-  :ui_priority: 11
-  :list_def: SELECT farm_code FROM farms ORDER BY farm_code
-- :column: pucs.puc_code
-  :caption: PUC
-  :data_type: :string
-  :control_type: :list
-  :default_value: 
-  :ordered_list: true
-  :ui_priority: 12
-  :list_def: SELECT puc_code FROM pucs ORDER BY puc_code
-- :column: orchards.orchard_code
-  :caption: Orchard
-  :data_type: :string
-  :control_type: :list
-  :default_value: 
-  :ordered_list: true
-  :ui_priority: 13
-  :list_def: SELECT orchard_code FROM orchards ORDER BY orchard_code
-- :column: ABS(date_part('epoch', current_timestamp - carton_labels.created_at) /
-    3600)::int
-  :caption: Label age (hrs)
-  :data_type: :integer
-  :control_type: :text
-  :default_value: 
-  :ordered_list: false
-  :ui_priority: 14
-  :list_def: 
-- :column: ABS(date_part('epoch', current_timestamp - cartons.created_at) / 3600)::int
-  :caption: Carton age (hrs)
-  :data_type: :integer
-  :control_type: :text
-  :default_value: 
-  :ordered_list: false
-  :ui_priority: 15
-  :list_def: 
-- :column: carton_labels.pallet_number
-  :caption: Pallet number
-  :data_type: :string
-  :control_type: :text
-  :default_value: 
-  :ordered_list: false
-  :ui_priority: 16
-  :list_def: 
 - :column: pallet_sequences.pallet_id
   :caption: pallet id
   :data_type: :integer
