@@ -2844,3 +2844,11 @@
   :ui_priority: 43
   :list_def: SELECT fn_party_role_name(id) FROM party_roles WHERE role_id = (SELECT
     id FROM roles WHERE name = 'TARGET CUSTOMER')
+- :column: pallet_id
+  :caption: Pallet Id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

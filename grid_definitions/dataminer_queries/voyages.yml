@@ -38,7 +38,7 @@
     :sequence_no: 1
     :caption: Id
     :namespaced_name: voyages.id
-    :data_type: :string
+    :data_type: :integer
     :width: 
     :format: 
     :hide: false
@@ -150,7 +150,7 @@
     :sequence_no: 8
     :caption: ETA
     :namespaced_name: 
-    :data_type: :string
+    :data_type: :date
     :width: 
     :format: 
     :hide: false
@@ -166,7 +166,7 @@
     :sequence_no: 9
     :caption: ATA
     :namespaced_name: 
-    :data_type: :string
+    :data_type: :date
     :width: 
     :format: 
     :hide: false
@@ -198,7 +198,7 @@
     :sequence_no: 11
     :caption: ETD
     :namespaced_name: 
-    :data_type: :string
+    :data_type: :date
     :width: 
     :format: 
     :hide: false
@@ -214,7 +214,7 @@
     :sequence_no: 12
     :caption: ATD
     :namespaced_name: 
-    :data_type: :string
+    :data_type: :date
     :width: 
     :format: 
     :hide: false
@@ -230,7 +230,7 @@
     :sequence_no: 13
     :caption: Load
     :namespaced_name: 
-    :data_type: :string
+    :data_type: :integer
     :width: 
     :format: 
     :hide: false
@@ -358,7 +358,7 @@
     :sequence_no: 21
     :caption: Loaded
     :namespaced_name: 
-    :data_type: :string
+    :data_type: :boolean
     :width: 
     :format: 
     :hide: false
@@ -433,4 +433,12 @@
   :default_value: 
   :ordered_list: false
   :ui_priority: 6
+  :list_def: 
+- :column: voyages.id
+  :caption: Voyage Id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
   :list_def: 

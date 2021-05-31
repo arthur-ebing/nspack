@@ -5,7 +5,7 @@
     :production_run_pallets: Pallets for Production Run
 :conditions:
   :standard:
-    - :col: vw_pallets.pallet_id
+    - :col: pallet_id
       :op: =
       :val: $:id$
   :production_run_pallets:

@@ -102,7 +102,7 @@
     :op: "="
     :val: "$:allocated$"
   :scrapped:
-  - :col: scrapped
+  - :col: vw_pallets.scrapped
     :op: "="
     :val: "$:scrapped$"
   :failed_inspections:

@@ -67,7 +67,7 @@
     :in_production: Packing Specification in Production
 :conditions:
   :standard:
-  - :col: product_setup_template_id
+  - :col: product_setups.product_setup_template_id
     :op: "="
     :val: "$:product_setup_template_id$"
   :active:

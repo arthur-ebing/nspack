@@ -1984,3 +1984,11 @@
   :ordered_list: false
   :ui_priority: 1
   :list_def: 
+- :column: aggregated.failed_otmc
+  :caption: Failed OTMC Pallets
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: true, false

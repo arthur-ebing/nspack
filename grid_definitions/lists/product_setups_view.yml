@@ -14,7 +14,7 @@
     :op: "="
     :val: "$:product_setups.active$"
   :in_production:
-  - :col: product_setups.in_production
+  - :col: fn_product_setup_in_production(product_setups.id)
     :op: "="
     :val: "$:product_setups.in_production$"
 :hide_for_client:
