@@ -502,7 +502,7 @@
   marketing_puc_id:
     :name: marketing_puc_id
     :sequence_no: 29
-    :caption: Marketing puc
+    :caption: Marketing PUC
     :namespaced_name: carton_labels.marketing_puc_id
     :data_type: :integer
     :width: 
@@ -518,7 +518,7 @@
   marketing_puc:
     :name: marketing_puc
     :sequence_no: 30
-    :caption: Marketing puc
+    :caption: Marketing PUC
     :namespaced_name: marketing_pucs.puc_code
     :data_type: :string
     :width: 80

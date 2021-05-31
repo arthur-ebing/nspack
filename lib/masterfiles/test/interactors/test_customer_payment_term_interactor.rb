@@ -43,7 +43,7 @@ module MasterfilesApp
       assert res.success, "#{res.message} : #{res.errors.inspect}"
       assert_instance_of(CustomerPaymentTerm, res.instance)
       assert_equal a_change, res.instance.payment_term_id
-      refute_equal value, res.instance.id
+      refute_equal value, res.instance.payment_term_id
     end
 
     def test_update_customer_payment_term_fail
