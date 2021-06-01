@@ -600,10 +600,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           if res.success
             row_keys = %i[
               payment_term
-              deal_type_id
-              deal_type
-              incoterm_id
-              incoterm
               payment_term_date_type_id
               payment_term_date_type
               short_description
@@ -643,10 +639,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           row_keys = %i[
             id
             payment_term
-            deal_type_id
-            deal_type
-            incoterm_id
-            incoterm
             payment_term_date_type_id
             payment_term_date_type
             short_description
