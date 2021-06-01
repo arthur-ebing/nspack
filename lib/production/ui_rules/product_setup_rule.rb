@@ -10,7 +10,6 @@ module UiRules
       make_form_object
       apply_form_values
 
-      @rules[:require_packaging_bom] = AppConst::REQUIRE_PACKAGING_BOM
       @rules[:gtins_required] = AppConst::CR_PROD.use_gtins?
       @rules[:basic_pack_equals_standard_pack] = AppConst::CR_MF.basic_pack_equals_standard_pack?
 
@@ -132,8 +131,6 @@ module UiRules
       fields[:pallet_stack_type_id] = { renderer: :label,
                                         with_value: pallet_stack_type_id_label,
                                         caption: 'Pallet Stack Type' }
-      fields[:description] = { renderer: :label,
-                               hide_on_load: !@rules[:require_packaging_bom] }
       fields[:product_chars] = { renderer: :label }
       fields[:gtin_code] = { renderer: :label,
                              caption: 'GTIN Code',
@@ -339,8 +336,6 @@ module UiRules
                                  prompt: 'Select Cartons per Pallet',
                                  searchable: true,
                                  remove_search_for_small_list: false },
-        description: { readonly: true,
-                       hide_on_load: !@rules[:require_packaging_bom] },
         active: { renderer: :checkbox },
         treatment_ids: { renderer: :multi,
                          options: MasterfilesApp::FruitRepo.new.for_select_treatments,

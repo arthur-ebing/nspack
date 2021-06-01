@@ -377,10 +377,11 @@ module ProductionApp
 
     def sequence_setup_data(id)
       data_ar = %i[marketing_variety customer_variety std_size basic_pack std_pack actual_count size_ref marketing_org
-                   packed_tm_group target_market mark pm_mark inventory_code pallet_base stack_type cpp bom client_size_ref
-                   client_product_code treatments order_number sell_by_code grade product_chars pm_type pm_subtype
+                   packed_tm_group target_market mark inventory_code pallet_base stack_type cpp client_size_ref
+                   client_product_code treatments order_number sell_by_code grade product_chars
                    tu_labour_product ru_labour_product fruit_stickers tu_stickers target_customer]
       data_ar << :rmt_class_code if AppConst::CR_PROD.capture_product_setup_class?
+      data_ar.push(:pm_mark, :pm_type, :pm_subtype, :bom) if AppConst::CR_PROD.require_packaging_bom?
       query = MesscadaApp::DatasetPalletSequence.call('WHERE pallet_sequences.id = ?')
       DB[query, id].first.select { |key, _| data_ar.include?(key) }
     end
@@ -400,20 +401,16 @@ module ProductionApp
                      packed_tm_group: get(:target_market_groups, attrs[:packed_tm_group_id], :target_market_group_name),
                      target_market: get(:target_markets, attrs[:target_market_id], :target_market_name),
                      mark: get(:marks, attrs[:mark_id], :mark_code),
-                     pm_mark: get(:pm_marks, attrs[:pm_mark_id], :packaging_marks),
                      inventory_code: get(:inventory_codes, attrs[:inventory_code_id], :inventory_code),
                      pallet_base: get(:pallet_bases, pallet_format[:pallet_base_id], :pallet_base_code),
                      stack_type: get(:pallet_stack_types, pallet_format[:pallet_stack_type_id], :stack_type_code),
                      cpp: get(:cartons_per_pallet, attrs[:cartons_per_pallet_id], :cartons_per_pallet),
-                     bom: get(:pm_boms, attrs[:pm_bom_id], :bom_code),
                      client_size_ref: attrs[:client_size_reference],
                      client_product_code: attrs[:client_product_code],
                      treatments: treatments(attrs[:treatment_ids]),
                      order_number: attrs[:marketing_order_number],
                      sell_by_code: attrs[:sell_by_code],
                      grade: get(:grades, attrs[:grade_id], :grade_code),
-                     pm_type: get(:pm_types, attrs[:pm_type_id], :pm_type_code),
-                     pm_subtype: get(:pm_subtypes, attrs[:pm_subtype_id], :subtype_code),
                      product_chars: attrs[:product_chars],
                      tu_labour_product: get(:pm_products, attrs[:tu_labour_product_id], :product_code),
                      ru_labour_product: get(:pm_products, attrs[:ru_labour_product_id], :product_code),
@@ -421,7 +418,17 @@ module ProductionApp
                      tu_stickers: sticker_values(attrs[:tu_sticker_ids]),
                      target_customer: party_repo.fn_party_role_name(attrs[:target_customer_party_role_id]) }
       data_attrs = data_attrs.merge(rmt_class_code: get(:rmt_classes, attrs[:rmt_class_id], :rmt_class_code)) if AppConst::CR_PROD.capture_product_setup_class?
+      data_attrs = data_attrs.merge(packaging_bom_attrs(attrs)) if AppConst::CR_PROD.require_packaging_bom?
       data_attrs
+    end
+
+    def packaging_bom_attrs(attrs)
+      {
+        pm_mark: get(:pm_marks, attrs[:pm_mark_id], :packaging_marks),
+        pm_type: get(:pm_types, attrs[:pm_type_id], :pm_type_code),
+        pm_subtype: get(:pm_subtypes, attrs[:pm_subtype_id], :subtype_code),
+        bom: get(:pm_boms, attrs[:pm_bom_id], :bom_code)
+      }
     end
 
     def customer_variety(customer_variety_id)

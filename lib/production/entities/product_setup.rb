@@ -31,9 +31,6 @@ module ProductionApp
     attribute :product_chars, Types::String
     attribute :pallet_base_id, Types::Integer
     attribute :pallet_stack_type_id, Types::Integer
-    attribute :pm_type_id, Types::Integer
-    attribute :pm_subtype_id, Types::Integer
-    attribute :description, Types::String
     attribute :target_market_id, Types::Integer
     attribute :gtin_code, Types::String
     attribute :rmt_class_id, Types::Integer

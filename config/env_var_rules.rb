@@ -35,7 +35,7 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { PRINT_PALLET_LABEL_AT_PALLET_VERIFICATION: 'optional. The shows print label fields at pallet verification.' },
     { EMAIL_REQUIRES_REPLY_TO: 'Set to Y if user cannot send email directly. i.e. FROM must be system email, and REPLY-TO will be set to user email.' },
     { DEFAULT_FG_PACKAGING_TYPE: 'Default fg packaging type pm_type_code for Product Setups. Habata will be BIN while Matrooz will be CARTON' },
-    { REQUIRE_PACKAGING_BOM: 'Require packaging bom for Product Setups. Display PKG Subtype and PKG BOM if true' },
+    # { REQUIRE_PACKAGING_BOM: 'Require packaging bom for Product Setups. Display PKG Subtype and PKG BOM if true' },
     { DEFAULT_LABEL_DIMENSION: 'User`s preferred label dimension in mm (width then height) e.g. 100x100' },
     { LABEL_SIZES: 'Possible label sizes for designing in format "w,h;w,h;w,h...". e.g. 100,100;100,150;84,64' },
     # { CARTON_EQUALS_PALLET: 'Create pallets and pallet_sequences from carton. Default false' },

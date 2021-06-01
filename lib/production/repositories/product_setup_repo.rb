@@ -54,17 +54,12 @@ module ProductionApp
 
     def find_product_setup(id)
       hash = DB["SELECT product_setups.* ,cultivar_groups.commodity_id, pallet_formats.pallet_base_id, pallet_formats.pallet_stack_type_id,
-                 pm_subtypes.pm_type_id, pm_products.pm_subtype_id, pm_boms.description,
                  fn_product_setup_code(product_setups.id) AS product_setup_code, fn_product_setup_in_production(product_setups.id) AS in_production
                  FROM product_setups
                  JOIN product_setup_templates ON product_setup_templates.id = product_setups.product_setup_template_id
                  JOIN cultivar_groups ON cultivar_groups.id = product_setup_templates.cultivar_group_id
                  LEFT JOIN std_fruit_size_counts ON std_fruit_size_counts.id = product_setups.std_fruit_size_count_id
                  JOIN pallet_formats ON pallet_formats.id = product_setups.pallet_format_id
-                 LEFT JOIN pm_boms ON pm_boms.id = product_setups.pm_bom_id
-                 LEFT JOIN pm_boms_products ON pm_boms_products.pm_bom_id = product_setups.pm_bom_id
-                 LEFT JOIN pm_products ON pm_products.id = pm_boms_products.pm_product_id
-                 LEFT JOIN pm_subtypes ON pm_subtypes.id = pm_products.pm_subtype_id
                  LEFT JOIN treatments ON treatments.id = ANY (product_setups.treatment_ids)
                  WHERE product_setups.id = ?", id].first
       return nil if hash.nil?

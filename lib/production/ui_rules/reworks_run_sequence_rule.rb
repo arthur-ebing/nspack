@@ -13,7 +13,7 @@ module UiRules
       make_form_object
       apply_form_values
 
-      @rules[:require_packaging_bom] = AppConst::REQUIRE_PACKAGING_BOM
+      @rules[:require_packaging_bom] = AppConst::CR_PROD.require_packaging_bom?
       @rules[:pm_boms_products] = pm_boms_products(@form_object[:pm_bom_id]) unless @form_object[:pm_bom_id].nil_or_empty?
       @rules[:allow_cultivar_group_mixing] = AppConst::ALLOW_CULTIVAR_GROUP_MIXING
       @rules[:gtins_required] = AppConst::CR_PROD.use_gtins?
@@ -244,7 +244,7 @@ module UiRules
                                prompt: 'Select PKG Mark',
                                searchable: true,
                                remove_search_for_small_list: false,
-                               hide_on_load: !@rules[:require_packaging_bom] }
+                               invisible: !@rules[:require_packaging_bom] }
       fields[:product_chars] =  {}
       fields[:inventory_code_id] =  { renderer: :select,
                                       options: @fruit_repo.for_select_inventory_codes,
@@ -312,7 +312,7 @@ module UiRules
                               prompt: 'Select PKG Type',
                               searchable: true,
                               remove_search_for_small_list: false,
-                              hide_on_load: !@rules[:require_packaging_bom] }
+                              invisible: !@rules[:require_packaging_bom] }
       fields[:pm_subtype_id] =  { renderer: :select,
                                   options: MasterfilesApp::BomRepo.new.for_select_pm_subtypes(
                                     where: { pm_type_id: default_pm_type_id }
@@ -322,7 +322,7 @@ module UiRules
                                   prompt: 'Select PKG Subtype',
                                   searchable: true,
                                   remove_search_for_small_list: false,
-                                  hide_on_load: !@rules[:require_packaging_bom] }
+                                  invisible: !@rules[:require_packaging_bom] }
 
       fields[:pm_bom_id] =  { renderer: :select,
                               options: MasterfilesApp::BomRepo.new.for_select_setup_pm_boms(
@@ -333,11 +333,11 @@ module UiRules
                               prompt: 'Select PKG BOM',
                               searchable: true,
                               remove_search_for_small_list: false,
-                              hide_on_load: !@rules[:require_packaging_bom] }
+                              invisible: !@rules[:require_packaging_bom] }
       fields[:description] =  { readonly: true,
-                                hide_on_load: !@rules[:require_packaging_bom] }
+                                invisible: !@rules[:require_packaging_bom] }
       fields[:erp_bom_code] =  { readonly: true,
-                                 hide_on_load: !@rules[:require_packaging_bom] }
+                                 invisible: !@rules[:require_packaging_bom] }
       fields[:active] =  { renderer: :checkbox }
       fields[:treatment_ids] =  { renderer: :multi,
                                   options: @fruit_repo.for_select_treatments,
