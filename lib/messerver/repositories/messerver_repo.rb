@@ -93,6 +93,10 @@ module MesserverApp
 
     def preview_published_label(label_template_name, vars, printer_type = AppConst::PREVIEW_PRINTER_TYPE)
       res = post_print_or_preview(preview_published_label_uri, label_template_name, vars, printer_type: printer_type)
+      # Test a preview for a specific label - alter no of F-vars as required:
+      # testvars = {}
+      # 30.times { |n| testvars["F#{n}".to_sym] = "ABC#{n}" }
+      # res = post_print_or_preview(preview_published_label_uri, 'OR_LE_IT_2WAX', testvars, printer_type: printer_type)
       unless res.success
         res = if res.instance[:response_code].to_s == '404'
                 failed_response("The label (#{label_template_name}) or printer was not found. Has it been published yet?")

@@ -378,8 +378,9 @@ const crossbeamsGridEvents = {
         missing.forEach((col) => {
           delete row[col];
         });
-        const nodes = gridOptions.api.applyTransaction({ add: [row] });
-        gridOptions.api.ensureNodeVisible(nodes.add[0]);
+        const nodes = gridOptions.api.applyTransaction({ add: [row], addIndex: 0 });
+        gridOptions.api.ensureNodeVisible(nodes.add[0], 'top');
+        nodes.add[0].setSelected(true, true);
       }
     } else {
       crossbeamsUtils.showWarning('Unable to update the grid - please reload the page to see changes.');
@@ -1766,7 +1767,7 @@ const crossbeamsGridStaticLoader = {
         defaultColDef: {
           resizable: true,
           sortable: true,
-          filter: true,
+          filter: 'agMultiColumnFilter',
         },
         allowDragFromColumnsToolPanel: true,
         rowSelection: 'single',
@@ -1784,6 +1785,7 @@ const crossbeamsGridStaticLoader = {
         },
         sideBar,
         suppressAggFuncInHeader: true,
+        suppressCopyRowsToClipboard: true, // Copy will not copy the whole selected row, just the current cell
         getRowClass(params) {
           if (params.data) {
             if (params.data.colour_rule) {
