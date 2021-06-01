@@ -228,7 +228,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     composition_level_2_ = DB[:pm_boms_products].where(pm_product_id: composition_level_2_id, quantity: args.units_per_carton).select_map(:pm_bom_id)
     composition_level_3_ = DB[:pm_boms_products].where(pm_product_id: composition_level_3_id).select_map(:pm_bom_id)
     pm_bom_ids = composition_level_1_ & composition_level_2_ & composition_level_3_
-    @pallet_errors << "pm_bom_id masterfile. Found #{pm_bom_ids.length} matching pm_boms for sequence_number: #{args.pallet_number}_#{args.pallet_sequence_number}" if pm_bom_ids.length != 1
+    @pallet_errors << "pm_bom_id masterfile. Found #{pm_bom_ids.length} matching pm_boms for sequence_number: #{args.pallet_number}_#{args.pallet_sequence_number}" if (pm_bom_ids.length != 1) && !args.depot_pallet
     pm_bom_ids.first
   end
 
@@ -344,9 +344,10 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     success_response('Created carton', id)
   end
 
-  def create_pallet_sequence(params)
+  def create_pallet_sequence(params) # rubocop:disable Metrics/AbcSize
     res = MesscadaApp::PalletSequenceContract.new.call(params)
     return failed_response("can't create_pallet_sequence #{validation_failed_response(res).errors}") if res.failure?
+    return failed_response(@pallet_errors.uniq.sort.join("\n")) unless @pallet_errors.empty?
 
     id = @repo.create(:pallet_sequences, res)
     log_status(:pallet_sequences, id, @status)
@@ -354,9 +355,10 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     success_response('Created pallet sequence', id)
   end
 
-  def create_pallet(params)
+  def create_pallet(params) # rubocop:disable Metrics/AbcSize
     res = MesscadaApp::PalletContract.new.call(params)
     return failed_response("can't create_pallet #{validation_failed_response(res).errors}") if res.failure?
+    return failed_response(@pallet_errors.uniq.sort.join("\n")) unless @pallet_errors.empty?
 
     id = @repo.create(:pallets, res)
     log_status(:pallets, id, @status)
@@ -412,8 +414,8 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
       --------
       output:
       pallets_created = #{@pallets_created}
-      pallet_ids_created = #{@pallet_ids_created}
-      pallet_sequence_ids_created = #{@pallet_sequence_ids_created}
+      pallet_ids = #{@pallet_ids_created}
+      pallet_sequence_ids = #{@pallet_sequence_ids_created}
 
       If there are any errors the transaction would not have committed
       errors:
