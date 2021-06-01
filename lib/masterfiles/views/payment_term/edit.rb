@@ -17,8 +17,6 @@ module Masterfiles
               form.action "/masterfiles/finance/payment_terms/#{id}"
               form.remote!
               form.method :update
-              form.add_field :incoterm_id
-              form.add_field :deal_type_id
               form.add_field :payment_term_date_type_id
               form.add_field :short_description
               form.add_field :long_description

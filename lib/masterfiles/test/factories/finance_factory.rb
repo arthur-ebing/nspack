@@ -17,13 +17,9 @@ module MasterfilesApp
     end
 
     def create_payment_term(opts = {})
-      incoterm_id = create_incoterm
-      deal_type_id = create_deal_type
       payment_term_date_type_id = create_payment_term_date_type
 
       default = {
-        incoterm_id: incoterm_id,
-        deal_type_id: deal_type_id,
         payment_term_date_type_id: payment_term_date_type_id,
         short_description: Faker::Lorem.unique.word,
         long_description: Faker::Lorem.word,
@@ -51,13 +47,13 @@ module MasterfilesApp
     def create_payment_term_date_type(opts = {})
       default = {
         type_of_date: Faker::Lorem.unique.word,
-        no_days_after_etd: Faker::Number.number(digits: 4),
-        no_days_after_eta: Faker::Number.number(digits: 4),
-        no_days_after_atd: Faker::Number.number(digits: 4),
-        no_days_after_ata: Faker::Number.number(digits: 4),
-        no_days_after_invoice: Faker::Number.number(digits: 4),
-        no_days_after_invoice_sent: Faker::Number.number(digits: 4),
-        no_days_after_container_load: Faker::Number.number(digits: 4),
+        no_days_after_etd: Faker::Number.number(digits: 2),
+        no_days_after_eta: Faker::Number.number(digits: 2),
+        no_days_after_atd: Faker::Number.number(digits: 2),
+        no_days_after_ata: Faker::Number.number(digits: 2),
+        no_days_after_invoice: Faker::Number.number(digits: 2),
+        no_days_after_invoice_sent: Faker::Number.number(digits: 2),
+        no_days_after_container_load: Faker::Number.number(digits: 2),
         anchor_to_date: Faker::Lorem.word,
         adjust_anchor_date_to_month_end: false,
         active: true,

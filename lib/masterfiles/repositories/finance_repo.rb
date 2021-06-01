@@ -104,17 +104,11 @@ module MasterfilesApp
         :payment_terms, id,
         parent_tables: [{ parent_table: :payment_term_date_types,
                           foreign_key: :payment_term_date_type_id,
-                          flatten_columns: { type_of_date: :payment_term_date_type } },
-                        { parent_table: :deal_types,
-                          foreign_key: :deal_type_id,
-                          flatten_columns: { deal_type: :deal_type } },
-                        { parent_table: :incoterms,
-                          foreign_key: :incoterm_id,
-                          flatten_columns: { incoterm: :incoterm } }]
+                          flatten_columns: { type_of_date: :payment_term_date_type } }]
       )
       return nil if hash.nil?
 
-      hash[:payment_term] = "#{hash[:deal_type]}_#{hash[:incoterm]}_#{hash[:short_description]}"
+      hash[:payment_term] = hash[:short_description]
       PaymentTerm.new(hash)
     end
 
