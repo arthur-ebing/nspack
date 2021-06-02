@@ -249,6 +249,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     hash[:legacy_data] = { pallet_id: hash['legacy_pallet_id'],
                            load_id: hash.delete('load_id'),
                            inspection_pallet_number: hash.delete('inspection_pallet_number'),
+                           consignment_note_number: hash.delete('consignment_note_number'),
                            load_order_id: hash.delete('load_order_id') }
 
     args = OpenStruct.new(hash)
