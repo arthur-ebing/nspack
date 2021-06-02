@@ -7,6 +7,9 @@ Sequel.migration do
   end
 
   down do
+    run <<~SQL
+      TRUNCATE payment_terms CASCADE
+    SQL
     alter_table(:payment_terms) do
       add_foreign_key :deal_type_id, :deal_types, type: :integer, null: false
       add_foreign_key :incoterm_id, :incoterms, type: :integer, null: false
