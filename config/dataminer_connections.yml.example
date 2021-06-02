@@ -1,6 +1,7 @@
 ---
 system:
-  db: postgres://postgres:postgres@localhost/$DBNAME
+  # db: postgres://postgres:postgres@localhost/$DBNAME
+  db: system
   path: $CURRENT/reports
   prepared_path: $SHARED/sys_prepared_reports
 application:
