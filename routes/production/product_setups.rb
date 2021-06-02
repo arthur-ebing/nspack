@@ -329,10 +329,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
         json_actions([OpenStruct.new(type: :replace_select_options,
                                      dom_id: 'product_setup_fruit_actual_counts_for_pack_id',
-                                     options_array: actual_counts),
-                      OpenStruct.new(type: :replace_input_value,
-                                     dom_id: 'product_setup_description',
-                                     value: '')])
+                                     options_array: actual_counts)])
       end
 
       r.on 'std_fruit_size_count_changed' do
@@ -346,10 +343,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
         json_actions([OpenStruct.new(type: :replace_select_options,
                                      dom_id: 'product_setup_fruit_actual_counts_for_pack_id',
-                                     options_array: actual_counts),
-                      OpenStruct.new(type: :replace_input_value,
-                                     dom_id: 'product_setup_description',
-                                     value: '')])
+                                     options_array: actual_counts)])
       end
 
       r.on 'actual_count_changed' do
