@@ -198,7 +198,7 @@
   :caption: Scrapped?
   :data_type: :boolean
   :control_type: :list
-  :default_value: 
+  :default_value:
   :ordered_list: false
   :ui_priority: 6
-  :list_def: true, false
+  :list_def: [true, false]
