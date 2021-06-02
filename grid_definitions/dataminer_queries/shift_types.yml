@@ -187,4 +187,4 @@
   :default_value: 
   :ordered_list: true
   :ui_priority: 1
-  :list_def: SELECT code, id FROM employment_types ORDER BY code
+  :list_def: SELECT employment_type_code, id FROM employment_types ORDER BY employment_type_code

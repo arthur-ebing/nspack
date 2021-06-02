@@ -121,13 +121,4 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-:query_parameter_definitions:
-- :column: fruit_size_references.fruit_actual_counts_for_pack_id
-  :caption: Fruit actual counts for pack
-  :data_type: :integer
-  :control_type: :list
-  :default_value: 
-  :ordered_list: true
-  :ui_priority: 1
-  :list_def: SELECT size_count_variation, id FROM fruit_actual_counts_for_packs ORDER
-    BY size_count_variation
+:query_parameter_definitions: []

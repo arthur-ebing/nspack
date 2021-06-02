@@ -601,11 +601,3 @@
   :ordered_list: true
   :ui_priority: 1
   :list_def: SELECT country_name, id FROM destination_countries ORDER BY country_name
-- :column: govt_inspection_sheets.govt_inspection_api_result_id
-  :caption: Govt inspection api result
-  :data_type: :integer
-  :control_type: :list
-  :default_value: 
-  :ordered_list: true
-  :ui_priority: 1
-  :list_def: SELECT upn_number, id FROM govt_inspection_api_results ORDER BY upn_number
