@@ -21,6 +21,22 @@ end
 { columnDefs: cols, rowDefs: [] }.to_json
 ----
 
+=== Multiselect
+
+If your grid should be used as a multiselect grid, create it with the `for_multiselect` option set to true.
+
+[source,ruby]
+----
+coldef = Crossbeams::DataGrid::ColumnDefiner.new(for_multiselect: true)
+cols = coldef.make_columns do |mk|
+  #..
+end
+----
+
+This will generate a column on the left with checkboxes for selecting rows.
+
+If the grid is a tree, the `for_tree` option should also be set (`Crossbeams::DataGrid::ColumnDefiner.new(for_multiselect: true, for_tree: true)`).
+
 == Columns
 
 Columns are specified in a DSL:
@@ -270,6 +286,16 @@ end
 layout = Crossbeams::Layout::Page.build(rules) do |page|
   page.add_grid('logged_actions',
                 "/development/logging/logged_actions/#{id}/grid",
+                caption: 'Column details')
+end
+
+# FOR MULTISELECT:
+# ----------------
+layout = Crossbeams::Layout::Page.build(rules) do |page|
+  page.add_grid('logged_actions',
+                "/development/logging/logged_actions/#{id}/grid",
+                multiselect: true,
+                multiselect_url: '/save/data/here',
                 caption: 'Column details')
 end
 ----
