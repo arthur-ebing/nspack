@@ -11,7 +11,7 @@ module Crossbeams
       hl: { install_location: 'HABATA',
             load_id_prefix: '',
             ps_apply_substitutes: false },
-      kr: { install_location: '',
+      kr: { install_location: 'KR',
             load_id_prefix: '',
             ps_apply_substitutes: false },
       um: { install_location: 'MATCOLD',
