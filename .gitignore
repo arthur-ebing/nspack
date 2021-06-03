@@ -69,3 +69,4 @@ pdf_documentation/*.png
 /edi/
 /edi_filedrop/
 /.env.local*
+script_test.rb
