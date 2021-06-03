@@ -224,10 +224,10 @@ module UiRules
         progress_controls = [uncomplete, preverify, titan_inspection, finish]
       when 2
         instance_controls = []
-        progress_controls = [reopen, titan_inspection, toggle_use_inspection_destination]
+        progress_controls = [reopen, preverify, titan_inspection, toggle_use_inspection_destination]
       else
         instance_controls = []
-        progress_controls = []
+        progress_controls = [preverify]
       end
       @form_object[:progress_controls] = progress_controls
       @form_object[:instance_controls] = instance_controls
