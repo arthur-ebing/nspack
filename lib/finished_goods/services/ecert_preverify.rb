@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  class ECertPreverify < BaseService
+  class ECertPreverify < BaseService # rubocop:disable Metrics/ClassLength
     attr_accessor :params, :agreement_id, :agreement_code, :business_id, :industry, :pallet_numbers, :create_units, :update_units
 
     def initialize(params)
@@ -20,6 +20,8 @@ module FinishedGoodsApp
 
       @pallet_numbers = res.instance
 
+      check_pallet!(:exists, pallet_numbers)
+
       res = find_tracking_unit
       return failed_response(res.message) unless res.success
 
@@ -30,17 +32,11 @@ module FinishedGoodsApp
       return failed_response(res.message) unless res.success
 
       success_response('Processed Tracking Units')
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     private
-
-    def repo
-      @repo ||= EcertRepo.new
-    end
-
-    def api
-      @api ||= ECertApi.new
-    end
 
     def find_tracking_unit
       pallet_numbers.each do |pallet_number|
@@ -96,7 +92,7 @@ module FinishedGoodsApp
         id = repo.get_id(:ecert_tracking_units, pallet_id: pallet_id)
 
         res = api.tracking_unit_status(pallet_number)
-        return failed_response(res.message) unless res.success
+        next unless res.success
 
         status = res.instance.first || {}
         tracking_unit_statuses = status['TrackingUnitStatuses'].first || {}
@@ -108,12 +104,19 @@ module FinishedGoodsApp
                   elot_key: response['eLotKey'],
                   passed: %w[Passed].include?(tracking_unit_statuses['ProcessStatus']),
                   verification_key: nil,
-                  process_result: repo.array_of_text_for_db_col(tracking_unit_statuses['ProcessResult']),
-                  rejection_reasons: repo.array_of_text_for_db_col(tracking_unit_statuses['RejectionReasons']) }
+                  process_result: tracking_unit_statuses['ProcessResult'],
+                  rejection_reasons: tracking_unit_statuses['RejectionReasons'] }
 
-        id.nil? ? repo.create(:ecert_tracking_units, attrs) : repo.update(:ecert_tracking_units, id, attrs)
+        process_ecert_tracking_units(id, attrs)
       end
       ok_response
+    end
+
+    def process_ecert_tracking_units(id, params)
+      res = EcertTrackingUnitSchema.call(params)
+      raise Crossbeams::InfoError, validation_failed_response(res).errors if res.failure?
+
+      id.nil? ? repo.create(:ecert_tracking_units, res) : repo.update(:ecert_tracking_units, id, res)
     end
 
     def tur_query(update = false)
@@ -125,6 +128,19 @@ module FinishedGoodsApp
         AgreementCode: agreement_code
       }
       URI.encode_www_form(hash)
+    end
+
+    def repo
+      @repo ||= EcertRepo.new
+    end
+
+    def api
+      @api ||= ECertApi.new
+    end
+
+    def check_pallet!(task, pallet_numbers)
+      res = MesscadaApp::TaskPermissionCheck::Pallets.call(task, pallet_number: pallet_numbers)
+      raise Crossbeams::InfoError, res.message unless res.success
     end
   end
 end
