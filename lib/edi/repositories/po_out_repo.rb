@@ -85,7 +85,7 @@ module EdiApp
           loads.customer_order_number AS order_no,
           (SELECT SUM(carton_quantity) FROM pallets p WHERE p.load_id = loads.id) AS cnts_on_truck,
           ph_resource.plant_resource_code AS lot_no,
-
+          ph_resource.resource_properties ->> 'edi_out_value' AS prod_grp,
           depots.depot_code AS dest_locn,
           depots.depot_code AS orig_depot,
           CASE WHEN govt_inspection_sheets.use_inspection_destination_for_load_out THEN

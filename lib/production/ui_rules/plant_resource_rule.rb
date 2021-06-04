@@ -58,6 +58,8 @@ module UiRules
                                 invisible: !at_ph_level }
       fields[:edi_out_value] = { renderer: :input,
                                  required: false,
+                                 pattern: :alphanumeric,
+                                 maxlength: 2,
                                  parent_field: :resource_properties,
                                  invisible: !at_ph_level }
       # if type is representative...
