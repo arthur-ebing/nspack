@@ -115,6 +115,7 @@ module ProductionApp
         plant_resources.resource_properties ->> 'phc' AS phc,
         plant_resources.resource_properties ->> 'packhouse_no' AS ph_no,
         plant_resources.resource_properties ->> 'gln' AS gln,
+        plant_resources.resource_properties ->> 'edi_out_value' AS edi_out_value,
         (SELECT string_agg(system_resource_code, '; ') FROM (SELECT pr.system_resource_code
           FROM plant_resources_system_resources prs
           JOIN system_resources pr ON pr.id = prs.system_resource_id

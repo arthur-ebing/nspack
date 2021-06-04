@@ -255,13 +255,15 @@ module MesscadaApp
     end
 
     def find_resource_phc(id)
-      # DB[:plant_resources].where(id: id).select(:id, Sequel.lit("resource_properties ->> 'phc'").as(:phc)).first[:phc].to_s
       DB[:plant_resources].where(id: id).get(Sequel.lit("resource_properties ->> 'phc'"))
     end
 
     def find_resource_packhouse_no(id)
-      # DB[:plant_resources].where(id: id).select(:id, Sequel.lit("resource_properties ->> 'packhouse_no'").as(:packhouse_no)).first[:packhouse_no].to_s
       DB[:plant_resources].where(id: id).get(Sequel.lit("resource_properties ->> 'packhouse_no'"))
+    end
+
+    def find_resource_edi_out_value(id)
+      DB[:plant_resources].where(id: id).get(Sequel.lit("resource_properties ->> 'edi_out_value'"))
     end
 
     def find_cartons_per_pallet(id)

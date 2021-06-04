@@ -26,6 +26,7 @@ module Production
               form.add_field :gln
               form.add_field :phc
               form.add_field :packhouse_no
+              form.add_field :edi_out_value
               form.add_field :carton_equals_pallet
             end
           end

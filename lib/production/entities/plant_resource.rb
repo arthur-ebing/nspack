@@ -44,6 +44,7 @@ module ProductionApp
     attribute :phc, Types::String
     attribute :ph_no, Types::String
     attribute :gln, Types::String
+    attribute :edi_out_value, Types::String
     attribute :linked_resources, Types::String
     attribute :type_description, Types::String
     attribute :path_array, Types::Array
