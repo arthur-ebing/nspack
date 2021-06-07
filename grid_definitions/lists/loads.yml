@@ -35,3 +35,7 @@
     - :col: voyages.id
       :op: =
       :val: $:voyage_id$
+  :order:
+    - :col: orders_loads.order_id
+      :op: =
+      :val: $:order_id$

@@ -20,25 +20,35 @@
   || ' - ' || cargo_temperatures.set_point_temperature AS cargo_temperature,\r\n    container_stack_types.stack_type_code
   || ' - ' || COALESCE(container_stack_types.description,'') AS stack_type,\r\n    EXISTS(select
   id from edi_out_transactions where record_id = loads.id and flow_type = 'PO') AS
-  edi_out_transactions,\r\n    loads.rmt_load,\r\n    loads.created_at,\r\n    loads.updated_at,\r\n
-  \   CASE\r\n        WHEN loads.shipped THEN 'blue'\r\n        WHEN loads.allocated
-  THEN 'green'\r\n    END AS colour_rule\r\n\r\nFROM loads\r\n         JOIN depots
-  ON depots.id = loads.depot_id\r\n         JOIN destination_cities ON destination_cities.id
-  = loads.final_destination_id\r\n         JOIN voyage_ports pol_voyage_ports ON pol_voyage_ports.id
-  = loads.pol_voyage_port_id\r\n         JOIN voyage_ports pod_voyage_ports ON pod_voyage_ports.id
-  = loads.pod_voyage_port_id\r\n         JOIN ports pol_port ON pol_port.id = pol_voyage_ports.port_id\r\n
-  \        JOIN ports pod_port ON pod_port.id = pod_voyage_ports.port_id\r\n         JOIN
-  voyages ON pol_voyage_ports.voyage_id = voyages.id\r\n         LEFT JOIN vessels
-  ON voyages.vessel_id = vessels.id\r\n         LEFT JOIN load_containers ON loads.id
-  = load_containers.load_id\r\n         LEFT JOIN cargo_temperatures ON load_containers.cargo_temperature_id
-  = cargo_temperatures.id\r\n         LEFT JOIN container_stack_types ON load_containers.stack_type_id
+  edi_out_transactions,\r\n    loads.rmt_load,\r\n    COALESCE(orders_loads.order_id,
+  0) AS zero_order_id,\r\n    pallet_sequences.packed_tm_group_id,\r\n    pallet_sequences.marketing_org_party_role_id,\r\n
+  \   loads.created_at,\r\n    loads.updated_at,\r\n    CASE\r\n        WHEN loads.shipped
+  THEN 'blue'\r\n        WHEN loads.allocated THEN 'green'\r\n        END AS colour_rule\r\n\r\nFROM
+  loads\r\n         JOIN depots ON depots.id = loads.depot_id\r\n         JOIN destination_cities
+  ON destination_cities.id = loads.final_destination_id\r\n         JOIN voyage_ports
+  pol_voyage_ports ON pol_voyage_ports.id = loads.pol_voyage_port_id\r\n         JOIN
+  voyage_ports pod_voyage_ports ON pod_voyage_ports.id = loads.pod_voyage_port_id\r\n
+  \        JOIN ports pol_port ON pol_port.id = pol_voyage_ports.port_id\r\n         JOIN
+  ports pod_port ON pod_port.id = pod_voyage_ports.port_id\r\n         JOIN voyages
+  ON pol_voyage_ports.voyage_id = voyages.id\r\n         LEFT JOIN vessels ON voyages.vessel_id
+  = vessels.id\r\n         LEFT JOIN load_containers ON loads.id = load_containers.load_id\r\n
+  \        LEFT JOIN cargo_temperatures ON load_containers.cargo_temperature_id =
+  cargo_temperatures.id\r\n         LEFT JOIN container_stack_types ON load_containers.stack_type_id
   = container_stack_types.id\r\n         LEFT JOIN load_voyages ON loads.id = load_voyages.load_id\r\n
   \        LEFT JOIN load_vehicles ON loads.id = load_vehicles.load_id\r\n         LEFT
-  JOIN (\r\n    SELECT\r\n        COUNT(id) AS pallet_quantity,\r\n        SUM(carton_quantity::numeric)
-  AS pallet_carton_quantity,\r\n        string_agg(pallet_number::text, ', '::text)
-  AS pallet_numbers,\r\n        string_agg(temp_tail::text, ', '::text) AS temp_tail,\r\n
-  \       load_id\r\n    FROM pallets\r\n    GROUP BY load_id) pallets\r\n                   ON
-  loads.id = pallets.load_id\r\nORDER BY loads.id DESC"
+  JOIN orders_loads ON orders_loads.load_id = loads.id\r\n         LEFT JOIN (\r\n
+  \                   SELECT\r\n                        COUNT(pallets.id) AS pallet_quantity,\r\n
+  \                       SUM(pallets.carton_quantity::numeric) AS pallet_carton_quantity,\r\n
+  \                       string_agg(pallets.pallet_number::text, ', ') AS pallet_numbers,\r\n
+  \                       string_agg(temp_tail::text, ', ') AS temp_tail,\r\n                        load_id\r\n
+  \                   FROM pallets\r\n                    GROUP BY load_id) pallets
+  ON loads.id = pallets.load_id\r\n         LEFT JOIN (\r\n                    SELECT\r\n
+  \                       string_agg(DISTINCT ps.packed_tm_group_id::text, ', ') AS
+  packed_tm_group_id,\r\n                        string_agg(DISTINCT ps.marketing_org_party_role_id::text,
+  ', ') AS marketing_org_party_role_id,\r\n                        load_id\r\n                    FROM
+  pallets\r\n                    JOIN pallet_sequences ps on pallets.id = ps.pallet_id\r\n
+  \                   GROUP BY load_id) pallet_sequences ON loads.id = pallet_sequences.load_id\r\nORDER
+  BY loads.id DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -750,9 +760,57 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  zero_order_id:
+    :name: zero_order_id
+    :sequence_no: 45
+    :caption: Zero order
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packed_tm_group_id:
+    :name: packed_tm_group_id
+    :sequence_no: 46
+    :caption: Packed tm group id
+    :namespaced_name: pallet_sequences.packed_tm_group_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marketing_org_party_role_id:
+    :name: marketing_org_party_role_id
+    :sequence_no: 47
+    :caption: Marketing org party role id
+    :namespaced_name: pallet_sequences.marketing_org_party_role_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 45
+    :sequence_no: 48
     :caption: Created at
     :namespaced_name: loads.created_at
     :data_type: :datetime
@@ -768,7 +826,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 46
+    :sequence_no: 49
     :caption: Updated at
     :namespaced_name: loads.updated_at
     :data_type: :datetime
@@ -784,7 +842,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 47
+    :sequence_no: 50
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
@@ -905,6 +963,14 @@
   :list_def: 
 - :column: voyages.id
   :caption: Voyages Id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: orders_loads.order_id
+  :caption: Order
   :data_type: :integer
   :control_type: :text
   :default_value: 

@@ -6,7 +6,7 @@ module FinishedGoodsApp
 
     def initialize(load_id, user, pallet_number = nil)
       @load_id = load_id
-      @instance = repo.find_load_flat(load_id)
+      @instance = repo.find_load(load_id)
       @pallet_number = pallet_number
       @user = user
     end

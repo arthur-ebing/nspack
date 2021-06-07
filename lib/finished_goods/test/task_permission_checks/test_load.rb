@@ -32,6 +32,7 @@ module FinishedGoodsApp
         pod_voyage_port_id: 1,
         order_number: Faker::Lorem.unique.word,
         edi_file_name: 'ABC',
+        order_id: nil,
         customer_order_number: 'ABC',
         customer_reference: 'ABC',
         exporter_certificate_code: 'ABC',
@@ -89,12 +90,15 @@ module FinishedGoodsApp
         temp_tail_pallet_number: '123',
         pallet_count: 1,
         nett_weight: 1.0,
+        packed_tm_group_id: nil,
+        marketing_org_party_role_id: nil,
+        target_customer_party_role_id: nil,
 
         # addendum
         addendum: true,
         location_of_issue: '123'
       }
-      FinishedGoodsApp::LoadFlat.new(base_attrs.merge(attrs))
+      FinishedGoodsApp::Load.new(base_attrs.merge(attrs))
     end
 
     def test_create
@@ -103,13 +107,13 @@ module FinishedGoodsApp
     end
 
     def test_edit
-      FinishedGoodsApp::LoadRepo.any_instance.stubs(:find_load_flat).returns(entity)
+      FinishedGoodsApp::LoadRepo.any_instance.stubs(:find_load).returns(entity)
       res = FinishedGoodsApp::TaskPermissionCheck::Load.call(:edit, 1)
       assert res.success, 'Should be able to edit a load'
     end
 
     def test_delete
-      FinishedGoodsApp::LoadRepo.any_instance.stubs(:find_load_flat).returns(entity(allocated: false, vehicle: false, shipped: false))
+      FinishedGoodsApp::LoadRepo.any_instance.stubs(:find_load).returns(entity(allocated: false, vehicle: false, shipped: false))
       res = FinishedGoodsApp::TaskPermissionCheck::Load.call(:delete, 1)
       assert res.success, 'Should be able to delete a load'
     end

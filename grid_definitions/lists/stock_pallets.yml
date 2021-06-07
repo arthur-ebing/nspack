@@ -126,6 +126,26 @@
   - :col: aggregated.rmt_grades
     :op: "="
     :val: false
+  :unallocated_pallet_stock_for_order:
+    - :col: vw_pallets.in_stock
+      :op: "="
+      :val: true
+    - :col: vw_pallets.zero_load_id
+      :op: IN
+      :val: "$:load_id$,0"
+    - :col: aggregated.rmt_grades
+      :op: "="
+      :val: false
+    - :col: vw_pallet_sequences.packed_tm_group_id
+      :op: "="
+      :val: "$:packed_tm_group_id$"
+    - :col: vw_pallet_sequences.marketing_org_party_role_id
+      :op: "="
+      :val: "$:marketing_org_party_role_id$"
+    - :col: vw_pallet_sequences.target_customer_party_role_id
+      :op: "="
+      :val: "$:target_customer_party_role_id$"
+      :optional: true
   :unallocated_bin_stock:
   - :col: vw_pallets.in_stock
     :op: "="
@@ -190,6 +210,15 @@
     :multiselect_save_method: remote
     :can_be_cleared: true
     :conditions: unallocated_pallet_stock
+  :allocate_for_order:
+    :url: "/finished_goods/dispatch/loads/$:id$/allocate"
+    :preselect: SELECT pallet_sequences.id FROM pallet_sequences JOIN pallets ON pallet_sequences.pallet_id
+      = pallets.id WHERE load_id = $:load_id$
+    :section_caption: SELECT 'Assign pallets to load ' || order_number FROM loads
+      WHERE id = $:load_id$
+    :multiselect_save_method: remote
+    :can_be_cleared: true
+    :conditions: unallocated_pallet_stock_for_order
   :allocate_bins:
     :url: "/finished_goods/dispatch/loads/$:id$/allocate"
     :preselect: SELECT pallet_sequences.id FROM pallet_sequences JOIN pallets ON pallet_sequences.pallet_id

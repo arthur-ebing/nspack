@@ -202,3 +202,35 @@ INSERT INTO currencies (currency, description) VALUES ('RUB' , 'Russian Ruble') 
 INSERT INTO currencies (currency, description) VALUES ('CNY' , 'Chinese Yuan') ON CONFLICT DO NOTHING;
 INSERT INTO currencies (currency, description) VALUES ('AUD' , 'Australian Dollar') ON CONFLICT DO NOTHING;
 INSERT INTO currencies (currency, description) VALUES ('NZD' , 'New Zealand Dollar') ON CONFLICT DO NOTHING;
+
+-- PAYMENT_TERM_DATE_TYPES
+INSERT INTO payment_term_date_types (type_of_date) VALUES ('Est Time of Departure') ON CONFLICT DO NOTHING;
+INSERT INTO payment_term_date_types (type_of_date) VALUES ('Est Time of Arrival') ON CONFLICT DO NOTHING;
+INSERT INTO payment_term_date_types (type_of_date) VALUES ('Invoice Date') ON CONFLICT DO NOTHING;
+INSERT INTO payment_term_date_types (type_of_date) VALUES ('Bill of Lading') ON CONFLICT DO NOTHING;
+INSERT INTO payment_term_date_types (type_of_date) VALUES ('Prepayment') ON CONFLICT DO NOTHING;
+INSERT INTO payment_term_date_types (type_of_date) VALUES ('Statement Date') ON CONFLICT DO NOTHING;
+INSERT INTO payment_term_date_types (type_of_date) VALUES ('Container Loading Date') ON CONFLICT DO NOTHING;
+INSERT INTO payment_term_date_types (type_of_date) VALUES ('Invoice Sent Date') ON CONFLICT DO NOTHING;
+INSERT INTO payment_term_date_types (type_of_date) VALUES ('Actual Time of Departure') ON CONFLICT DO NOTHING;
+INSERT INTO payment_term_date_types (type_of_date) VALUES ('Actual Time of Arrival') ON CONFLICT DO NOTHING;
+
+-- DEAL_TYPES
+INSERT INTO deal_types (deal_type) VALUES ('CONSIGNMENT') ON CONFLICT DO NOTHING;
+INSERT INTO deal_types (deal_type) VALUES ('FT') ON CONFLICT DO NOTHING;
+INSERT INTO deal_types (deal_type) VALUES ('MGP') ON CONFLICT DO NOTHING;
+INSERT INTO deal_types (deal_type) VALUES ('NRA') ON CONFLICT DO NOTHING;
+
+-- INCOTERMS
+INSERT INTO incoterms (incoterm) VALUES ('C&F') ON CONFLICT DO NOTHING;
+INSERT INTO incoterms (incoterm) VALUES ('CIF') ON CONFLICT DO NOTHING;
+INSERT INTO incoterms (incoterm) VALUES ('CMP') ON CONFLICT DO NOTHING;
+INSERT INTO incoterms (incoterm) VALUES ('DIP') ON CONFLICT DO NOTHING;
+INSERT INTO incoterms (incoterm) VALUES ('DMP') ON CONFLICT DO NOTHING;
+INSERT INTO incoterms (incoterm) VALUES ('EXW') ON CONFLICT DO NOTHING;
+INSERT INTO incoterms (incoterm) VALUES ('FMP') ON CONFLICT DO NOTHING;
+INSERT INTO incoterms (incoterm) VALUES ('FOB') ON CONFLICT DO NOTHING;
+INSERT INTO incoterms (incoterm) VALUES ('Deliver at Store') ON CONFLICT DO NOTHING;
+INSERT INTO incoterms (incoterm) VALUES ('DDP') ON CONFLICT DO NOTHING;
+INSERT INTO incoterms (incoterm) VALUES ('DDU') ON CONFLICT DO NOTHING;
+INSERT INTO incoterms (incoterm) VALUES ('EX Coldstore') ON CONFLICT DO NOTHING;

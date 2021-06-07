@@ -29,9 +29,9 @@
   \   vw_pallets.palletizing_bay,\r\n    aggregated.pick_references,\r\n    vw_pallets.phc,\r\n
   \   aggregated.verification_results,\r\n    vw_pallets.scrapped_at,\r\n    vw_pallets.scrapped,\r\n
   \   vw_pallets.partially_palletized,\r\n    vw_pallets.reinspected,\r\n    aggregated.verified,\r\n
-  \   aggregated.verifications_passed,\r\n    fn_pallet_verification_failed(vw_pallets.pallet_id)
-  AS pallet_verification_failed,\r\n    vw_pallets.build_status,\r\n    vw_pallets.temp_tail,\r\n
-  \   vw_pallets.depot_pallet,\r\n    vw_pallets.edi_in_file,\r\n    vw_pallets.edi_in_consignment_note_number,\r\n
+  \   aggregated.verifications_passed,\r\n    vw_pallets.pallet_verification_failed,\r\n
+  \   vw_pallets.build_status,\r\n    vw_pallets.temp_tail,\r\n    vw_pallets.depot_pallet,\r\n
+  \   vw_pallets.edi_in_file,\r\n    vw_pallets.edi_in_consignment_note_number,\r\n
   \   aggregated.packed_at,\r\n    aggregated.packed_dates,\r\n    aggregated.packed_weeks,\r\n
   \   aggregated.repacked,\r\n    aggregated.repacked_at,\r\n    aggregated.repacked_from_pallet_ids,\r\n
   \   aggregated.failed_otmc_results,\r\n    aggregated.failed_otmc,\r\n    aggregated.created_by,\r\n
@@ -41,12 +41,14 @@
   \       WHEN vw_pallets.allocated THEN 'ready'\r\n        WHEN vw_pallets.in_stock
   THEN 'ok'\r\n        WHEN vw_pallets.palletized OR vw_pallets.partially_palletized
   THEN 'inprogress'\r\n        WHEN vw_pallets.inspected AND NOT vw_pallets.govt_inspection_passed
-  THEN 'error'\r\n        WHEN fn_pallet_verification_failed(vw_pallets.pallet_id)
-  THEN 'error'\r\n    END AS colour_rule,\r\n    -- Parameters\r\n    vw_pallet_sequences.packed_tm_group,\r\n
-  \   vw_pallet_sequences.rmt_grade,\r\n    vw_pallet_sequences.production_run_id\r\n\r\nFROM
-  vw_pallets\r\nJOIN vw_pallet_sequences ON vw_pallets.pallet_id = vw_pallet_sequences.pallet_id\r\nLEFT
-  JOIN vw_pallet_sequences_aggregated aggregated ON aggregated.pallet_id = vw_pallets.pallet_id\r\n\r\nORDER
-  BY zero_load_id DESC, pallet_number DESC;"
+  THEN 'error'\r\n        WHEN vw_pallets.pallet_verification_failed THEN 'error'\r\n
+  \       END AS colour_rule,\r\n    -- Parameters\r\n    vw_pallet_sequences.packed_tm_group_id,\r\n
+  \   vw_pallet_sequences.packed_tm_group,\r\n    vw_pallet_sequences.marketing_org_party_role_id,\r\n
+  \   vw_pallet_sequences.target_customer_party_role_id,\r\n    vw_pallet_sequences.rmt_grade,\r\n
+  \   vw_pallet_sequences.production_run_id\r\n\r\nFROM vw_pallets\r\n         JOIN
+  vw_pallet_sequences ON vw_pallets.pallet_id = vw_pallet_sequences.pallet_id\r\n
+  \        LEFT JOIN vw_pallet_sequences_aggregated aggregated ON aggregated.pallet_id
+  = vw_pallets.pallet_id\r\n\r\nORDER BY zero_load_id DESC, pallet_number DESC;"
 :limit: 
 :offset: 
 :external_settings:
@@ -1391,7 +1393,7 @@
     :name: pallet_verification_failed
     :sequence_no: 84
     :caption: Pallet verification failed
-    :namespaced_name: 
+    :namespaced_name: vw_pallets.pallet_verification_failed
     :data_type: :boolean
     :width: 
     :format: 
@@ -1723,11 +1725,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  packed_tm_group:
-    :name: packed_tm_group
+  packed_tm_group_id:
+    :name: packed_tm_group_id
     :sequence_no: 105
-    :caption: Packed tm group
-    :namespaced_name: vw_pallet_sequences.packed_tm_group
+    :caption: Packed tm group id
+    :namespaced_name: vw_pallet_sequences.packed_tm_group_id
     :data_type: :integer
     :width: 
     :format: 
@@ -1739,9 +1741,57 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  packed_tm_group:
+    :name: packed_tm_group
+    :sequence_no: 106
+    :caption: Packed tm group
+    :namespaced_name: vw_pallet_sequences.packed_tm_group
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marketing_org_party_role_id:
+    :name: marketing_org_party_role_id
+    :sequence_no: 107
+    :caption: Marketing org party role id
+    :namespaced_name: vw_pallet_sequences.marketing_org_party_role_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  target_customer_party_role_id:
+    :name: target_customer_party_role_id
+    :sequence_no: 108
+    :caption: Target customer party role
+    :namespaced_name: vw_pallet_sequences.target_customer_party_role_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   rmt_grade:
     :name: rmt_grade
-    :sequence_no: 106
+    :sequence_no: 109
     :caption: Rmt grade
     :namespaced_name: vw_pallet_sequences.rmt_grade
     :data_type: :boolean
@@ -1757,7 +1807,7 @@
     :group_max: false
   production_run_id:
     :name: production_run_id
-    :sequence_no: 107
+    :sequence_no: 110
     :caption: Production run
     :namespaced_name: vw_pallet_sequences.production_run_id
     :data_type: :integer
@@ -1936,7 +1986,7 @@
   :ordered_list: false
   :ui_priority: 17
   :list_def: 
-- :column: vw_pallets.failed_otmc_results
+- :column: aggregated.failed_otmc_results
   :caption: Failed OTMC Results
   :data_type: :string
   :control_type: :text
@@ -1944,7 +1994,7 @@
   :ordered_list: false
   :ui_priority: 18
   :list_def: 
-- :column: vw_pallets.failed_otmc
+- :column: aggregated.failed_otmc
   :caption: Failed OTMC?
   :data_type: :boolean
   :control_type: :text
@@ -1952,7 +2002,7 @@
   :ordered_list: false
   :ui_priority: 19
   :list_def: true, false
-- :column: vw_pallets.repacked
+- :column: aggregated.repacked
   :caption: Repacked?
   :data_type: :boolean
   :control_type: :text
@@ -1974,7 +2024,7 @@
   :control_type: :text
   :default_value: 
   :ordered_list: false
-  :ui_priority: 1
+  :ui_priority: 22
   :list_def: true, false
 - :column: aggregated.count
   :caption: Count
@@ -1982,7 +2032,23 @@
   :control_type: :text
   :default_value: 
   :ordered_list: false
-  :ui_priority: 1
+  :ui_priority: 23
+  :list_def: 
+- :column: vw_pallet_sequences.packed_tm_group_id
+  :caption: Packed TM group Id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 24
+  :list_def: 
+- :column: vw_pallet_sequences.marketing_org_party_role_id
+  :caption: Marketing Org Party Role Id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 25
   :list_def: 
 - :column: aggregated.failed_otmc
   :caption: Failed OTMC Pallets

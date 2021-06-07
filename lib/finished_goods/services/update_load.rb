@@ -64,7 +64,7 @@ module FinishedGoodsApp
     end
 
     def load_entity(id)
-      repo.find_load_flat(id)
+      repo.find_load(id)
     end
   end
 end

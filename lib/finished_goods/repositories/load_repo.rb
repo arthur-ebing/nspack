@@ -2,63 +2,73 @@
 
 module FinishedGoodsApp
   class LoadRepo < BaseRepo # rubocop:disable Metrics/ClassLength
-    build_for_select :loads,
-                     label: :order_number,
-                     value: :id,
-                     order_by: :order_number
-    build_inactive_select :loads,
-                          label: :order_number,
-                          value: :id,
-                          order_by: :order_number
-    crud_calls_for :loads, name: :load, wrapper: Load
+    crud_calls_for :loads, name: :load
 
-    def find_load_flat(id) # rubocop:disable Metrics/AbcSize
-      hash = find_with_association(:loads, id,
-                                   parent_tables: [{ parent_table: :voyage_ports,
-                                                     columns: %i[port_id voyage_id eta ata],
-                                                     foreign_key: :pod_voyage_port_id,
-                                                     flatten_columns: { port_id: :pod_port_id,
-                                                                        voyage_id: :voyage_id,
-                                                                        eta: :eta,
-                                                                        ata: :ata } },
-                                                   { parent_table: :voyage_ports,
-                                                     columns: %i[port_id etd atd],
-                                                     foreign_key: :pol_voyage_port_id,
-                                                     flatten_columns: { port_id: :pol_port_id, etd: :etd, atd: :atd } },
-                                                   { parent_table: :depots,
-                                                     columns: %i[depot_code],
-                                                     foreign_key: :depot_id,
-                                                     flatten_columns: { depot_code: :depot_code } },
-                                                   { parent_table: :voyages,
-                                                     columns: %i[voyage_type_id vessel_id voyage_number year voyage_code],
-                                                     foreign_key: :voyage_id,
-                                                     flatten_columns: { voyage_type_id: :voyage_type_id,
-                                                                        vessel_id: :vessel_id,
-                                                                        voyage_number: :voyage_number,
-                                                                        voyage_code: :voyage_code,
-                                                                        year: :year } }],
-                                   sub_tables: [{ sub_table: :load_voyages,
-                                                  columns: %i[shipping_line_party_role_id shipper_party_role_id booking_reference memo_pad],
-                                                  one_to_one: { shipping_line_party_role_id: :shipping_line_party_role_id,
-                                                                shipper_party_role_id: :shipper_party_role_id,
-                                                                booking_reference: :booking_reference,
-                                                                memo_pad: :memo_pad } },
-                                                { sub_table: :load_vehicles,
-                                                  columns: %i[vehicle_number],
-                                                  one_to_one: { vehicle_number: :vehicle_number } },
-                                                { sub_table: :load_containers,
-                                                  columns: %i[container_code cargo_temperature_id verified_gross_weight],
-                                                  one_to_one: { container_code: :container_code,
-                                                                cargo_temperature_id: :cargo_temperature_id,
-                                                                verified_gross_weight: :verified_gross_weight } }],
+    def for_select_loads(where: {}, exclude: {}, active: true)
+      DB[:loads]
+        .left_join(:orders_loads, load_id: :id)
+        .where(Sequel[:loads][:active] => active)
+        .where(where)
+        .exclude(exclude)
+        .distinct
+        .select(Sequel[:loads][:id])
+        .map { |r| [r[:id], r[:id]] }
+    end
 
-                                   lookup_functions: [{ function: :fn_current_status, args: ['loads', :id],  col_name: :status },
-                                                      { function: :fn_party_role_name, args: [:customer_party_role_id], col_name: :customer },
-                                                      { function: :fn_party_role_name, args: [:exporter_party_role_id], col_name: :exporter },
-                                                      { function: :fn_party_role_name, args: [:billing_client_party_role_id], col_name: :billing_client },
-                                                      { function: :fn_party_role_name, args: [:consignee_party_role_id], col_name: :consignee },
-                                                      { function: :fn_party_role_name, args: [:final_receiver_party_role_id], col_name: :final_receiver }])
+    def find_load(id) # rubocop:disable Metrics/AbcSize
+      hash = find_with_association(
+        :loads, id,
+        parent_tables: [{ parent_table: :voyage_ports,
+                          columns: %i[port_id voyage_id eta ata],
+                          foreign_key: :pod_voyage_port_id,
+                          flatten_columns: { port_id: :pod_port_id,
+                                             voyage_id: :voyage_id,
+                                             eta: :eta,
+                                             ata: :ata } },
+                        { parent_table: :voyage_ports,
+                          columns: %i[port_id etd atd],
+                          foreign_key: :pol_voyage_port_id,
+                          flatten_columns: { port_id: :pol_port_id, etd: :etd, atd: :atd } },
+                        { parent_table: :depots,
+                          columns: %i[depot_code],
+                          foreign_key: :depot_id,
+                          flatten_columns: { depot_code: :depot_code } },
+                        { parent_table: :voyages,
+                          columns: %i[voyage_type_id vessel_id voyage_number year voyage_code],
+                          foreign_key: :voyage_id,
+                          flatten_columns: { voyage_type_id: :voyage_type_id,
+                                             vessel_id: :vessel_id,
+                                             voyage_number: :voyage_number,
+                                             voyage_code: :voyage_code,
+                                             year: :year } }],
+        sub_tables: [{ sub_table: :load_voyages,
+                       columns: %i[shipping_line_party_role_id shipper_party_role_id booking_reference memo_pad],
+                       one_to_one: { shipping_line_party_role_id: :shipping_line_party_role_id,
+                                     shipper_party_role_id: :shipper_party_role_id,
+                                     booking_reference: :booking_reference,
+                                     memo_pad: :memo_pad } },
+                     { sub_table: :load_vehicles,
+                       columns: %i[vehicle_number],
+                       one_to_one: { vehicle_number: :vehicle_number } },
+                     { sub_table: :load_containers,
+                       columns: %i[container_code cargo_temperature_id verified_gross_weight],
+                       one_to_one: { container_code: :container_code,
+                                     cargo_temperature_id: :cargo_temperature_id,
+                                     verified_gross_weight: :verified_gross_weight } }],
+
+        lookup_functions: [{ function: :fn_current_status, args: ['loads', :id],  col_name: :status },
+                           { function: :fn_party_role_name, args: [:customer_party_role_id], col_name: :customer },
+                           { function: :fn_party_role_name, args: [:exporter_party_role_id], col_name: :exporter },
+                           { function: :fn_party_role_name, args: [:billing_client_party_role_id], col_name: :billing_client },
+                           { function: :fn_party_role_name, args: [:consignee_party_role_id], col_name: :consignee },
+                           { function: :fn_party_role_name, args: [:final_receiver_party_role_id], col_name: :final_receiver }]
+      )
       return nil if hash.nil?
+
+      # Orders
+      order_ids = select_values(:orders_loads, :order_id, load_id: id)
+      hash[:order_id] = order_ids.one? ? order_ids.first : nil
+      hash[:packed_tm_group_id], hash[:marketing_org_party_role_id], hash[:target_customer_party_role_id] = get(:orders, hash[:order_id], %i[packed_tm_group_id marketing_org_party_role_id target_customer_party_role_id])
 
       # load_voyages
       hash[:load_voyage_id] = get_id(:load_voyages, load_id: id)
@@ -97,7 +107,7 @@ module FinishedGoodsApp
       # Addendum
       hash[:addendum] = exists?(:titan_requests, load_id: id)
 
-      LoadFlat.new(hash)
+      Load.new(hash)
     end
 
     def org_code_for_po(load_id)

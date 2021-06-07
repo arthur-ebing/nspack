@@ -237,6 +237,18 @@ class Nspack < Roda
         handle_not_found(r)
       end
 
+      r.on 'add_load_to_order', Integer do |order_id|
+        check_auth!('dispatch', 'edit')
+        res = interactor.add_load_to_order(id, order_id)
+        flash[res.success ? :notice : :error] = res.message
+        r.redirect "/finished_goods/dispatch/loads/#{id}"
+      end
+
+      r.on 'new_order' do
+        form_values = interactor.load_entity(id).to_h
+        show_partial_or_page(r) { FinishedGoods::Orders::Order::New.call(form_values: form_values, remote: fetch?(r)) }
+      end
+
       r.on 'truck_arrival' do
         r.get do       # SHOW
           check_auth!('dispatch', 'edit')
@@ -387,7 +399,8 @@ class Nspack < Roda
 
       r.on 'copy' do    # COPY
         check_auth!('dispatch', 'new')
-        show_partial_or_page(r) { FinishedGoods::Dispatch::Load::New.call(id: id) }
+        form_values = interactor.load_entity(id).to_h
+        show_partial_or_page(r) { FinishedGoods::Dispatch::Load::New.call(form_values: form_values, back_url: request.referer) }
       end
 
       r.on 'edit' do   # EDIT
@@ -535,7 +548,7 @@ class Nspack < Roda
 
       r.on 'new' do    # NEW
         check_auth!('dispatch', 'new')
-        show_partial_or_page(r) { FinishedGoods::Dispatch::Load::New.call }
+        show_partial_or_page(r) { FinishedGoods::Dispatch::Load::New.call(back_url: request.referer) }
       end
 
       r.post do        # CREATE
@@ -545,7 +558,7 @@ class Nspack < Roda
           r.redirect "/finished_goods/dispatch/loads/#{res.instance.id}"
         else
           re_show_form(r, res, url: '/finished_goods/dispatch/loads/new') do
-            FinishedGoods::Dispatch::Load::New.call(form_values: params[:load], form_errors: res.errors)
+            FinishedGoods::Dispatch::Load::New.call(form_values: params[:load], form_errors: res.errors, back_url: request.referer)
           end
         end
       end

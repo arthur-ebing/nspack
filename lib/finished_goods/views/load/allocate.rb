@@ -40,15 +40,34 @@ module FinishedGoods
 
             page.add_notice "Use the checkboxes and save selection button to select #{palbin}s from the grid below. - Or add #{palbin}s by listing #{palbin} numbers in the box above and pressing Allocate pasted #{palbin}s."
             page.section do |section|
-              section.add_grid('stock_pallets',
-                               '/list/stock_pallets/grid_multi',
-                               caption: "Choose #{palbin}s",
-                               is_multiselect: true,
-                               can_be_cleared: true,
-                               multiselect_url: "/finished_goods/dispatch/loads/#{id}/allocate_multiselect",
-                               multiselect_key: ui_rule.form_object.rmt_load ? 'allocate_bins' : 'allocate',
-                               height: 40,
-                               multiselect_params: { id: id })
+              if ui_rule.form_object.order_id.nil?
+                section.add_grid('stock_pallets',
+                                 '/list/stock_pallets/grid_multi',
+                                 caption: "Choose #{palbin}s",
+                                 is_multiselect: true,
+                                 can_be_cleared: true,
+                                 multiselect_url: "/finished_goods/dispatch/loads/#{id}/allocate_multiselect",
+                                 multiselect_key: ui_rule.form_object.rmt_load ? 'allocate_bins' : 'allocate',
+                                 height: 40,
+                                 multiselect_params: { id: id })
+
+              else
+                p ui_rule.form_object.target_customer_party_role_id
+                section.add_grid('stock_pallets',
+                                 '/list/stock_pallets/grid_multi',
+                                 caption: 'Choose Pallets',
+                                 is_multiselect: true,
+                                 can_be_cleared: true,
+                                 multiselect_url: "/finished_goods/dispatch/loads/#{id}/allocate_multiselect",
+                                 multiselect_key: 'allocate_for_order',
+                                 height: 40,
+                                 multiselect_params: {
+                                   load_id: id,
+                                   packed_tm_group_id: ui_rule.form_object.packed_tm_group_id,
+                                   marketing_org_party_role_id: ui_rule.form_object.marketing_org_party_role_id,
+                                   target_customer_party_role_id: ui_rule.form_object.target_customer_party_role_id
+                                 })
+              end
             end
           end
 

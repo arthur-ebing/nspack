@@ -91,7 +91,7 @@ module EdiApp
     end
 
     def update_voyage # rubocop:disable Metrics/AbcSize
-      instance = load_repo.find_load_flat(load_id)
+      instance = load_repo.find_load(load_id)
       voyage_id = instance.voyage_id
       pol_voyage_port_id = repo.get_id(:voyage_ports, port_id: attrs[:pol_port_id], voyage_id: voyage_id)
       # repo.get(:voyage_ports, pol_voyage_port_id, [:atd, :etd] )
@@ -123,7 +123,7 @@ module EdiApp
     #   else
     #     raise Crossbeams::InfoError, "Pallets allocated load: #{load_ids.join(', ')}"
     #   end
-    #   instance = load_repo.find_load_flat(load_id).to_h
+    #   instance = load_repo.find_load(load_id).to_h
     #   check = %i[exporter_party_role_id
     #              consignee_party_role_id
     #              final_receiver_party_role_id

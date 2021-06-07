@@ -34,7 +34,8 @@ module UiRules
       fields[:voyage_code] = { renderer: :label, with_value: voyage_code_label, caption: 'Voyage Code' }
       fields[:depot_id] = { renderer: :label, with_value: depot_label, caption: 'Depot' }
       fields[:rmt_load] = { renderer: :label, as_boolean: true, caption: 'RMT Load' }
-      fields[:order_number] = { renderer: :label }
+      fields[:order_id] = { renderer: :label, caption: 'Order', hide_on_load: @form_object.order_id.nil?  }
+      fields[:order_number] = { renderer: :label, caption: 'Internal Order Number' }
       fields[:customer_order_number] = { renderer: :label }
       fields[:customer_reference] = { renderer: :label }
       fields[:exporter_certificate_code] = { renderer: :label }
@@ -159,7 +160,8 @@ module UiRules
         id: { renderer: :label,
               caption: 'Load' },
         load_id: { hide_on_load: true },
-        order_number: {},
+        order_id: { hide_on_load: @form_object.order_id.nil? },
+        order_number: { caption: 'Internal Order Number' },
         customer_order_number: {},
         customer_reference: {},
         depot_id: { renderer: :select,
@@ -257,7 +259,7 @@ module UiRules
         return
       end
 
-      hash = @repo.find_load_flat(@options[:id]).to_h
+      hash = @repo.find_load(@options[:id]).to_h
       hash[:pallet_list] = nil
       @form_object = OpenStruct.new(hash)
     end
@@ -272,6 +274,7 @@ module UiRules
                                     final_receiver_party_role_id: nil,
                                     final_destination_id: nil,
                                     year: DateTime.now.year,
+                                    voyage_type_id: @repo.get_id(:voyage_types, voyage_type_code: 'ROAD'),
                                     pol_voyage_port_id: nil,
                                     pod_voyage_port_id: nil,
                                     order_number: nil,
@@ -306,6 +309,11 @@ module UiRules
                text: 'Back',
                url: '/list/loads',
                style: :back_button }
+      order = { control_type: :link,
+                text: 'Back to Order',
+                url: "/finished_goods/orders/orders/#{@form_object.order_id}",
+                visible: !@form_object.order_id.nil?,
+                style: :back_button }
       edit = { control_type: :link,
                style: :action_button,
                text: 'Edit',
@@ -394,22 +402,22 @@ module UiRules
 
       case @form_object.step
       when 0
-        instance_controls = [back, edit, delete]
+        instance_controls = [back, order, edit, delete]
         progress_controls = [allocate]
       when 1
-        instance_controls = [back, edit] + reports
+        instance_controls = [back, order, edit] + reports
         progress_controls = [allocate, truck_arrival]
       when 2
-        instance_controls = [back, edit] + reports
+        instance_controls = [back, order, edit] + reports
         progress_controls = [allocate, edit_truck_arrival, delete_truck_arrival, load_truck]
       when 3
-        instance_controls = [back, edit] + reports
+        instance_controls = [back, order, edit] + reports
         progress_controls = [unload_truck, delete_tail, tail, ship]
       when 4
-        instance_controls = [back, edit] + reports
+        instance_controls = [back, order, edit] + reports
         progress_controls = [unship, addendum, update_otmc]
       else
-        instance_controls = [back] + reports
+        instance_controls = [back, order] + reports
         progress_controls = []
       end
 

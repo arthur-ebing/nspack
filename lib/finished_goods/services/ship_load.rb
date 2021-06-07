@@ -7,7 +7,7 @@ module FinishedGoodsApp
     def initialize(load_id, user)
       @repo = LoadRepo.new
       @load_id = load_id
-      @instance = repo.find_load_flat(load_id)
+      @instance = repo.find_load(load_id)
       @user = user
       @shipped_at = repo.get(:loads, load_id, :shipped_at) || Time.now
     end
@@ -18,11 +18,20 @@ module FinishedGoodsApp
 
       ship_pallets
       ship_load
+      ship_order
 
       success_response("Shipped Load: #{load_id}")
     end
 
     private
+
+    def ship_order
+      order_id = DB[:orders_loads].where(load_id: load_id).get(:order_id)
+      return unless order_id
+
+      shipped = DB[:orders_loads].join(:loads, id: :load_id).where(order_id: order_id).select_map(:shipped).all?
+      repo.update(:orders, order_id, shipped: shipped)
+    end
 
     def ship_load # rubocop:disable Metrics/AbcSize
       load_container_id = repo.get_id(:load_containers, load_id: load_id)

@@ -10,6 +10,7 @@ module FinishedGoodsApp
     required(:billing_client_party_role_id).filled(:integer)
     required(:consignee_party_role_id).filled(:integer)
     required(:final_receiver_party_role_id).filled(:integer)
+    optional(:order_id).maybe(:integer)
     optional(:order_number).maybe(Types::StrippedString)
     optional(:customer_order_number).maybe(Types::StrippedString)
     optional(:customer_reference).maybe(Types::StrippedString)

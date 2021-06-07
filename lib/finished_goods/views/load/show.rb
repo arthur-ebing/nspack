@@ -40,11 +40,11 @@ module FinishedGoods
                   row.column do |col|
                     col.add_field :id
                     col.add_field :load_id
+                    col.add_field :order_id
                     col.add_field :order_number
                     col.add_field :customer_order_number
                     col.add_field :customer_reference
                     col.add_field :depot_id
-                    col.add_field :rmt_load
                     col.add_field :location_of_issue
                   end
                   row.column do |col|
@@ -55,6 +55,7 @@ module FinishedGoods
                     col.add_field :requires_temp_tail
                     col.add_field :temp_tail_pallet_number
                     col.add_field :temp_tail
+                    col.add_field :rmt_load
                   end
                 end
               end

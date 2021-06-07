@@ -19,16 +19,16 @@ module FinishedGoodsApp
     end
 
     def test_load
-      FinishedGoodsApp::LoadRepo.any_instance.stubs(:find_load_flat).returns(fake_load)
+      FinishedGoodsApp::LoadRepo.any_instance.stubs(:find_load).returns(fake_load)
       entity = interactor.send(:load_entity, 1)
-      assert entity.is_a?(LoadFlat)
+      assert entity.is_a?(Load)
     end
 
     def test_create_load
       attrs = fake_load.to_h.reject { |k, _| k == :id }
       res = interactor.create_load(attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(LoadFlat, res.instance)
+      assert_instance_of(Load, res.instance)
       assert res.instance.id.nonzero?
     end
 
@@ -41,13 +41,13 @@ module FinishedGoodsApp
 
     def test_update_load
       id = create_load
-      attrs = interactor.send(:repo).find_load_flat(id).to_h.reject { |k, _| %i[id shipped_at].include?(k) }
+      attrs = interactor.send(:repo).find_load(id).to_h.reject { |k, _| %i[id shipped_at].include?(k) }
       attrs[:load_id] = id
       value = attrs[:order_number]
       attrs[:order_number] = 'a_change'
       res = interactor.update_load(id, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(LoadFlat, res.instance)
+      assert_instance_of(Load, res.instance)
       assert_equal 'a_change', res.instance.order_number
       refute_equal value, res.instance.order_number
     end
@@ -113,6 +113,7 @@ module FinishedGoodsApp
         pod_voyage_port_id: pod_voyage_port_id,
         order_number: Faker::Lorem.unique.word,
         edi_file_name: 'ABC',
+        order_id: nil,
         customer_order_number: 'ABC',
         customer_reference: 'ABC',
         exporter_certificate_code: 'ABC',
@@ -170,6 +171,9 @@ module FinishedGoodsApp
         temp_tail_pallet_number: '123',
         pallet_count: 1,
         nett_weight: 1.0,
+        packed_tm_group_id: nil,
+        marketing_org_party_role_id: nil,
+        target_customer_party_role_id: nil,
 
         # addendum
         addendum: true,
@@ -178,7 +182,7 @@ module FinishedGoodsApp
     end
 
     def fake_load(overrides = {})
-      LoadFlat.new(load_attrs.merge(overrides))
+      Load.new(load_attrs.merge(overrides))
     end
 
     private

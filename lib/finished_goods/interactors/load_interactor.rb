@@ -51,6 +51,8 @@ module FinishedGoodsApp
       success_response("Deleted load: #{id}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    rescue Sequel::ForeignKeyConstraintViolation => e
+      failed_response("Unable to delete load. It is still referenced#{e.message.partition('referenced').last}")
     end
 
     def delete_load_vehicle(id) # rubocop:disable Metrics/AbcSize
@@ -92,6 +94,7 @@ module FinishedGoodsApp
       repo.transaction do
         repo.unallocate_pallets(current_allocation - new_allocation, @user)
         repo.allocate_pallets(load_id, new_allocation - current_allocation, @user)
+        FinishedGoodsApp::ProcessOrderLines.call(@user, load_id: load_id)
 
         log_transaction
       end
@@ -285,6 +288,17 @@ module FinishedGoodsApp
       success_response('ok', load_id)
     end
 
+    def add_load_to_order(load_id, order_id)
+      res = nil
+      repo.transaction do
+        res = AddLoadToOrder.call(load_id, order_id, @user)
+        log_transaction
+      end
+      success_response(res.message)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def assert_permission!(task, id = nil, pallet_number = nil)
       res = TaskPermissionCheck::Load.call(task, id, pallet_number)
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
@@ -292,6 +306,10 @@ module FinishedGoodsApp
 
     def check(task, id = nil, pallet_number = nil)
       TaskPermissionCheck::Load.call(task, id, pallet_number)
+    end
+
+    def load_entity(id)
+      repo.find_load(id)
     end
 
     private
@@ -308,10 +326,6 @@ module FinishedGoodsApp
 
     def repo
       @repo ||= LoadRepo.new
-    end
-
-    def load_entity(id)
-      repo.find_load_flat(id)
     end
   end
 end

@@ -1,0 +1,35 @@
+---
+:dataminer_definition: orders
+:actions:
+- :url: "/finished_goods/orders/orders/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: false
+- :url: "/finished_goods/orders/orders/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/finished_goods/orders/orders/$:id$/copy"
+  :text: copy
+  :icon: copy
+  :title: Copy
+  :popup: true
+- :url: "/finished_goods/orders/orders/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :separator: true
+- :url: "/development/statuses/list/orders/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/finished_goods/orders/orders/new"
+  :text: New Order
+  :style: :button
+  :behaviour: :popup

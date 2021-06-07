@@ -298,7 +298,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             ]
             update_grid_row(id,
                             changes: select_attributes(res.instance, row_keys),
-                            grid_id: 'incoterms',
                             notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::Finance::Incoterm::Edit.call(id, form_values: params[:incoterm], form_errors: res.errors) }

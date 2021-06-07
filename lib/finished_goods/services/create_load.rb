@@ -41,6 +41,8 @@ module FinishedGoodsApp
       @params[:load_id] = load_id
       repo.log_status(:loads, load_id, 'CREATED', user_name: @user.user_name, comment: comment)
 
+      repo.create(:orders_loads, load_id: @load_id, order_id: params[:order_id]) unless params[:order_id].nil?
+
       ok_response
     end
 
@@ -59,7 +61,7 @@ module FinishedGoodsApp
     end
 
     def load_entity(id)
-      repo.find_load_flat(id)
+      repo.find_load(id)
     end
   end
 end

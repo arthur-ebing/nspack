@@ -37,7 +37,7 @@ module FinishedGoodsApp
     end
 
     def setup_load(load_id)
-      load_flat = LoadRepo.new.find_load_flat(load_id)
+      load_flat = LoadRepo.new.find_load(load_id)
       initial_count = LoadRepo.new.all_hash(:pallets, load_id: load_id).length
 
       raise 'Setup Load called without load_id' if load_flat.nil?

@@ -29,7 +29,7 @@ module FinishedGoodsApp
       def call # rubocop:disable Metrics/AbcSize
         return failed_response "Value #{id} is too big to be a load. Perhaps you scanned a pallet number?" if id.to_i > AppConst::MAX_DB_INT
 
-        @entity = @repo.find_load_flat(id)
+        @entity = @repo.find_load(id)
         return failed_response 'Record not found' unless @entity || task == :create
 
         @pallet_numbers ||= @repo.select_values(:pallets, :pallet_number, load_id: id)
@@ -110,12 +110,13 @@ module FinishedGoodsApp
         all_ok
       end
 
-      def ship_check # rubocop:disable Metrics/AbcSize
+      def ship_check # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
         return failed_response("Load: #{id} has already been shipped") if shipped?
         return failed_response("Load: #{id} doesnt have pallets allocated") unless allocated?
         return failed_response("Load: #{id} truck arrival not done") unless vehicle?
         return failed_response("Load: #{id} hasn't been loaded") unless loaded?
         return failed_response("Load: #{id} requires a temp tail to be set") unless temp_tail?
+        return failed_response("Load: #{id} associated order not completed") unless order_completed?
 
         all_ok
       end
@@ -145,6 +146,10 @@ module FinishedGoodsApp
         return failed_response("Pallet: #{failed_pallet_numbers.join(', ')} not inspected, Unable to request Addendum.") unless failed_pallet_numbers.empty?
 
         all_ok
+      end
+
+      def order_completed?
+        DB[:orders_loads].join(:orders, id: :order_id).where(load_id: id).get(:completed) || true
       end
 
       def shipped?

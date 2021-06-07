@@ -1,0 +1,698 @@
+---
+:caption: Orders
+:sql: "SELECT\r\n   orders.id,\r\n   orders.customer_order_number,\r\n   orders.internal_order_number,\r\n
+  \  fn_current_status('orders', orders.id) AS status,\r\n   order_types.order_type,\r\n
+  \  deal_types.deal_type,\r\n   incoterms.incoterm,\r\n   fn_party_role_name(orders.customer_party_role_id)
+  AS customer,\r\n   fn_party_role_name(orders.contact_party_role_id) AS contact,\r\n
+  \  customer_payment_term_sets.id AS customer_payment_term_sets_id,\r\n   fn_party_role_name(orders.exporter_party_role_id)
+  AS exporter,\r\n   fn_party_role_name(orders.final_receiver_party_role_id) AS final_receiver,\r\n
+  \  fn_party_role_name(orders.marketing_org_party_role_id) AS marketing_org,\r\n
+  \  target_market_groups.target_market_group_name AS packed_tm_group,\r\n   fn_party_role_name(orders.target_customer_party_role_id)
+  AS target_customer,\r\n   orders.order_type_id,\r\n   orders.currency_id,\r\n   currencies.currency
+  AS currency,\r\n   orders.customer_payment_term_set_id,\r\n   orders.target_customer_party_role_id,\r\n
+  \  orders.exporter_party_role_id,\r\n   orders.packed_tm_group_id,\r\n   orders.customer_party_role_id,\r\n
+  \  orders.contact_party_role_id,\r\n   orders.final_receiver_party_role_id,\r\n
+  \  orders.marketing_org_party_role_id,\r\n   orders.deal_type_id,\r\n   orders.incoterm_id,\r\n
+  \  orders.allocated,\r\n   orders.shipped,\r\n   orders.completed,\r\n   orders.completed_at,\r\n
+  \  orders.remarks,\r\n   orders.active,\r\n   orders.created_at,\r\n   orders.updated_at\r\nFROM
+  orders\r\nJOIN currencies ON currencies.id = orders.currency_id\r\nJOIN customer_payment_term_sets
+  ON customer_payment_term_sets.id = orders.customer_payment_term_set_id\r\nJOIN order_types
+  ON order_types.id = orders.order_type_id\r\nJOIN target_market_groups ON target_market_groups.id
+  = orders.packed_tm_group_id\r\nJOIN deal_types ON deal_types.id = orders.deal_type_id\r\nJOIN
+  incoterms  ON incoterms.id = orders.incoterm_id"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Order
+    :namespaced_name: orders.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  customer_order_number:
+    :name: customer_order_number
+    :sequence_no: 2
+    :caption: Customer order number
+    :namespaced_name: orders.customer_order_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  internal_order_number:
+    :name: internal_order_number
+    :sequence_no: 3
+    :caption: Internal order number
+    :namespaced_name: orders.internal_order_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 4
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  order_type:
+    :name: order_type
+    :sequence_no: 5
+    :caption: Order type
+    :namespaced_name: order_types.order_type
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  deal_type:
+    :name: deal_type
+    :sequence_no: 6
+    :caption: Deal type
+    :namespaced_name: deal_types.deal_type
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  incoterm:
+    :name: incoterm
+    :sequence_no: 7
+    :caption: Incoterm
+    :namespaced_name: incoterms.incoterm
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  customer:
+    :name: customer
+    :sequence_no: 8
+    :caption: Customer
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  contact:
+    :name: contact
+    :sequence_no: 9
+    :caption: Contact
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  customer_payment_term_sets_id:
+    :name: customer_payment_term_sets_id
+    :sequence_no: 10
+    :caption: Customer payment term sets
+    :namespaced_name: customer_payment_term_sets.id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  exporter:
+    :name: exporter
+    :sequence_no: 11
+    :caption: Exporter
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  final_receiver:
+    :name: final_receiver
+    :sequence_no: 12
+    :caption: Final receiver
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marketing_org:
+    :name: marketing_org
+    :sequence_no: 13
+    :caption: Marketing org
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packed_tm_group:
+    :name: packed_tm_group
+    :sequence_no: 14
+    :caption: Packed TM group
+    :namespaced_name: target_market_groups.target_market_group_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  target_customer:
+    :name: target_customer
+    :sequence_no: 15
+    :caption: Target customer
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  order_type_id:
+    :name: order_type_id
+    :sequence_no: 16
+    :caption: Order type
+    :namespaced_name: orders.order_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  currency_id:
+    :name: currency_id
+    :sequence_no: 17
+    :caption: Currency
+    :namespaced_name: orders.currency_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  currency:
+    :name: currency
+    :sequence_no: 18
+    :caption: Currency
+    :namespaced_name: currencies.currency
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  customer_payment_term_set_id:
+    :name: customer_payment_term_set_id
+    :sequence_no: 19
+    :caption: Customer payment term set
+    :namespaced_name: orders.customer_payment_term_set_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  target_customer_party_role_id:
+    :name: target_customer_party_role_id
+    :sequence_no: 20
+    :caption: Target customer party role
+    :namespaced_name: orders.target_customer_party_role_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  exporter_party_role_id:
+    :name: exporter_party_role_id
+    :sequence_no: 21
+    :caption: Exporter party role
+    :namespaced_name: orders.exporter_party_role_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packed_tm_group_id:
+    :name: packed_tm_group_id
+    :sequence_no: 22
+    :caption: Packed tm group
+    :namespaced_name: orders.packed_tm_group_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  customer_party_role_id:
+    :name: customer_party_role_id
+    :sequence_no: 23
+    :caption: Customer party role
+    :namespaced_name: orders.customer_party_role_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  contact_party_role_id:
+    :name: contact_party_role_id
+    :sequence_no: 24
+    :caption: Contact party role
+    :namespaced_name: orders.contact_party_role_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  final_receiver_party_role_id:
+    :name: final_receiver_party_role_id
+    :sequence_no: 25
+    :caption: Final receiver party role
+    :namespaced_name: orders.final_receiver_party_role_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marketing_org_party_role_id:
+    :name: marketing_org_party_role_id
+    :sequence_no: 26
+    :caption: Marketing org party role
+    :namespaced_name: orders.marketing_org_party_role_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  deal_type_id:
+    :name: deal_type_id
+    :sequence_no: 27
+    :caption: Deal type
+    :namespaced_name: orders.deal_type_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  incoterm_id:
+    :name: incoterm_id
+    :sequence_no: 28
+    :caption: Incoterm
+    :namespaced_name: orders.incoterm_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  allocated:
+    :name: allocated
+    :sequence_no: 29
+    :caption: Allocated
+    :namespaced_name: orders.allocated
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  shipped:
+    :name: shipped
+    :sequence_no: 30
+    :caption: Shipped
+    :namespaced_name: orders.shipped
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  completed:
+    :name: completed
+    :sequence_no: 31
+    :caption: Completed
+    :namespaced_name: orders.completed
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  completed_at:
+    :name: completed_at
+    :sequence_no: 32
+    :caption: Completed at
+    :namespaced_name: orders.completed_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  remarks:
+    :name: remarks
+    :sequence_no: 33
+    :caption: Remarks
+    :namespaced_name: orders.remarks
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 34
+    :caption: Active
+    :namespaced_name: orders.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 35
+    :caption: Created at
+    :namespaced_name: orders.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 36
+    :caption: Updated at
+    :namespaced_name: orders.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: orders.order_type_id
+  :caption: Order type
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT order_type, id FROM order_types ORDER BY order_type
+- :column: orders.currency_id
+  :caption: Currency
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT currency, id FROM currencies ORDER BY currency
+- :column: orders.customer_payment_term_set_id
+  :caption: Customer payment term set
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT id, id FROM customer_payment_term_sets ORDER BY id
+- :column: orders.target_customer_party_role_id
+  :caption: Target customer party role
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: SELECT fn_party_role_name(id), id FROM party_roles WHERE role_id = (SELECT
+    id FROM roles WHERE name = 'ROLE_NAME_GOES_HERE')
+- :column: orders.exporter_party_role_id
+  :caption: Exporter party role
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: SELECT fn_party_role_name(id), id FROM party_roles WHERE role_id = (SELECT
+    id FROM roles WHERE name = 'ROLE_NAME_GOES_HERE')
+- :column: orders.packed_tm_group_id
+  :caption: Packed tm group
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT target_market_group_name, id FROM target_market_groups ORDER BY
+    target_market_group_name
+- :column: orders.customer_party_role_id
+  :caption: Customer party role
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: SELECT fn_party_role_name(id), id FROM party_roles WHERE role_id = (SELECT
+    id FROM roles WHERE name = 'ROLE_NAME_GOES_HERE')
+- :column: orders.contact_party_role_id
+  :caption: Contact party role
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: SELECT fn_party_role_name(id), id FROM party_roles WHERE role_id = (SELECT
+    id FROM roles WHERE name = 'ROLE_NAME_GOES_HERE')
+- :column: orders.final_receiver_party_role_id
+  :caption: Final receiver party role
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: SELECT fn_party_role_name(id), id FROM party_roles WHERE role_id = (SELECT
+    id FROM roles WHERE name = 'ROLE_NAME_GOES_HERE')
+- :column: orders.marketing_org_party_role_id
+  :caption: Marketing org party role
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: SELECT fn_party_role_name(id), id FROM party_roles WHERE role_id = (SELECT
+    id FROM roles WHERE name = 'ROLE_NAME_GOES_HERE')
+- :column: customer_payment_term_sets.id
+  :caption: Customer payment term sets
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

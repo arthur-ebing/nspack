@@ -186,7 +186,7 @@ module FinishedGoodsApp
     end
 
     def compile_addendum(load_id) # rubocop:disable Metrics/AbcSize
-      load = LoadRepo.new.find_load_flat(load_id)
+      load = LoadRepo.new.find_load(load_id)
       consignor_address = party_repo.find_address_for_party_role('Delivery Address', load.exporter_party_role_id)
       consignee_address = party_repo.find_address_for_party_role('Delivery Address', load.consignee_party_role_id)
       pallet_ids = select_values(:pallets, :id, load_id: load_id)
@@ -239,7 +239,7 @@ module FinishedGoodsApp
     end
 
     def compile_consignment_items(load_id)
-      load = LoadRepo.new.find_load_flat(load_id)
+      load = LoadRepo.new.find_load(load_id)
       pallet_id = select_values_in_order(:pallets, :id, where: { load_id: load_id }, order: :id).first
       pallet = find_pallet_for_titan(pallet_id)
       {
