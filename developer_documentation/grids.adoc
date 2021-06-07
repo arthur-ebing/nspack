@@ -31,6 +31,8 @@ To achieve this, the `order_items.yml` file would include the following:
 
 This will become a WHERE clause like this: `WHERE order_id = 1`.
 
+NOTE: A condition can be marked as `:optional:`. In this case, if the `:val:` is nil, the `:col:` will not be included in the _WHERE_ clause. See example under "several conditions" below.
+
 NOTE: There are three special values you can use for `:val:` -- `$:START_OF_DAY$`, `$:END_OF_DAY$` and `$:TODAY$`. These return today at 00:00am, today at 23:59:59 and today respectively.
 [source,yaml]
 ----
@@ -89,9 +91,11 @@ This example of `order_items.yml` list file will return different rows for the f
     - :col: active
       :op: =
       :val: $:active$
+      :optional: true # <3>
 ----
 <1> Key is `standard`, uses `WHERE order_id = 1`
 <2> Key is `customer`, uses `WHERE customer_id = 5 AND NOT active`
+<3> Param `active` is marked as optional. So if `$:active$` is `nil`, it will use `WHERE customer_id = 5` (The optional `active` is ignored)
 
 === Conditions: valid operators
 
@@ -133,11 +137,15 @@ NOTE: The underscore is important: `_limit` and `_offset`.
 
 Links can be specified to appear at the top of the page. Typically they will be styled as buttons.
 
-This uses the same options as for link:/developer_documentation/non_field_renderers.adoc#_link[Link], but has the extra option `:hide_if_sql_returns_true` and `:hide_for_key`.
+This uses the same options as for link:/developer_documentation/non_field_renderers.adoc#_link[Link], but has the extra option `:hide_if_sql_returns_true`, `:hide_for_key` and `hide_for_client_rule`.
 
 The value of `:hide_if_sql_returns_true` **must** be a valid snippet of SQL that returns `true` or `false`. Typical is to return the result of an `EXISTS` query.
 
 The value of `:hide_for_key` **must** be an array of one or more strings. If any string matches the value of the `key=` parameter of the URL that loaded the page, the control will be hidden.
+
+The value of `:hide_for_client_rule` **must** be a semicolon-separated list of AppConst client rules. If any client rule returns true, the control will be hidden.
+This works similarly for `:show_for_client_rule`, but the control will be hidden _unless_ all client rules return `true`.
+
 
 This example will display an anchor (`<a>`) styled as a button that will render in a popup dialog when clicked.
 
@@ -155,6 +163,7 @@ NOTE: The `grid_id` option will need to match the id of your grid if your action
   :hide_for_key:
     - inactive
     - someotherkey
+  :hide_for_client_rule: CR_PROD.some_check?;CR_FG.another_check
 ----
 
 === Calculated columns

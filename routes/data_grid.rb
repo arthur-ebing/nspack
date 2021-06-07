@@ -27,6 +27,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         session[:last_grid_url] = "/list/#{id}"
         opts = { fit_height: true, bookmark_row_on_action: !fetch?(r) }
         opts[:query_string] = request.query_string if request.query_string
+        opts[:client_rule_check] = ->(args) { Crossbeams::Config::ClientRuleChecker.rule_passed?(*args) }
         show_page { render_data_grid_page(id, opts) }
       end
 
@@ -34,18 +35,35 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         # Pass query_string rather than params as it is passed through directly
         # to the grid div's url.
         if fetch?(r)
-          show_partial { render_data_grid_page(id, query_string: request.query_string) }
+          show_partial do
+            render_data_grid_page(id,
+                                  query_string: request.query_string,
+                                  client_rule_check: ->(args) { Crossbeams::Config::ClientRuleChecker.rule_passed?(*args) })
+          end
         else
           session[:last_grid_url] = "/list/#{id}/with_params?#{request.query_string}"
-          show_page { render_data_grid_page(id, query_string: request.query_string, fit_height: true, bookmark_row_on_action: true) }
+          show_page do
+            render_data_grid_page(id,
+                                  query_string: request.query_string,
+                                  fit_height: true,
+                                  bookmark_row_on_action: true,
+                                  client_rule_check: ->(args) { Crossbeams::Config::ClientRuleChecker.rule_passed?(*args) })
+          end
         end
       end
 
       r.on 'multi' do
         if fetch?(r)
-          show_partial { render_data_grid_page_multiselect(id, params) }
+          show_partial do
+            render_data_grid_page_multiselect(id,
+                                              params.merge(client_rule_check: ->(args) { Crossbeams::Config::ClientRuleChecker.rule_passed?(*args) }))
+          end
         else
-          show_page { render_data_grid_page_multiselect(id, params.merge(fit_height: true)) }
+          show_page do
+            render_data_grid_page_multiselect(id,
+                                              params.merge(fit_height: true,
+                                                           client_rule_check: ->(args) { Crossbeams::Config::ClientRuleChecker.rule_passed?(*args) }))
+          end
         end
       end
 
@@ -54,11 +72,13 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           render_data_grid_rows(id,
                                 ->(function, program, permission) { auth_blocked?(function, program.split(','), permission) },
                                 ->(args) { Crossbeams::Config::UserPermissions.can_user?(current_user, *args) },
+                                ->(args) { Crossbeams::Config::ClientRuleChecker.rule_passed?(*args) },
                                 params)
         else
           render_data_grid_rows(id,
                                 ->(function, program, permission) { auth_blocked?(function, program.split(','), permission) },
-                                ->(args) { Crossbeams::Config::UserPermissions.can_user?(current_user, *args) })
+                                ->(args) { Crossbeams::Config::UserPermissions.can_user?(current_user, *args) },
+                                ->(args) { Crossbeams::Config::ClientRuleChecker.rule_passed?(*args) })
         end
       rescue StandardError => e
         ErrorMailer.send_exception_email(e,
@@ -71,6 +91,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         render_data_grid_multiselect_rows(id,
                                           ->(function, program, permission) { auth_blocked?(function, program.split(','), permission) },
                                           ->(*args) { Crossbeams::Config::UserPermissions.can_user?(current_user, *args) },
+                                          ->(args) { Crossbeams::Config::ClientRuleChecker.rule_passed?(*args) },
                                           key,
                                           params)
       rescue StandardError => e
@@ -102,6 +123,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         render_data_grid_lookup_rows(id,
                                      ->(function, program, permission) { auth_blocked?(function, program.split(','), permission) },
                                      ->(*args) { Crossbeams::Config::UserPermissions.can_user?(current_user, *args) },
+                                     ->(args) { Crossbeams::Config::ClientRuleChecker.rule_passed?(*args) },
                                      key,
                                      params)
       rescue StandardError => e
@@ -133,7 +155,10 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'grid' do
-        render_search_grid_rows(id, params, ->(function, program, permission) { auth_blocked?(function, program.split(','), permission) })
+        render_search_grid_rows(id,
+                                params,
+                                ->(args) { Crossbeams::Config::ClientRuleChecker.rule_passed?(*args) },
+                                ->(function, program, permission) { auth_blocked?(function, program.split(','), permission) })
       rescue StandardError => e
         ErrorMailer.send_exception_email(e,
                                          subject: "Grid error at #{request.path}",

@@ -29,6 +29,7 @@ The actions are rendered as a context menu that can include submenu groupings.
       - complete
     :hide_if_null: another_field_id,further_field
     :hide_if_env_var: CLIENT_CODE:kr,NO_EDIT:<present>
+    :hide_for_client_rule: CR_PROD.can_mix_cultivar_groups?
   - :separator: true
   - :submenu:
      :text: Submenu caption
@@ -130,6 +131,20 @@ a|The item will only appear if there is any matching ENVIRONMENT VARIABLE/value 
 If the value is `<present>`, the action will be shown if there is a matching ENVIRONMENT VARIABLE with _any_ value.
 
 Example: `:show_if_env_var: CLIENT_CODE:kr,SOME_VAR:<present>`.
+
+|:hide_for_client_rule
+|String of client rule calls separated by semicolons.
+a|The item will only appear if none of the client rules return `true`.
+Each client rule is specified as `<AppConst varname>.<client_rule>`
+
+Example: `:hide_for_client_rule: CR_PROD.check_something?;CR_FG.is_this_ok?`
+
+|:show_for_client_rule
+|String of client rule calls separated by semicolons.
+a|The item will only appear if all client rules return `true`.
+Each client rule is specified as `<AppConst varname>.<client_rule>`
+
+Example: `:show_for_client_rule: CR_PROD.check_something?;CR_FG.is_this_ok?`
 
 |:is_delete
 |`true` or `false`

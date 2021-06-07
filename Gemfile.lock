@@ -38,9 +38,9 @@ GIT
 
 GIT
   remote: https://github.com/NoSoft-SA/roda-data_grid.git
-  revision: 58918a28aa9774a17cb8cee17298d4effa35a651
+  revision: f59a36d22fe0d0741aab0cfcd8cd3365726906af
   specs:
-    roda-data_grid (0.5.4)
+    roda-data_grid (0.5.5)
       caxlsx
       crossbeams-dataminer
       crossbeams-layout
@@ -162,7 +162,7 @@ GEM
     net-scp (3.0.0)
       net-ssh (>= 2.6.5, < 7.0.0)
     net-ssh (6.1.0)
-    nokogiri (1.11.6)
+    nokogiri (1.11.7)
       mini_portile2 (~> 2.5.0)
       racc (~> 1.4)
     parallel (1.19.1)

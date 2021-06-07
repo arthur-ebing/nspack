@@ -27,6 +27,7 @@ require 'pry' if ENV.fetch('RACK_ENV') == 'development'
 Dir['./lib/client_rules/*.rb'].sort.each { |f| require f }
 
 require './config/app_const'
+require './config/client_rule_checker'
 require './config/extended_column_definitions'
 require './config/mail_settings'
 require './config/masterfile_extract_config'
