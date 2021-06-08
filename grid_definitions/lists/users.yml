@@ -42,6 +42,15 @@
     :function: development
     :program: masterfiles
     :permission: user_permissions
+- :url: "/development/masterfiles/users/$:id$/copy_programs"
+  :text: copy programs from another user
+  :icon: list
+  :title: Assign programs and permissions to $:user_name$
+  :popup: true
+  :auth:
+    :function: development
+    :program: masterfiles
+    :permission: user_permissions
 - :url: "/list/user_program_permissions/with_params?key=standard&id=$:id$"
   :text: program permissions
   :title: Edit security group name for programs
