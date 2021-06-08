@@ -1,0 +1,180 @@
+---
+:dataminer_definition: stock_pallets
+:actions:
+- :url: "/list/stock_pallet_sequences/with_params?key=standard&pallet_id=$:pallet_id$"
+  :text: sequences
+  :title: Pallet sequences for Pallet No $:pallet_number$
+  :icon: list
+  :popup: true
+- :url: "/finished_goods/dispatch/loads/$:load_id$/unship/$:pallet_number$"
+  :text: Unship and Unallocate
+  :icon: edit
+  :hide_if_false: shipped
+  :has_permission:
+  - load
+  - can_unship
+:conditions:
+  :unallocated_pallets:
+  - :col: vw_pallets.in_stock
+    :op: "="
+    :val: true
+  - :col: aggregated.rmt_grades
+    :op: "="
+    :val: false
+  - :col: vw_pallets.zero_load_id
+    :op: IN
+    :val: "$:load_id$,0"
+  - :col: vw_pallet_sequences.packed_tm_group_id
+    :op: "="
+    :val: "$:packed_tm_group_id$"
+    :optional: true
+  - :col: vw_pallet_sequences.marketing_org_party_role_id
+    :op: "="
+    :val: "$:marketing_org_party_role_id$"
+    :optional: true
+  - :col: vw_pallet_sequences.target_customer_party_role_id
+    :op: "="
+    :val: "$:target_customer_party_role_id$"
+    :optional: true
+  :unallocated_pallets_for_order_item:
+  - :col: vw_pallets.in_stock
+    :op: "="
+    :val: true
+  - :col: aggregated.rmt_grades
+    :op: "="
+    :val: false
+  - :col: vw_pallets.zero_load_id
+    :op: IN
+    :val: "$:load_id$,0"
+  - :col: vw_pallet_sequences.packed_tm_group_id
+    :op: "="
+    :val: "$:packed_tm_group_id$"
+    :optional: true
+  - :col: vw_pallet_sequences.marketing_org_party_role_id
+    :op: "="
+    :val: "$:marketing_org_party_role_id$"
+    :optional: true
+  - :col: vw_pallet_sequences.target_customer_party_role_id
+    :op: "="
+    :val: "$:target_customer_party_role_id$"
+    :optional: true
+  - :col: vw_pallet_sequences.commodity_id
+    :op: "="
+    :val: "$:commodity_id$"
+    :optional: true
+  - :col: vw_pallet_sequences.basic_pack_id
+    :op: "="
+    :val: "$:basic_pack_id$"
+    :optional: true
+  - :col: vw_pallet_sequences.standard_pack_id
+    :op: "="
+    :val: "$:standard_pack_id$"
+    :optional: true
+  - :col: vw_pallet_sequences.actual_count_id
+    :op: "="
+    :val: "$:actual_count_id$"
+    :optional: true
+  - :col: vw_pallet_sequences.size_reference_id
+    :op: "="
+    :val: "$:size_reference_id$"
+    :optional: true
+  - :col: vw_pallet_sequences.grade_id
+    :op: "="
+    :val: "$:grade_id$"
+    :optional: true
+  - :col: vw_pallet_sequences.mark_id
+    :op: "="
+    :val: "$:mark_id$"
+    :optional: true
+  - :col: vw_pallet_sequences.marketing_variety_id
+    :op: "="
+    :val: "$:marketing_variety_id$"
+    :optional: true
+  - :col: vw_pallet_sequences.inventory_id
+    :op: "="
+    :val: "$:inventory_id$"
+    :optional: true
+  - :col: vw_pallet_sequences.sell_by_code
+    :op: "="
+    :val: "$:sell_by_code$"
+    :optional: true
+  - :col: vw_pallet_sequences.pallet_format_id
+    :op: "="
+    :val: "$:pallet_format_id$"
+    :optional: true
+  - :col: vw_pallet_sequences.pm_mark_id
+    :op: "="
+    :val: "$:pm_mark_id$"
+    :optional: true
+  - :col: vw_pallet_sequences.pm_bom_id
+    :op: "="
+    :val: "$:pm_bom_id$"
+    :optional: true
+  - :col: vw_pallet_sequences.rmt_class_id
+    :op: "="
+    :val: "$:rmt_class_id$"
+    :optional: true
+  :unallocated_palbins:
+  - :col: vw_pallets.in_stock
+    :op: "="
+    :val: true
+  - :col: vw_pallets.zero_load_id
+    :op: IN
+    :val: "$:load_id$,0"
+  - :col: aggregated.count
+    :op: "="
+    :val: 1
+  - :col: aggregated.rmt_grades
+    :op: "="
+    :val: true
+:multiselect:
+  :allocate_pallets:
+    :url: "/finished_goods/dispatch/loads/$:load_id$/allocate"
+    :preselect: SELECT pallet_sequences.id FROM pallet_sequences JOIN pallets ON pallet_sequences.pallet_id = pallets.id WHERE load_id = $:load_id$
+    :section_caption: 'Assign pallets to load'
+    :multiselect_save_method: remote
+    :can_be_cleared: true
+    :conditions: unallocated_pallets
+  :allocate_pallets_for_order_item:
+    :url: "/finished_goods/dispatch/loads/$:load_id$/allocate_multiselect"
+    :preselect: SELECT pallet_sequences.id FROM pallet_sequences JOIN pallets ON pallet_sequences.pallet_id = pallets.id WHERE load_id = $:load_id$
+    :section_caption: 'Assign pallets to load'
+    :multiselect_save_method: remote
+    :can_be_cleared: true
+    :conditions: unallocated_pallets_for_order_item
+  :allocate_palbins:
+    :url: "/finished_goods/dispatch/loads/$:load_id$/allocate"
+    :preselect: SELECT pallet_sequences.id FROM pallet_sequences JOIN pallets ON pallet_sequences.pallet_id = pallets.id WHERE load_id = $:load_id$
+    :section_caption: 'Assign pallets to load'
+    :multiselect_save_method: remote
+    :can_be_cleared: true
+    :conditions: unallocated_palbins
+:hide_for_client:
+  hb:
+  - marketing_puc
+  - marketing_orchard
+  - shipped_date
+  um:
+  - marketing_puc
+  - marketing_orchard
+  - shipped_date
+  ud:
+  - marketing_puc
+  - marketing_orchard
+  sr:
+  - marketing_puc
+  - marketing_orchard
+  - shipped_date
+  srp:
+  - marketing_puc
+  - marketing_orchard
+  hl:
+  - marketing_puc
+  - marketing_orchard
+  - shipped_date
+  sr2:
+  - marketing_puc
+  - marketing_orchard
+  - shipped_date
+  kr:
+  - shipped_date

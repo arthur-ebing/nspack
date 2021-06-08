@@ -45,8 +45,14 @@
   \       END AS colour_rule,\r\n    -- Parameters\r\n    vw_pallet_sequences.packed_tm_group_id,\r\n
   \   vw_pallet_sequences.packed_tm_group,\r\n    vw_pallet_sequences.marketing_org_party_role_id,\r\n
   \   vw_pallet_sequences.target_customer_party_role_id,\r\n    vw_pallet_sequences.rmt_grade,\r\n
-  \   vw_pallet_sequences.production_run_id\r\n\r\nFROM vw_pallets\r\n         JOIN
-  vw_pallet_sequences ON vw_pallets.pallet_id = vw_pallet_sequences.pallet_id\r\n
+  \   vw_pallet_sequences.production_run_id,\r\n    vw_pallet_sequences.commodity_id,\r\n
+  \   vw_pallet_sequences.basic_pack_id,\r\n    vw_pallet_sequences.standard_pack_id,\r\n
+  \   vw_pallet_sequences.actual_count_id,\r\n    vw_pallet_sequences.size_reference_id,\r\n
+  \   vw_pallet_sequences.grade_id,\r\n    vw_pallet_sequences.mark_id,\r\n    vw_pallet_sequences.marketing_variety_id,\r\n
+  \   vw_pallet_sequences.inventory_id,\r\n    vw_pallet_sequences.sell_by_code,\r\n
+  \   vw_pallet_sequences.pallet_format_id,\r\n    vw_pallet_sequences.pm_mark_id,\r\n
+  \   vw_pallet_sequences.pm_bom_id,\r\n    vw_pallet_sequences.rmt_class_id\r\n\r\n\r\nFROM
+  vw_pallets\r\n         JOIN vw_pallet_sequences ON vw_pallets.pallet_id = vw_pallet_sequences.pallet_id\r\n
   \        LEFT JOIN vw_pallet_sequences_aggregated aggregated ON aggregated.pallet_id
   = vw_pallets.pallet_id\r\n\r\nORDER BY zero_load_id DESC, pallet_number DESC;"
 :limit: 
@@ -1701,7 +1707,7 @@
     :data_type: :boolean
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :pinned: 
     :groupable: false
     :group_by_seq: 
@@ -1811,6 +1817,230 @@
     :caption: Production run
     :namespaced_name: vw_pallet_sequences.production_run_id
     :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  commodity_id:
+    :name: commodity_id
+    :sequence_no: 111
+    :caption: Commodity
+    :namespaced_name: vw_pallet_sequences.commodity_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  basic_pack_id:
+    :name: basic_pack_id
+    :sequence_no: 112
+    :caption: Basic pack
+    :namespaced_name: vw_pallet_sequences.basic_pack_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  standard_pack_id:
+    :name: standard_pack_id
+    :sequence_no: 113
+    :caption: Standard pack
+    :namespaced_name: vw_pallet_sequences.standard_pack_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  actual_count_id:
+    :name: actual_count_id
+    :sequence_no: 114
+    :caption: Actual count
+    :namespaced_name: vw_pallet_sequences.actual_count_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  size_reference_id:
+    :name: size_reference_id
+    :sequence_no: 115
+    :caption: Size reference
+    :namespaced_name: vw_pallet_sequences.size_reference_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  grade_id:
+    :name: grade_id
+    :sequence_no: 116
+    :caption: Grade
+    :namespaced_name: vw_pallet_sequences.grade_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mark_id:
+    :name: mark_id
+    :sequence_no: 117
+    :caption: Mark
+    :namespaced_name: vw_pallet_sequences.mark_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marketing_variety_id:
+    :name: marketing_variety_id
+    :sequence_no: 118
+    :caption: Marketing variety
+    :namespaced_name: vw_pallet_sequences.marketing_variety_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inventory_id:
+    :name: inventory_id
+    :sequence_no: 119
+    :caption: Inventory
+    :namespaced_name: vw_pallet_sequences.inventory_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  sell_by_code:
+    :name: sell_by_code
+    :sequence_no: 120
+    :caption: Sell by code
+    :namespaced_name: vw_pallet_sequences.sell_by_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_format_id:
+    :name: pallet_format_id
+    :sequence_no: 121
+    :caption: Pallet format
+    :namespaced_name: vw_pallet_sequences.pallet_format_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pm_mark_id:
+    :name: pm_mark_id
+    :sequence_no: 122
+    :caption: Pm mark
+    :namespaced_name: vw_pallet_sequences.pm_mark_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pm_bom_id:
+    :name: pm_bom_id
+    :sequence_no: 123
+    :caption: Pm bom
+    :namespaced_name: vw_pallet_sequences.pm_bom_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_class_id:
+    :name: rmt_class_id
+    :sequence_no: 124
+    :caption: RMT class
+    :namespaced_name: vw_pallet_sequences.rmt_class_id
+    :data_type: :string
     :width: 
     :format: 
     :hide: true
@@ -2058,3 +2288,115 @@
   :ordered_list: false
   :ui_priority: 1
   :list_def: true, false
+- :column: vw_pallet_sequences.commodity_id
+  :caption: commodity id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: vw_pallet_sequences.basic_pack_id
+  :caption: basic_pack id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: vw_pallet_sequences.standard_pack_id
+  :caption: standard_pack id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: vw_pallet_sequences.actual_count_id
+  :caption: actual_count_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: vw_pallet_sequences.size_reference_id
+  :caption: size_reference_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: vw_pallet_sequences.grade_id
+  :caption: grade_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: vw_pallet_sequences.mark_id
+  :caption: mark_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: vw_pallet_sequences.marketing_variety_id
+  :caption: marketing_variety_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: vw_pallet_sequences.inventory_id
+  :caption: inventory_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: vw_pallet_sequences.sell_by_code
+  :caption: sell_by_code
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: vw_pallet_sequences.pallet_format_id
+  :caption: pallet_format_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: vw_pallet_sequences.pm_mark_id
+  :caption: pm_mark_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: vw_pallet_sequences.pm_bom_id
+  :caption: pm_bom_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: vw_pallet_sequences.rmt_class_id
+  :caption: rmt_class_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

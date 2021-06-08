@@ -117,6 +117,7 @@ module FinishedGoodsApp
         WHERE orders.id = ?
         GROUP BY
             orders_loads.order_id,
+            orders_loads.load_id,
             cultivars.commodity_id,
             pallet_sequences.basic_pack_code_id,
             pallet_sequences.standard_pack_code_id,
