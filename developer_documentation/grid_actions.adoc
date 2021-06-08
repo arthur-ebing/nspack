@@ -276,7 +276,7 @@ Possible options in the `:multiselect` section:
 ----
 :multiselect:
   :keyname:                                               # <1>
-    :url: "/path/to/call/on/save"                         # <2>
+    :url: "/path/to/call/on/save/$:id%/optional"          # <2>
     :section_caption: "SELECT statement or fixed string"  # <3>
     :grid_caption: "Fixed string"                         # <4>
     :preselect: "SELECT statement"                        # <5>
@@ -285,7 +285,7 @@ Possible options in the `:multiselect` section:
     :conditions: some_key                                 # <8>
 ----
 <1> Keyname to match `?key=` part of calling URL.
-<2> The path to be called when the user saves a selection.
+<2> The path to be called when the user saves a selection. The url can optionally contain `$:id$`, but **no other dynamic values**.
 <3> Caption can be a `SELECT` query that returns the caption (using tokens from the URL) or a fixed string.
 <4> Caption that appears in grid header. Fixed string. Defaults to List def caption or report caption.
 <5> A `SELECT` statement that returns an `id` column. Matching ids in the grid will be pre-selected.

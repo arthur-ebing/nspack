@@ -25,7 +25,8 @@
   \ LEFT OUTER JOIN system_resources sysres ON sysres.id = parent.system_resource_id\r\n
   \ LEFT OUTER JOIN packing_methods pm ON pm.id = a.packing_method_id\r\n  LEFT OUTER
   JOIN pm_boms ON pm_boms.id = s.pm_bom_id\r\n  LEFT OUTER JOIN marks ON marks.id
-  = s.mark_id\r\n  LEFT OUTER JOIN pm_marks ON pm_marks.id = s.pm_mark_id"
+  = s.mark_id\r\n  LEFT OUTER JOIN pm_marks ON pm_marks.id = s.pm_mark_id\r\n  ORDER
+  BY parent.plant_resource_code, p.plant_resource_code"
 :limit: 
 :offset: 
 :external_settings:

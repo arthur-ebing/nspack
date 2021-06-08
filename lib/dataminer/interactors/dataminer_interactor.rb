@@ -616,11 +616,13 @@ module DataminerApp
 
     def assert_columns_and_params_match!(report)
       # Check existing params vs report column names...
-      param_names = report.query_parameter_definitions.map(&:column)
-      col_names = report.columns.map { |nm, col| col.namespaced_name || nm }
-      param_names.each do |col|
-        raise Crossbeams::InfoError, %(Not saved - parameter "#{col}" is not defined in the changed SQL) unless col_names.include?(col)
-      end
+      # param_names = report.query_parameter_definitions.map(&:column)
+      # col_names = report.columns.map { |nm, col| col.namespaced_name || nm }
+      # This check is too specific. It does not take into consideration that a parameter can be based on a column
+      # that does not appear in the grid.
+      # param_names.each do |col|
+      #   raise Crossbeams::InfoError, %(Not saved - parameter "#{col}" is not defined in the changed SQL) unless col_names.include?(col)
+      # end
     end
 
     def list_search_yaml_file_name(key, file)
