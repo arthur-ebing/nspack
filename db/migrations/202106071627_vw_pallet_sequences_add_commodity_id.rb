@@ -321,10 +321,10 @@ Sequel.migration do
           ) s
       $$;
       
-      create or replace aggregate array_merge_agg(anyarray) (
-          sfunc = array_merge,
-          stype = anyarray
-      );
+      -- create or replace aggregate array_merge_agg(anyarray) (
+      --     sfunc = array_merge,
+      --     stype = anyarray
+      -- );
     SQL
     run <<~SQL
       CREATE VIEW public.vw_pallet_sequences_aggregated
@@ -869,10 +869,10 @@ Sequel.migration do
           ) s
       $$;
       
-      create or replace aggregate array_merge_agg(anyarray) (
-          sfunc = array_merge,
-          stype = anyarray
-      );
+      -- create or replace aggregate array_merge_agg(anyarray) (
+      --     sfunc = array_merge,
+      --     stype = anyarray
+      -- );
     SQL
     run <<~SQL
       CREATE VIEW public.vw_pallet_sequences_aggregated
