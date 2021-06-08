@@ -166,7 +166,7 @@ const crossbeamsGridFormatters = {
       if (index % 2 === 0) {
         url += cmp;
       } else {
-        url += params.data[item[cmp]];
+        url += params.data[item[cmp]] === null ? '' : params.data[item[cmp]];
       }
     });
     return {
