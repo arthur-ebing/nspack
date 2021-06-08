@@ -5,7 +5,7 @@ module FinishedGoodsApp
     attr_reader :header
 
     def auth_token_call
-      http = Crossbeams::HTTPCalls.new(use_ssl: false, open_timeout: AppConst::E_CERT_OPEN_TIMEOUT, read_timeout: AppConst::E_CERT_READ_TIMEOUT)
+      http = Crossbeams::HTTPCalls.new(use_ssl: false, call_logger: call_logger, open_timeout: AppConst::E_CERT_OPEN_TIMEOUT, read_timeout: AppConst::E_CERT_READ_TIMEOUT)
       url = 'http://uas.ecert.co.za/oauth2/token'
       raise Crossbeams::InfoError, 'Service Unavailable: Failed to connect to remote server.' unless http.can_ping?('ecert.co.za')
 
@@ -21,7 +21,7 @@ module FinishedGoodsApp
       auth_token_call if header.nil?
 
       url = "#{AppConst::E_CERT_ENVIRONMENT}tur.ecert.co.za/api/TrackingUnit/GetTrackingUnitStatus?trackingUnitId=#{pallet_number}"
-      http = Crossbeams::HTTPCalls.new(open_timeout: AppConst::E_CERT_OPEN_TIMEOUT, read_timeout: AppConst::E_CERT_READ_TIMEOUT)
+      http = Crossbeams::HTTPCalls.new(call_logger: call_logger, open_timeout: AppConst::E_CERT_OPEN_TIMEOUT, read_timeout: AppConst::E_CERT_READ_TIMEOUT)
 
       res = http.request_get(url, header)
       return failed_response(res.message) unless res.success
@@ -30,11 +30,11 @@ module FinishedGoodsApp
       success_response('Found Tracking Unit', instance)
     end
 
-    def elot(params, body)
+    def elot(params, body) # rubocop:disable Metrics/AbcSize
       auth_token_call if header.nil?
 
       url = "#{AppConst::E_CERT_ENVIRONMENT}tur.ecert.co.za/api/TrackingUnit/eLot?#{params}"
-      http = Crossbeams::HTTPCalls.new(open_timeout: AppConst::E_CERT_OPEN_TIMEOUT, read_timeout: AppConst::E_CERT_READ_TIMEOUT)
+      http = Crossbeams::HTTPCalls.new(call_logger: call_logger, open_timeout: AppConst::E_CERT_OPEN_TIMEOUT, read_timeout: AppConst::E_CERT_READ_TIMEOUT)
       res = http.json_post(url, body, header)
       return failed_response(res.message) unless res.success
 
@@ -46,7 +46,7 @@ module FinishedGoodsApp
 
     def update_agreements # rubocop:disable Metrics/AbcSize
       url = 'https://app.ecert.co.za/api/v1/Agreement/Get'
-      http = Crossbeams::HTTPCalls.new
+      http = Crossbeams::HTTPCalls.new(call_logger: call_logger)
       return failed_response('Service Unavailable: Failed to connect to remote server.') unless http.can_ping?('ecert.co.za')
 
       res = http.request_get(url)
@@ -65,6 +65,10 @@ module FinishedGoodsApp
 
     def save_to_yaml(payload)
       File.open(File.join(ENV['ROOT'], 'tmp', 'eCert_store.yml'), 'w') { |f| f << payload.to_yaml }
+    end
+
+    def call_logger
+      Crossbeams::HTTPTextCallLogger.new('ECERT-API', log_path: 'log/ecert_api_http_calls.log')
     end
   end
 end
