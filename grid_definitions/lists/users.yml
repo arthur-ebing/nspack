@@ -44,7 +44,7 @@
     :permission: user_permissions
 - :url: "/development/masterfiles/users/$:id$/copy_programs"
   :text: copy programs from another user
-  :icon: list
+  :icon: copy
   :title: Assign programs and permissions to $:user_name$
   :popup: true
   :auth:
