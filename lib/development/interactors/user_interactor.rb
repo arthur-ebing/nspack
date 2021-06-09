@@ -16,8 +16,7 @@ module DevelopmentApp
 
       id = repo.create_user(prepare_password(res))
       instance = user(id)
-      success_response("Created user #{instance.user_name}",
-                       instance)
+      success_response("Created user #{instance.user_name}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { login_name: ['This user already exists'] }))
     end
@@ -28,14 +27,24 @@ module DevelopmentApp
 
       repo.update_user(id, res)
       instance = user(id)
-      success_response("Updated user #{instance.user_name}",
-                       instance)
+      success_response("Updated user #{instance.user_name}", instance)
     end
 
     def delete_user(id)
       name = user(id).user_name
       res = repo.delete_or_deactivate_user(id)
       success_response("#{res.message} #{name}")
+    end
+
+    def copy_programs_and_permissions(id, params)
+      res = CopyUserSchema.call(params)
+      return validation_failed_response(res) if res.failure?
+
+      repo.transaction do
+        repo.copy_programs_and_permissions(id, res)
+      end
+      instance = user(id)
+      success_response("Updated user #{instance.user_name}", instance)
     end
 
     def change_user_password(id, params)
@@ -72,16 +81,14 @@ module DevelopmentApp
       return validation_failed_response(res) if res.failure?
 
       res = repo.update_user_permission(ids, res.to_h[:security_group_id])
-      success_response("Updated permissions for #{user(id).user_name}",
-                       res.instance)
+      success_response("Updated permissions for #{user(id).user_name}", res.instance)
     end
 
     def change_user_permissions(id, params)
       user_permissions = Crossbeams::Config::UserPermissions.new.apply_params(params)
       repo.update_user(id, permission_tree: repo.hash_for_jsonb_col(user_permissions))
       instance = user(id)
-      success_response("Updated user #{instance.user_name}",
-                       instance)
+      success_response("Updated user #{instance.user_name}", instance)
     end
 
     def find_homepage(id)

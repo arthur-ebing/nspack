@@ -8,4 +8,9 @@ module DevelopmentApp
     required(:email).maybe(Types::StrippedString)
     optional(:profile).maybe(:hash)
   end
+
+  CopyUserSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:from_user_id).filled(:integer)
+  end
 end

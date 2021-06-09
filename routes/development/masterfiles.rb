@@ -210,6 +210,26 @@ class Nspack < Roda
         end
       end
 
+      r.on 'copy_programs' do
+        r.get do
+          show_partial { Development::Masterfiles::User::CopyProgram.call(id) }
+        end
+        r.patch do
+          res = interactor.copy_programs_and_permissions(id, params[:user])
+          if res.success
+            show_json_notice res.message
+          else
+            re_show_form(r, res, url: "/development/masterfiles/users/#{id}/copy_programs") do
+              Development::Masterfiles::User::CopyProgram.call(id, form_errors: res.errors)
+            end
+          end
+        end
+      end
+
+      r.on 'confirm_programs' do
+        show_partial { Development::Masterfiles::User::ConfirmProgram.call(id, form_values: params[:user]) }
+      end
+
       r.on 'details' do
         r.get do
           show_partial { Development::Masterfiles::User::Details.call(id) }
@@ -228,6 +248,7 @@ class Nspack < Roda
           end
         end
       end
+
       r.on 'change_password' do
         r.get do
           check_auth!('masterfiles', 'user_maintenance')
@@ -260,7 +281,7 @@ class Nspack < Roda
                                        email: res.instance[:email] },
                             notice: res.message)
           else
-            re_show_form(r, res) { Development::Masterfiles::User::Edit.call(id, params[:user], res.errors) }
+            re_show_form(r, res) { Development::Masterfiles::User::Edit.call(id, form_values: params[:user], form_errors: res.errors) }
           end
         end
         r.delete do    # DELETE
@@ -270,6 +291,7 @@ class Nspack < Roda
         end
       end
     end
+
     r.on 'users' do
       interactor = DevelopmentApp::UserInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW

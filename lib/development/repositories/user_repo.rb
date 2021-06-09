@@ -64,6 +64,17 @@ module DevelopmentApp
       success_response('Applied', DB[qry].first)
     end
 
+    def copy_programs_and_permissions(id, res)
+      params = res.to_h
+      new_programs = DB[:programs_users]
+                     .where(user_id: params[:from_user_id])
+                     .exclude(user_id: id)
+                     .select_map(%i[program_id security_group_id])
+      new_programs.each do |program_id, security_group_id|
+        DB[:programs_users].insert(user_id: id, program_id: program_id, security_group_id: security_group_id)
+      end
+    end
+
     def link_users(id, user_ids)
       existing_ids      = DB[:user_email_groups_users].where(user_email_group_id: id).select_map(:user_id)
       old_ids           = existing_ids - user_ids

@@ -1003,6 +1003,96 @@ const crossbeamsGridEvents = {
     target.stopPropagation();
     target.preventDefault();
   },
+
+  gridPageKey: function gridPageKey(gridId) {
+    return `${window.location.pathname.replace(/\d+/, '').replace(/\/$/, '').replace(/\/\//, '/')}-${gridId}`;
+  },
+
+  gridStateOnLoad: function gridStateOnLoad(gridId) {
+    const gridOptions = crossbeamsGridStore.getGrid(gridId);
+    const key = crossbeamsGridEvents.gridPageKey(gridId);
+    if (crossbeamsLocalStorage.hasItem(key)) {
+      gridOptions.columnApi.applyColumnState({
+        state: crossbeamsLocalStorage.getItem(key),
+        applyOrder: true,
+      });
+      if (document.querySelector(`#${gridId}-frame .gridStateLoad`)) {
+        document.querySelector(`#${gridId}-frame .gridStateLoad`).hidden = true;
+      }
+      if (document.querySelector(`#${gridId}-frame .gridStateClear`)) {
+        document.querySelector(`#${gridId}-frame .gridStateClear`).hidden = false;
+      }
+      if (document.querySelector(`#${gridId}-frame .gridStateDelete`)) {
+        document.querySelector(`#${gridId}-frame .gridStateDelete`).hidden = false;
+      }
+    }
+  },
+
+  gridStateSave: function gridStateSave(gridId) {
+    const gridOptions = crossbeamsGridStore.getGrid(gridId);
+    crossbeamsLocalStorage.setItem(crossbeamsGridEvents.gridPageKey(gridId), gridOptions.columnApi.getColumnState());
+    if (document.querySelector(`#${gridId}-frame .gridStateLoad`)) {
+      document.querySelector(`#${gridId}-frame .gridStateLoad`).hidden = false;
+    }
+    if (document.querySelector(`#${gridId}-frame .gridStateClear`)) {
+      document.querySelector(`#${gridId}-frame .gridStateClear`).hidden = false;
+    }
+    if (document.querySelector(`#${gridId}-frame .gridStateDelete`)) {
+      document.querySelector(`#${gridId}-frame .gridStateDelete`).hidden = false;
+    }
+    crossbeamsUtils.showSuccess('Column state was saved');
+  },
+
+  gridStateLoad: function gridStateLoad(gridId) {
+    const gridOptions = crossbeamsGridStore.getGrid(gridId);
+    const key = crossbeamsGridEvents.gridPageKey(gridId);
+
+    if (!crossbeamsLocalStorage.hasItem(key)) {
+      crossbeamsUtils.showWarning('No saved column state to load');
+      return;
+    }
+    gridOptions.columnApi.applyColumnState({
+      state: crossbeamsLocalStorage.getItem(key),
+      applyOrder: true,
+    });
+    if (document.querySelector(`#${gridId}-frame .gridStateClear`)) {
+      document.querySelector(`#${gridId}-frame .gridStateClear`).hidden = false;
+    }
+    if (document.querySelector(`#${gridId}-frame .gridStateDelete`)) {
+      document.querySelector(`#${gridId}-frame .gridStateDelete`).hidden = false;
+    }
+    crossbeamsUtils.showSuccess('Saved column state was loaded');
+  },
+
+  gridStateClear: function gridStateClear(gridId) {
+    const gridOptions = crossbeamsGridStore.getGrid(gridId);
+    gridOptions.columnApi.resetColumnState();
+    if (document.querySelector(`#${gridId}-frame .gridStateLoad`)) {
+      document.querySelector(`#${gridId}-frame .gridStateLoad`).hidden = false;
+    }
+    if (document.querySelector(`#${gridId}-frame .gridStateClear`)) {
+      document.querySelector(`#${gridId}-frame .gridStateClear`).hidden = true;
+    }
+    if (document.querySelector(`#${gridId}-frame .gridStateDelete`)) {
+      document.querySelector(`#${gridId}-frame .gridStateDelete`).hidden = true;
+    }
+  },
+
+  gridStateDelete: function gridStateDelete(gridId) {
+    const gridOptions = crossbeamsGridStore.getGrid(gridId);
+    gridOptions.columnApi.resetColumnState();
+    crossbeamsLocalStorage.removeItem(crossbeamsGridEvents.gridPageKey(gridId));
+    if (document.querySelector(`#${gridId}-frame .gridStateLoad`)) {
+      document.querySelector(`#${gridId}-frame .gridStateLoad`).hidden = true;
+    }
+    if (document.querySelector(`#${gridId}-frame .gridStateClear`)) {
+      document.querySelector(`#${gridId}-frame .gridStateClear`).hidden = true;
+    }
+    if (document.querySelector(`#${gridId}-frame .gridStateDelete`)) {
+      document.querySelector(`#${gridId}-frame .gridStateDelete`).hidden = true;
+    }
+    crossbeamsUtils.showInformation('Saved column state has been discarded');
+  },
 };
 
 // ------------------------------
@@ -1589,6 +1679,7 @@ const crossbeamsGridStaticLoader = {
       colDefs,
       vport.scrollWidth > vport.offsetWidth);
     crossbeamsGridEvents.makeRowBookmark(gridOptions.context.domGridId);
+    crossbeamsGridEvents.gridStateOnLoad(gridOptions.context.domGridId);
   },
 
   /**
