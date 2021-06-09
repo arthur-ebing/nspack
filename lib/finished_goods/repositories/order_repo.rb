@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  class OrderRepo < BaseRepo
+  class OrderRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     build_for_select :orders,
                      label: :internal_order_number,
                      value: :id,
@@ -11,7 +11,7 @@ module FinishedGoodsApp
                           value: :id,
                           order_by: :internal_order_number
 
-    crud_calls_for :orders, name: :order
+    crud_calls_for :orders, name: :order, exclude: [:delete]
 
     build_for_select :order_items,
                      label: :sell_by_code,
@@ -58,20 +58,38 @@ module FinishedGoodsApp
       hash = find_with_association(
         :order_items, id,
         parent_tables: [
-          { parent_table: :fruit_actual_counts_for_packs, foreign_key: :actual_count_id, flatten_columns: { actual_count_for_pack: :actual_count } },
-          { parent_table: :basic_pack_codes, foreign_key: :basic_pack_id, flatten_columns: { basic_pack_code: :basic_pack } },
-          { parent_table: :standard_pack_codes, foreign_key: :standard_pack_id, flatten_columns: { standard_pack_code: :standard_pack } },
-          { parent_table: :commodities, foreign_key: :commodity_id, flatten_columns: { code: :commodity } },
-          { parent_table: :grades, foreign_key: :grade_id, flatten_columns: { grade_code: :grade } },
-          { parent_table: :inventory_codes, foreign_key: :inventory_id, flatten_columns: { inventory_code: :inventory } },
-          { parent_table: :marks, foreign_key: :mark_id, flatten_columns: { mark_code: :mark } },
-          { parent_table: :marketing_varieties, foreign_key: :marketing_variety_id, flatten_columns: { marketing_variety_code: :marketing_variety } },
-          { parent_table: :fruit_size_references, foreign_key: :size_reference_id, flatten_columns: { size_reference: :size_reference } },
-          { parent_table: :pallet_formats, foreign_key: :pallet_format_id, flatten_columns: { description: :pallet_format } },
-          { parent_table: :pm_boms, foreign_key: :pm_bom_id, flatten_columns: { bom_code: :pkg_bom } },
-          { parent_table: :pm_marks, foreign_key: :pm_mark_id, flatten_columns: { description: :pkg_mark } },
-          { parent_table: :rmt_classes, foreign_key: :rmt_class_id, flatten_columns: { rmt_class_code: :rmt_class } },
-          { parent_table: :treatments, foreign_key: :treatment_id, flatten_columns: { treatment_code: :treatment } }
+          { parent_table: :orders, foreign_key: :order_id,
+            flatten_columns: { packed_tm_group_id: :packed_tm_group_id,
+                               marketing_org_party_role_id: :marketing_org_party_role_id,
+                               target_customer_party_role_id: :target_customer_party_role_id } },
+          { parent_table: :fruit_actual_counts_for_packs, foreign_key: :actual_count_id,
+            flatten_columns: { actual_count_for_pack: :actual_count } },
+          { parent_table: :basic_pack_codes, foreign_key: :basic_pack_id,
+            flatten_columns: { basic_pack_code: :basic_pack } },
+          { parent_table: :standard_pack_codes, foreign_key: :standard_pack_id,
+            flatten_columns: { standard_pack_code: :standard_pack } },
+          { parent_table: :commodities, foreign_key: :commodity_id,
+            flatten_columns: { code: :commodity } },
+          { parent_table: :grades, foreign_key: :grade_id,
+            flatten_columns: { grade_code: :grade } },
+          { parent_table: :inventory_codes, foreign_key: :inventory_id,
+            flatten_columns: { inventory_code: :inventory } },
+          { parent_table: :marks, foreign_key: :mark_id,
+            flatten_columns: { mark_code: :mark } },
+          { parent_table: :marketing_varieties, foreign_key: :marketing_variety_id,
+            flatten_columns: { marketing_variety_code: :marketing_variety } },
+          { parent_table: :fruit_size_references, foreign_key: :size_reference_id,
+            flatten_columns: { size_reference: :size_reference } },
+          { parent_table: :pallet_formats, foreign_key: :pallet_format_id,
+            flatten_columns: { description: :pallet_format } },
+          { parent_table: :pm_boms, foreign_key: :pm_bom_id,
+            flatten_columns: { bom_code: :pkg_bom } },
+          { parent_table: :pm_marks, foreign_key: :pm_mark_id,
+            flatten_columns: { description: :pkg_mark } },
+          { parent_table: :rmt_classes, foreign_key: :rmt_class_id,
+            flatten_columns: { rmt_class_code: :rmt_class } },
+          { parent_table: :treatments, foreign_key: :treatment_id,
+            flatten_columns: { treatment_code: :treatment } }
         ],
         lookup_functions: [
           { function: :fn_current_status, args: ['order_items', :id], col_name: :status }
@@ -81,6 +99,11 @@ module FinishedGoodsApp
 
       hash[:order] = get(:orders, hash[:order_id], :internal_order_number)
       OrderItem.new(hash)
+    end
+
+    def delete_order(id)
+      DB[:orders_loads].where(order_id: id).delete
+      delete(:orders, id)
     end
 
     def delete_order_item(id)
@@ -100,6 +123,17 @@ module FinishedGoodsApp
       end
 
       update(:order_items, id, { column => value })
+    end
+
+    def allocate_to_order_item(id, allocate_sequence_ids, user)
+      load_id = get(:order_items, id, :load_id)
+      pallet_sequence_ids = select_values(:order_items_pallet_sequences, :pallet_sequence_id, order_item_id: id)
+      current_allocation = select_values(:pallet_sequences, :pallet_number, id: pallet_sequence_ids)
+      new_allocation = select_values(:pallet_sequences, :pallet_number, id: allocate_sequence_ids)
+
+      LoadRepo.new.unallocate_pallets(current_allocation - new_allocation, user)
+      LoadRepo.new.allocate_pallets(load_id, new_allocation - current_allocation, user)
+      FinishedGoodsApp::ProcessOrderLines.call(user, load_id: load_id)
     end
   end
 end

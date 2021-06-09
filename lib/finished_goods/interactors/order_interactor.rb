@@ -45,7 +45,6 @@ module FinishedGoodsApp
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue Sequel::ForeignKeyConstraintViolation => e
-      puts e.message
       failed_response("Unable to delete order. It is still referenced#{e.message.partition('referenced').last}")
     end
 

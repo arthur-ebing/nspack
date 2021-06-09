@@ -136,9 +136,9 @@
     :can_be_cleared: true
     :conditions: unallocated_pallets
   :allocate_pallets_for_order_item:
-    :url: "/finished_goods/dispatch/loads/$:load_id$/allocate_multiselect"
+    :url: "/finished_goods/orders/order_items/$:id$/allocate"
     :preselect: SELECT pallet_sequences.id FROM pallet_sequences JOIN pallets ON pallet_sequences.pallet_id = pallets.id WHERE load_id = $:load_id$
-    :section_caption: 'Assign pallets to load'
+    :section_caption: "SELECT 'Assign pallets to load: ' || $:load_id$"
     :multiselect_save_method: remote
     :can_be_cleared: true
     :conditions: unallocated_pallets_for_order_item

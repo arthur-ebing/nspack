@@ -8,9 +8,9 @@
   = pallet_sequences.pallet_id\r\n\r\n    GROUP BY order_item_id,\r\n             load_id\r\n)\r\nSELECT\r\n
   \   order_items.id,\r\n    order_items.order_id,\r\n    orders.packed_tm_group_id,\r\n
   \   orders.marketing_org_party_role_id,\r\n    orders.target_customer_party_role_id,\r\n
-  \   order_items.load_id,\r\n    order_items.carton_quantity,\r\n    allocated_sequences.allocated_carton_quantity,\r\n
-  \   allocated_sequences.pallet_ids,\r\n    allocated_sequences.pallet_numbers,\r\n
-  \   order_items.price_per_carton,\r\n    order_items.price_per_kg,\r\n    order_items.commodity_id,\r\n
+  \   order_items.carton_quantity,\r\n    allocated_sequences.allocated_carton_quantity,\r\n
+  \   order_items.price_per_carton,\r\n    order_items.price_per_kg,\r\n    allocated_sequences.pallet_ids,\r\n
+  \   allocated_sequences.pallet_numbers,\r\n    order_items.load_id,\r\n    order_items.commodity_id,\r\n
   \   order_items.basic_pack_id,\r\n    order_items.standard_pack_id,\r\n    order_items.actual_count_id,\r\n
   \   order_items.size_reference_id,\r\n    order_items.inventory_id,\r\n    order_items.grade_id,\r\n
   \   order_items.mark_id,\r\n    order_items.marketing_variety_id,\r\n    order_items.sell_by_code,\r\n
@@ -129,25 +129,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  load_id:
-    :name: load_id
-    :sequence_no: 6
-    :caption: Load
-    :namespaced_name: order_items.load_id
-    :data_type: :integer
-    :width: 80
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   carton_quantity:
     :name: carton_quantity
-    :sequence_no: 7
+    :sequence_no: 6
     :caption: Required Carton qty
     :namespaced_name: order_items.carton_quantity
     :data_type: :integer
@@ -163,7 +147,7 @@
     :group_max: false
   allocated_carton_quantity:
     :name: allocated_carton_quantity
-    :sequence_no: 8
+    :sequence_no: 7
     :caption: Allocated carton qty
     :namespaced_name: allocated_sequences.allocated_carton_quantity
     :data_type: :integer
@@ -177,41 +161,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  pallet_ids:
-    :name: pallet_ids
-    :sequence_no: 9
-    :caption: Pallet ids
-    :namespaced_name: allocated_sequences.pallet_ids
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  pallet_numbers:
-    :name: pallet_numbers
-    :sequence_no: 10
-    :caption: Pallet numbers
-    :namespaced_name: allocated_sequences.pallet_numbers
-    :data_type: :string
-    :width: 200
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   price_per_carton:
     :name: price_per_carton
-    :sequence_no: 11
+    :sequence_no: 8
     :caption: Price per carton
     :namespaced_name: order_items.price_per_carton
     :data_type: :number
@@ -227,11 +179,59 @@
     :group_max: false
   price_per_kg:
     :name: price_per_kg
-    :sequence_no: 12
+    :sequence_no: 9
     :caption: Price per kg
     :namespaced_name: order_items.price_per_kg
     :data_type: :number
     :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_ids:
+    :name: pallet_ids
+    :sequence_no: 10
+    :caption: Pallet ids
+    :namespaced_name: allocated_sequences.pallet_ids
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_numbers:
+    :name: pallet_numbers
+    :sequence_no: 11
+    :caption: Pallet numbers
+    :namespaced_name: allocated_sequences.pallet_numbers
+    :data_type: :string
+    :width: 200
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  load_id:
+    :name: load_id
+    :sequence_no: 12
+    :caption: Load
+    :namespaced_name: order_items.load_id
+    :data_type: :integer
+    :width: 80
     :format: 
     :hide: false
     :pinned: 

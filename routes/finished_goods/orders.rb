@@ -60,7 +60,8 @@ class Nspack < Roda
           flash[:notice] = res.message
           r.redirect '/list/orders'
         else
-          show_json_error(res.message, status: 200)
+          flash[:error] = res.message
+          r.redirect "/finished_goods/orders/orders/#{id}"
         end
       end
 
@@ -133,6 +134,24 @@ class Nspack < Roda
           update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
         else
           undo_grid_inline_edit(message: res.message, message_type: :error)
+        end
+      end
+
+      r.on 'allocate' do
+        r.get do       # SHOW
+          check_auth!('orders', 'edit')
+          interactor.assert_permission!(:edit, id)
+          show_partial_or_page(r) { FinishedGoods::Orders::OrderItem::Allocate.call(id) }
+        end
+
+        r.post do # UPDATE
+          res = interactor.allocate_to_order_item(id, multiselect_grid_choices(params))
+          if res.success
+            flash[:notice] = res.message
+            r.redirect "/finished_goods/orders/orders/#{res.instance.order_id}"
+          else
+            re_show_form(r, res, url: request.fullpath) { FinishedGoods::Orders::OrderItem::Allocate.call(id) }
+          end
         end
       end
 

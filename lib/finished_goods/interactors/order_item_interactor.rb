@@ -34,6 +34,20 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
+    def allocate_to_order_item(id, params)
+      repo.transaction do
+        check!(:edit, id)
+        repo.allocate_to_order_item(id, params, @user)
+
+        log_transaction
+      end
+
+      instance = order_item(id)
+      success_response('Updated order item', instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def inline_update_order_item(id, params)
       repo.transaction do
         check!(:edit, id)

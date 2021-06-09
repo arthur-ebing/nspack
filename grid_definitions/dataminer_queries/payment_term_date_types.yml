@@ -48,7 +48,7 @@
   no_days_after_etd:
     :name: no_days_after_etd
     :sequence_no: 3
-    :caption: No days after etd
+    :caption: No days after ETD
     :namespaced_name: payment_term_date_types.no_days_after_etd
     :data_type: :integer
     :width: 
@@ -64,7 +64,7 @@
   no_days_after_eta:
     :name: no_days_after_eta
     :sequence_no: 4
-    :caption: No days after eta
+    :caption: No days after ETA
     :namespaced_name: payment_term_date_types.no_days_after_eta
     :data_type: :integer
     :width: 
@@ -80,7 +80,7 @@
   no_days_after_atd:
     :name: no_days_after_atd
     :sequence_no: 5
-    :caption: No days after atd
+    :caption: No days after ATD
     :namespaced_name: payment_term_date_types.no_days_after_atd
     :data_type: :integer
     :width: 
@@ -96,7 +96,7 @@
   no_days_after_ata:
     :name: no_days_after_ata
     :sequence_no: 6
-    :caption: No days after ata
+    :caption: No days after ATA
     :namespaced_name: payment_term_date_types.no_days_after_ata
     :data_type: :integer
     :width: 

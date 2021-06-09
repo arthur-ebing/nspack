@@ -46,6 +46,9 @@ module FinishedGoodsApp
     attribute :order_id, Types::Integer
     attribute :load_id, Types::Integer
     attribute :order, Types::Integer
+    attribute :packed_tm_group_id, Types::Integer
+    attribute :marketing_org_party_role_id, Types::Integer
+    attribute :target_customer_party_role_id, Types::Integer
     attribute :commodity_id, Types::Integer
     attribute :commodity, Types::String
     attribute :basic_pack_id, Types::Integer

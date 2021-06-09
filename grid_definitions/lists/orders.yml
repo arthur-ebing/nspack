@@ -4,22 +4,15 @@
 - :url: "/finished_goods/orders/orders/$:id$"
   :text: view
   :icon: view-show
-  :title: View
-  :popup: false
-- :url: "/finished_goods/orders/orders/$:id$/edit"
-  :text: edit
+  :hide_if_false: shipped
+- :url: "/finished_goods/orders/orders/$:id$"
+  :text: manage
   :icon: edit
-  :title: Edit
-  :popup: true
+  :hide_if_true: shipped
 - :url: "/finished_goods/orders/orders/$:id$/copy"
   :text: copy
   :icon: copy
   :title: Copy
-  :popup: true
-- :url: "/finished_goods/orders/orders/$:id$"
-  :text: delete
-  :icon: delete
-  :is_delete: true
   :popup: true
 - :separator: true
 - :url: "/development/statuses/list/orders/$:id$"

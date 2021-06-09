@@ -6,19 +6,19 @@
   :icon: view-show
   :title: View
   :popup: true
-- :url: "/finished_goods/orders/order_items/$:id$/edit"
-  :text: edit
-  :icon: edit
-  :title: Edit
-  :popup: true
+#- :url: "/finished_goods/orders/order_items/$:id$/edit"
+#  :text: edit
+#  :icon: edit
+#  :title: Edit
+#  :popup: true
 - :url: "/finished_goods/orders/order_items/$:id$"
   :text: delete
   :icon: delete
   :is_delete: true
   :popup: true
-- :url: "/list/stock_pallets_for_loads/multi?key=allocate_pallets_for_order_item&load_id=$:load_id$&packed_tm_group_id=$:packed_tm_group_id$&marketing_org_party_role_id=$:marketing_org_party_role_id$&target_customer_party_role_id=$:target_customer_party_role_id$&commodity_id=$:commodity_id$&basic_pack_id=$:basic_pack_id$&standard_pack_id=$:standard_pack_id$&actual_count_id=$:actual_count_id$&size_reference_id=$:size_reference_id$&grade_id=$:grade_id$&mark_id=$:mark_id$&marketing_variety_id=$:marketing_variety_id$&inventory_id=$:inventory_id$&sell_by_code=$:sell_by_code$&pallet_format_id=$:pallet_format_id$&pm_mark_id=$:pm_mark_id$&pm_bom_id=$:pm_bom_id$&rmt_class_id=$:rmt_class_id$"
-  :text: assign pallets
-  :icon: list
+- :url: "/finished_goods/orders/order_items/$:id$/allocate"
+  :text: allocate pallets
+  :icon: edit
   :popup: true
 - :separator: true
 - :url: "/development/statuses/list/order_items/$:id$"

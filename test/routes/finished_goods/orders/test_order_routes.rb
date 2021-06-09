@@ -70,7 +70,7 @@ class TestOrderRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     INTERACTOR.any_instance.stubs(:delete_order).returns(bad_response)
     patch_as_fetch 'finished_goods/orders/orders/1/delete', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-    expect_json_error
+    expect_flash_error
   end
 
   def test_new
