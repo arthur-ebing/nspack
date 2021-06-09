@@ -76,7 +76,7 @@ module UiRules
           options: @repo.for_select_users(exclude: { id: @options[:id] }),
           min_charwidth: 30,
           prompt: true,
-          hide_on_load: !@form_object.from_user_id.nil?
+          hide_on_load: @form_object.to_h[:from_user_id]
         }
       }
     end
