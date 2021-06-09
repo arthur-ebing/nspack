@@ -141,7 +141,7 @@ module MasterfilesApp
                  JOIN pm_subtypes ON pm_subtypes.id = pp.pm_subtype_id
                  JOIN pm_types ON pm_types.id = pm_subtypes.pm_type_id
                  JOIN pm_composition_levels ON pm_composition_levels.id = pm_types.pm_composition_level_id
-                 ORDER BY pm_composition_levels.composition_level ASC LIMIT 1) cpp ON cpp.id = pm_boms_products.pm_product_id
+                 ORDER BY pm_composition_levels.composition_level ASC) cpp ON cpp.id = pm_boms_products.pm_product_id
           WHERE pm_boms.bom_code LIKE '%#{commodity_code}#{size_count}'
           AND cpp.basic_pack_id = #{basic_pack_code_id}"]
         .map { |r| [r[:bom_code], r[:id]] }
