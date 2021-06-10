@@ -612,6 +612,12 @@ module DataminerApp
       success_response('ok')
     end
 
+    def show_debug_query(id)
+      report = repo.lookup_admin_report(id)
+      file = File.basename(repo.lookup_file_name(id, true))
+      success_response('ok', { file: file, caption: report.caption, sql: report.runnable_sql })
+    end
+
     private
 
     def assert_columns_and_params_match!(report)

@@ -31,6 +31,27 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         show_page { render_data_grid_page(id, opts) }
       end
 
+      r.on 'debug' do
+        # Perhaps move this to a roda-data_grid method.... (include params in SQL etc.)
+        context = { for_grid_queries: true, route_url: request.path, request_ip: request.ip }
+        interactor = DataminerApp::DataminerInteractor.new(current_user, {}, context, {})
+        res = interactor.show_debug_query("grid-definitions_#{id}")
+        xtra = case r.remaining_path
+               when '/with_params'
+                 "<p>Parameterised list: #{params.inspect}</p>"
+               when '/multi'
+                 "<p>Multiselect list: #{params.inspect}</p>"
+               else
+                 ''
+               end
+        view(inline: <<~HTML)
+          <h2>Debug list: #{res.instance[:caption]}</h2>
+          <p>#{res.instance[:file]}</p>
+          #{xtra}
+          <div>#{sql_to_highlight(res.instance[:sql])}</div>
+        HTML
+      end
+
       r.on 'with_params' do
         # Pass query_string rather than params as it is passed through directly
         # to the grid div's url.
