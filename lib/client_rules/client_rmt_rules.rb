@@ -38,8 +38,8 @@ module Crossbeams
             set_defaults_for_new_rmt_delivery: true,
             convert_carton_to_rebins: false,
             create_farm_location: false,
-            pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
-            default_delivery_location: 'FRUIT_RECEPTION_1' },
+            pending_delivery_location: nil,
+            default_delivery_location: nil },
       um: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             delivery_capture_container_material: false,
@@ -129,6 +129,8 @@ module Crossbeams
       return 'Default location_id for pending PALBIN edi bin receiving.' if explain
 
       location_long_code = setting(:pending_delivery_location)
+      return nil unless location_long_code
+
       repo = BaseRepo.new
       id = repo.get_id(:locations, location_long_code: location_long_code)
       return id unless id.nil?
@@ -149,6 +151,8 @@ module Crossbeams
       return 'Default location_id for PALBIN edi bin receiving.' if explain
 
       location_long_code = setting(:default_delivery_location)
+      return nil unless location_long_code
+
       repo = BaseRepo.new
       id = repo.get_id(:locations, location_long_code: location_long_code)
       return id unless id.nil?
