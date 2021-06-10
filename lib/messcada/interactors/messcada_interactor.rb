@@ -237,12 +237,14 @@ module MesscadaApp
       end
       cvl_res
     rescue Crossbeams::InfoError => e
-      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message(__method__)) if AppConst::ROBOT_DISPLAY_LINES != 4
+      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message(__method__)) unless e.message.start_with?('No setup data cached') || AppConst::ROBOT_DISPLAY_LINES == 4
+      AppConst::ROBOT_LOG.warn(e.message)
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
     rescue StandardError => e
       ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
+      AppConst::ROBOT_LOG.error(e.message)
       puts e
       puts e.backtrace.join("\n")
       failed_response(e.message)
@@ -258,11 +260,13 @@ module MesscadaApp
     rescue Crossbeams::InfoError => e
       # Only send an email if the error is not caused by an un-allocated button:
       ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message(__method__)) unless e.message.start_with?('No setup data cached')
+      AppConst::ROBOT_LOG.info(e.message)
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
     rescue StandardError => e
       ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
+      AppConst::ROBOT_LOG.error(e.message)
       puts e
       puts e.backtrace.join("\n")
       failed_response(e.message)
@@ -332,12 +336,14 @@ module MesscadaApp
       end
       cvl_res
     rescue Crossbeams::InfoError => e
-      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message(__method__))
+      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message(__method__)) unless e.message.start_with?('No setup data cached')
+      AppConst::ROBOT_LOG.info(e.message)
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
     rescue StandardError => e
       ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
+      AppConst::ROBOT_LOG.error(e.message)
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)

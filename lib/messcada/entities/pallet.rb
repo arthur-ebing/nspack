@@ -115,20 +115,25 @@ module MesscadaApp
 
       case scanned_pallet_number.length
       when 9, 18
+        # Valid pallet numbers have 9 or 18 digits.
         scanned_pallet_number
       when 11
+        # Last 9 digits. Number is prefixed with "46", "47", "48" or "49".
         raise Crossbeams::InfoError, "Pallet #{scanned_pallet_number} is not a recognised format for 11 digits." unless %w[46 47 48 49].include?(scanned_pallet_number[0, 2])
 
         scanned_pallet_number[-9, 9]
       when 15
+        # Last 9 digits. Number starts with "]C".
         raise Crossbeams::InfoError, "Pallet #{scanned_pallet_number} is not a recognised format for 15 digits." unless scanned_pallet_number.start_with?(']C')
 
         scanned_pallet_number[-9, 9]
       when 19
+        # 18 digits prefixed with "0".
         raise Crossbeams::InfoError, "Pallet #{scanned_pallet_number} is not a recognised format for 19 digits." unless scanned_pallet_number.start_with?('0')
 
         scanned_pallet_number.delete_prefix('0')
       when 20, 21, 23
+        # Long numbers - discard the (variable) prefix and use the last 18 digits.
         scanned_pallet_number[-18, 18]
       else
         raise Crossbeams::InfoError, "Scan #{scanned_pallet_number} is not a recognised pallet number length."

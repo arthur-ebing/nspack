@@ -217,7 +217,7 @@ INSERT INTO payment_term_date_types (type_of_date) VALUES ('Actual Time of Arriv
 
 -- DEAL_TYPES
 INSERT INTO deal_types (deal_type) VALUES ('CONSIGNMENT') ON CONFLICT DO NOTHING;
-INSERT INTO deal_types (deal_type) VALUES ('FT') ON CONFLICT DO NOTHING;
+INSERT INTO deal_types (deal_type) VALUES ('FP') ON CONFLICT DO NOTHING;
 INSERT INTO deal_types (deal_type) VALUES ('MGP') ON CONFLICT DO NOTHING;
 INSERT INTO deal_types (deal_type) VALUES ('NRA') ON CONFLICT DO NOTHING;
 
