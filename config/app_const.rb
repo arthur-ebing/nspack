@@ -76,8 +76,8 @@ class AppConst # rubocop:disable Metrics/ClassLength
   CR_MF = Crossbeams::ClientMfRules.new(CLIENT_CODE)
   CR_RMT = Crossbeams::ClientRmtRules.new(CLIENT_CODE)
 
-  # Log for errors experienced by roobot calls:
-  ROBOT_LOG = Logger.new('log/robot.log')
+  # Log for errors experienced by robot calls (Keep history: 10 files of up to 1Mb each):
+  ROBOT_LOG = Logger.new('log/robot.log', 10, 1_024_000)
 
   # labeling cached setup data path
   LABELING_CACHED_DATA_FILEPATH = File.expand_path('../tmp/run_cache', __dir__)

@@ -394,6 +394,16 @@ and all words start with initial capital letter.
 |any text
 |The value of the column in the record for this field.
 
+|:include_hidden_field
+|Should a hidden field be rendered
+|true or false
+|If true, a hidden field will render and its value will be posted with the form.
+
+|:hidden_value
+|The value of the hidden field (when `:include_hidden_field` is true.)
+|Any value
+|Only provide this if you want to store a value different from the one to display in the label. e.g. hidden value is an `id`, while the label desplays a `code`.
+
 |:hint
 |Hint text to be shown to the user. A question-mark icon appears in the label that the user can click on to display this text. Text can include HTML tags for formatting.
 |HTML text
