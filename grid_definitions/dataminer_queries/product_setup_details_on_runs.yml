@@ -21,12 +21,13 @@
   \            product_setups.updated_at,\r\n             CASE WHEN fn_product_setup_in_production
   (product_setups.id) THEN 'warning'\r\n             WHEN NOT product_setups.active
   THEN 'inactive'\r\n             ELSE NULL\r\n             END AS colour_rule,\r\n
-  \            production_runs.id AS production_run_id,\r\n             ( SELECT array_agg(pst.treatment_code)\r\n
-  \              FROM ( SELECT t.treatment_code\r\n                            FROM
-  treatments t\r\n                            JOIN product_setups ps ON t.id = ANY
-  (ps.treatment_ids)\r\n                            WHERE ps.id = product_setups.id\r\n
-  \                           ORDER BY t.treatment_code DESC) AS pst) AS product_setup_treatments\r\nFROM
-  product_setups\r\nJOIN product_setup_templates ON product_setup_templates.id = product_setups.product_setup_template_id\r\nJOIN
+  \           production_runs.id AS production_run_id,\r\n            production_runs.started_at,\r\n
+  \            ( SELECT array_agg(pst.treatment_code)\r\n               FROM ( SELECT
+  t.treatment_code\r\n                            FROM treatments t\r\n                            JOIN
+  product_setups ps ON t.id = ANY (ps.treatment_ids)\r\n                            WHERE
+  ps.id = product_setups.id\r\n                            ORDER BY t.treatment_code
+  DESC) AS pst) AS product_setup_treatments\r\nFROM product_setups\r\nJOIN product_setup_templates
+  ON product_setup_templates.id = product_setups.product_setup_template_id\r\nJOIN
   marketing_varieties ON marketing_varieties.id = product_setups.marketing_variety_id\r\nLEFT
   JOIN std_fruit_size_counts ON std_fruit_size_counts.id = product_setups.std_fruit_size_count_id\r\nLEFT
   JOIN commodities ON commodities.id = std_fruit_size_counts.commodity_id\r\nJOIN
@@ -598,9 +599,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  started_at:
+    :name: started_at
+    :sequence_no: 35
+    :caption: Started at
+    :namespaced_name: production_runs.started_at
+    :data_type: :datetime
+    :width: 150
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   product_setup_treatments:
     :name: product_setup_treatments
-    :sequence_no: 35
+    :sequence_no: 36
     :caption: Product setup treatments
     :namespaced_name: 
     :data_type: :string

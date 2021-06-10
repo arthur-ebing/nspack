@@ -13,6 +13,7 @@
   :icon: printer
   :title: Print carton label
   :popup: true
+  :hide_if_null: started_at
 :conditions:
   :standard:
   - :col: production_runs.id
