@@ -636,21 +636,29 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           actual_counts = interactor.for_select_basic_pack_actual_counts(basic_pack_code_id, std_fruit_size_count_id)
           pm_boms = interactor.for_select_setup_pm_boms(commodity_id, std_fruit_size_count_id, basic_pack_code_id)
         end
-        json_actions([OpenStruct.new(type: :replace_select_options,
-                                     dom_id: 'reworks_run_sequence_fruit_actual_counts_for_pack_id',
-                                     options_array: actual_counts),
-                      OpenStruct.new(type: :replace_select_options,
-                                     dom_id: 'reworks_run_sequence_pm_bom_id',
-                                     options_array: pm_boms),
-                      OpenStruct.new(type: :replace_input_value,
-                                     dom_id: 'reworks_run_sequence_description',
-                                     value: ''),
-                      OpenStruct.new(type: :replace_input_value,
-                                     dom_id: 'reworks_run_sequence_erp_bom_code',
-                                     value: ''),
-                      OpenStruct.new(type: :replace_inner_html,
-                                     dom_id: 'reworks_run_sequence_pm_boms_products',
-                                     value: [])])
+        actions = if AppConst::CR_PROD.require_packaging_bom?
+                    [OpenStruct.new(type: :replace_select_options,
+                                    dom_id: 'reworks_run_sequence_fruit_actual_counts_for_pack_id',
+                                    options_array: actual_counts),
+                     OpenStruct.new(type: :replace_select_options,
+                                    dom_id: 'reworks_run_sequence_pm_bom_id',
+                                    options_array: pm_boms),
+                     OpenStruct.new(type: :replace_input_value,
+                                    dom_id: 'reworks_run_sequence_description',
+                                    value: ''),
+                     OpenStruct.new(type: :replace_input_value,
+                                    dom_id: 'reworks_run_sequence_erp_bom_code',
+                                    value: ''),
+                     OpenStruct.new(type: :replace_inner_html,
+                                    dom_id: 'reworks_run_sequence_pm_boms_products',
+                                    value: [])]
+                  else
+                    [OpenStruct.new(type: :replace_select_options,
+                                    dom_id: 'reworks_run_sequence_fruit_actual_counts_for_pack_id',
+                                    options_array: actual_counts)]
+
+                  end
+        json_actions(actions)
       end
 
       r.on 'std_fruit_size_count_changed' do
@@ -664,21 +672,29 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           actual_counts = interactor.for_select_basic_pack_actual_counts(basic_pack_code_id, std_fruit_size_count_id)
           pm_boms = interactor.for_select_setup_pm_boms(commodity_id, std_fruit_size_count_id, basic_pack_code_id)
         end
-        json_actions([OpenStruct.new(type: :replace_select_options,
-                                     dom_id: 'reworks_run_sequence_fruit_actual_counts_for_pack_id',
-                                     options_array: actual_counts),
-                      OpenStruct.new(type: :replace_select_options,
-                                     dom_id: 'reworks_run_sequence_pm_bom_id',
-                                     options_array: pm_boms),
-                      OpenStruct.new(type: :replace_input_value,
-                                     dom_id: 'reworks_run_sequence_description',
-                                     value: ''),
-                      OpenStruct.new(type: :replace_input_value,
-                                     dom_id: 'reworks_run_sequence_erp_bom_code',
-                                     value: ''),
-                      OpenStruct.new(type: :replace_inner_html,
-                                     dom_id: 'reworks_run_sequence_pm_boms_products',
-                                     value: [])])
+        actions = if AppConst::CR_PROD.require_packaging_bom?
+                    [OpenStruct.new(type: :replace_select_options,
+                                    dom_id: 'reworks_run_sequence_fruit_actual_counts_for_pack_id',
+                                    options_array: actual_counts),
+                     OpenStruct.new(type: :replace_select_options,
+                                    dom_id: 'reworks_run_sequence_pm_bom_id',
+                                    options_array: pm_boms),
+                     OpenStruct.new(type: :replace_input_value,
+                                    dom_id: 'reworks_run_sequence_description',
+                                    value: ''),
+                     OpenStruct.new(type: :replace_input_value,
+                                    dom_id: 'reworks_run_sequence_erp_bom_code',
+                                    value: ''),
+                     OpenStruct.new(type: :replace_inner_html,
+                                    dom_id: 'reworks_run_sequence_pm_boms_products',
+                                    value: [])]
+                  else
+                    [OpenStruct.new(type: :replace_select_options,
+                                    dom_id: 'reworks_run_sequence_fruit_actual_counts_for_pack_id',
+                                    options_array: actual_counts)]
+
+                  end
+        json_actions(actions)
       end
 
       r.on 'actual_count_changed' do
