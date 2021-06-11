@@ -32,24 +32,18 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'debug' do
-        # Perhaps move this to a roda-data_grid method.... (include params in SQL etc.)
-        context = { for_grid_queries: true, route_url: request.path, request_ip: request.ip }
-        interactor = DataminerApp::DataminerInteractor.new(current_user, {}, context, {})
-        res = interactor.show_debug_query("grid-definitions_#{id}")
-        xtra = case r.remaining_path
-               when '/with_params'
-                 "<p>Parameterised list: #{params.inspect}</p>"
-               when '/multi'
-                 "<p>Multiselect list: #{params.inspect}</p>"
-               else
-                 ''
-               end
-        view(inline: <<~HTML)
-          <h2>Debug list: #{res.instance[:caption]}</h2>
-          <p>#{res.instance[:file]}</p>
-          #{xtra}
-          <div>#{sql_to_highlight(res.instance[:sql])}</div>
-        HTML
+        opts = {
+          id: id,
+          deny_access: ->(function, program, permission) { auth_blocked?(function, program.split(','), permission) },
+          has_permission: ->(args) { Crossbeams::Config::UserPermissions.can_user?(current_user, *args) },
+          client_rule_check: ->(args) { Crossbeams::Config::ClientRuleChecker.rule_passed?(*args) },
+          params: params || {}
+        }
+        opts[:multi_key] = params[:key] if r.remaining_path == '/multi'
+
+        hs = render_debug_list(opts) # Change the grid gem to just return raw unformatted data.
+
+        show_page { DM::Admin::Debug.new.call(id, hs) }
       end
 
       r.on 'with_params' do

@@ -4,15 +4,21 @@ module DataminerHelpers
   # @param sql [String] the sql.
   # @return [String] HTML styled for syntax highlighting.
   def sql_to_highlight(sql)
-    ar = sql_add_newlines(sql_format_from_and_where(sql)).split("\n")
-    wrapped_sql = ar.map { |a| wrap_line(a, 120) }
-                    .reject(&:empty?)
-                    .join("\n")
-
     theme     = Rouge::Themes::Github.new
     formatter = Rouge::Formatters::HTMLInline.new(theme)
     lexer     = Rouge::Lexers::SQL.new
-    formatter.format(lexer.lex(wrapped_sql))
+    formatter.format(lexer.lex(wrapped_sql(sql)))
+  end
+
+  # Wrap SQL after inserting linebreaks before keywords.
+  #
+  # @param sql [String] the sql.
+  # @return [String] SQL with newline characters at appropriate places.
+  def wrapped_sql(sql)
+    ar = sql_add_newlines(sql_format_from_and_where(sql)).split("\n")
+    ar.map { |a| wrap_line(a, 120) }
+      .reject(&:empty?)
+      .join("\n")
   end
 
   # Word-wrap a line of text.
