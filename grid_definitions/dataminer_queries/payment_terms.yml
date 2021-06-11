@@ -148,7 +148,7 @@
     :data_type: :number
     :width: 
     :format: :delimited_1000
-    :hide: false
+    :hide: true
     :pinned: 
     :groupable: true
     :group_by_seq: 

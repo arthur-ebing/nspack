@@ -1,7 +1,8 @@
 ---
 :caption: Customer Payment Term Sets
 :sql: "SELECT\r\n    customer_payment_term_sets.id,\r\n    ARRAY_AGG(payment_terms.short_description)
-  AS customer_payment_term_set,\r\n    customer_payment_term_sets.customer_id,\r\n
+  AS customer_payment_term_set,\r\n    ARRAY_AGG(payment_terms.long_description) AS
+  customer_payment_term_set_description,\r\n    customer_payment_term_sets.customer_id,\r\n
   \   fn_party_role_name(customers.customer_party_role_id) AS customer,\r\n    customer_payment_term_sets.incoterm_id,\r\n
   \   incoterms.incoterm,\r\n    customer_payment_term_sets.deal_type_id,\r\n    deal_types.deal_type,\r\n
   \   customer_payment_term_sets.active,\r\n    customer_payment_term_sets.created_at,\r\n
@@ -50,9 +51,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  customer_payment_term_set_description:
+    :name: customer_payment_term_set_description
+    :sequence_no: 3
+    :caption: Customer payment term set description
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   customer_id:
     :name: customer_id
-    :sequence_no: 3
+    :sequence_no: 4
     :caption: Customer
     :namespaced_name: customer_payment_term_sets.customer_id
     :data_type: :string
@@ -68,7 +85,7 @@
     :group_max: false
   customer:
     :name: customer
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Customer
     :namespaced_name: 
     :data_type: :string
@@ -84,7 +101,7 @@
     :group_max: false
   incoterm_id:
     :name: incoterm_id
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Incoterm
     :namespaced_name: customer_payment_term_sets.incoterm_id
     :data_type: :integer
@@ -100,7 +117,7 @@
     :group_max: false
   incoterm:
     :name: incoterm
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Incoterm
     :namespaced_name: incoterms.incoterm
     :data_type: :string
@@ -116,7 +133,7 @@
     :group_max: false
   deal_type_id:
     :name: deal_type_id
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Deal type
     :namespaced_name: customer_payment_term_sets.deal_type_id
     :data_type: :integer
@@ -132,7 +149,7 @@
     :group_max: false
   deal_type:
     :name: deal_type
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Deal type
     :namespaced_name: deal_types.deal_type
     :data_type: :string
@@ -148,7 +165,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Active
     :namespaced_name: customer_payment_term_sets.active
     :data_type: :boolean
@@ -164,7 +181,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Created at
     :namespaced_name: customer_payment_term_sets.created_at
     :data_type: :datetime
@@ -180,7 +197,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Updated at
     :namespaced_name: customer_payment_term_sets.updated_at
     :data_type: :datetime
@@ -196,7 +213,7 @@
     :group_max: false
   status:
     :name: status
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Status
     :namespaced_name: 
     :data_type: :string

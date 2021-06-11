@@ -20,7 +20,7 @@ module UiRules
       fields[:long_description] = { renderer: :label }
       fields[:percentage] = { renderer: :label }
       fields[:days] = { renderer: :label }
-      fields[:amount_per_carton] = { renderer: :label }
+      fields[:amount_per_carton] = { renderer: :label, hide_on_load: true }
       fields[:for_liquidation] = { renderer: :label,
                                    as_boolean: true }
       fields[:active] = { renderer: :label,
@@ -38,7 +38,7 @@ module UiRules
         long_description: {},
         percentage: {},
         days: {},
-        amount_per_carton: {},
+        amount_per_carton: { hide_on_load: true },
         for_liquidation: { renderer: :checkbox }
       }
     end
