@@ -29,23 +29,23 @@ module FinishedGoodsApp
       compile_order_items_from_pallet_sequences.each do |order_item|
         order_item_id = nil
         pallet_sequence_ids = order_item.delete(:pallet_sequence_ids)
-        treatment_ids = Array(order_item[:treatment_ids] || [0])
-        treatment_ids.sort.each do |treatment_id|
-          order_item[:treatment_id] = treatment_id.zero? ? nil : treatment_id
-          order_item = OrderItemSchema.call(order_item).to_h
-          next unless current_order_items
+        # treatment_ids = Array(order_item[:treatment_ids] || [0])
+        # treatment_ids.sort.each do |treatment_id|
+        #   order_item[:treatment_id] = treatment_id.zero? ? nil : treatment_id
+        order_item = OrderItemSchema.call(order_item).to_h
+        next unless current_order_items
 
-          current_order_items.each do |item|
-            item = OrderItemSchema.call(item).to_h
+        current_order_items.each do |item|
+          item = OrderItemSchema.call(item).to_h
 
-            item_id = item.delete(:id)
-            compare = item.compact.reject { |k| %i[order_id carton_quantity price_per_carton price_per_kg].include?(k) }
-            if order_item.slice(*compare.keys) == compare
-              order_item_id = item_id
-              break
-            end
+          item_id = item.delete(:id)
+          compare = item.compact.reject { |k| %i[order_id carton_quantity price_per_carton price_per_kg].include?(k) }
+          if order_item.slice(*compare.keys) == compare
+            order_item_id = item_id
+            break
           end
         end
+        # end
 
         order_item_id ||= create_order_item(order_item)
         link_order_items_pallet_sequences(order_item_id, pallet_sequence_ids)

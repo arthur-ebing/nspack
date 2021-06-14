@@ -97,7 +97,6 @@ module FinishedGoodsApp
       )
       return nil if hash.nil?
 
-      hash[:order] = get(:orders, hash[:order_id], :internal_order_number)
       OrderItem.new(hash)
     end
 
@@ -125,15 +124,53 @@ module FinishedGoodsApp
       update(:order_items, id, { column => value })
     end
 
-    def allocate_to_order_item(id, allocate_sequence_ids, user)
+    def allocate_to_order_item(id, allocate_pallet_ids, user)
       load_id = get(:order_items, id, :load_id)
       pallet_sequence_ids = select_values(:order_items_pallet_sequences, :pallet_sequence_id, order_item_id: id)
       current_allocation = select_values(:pallet_sequences, :pallet_number, id: pallet_sequence_ids)
-      new_allocation = select_values(:pallet_sequences, :pallet_number, id: allocate_sequence_ids)
+      new_allocation = select_values(:pallets, :pallet_number, id: allocate_pallet_ids)
 
       LoadRepo.new.unallocate_pallets(current_allocation - new_allocation, user)
       LoadRepo.new.allocate_pallets(load_id, new_allocation - current_allocation, user)
       FinishedGoodsApp::ProcessOrderLines.call(user, load_id: load_id)
+    end
+
+    def find_pallets_for_order_item(id) # rubocop:disable Metrics/AbcSize
+      order_item = find_order_item(id)
+      params = {
+        load_id: order_item.load_id,
+        packed_tm_group_id: order_item.packed_tm_group_id,
+        marketing_org_party_role_id: order_item.marketing_org_party_role_id,
+        target_customer_party_role_id: order_item.target_customer_party_role_id,
+        commodity_id: order_item.commodity_id,
+        basic_pack_code_id: order_item.basic_pack_id,
+        standard_pack_code_id: order_item.standard_pack_id,
+        fruit_actual_counts_for_pack_id: order_item.actual_count_id,
+        fruit_size_reference_id: order_item.size_reference_id,
+        grade_id: order_item.grade_id,
+        mark_id: order_item.mark_id,
+        marketing_variety_id: order_item.marketing_variety_id,
+        inventory_code_id: order_item.inventory_id,
+        sell_by_code: order_item.sell_by_code,
+        pallet_format_id: order_item.pallet_format_id,
+        pm_mark_id: order_item.pm_mark_id,
+        pm_bom_id: order_item.pm_bom_id,
+        rmt_class_id: order_item.rmt_class_id
+      }
+
+      load_id = params.delete(:load_id)
+
+      pallet_ids = DB[:pallet_sequences]
+                   .join(:cultivars, id: :cultivar_id)
+                   .join(:commodities, id: :commodity_id)
+                   .where(params.compact)
+                   .select_map(:pallet_id)
+
+      ids = DB[:pallets]
+            .where(in_stock: true, id: pallet_ids)
+            .where(Sequel.lit("load_id is null OR load_id = #{load_id}"))
+            .distinct.select_map(:id) + [0]
+      [load_id, ids]
     end
   end
 end

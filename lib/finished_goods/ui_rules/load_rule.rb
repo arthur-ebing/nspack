@@ -3,11 +3,9 @@
 module UiRules
   class LoadRule < Base # rubocop:disable Metrics/ClassLength
     def generate_rules
-      @repo = FinishedGoodsApp::LoadRepo.new
-      @party_repo = MasterfilesApp::PartyRepo.new
       make_form_object
-
       apply_form_values
+      append_allocatable_pallets if %i[allocate].include? @mode
 
       add_progress_step
       add_controls
@@ -123,46 +121,69 @@ module UiRules
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize
+      on_order = !@form_object.order_id.nil?
+      customer_label = { renderer: :label,
+                         caption: 'Customer',
+                         with_value: @party_repo.fn_party_role_name(@form_object.customer_party_role_id),
+                         include_hidden_field: true,
+                         hidden_value: @form_object.customer_party_role_id }
+      customer_select = { renderer: :select,
+                          options: @party_repo.for_select_party_roles(AppConst::ROLE_CUSTOMER),
+                          disabled_options: @party_repo.for_select_inactive_party_roles(AppConst::ROLE_CUSTOMER),
+                          caption: 'Customer',
+                          required: true,
+                          prompt: true }
+      exporter_label = { renderer: :label,
+                         caption: 'Exporter',
+                         with_value: @party_repo.fn_party_role_name(@form_object.exporter_party_role_id),
+                         include_hidden_field: true,
+                         hidden_value: @form_object.exporter_party_role_id }
+      exporter_select = { renderer: :select,
+                          options: @party_repo.for_select_party_roles(AppConst::ROLE_EXPORTER),
+                          disabled_options: @party_repo.for_select_inactive_party_roles(AppConst::ROLE_EXPORTER),
+                          caption: 'Exporter',
+                          required: true,
+                          prompt: true }
+      final_receiver_label = { renderer: :label,
+                               caption: 'Exporter',
+                               with_value: @party_repo.fn_party_role_name(@form_object.final_receiver_party_role_id),
+                               include_hidden_field: true,
+                               hidden_value: @form_object.final_receiver_party_role_id }
+      final_receiver_select = { renderer: :select,
+                                options: @party_repo.for_select_party_roles(AppConst::ROLE_FINAL_RECEIVER),
+                                disabled_options: @party_repo.for_select_inactive_party_roles(AppConst::ROLE_FINAL_RECEIVER),
+                                caption: 'Final Receiver',
+                                required: true,
+                                prompt: true }
+
       { # Parties
-        customer_party_role_id: { renderer: :select,
-                                  options: @party_repo.for_select_party_roles(AppConst::ROLE_CUSTOMER),
-                                  disabled_options: @party_repo.for_select_inactive_party_roles(AppConst::ROLE_CUSTOMER),
-                                  caption: 'Customer',
-                                  required: true,
-                                  prompt: true },
+        customer_party_role_id: on_order ? customer_label : customer_select,
+        exporter_party_role_id: on_order ? exporter_label : exporter_select,
+        final_receiver_party_role_id: on_order ? final_receiver_label : final_receiver_select,
+
         billing_client_party_role_id: { renderer: :select,
                                         options: @party_repo.for_select_party_roles(AppConst::ROLE_BILLING_CLIENT),
                                         disabled_options: @party_repo.for_select_inactive_party_roles(AppConst::ROLE_BILLING_CLIENT),
                                         caption: 'Billing Client',
                                         required: true,
                                         prompt: true },
-        exporter_party_role_id: { renderer: :select,
-                                  options: @party_repo.for_select_party_roles(AppConst::ROLE_EXPORTER),
-                                  disabled_options: @party_repo.for_select_inactive_party_roles(AppConst::ROLE_EXPORTER),
-                                  caption: 'Exporter',
-                                  required: true,
-                                  prompt: true },
         consignee_party_role_id: { renderer: :select,
                                    options: @party_repo.for_select_party_roles(AppConst::ROLE_CONSIGNEE),
                                    disabled_options: @party_repo.for_select_inactive_party_roles(AppConst::ROLE_CONSIGNEE),
                                    caption: 'Consignee',
                                    required: true,
                                    prompt: true },
-        final_receiver_party_role_id: { renderer: :select,
-                                        options: @party_repo.for_select_party_roles(AppConst::ROLE_FINAL_RECEIVER),
-                                        disabled_options: @party_repo.for_select_inactive_party_roles(AppConst::ROLE_FINAL_RECEIVER),
-                                        caption: 'Final Receiver',
-                                        required: true,
-                                        prompt: true },
         status: { renderer: :label },
 
         # Load Details
         id: { renderer: :label,
               caption: 'Load' },
         load_id: { hide_on_load: true },
-        order_id: { hide_on_load: @form_object.order_id.nil? },
-        order_number: { caption: 'Internal Order Number' },
-        customer_order_number: {},
+        order_id: { initially_visible: on_order,
+                    readonly: on_order },
+        order_number: { caption: 'Internal Order Number',
+                        readonly: on_order },
+        customer_order_number: { readonly: on_order },
         customer_reference: {},
         depot_id: { renderer: :select,
                     options: MasterfilesApp::DepotRepo.new.for_select_depots,
@@ -171,7 +192,7 @@ module UiRules
                     required: true },
         rmt_load: { renderer: :checkbox,
                     caption: 'RMT Load',
-                    hide_on_load: @form_object.allocated,
+                    hide_on_load: @form_object.allocated || on_order,
                     as_boolean: true },
         exporter_certificate_code: {},
         edi_file_name: { renderer: :label },
@@ -254,6 +275,9 @@ module UiRules
     end
 
     def make_form_object
+      @repo = FinishedGoodsApp::LoadRepo.new
+      @party_repo = MasterfilesApp::PartyRepo.new
+
       if @mode == :new
         make_new_form_object
         return
@@ -262,6 +286,10 @@ module UiRules
       hash = @repo.find_load(@options[:id]).to_h
       hash[:pallet_list] = nil
       @form_object = OpenStruct.new(hash)
+    end
+
+    def append_allocatable_pallets
+      @form_object.pallet_ids = @repo.find_pallets_for_for_load(@options[:id])
     end
 
     def make_new_form_object

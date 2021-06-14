@@ -115,6 +115,7 @@ module FinishedGoodsApp
         order_number: 'ABC',
         remarks: 'ABC',
         contact_person_ids: [contact_party_role_id],
+        pricing_per_kg: false,
         active: true
       }
     end

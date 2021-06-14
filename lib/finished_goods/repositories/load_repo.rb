@@ -2,7 +2,12 @@
 
 module FinishedGoodsApp
   class LoadRepo < BaseRepo # rubocop:disable Metrics/ClassLength
-    crud_calls_for :loads, name: :load
+    crud_calls_for :loads, name: :load, exclude: [:delete]
+
+    def delete_load(id)
+      DB[:orders_loads].where(load_id: id).delete
+      delete(:loads, id)
+    end
 
     def for_select_loads(where: {}, exclude: {}, active: true)
       DB[:loads]
@@ -214,6 +219,28 @@ module FinishedGoodsApp
         .where(in_stock: false, packed_tm_group_id: tm_id, shipped: false)
         .distinct
         .select_map(:pallet_id)
+    end
+
+    def find_pallets_for_for_load(id) # rubocop:disable Metrics/AbcSize
+      load = find_load(id)
+      params = {
+        packed_tm_group_id: load.packed_tm_group_id,
+        marketing_org_party_role_id: load.marketing_org_party_role_id,
+        target_customer_party_role_id: load.target_customer_party_role_id,
+        rmt_grade: load.rmt_load
+      }
+
+      pallet_ids = DB[:pallet_sequences]
+                   .join(:cultivars, id: :cultivar_id)
+                   .join(:commodities, id: :commodity_id)
+                   .join(:grades, id: Sequel[:pallet_sequences][:grade_id])
+                   .where(params.compact)
+                   .select_map(:pallet_id)
+
+      DB[:pallets]
+        .where(in_stock: true, id: pallet_ids)
+        .where(Sequel.lit("load_id is null OR load_id = #{id}"))
+        .distinct.select_map(:id) + [0]
     end
   end
 end

@@ -52,7 +52,8 @@ module FinishedGoodsApp
         remarks: Faker::Lorem.word,
         active: true,
         created_at: '2010-01-01 12:00',
-        updated_at: '2010-01-01 12:00'
+        updated_at: '2010-01-01 12:00',
+        pricing_per_kg: false
       }
       DB[:orders].insert(default.merge(opts))
     end

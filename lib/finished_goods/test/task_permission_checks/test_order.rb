@@ -44,6 +44,7 @@ module FinishedGoodsApp
         order_number: 'ABC',
         contact_person_ids: [1],
         remarks: 'ABC',
+        pricing_per_kg: false,
         active: true
       }
       FinishedGoodsApp::Order.new(base_attrs.merge(attrs))

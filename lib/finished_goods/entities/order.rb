@@ -36,7 +36,7 @@ module FinishedGoodsApp
     attribute :internal_order_number, Types::String
     attribute :order_number, Types::String
     attribute :remarks, Types::String
-    attribute :contact_person_ids, Types::IntArray
+    attribute :pricing_per_kg, Types::Bool
     attribute? :status, Types::String
     attribute? :active, Types::Bool
   end
@@ -45,7 +45,6 @@ module FinishedGoodsApp
     attribute :id, Types::Integer
     attribute :order_id, Types::Integer
     attribute :load_id, Types::Integer
-    attribute :order, Types::Integer
     attribute :packed_tm_group_id, Types::Integer
     attribute :marketing_org_party_role_id, Types::Integer
     attribute :target_customer_party_role_id, Types::Integer

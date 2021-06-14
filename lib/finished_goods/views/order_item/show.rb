@@ -16,8 +16,8 @@ module FinishedGoods
               form.view_only!
               form.row do |row|
                 row.column do |col|
-                  col.add_field :order
-                  col.add_field :load
+                  col.add_field :order_id
+                  col.add_field :load_id
                   col.add_field :commodity
                   col.add_field :basic_pack
                   col.add_field :standard_pack
@@ -34,8 +34,8 @@ module FinishedGoods
                   col.add_field :price_per_kg
                   col.add_field :sell_by_code
                   col.add_field :pallet_format
-                  col.add_field :pm_mark
-                  col.add_field :pm_bom
+                  col.add_field :pkg_mark
+                  col.add_field :pkg_bom
                   col.add_field :rmt_class
                   col.add_field :treatment
                   col.add_field :active

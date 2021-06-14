@@ -47,12 +47,10 @@ module FinishedGoods
                                can_be_cleared: true,
                                multiselect_url: "/finished_goods/dispatch/loads/#{id}/allocate_multiselect",
                                multiselect_key: ui_rule.form_object.rmt_load ? 'allocate_palbins' : 'allocate_pallets',
-                               height: 40,
+                               height: 30,
                                multiselect_params: {
-                                 load_id: id,
-                                 packed_tm_group_id: ui_rule.form_object.packed_tm_group_id,
-                                 marketing_org_party_role_id: ui_rule.form_object.marketing_org_party_role_id,
-                                 target_customer_party_role_id: ui_rule.form_object.target_customer_party_role_id
+                                 id: id,
+                                 pallet_ids: ui_rule.form_object.pallet_ids
                                })
             end
           end

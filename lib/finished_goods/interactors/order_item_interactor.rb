@@ -13,7 +13,7 @@ module FinishedGoodsApp
         log_transaction
       end
       instance = order_item(id)
-      success_response("Created order item #{instance.sell_by_code}", instance)
+      success_response("Created order item #{instance.id}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { sell_by_code: ['This order item already exists'] }))
     rescue Crossbeams::InfoError => e
@@ -29,7 +29,7 @@ module FinishedGoodsApp
         log_transaction
       end
       instance = order_item(id)
-      success_response("Updated order item #{instance.sell_by_code}", instance)
+      success_response("Updated order item #{instance.id}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -63,7 +63,7 @@ module FinishedGoodsApp
     end
 
     def delete_order_item(id) # rubocop:disable Metrics/AbcSize
-      name = order_item(id).sell_by_code
+      name = order_item(id).id
       repo.transaction do
         repo.delete_order_item(id)
         log_status(:order_items, id, 'DELETED')
@@ -74,6 +74,10 @@ module FinishedGoodsApp
       failed_response(e.message)
     rescue Sequel::ForeignKeyConstraintViolation => e
       failed_response("Unable to delete order item. It is still referenced#{e.message.partition('referenced').last}")
+    end
+
+    def find_pallets_for_order_item(id)
+      repo.find_pallets_for_order_item(id)
     end
 
     def assert_permission!(task, id = nil)

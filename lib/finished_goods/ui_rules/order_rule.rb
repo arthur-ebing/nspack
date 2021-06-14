@@ -36,6 +36,7 @@ module UiRules
       fields[:customer_order_number] = { renderer: :label }
       fields[:internal_order_number] = { renderer: :label }
       fields[:remarks] = { renderer: :label }
+      fields[:pricing_per_kg] = { renderer: :label, as_boolean: true }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
@@ -45,7 +46,7 @@ module UiRules
       @repo = FinishedGoodsApp::OrderRepo.new
 
       customer_id = @repo.get_id(:customers, customer_party_role_id: @form_object.customer_party_role_id)
-      contact_person_ids = @repo.get(:customers, customer_id, :contact_person_ids).to_a
+      contact_person_ids, currency_ids = @repo.get(:customers, customer_id, %i[contact_person_ids currency_ids])
       deal_type_ids = @repo.select_values(:customer_payment_term_sets, :deal_type_id, customer_id: customer_id)
       incoterm_ids = @repo.select_values(:customer_payment_term_sets, :incoterm_id, customer_id: customer_id)
 
@@ -65,14 +66,14 @@ module UiRules
         contact_party_role_id: { renderer: :select,
                                  options: @party_repo.for_select_party_roles(
                                    AppConst::ROLE_CUSTOMER_CONTACT_PERSON,
-                                   where: { id: contact_person_ids }
+                                   where: { id: Array(contact_person_ids) }
                                  ),
                                  disabled_options: @party_repo.for_select_inactive_party_roles(AppConst::ROLE_CUSTOMER_CONTACT_PERSON),
                                  caption: 'Contact Person',
                                  prompt: true,
                                  required: true },
         currency_id: { renderer: :select,
-                       options: @finance_repo.for_select_currencies,
+                       options: @finance_repo.for_select_currencies(where: { id: Array(currency_ids) }),
                        disabled_options: @finance_repo.for_select_inactive_currencies,
                        caption: 'Currency',
                        prompt: true,
@@ -130,7 +131,8 @@ module UiRules
                                         required: true },
         customer_order_number: {},
         internal_order_number: {},
-        remarks: {}
+        remarks: {},
+        pricing_per_kg: { renderer: :checkbox }
       }
     end
 
@@ -148,7 +150,7 @@ module UiRules
       @form_object = OpenStruct.new(order_type_id: @repo.get_id(:order_types, order_type: 'SALES_ORDER'),
                                     customer_party_role_id: nil,
                                     contact_party_role_id: nil,
-                                    currency_id: @repo.get_id(:currencies, currency: 'ZAR'),
+                                    currency_id: nil,
                                     deal_type_id: nil,
                                     incoterm_id: nil,
                                     customer_payment_term_set_id: nil,
@@ -163,7 +165,8 @@ module UiRules
                                     completed_at: nil,
                                     customer_order_number: nil,
                                     internal_order_number: nil,
-                                    remarks: nil)
+                                    remarks: nil,
+                                    pricing_per_kg: nil)
     end
 
     def handle_behaviour
@@ -262,7 +265,9 @@ module UiRules
       form_object_merge!(params)
       @form_object[:customer_party_role_id] = params[:changed_value].to_i
       fields = common_fields
-      default_currency_id = @repo.get_value(:customers, :default_currency_id, customer_party_role_id: @form_object.customer_party_role_id)
+      # default_currency_value = @repo.get_value(:customers, :default_currency_id, customer_party_role_id: @form_object.customer_party_role_id)
+      party_id = MasterfilesApp::PartyRepo.new.find_party_role(params[:changed_value].to_i)&.party_id
+      receiver_value = MasterfilesApp::PartyRepo.new.party_role_id_from_role_and_party_id(AppConst::ROLE_FINAL_RECEIVER, party_id)
 
       json_actions([OpenStruct.new(type: :replace_select_options,
                                    dom_id: 'order_contact_party_role_id',
@@ -274,8 +279,11 @@ module UiRules
                                    dom_id: 'order_incoterm_id',
                                    options_array: fields[:incoterm_id][:options]),
                     OpenStruct.new(type: :change_select_value,
+                                   dom_id: 'order_final_receiver_party_role_id',
+                                   value: receiver_value),
+                    OpenStruct.new(type: :replace_select_options,
                                    dom_id: 'order_currency_id',
-                                   value: default_currency_id)])
+                                   options_array: fields[:currency_id][:options])])
     end
 
     def deal_type_changed # rubocop:disable Metrics/AbcSize

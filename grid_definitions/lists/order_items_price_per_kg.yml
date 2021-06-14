@@ -42,18 +42,18 @@
       :val: "$:order_id$"
 :hide_for_client:
   hb:
-    - price_per_kg
+    - price_per_carton
   um:
-    - price_per_kg
+    - price_per_carton
   ud:
-    - price_per_kg
+    - price_per_carton
   sr:
-    - price_per_kg
+    - price_per_carton
   srp:
-    - price_per_kg
+    - price_per_carton
   hl:
-    - price_per_kg
+    - price_per_carton
   sr2:
-    - price_per_kg
+    - price_per_carton
   kr:
-    - price_per_kg
+    - price_per_carton

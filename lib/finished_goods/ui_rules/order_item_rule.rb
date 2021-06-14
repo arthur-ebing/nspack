@@ -15,8 +15,8 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      fields[:order] = { renderer: :label }
-      fields[:load] = { renderer: :label }
+      fields[:order_id] = { renderer: :label }
+      fields[:load_id] = { renderer: :label }
       fields[:commodity] = { renderer: :label }
       fields[:basic_pack] = { renderer: :label }
       fields[:standard_pack] = { renderer: :label }
@@ -31,10 +31,10 @@ module UiRules
       fields[:price_per_kg] = { renderer: :label }
       fields[:sell_by_code] = { renderer: :label }
       fields[:pallet_format] = { renderer: :label }
-      fields[:pm_mark] = { renderer: :label,
-                           caption: 'PKG Mark' }
-      fields[:pm_bom] = { renderer: :label,
-                          caption: 'PKG BOM' }
+      fields[:pkg_mark] = { renderer: :label,
+                            caption: 'PKG Mark' }
+      fields[:pkg_bom] = { renderer: :label,
+                           caption: 'PKG BOM' }
       fields[:rmt_class] = { renderer: :label,
                              caption: 'RMT Class' }
       fields[:treatment] = { renderer: :label, hide_on_load: true }
@@ -115,9 +115,7 @@ module UiRules
                         caption: 'Inventory',
                         required: true,
                         prompt: true },
-        carton_quantity: {
-          required: true
-        },
+        carton_quantity: { required: true },
         price_per_carton: {},
         price_per_kg: {},
         sell_by_code: {},

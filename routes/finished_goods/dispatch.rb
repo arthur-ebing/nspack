@@ -373,7 +373,7 @@ class Nspack < Roda
       r.on 'allocate_multiselect' do
         check_auth!('dispatch', 'edit')
         interactor.assert_permission!(:edit, id)
-        pallet_numbers = BaseRepo.new.select_values(:pallet_sequences, :pallet_number, id: multiselect_grid_choices(params)).uniq
+        pallet_numbers = BaseRepo.new.select_values(:pallets, :pallet_number, id: multiselect_grid_choices(params)).uniq
         res = interactor.allocate_multiselect(id, pallet_numbers)
         flash[res.success ? :notice : :error] = res.message
         r.redirect request.referer

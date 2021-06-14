@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/BlockLength
 module FinishedGoods
   module Orders
     module Order
@@ -8,7 +9,7 @@ module FinishedGoods
           ui_rule = UiRules::Compiler.new(:order, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
+          layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
@@ -36,6 +37,7 @@ module FinishedGoods
                   col.add_field :customer_order_number
                   col.add_field :internal_order_number
                   col.add_field :remarks
+                  col.add_field :pricing_per_kg
                 end
               end
             end
@@ -47,3 +49,4 @@ module FinishedGoods
     end
   end
 end
+# rubocop:enable Metrics/BlockLength

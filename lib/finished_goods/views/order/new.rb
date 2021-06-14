@@ -35,6 +35,7 @@ module FinishedGoods
                   col.add_field :customer_order_number
                   col.add_field :internal_order_number
                   col.add_field :remarks
+                  col.add_field :pricing_per_kg
                 end
               end
             end
