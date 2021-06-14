@@ -562,39 +562,23 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def update_reworks_run_pallet_sequence(params)  # rubocop:disable Metrics/AbcSize,  Metrics/CyclomaticComplexity
-      if AppConst::CLIENT_CODE == 'kr'
-        # if params[:standard_pack_code_id].to_i.nonzero?.nil?
-        standard_pack_code_id = standard_pack_code_id(params[:fruit_actual_counts_for_pack_id], params[:basic_pack_code_id])
-        return failed_response(standard_pack_code_id) if standard_pack_code_id.is_a? String
-
-        params = params.merge(standard_pack_code_id: standard_pack_code_id)
-        # end
+    def update_reworks_run_pallet_sequence(params)  # rubocop:disable Metrics/AbcSize
+      if AppConst::CR_MF.basic_pack_equals_standard_pack?
+        standard_pack_id = repo.get_value(:basic_packs_standard_packs, :standard_pack_id, basic_pack_id: params[:basic_pack_code_id])
+        params[:standard_pack_code_id] = standard_pack_id
       end
 
       res = validate_reworks_run_pallet_sequence_params(params)
       return validation_failed_response(res) if res.failure?
       return failed_response('You did not choose a Size Reference or Actual Count') if params[:fruit_size_reference_id].to_i.nonzero?.nil? && params[:fruit_actual_counts_for_pack_id].to_i.nonzero?.nil?
 
+      res = res.to_h.merge(fruit_actual_counts_for_pack_id: fruit_actual_counts_for_pack_id(res[:basic_pack_code_id], res[:std_fruit_size_count_id]))
       rejected_fields = %i[id product_setup_template_id pallet_label_name]
       attrs = res.to_h.reject { |k, _| rejected_fields.include?(k) }
 
       success_response('Ok', attrs)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
-    end
-
-    def standard_pack_code_id(fruit_actual_counts_for_pack_id, basic_pack_code_id)  # rubocop:disable Metrics/AbcSize
-      if fruit_actual_counts_for_pack_id.to_i.nonzero?.nil?
-        standard_pack_code_id = prod_setup_repo.basic_pack_standard_pack_code_id(basic_pack_code_id) unless basic_pack_code_id.to_i.nonzero?.nil?
-        return 'Cannot find Standard Pack' if standard_pack_code_id.nil?
-      else
-        standard_pack_code_ids = MasterfilesApp::FruitSizeRepo.new.find_fruit_actual_counts_for_pack(fruit_actual_counts_for_pack_id).standard_pack_code_ids
-        return 'There is a 1 to many relationship between the Actual Count and Standard Pack' unless standard_pack_code_ids.size.==1
-
-        standard_pack_code_id = standard_pack_code_ids[0]
-      end
-      standard_pack_code_id
     end
 
     def recalc_marketing_attrs?(params)
@@ -1178,19 +1162,29 @@ module ProductionApp
     end
 
     def for_select_basic_pack_actual_counts(basic_pack_code_id, std_fruit_size_count_id)
-      MasterfilesApp::FruitSizeRepo.new.for_select_fruit_actual_counts_for_packs(
+      fruit_size_repo.for_select_fruit_actual_counts_for_packs(
         where: { basic_pack_code_id: basic_pack_code_id, std_fruit_size_count_id: std_fruit_size_count_id }
       )
+    end
+
+    def fruit_actual_counts_for_pack_id(basic_pack_code_id, std_fruit_size_count_id)
+      args = { basic_pack_code_id: basic_pack_code_id, std_fruit_size_count_id: std_fruit_size_count_id }
+      repo.get_value(:fruit_actual_counts_for_packs, :id, args)
     end
 
     def for_select_actual_count_standard_pack_codes(standard_pack_ids)
       return [] if standard_pack_ids.empty?
 
-      MasterfilesApp::FruitSizeRepo.new.for_select_standard_packs(where: { id: standard_pack_ids })
+      fruit_size_repo.for_select_standard_packs(where: { id: standard_pack_ids })
     end
 
-    def for_select_actual_count_size_references(size_reference_ids)
-      MasterfilesApp::FruitSizeRepo.new.for_select_fruit_size_references(where: { id: size_reference_ids }) || MasterfilesApp::FruitSizeRepo.new.for_select_fruit_size_references
+    def for_select_standard_pack_codes(requires_standard_counts, basic_pack_code_id, standard_pack_ids)
+      args = requires_standard_counts ? { id: standard_pack_ids } : { basic_pack_code_id: basic_pack_code_id }
+      fruit_size_repo.for_select_standard_packs(where: args)
+    end
+
+    def for_select_actual_count_size_references(requires_standard_counts, size_reference_ids)
+      requires_standard_counts ? fruit_size_repo.for_select_fruit_size_references(where: { id: size_reference_ids }) : fruit_size_repo.for_select_fruit_size_references
     end
 
     def for_select_customer_varieties(packed_tm_group_id, marketing_variety_id)
@@ -1322,6 +1316,10 @@ module ProductionApp
 
     def prod_setup_repo
       @prod_setup_repo ||= ProductionApp::ProductSetupRepo.new
+    end
+
+    def fruit_size_repo
+      @fruit_size_repo ||= MasterfilesApp::FruitSizeRepo.new
     end
 
     def reworks_run(id)

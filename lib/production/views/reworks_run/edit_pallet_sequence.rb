@@ -41,7 +41,7 @@ module Production
                     fold.add_field :marketing_variety_id
                     fold.add_field :std_fruit_size_count_id
                     fold.add_field :basic_pack_code_id
-                    fold.add_field :fruit_actual_counts_for_pack_id
+                    fold.add_field :actual_count
                     fold.add_field :standard_pack_code_id
                     fold.add_field :fruit_size_reference_id
                     fold.add_field :rmt_class_id

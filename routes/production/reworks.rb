@@ -628,18 +628,26 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.on 'basic_pack_code_changed' do
         commodity_id = params[:reworks_run_sequence_commodity_id]
         std_fruit_size_count_id = params[:reworks_run_sequence_std_fruit_size_count_id]
-        if commodity_id.blank? || std_fruit_size_count_id.blank? || params[:changed_value].blank?
-          actual_counts = []
+        basic_pack_code_id = params[:changed_value]
+        if commodity_id.blank? || std_fruit_size_count_id.blank? || basic_pack_code_id.blank?
+          actual_count = nil
+          standard_pack_codes = []
+          size_references = []
           pm_boms = []
         else
-          basic_pack_code_id = params[:changed_value]
-          actual_counts = interactor.for_select_basic_pack_actual_counts(basic_pack_code_id, std_fruit_size_count_id)
+          commodity = MasterfilesApp::CommodityRepo.new.find_commodity(commodity_id)
+          requires_standard_counts = commodity.requires_standard_counts
+          fruit_actual_counts_for_pack_id = interactor.fruit_actual_counts_for_pack_id(basic_pack_code_id, std_fruit_size_count_id)
+
+          actual_count = MasterfilesApp::FruitSizeRepo.new.find_fruit_actual_counts_for_pack(fruit_actual_counts_for_pack_id)
+          standard_pack_codes = interactor.for_select_standard_pack_codes(requires_standard_counts, basic_pack_code_id, actual_count&.standard_pack_code_ids.to_a)
+          size_references = interactor.for_select_actual_count_size_references(requires_standard_counts, actual_count&.size_reference_ids.to_a)
           pm_boms = interactor.for_select_setup_pm_boms(commodity_id, std_fruit_size_count_id, basic_pack_code_id)
         end
         actions = if AppConst::CR_PROD.require_packaging_bom?
-                    [OpenStruct.new(type: :replace_select_options,
-                                    dom_id: 'reworks_run_sequence_fruit_actual_counts_for_pack_id',
-                                    options_array: actual_counts),
+                    [OpenStruct.new(type: :replace_input_value,
+                                    dom_id: 'reworks_run_sequence_actual_count',
+                                    value: actual_count&.actual_count_for_pack),
                      OpenStruct.new(type: :replace_select_options,
                                     dom_id: 'reworks_run_sequence_pm_bom_id',
                                     options_array: pm_boms),
@@ -653,29 +661,45 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                     dom_id: 'reworks_run_sequence_pm_boms_products',
                                     value: [])]
                   else
-                    [OpenStruct.new(type: :replace_select_options,
-                                    dom_id: 'reworks_run_sequence_fruit_actual_counts_for_pack_id',
-                                    options_array: actual_counts)]
+                    [OpenStruct.new(type: :replace_input_value,
+                                    dom_id: 'reworks_run_sequence_actual_count',
+                                    value: actual_count&.actual_count_for_pack)]
 
                   end
+        unless AppConst::CR_MF.basic_pack_equals_standard_pack?
+          actions << OpenStruct.new(type: :replace_select_options,
+                                    dom_id: 'reworks_run_sequence_standard_pack_code_id',
+                                    options_array: standard_pack_codes)
+          actions << OpenStruct.new(type: :replace_select_options,
+                                    dom_id: 'reworks_run_sequence_fruit_size_reference_id',
+                                    options_array: size_references)
+        end
         json_actions(actions)
       end
 
       r.on 'std_fruit_size_count_changed' do
         commodity_id = params[:reworks_run_sequence_commodity_id]
         basic_pack_code_id = params[:reworks_run_sequence_basic_pack_code_id]
-        if commodity_id.blank? || basic_pack_code_id.blank? || params[:changed_value].blank?
-          actual_counts = []
+        std_fruit_size_count_id = params[:changed_value]
+        if commodity_id.blank? || basic_pack_code_id.blank? || std_fruit_size_count_id.blank?
+          actual_count = nil
+          standard_pack_codes = []
+          size_references = []
           pm_boms = []
         else
-          std_fruit_size_count_id = params[:changed_value]
-          actual_counts = interactor.for_select_basic_pack_actual_counts(basic_pack_code_id, std_fruit_size_count_id)
+          commodity = MasterfilesApp::CommodityRepo.new.find_commodity(commodity_id)
+          requires_standard_counts = commodity.requires_standard_counts
+          fruit_actual_counts_for_pack_id = interactor.fruit_actual_counts_for_pack_id(basic_pack_code_id, std_fruit_size_count_id)
+
+          actual_count = MasterfilesApp::FruitSizeRepo.new.find_fruit_actual_counts_for_pack(fruit_actual_counts_for_pack_id)
+          standard_pack_codes = interactor.for_select_standard_pack_codes(requires_standard_counts, basic_pack_code_id, actual_count&.standard_pack_code_ids.to_a)
+          size_references = interactor.for_select_actual_count_size_references(requires_standard_counts, actual_count&.size_reference_ids.to_a)
           pm_boms = interactor.for_select_setup_pm_boms(commodity_id, std_fruit_size_count_id, basic_pack_code_id)
         end
         actions = if AppConst::CR_PROD.require_packaging_bom?
-                    [OpenStruct.new(type: :replace_select_options,
-                                    dom_id: 'reworks_run_sequence_fruit_actual_counts_for_pack_id',
-                                    options_array: actual_counts),
+                    [OpenStruct.new(type: :replace_input_value,
+                                    dom_id: 'reworks_run_sequence_actual_count',
+                                    value: actual_count&.actual_count_for_pack),
                      OpenStruct.new(type: :replace_select_options,
                                     dom_id: 'reworks_run_sequence_pm_bom_id',
                                     options_array: pm_boms),
@@ -689,30 +713,20 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                     dom_id: 'reworks_run_sequence_pm_boms_products',
                                     value: [])]
                   else
-                    [OpenStruct.new(type: :replace_select_options,
-                                    dom_id: 'reworks_run_sequence_fruit_actual_counts_for_pack_id',
-                                    options_array: actual_counts)]
+                    [OpenStruct.new(type: :replace_input_value,
+                                    dom_id: 'reworks_run_sequence_actual_count',
+                                    value: actual_count&.actual_count_for_pack)]
 
                   end
-        json_actions(actions)
-      end
-
-      r.on 'actual_count_changed' do
-        if params[:changed_value].blank?
-          standard_pack_codes = []
-          size_references = []
-        else
-          fruit_actual_counts_for_pack_id = params[:changed_value]
-          actual_count = MasterfilesApp::FruitSizeRepo.new.find_fruit_actual_counts_for_pack(fruit_actual_counts_for_pack_id)
-          standard_pack_codes = interactor.for_select_actual_count_standard_pack_codes(actual_count.standard_pack_code_ids.to_a)
-          size_references = interactor.for_select_actual_count_size_references(actual_count.size_reference_ids.to_a)
+        unless AppConst::CR_MF.basic_pack_equals_standard_pack?
+          actions << OpenStruct.new(type: :replace_select_options,
+                                    dom_id: 'reworks_run_sequence_standard_pack_code_id',
+                                    options_array: standard_pack_codes)
+          actions << OpenStruct.new(type: :replace_select_options,
+                                    dom_id: 'reworks_run_sequence_fruit_size_reference_id',
+                                    options_array: size_references)
         end
-        json_actions([OpenStruct.new(type: :replace_select_options,
-                                     dom_id: 'reworks_run_sequence_standard_pack_code_id',
-                                     options_array: standard_pack_codes),
-                      OpenStruct.new(type: :replace_select_options,
-                                     dom_id: 'reworks_run_sequence_fruit_size_reference_id',
-                                     options_array: size_references)])
+        json_actions(actions)
       end
 
       r.on 'packed_tm_group_changed' do

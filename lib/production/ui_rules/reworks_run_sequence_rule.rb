@@ -18,6 +18,7 @@ module UiRules
       @rules[:allow_cultivar_group_mixing] = AppConst::ALLOW_CULTIVAR_GROUP_MIXING
       @rules[:gtins_required] = AppConst::CR_PROD.use_gtins?
       @rules[:use_packing_specifications] = AppConst::CR_PROD.use_packing_specifications?
+      @rules[:basic_pack_equals_standard_pack] = AppConst::CR_MF.basic_pack_equals_standard_pack?
 
       if @mode == :change_production_run
         make_reworks_run_pallet_header_table
@@ -111,11 +112,11 @@ module UiRules
     end
 
     def edit_sequence_fields  # rubocop:disable Metrics/AbcSize
-      commodity_id_label = MasterfilesApp::CommodityRepo.new.find_commodity(@form_object.commodity_id)&.code
       commodity_id = @form_object[:commodity_id].nil_or_empty? ? ProductionApp::ProductSetupRepo.new.commodity_id(@form_object.cultivar_group_id, @form_object.cultivar_id) : @form_object[:commodity_id]
+      commodity = MasterfilesApp::CommodityRepo.new.find_commodity(commodity_id)
+      requires_standard_counts = commodity.requires_standard_counts
       default_mkting_org_id = @form_object[:marketing_org_party_role_id].nil_or_empty? ? MasterfilesApp::PartyRepo.new.find_party_role_from_party_name_for_role(AppConst::CR_PROD.default_marketing_org, AppConst::ROLE_MARKETER) : @form_object[:marketing_org_party_role_id]
       default_pm_type_id = @form_object[:pm_type_id].nil_or_empty? ? MasterfilesApp::BomRepo.new.find_pm_type(DB[:pm_types].where(pm_type_code: AppConst::DEFAULT_FG_PACKAGING_TYPE).select_map(:id))&.id : @form_object[:pm_type_id]
-
       fields[:pallet_number] =  { renderer: :label,
                                   with_value: @form_object[:pallet_number],
                                   caption: 'Pallet Number',
@@ -126,7 +127,7 @@ module UiRules
                                            readonly: true }
       fields[:commodity_id] =  { renderer: :hidden }
       fields[:commodity_code] =  { renderer: :label,
-                                   with_value: commodity_id_label,
+                                   with_value: commodity&.code,
                                    caption: 'Commodity' }
       fields[:marketing_variety_id] =  { renderer: :select,
                                          options: @repo.for_select_template_commodity_marketing_varieties(commodity_id, @form_object.cultivar_id),
@@ -144,6 +145,7 @@ module UiRules
                                             caption: 'Std Size Count',
                                             prompt: 'Select Size Count',
                                             searchable: true,
+                                            invisible: !requires_standard_counts,
                                             remove_search_for_small_list: false }
       fields[:basic_pack_code_id] =  { renderer: :select,
                                        options: @fruit_size_repo.for_select_basic_packs,
@@ -160,17 +162,11 @@ module UiRules
                                           required: true,
                                           prompt: 'Select Standard Pack',
                                           searchable: true,
+                                          invisible: @rules[:basic_pack_equals_standard_pack],
                                           remove_search_for_small_list: false }
-      fields[:fruit_actual_counts_for_pack_id] =  { renderer: :select,
-                                                    options: @fruit_size_repo.for_select_fruit_actual_counts_for_packs(
-                                                      where: { basic_pack_code_id: @form_object.basic_pack_code_id,
-                                                               std_fruit_size_count_id: @form_object.std_fruit_size_count_id }
-                                                    ),
-                                                    disabled_options: @fruit_size_repo.for_select_inactive_fruit_actual_counts_for_packs,
-                                                    caption: 'Actual Count',
-                                                    prompt: 'Select Actual Count',
-                                                    searchable: true,
-                                                    remove_search_for_small_list: false }
+      fields[:actual_count] =  { readonly: true,
+                                 caption: 'Actual Count',
+                                 invisible: !requires_standard_counts }
       fields[:fruit_size_reference_id] =  { renderer: :select,
                                             options: @fruit_size_repo.for_select_fruit_size_references,
                                             disabled_options: @fruit_size_repo.for_select_inactive_fruit_size_references,
@@ -456,8 +452,6 @@ module UiRules
         behaviour.dropdown_change :std_fruit_size_count_id,
                                   notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/std_fruit_size_count_changed",
                                              param_keys: %i[reworks_run_sequence_commodity_id reworks_run_sequence_basic_pack_code_id] }]
-        behaviour.dropdown_change :fruit_actual_counts_for_pack_id,
-                                  notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/actual_count_changed" }]
         behaviour.dropdown_change :marketing_variety_id,
                                   notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/marketing_variety_changed",
                                              param_keys: %i[reworks_run_sequence_packed_tm_group_id] }]

@@ -388,6 +388,8 @@ module ProductionApp
 
     def sequence_edit_data(attrs)  # rubocop:disable Metrics/AbcSize
       party_repo = MasterfilesApp::PartyRepo.new
+      args = { basic_pack_code_id: attrs[:basic_pack_code_id], std_fruit_size_count_id: attrs[:std_fruit_size_count_id] }
+      fruit_actual_counts_for_pack_id = get_value(:fruit_actual_counts_for_packs, :id, args)
 
       pallet_format = MasterfilesApp::PackagingRepo.new.find_pallet_format(attrs[:pallet_format_id])
       data_attrs = { marketing_variety: get(:marketing_varieties, attrs[:marketing_variety_id], :marketing_variety_code),
@@ -395,7 +397,7 @@ module ProductionApp
                      std_size: get(:std_fruit_size_counts, attrs[:std_fruit_size_count_id], :size_count_value),
                      basic_pack: get(:basic_pack_codes, attrs[:basic_pack_code_id], :basic_pack_code),
                      std_pack: get(:standard_pack_codes, attrs[:standard_pack_code_id], :standard_pack_code),
-                     actual_count: get(:fruit_actual_counts_for_packs, attrs[:fruit_actual_counts_for_pack_id], :actual_count_for_pack),
+                     actual_count: get(:fruit_actual_counts_for_packs, fruit_actual_counts_for_pack_id, :actual_count_for_pack),
                      size_ref: get(:fruit_size_references, attrs[:fruit_size_reference_id], :size_reference),
                      marketing_org: party_repo.fn_party_role_name(attrs[:marketing_org_party_role_id]),
                      packed_tm_group: get(:target_market_groups, attrs[:packed_tm_group_id], :target_market_group_name),
@@ -605,7 +607,8 @@ module ProductionApp
     def find_pallet_sequence_setup_data(sequence_id)
       query = <<~SQL
         SELECT ps.id, ps.pallet_number, ps.pallet_sequence_number, ps.marketing_variety_id, ps.customer_variety_id,
-        ps.std_fruit_size_count_id, ps.basic_pack_code_id, ps.standard_pack_code_id, ps.fruit_actual_counts_for_pack_id, ps.fruit_size_reference_id,
+        ps.std_fruit_size_count_id, ps.basic_pack_code_id, ps.standard_pack_code_id, ps.fruit_actual_counts_for_pack_id,
+        fruit_actual_counts_for_packs.actual_count_for_pack AS actual_count, ps.fruit_size_reference_id,
         ps.marketing_org_party_role_id, ps.packed_tm_group_id, ps.target_market_id, ps.mark_id, ps.pm_mark_id, ps.inventory_code_id, ps.pallet_format_id, ps.cartons_per_pallet_id,
         ps.pm_bom_id, ps.client_size_reference, ps.client_product_code, ps.treatment_ids, ps.marketing_order_number, ps.sell_by_code,
         cultivar_groups.commodity_id, ps.grade_id, ps.product_chars, pallet_formats.pallet_base_id, pallet_formats.pallet_stack_type_id,
@@ -626,6 +629,7 @@ module ProductionApp
         LEFT JOIN pm_products ON pm_products.id = pm_boms_products.pm_product_id
         LEFT JOIN plant_resources packhouses ON packhouses.id = ps.packhouse_resource_id
         LEFT JOIN plant_resources lines ON lines.id = ps.production_line_id
+        LEFT JOIN fruit_actual_counts_for_packs ON fruit_actual_counts_for_packs.id = ps.fruit_actual_counts_for_pack_id
         WHERE ps.id = #{sequence_id}
       SQL
       hash = DB[query].first
