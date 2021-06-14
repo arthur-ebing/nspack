@@ -69,6 +69,7 @@ module MasterfilesApp
 
       default = {
         default_currency_id: currency_id,
+        currency_ids: BaseRepo.new.array_for_db_col([currency_id]),
         customer_party_role_id: party_role_id,
         contact_person_ids: BaseRepo.new.array_for_db_col([party_role_id]),
         active: true,

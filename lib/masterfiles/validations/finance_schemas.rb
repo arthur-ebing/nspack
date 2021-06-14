@@ -24,6 +24,7 @@ module MasterfilesApp
     required(:default_currency_id).filled(:integer)
     required(:customer_party_role_id).filled(:integer)
     optional(:contact_person_ids).maybe(:array).each(:integer)
+    optional(:currency_ids).maybe(:array).each(:integer)
   end
 
   DealTypeSchema = Dry::Schema.Params do

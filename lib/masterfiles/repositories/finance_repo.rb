@@ -12,8 +12,6 @@ module MasterfilesApp
                           order_by: :currency
     crud_calls_for :currencies, name: :currency, wrapper: Currency
 
-    crud_calls_for :customers, name: :customer, exclude: [:delete]
-
     build_for_select :deal_types,
                      label: :deal_type,
                      value: :id,
@@ -129,6 +127,8 @@ module MasterfilesApp
       return nil if hash.nil?
 
       hash[:contact_people] = hash[:contact_person_ids].to_a.map { |i| DB.get(Sequel.function(:fn_party_role_name, i)) }
+      hash[:currencies] = select_values(:currencies, :currency, id: Array(hash[:currency_ids]))
+
       Customer.new(hash)
     end
 
@@ -192,6 +192,18 @@ module MasterfilesApp
       array = ds.select_map([:short_description, Sequel[:customer_payment_term_sets][:id]])
       hash = array.each_with_object({}) { |item, result| (result[item[1]] ||= []) << item[0] }
       hash.map { |k, v| [v.join('_'), k] }
+    end
+
+    def create_customer(res)
+      attrs = res.to_h
+      attrs[:currency_ids] = (attrs[:currency_ids] + [attrs[:default_currency_id]]).uniq
+      create(:customers, attrs)
+    end
+
+    def update_customer(id, res)
+      attrs = res.to_h
+      attrs[:currency_ids] = (attrs[:currency_ids] + [attrs[:default_currency_id]]).uniq
+      update(:customers, id, attrs)
     end
 
     def delete_customer(id)

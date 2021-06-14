@@ -79,6 +79,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
     end
+
     # CUSTOMERS
     # --------------------------------------------------------------------------
     r.on 'customers', Integer do |id|
@@ -106,6 +107,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             row_keys = %i[
               default_currency_id
               default_currency
+              currency_ids
+              currencies
               contact_people
               customer_party_role_id
               customer
@@ -117,6 +120,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             re_show_form(r, res) { Masterfiles::Finance::Customer::Edit.call(id, form_values: params[:customer], form_errors: res.errors) }
           end
         end
+
         r.delete do    # DELETE
           check_auth!('finance', 'delete')
           interactor.assert_permission!(:delete, id)
@@ -171,6 +175,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             id
             default_currency_id
             default_currency
+            currency_ids
+            currencies
             contact_people
             customer_party_role_id
             customer

@@ -3,8 +3,6 @@
 module UiRules
   class CustomerRule < Base
     def generate_rules
-      @repo = MasterfilesApp::FinanceRepo.new
-      @party_repo = MasterfilesApp::PartyRepo.new
       make_form_object
       apply_form_values
 
@@ -18,14 +16,15 @@ module UiRules
     end
 
     def set_show_fields
+      fields[:currencies] = { renderer: :list,
+                              hide_on_load: @form_object.currencies.empty?,
+                              items: @form_object.currencies }
       fields[:default_currency] = { renderer: :label,
-                                    caption: 'Default Currency' }
+                                    hide_on_load: true }
       fields[:contact_people] = { renderer: :list,
-                                  caption: 'Contact People',
                                   hide_on_load: @form_object.contact_people.empty?,
                                   items: @form_object.contact_people }
-      fields[:customer] = { renderer: :label,
-                            caption: 'Customer' }
+      fields[:customer] = { renderer: :label }
       fields[:active] = { renderer: :label,
                           as_boolean: true }
     end
@@ -35,9 +34,15 @@ module UiRules
       party_role_options += @party_repo.for_select_party_roles_exclude(AppConst::ROLE_CUSTOMER, where: { person_id: nil })
       hide_org_renderers = @form_object.customer_party_role_id != 'Create New Organization'
       {
+        currency_ids: { renderer: :multi,
+                        options: @finance_repo.for_select_currencies,
+                        selected: @form_object.currency_ids,
+                        caption: 'Currencies' },
         default_currency_id: { renderer: :select,
                                options: @repo.for_select_currencies,
                                disabled_options: @repo.for_select_inactive_currencies,
+                               hide_on_load: true,
+                               prompt: true,
                                caption: 'Default Currency' },
         contact_person_ids: { renderer: :multi,
                               options: @party_repo.for_select_party_roles(AppConst::ROLE_CUSTOMER_CONTACT_PERSON),
@@ -65,6 +70,10 @@ module UiRules
     end
 
     def make_form_object
+      @repo = MasterfilesApp::FinanceRepo.new
+      @party_repo = MasterfilesApp::PartyRepo.new
+      @finance_repo = MasterfilesApp::FinanceRepo.new
+
       if @mode == :new
         make_new_form_object
         return

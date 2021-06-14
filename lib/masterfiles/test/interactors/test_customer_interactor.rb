@@ -72,10 +72,12 @@ module MasterfilesApp
 
       {
         id: 1,
-        default_currency_id: currency_id,
-        default_currency: 'ZAR',
         customer_party_role_id: party_role_id,
         customer: 'ABC',
+        currency_ids: [currency_id],
+        currencies: %w[ZAR],
+        default_currency_id: currency_id,
+        default_currency: 'ZAR',
         contact_person_ids: [party_role_id],
         contact_people: %w[ABC],
         active: true,

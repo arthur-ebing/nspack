@@ -12,6 +12,8 @@ module MasterfilesApp
     attribute :id, Types::Integer
     attribute :default_currency_id, Types::Integer
     attribute :default_currency, Types::String
+    attribute :currency_ids, Types::Array
+    attribute :currencies, Types::Array
     attribute :contact_person_ids, Types::Array
     attribute :contact_people, Types::Array
     attribute :customer_party_role_id, Types::Integer

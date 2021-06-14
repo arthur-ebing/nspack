@@ -10,6 +10,8 @@ module MasterfilesApp
     def entity(attrs = {})
       base_attrs = {
         id: 1,
+        currency_ids: [1, 2, 3],
+        currencies: %w[A B C],
         default_currency_id: 1,
         default_currency: 'ZAR',
         contact_person_ids: [1, 2, 3],
