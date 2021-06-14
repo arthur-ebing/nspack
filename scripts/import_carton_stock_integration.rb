@@ -65,6 +65,11 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     params = {}
     pallet_id = nil
 
+    @pallet_nett_weight = 0
+    pallet_rows.each do |sequence|
+      @pallet_nett_weight += sequence.to_h['nett_weight'].to_f
+    end
+
     pallet_rows.each_with_index do |sequence, index|
       params = get_mf_ids_for_pallet(sequence.to_h)
       if index.zero?
@@ -357,6 +362,9 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
   end
 
   def create_pallet(params) # rubocop:disable Metrics/AbcSize
+    args = params.clone
+    args[:nett_weight] = @pallet_nett_weight.round(2)
+
     res = MesscadaApp::PalletContract.new.call(params)
     return failed_response("can't create_pallet #{validation_failed_response(res).errors}") if res.failure?
     return failed_response(@pallet_errors.uniq.sort.join("\n")) unless @pallet_errors.empty?
