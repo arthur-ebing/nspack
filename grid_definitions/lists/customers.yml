@@ -17,9 +17,9 @@
   :is_delete: true
   :popup: true
 - :separator: true
-- :url: "/masterfiles/finance/customer_payment_term_sets/new?customer_id=$:id$"
-  :text: New Payment Term Set
-  :icon: edit
+- :url: "/list/customer_payment_term_sets/with_params?key=customer&id=$:id$"
+  :text: Payment Term Sets
+  :icon: list
   :popup: true
 - :separator: true
 - :url: "/development/statuses/list/customers/$:id$"
