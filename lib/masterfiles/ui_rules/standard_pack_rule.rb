@@ -20,7 +20,8 @@ module UiRules
       fields[:std_pack_label_code] = { renderer: :label,
                                        caption: 'Label code' }
       fields[:material_mass] = { renderer: :label }
-      fields[:plant_resource_button_indicator] = { renderer: :label }
+      fields[:plant_resource_button_indicator] = { renderer: :label,
+                                                   invisible: !AppConst::CR_PROD.provide_pack_type_at_carton_verification? }
       fields[:active] = { renderer: :label,
                           as_boolean: true }
       fields[:use_size_ref_for_edi] = { renderer: :label,
@@ -54,9 +55,14 @@ module UiRules
                                            options: @repo.for_select_plant_resource_button_indicator(Crossbeams::Config::ResourceDefinitions::MODULE_BUTTON),
                                            caption: 'Button Indicator',
                                            prompt: 'Select Button Indicator',
+                                           invisible: !AppConst::CR_PROD.provide_pack_type_at_carton_verification?,
                                            searchable: true,
-                                           remove_search_for_small_list: false },
-        use_size_ref_for_edi: { renderer: :checkbox },
+                                           remove_search_for_small_list: false,
+                                           hint: '<p>Selecting this indicator allows you to specify which std_pack is to be used for which button.</p>
+                                                  <p>Then when the carton is verified, the correct standard pack will be assigned to the carton.</p>' },
+        use_size_ref_for_edi: { renderer: :checkbox,
+                                hint: '<p>When the checkbox is ticked:</p>
+                                       <p>edi files will use the fruit_size_references.size_reference as the edi_size_count.</p>' },
         palletizer_incentive_rate: { required: true,
                                      renderer: :numeric },
         bin: { renderer: :checkbox,
