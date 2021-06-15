@@ -7,10 +7,10 @@ module LabelPrintingApp
 
     attr_reader :label_name, :instance
 
-    def initialize(label_name, instance, params)
+    def initialize(label_name, instance, supporting_data = {})
       @label_name = label_name
       @instance = instance
-      @supporting_data = params[:supporting_data] || {}
+      @supporting_data = supporting_data
       raise ArgumentError if label_name.nil?
     end
 
