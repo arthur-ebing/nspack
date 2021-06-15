@@ -575,14 +575,14 @@ module ProductionApp
       success_response('Allocation copied', alloc[:production_run_id])
     end
 
-    def preview_allocation_carton_label(product_resource_allocation_id)
+    def preview_allocation_carton_label(product_resource_allocation_id) # rubocop:disable Metrics/AbcSize
       alloc = repo.find_hash(:product_resource_allocations, product_resource_allocation_id)
       return failed_response('Please choose a product setup') unless alloc[:product_setup_id]
       return failed_response('Please choose a label template') unless alloc[:label_template_id]
 
       instance = messcada_repo.allocated_product_setup_label_printing_instance(product_resource_allocation_id)
       label = repo.find_hash(:label_templates, alloc[:label_template_id])[:label_template_name]
-      LabelPrintingApp::PreviewLabel.call(label, instance)
+      LabelPrintingApp::PreviewLabel.call(label, instance, supporting_data: { packed_date: run_start_date(instance[:production_run_id]) })
     end
 
     # create carton_print_repo?
@@ -753,6 +753,10 @@ module ProductionApp
 
     def product_resource_allocation_flat(id)
       repo.find_product_resource_allocation_flat(id)
+    end
+
+    def run_start_date(production_run_id)
+      messcada_repo.run_start_date(production_run_id)
     end
 
     def validate_bin_tipping_control_data_params(params)
