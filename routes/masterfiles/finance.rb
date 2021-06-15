@@ -404,7 +404,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       interactor = MasterfilesApp::CustomerPaymentTermSetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('finance', 'new')
-        show_partial_or_page(r) { Masterfiles::Finance::CustomerPaymentTermSet::New.call(remote: fetch?(r)) }
+        show_partial_or_page(r) { Masterfiles::Finance::CustomerPaymentTermSet::New.call(form_values: params, remote: fetch?(r)) }
       end
       r.post do        # CREATE
         res = interactor.create_customer_payment_term_set(params[:customer_payment_term_set])

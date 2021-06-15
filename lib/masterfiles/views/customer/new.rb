@@ -17,8 +17,8 @@ module Masterfiles
               form.action '/masterfiles/finance/customers'
               form.remote! if remote
               form.add_field :customer_party_role_id
-              form.add_field :currency_ids
               form.add_field :default_currency_id
+              form.add_field :currency_ids
               form.add_field :contact_person_ids
               # Organization
               form.add_field :medium_description

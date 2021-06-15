@@ -33,8 +33,6 @@
       :editor: :numeric
     price_per_carton:
       :editor: :numeric
-    price_per_kg:
-      :editor: :numeric
 :conditions:
   :on_order:
     - :col: order_items.order_id

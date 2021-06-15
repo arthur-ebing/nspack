@@ -31,8 +31,6 @@
   :editable_fields:
     carton_quantity:
       :editor: :numeric
-    price_per_carton:
-      :editor: :numeric
     price_per_kg:
       :editor: :numeric
 :conditions:

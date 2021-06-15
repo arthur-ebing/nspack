@@ -196,13 +196,13 @@ module MasterfilesApp
 
     def create_customer(res)
       attrs = res.to_h
-      attrs[:currency_ids] = (attrs[:currency_ids] + [attrs[:default_currency_id]]).uniq
+      attrs[:currency_ids] = (Array(attrs[:currency_ids]) + Array(attrs[:default_currency_id])).uniq.compact
       create(:customers, attrs)
     end
 
     def update_customer(id, res)
       attrs = res.to_h
-      attrs[:currency_ids] = (attrs[:currency_ids] + [attrs[:default_currency_id]]).uniq
+      attrs[:currency_ids] = (Array(attrs[:currency_ids]) + Array(attrs[:default_currency_id])).uniq.compact
       update(:customers, id, attrs)
     end
 

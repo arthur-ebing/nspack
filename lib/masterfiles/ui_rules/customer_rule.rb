@@ -17,12 +17,9 @@ module UiRules
 
     def set_show_fields
       fields[:currencies] = { renderer: :list,
-                              hide_on_load: @form_object.currencies.empty?,
                               items: @form_object.currencies }
-      fields[:default_currency] = { renderer: :label,
-                                    hide_on_load: true }
+      fields[:default_currency] = { renderer: :label }
       fields[:contact_people] = { renderer: :list,
-                                  hide_on_load: @form_object.contact_people.empty?,
                                   items: @form_object.contact_people }
       fields[:customer] = { renderer: :label }
       fields[:active] = { renderer: :label,
@@ -41,8 +38,8 @@ module UiRules
         default_currency_id: { renderer: :select,
                                options: @repo.for_select_currencies,
                                disabled_options: @repo.for_select_inactive_currencies,
-                               hide_on_load: true,
                                prompt: true,
+                               required: true,
                                caption: 'Default Currency' },
         contact_person_ids: { renderer: :multi,
                               options: @party_repo.for_select_party_roles(AppConst::ROLE_CUSTOMER_CONTACT_PERSON),
