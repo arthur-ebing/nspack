@@ -365,7 +365,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     args = params.clone
     args[:nett_weight] = @pallet_nett_weight.round(2)
 
-    res = MesscadaApp::PalletContract.new.call(params)
+    res = MesscadaApp::PalletContract.new.call(args)
     return failed_response("can't create_pallet #{validation_failed_response(res).errors}") if res.failure?
     return failed_response(@pallet_errors.uniq.sort.join("\n")) unless @pallet_errors.empty?
 
