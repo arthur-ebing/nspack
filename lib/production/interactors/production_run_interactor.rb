@@ -582,7 +582,7 @@ module ProductionApp
 
       instance = messcada_repo.allocated_product_setup_label_printing_instance(product_resource_allocation_id)
       label = repo.find_hash(:label_templates, alloc[:label_template_id])[:label_template_name]
-      LabelPrintingApp::PreviewLabel.call(label, instance, supporting_data: { packed_date: run_start_date(instance[:production_run_id]) })
+      LabelPrintingApp::PreviewLabel.call(label, instance, { packed_date: run_start_date(instance[:production_run_id]) })
     end
 
     # create carton_print_repo?
