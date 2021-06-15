@@ -1520,3 +1520,11 @@
   :ordered_list: false
   :ui_priority: 1
   :list_def: 
+- :column: bin_received_at
+  :caption: Received At
+  :data_type: :datetime
+  :control_type: :daterange
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:

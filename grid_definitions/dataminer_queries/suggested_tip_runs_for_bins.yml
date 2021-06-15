@@ -30,11 +30,10 @@
         production_runs.started_at ,
         ABS(production_runs.started_at::timestamp::date - rmt_bins.bin_received_date_time::timestamp::date) AS days_apart
       FROM rmt_bins
-      LEFT JOIN cultivars ON rmt_bins.cultivar_id = cultivars.id
       LEFT JOIN production_runs ON rmt_bins.farm_id = production_runs.farm_id
       AND rmt_bins.puc_id = production_runs.puc_id
       AND rmt_bins.orchard_id = production_runs.orchard_id
-      AND (rmt_bins.cultivar_group_id = production_runs.cultivar_group_id or cultivars.cultivar_group_id = production_runs.cultivar_group_id)
+      AND rmt_bins.cultivar_group_id = production_runs.cultivar_group_id
       WHERE NOT rmt_bins.bin_tipped),
 
     untipped_bin_runs_grp AS (
@@ -48,7 +47,7 @@
 
     SELECT
       vw_bins.id, vw_bins.bin_asset_number, vw_bins.bin_received_date_time, vw_bins.cultivar_name, vw_bins.farm_code,
-      vw_bins.puc_code, vw_bins.orchard_code, vw_bins.rmt_delivery_id,
+      vw_bins.puc_code, vw_bins.orchard_code, vw_bins.rmt_delivery_id, '' as enter_tip_run_id,
       COALESCE(tipped_bin_runs_grp.suggested_tip_run_id, untipped_bin_runs_grp.suggested_tip_run_id) AS suggested_tip_run_id,
       CASE
         WHEN tipped_bin_runs_grp.matching_run_ids IS NOT NULL THEN 'delivery runs'
@@ -288,6 +287,22 @@
     :namespaced_name: rmt_delivery_id
     :data_type: :integer
     :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  enter_tip_run_id:
+    :name: enter_tip_run_id
+    :sequence_no: 14
+    :caption: Enter Tip Run
+    :namespaced_name: suggested_tip_run_id
+    :data_type: :integer
+    :width: 120
     :format:
     :hide: false
     :pinned:

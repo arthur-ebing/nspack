@@ -6,6 +6,87 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # REWORKS RUNS
     # --------------------------------------------------------------------------
     interactor = ProductionApp::ReworksRunInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+    stepper = interactor.stepper(:bulk_bin_tipping)
+
+    r.on 'search_untipped_bins' do
+      r.get do
+        stepper.clear
+        show_page { Production::Runs::ReworksRun::SearchUntippedBins.call(remote: fetch?(r)) }
+      end
+
+      r.post do
+        show_partial_or_page(r) { Production::Runs::ReworksRun::BulkTipBinProcess.call(0, params[:search_form]) }
+      end
+    end
+
+    r.on 'selected_untipped_bins' do
+      stepper.write(selected_untipped_bins: multiselect_grid_choices(params))
+      show_partial_or_page(r) { Production::Runs::ReworksRun::BulkTipBinProcess.call(1) }
+    end
+
+    r.on 'suggested_runs_multiselect' do
+      res = interactor.bins_grid_with_suggested_runs(stepper.read[:selected_untipped_bins])
+      stepper.merge(bins_with_suggested_runs: res[:rowDefs])
+      res.to_json
+    rescue StandardError => e
+      show_json_exception(e)
+    end
+
+    r.on 'bulk_tip_bins' do
+      res = interactor.bulk_tip_bins(multiselect_grid_choices(params), stepper.read[:bins_with_suggested_runs])
+      stepper.merge(bins_with_editable_suggested_runs: res.instance[:runs])
+      stepper.merge(bg_job_bins: res.instance[:bg_job_bins])
+      show_partial_or_page(r) { Production::Runs::ReworksRun::BulkTipBinProcess.call(2) }
+    rescue StandardError => e
+      show_json_exception(e)
+    end
+
+    r.on 'edit_suggested_runs' do
+      interactor.edit_suggested_runs(stepper.read[:bins_with_editable_suggested_runs])
+    rescue StandardError => e
+      show_json_exception(e)
+    end
+
+    r.on 'tip_bin',  Integer do |id|
+      res = interactor.tip_bin_against_run(id, params[:column_value].to_i, stepper.read[:bg_job_bins], stepper.read[:bins_with_editable_suggested_runs])
+      stepper.merge(bg_job_bins: res.instance[:bg_job_bins])
+      stepper.merge(bins_with_editable_suggested_runs: res.instance[:bins_with_editable_suggested_runs])
+      show_json_notice(res.message)
+    end
+
+    r.on 'view_summary' do
+      res = interactor.build_view_summary_grid(stepper.read[:bg_job_bins])
+      stepper.merge(summary_grid: res.instance)
+      show_partial_or_page(r) { Production::Runs::ReworksRun::BulkTipBinProcess.call(3) }
+    end
+
+    r.on 'summary' do
+      stepper.read[:summary_grid]
+    rescue StandardError => e
+      show_json_exception(e)
+    end
+
+    r.on 'view_reworks_run_errors',  Integer do |id|
+      show_partial_or_page(r) { Production::Runs::ReworksRun::ReworksRunErrors.call(id) }
+    end
+
+    r.on 'reworks_run_errors_grid',  Integer do |id|
+      interactor.reworks_run_errors_grid(id)
+    end
+
+    r.on 'finish' do
+      res = interactor.complete_bulk_tipping(stepper.read[:bg_job_bins])
+      if res.success
+        flash[:notice] = res.message
+      else
+        flash[:error] = res.message
+      end
+      r.redirect('/production/reworks/search_untipped_bins')
+    end
+
+    r.on 'back_to_editing_runs' do
+      show_partial_or_page(r) { Production::Runs::ReworksRun::BulkTipBinProcess.call(2) }
+    end
 
     r.on 'change_deliveries_orchard' do
       r.is do

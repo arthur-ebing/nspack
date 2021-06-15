@@ -1,6 +1,6 @@
 ---
 :caption: Pallet Changes Details
-:sql: "SELECT reworks_runs.id,\r\nreworks_runs.reworks_run_type_id,\r\nreworks_runs.created_at,\r\nreworks_run_types.run_type,\r\nreworks_runs.scrap_reason_id,\r\nscrap_reasons.scrap_reason,\r\nreworks_runs.remarks,\r\nreworks_runs.changes_made
+:sql: "SELECT reworks_runs.id,\r\nreworks_runs.reworks_run_type_id,\r\nreworks_runs.errors,\r\nreworks_runs.created_at,\r\nreworks_run_types.run_type,\r\nreworks_runs.scrap_reason_id,\r\nscrap_reasons.scrap_reason,\r\nreworks_runs.remarks,\r\nreworks_runs.changes_made
   ->> 'reworks_action' AS reworks_action,\r\nreworks_runs.user,\r\nCOALESCE(reworks_runs.pallets_scrapped,
   reworks_runs.pallets_unscrapped, reworks_runs.pallets_selected) AS pallets_selected,\r\nreworks_runs.pallets_affected,\r\nreworks_runs.changes_made
   -> 'pallets' ->> 'pallet_number' AS pallet_number,\r\nreworks_runs.changes_made
@@ -10,7 +10,7 @@
   -> 'pallets' -> 'pallet_sequences' -> 'changes' ->> 'after' AS after_state, \r\nreworks_runs.updated_at,
   \r\nreworks_runs.parent_id,\r\nEXISTS(SELECT id FROM reworks_runs cr WHERE cr.parent_id
   = reworks_runs.id) AS has_children,\r\nCASE WHEN EXISTS(SELECT id FROM reworks_runs
-  cr WHERE cr.parent_id = reworks_runs.id) THEN 'ready'\r\nELSE NULL::text\r\nEND
+  cr WHERE cr.parent_id = reworks_runs.id) THEN 'ready'\r\n WHEN reworks_runs.errors IS NOT NULL THEN 'red' ELSE NULL::text\r\nEND
   AS colour_rule\r\nFROM reworks_runs\r\nJOIN reworks_run_types ON reworks_run_types.id
   = reworks_runs.reworks_run_type_id\r\nLEFT JOIN scrap_reasons ON scrap_reasons.id
   = reworks_runs.scrap_reason_id\r\nORDER BY id DESC"
@@ -369,6 +369,22 @@
     :pinned: 
     :groupable: false
     :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  errors:
+    :name: errors
+    :sequence_no: 23
+    :caption: Errors
+    :namespaced_name:
+    :data_type: :string
+    :width:
+    :format:
+    :hide: true
+    :pinned:
+    :groupable: false
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false

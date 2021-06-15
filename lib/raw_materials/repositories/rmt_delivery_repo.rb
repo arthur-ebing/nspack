@@ -437,5 +437,78 @@ module RawMaterialsApp
         .where(marketing_orchard: true, Sequel[:pucs][:id] => puc_id, Sequel[:orchards][:id] => orchard_id, Sequel[:cultivars][:id] => cultivar_id)
         .get(Sequel[:registered_orchards][:id])
     end
+
+    def find_suggested_runs_for_untipped_bins(selection)
+      qry = <<~SQL
+        WITH
+          tipped_bin_runs AS (
+            SELECT DISTINCT
+              rmt_delivery_id,
+              production_runs.started_at,
+              production_run_tipped_id AS run_id
+            FROM rmt_bins
+            JOIN production_runs on production_runs.id=rmt_bins.production_run_tipped_id
+            WHERE rmt_bins.bin_tipped order by rmt_delivery_id),
+
+          tipped_bin_runs_grp AS (
+            SELECT
+              rmt_bins.id as bin_id,
+              rmt_bins.rmt_delivery_id,
+              ARRAY_AGG(DISTINCT run_id) AS matching_run_ids,
+              (select run_id from tipped_bin_runs i where i.rmt_delivery_id=rmt_bins.rmt_delivery_id order by (ABS(started_at::timestamp::date - rmt_bins.bin_received_date_time::timestamp::date)) asc limit 1) as suggested_tip_run_id,
+              (select started_at from tipped_bin_runs i where i.rmt_delivery_id=rmt_bins.rmt_delivery_id order by (ABS(started_at::timestamp::date - rmt_bins.bin_received_date_time::timestamp::date)) asc limit 1) as suggested_tip_run_start_date
+            FROM rmt_bins
+            JOIN tipped_bin_runs o on o.rmt_delivery_id=rmt_bins.rmt_delivery_id
+            WHERE NOT rmt_bins.bin_tipped
+            GROUP BY bin_id, rmt_bins.rmt_delivery_id),
+
+          untipped_bin_runs AS (
+            SELECT
+              rmt_bins.id as bin_id,
+              production_runs.id AS run_id,
+              production_runs.started_at ,
+              ABS(production_runs.started_at::timestamp::date - rmt_bins.bin_received_date_time::timestamp::date) AS days_apart
+            FROM rmt_bins
+            LEFT JOIN cultivars ON rmt_bins.cultivar_id = cultivars.id
+            LEFT JOIN production_runs ON rmt_bins.farm_id = production_runs.farm_id
+            AND rmt_bins.puc_id = production_runs.puc_id
+            AND rmt_bins.orchard_id = production_runs.orchard_id
+            AND (rmt_bins.cultivar_group_id = production_runs.cultivar_group_id or cultivars.cultivar_group_id = production_runs.cultivar_group_id)
+            WHERE NOT rmt_bins.bin_tipped),
+
+          untipped_bin_runs_grp AS (
+            SELECT
+              bin_id,
+              ARRAY_AGG(DISTINCT run_id) AS matching_run_ids,
+              (select run_id from untipped_bin_runs i where o.bin_id=i.bin_id order by days_apart asc limit 1) as suggested_tip_run_id,
+              (select started_at from untipped_bin_runs i where o.bin_id=i.bin_id order by days_apart asc limit 1) as suggested_tip_run_start_date
+            FROM untipped_bin_runs o
+            GROUP BY bin_id)
+
+          SELECT
+            vw_bins.id, vw_bins.bin_asset_number, vw_bins.bin_received_date_time, vw_bins.cultivar_name, vw_bins.farm_code,
+            vw_bins.puc_code, vw_bins.orchard_code, vw_bins.rmt_delivery_id, '' as enter_tip_run_id,
+            COALESCE(tipped_bin_runs_grp.suggested_tip_run_id, untipped_bin_runs_grp.suggested_tip_run_id) AS suggested_tip_run_id,
+            CASE
+              WHEN tipped_bin_runs_grp.matching_run_ids IS NOT NULL THEN 'delivery runs'
+              WHEN untipped_bin_runs_grp.matching_run_ids IS NOT NULL THEN 'runs only'
+            END matching_method,
+            ABS(vw_bins.bin_received_date_time::timestamp::date - COALESCE(tipped_bin_runs_grp.suggested_tip_run_start_date, untipped_bin_runs_grp.suggested_tip_run_start_date)::timestamp::date) AS days_apart,
+            CASE
+              WHEN COALESCE(tipped_bin_runs_grp.suggested_tip_run_id, untipped_bin_runs_grp.suggested_tip_run_id) IS NOT NULL
+              THEN COALESCE(tipped_bin_runs_grp.matching_run_ids, untipped_bin_runs_grp.matching_run_ids)
+              ELSE NULL
+            END matching_run_ids,
+            fn_production_run_code(COALESCE(tipped_bin_runs_grp.suggested_tip_run_id, untipped_bin_runs_grp.suggested_tip_run_id)) AS suggested_tip_run_code,
+            COALESCE(tipped_bin_runs_grp.suggested_tip_run_start_date, untipped_bin_runs_grp.suggested_tip_run_start_date) AS suggested_tip_run_start_date,
+            cultivar_id, farm_id, puc_id, orchard_id
+          FROM vw_bins
+          LEFT JOIN tipped_bin_runs_grp on tipped_bin_runs_grp.bin_id=vw_bins.id
+          LEFT JOIN untipped_bin_runs_grp on untipped_bin_runs_grp.bin_id=vw_bins.id
+          WHERE NOT vw_bins.bin_tipped AND id IN(#{selection.join(',')})
+          ORDER BY id desc
+      SQL
+      DB[qry].all
+    end
   end
 end

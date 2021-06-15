@@ -7,6 +7,151 @@ module ProductionApp
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 
+    def reworks_run_errors_grid(rw_run_id)
+      row_defs = repo.get(:reworks_runs, rw_run_id, :errors)
+      col_defs = reworks_run_errors_grid_col_defs
+      {
+        columnDefs: col_defs,
+        rowDefs: row_defs
+      }.to_json
+    end
+
+    def edit_suggested_runs(row_defs)
+      col_defs = edit_suggested_runs_col_defs
+      {
+        extraContext: { keyColumn: 'id' },
+        fieldUpdateUrl: '/production/reworks/tip_bin/$:id$',
+        columnDefs: col_defs,
+        rowDefs: row_defs
+      }.to_json
+    end
+
+    def edit_suggested_runs_col_defs
+      col_names = suggested_runs_col_names
+
+      Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
+        make_columns_for(col_names).each do |col|
+          col[:options].merge!(editable: true, cellEditor: 'numericCellEditor', cellEditorType: 'integer') if col[:field] == 'enter_tip_run_id'
+          mk.col col[:field], col[:options][:caption], col[:options]
+        end
+      end
+    end
+
+    def bins_grid_with_suggested_runs(selection)
+      row_defs = delivery_repo.find_suggested_runs_for_untipped_bins(selection)
+      col_defs = suggested_runs_col_defs
+      {
+        columnDefs: col_defs,
+        rowDefs: row_defs
+      }
+    end
+
+    def suggested_runs_col_defs
+      col_names = suggested_runs_col_names
+
+      Crossbeams::DataGrid::ColumnDefiner.new(for_multiselect: true).make_columns do |mk|
+        make_columns_for(col_names).each do |col|
+          mk.col col[:field], col[:options][:caption], col[:options] unless col[:field] == 'enter_tip_run_id'
+        end
+      end
+    end
+
+    def suggested_runs_col_names
+      persistor = Crossbeams::Dataminer::YamlPersistor.new('grid_definitions/dataminer_queries/suggested_tip_runs_for_bins.yml')
+      rpt = Crossbeams::Dataminer::Report.load(persistor)
+      rpt.columns
+    end
+
+    def make_columns_for(col_names)
+      cols = []
+      col_names.each { |name, column_def| cols << col_with_attrs(name, column_def) }
+      cols
+    end
+
+    def col_with_attrs(name, column_def)
+      col = { field: name }
+      opts = column_def.to_hash
+      col.merge(options: opts)
+    end
+
+    def bulk_tip_bins(bulk_bintip_ids, suggested_runs)
+      bulk_tip_bins = suggested_runs.find_all { |r| bulk_bintip_ids.include?(r[:id]) && r[:suggested_tip_run_id] }
+      bins_to_be_tipped_individually = suggested_runs - bulk_tip_bins
+      bg_job_bins = bulk_tip_bins.map { |b| { bin_id: b[:id], run_id: b[:suggested_tip_run_id], bulk_bin: true } }
+
+      success_response('bulk bin_tipping queued up successfully', runs: bins_to_be_tipped_individually, bg_job_bins: bg_job_bins)
+    end
+
+    def tip_bin_against_run(id, column_value, bg_job_bins, bins_with_editable_suggested_runs) # rubocop:disable Metrics/AbcSize
+      # TODO
+      # validate_if_tiping
+
+      if column_value.zero?
+        bg_job_bins.delete_if { |r| r[:bin_id] == id }
+      elsif (bg_bin = bg_job_bins.find { |b| b[:bin_id] == id })
+        bg_bin[:run_id] = column_value
+      else
+        bg_job_bins.push(bin_id: id, run_id: column_value, bulk_bin: false)
+      end
+
+      if (edit_bin = bins_with_editable_suggested_runs.find { |b| b[:id] == id })
+        edit_bin[:enter_tip_run_id] = column_value.zero? ? nil : column_value
+      end
+      success_response("bin: #{id} queued up for tipping", bg_job_bins: bg_job_bins, bins_with_editable_suggested_runs: bins_with_editable_suggested_runs)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def build_view_summary_grid(bg_job_bins)
+      row_defs = bg_job_bins.group_by { |t| t[:run_id] }.map do |k, v|
+        { run_id: k,
+          qty_bulk_tipped: v.find_all { |d| d[:bulk_bin] }.length,
+          qty_edited: v.find_all { |d| !d[:bulk_bin] }.length }
+      end
+
+      col_defs = summary_col_defs
+      grid_def = {
+        columnDefs: col_defs,
+        rowDefs: row_defs
+      }.to_json
+
+      success_response('ok', grid_def)
+    end
+
+    def complete_bulk_tipping(bg_job_bins) # rubocop:disable Metrics/AbcSize
+      return failed_response('No bins were tipped') if bg_job_bins.empty?
+
+      repo.transaction do
+        rw_run_id = repo.create_reworks_run(user: @user.user_name,
+                                            reworks_run_type_id: repo.get_value(:reworks_run_types, :id, run_type: AppConst::RUN_TYPE_TIP_BINS_AGAINST_SUGGESTED_RUN),
+                                            pallets_selected: "{ #{bg_job_bins.map { |i| i[:bin_id] }.join(',')} }",
+                                            pallets_affected: "{ #{bg_job_bins.map { |i| i[:bin_id] }.join(',')} }")
+
+        ProductionApp::Job::BulkTipBins.enqueue(rw_run_id, bg_job_bins.map { |b| { bin_id: b[:bin_id], run_id: b[:run_id] } })
+      end
+      success_response('bulk bin_tipping completed')
+    end
+
+    def stepper(key)
+      @stepper ||= BulkBinTippingStep.new(key, @user, @context.request_ip)
+    end
+
+    def summary_col_defs
+      Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
+        mk.col 'run_id', 'Production Run'
+        mk.col 'qty_bulk_tipped', 'Qty Bulk Tipped'
+        mk.col 'qty_edited', 'Qty Edited'
+      end
+    end
+
+    def reworks_run_errors_grid_col_defs
+      Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
+        mk.col 'id', 'Bin'
+        mk.col 'error', 'Error'
+        mk.col 'suggested_tip_run_id', 'Suggested Tip Run'
+      end
+    end
+
     def validate_change_delivery_orchard_screen_params(params) # rubocop:disable Metrics/AbcSize
       res = validate_only_cultivar_change(params)
       if res.failure?
@@ -1304,6 +1449,10 @@ module ProductionApp
 
     def repo
       @repo ||= ReworksRepo.new
+    end
+
+    def delivery_repo
+      @delivery_repo ||= RawMaterialsApp::RmtDeliveryRepo.new
     end
 
     def prod_repo

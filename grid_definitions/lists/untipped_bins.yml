@@ -1,0 +1,36 @@
+---
+:dataminer_definition: rmt_bins
+:conditions:
+  :standard:
+    - :col: bin_tipped
+      :op: =
+      :val: false
+    - :col: rmt_delivery_id
+      :op: =
+      :val: $:rmt_delivery_id$
+      :optional: true
+    - :col: puc_id
+      :op: =
+      :val: $:puc_id$
+      :optional: true
+    - :col: orchard_id
+      :op: =
+      :val: $:orchard_id$
+      :optional: true
+    - :col: cultivar_id
+      :op: =
+      :val: $:cultivar_id$
+      :optional: true
+    - :col: bin_received_at
+      :op: '>='
+      :val: $:from$
+      :optional: true
+    - :col: bin_received_at
+      :op: '<='
+      :val: $:to$
+      :optional: true
+:multiselect:
+  :standard:
+    :url: "/production/reworks/suggest_runs_to_tip_bins_against"
+    :conditions: standard
+    :multiselect_save_method: loading

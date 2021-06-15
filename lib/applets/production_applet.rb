@@ -10,6 +10,7 @@ Dir["#{root_dir}/production/task_permission_checks/*.rb"].sort.each { |f| requir
 Dir["#{root_dir}/production/ui_rules/*.rb"].sort.each { |f| require f }
 Dir["#{root_dir}/production/validations/*.rb"].sort.each { |f| require f }
 Dir["#{root_dir}/production/views/**/*.rb"].sort.each { |f| require f }
+Dir["#{root_dir}/production/steppers/*.rb"].sort.each { |f| require f }
 
 module ProductionApp
 end

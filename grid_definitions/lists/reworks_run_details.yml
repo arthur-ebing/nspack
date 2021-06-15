@@ -19,6 +19,11 @@
   :title: View
   :popup: true
   :hide_if_null: parent_id
+- :url: "/production/reworks/view_reworks_run_errors/$:id$"
+  :text: errors
+  :icon: quit
+  :popup: true
+  :hide_if_null: errors
 :conditions:
   :view_children:
     - :col: reworks_runs.parent_id
