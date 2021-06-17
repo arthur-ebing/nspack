@@ -37,7 +37,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # @param args [Hash] the optional where-clause conditions.
   # @return [Array] the table rows.
   def all(table_name, wrapper, args = nil)
-    ds = all_hash(table_name, args, true)
+    ds = all_hash(table_name, args, return_dataset: true)
     dataset_wrapped(ds, wrapper)
   end
 
@@ -58,7 +58,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # @param args [Hash] the optional where-clause conditions.
   # @param return_dataset [boolean] if true, returns the Sequel dataset, else the records. Default is false.
   # @return [Array] the table rows.
-  def all_hash(table_name, args = nil, return_dataset = false)
+  def all_hash(table_name, args = nil, return_dataset: false)
     ds = args.nil? ? DB[table_name] : DB[table_name].where(args)
     return_dataset ? ds : ds.all
   end
@@ -312,7 +312,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # @param order [Symbol] the order by clause.
   # @param descending [Boolean] return in descending order. Default is false.
   # @return [Array] the values from the column(s) of each row.
-  def select_values_in_order(table_name, columns, where: {}, order:, descending: false)
+  def select_values_in_order(table_name, columns, order:, where: {}, descending: false)
     ds = DB[table_name]
     ds = ds.where(where)
     ds = ds.order(order) if order && !descending

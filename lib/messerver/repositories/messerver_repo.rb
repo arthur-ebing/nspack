@@ -281,15 +281,16 @@ module MesserverApp
       failed_response("There was an error: #{e.message}")
     end
 
-    def format_response(response, context = nil) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
-      if response.code == '200'
+    def format_response(response, context = nil) # rubocop:disable Metrics/AbcSize
+      case response.code
+      when '200'
         if response.body&.include?('204 No content')
           send_error_email(response, context)
           failed_response('The server returned an empty response', response_code: '204')
         else
           success_response(response.code, response)
         end
-      elsif response.code == '503' # The printer is unavailable
+      when '503' # The printer is unavailable
         failed_response(response.body, response_code: response.code)
       else
         msg = response.code.start_with?('5') ? 'The destination server encountered an error.' : 'The request was not successful.'

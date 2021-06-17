@@ -27,7 +27,7 @@ class TestMethodNameColumnNameClashes < Minitest::Test
   end
 
   def test_valid_names_for_interactors
-    skip 'To be implemented when existing methods have been renamed'
+    # skip 'To be implemented when existing methods have been renamed'
 
     all_repo_methods = ObjectSpace.each_object(BaseInteractor.singleton_class).map { |c| c.instance_methods(false) }.flatten
     all_cols = Set.new

@@ -6,6 +6,7 @@ module LabelApp
     required(:label_name).filled(Types::StrippedString)
     optional(:label_dimension).filled(:string)
     optional(:px_per_mm).filled(:string)
+    required(:print_rotation).filled(:integer)
     optional(:multi_label).maybe(:bool)
     optional(:variable_set).filled(Types::StrippedString)
   end

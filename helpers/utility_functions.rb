@@ -137,13 +137,14 @@ module UtilityFunctions # rubocop:disable Metrics/ModuleLength
   # @param hash [hash] the hash with keys to symbolize.
   # @return [hash]
   def symbolize_keys(hash)
-    if hash.is_a?(Hash)
+    case hash
+    when Hash
       Hash[
         hash.map do |k, v|
           [k.respond_to?(:to_sym) ? k.to_sym : k, symbolize_keys(v)]
         end
       ]
-    elsif hash.is_a?(Array)
+    when Array
       hash.map { |a| symbolize_keys(a) }
     else
       hash
