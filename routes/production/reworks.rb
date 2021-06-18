@@ -718,7 +718,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         else
           commodity = MasterfilesApp::CommodityRepo.new.find_commodity(commodity_id)
           requires_standard_counts = commodity.requires_standard_counts
-          fruit_actual_counts_for_pack_id = interactor.fruit_actual_counts_for_pack_id(basic_pack_code_id, std_fruit_size_count_id)
+          fruit_actual_counts_for_pack_id = interactor.find_fruit_actual_counts_for_pack_id(basic_pack_code_id, std_fruit_size_count_id)
 
           actual_count = MasterfilesApp::FruitSizeRepo.new.find_fruit_actual_counts_for_pack(fruit_actual_counts_for_pack_id)
           standard_pack_codes = interactor.for_select_standard_pack_codes(requires_standard_counts, basic_pack_code_id, actual_count&.standard_pack_code_ids.to_a)
@@ -770,7 +770,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         else
           commodity = MasterfilesApp::CommodityRepo.new.find_commodity(commodity_id)
           requires_standard_counts = commodity.requires_standard_counts
-          fruit_actual_counts_for_pack_id = interactor.fruit_actual_counts_for_pack_id(basic_pack_code_id, std_fruit_size_count_id)
+          fruit_actual_counts_for_pack_id = interactor.find_fruit_actual_counts_for_pack_id(basic_pack_code_id, std_fruit_size_count_id)
 
           actual_count = MasterfilesApp::FruitSizeRepo.new.find_fruit_actual_counts_for_pack(fruit_actual_counts_for_pack_id)
           standard_pack_codes = interactor.for_select_standard_pack_codes(requires_standard_counts, basic_pack_code_id, actual_count&.standard_pack_code_ids.to_a)

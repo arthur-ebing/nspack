@@ -717,7 +717,7 @@ module ProductionApp
       return validation_failed_response(res) if res.failure?
       return failed_response('You did not choose a Size Reference or Actual Count') if params[:fruit_size_reference_id].to_i.nonzero?.nil? && params[:fruit_actual_counts_for_pack_id].to_i.nonzero?.nil?
 
-      res = res.to_h.merge(fruit_actual_counts_for_pack_id: fruit_actual_counts_for_pack_id(res[:basic_pack_code_id], res[:std_fruit_size_count_id]))
+      res = res.to_h.merge(fruit_actual_counts_for_pack_id: find_fruit_actual_counts_for_pack_id(res[:basic_pack_code_id], res[:std_fruit_size_count_id]))
       rejected_fields = %i[id product_setup_template_id pallet_label_name]
       attrs = res.to_h.reject { |k, _| rejected_fields.include?(k) }
 
@@ -1312,7 +1312,7 @@ module ProductionApp
       )
     end
 
-    def fruit_actual_counts_for_pack_id(basic_pack_code_id, std_fruit_size_count_id)
+    def find_fruit_actual_counts_for_pack_id(basic_pack_code_id, std_fruit_size_count_id)
       args = { basic_pack_code_id: basic_pack_code_id, std_fruit_size_count_id: std_fruit_size_count_id }
       repo.get_value(:fruit_actual_counts_for_packs, :id, args)
     end
