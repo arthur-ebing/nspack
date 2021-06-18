@@ -1,5 +1,5 @@
 <h3><%= @page.flow_type %></h3>
-<p><%= @page.file_name %></p>
+<p><%= Crossbeams::Layout::Link.new(text: 'Back', url: back_button_url, style: :back_button).render %> <%= @page.file_name %></p>
 <% page_config = Crossbeams::Layout::PageConfig.new %>
 
 <form>

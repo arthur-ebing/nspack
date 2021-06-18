@@ -33,6 +33,22 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
+    r.on 'download_edi_file' do
+      response.headers['content_type'] = 'plain/text'
+      response.headers['Content-Disposition'] = "attachment; filename=\"#{File.basename(params[:file_path])}\""
+      response.write(File.read(params[:file_path]))
+    end
+
+    r.on 'display_raw_edi_file' do
+      view(inline: <<~HTML)
+        <h2>#{params[:flow_type]} - #{File.basename(params[:file_path])}</h2>
+        <p>#{Crossbeams::Layout::Link.new(text: 'Back', url: back_button_url, style: :back_button).render} #{params[:file_path]}</p>
+        <pre>
+          #{File.read(params[:file_path])}
+        </pre>
+      HTML
+    end
+
     r.on 'display_edi_file' do
       r.on 'csv_grid' do
         interactor.csv_grid(params[:file_path])

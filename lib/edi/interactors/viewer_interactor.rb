@@ -84,7 +84,7 @@ module EdiApp
       end
 
       {
-        columnDefs: grid_columns_for_edi_files,
+        columnDefs: grid_columns_for_edi_files(sent: for_send),
         rowDefs: edi_files
       }.to_json
     end
@@ -203,10 +203,13 @@ module EdiApp
       flow_type
     end
 
-    def grid_columns_for_edi_files
+    def grid_columns_for_edi_files(sent: false) # rubocop:disable Metrics/AbcSize
       Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
         mk.action_column do |act|
           act.link 'view', '/edi/viewer/display_edi_file?flow_type=$col1$&file_path=$col2$', col1: 'flow_type', col2: 'file_path', icon: 'document-add'
+          act.separator
+          act.link 'view plain file', '/edi/viewer/display_raw_edi_file?flow_type=$col1$&file_path=$col2$', col1: 'flow_type', col2: 'file_path', icon: 'code'
+          act.link 'download', '/edi/viewer/download_edi_file?flow_type=$col1$&file_path=$col2$', col1: 'flow_type', col2: 'file_path', icon: 'download' if sent
           act.link 're-process this file', '/edi/actions/re_receive_file?file_path=$col1$', col1: 'file_path', icon: 'play', hide_if_false: 'in_error', prompt: 'Are you sure?'
         end
         mk.col 'id', 'ID', hide: true
