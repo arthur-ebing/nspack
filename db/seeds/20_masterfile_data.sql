@@ -205,16 +205,16 @@ INSERT INTO currencies (currency, description) VALUES ('AUD' , 'Australian Dolla
 INSERT INTO currencies (currency, description) VALUES ('NZD' , 'New Zealand Dollar') ON CONFLICT DO NOTHING;
 
 -- PAYMENT_TERM_DATE_TYPES
-INSERT INTO payment_term_date_types (type_of_date) VALUES ('Est Time of Departure') ON CONFLICT DO NOTHING;
-INSERT INTO payment_term_date_types (type_of_date) VALUES ('Est Time of Arrival') ON CONFLICT DO NOTHING;
-INSERT INTO payment_term_date_types (type_of_date) VALUES ('Invoice Date') ON CONFLICT DO NOTHING;
-INSERT INTO payment_term_date_types (type_of_date) VALUES ('Bill of Lading') ON CONFLICT DO NOTHING;
-INSERT INTO payment_term_date_types (type_of_date) VALUES ('Prepayment') ON CONFLICT DO NOTHING;
-INSERT INTO payment_term_date_types (type_of_date) VALUES ('Statement Date') ON CONFLICT DO NOTHING;
-INSERT INTO payment_term_date_types (type_of_date) VALUES ('Container Loading Date') ON CONFLICT DO NOTHING;
-INSERT INTO payment_term_date_types (type_of_date) VALUES ('Invoice Sent Date') ON CONFLICT DO NOTHING;
-INSERT INTO payment_term_date_types (type_of_date) VALUES ('Actual Time of Departure') ON CONFLICT DO NOTHING;
-INSERT INTO payment_term_date_types (type_of_date) VALUES ('Actual Time of Arrival') ON CONFLICT DO NOTHING;
+INSERT INTO payment_term_date_types (type_of_date, no_days_after_etd, anchor_to_date) VALUES ('Est Time of Departure', 0, 'd') ON CONFLICT DO NOTHING;
+INSERT INTO payment_term_date_types (type_of_date, no_days_after_eta, anchor_to_date) VALUES ('Est Time of Arrival', 0, 'a') ON CONFLICT DO NOTHING;
+INSERT INTO payment_term_date_types (type_of_date, no_days_after_invoice, anchor_to_date) VALUES ('Invoice Date', 0, 'i') ON CONFLICT DO NOTHING;
+INSERT INTO payment_term_date_types (type_of_date, no_days_after_etd, anchor_to_date) VALUES ('Bill of Lading', 7, 'd') ON CONFLICT DO NOTHING;
+INSERT INTO payment_term_date_types (type_of_date, no_days_after_etd, anchor_to_date) VALUES ('Prepayment', -5, 'd') ON CONFLICT DO NOTHING;
+INSERT INTO payment_term_date_types (type_of_date, no_days_after_etd, anchor_to_date, adjust_anchor_date_to_month_end) VALUES ('Statement Date', 0, 'd', true) ON CONFLICT DO NOTHING;
+INSERT INTO payment_term_date_types (type_of_date, no_days_after_container_load, anchor_to_date) VALUES ('Container Loading Date', 0, 'c') ON CONFLICT DO NOTHING;
+INSERT INTO payment_term_date_types (type_of_date, no_days_after_invoice_sent, anchor_to_date) VALUES ('Invoice Sent Date', 2, 's') ON CONFLICT DO NOTHING;
+INSERT INTO payment_term_date_types (type_of_date, no_days_after_atd, anchor_to_date) VALUES ('Actual Time of Departure', 0, 'd') ON CONFLICT DO NOTHING;
+INSERT INTO payment_term_date_types (type_of_date, no_days_after_ata, anchor_to_date) VALUES ('Actual Time of Arrival', 0, 'a') ON CONFLICT DO NOTHING;
 
 -- DEAL_TYPES
 INSERT INTO deal_types (deal_type) VALUES ('CONSIGNMENT') ON CONFLICT DO NOTHING;
