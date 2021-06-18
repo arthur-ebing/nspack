@@ -598,6 +598,10 @@ const crossbeamsUtils = {
     if (select) {
       select.removeActiveItems();
       select.setChoices(newItems, 'value', 'label', true); // seems to remove sortable...
+      // Select the item if there is only one
+      if (newItems.length === 1) {
+        select.setChoiceByValue(newItems[0].value);
+      }
     } else {
       while (elem.options.length) elem.remove(0);
       newItems.forEach((item) => {
