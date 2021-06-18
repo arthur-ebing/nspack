@@ -37,7 +37,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # @param args [Hash] the optional where-clause conditions.
   # @return [Array] the table rows.
   def all(table_name, wrapper, args = nil)
-    ds = all_hash(table_name, args, return_dataset: true)
+    ds = args.nil? ? DB[table_name] : DB[table_name].where(args)
     dataset_wrapped(ds, wrapper)
   end
 
@@ -51,16 +51,13 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
     dataset.with_row_proc(->(h) { wrapper.new(h) }).all
   end
 
-  # Return all rows from a table as Hashes or just the Sequel::Dataset
-  # without running the query.
+  # Return all rows from a table as Hashes.
   #
   # @param table_name [Symbol] the db table name.
   # @param args [Hash] the optional where-clause conditions.
-  # @param return_dataset [boolean] if true, returns the Sequel dataset, else the records. Default is false.
   # @return [Array] the table rows.
-  def all_hash(table_name, args = nil, return_dataset: false)
-    ds = args.nil? ? DB[table_name] : DB[table_name].where(args)
-    return_dataset ? ds : ds.all
+  def all_hash(table_name, args = nil)
+    args.nil? ? DB[table_name].all : DB[table_name].where(args).all
   end
 
   # Find a row in a table. Raises an exception if it is not found.
