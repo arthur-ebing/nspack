@@ -598,8 +598,8 @@ const crossbeamsUtils = {
     if (select) {
       select.removeActiveItems();
       select.setChoices(newItems, 'value', 'label', true); // seems to remove sortable...
-      // Select the item if there is only one
-      if (newItems.length === 1) {
+      // Select the item if there is only one and the select is required
+      if (newItems.length === 1 && select.config.classNames.containerOuter.includes('cbl-input-required')) {
         select.setChoiceByValue(newItems[0].value);
       }
     } else {
@@ -1082,7 +1082,7 @@ const crossbeamsUtils = {
           crossbeamsUtils.showWarning(`Unable to gather values for behaviour URL - element with id "${key}" not found.`);
           val = '';
         } else {
-          val = e.value;
+          val = e === null ? '' : e.value;
         }
       }
       queryParam[key] = val;
