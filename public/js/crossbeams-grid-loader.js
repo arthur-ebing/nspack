@@ -306,8 +306,8 @@ const crossbeamsGridFormatters = {
     [url, linkText, prompt, method] = params.value.split('|');
     prompt = prompt || 'Are you sure?';
     method = (method || 'post').toLowerCase();
-    return `<a class="${crossbeamsGridFormatters.buttonClassForLinks()}" href='#' data-prompt="${prompt}" data-method="${method}" data-url="${url}"
-    onclick="crossbeamsGridEvents.promptClick(this);">${linkText}</a>`;
+    return `<a class="${crossbeamsGridFormatters.buttonClassForLinks()}" href='#' data-link-prompt="${prompt}" data-method="${method}"
+    data-url="${url}" onclick="crossbeamsGridEvents.promptClick(this); return false;">${linkText}</a>`;
   },
 };
 
@@ -982,7 +982,7 @@ const crossbeamsGridEvents = {
    * @returns {void}
    */
   promptClick: function promptClick(target) {
-    const prompt = target.dataset.prompt;
+    const prompt = target.dataset.linkPrompt;
     const title = target.textContent && target.textContent;
     const url = target.dataset.url;
     const method = target.dataset.method;
@@ -991,6 +991,7 @@ const crossbeamsGridEvents = {
         method="post"><input name="_csrf" type="hidden" value="${document.querySelector('meta[name="_csrf"]').content}" />
         <input name="_method" type="hidden" value="${+method}" /></form>`;
       document.getElementById('dynForm').submit();
+      return false;
     };
 
     crossbeamsUtils.confirm({
@@ -998,10 +999,7 @@ const crossbeamsGridEvents = {
       okFunc: caller,
       title,
     });
-    // TODO: make call via AJAX & reload grid? Or http to server to figure it out?.....
-    // ALSO: disable link automatically while call is being processed...
-    target.stopPropagation();
-    target.preventDefault();
+    return false;
   },
 
   gridPageKey: function gridPageKey(gridId) {
@@ -1986,7 +1984,6 @@ const crossbeamsGridStaticLoader = {
 
     if (multisel) {
       gridOptions.rowSelection = 'multiple';
-      gridOptions.rowDeselection = true;
       gridOptions.suppressRowClickSelection = true;
       gridOptions.groupSelectsChildren = true;
       gridOptions.groupSelectsFiltered = true;

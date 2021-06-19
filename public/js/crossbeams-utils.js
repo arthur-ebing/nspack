@@ -1281,13 +1281,15 @@ const crossbeamsUtils = {
    * @param {function} [cancelFunc] - optional function to call if the user presses cancel.
    * @returns {void}
    */
-  confirm: function confirm({ prompt, title, okFunc, cancelFunc }) {
-    // console.log(title);
+  confirm: function confirm({
+    prompt, title, okFunc, cancelFunc,
+  }) {
     swal({
       title: title === undefined ? '' : title,
       text: prompt,
       type: 'warning',
-      showCancelButton: true }).then(okFunc, cancelFunc).catch(swal.noop);
+      showCancelButton: true,
+    }).then(okFunc, cancelFunc).catch(swal.noop);
   },
 
   /**
