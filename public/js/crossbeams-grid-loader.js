@@ -507,6 +507,9 @@ const crossbeamsGridEvents = {
             if (data.flash.notice) {
               crossbeamsUtils.showSuccess(data.flash.notice);
             }
+            if (data.flash.warning) {
+              crossbeamsUtils.showWarning(data.flash.warning);
+            }
             if (data.flash.error) {
               if (data.exception) {
                 crossbeamsUtils.showError(data.flash.error);
@@ -2145,6 +2148,9 @@ document.addEventListener('DOMContentLoaded', () => {
                   if (data.flash) {
                     if (data.flash.notice) {
                       crossbeamsUtils.showSuccess(data.flash.notice);
+                    }
+                    if (data.flash.warning) {
+                      crossbeamsUtils.showWarning(data.flash.warning);
                     }
                     if (data.flash.error) {
                       if (data.exception) {

@@ -1,4 +1,4 @@
-module ErrorHelpers
+module ErrorHelpers # rubocop:disable Metrics/ModuleLength
   # For a JSON response, set the content-type header.
   # @return [void]
   def return_json_response
@@ -136,6 +136,14 @@ module ErrorHelpers
   # @return [JSON] the message formatted for javascript to handle.
   def show_json_notice(message)
     { flash: { notice: message } }.to_json
+  end
+
+  # Show a message as a notice in JSON.
+  #
+  # @param message [String] the notice.
+  # @return [JSON] the message formatted for javascript to handle.
+  def show_json_warning(message)
+    { flash: { warning: message } }.to_json
   end
 
   # Show a permission-refused message in JSON.

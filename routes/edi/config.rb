@@ -145,7 +145,8 @@ class Nspack < Roda # rubocop:disable  Metrics/ClassLength
     end
 
     r.on 'destination_type_changed' do # rubocop:disable Metrics/BlockLength
-      if params[:changed_value] == AppConst::DEPOT_DESTINATION_TYPE
+      case params[:changed_value]
+      when AppConst::DEPOT_DESTINATION_TYPE
         depots = MasterfilesApp::DepotRepo.new.for_select_depots
         json_actions([OpenStruct.new(type: :replace_select_options,
                                      dom_id: 'edi_out_rule_depot_id',
@@ -162,20 +163,24 @@ class Nspack < Roda # rubocop:disable  Metrics/ClassLength
                                      options_array: []),
                       OpenStruct.new(type: :hide_element,
                                      dom_id: 'edi_out_rule_party_role_id_field_wrapper')])
-      elsif params[:changed_value] == AppConst::PARTY_ROLE_DESTINATION_TYPE
-        roles = AppConst::EDI_OUT_RULES_TEMPLATE[params[:edi_out_rule_flow_type]][:roles].to_a
-        json_actions([OpenStruct.new(type: :replace_select_options,
-                                     dom_id: 'edi_out_rule_depot_id',
-                                     options_array: []),
-                      OpenStruct.new(type: :hide_element,
-                                     dom_id: 'edi_out_rule_depot_id_field_wrapper'),
-                      OpenStruct.new(type: :replace_select_options,
-                                     dom_id: 'edi_out_rule_role_id',
-                                     options_array: roles),
-                      OpenStruct.new(type: :show_element,
-                                     dom_id: 'edi_out_rule_role_id_field_wrapper'),
-                      OpenStruct.new(type: :show_element,
-                                     dom_id: 'edi_out_rule_party_role_id_field_wrapper')])
+      when AppConst::PARTY_ROLE_DESTINATION_TYPE
+        if params[:edi_out_rule_flow_type].blank?
+          show_json_warning('You need to choose a flow type first')
+        else
+          roles = AppConst::EDI_OUT_RULES_TEMPLATE[params[:edi_out_rule_flow_type]][:roles].to_a
+          json_actions([OpenStruct.new(type: :replace_select_options,
+                                       dom_id: 'edi_out_rule_depot_id',
+                                       options_array: []),
+                        OpenStruct.new(type: :hide_element,
+                                       dom_id: 'edi_out_rule_depot_id_field_wrapper'),
+                        OpenStruct.new(type: :replace_select_options,
+                                       dom_id: 'edi_out_rule_role_id',
+                                       options_array: roles),
+                        OpenStruct.new(type: :show_element,
+                                       dom_id: 'edi_out_rule_role_id_field_wrapper'),
+                        OpenStruct.new(type: :show_element,
+                                       dom_id: 'edi_out_rule_party_role_id_field_wrapper')])
+        end
       else
         json_actions([OpenStruct.new(type: :replace_select_options,
                                      dom_id: 'edi_out_rule_depot_id',
