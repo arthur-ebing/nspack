@@ -1122,12 +1122,14 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
       res = interactor.complete_pallet_tripsheet(id, params[:pallet][:print], params[:pallet][:printer])
       if res.success
-        jasper_params = JasperParams.new('interwarehouse',
-                                         current_user.login_name,
-                                         vehicle_job_id: id)
-        jasper_params.mode = :print
-        jasper_params.printer = LabelApp::PrinterRepo.new.find_printer(params[:pallet][:printer])&.printer_code
-        res = CreateJasperReport.call(jasper_params)
+        if params[:pallet][:print] == 't'
+          jasper_params = JasperParams.new('interwarehouse',
+                                           current_user.login_name,
+                                           vehicle_job_id: id)
+          jasper_params.mode = :print
+          jasper_params.printer = LabelApp::PrinterRepo.new.find_printer(params[:pallet][:printer])&.printer_code
+          res = CreateJasperReport.call(jasper_params)
+        end
 
         if res.success
           store_locally(:flash_notice, "Tripsheet:#{id} completed and printed successfully")
