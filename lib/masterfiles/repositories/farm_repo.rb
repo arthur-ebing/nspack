@@ -268,11 +268,15 @@ module MasterfilesApp
       DB[:pucs].join(:farms_pucs, puc_id: :id).where(farm_id: farm_id).select_map(:puc_id).first
     end
 
-    def select_unallocated_pucs
+    def for_select_primary_pucs
       query = <<~SQL
-        SELECT puc_code,id
+        SELECT
+          CONCAT(puc_code, ' ', STRING_AGG(farm_code, ', ')) AS puc_code,
+          pucs.id
         FROM pucs
-        WHERE active AND id NOT IN (SELECT distinct puc_id from farms_pucs)
+        LEFT JOIN farms_pucs ON pucs.id = farms_pucs.puc_id
+        LEFT JOIN farms ON farms_pucs.farm_id = farms.id
+        GROUP BY pucs.id
       SQL
       DB[query].order(:puc_code).select_map(%i[puc_code id])
     end

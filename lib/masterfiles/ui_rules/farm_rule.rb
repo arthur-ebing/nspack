@@ -44,16 +44,15 @@ module UiRules
     end
 
     def common_fields
-      farm_pucs = @options[:id] ? @repo.selected_farm_pucs(where: { farm_id: @options[:id] }) : @repo.select_unallocated_pucs
       puc_renderer = if @mode == :new
                        { renderer: :select,
-                         options: farm_pucs,
+                         options: @repo.for_select_primary_pucs,
                          disabled_options: @repo.for_select_inactive_pucs,
                          caption: 'Primary PUC',
                          required: true }
                      else
                        { renderer: :label,
-                         with_value: farm_pucs.first.first,
+                         with_value: @repo.selected_farm_pucs(where: { farm_id: @options[:id] }).first.first,
                          caption: 'Primary PUC' }
                      end
       {
@@ -64,6 +63,7 @@ module UiRules
         pdn_region_id: { renderer: :select,
                          options: @repo.for_select_production_regions,
                          disabled_options: @repo.for_select_inactive_production_regions,
+                         caption: 'PDN Region',
                          required: true },
         farm_group_id: { renderer: :select,
                          options: @repo.for_select_farm_groups,
