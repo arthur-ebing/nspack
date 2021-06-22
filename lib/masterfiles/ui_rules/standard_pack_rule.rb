@@ -20,8 +20,10 @@ module UiRules
       fields[:std_pack_label_code] = { renderer: :label,
                                        caption: 'Label code' }
       fields[:material_mass] = { renderer: :label }
-      fields[:plant_resource_button_indicator] = { renderer: :label,
-                                                   invisible: !AppConst::CR_PROD.provide_pack_type_at_carton_verification? }
+      fields[:plant_resource_button_indicator] = {
+        renderer: :label,
+        hide_on_load: !AppConst::CR_PROD.provide_pack_type_at_carton_verification?
+      }
       fields[:active] = { renderer: :label,
                           as_boolean: true }
       fields[:use_size_ref_for_edi] = { renderer: :label,
@@ -51,15 +53,17 @@ module UiRules
         std_pack_label_code: { caption: 'Label code' },
         material_mass: { required: true,
                          renderer: :numeric },
-        plant_resource_button_indicator: { renderer: :select,
-                                           options: @repo.for_select_plant_resource_button_indicator(Crossbeams::Config::ResourceDefinitions::MODULE_BUTTON),
-                                           caption: 'Button Indicator',
-                                           prompt: 'Select Button Indicator',
-                                           invisible: !AppConst::CR_PROD.provide_pack_type_at_carton_verification?,
-                                           searchable: true,
-                                           remove_search_for_small_list: false,
-                                           hint: '<p>Selecting this indicator allows you to specify which std_pack is to be used for which button.</p>
-                                                  <p>Then when the carton is verified, the correct standard pack will be assigned to the carton.</p>' },
+        plant_resource_button_indicator: {
+          renderer: :select,
+          options: @repo.for_select_plant_resource_button_indicator(Crossbeams::Config::ResourceDefinitions::MODULE_BUTTON),
+          caption: 'Button Indicator',
+          prompt: 'Select Button Indicator',
+          hide_on_load: !AppConst::CR_PROD.provide_pack_type_at_carton_verification?,
+          searchable: true,
+          remove_search_for_small_list: false,
+          hint: '<p>Selecting this indicator allows you to specify which std_pack is to be used for which button.</p>
+                 <p>Then when the carton is verified, the correct standard pack will be assigned to the carton.</p>'
+        },
         use_size_ref_for_edi: { renderer: :checkbox,
                                 hint: '<p>When the checkbox is ticked:</p>
                                        <p>edi files will use the fruit_size_references.size_reference as the edi_size_count.</p>' },
@@ -68,20 +72,24 @@ module UiRules
         bin: { renderer: :checkbox,
                caption: 'Bin?',
                as_boolean: true  },
-        rmt_container_type_id: { renderer: :select,
-                                 options: MasterfilesApp::RmtContainerTypeRepo.new.for_select_rmt_container_types,
-                                 disabled_options: MasterfilesApp::RmtContainerTypeRepo.new.for_select_inactive_rmt_container_types,
-                                 prompt: true,
-                                 hide_on_load: !@form_object.bin,
-                                 caption: 'Container Type' },
-        rmt_container_material_type_id: { renderer: :select,
-                                          options: MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_rmt_container_material_types(
-                                            where: { rmt_container_type_id: @form_object.rmt_container_type_id }
-                                          ),
-                                          disabled_options: MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_inactive_rmt_container_material_types,
-                                          prompt: true,
-                                          hide_on_load: !@form_object.bin,
-                                          caption: 'Material Type' },
+        rmt_container_type_id: {
+          renderer: :select,
+          options: MasterfilesApp::RmtContainerTypeRepo.new.for_select_rmt_container_types,
+          disabled_options: MasterfilesApp::RmtContainerTypeRepo.new.for_select_inactive_rmt_container_types,
+          prompt: true,
+          hide_on_load: !@form_object.bin,
+          caption: 'Container Type'
+        },
+        rmt_container_material_type_id: {
+          renderer: :select,
+          options: MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_rmt_container_material_types(
+            where: { rmt_container_type_id: @form_object.rmt_container_type_id }
+          ),
+          disabled_options: MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_inactive_rmt_container_material_types,
+          prompt: true,
+          hide_on_load: !@form_object.bin,
+          caption: 'Material Type'
+        },
         basic_pack_ids: { renderer: :multi,
                           caption: 'Basic Packs',
                           options: @repo.for_select_basic_packs,

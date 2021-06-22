@@ -60,7 +60,6 @@ module MasterfilesApp
     end
 
     def validate_standard_pack_params(params)
-      # StandardPackSchema.call(params)
       StandardPackContract.new.call(params)
     end
   end
