@@ -13,6 +13,7 @@ module MesscadaApp
 
     def call # rubocop:disable Metrics/AbcSize
       return success_response('ok', params) unless params[:identifier].nil_or_empty?
+      return success_response('ok', params) unless AppConst::CR_PROD.incentive_palletizing
 
       contract_worker_id = repo.logged_in_worker_for_device(params[:device], params[:card_reader])
       return failed_response('Not logged-in', params) if contract_worker_id.nil?
