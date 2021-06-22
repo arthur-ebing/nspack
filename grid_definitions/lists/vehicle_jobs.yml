@@ -6,6 +6,12 @@
   :icon: view-show
   :title: View
   :popup: true
+- :url: "/rmd/finished_goods/print_pallet_tripsheet/$:id$"
+  :text: print_tripsheet
+  :icon: printer
+  :hide_if_false: loaded
+  :title: Print
+  :loading_window: true
 - :url: "/finished_goods/interwarehouse_transfers/cancel_pallet_tripsheet/$:id$"
   :text: cancel
   :icon: edit-pencil

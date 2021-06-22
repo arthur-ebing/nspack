@@ -219,7 +219,9 @@ module FinishedGoodsApp
       success_response 'Tripsheet valid'
     end
 
-    def complete_pallet_tripsheet(vehicle_job_id) # rubocop:disable Metrics/AbcSize
+    def complete_pallet_tripsheet(vehicle_job_id, print, printer) # rubocop:disable Metrics/AbcSize
+      return failed_response('Please select a printer') if print == 't' && printer.nil_or_empty?
+
       repo.transaction do
         repo.update(:vehicle_jobs, vehicle_job_id, loaded_at: Time.now)
         repo.load_vehicle_job_units(vehicle_job_id)

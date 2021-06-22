@@ -1062,8 +1062,21 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
+    r.on 'print_changed' do
+      show =  case params[:changed_value]
+              when 't'
+                true
+              when 'f', ''
+                false
+              end
+
+      action = show ? :show_element : :hide_element
+      json_actions([OpenStruct.new(type: action, dom_id: 'pallet_printer_row')])
+    end
+
     r.on 'scan_tripsheet_pallet', Integer do |id|
       form_state = {}
+      form_state.merge! retrieve_from_local_store(:form_state).to_h
       error = retrieve_from_local_store(:error)
       form_state.merge!(error_message: error) unless error.nil?
 
@@ -1073,6 +1086,11 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                      caption: 'Scan Tripeheet Pallet',
                                      action: "/rmd/finished_goods/create_pallet_vehicle_job_unit/#{id}",
                                      button_caption: 'Submit')
+
+      form.behaviours do |behaviour|
+        behaviour.input_change :print,
+                               notify: [{ url: '/rmd/finished_goods/print_changed' }]
+      end
 
       tripsheet_pallets = FinishedGoodsApp::GovtInspectionRepo.new.get_vehicle_job_units(id)
       form.add_label(:tripsheet_number, 'Tripsheet Number', id)
@@ -1085,6 +1103,14 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
 
+      form.add_toggle(:print, 'Print Tripsheet?')
+      form.add_select(:printer,
+                      'Printer',
+                      items: LabelApp::PrinterRepo.new.select_printers_for_application(AppConst::PRINT_APP_PALLET_TRIPSHEET),
+                      value: LabelApp::PrinterRepo.new.default_printer_for_application(AppConst::PRINT_APP_PALLET_TRIPSHEET),
+                      required: false,
+                      prompt: true,
+                      hide_on_load: form_state[:print] != 't')
       form.add_button('Cancel', "/rmd/finished_goods/cancel_pallet_tripsheet/#{id}")
       form.add_button('Complete', "/rmd/finished_goods/complete_pallet_tripsheet/#{id}")
       form.add_csrf_tag csrf_tag
@@ -1094,13 +1120,36 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     r.on 'complete_pallet_tripsheet', Integer do |id|
       interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
-      res = interactor.complete_pallet_tripsheet(id)
+      res = interactor.complete_pallet_tripsheet(id, params[:pallet][:print], params[:pallet][:printer])
       if res.success
-        store_locally(:flash_notice, "Tripsheet:#{id} completed successfully")
-        r.redirect('/rmd/finished_goods/create_pallet_tripsheet')
+        jasper_params = JasperParams.new('interwarehouse',
+                                         current_user.login_name,
+                                         vehicle_job_id: id)
+        jasper_params.mode = :print
+        jasper_params.printer = LabelApp::PrinterRepo.new.find_printer(params[:pallet][:printer])&.printer_code
+        res = CreateJasperReport.call(jasper_params)
+
+        if res.success
+          store_locally(:flash_notice, "Tripsheet:#{id} completed and printed successfully")
+          r.redirect('/rmd/finished_goods/create_pallet_tripsheet')
+        end
+      end
+
+      store_locally(:error, unwrap_failed_response(res))
+      store_locally(:form_state, params[:pallet])
+      r.redirect("/rmd/finished_goods/scan_tripsheet_pallet/#{id}")
+    end
+
+    r.on 'print_pallet_tripsheet', Integer do |id|
+      jasper_params = JasperParams.new('interwarehouse',
+                                       current_user.login_name,
+                                       vehicle_job_id: id)
+      res = CreateJasperReport.call(jasper_params)
+
+      if res.success
+        change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
       else
-        store_locally(:error, unwrap_failed_response(res))
-        r.redirect('/rmd/finished_goods/continue_pallet_tripsheet')
+        show_error(res.message, fetch?(r))
       end
     end
 

@@ -6,6 +6,7 @@
   "govt_inspection_sheets"."booking_reference", "locations"."location_long_code" AS
   planned_location_to_location_long_code, "stock_types"."stock_type_code", fn_current_status('vehicle_jobs',
   "vehicle_jobs"."id") AS status, CASE WHEN (vehicle_jobs.loaded_at is null AND govt_inspection_sheet_id is null) THEN true ELSE false END as can_cancel,
+  CASE WHEN vehicle_jobs.loaded_at is not null  THEN true ELSE false END as loaded,
   CASE WHEN (vehicle_jobs.loaded_at is not null AND vehicle_jobs.offloaded_at is null AND govt_inspection_sheet_id is null) THEN true ELSE false END as can_open,
   CASE WHEN vehicle_jobs.offloaded_at is not null THEN 'gray'
   WHEN vehicle_jobs.loaded_at is null AND vehicle_jobs.offloaded_at is null AND govt_inspection_sheet_id is null THEN 'green'

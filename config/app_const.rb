@@ -395,7 +395,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   PRINT_APP_BIN = 'Bin'
   PRINT_APP_REBIN = 'Rebin'
   PRINT_APP_CARTON = 'Carton'
-  PRINT_APP_PALLET = 'Pallet'
+  PRINT_APP_PALLET_TRIPSHEET = 'Pallet Tripsheet'
   PRINT_APP_PACKPOINT = 'Packpoint'
   PRINT_APP_PERSONNEL = 'Personnel'
 
@@ -404,7 +404,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
     PRINT_APP_BIN,
     PRINT_APP_REBIN,
     PRINT_APP_CARTON,
-    PRINT_APP_PALLET,
+    PRINT_APP_PALLET_TRIPSHEET,
     PRINT_APP_PACKPOINT,
     PRINT_APP_PERSONNEL
   ].freeze
