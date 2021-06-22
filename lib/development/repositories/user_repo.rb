@@ -67,8 +67,11 @@ module DevelopmentApp
     def copy_programs_and_permissions(id, res)
       params = res.to_h
 
-      new_ids = DB[:programs_users].where(user_id: params[:from_user_id]).exclude(user_id: id).select_map(:program_id)
-      new_ids.each do |program_id|
+      existing_program_ids  = DB[:programs_users].where(user_id: id).select_map(:program_id)
+      from_user_program_ids = DB[:programs_users].where(user_id: params[:from_user_id]).select_map(:program_id)
+      new_program_ids       = from_user_program_ids - existing_program_ids
+
+      new_program_ids.each do |program_id|
         security_group_id = DB[:programs_users].where(user_id: params[:from_user_id], program_id: program_id).get(:security_group_id)
         DB[:programs_users].insert(user_id: id, program_id: program_id, security_group_id: security_group_id)
       end
