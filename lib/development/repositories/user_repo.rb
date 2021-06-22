@@ -64,7 +64,7 @@ module DevelopmentApp
       success_response('Applied', DB[qry].first)
     end
 
-    def copy_programs_and_permissions(id, res)
+    def copy_programs_and_permissions(id, res) # rubocop:disable Metrics/AbcSize
       params = res.to_h
 
       existing_program_ids  = DB[:programs_users].where(user_id: id).select_map(:program_id)
