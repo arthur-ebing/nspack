@@ -5,7 +5,7 @@ module Crossbeams
     include Crossbeams::AutoDocumentation
 
     CLIENT_SETTINGS = {
-      hb: { run_allocations: false,
+      hb: { run_allocations: true,
             pallet_label_seqs_sql: 'SELECT ps.production_run_id, o.orchard_code, c.cultivar_code, ps.nett_weight FROM pallet_sequences ps JOIN orchards o ON o.id = ps.orchard_id JOIN cultivars c ON c.id = ps.cultivar_id WHERE ps.pallet_id = ? ORDER BY ps.pallet_sequence_number',
             use_gtins: false,
             print_from_line_scanning: false,

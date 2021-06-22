@@ -24,6 +24,7 @@ module ProductionApp
       alloc = repo.get(:production_runs, id, :allocation_required)
       assert alloc
 
+      skip 'Temporarily set HB to allow allocations to runs (for Citrus ph)'
       AppConst::TEST_SETTINGS.client_code = 'hb'
       id = repo.create_production_run(attrs)
       alloc = repo.get(:production_runs, id, :allocation_required)
