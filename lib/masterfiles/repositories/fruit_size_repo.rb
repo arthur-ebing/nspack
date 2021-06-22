@@ -238,26 +238,6 @@ module MasterfilesApp
       FruitActualCountsForPack.new(hash)
     end
 
-    def list_standard_pack_codes(id)
-      query = <<~SQL
-        SELECT standard_pack_codes.standard_pack_code
-        FROM standard_pack_codes
-        JOIN fruit_actual_counts_for_packs ON standard_pack_codes.id = ANY (fruit_actual_counts_for_packs.standard_pack_code_ids)
-        WHERE fruit_actual_counts_for_packs.id = #{id}
-      SQL
-      DB[query].order(:standard_pack_code).select_map(:standard_pack_code)
-    end
-
-    def list_size_references(id)
-      query = <<~SQL
-        SELECT fruit_size_references.size_reference
-        FROM fruit_size_references
-        JOIN fruit_actual_counts_for_packs ON fruit_size_references.id = ANY (fruit_actual_counts_for_packs.size_reference_ids)
-        WHERE fruit_actual_counts_for_packs.id = #{id}
-      SQL
-      DB[query].order(:size_reference).select_map(:size_reference)
-    end
-
     def for_select_plant_resource_button_indicator(system_resource_type_code)
       query = <<~SQL
         SELECT DISTINCT substring("system_resource_code"  from '..$') AS button

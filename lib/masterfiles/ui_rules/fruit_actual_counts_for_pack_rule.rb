@@ -16,15 +16,13 @@ module UiRules
       form_name 'fruit_actual_counts_for_pack'
     end
 
-    def set_show_fields # rubocop:disable Metrics/AbcSize
-      std_fruit_size_count_id_label = @repo.find_hash(:std_fruit_size_counts, @form_object.std_fruit_size_count_id)[:size_count_value]
-      basic_pack_code_id_label = @repo.find_hash(:basic_pack_codes, @form_object.basic_pack_code_id)[:basic_pack_code]
-      fields[:std_fruit_size_count_id] = { renderer: :label, with_value: std_fruit_size_count_id_label, caption: 'Std Fruit Size Count' }
-      fields[:basic_pack_code_id] = { renderer: :label, with_value: basic_pack_code_id_label, caption: 'Basic Pack' }
+    def set_show_fields
+      fields[:std_fruit_size_count] = { renderer: :label }
+      fields[:basic_pack_code] = { renderer: :label, caption: 'Basic Pack' }
       fields[:actual_count_for_pack] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
-      fields[:standard_pack_codes] = { renderer: :list, items: list_standard_pack_codes, caption: 'Standard Packs' }
-      fields[:size_references] = { renderer: :list, items: list_size_references }
+      fields[:standard_packs] = { renderer: :list, items: @form_object.standard_packs.split(',') }
+      fields[:size_references] = { renderer: :list, items: @form_object.size_references.split(',') }
     end
 
     def common_fields
@@ -51,8 +49,7 @@ module UiRules
         size_reference_ids: { renderer: :multi,
                               options: MasterfilesApp::FruitSizeRepo.new.for_select_fruit_size_references,
                               selected: @form_object.size_reference_ids,
-                              caption: 'Size References',
-                              required: true }
+                              caption: 'Size References' }
       }
     end
 
@@ -76,14 +73,6 @@ module UiRules
       behaviours do |behaviour|
         behaviour.dropdown_change :basic_pack_code_id, notify: [{ url: '/masterfiles/fruit/std_fruit_size_counts/basic_pack_changed' }]
       end
-    end
-
-    def list_standard_pack_codes
-      @repo.list_standard_pack_codes(@options[:id])
-    end
-
-    def list_size_references
-      @repo.list_size_references(@options[:id])
     end
   end
 end

@@ -12,11 +12,11 @@ module Masterfiles
             page.form_object ui_rule.form_object
             page.form do |form|
               form.view_only!
-              form.add_field :std_fruit_size_count_id
-              form.add_field :basic_pack_code_id
+              form.add_field :std_fruit_size_count
+              form.add_field :basic_pack_code
               form.add_field :actual_count_for_pack
               form.add_field :active
-              form.add_field :standard_pack_codes
+              form.add_field :standard_packs
               form.add_field :size_references
             end
           end
