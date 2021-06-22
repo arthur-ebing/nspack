@@ -28,6 +28,16 @@ class Nspack < Roda
         end
         redirect_to_last_grid(r)
       end
+
+      r.on 'refresh_office' do
+        res = interactor.refresh_server_printers(URI.parse(AppConst::URL_BASE_IP).host)
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
+        redirect_to_last_grid(r)
+      end
     end
 
     # PRINTER APPLICATIONS

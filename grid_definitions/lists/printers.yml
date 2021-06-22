@@ -9,6 +9,11 @@
 :page_controls:
 - :control_type: :link
   :url: "/labels/printers/printers/refresh"
-  :text: Refresh printer list
+  :text: Refresh industrial printer list
+  :style: :button
+  :behaviour: :default
+- :control_type: :link
+  :url: "/labels/printers/printers/refresh_office"
+  :text: Refresh office printer list
   :style: :button
   :behaviour: :default
