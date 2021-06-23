@@ -1402,6 +1402,9 @@ module DevelopmentApp
           end
           s = <<~RUBY
             def create_#{opts.inflector.singularize(table)}(opts = {})
+                  id = get_available_factory_record(:#{table}, opts)
+                  return id unless id.nil?
+
                   #{show_lkp(lkps)}default = {
                     #{fields.map { |f| render_field(f, table) }.join(",\n        ")}
                   }

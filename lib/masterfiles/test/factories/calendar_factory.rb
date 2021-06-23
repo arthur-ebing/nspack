@@ -3,6 +3,9 @@
 module MasterfilesApp
   module CalendarFactory
     def create_season_group(opts = {})
+      id = get_available_factory_record(:season_groups, opts)
+      return id unless id.nil?
+
       default = {
         season_group_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
