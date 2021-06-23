@@ -67,13 +67,16 @@ module DevelopmentApp
     def copy_programs_and_permissions(id, res) # rubocop:disable Metrics/AbcSize
       params = res.to_h
 
-      existing_program_ids  = DB[:programs_users].where(user_id: id).select_map(:program_id)
-      from_user_program_ids = DB[:programs_users].where(user_id: params[:from_user_id]).select_map(:program_id)
-      new_program_ids       = from_user_program_ids - existing_program_ids
+      existing_user   = DB[:programs_users].where(user_id: id)
+      from_user       = DB[:programs_users].where(user_id: params[:from_user_id])
+      new_program_ids = from_user.select_map(:program_id) - existing_user.select_map(:program_id)
 
-      new_program_ids.each do |program_id|
-        security_group_id = DB[:programs_users].where(user_id: params[:from_user_id], program_id: program_id).get(:security_group_id)
-        DB[:programs_users].insert(user_id: id, program_id: program_id, security_group_id: security_group_id)
+      from_user.select_map(%i[program_id security_group_id]).each do |program_id, security_group_id|
+        if new_program_ids.include? program_id
+          DB[:programs_users].insert(user_id: id, program_id: program_id, security_group_id: security_group_id)
+        else
+          DB[:programs_users].where(user_id: id, program_id: program_id).update(security_group_id: security_group_id)
+        end
       end
     end
 
