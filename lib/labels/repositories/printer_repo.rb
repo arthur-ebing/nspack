@@ -106,7 +106,7 @@ module LabelApp
     end
 
     def distinct_px_mm
-      DB[:printers].distinct.select_map(:pixels_per_mm).sort
+      DB[:printers].exclude(pixels_per_mm: nil).distinct.select_map(:pixels_per_mm).sort
     end
 
     def printers_for(px_per_mm)

@@ -385,11 +385,7 @@ class Nspack < Roda
       r.on :id do |id|
         r.post do
           repo = LabelApp::LabelRepo.new
-          img = if AppConst::NEW_FEATURE_LBL_PREPROCESS
-                  Sequel.blob(interactor.image_from_param_without_alpha(params[:imageString]))
-                else
-                  Sequel.blob(interactor.image_from_param(params[:imageString]))
-                end
+          img = Sequel.blob(interactor.image_from_param_without_alpha(params[:imageString]))
           xml = interactor.variable_xml_from_params(params)
           puts '---'
           puts xml
@@ -417,11 +413,7 @@ class Nspack < Roda
         extra_attributes = session[:new_label_attributes] ### WHAT IF THESE nil? (as happened at SRCC at 00:40) <session cleared? problem if cloned? OR double-send? - 1st end has session data and second has it replaced with nil...>
         extcols = interactor.select_extended_columns_params(extra_attributes)
         from_id = extra_attributes[:cloned_from_id]
-        img = if AppConst::NEW_FEATURE_LBL_PREPROCESS
-                Sequel.blob(interactor.image_from_param_without_alpha(params[:imageString]))
-              else
-                Sequel.blob(interactor.image_from_param(params[:imageString]))
-              end
+        img = Sequel.blob(interactor.image_from_param_without_alpha(params[:imageString]))
         # p params[:label]
         # puts '>>> XML'
         # puts '---'

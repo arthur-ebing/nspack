@@ -91,7 +91,12 @@ class CreateJasperReport < BaseService # rubocop:disable Metrics/ClassLength
 
   def save_file(output)
     file = "#{@output_file}.#{@file_type}"
-    File.open(file, 'w') { |f| f << output[:doc] }
+    mode = if %i[csv html txt].include?(@file_type)
+             'w'
+           else
+             'wb'
+           end
+    File.open(file, mode) { |f| f << output[:doc] }
   end
 
   def send_error_mail(result) # rubocop:disable Metrics/AbcSize
