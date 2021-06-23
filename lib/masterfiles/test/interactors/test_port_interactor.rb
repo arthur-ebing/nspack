@@ -6,7 +6,7 @@ module MasterfilesApp
   class TestPortInteractor < MiniTestWithHooks
     include PortFactory
     include PortTypeFactory
-    include VoyageTypeFactory
+    include VesselFactory
     include DepotFactory
 
     def test_repo

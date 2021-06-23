@@ -41,54 +41,12 @@ module RawMaterialsApp
       RawMaterialsApp::RmtDeliveryRepo.any_instance.stubs(:find_rmt_delivery).returns(entity)
       res = RawMaterialsApp::TaskPermissionCheck::RmtDelivery.call(:edit, 1)
       assert res.success, 'Should be able to edit a rmt_delivery'
-
-      # RawMaterialsApp::RmtDeliveryRepo.any_instance.stubs(:find_rmt_delivery).returns(entity(completed: true))
-      # res = RawMaterialsApp::TaskPermissionCheck::RmtDelivery.call(:edit, 1)
-      # refute res.success, 'Should not be able to edit a completed rmt_delivery'
     end
 
     def test_delete
       RawMaterialsApp::RmtDeliveryRepo.any_instance.stubs(:find_rmt_delivery).returns(entity)
       res = RawMaterialsApp::TaskPermissionCheck::RmtDelivery.call(:delete, 1)
       assert res.success, 'Should be able to delete a rmt_delivery'
-
-      # RawMaterialsApp::RmtDeliveryRepo.any_instance.stubs(:find_rmt_delivery).returns(entity(completed: true))
-      # res = RawMaterialsApp::TaskPermissionCheck::RmtDelivery.call(:delete, 1)
-      # refute res.success, 'Should not be able to delete a completed rmt_delivery'
     end
-
-    # def test_complete
-    #   RawMaterialsApp::RmtDeliveryRepo.any_instance.stubs(:find_rmt_delivery).returns(entity)
-    #   res = RawMaterialsApp::TaskPermissionCheck::RmtDelivery.call(:complete, 1)
-    #   assert res.success, 'Should be able to complete a rmt_delivery'
-
-    #   RawMaterialsApp::RmtDeliveryRepo.any_instance.stubs(:find_rmt_delivery).returns(entity(completed: true))
-    #   res = RawMaterialsApp::TaskPermissionCheck::RmtDelivery.call(:complete, 1)
-    #   refute res.success, 'Should not be able to complete an already completed rmt_delivery'
-    # end
-
-    # def test_approve
-    #   RawMaterialsApp::RmtDeliveryRepo.any_instance.stubs(:find_rmt_delivery).returns(entity(completed: true, approved: false))
-    #   res = RawMaterialsApp::TaskPermissionCheck::RmtDelivery.call(:approve, 1)
-    #   assert res.success, 'Should be able to approve a completed rmt_delivery'
-
-    #   RawMaterialsApp::RmtDeliveryRepo.any_instance.stubs(:find_rmt_delivery).returns(entity)
-    #   res = RawMaterialsApp::TaskPermissionCheck::RmtDelivery.call(:approve, 1)
-    #   refute res.success, 'Should not be able to approve a non-completed rmt_delivery'
-
-    #   RawMaterialsApp::RmtDeliveryRepo.any_instance.stubs(:find_rmt_delivery).returns(entity(completed: true, approved: true))
-    #   res = RawMaterialsApp::TaskPermissionCheck::RmtDelivery.call(:approve, 1)
-    #   refute res.success, 'Should not be able to approve an already approved rmt_delivery'
-    # end
-
-    # def test_reopen
-    #   RawMaterialsApp::RmtDeliveryRepo.any_instance.stubs(:find_rmt_delivery).returns(entity)
-    #   res = RawMaterialsApp::TaskPermissionCheck::RmtDelivery.call(:reopen, 1)
-    #   refute res.success, 'Should not be able to reopen a rmt_delivery that has not been approved'
-
-    #   RawMaterialsApp::RmtDeliveryRepo.any_instance.stubs(:find_rmt_delivery).returns(entity(completed: true, approved: true))
-    #   res = RawMaterialsApp::TaskPermissionCheck::RmtDelivery.call(:reopen, 1)
-    #   assert res.success, 'Should be able to reopen an approved rmt_delivery'
-    # end
   end
 end

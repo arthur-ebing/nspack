@@ -76,13 +76,7 @@ module MasterfilesApp
     end
 
     def validate_organization_params(params)
-      params[:role_ids] ||= ''
       OrganizationSchema.call(params)
-    end
-
-    def organization_target_customer_party_role_id(id)
-      party_id = repo.get(:organizations, id, :party_id)
-      repo.party_role_id_from_role_and_party_id(AppConst::ROLE_TARGET_CUSTOMER, party_id)
     end
   end
 end

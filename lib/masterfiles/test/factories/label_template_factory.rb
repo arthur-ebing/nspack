@@ -3,6 +3,9 @@
 module MasterfilesApp
   module LabelTemplateFactory
     def create_label_template(opts = {})
+      id = get_available_factory_record(:label_templates, opts)
+      return id unless id.nil?
+
       default = {
         label_template_name: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,

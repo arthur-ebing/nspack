@@ -10,7 +10,7 @@ module RawMaterialsApp
     include MasterfilesApp::CultivarFactory
     include MasterfilesApp::FarmFactory
     include MasterfilesApp::DepotFactory
-    include MasterfilesApp::RmtContainerMaterialTypeFactory
+    include MasterfilesApp::RmtContainerFactory
     include RawMaterialsApp::RmtBinFactory
 
     def test_repo

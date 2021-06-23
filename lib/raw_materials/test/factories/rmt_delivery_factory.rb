@@ -3,6 +3,9 @@
 module RawMaterialsApp
   module RmtDeliveryFactory
     def create_rmt_delivery(opts = {}) # rubocop:disable Metrics/AbcSize
+      id = get_available_factory_record(:rmt_deliveries, opts)
+      return id unless id.nil?
+
       orchard_id = create_orchard
       cultivar_id = create_cultivar
       rmt_delivery_destination_id = create_rmt_delivery_destination

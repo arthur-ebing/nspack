@@ -63,11 +63,11 @@ module MasterfilesApp
     private
 
     def organization_attrs
-      party_id = create_party(party_type: 'O')
+      id = create_organization
+      party_id = DB[:organizations].where(id: id).get(:party_id)
       role_id = create_role
-      create_party_role(party_id: party_id, role_id: role_id)
       {
-        id: 1,
+        id: id,
         party_id: party_id,
         parent_id: nil,
         parent_organization: nil,

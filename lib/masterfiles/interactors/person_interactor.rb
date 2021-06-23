@@ -62,7 +62,6 @@ module MasterfilesApp
     end
 
     def validate_person_params(params)
-      params[:role_ids] ||= ''
       PersonSchema.call(params)
     end
   end

@@ -53,7 +53,7 @@ module MasterfilesApp
     end
 
     def test_delete_uom
-      id = create_uom
+      id = create_uom(force_create: true)
       assert_count_changed(:uoms, -1) do
         res = interactor.delete_uom(id)
         assert res.success, res.message

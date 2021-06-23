@@ -9,12 +9,11 @@ module MasterfilesApp
       id = nil
       repo.transaction do
         id = repo.create_fruit_size_reference(res)
-        log_status('fruit_size_references', id, 'CREATED')
+        log_status(:fruit_size_references, id, 'CREATED')
         log_transaction
       end
       instance = fruit_size_reference(id)
-      success_response("Created fruit size reference #{instance.size_reference}",
-                       instance)
+      success_response("Created fruit size reference #{instance.size_reference}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { size_reference: ['This fruit size reference already exists'] }))
     rescue Crossbeams::InfoError => e
@@ -30,8 +29,7 @@ module MasterfilesApp
         log_transaction
       end
       instance = fruit_size_reference(id)
-      success_response("Updated fruit size reference #{instance.size_reference}",
-                       instance)
+      success_response("Updated fruit size reference #{instance.size_reference}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -40,7 +38,7 @@ module MasterfilesApp
       name = fruit_size_reference(id).size_reference
       repo.transaction do
         repo.delete_fruit_size_reference(id)
-        log_status('fruit_size_references', id, 'DELETED')
+        log_status(:fruit_size_references, id, 'DELETED')
         log_transaction
       end
       success_response("Deleted fruit size reference #{name}")

@@ -3,8 +3,10 @@
 module MasterfilesApp
   module DepotFactory
     def create_depot(opts = {})
-      destination_city_id = create_destination_city
+      id = get_available_factory_record(:depots, opts)
+      return id unless id.nil?
 
+      destination_city_id = create_destination_city
       default = {
         city_id: destination_city_id,
         depot_code: Faker::Lorem.unique.word,
@@ -18,8 +20,10 @@ module MasterfilesApp
     end
 
     def create_destination_city(opts = {})
-      destination_country_id = create_destination_country
+      id = get_available_factory_record(:destination_cities, opts)
+      return id unless id.nil?
 
+      destination_country_id = create_destination_country
       default = {
         destination_country_id: destination_country_id,
         city_name: Faker::Lorem.unique.word,
@@ -31,8 +35,10 @@ module MasterfilesApp
     end
 
     def create_destination_country(opts = {})
-      destination_region_id = create_destination_region
+      id = get_available_factory_record(:destination_countries, opts)
+      return id unless id.nil?
 
+      destination_region_id = create_destination_region
       default = {
         destination_region_id: destination_region_id,
         country_name: Faker::Lorem.unique.word,
@@ -44,6 +50,9 @@ module MasterfilesApp
     end
 
     def create_destination_region(opts = {})
+      id = get_available_factory_record(:destination_regions, opts)
+      return id unless id.nil?
+
       default = {
         destination_region_name: Faker::Lorem.unique.word,
         active: true,

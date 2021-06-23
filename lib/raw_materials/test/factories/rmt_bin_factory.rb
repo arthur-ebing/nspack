@@ -3,6 +3,9 @@
 module RawMaterialsApp
   module RmtBinFactory # rubocop:disable Metrics/ModuleLength
     def create_rmt_bin(opts = {}) # rubocop:disable Metrics/AbcSize
+      id = get_available_factory_record(:rmt_bins, opts)
+      return id unless id.nil?
+
       rmt_delivery_id = create_rmt_delivery
       rmt_class_id = create_rmt_class
       rmt_material_owner_party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_IMPLEMENTATION_OWNER)
@@ -60,6 +63,9 @@ module RawMaterialsApp
     end
 
     def create_rmt_class(opts = {})
+      id = get_available_factory_record(:rmt_classes, opts)
+      return id unless id.nil?
+
       default = {
         rmt_class_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
@@ -72,6 +78,9 @@ module RawMaterialsApp
     end
 
     def create_rmt_size(opts = {})
+      id = get_available_factory_record(:rmt_sizes, opts)
+      return id unless id.nil?
+
       default = {
         size_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word
@@ -80,6 +89,9 @@ module RawMaterialsApp
     end
 
     def create_location_type(opts = {})
+      id = get_available_factory_record(:location_types, opts)
+      return id unless id.nil?
+
       default = {
         location_type_code: Faker::Lorem.word,
         short_code: Faker::Lorem.word,
@@ -90,6 +102,9 @@ module RawMaterialsApp
     end
 
     def create_assignment(opts = {})
+      id = get_available_factory_record(:location_assignments, opts)
+      return id unless id.nil?
+
       default = {
         assignment_code: Faker::Lorem.word,
         created_at: '2010-01-01 12:00',
@@ -99,6 +114,9 @@ module RawMaterialsApp
     end
 
     def create_storage_type(opts = {})
+      id = get_available_factory_record(:location_storage_types, opts)
+      return id unless id.nil?
+
       default = {
         storage_type_code: Faker::Lorem.word,
         location_short_code_prefix: Faker::Lorem.word
@@ -107,6 +125,9 @@ module RawMaterialsApp
     end
 
     def create_location_storage_definition(opts = {})
+      id = get_available_factory_record(:location_storage_definitions, opts)
+      return id unless id.nil?
+
       default = {
         storage_definition_code: Faker::Lorem.word,
         active: true,
@@ -119,6 +140,9 @@ module RawMaterialsApp
     end
 
     def create_location(opts = {})
+      id = get_available_factory_record(:locations, opts)
+      return id unless id.nil?
+
       location_type_id = create_location_type
       primary_storage_type_id = create_storage_type
       primary_assignment_id = create_assignment
@@ -146,6 +170,9 @@ module RawMaterialsApp
     end
 
     def create_rmt_container_material_owner(opts = {})
+      id = get_available_factory_record(:rmt_container_material_owners, opts)
+      return id unless id.nil?
+
       rmt_container_material_type_id = create_rmt_container_material_type
       rmt_material_owner_party_role_id = create_party_role(party_type: 'P', name: AppConst::ROLE_RMT_BIN_OWNER)
 

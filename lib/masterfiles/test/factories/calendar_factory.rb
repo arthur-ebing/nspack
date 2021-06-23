@@ -16,6 +16,9 @@ module MasterfilesApp
     end
 
     def create_season(opts = {})
+      id = get_available_factory_record(:seasons, opts)
+      return id unless id.nil?
+
       season_group_id = create_season_group
       commodity_id = create_commodity
 

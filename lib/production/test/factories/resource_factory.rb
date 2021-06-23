@@ -3,6 +3,9 @@
 module ProductionApp
   module ResourceFactory
     def create_plant_resource(opts = {})
+      id = get_available_factory_record(:plant_resources, opts)
+      return id unless id.nil?
+
       plant_resource_type_id = create_plant_resource_type
       system_resource_id = create_system_resource
 
@@ -34,6 +37,9 @@ module ProductionApp
     end
 
     def create_system_resource(opts = {})
+      id = get_available_factory_record(:system_resources, opts)
+      return id unless id.nil?
+
       system_resource_type_id = create_system_resource_type
       plant_resource_type_id = create_plant_resource_type
 

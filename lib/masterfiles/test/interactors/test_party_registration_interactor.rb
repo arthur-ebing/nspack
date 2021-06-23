@@ -63,15 +63,14 @@ module MasterfilesApp
     private
 
     def registration_attrs
-      party_id = create_party
-      party_role_id = create_party_role(party_id: party_id)
-
+      party_role_id = create_party_role(party_type: 'O', name: AppConst::PARTY_ROLE_REGISTRATION_TYPES.values.first)
+      party_id = DB[:party_roles].where(id: party_role_id).get(:party_id)
       {
         id: 1,
         party_role_id: party_role_id,
         party_id: party_id,
-        registration_type: Faker::Lorem.unique.word,
-        registration_code: 'ABC',
+        registration_type: AppConst::PARTY_ROLE_REGISTRATION_TYPES.keys.first,
+        registration_code: Faker::Lorem.unique.word,
         role_name: 'ABC',
         party_name: 'ABC'
       }

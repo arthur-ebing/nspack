@@ -55,8 +55,7 @@ module ProductionApp
     def test_update_product_setup
       AppConst::TEST_SETTINGS.client_code = 'kr'
       id = create_product_setup
-      attrs = interactor.send(:repo).find_product_setup(id)
-      attrs = attrs.to_h
+      attrs = interactor.send(:repo).find_product_setup(id).to_h
       attrs.delete(:commodity_id)
       value = attrs[:client_size_reference]
       attrs[:client_size_reference] = 'a_change'
@@ -68,15 +67,14 @@ module ProductionApp
 
       AppConst::TEST_SETTINGS.client_code = 'um'
       id = create_product_setup
-      attrs = interactor.send(:repo).find_product_setup(id)
-      attrs = attrs.to_h
+      attrs = interactor.send(:repo).find_product_setup(id).to_h
       attrs.delete(:commodity_id)
       value = attrs[:client_size_reference]
-      attrs[:client_size_reference] = 'a_change'
+      attrs[:client_size_reference] = 'changed'
       res = interactor.update_product_setup(id, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
       assert_instance_of(ProductSetup, res.instance)
-      assert_equal 'a_change', res.instance.client_size_reference
+      assert_equal 'changed', res.instance.client_size_reference
       refute_equal value, res.instance.client_size_reference
     ensure
       AppConst::TEST_SETTINGS.client_code = AppConst::TEST_SETTINGS.boot_client_code
@@ -123,10 +121,9 @@ module ProductionApp
       fruit_actual_counts_for_pack_id = create_fruit_actual_counts_for_pack
       rmt_class_id = create_rmt_class
       std_fruit_size_count_id = create_std_fruit_size_count
-      basic_pack_code_id = create_basic_pack
+
       standard_pack_code_id = create_standard_pack
-      create_basic_packs_standard_packs(standard_pack_id: standard_pack_code_id,
-                                        basic_pack_id: basic_pack_code_id)
+      basic_pack_code_id = create_basic_pack(standard_pack_id: standard_pack_code_id)
       target_customer_party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_TARGET_CUSTOMER)
 
       {

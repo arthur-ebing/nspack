@@ -65,7 +65,7 @@ module MasterfilesApp
     end
 
     def test_delete_farm
-      id = create_farm
+      id = create_farm(force_create: true)
       assert_count_changed(:farms, -1) do
         res = interactor.delete_farm(id)
         assert res.success, res.message

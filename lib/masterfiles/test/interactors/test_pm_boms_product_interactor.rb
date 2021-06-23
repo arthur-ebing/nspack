@@ -64,7 +64,7 @@ module MasterfilesApp
     end
 
     def test_delete_pm_boms_product
-      pm_bom_id = create_pm_bom
+      pm_bom_id = create_pm_bom(force_create: true)
       create_pm_boms_product(pm_bom_id: pm_bom_id)
       id = create_pm_boms_product(pm_bom_id: pm_bom_id)
 

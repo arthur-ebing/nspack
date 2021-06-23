@@ -3,6 +3,9 @@
 module MasterfilesApp
   module PackagingFactory  # rubocop:disable Metrics/ModuleLength
     def create_pallet_base(opts = {})
+      id = get_available_factory_record(:pallet_bases, opts)
+      return id unless id.nil?
+
       default = {
         pallet_base_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
@@ -18,6 +21,9 @@ module MasterfilesApp
     end
 
     def create_pallet_stack_type(opts = {})
+      id = get_available_factory_record(:pallet_stack_types, opts)
+      return id unless id.nil?
+
       default = {
         stack_type_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
@@ -28,9 +34,11 @@ module MasterfilesApp
     end
 
     def create_pallet_format(opts = {})
+      id = get_available_factory_record(:pallet_formats, opts)
+      return id unless id.nil?
+
       pallet_base_id = create_pallet_base
       pallet_stack_type_id = create_pallet_stack_type
-
       default = {
         description: Faker::Lorem.unique.word,
         pallet_base_id: pallet_base_id,
@@ -41,9 +49,11 @@ module MasterfilesApp
     end
 
     def create_cartons_per_pallet(opts = {})
+      id = get_available_factory_record(:cartons_per_pallet, opts)
+      return id unless id.nil?
+
       pallet_format_id = create_pallet_format
       basic_pack_code_id = create_basic_pack
-
       default = {
         description: Faker::Lorem.unique.word,
         pallet_format_id: pallet_format_id,
@@ -56,6 +66,9 @@ module MasterfilesApp
     end
 
     def create_pm_composition_level(opts = {})
+      id = get_available_factory_record(:pm_composition_levels, opts)
+      return id unless id.nil?
+
       default = {
         composition_level: Faker::Number.number(digits: 4),
         description: Faker::Lorem.unique.word,
@@ -65,8 +78,10 @@ module MasterfilesApp
     end
 
     def create_pm_type(opts = {})
-      pm_composition_level_id = create_pm_composition_level
+      id = get_available_factory_record(:pm_types, opts)
+      return id unless id.nil?
 
+      pm_composition_level_id = create_pm_composition_level
       default = {
         pm_composition_level_id: pm_composition_level_id,
         pm_type_code: Faker::Lorem.unique.word,
@@ -78,8 +93,10 @@ module MasterfilesApp
     end
 
     def create_pm_subtype(opts = {})
-      pm_type_id = create_pm_type
+      id = get_available_factory_record(:pm_subtypes, opts)
+      return id unless id.nil?
 
+      pm_type_id = create_pm_type
       default = {
         pm_type_id: pm_type_id,
         subtype_code: Faker::Lorem.unique.word,
@@ -90,18 +107,18 @@ module MasterfilesApp
       DB[:pm_subtypes].insert(default.merge(opts))
     end
 
-    def create_pm_product(opts = {})
-      pm_subtype_id = create_pm_subtype
-      basic_pack_code_id = create_basic_pack
+    def create_pm_product(opts = {}) # rubocop:disable Metrics/AbcSize
+      id = get_available_factory_record(:pm_products, opts)
+      return id unless id.nil?
 
+      opts[:pm_subtype_id] ||= create_pm_subtype
+      opts[:basic_pack_id] ||= create_basic_pack
       default = {
-        pm_subtype_id: pm_subtype_id,
         erp_code: Faker::Lorem.unique.word,
         product_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
         active: true,
         material_mass: Faker::Number.decimal,
-        basic_pack_id: basic_pack_code_id,
         height_mm: Faker::Number.number(digits: 4),
         gross_weight_per_unit: nil,
         items_per_unit: Faker::Number.number(digits: 4)
@@ -110,6 +127,9 @@ module MasterfilesApp
     end
 
     def create_pm_bom(opts = {})
+      id = get_available_factory_record(:pm_boms, opts)
+      return id unless id.nil?
+
       default = {
         bom_code: Faker::Lorem.unique.word,
         erp_bom_code: Faker::Lorem.word,
@@ -123,14 +143,14 @@ module MasterfilesApp
     end
 
     def create_pm_boms_product(opts = {})
-      pm_product_id = create_pm_product
-      pm_bom_id = create_pm_bom
-      uom_id = create_uom
+      id = get_available_factory_record(:pm_boms_products, opts)
+      return id unless id.nil?
+
+      opts[:pm_product_id] ||= create_pm_product(force_create: true)
+      opts[:pm_bom_id] ||= create_pm_bom(force_create: true)
+      opts[:uom_id] ||= create_uom
 
       default = {
-        pm_product_id: pm_product_id,
-        pm_bom_id: pm_bom_id,
-        uom_id: uom_id,
         quantity: Faker::Number.decimal,
         active: true
       }
@@ -138,6 +158,9 @@ module MasterfilesApp
     end
 
     def create_packing_method(opts = {})
+      id = get_available_factory_record(:packing_methods, opts)
+      return id unless id.nil?
+
       default = {
         packing_method_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
@@ -150,8 +173,10 @@ module MasterfilesApp
     end
 
     def create_pm_mark(opts = {})
-      mark_id = create_mark
+      id = get_available_factory_record(:pm_marks, opts)
+      return id unless id.nil?
 
+      mark_id = create_mark
       default = {
         mark_id: mark_id,
         packaging_marks: BaseRepo.new.array_of_text_for_db_col(%w[A B C]),

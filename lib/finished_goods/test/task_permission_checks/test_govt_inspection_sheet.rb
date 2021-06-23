@@ -5,7 +5,6 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 module FinishedGoodsApp
   class TestGovtInspectionSheetPermission < Minitest::Test
     include Crossbeams::Responses
-    include GovtInspectionFactory
 
     def entity(attrs = {})
       base_attrs = {

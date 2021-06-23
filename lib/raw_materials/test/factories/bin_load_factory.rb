@@ -3,6 +3,9 @@
 module RawMaterialsApp
   module BinLoadFactory
     def create_bin_load_purpose(opts = {})
+      id = get_available_factory_record(:bin_load_purposes, opts)
+      return id unless id.nil?
+
       default = {
         purpose_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
@@ -14,6 +17,9 @@ module RawMaterialsApp
     end
 
     def create_bin_load(opts = {}, add_product: true)
+      id = get_available_factory_record(:bin_loads, opts)
+      return id unless id.nil?
+
       qty_bins = Faker::Number.number(digits: 4)
       bin_load_purpose_id = create_bin_load_purpose
       party_role_id = create_party_role

@@ -3,6 +3,9 @@
 module QualityApp
   module OrchardTestFactory
     def create_orchard_test_type(opts = {}) # rubocop:disable Metrics/AbcSize
+      id = get_available_factory_record(:orchard_test_types, opts)
+      return id unless id.nil?
+
       applicable_tm_group_ids = [create_target_market_group, create_target_market_group, create_target_market_group]
       applicable_cultivar_ids = [create_cultivar, create_cultivar, create_cultivar]
       applicable_commodity_group_ids = [create_commodity_group, create_commodity_group, create_commodity_group]

@@ -59,7 +59,7 @@ module MasterfilesApp
     end
 
     def test_delete_uom_type
-      id = create_uom_type
+      id = create_uom_type(force_create: true)
       assert_count_changed(:uom_types, -1) do
         res = interactor.delete_uom_type(id)
         assert res.success, res.message

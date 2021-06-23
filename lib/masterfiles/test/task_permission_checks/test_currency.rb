@@ -5,7 +5,6 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 module MasterfilesApp
   class TestCurrencyPermission < Minitest::Test
     include Crossbeams::Responses
-    include FinanceFactory
 
     def entity(attrs = {})
       base_attrs = {

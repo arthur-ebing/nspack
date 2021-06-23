@@ -61,7 +61,7 @@ module ProductionApp
     end
 
     def test_delete_product_setup_template
-      id = create_product_setup_template
+      id = create_product_setup_template(force_create: true)
       assert_count_changed(:product_setup_templates, -1) do
         res = interactor.delete_product_setup_template(id)
         assert res.success, res.message

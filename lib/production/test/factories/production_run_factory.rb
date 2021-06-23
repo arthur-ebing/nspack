@@ -3,6 +3,9 @@
 module ProductionApp
   module ProductionRunFactory
     def create_production_run(opts = {}) # rubocop:disable Metrics/AbcSize
+      id = get_available_factory_record(:production_runs, opts)
+      return id unless id.nil?
+
       farm_id = create_farm
       puc_id = create_puc
       ph_resource_id = create_plant_resource
@@ -58,6 +61,9 @@ module ProductionApp
     end
 
     def create_product_resource_allocation(opts = {})
+      id = get_available_factory_record(:product_resource_allocations, opts)
+      return id unless id.nil?
+
       production_run_id = create_production_run
       product_setup_id = create_product_setup
       label_template_id = create_label_template

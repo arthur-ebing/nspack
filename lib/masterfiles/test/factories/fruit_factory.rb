@@ -3,6 +3,9 @@
 module MasterfilesApp
   module FruitFactory # rubocop:disable Metrics/ModuleLength
     def create_grade(opts = {})
+      id = get_available_factory_record(:grades, opts)
+      return id unless id.nil?
+
       default = {
         grade_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
@@ -13,6 +16,9 @@ module MasterfilesApp
     end
 
     def create_treatment_type(opts = {})
+      id = get_available_factory_record(:treatment_types, opts)
+      return id unless id.nil?
+
       default = {
         treatment_type_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
@@ -22,6 +28,9 @@ module MasterfilesApp
     end
 
     def create_treatment(opts = {})
+      id = get_available_factory_record(:treatments, opts)
+      return id unless id.nil?
+
       treatment_type_id = create_treatment_type
 
       default = {
@@ -34,6 +43,9 @@ module MasterfilesApp
     end
 
     def create_inventory_code(opts = {})
+      id = get_available_factory_record(:inventory_codes, opts)
+      return id unless id.nil?
+
       default = {
         inventory_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
@@ -44,7 +56,11 @@ module MasterfilesApp
       DB[:inventory_codes].insert(default.merge(opts))
     end
 
-    def create_basic_pack(opts = {})
+    def create_basic_pack(opts = {}) # rubocop:disable Metrics/AbcSize
+      id = get_available_factory_record(:basic_pack_codes, opts)
+      return id unless id.nil?
+
+      standard_pack_id = opts.delete(:standard_pack_id)
       default = {
         basic_pack_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
@@ -54,10 +70,16 @@ module MasterfilesApp
         active: true,
         footprint_code: Faker::Lorem.word
       }
-      DB[:basic_pack_codes].insert(default.merge(opts))
+      basic_pack_id = DB[:basic_pack_codes].insert(default.merge(opts))
+      standard_pack_id ||= create_standard_pack if AppConst::CR_MF.basic_pack_equals_standard_pack?
+      DB[:basic_packs_standard_packs].insert(standard_pack_id: standard_pack_id, basic_pack_id: basic_pack_id) if standard_pack_id
+      basic_pack_id
     end
 
     def create_standard_pack(opts = {})
+      id = get_available_factory_record(:standard_pack_codes, opts)
+      return id unless id.nil?
+
       default = {
         standard_pack_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
@@ -71,19 +93,11 @@ module MasterfilesApp
       DB[:standard_pack_codes].insert(default.merge(opts))
     end
 
-    def create_basic_packs_standard_packs(opts = {})
-      standard_pack_id = create_standard_pack
-      basic_pack_id = create_basic_pack
+    def create_std_fruit_size_count(opts = {}) # rubocop:disable Metrics/AbcSize
+      id = get_available_factory_record(:std_fruit_size_counts, opts)
+      return id unless id.nil?
 
-      default = {
-        standard_pack_id: standard_pack_id,
-        basic_pack_id: basic_pack_id
-      }
-      DB[:basic_packs_standard_packs].insert(default.merge(opts))
-    end
-
-    def create_std_fruit_size_count(opts = {})
-      commodity_id = create_commodity
+      commodity_id = create_commodity(force_create: true)
       uom_id = create_uom
 
       default = {
@@ -105,9 +119,12 @@ module MasterfilesApp
       DB[:std_fruit_size_counts].insert(default.merge(opts))
     end
 
-    def create_fruit_actual_counts_for_pack(opts = {})
+    def create_fruit_actual_counts_for_pack(opts = {}) # rubocop:disable Metrics/AbcSize
+      id = get_available_factory_record(:fruit_actual_counts_for_packs, opts)
+      return id unless id.nil?
+
       std_fruit_size_count_id = create_std_fruit_size_count
-      basic_pack_code_id = create_basic_pack
+      basic_pack_code_id = create_basic_pack(force_create: true)
       standard_pack_code_ids = create_standard_pack
       size_reference_ids = create_fruit_size_reference
 
@@ -115,14 +132,17 @@ module MasterfilesApp
         std_fruit_size_count_id: std_fruit_size_count_id,
         basic_pack_code_id: basic_pack_code_id,
         actual_count_for_pack: Faker::Number.number(digits: 4),
-        standard_pack_code_ids: "{#{standard_pack_code_ids}}",
-        size_reference_ids: "{#{size_reference_ids}}",
+        standard_pack_code_ids: BaseRepo.new.array_for_db_col([standard_pack_code_ids]),
+        size_reference_ids: BaseRepo.new.array_for_db_col([size_reference_ids]),
         active: true
       }
       DB[:fruit_actual_counts_for_packs].insert(default.merge(opts))
     end
 
     def create_fruit_size_reference(opts = {})
+      id = get_available_factory_record(:fruit_size_references, opts)
+      return id unless id.nil?
+
       default = {
         size_reference: Faker::Lorem.unique.word,
         edi_out_code: Faker::Lorem.word

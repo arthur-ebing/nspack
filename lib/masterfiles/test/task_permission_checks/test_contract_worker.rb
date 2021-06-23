@@ -5,7 +5,6 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 module MasterfilesApp
   class TestContractWorkerPermission < Minitest::Test
     include Crossbeams::Responses
-    include HRFactory
 
     def entity(attrs = {})
       base_attrs = {
@@ -44,54 +43,12 @@ module MasterfilesApp
       MasterfilesApp::HumanResourcesRepo.any_instance.stubs(:find_contract_worker).returns(entity)
       res = MasterfilesApp::TaskPermissionCheck::ContractWorker.call(:edit, 1)
       assert res.success, 'Should be able to edit a contract_worker'
-
-      # MasterfilesApp::HumanResourcesRepo.any_instance.stubs(:find_contract_worker).returns(entity(completed: true))
-      # res = MasterfilesApp::TaskPermissionCheck::ContractWorker.call(:edit, 1)
-      # refute res.success, 'Should not be able to edit a completed contract_worker'
     end
 
     def test_delete
       MasterfilesApp::HumanResourcesRepo.any_instance.stubs(:find_contract_worker).returns(entity)
       res = MasterfilesApp::TaskPermissionCheck::ContractWorker.call(:delete, 1)
       assert res.success, 'Should be able to delete a contract_worker'
-
-      # MasterfilesApp::HumanResourcesRepo.any_instance.stubs(:find_contract_worker).returns(entity(completed: true))
-      # res = MasterfilesApp::TaskPermissionCheck::ContractWorker.call(:delete, 1)
-      # refute res.success, 'Should not be able to delete a completed contract_worker'
     end
-
-    # def test_complete
-    #   MasterfilesApp::HumanResourcesRepo.any_instance.stubs(:find_contract_worker).returns(entity)
-    #   res = MasterfilesApp::TaskPermissionCheck::ContractWorker.call(:complete, 1)
-    #   assert res.success, 'Should be able to complete a contract_worker'
-
-    #   MasterfilesApp::HumanResourcesRepo.any_instance.stubs(:find_contract_worker).returns(entity(completed: true))
-    #   res = MasterfilesApp::TaskPermissionCheck::ContractWorker.call(:complete, 1)
-    #   refute res.success, 'Should not be able to complete an already completed contract_worker'
-    # end
-
-    # def test_approve
-    #   MasterfilesApp::HumanResourcesRepo.any_instance.stubs(:find_contract_worker).returns(entity(completed: true, approved: false))
-    #   res = MasterfilesApp::TaskPermissionCheck::ContractWorker.call(:approve, 1)
-    #   assert res.success, 'Should be able to approve a completed contract_worker'
-
-    #   MasterfilesApp::HumanResourcesRepo.any_instance.stubs(:find_contract_worker).returns(entity)
-    #   res = MasterfilesApp::TaskPermissionCheck::ContractWorker.call(:approve, 1)
-    #   refute res.success, 'Should not be able to approve a non-completed contract_worker'
-
-    #   MasterfilesApp::HumanResourcesRepo.any_instance.stubs(:find_contract_worker).returns(entity(completed: true, approved: true))
-    #   res = MasterfilesApp::TaskPermissionCheck::ContractWorker.call(:approve, 1)
-    #   refute res.success, 'Should not be able to approve an already approved contract_worker'
-    # end
-
-    # def test_reopen
-    #   MasterfilesApp::HumanResourcesRepo.any_instance.stubs(:find_contract_worker).returns(entity)
-    #   res = MasterfilesApp::TaskPermissionCheck::ContractWorker.call(:reopen, 1)
-    #   refute res.success, 'Should not be able to reopen a contract_worker that has not been approved'
-
-    #   MasterfilesApp::HumanResourcesRepo.any_instance.stubs(:find_contract_worker).returns(entity(completed: true, approved: true))
-    #   res = MasterfilesApp::TaskPermissionCheck::ContractWorker.call(:reopen, 1)
-    #   assert res.success, 'Should be able to reopen an approved contract_worker'
-    # end
   end
 end

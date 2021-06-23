@@ -51,7 +51,8 @@ module MasterfilesApp
     end
 
     def test_party_address_ids
-      party_id = create_party
+      organization_id = create_organization
+      party_id = DB[:organizations].where(id: organization_id).get(:party_id)
       address_ids = []
       4.times do
         address_ids << create_party_address(party_id: party_id)
@@ -61,7 +62,8 @@ module MasterfilesApp
     end
 
     def test_party_contact_method_ids
-      party_id = create_party
+      organization_id = create_organization
+      party_id = DB[:organizations].where(id: organization_id).get(:party_id)
       contact_method_ids = []
       4.times do
         contact_method_ids << create_party_contact_method(party_id: party_id)
@@ -73,11 +75,11 @@ module MasterfilesApp
     def test_assign_roles
       role_ids = []
       4.times do
-        role_ids << create_role
+        role_ids << create_role(force_create: true)
       end
 
-      org_id = create_organization
-      party_id = repo.get(:organizations, org_id, :party_id)
+      organization_id = create_organization
+      party_id = DB[:organizations].where(id: organization_id).get(:party_id)
 
       repo.create_party_roles(party_id, role_ids)
       party_role_created = repo.where_hash(:party_roles, party_id: party_id)
@@ -92,8 +94,7 @@ module MasterfilesApp
     end
 
     def test_add_party_name
-      party_id = create_party
-      organization_id = create_organization(party_id: party_id)
+      organization_id = create_organization
       organization = repo.find_hash(:organizations, organization_id)
       hash = repo.find_hash(:parties, organization[:party_id])
       exp = { party_name: DB['SELECT fn_party_name(?)', organization[:party_id]].single_value }
@@ -102,7 +103,8 @@ module MasterfilesApp
     end
 
     def test_add_dependent_ids
-      party_id = create_party
+      organization_id = create_organization
+      party_id = DB[:organizations].where(id: organization_id).get(:party_id)
       hash = repo.find_hash(:parties, party_id)
       exp = {
         contact_method_ids: [],
@@ -121,7 +123,8 @@ module MasterfilesApp
     end
 
     def test_delete_party_dependents
-      party_id = create_party
+      organization_id = create_organization
+      party_id = DB[:organizations].where(id: organization_id).get(:party_id)
       party_address_id = create_party_address(party_id: party_id)
       party_contact_method_id = create_party_contact_method(party_id: party_id)
       assert repo.find_hash(:party_addresses, party_address_id)
@@ -132,18 +135,6 @@ module MasterfilesApp
       refute repo.find_hash(:party_addresses, party_address_id)
       refute repo.find_hash(:party_contact_methods, party_contact_method_id)
       refute repo.find_hash(:parties, party_id)
-    end
-
-    def test_factories
-      create_organization
-      create_role
-      create_party
-      create_party_role
-      create_person
-      create_address
-      create_contact_method
-      create_party_address
-      create_party_contact_method
     end
 
     private

@@ -2,21 +2,10 @@
 
 module FinishedGoodsApp
   module OrderFactory
-    def create_orders_loads(opts = {})
-      load_id = create_load
-      order_id = create_order
-
-      default = {
-        load_id: load_id,
-        order_id: order_id,
-        active: true,
-        created_at: '2010-01-01 12:00',
-        updated_at: '2010-01-01 12:00'
-      }
-      DB[:orders_loads].insert(default.merge(opts))
-    end
-
     def create_order(opts = {}) # rubocop:disable Metrics/AbcSize
+      id = get_available_factory_record(:orders, opts)
+      return id unless id.nil?
+
       order_type_id = create_order_type
       customer_party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_CUSTOMER)
       contact_party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_CUSTOMER_CONTACT_PERSON)
@@ -59,6 +48,9 @@ module FinishedGoodsApp
     end
 
     def create_order_item(opts = {}) # rubocop:disable Metrics/AbcSize
+      id = get_available_factory_record(:order_items, opts)
+      return id unless id.nil?
+
       order_id = create_order
       commodity_id = create_commodity
       basic_pack_code_id = create_basic_pack

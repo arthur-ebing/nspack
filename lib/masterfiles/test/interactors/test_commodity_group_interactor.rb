@@ -58,7 +58,7 @@ module MasterfilesApp
     end
 
     def test_delete
-      id = create_commodity_group
+      id = create_commodity_group(force_create: true)
       assert_count_changed(:commodity_groups, -1) do
         res = interactor.delete_commodity_group(id)
         assert res.success, res.message

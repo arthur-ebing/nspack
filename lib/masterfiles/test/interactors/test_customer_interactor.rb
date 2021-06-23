@@ -57,7 +57,7 @@ module MasterfilesApp
     end
 
     def test_delete_customer
-      id = create_customer
+      id = create_customer(force_create: true)
       assert_count_changed(:customers, -1) do
         res = interactor.delete_customer(id)
         assert res.success, res.message

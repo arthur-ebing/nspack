@@ -5,7 +5,6 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 module FinishedGoodsApp
   class TestVoyagePortPermission < Minitest::Test
     include Crossbeams::Responses
-    include VoyagePortFactory
 
     def entity(attrs = {})
       base_attrs = {

@@ -65,7 +65,7 @@ module MasterfilesApp
     end
 
     def test_delete_orchard
-      id = create_orchard
+      id = create_orchard(force_create: true)
       assert_count_changed(:orchards, -1) do
         res = interactor.delete_orchard(id)
         assert res.success, res.message

@@ -3,6 +3,9 @@
 module MasterfilesApp
   module FinanceFactory # rubocop:disable Metrics/ModuleLength
     def create_customer_payment_term(opts = {})
+      id = get_available_factory_record(:customer_payment_terms, opts)
+      return id unless id.nil?
+
       payment_term_id = create_payment_term
       customer_payment_term_set_id = create_customer_payment_term_set
 
@@ -64,9 +67,11 @@ module MasterfilesApp
     end
 
     def create_customer(opts = {})
+      id = get_available_factory_record(:customers, opts)
+      return id unless id.nil?
+
       currency_id = create_currency
       party_role_id = create_party_role
-
       default = {
         default_currency_id: currency_id,
         currency_ids: BaseRepo.new.array_for_db_col([currency_id]),

@@ -3,6 +3,9 @@
 module MasterfilesApp
   module CultivarFactory
     def create_cultivar_group(opts = {})
+      id = get_available_factory_record(:cultivar_groups, opts)
+      return id unless id.nil?
+
       commodity_id = create_commodity
       default = {
         commodity_id: commodity_id,
@@ -14,6 +17,9 @@ module MasterfilesApp
     end
 
     def create_cultivar(opts = {})
+      id = get_available_factory_record(:cultivars, opts)
+      return id unless id.nil?
+
       commodity_id = create_commodity
       cultivar_group_id = create_cultivar_group
 

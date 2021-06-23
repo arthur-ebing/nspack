@@ -59,7 +59,7 @@ module MasterfilesApp
     end
 
     def test_delete_cultivar
-      id = create_cultivar
+      id = create_cultivar(force_create: true)
       assert_count_changed(:cultivars, -1) do
         res = interactor.delete_cultivar(id)
         assert res.success, res.message

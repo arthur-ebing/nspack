@@ -63,8 +63,8 @@ module MasterfilesApp
     private
 
     def person_attrs
-      party_id = create_party(party_type: 'P')
-      id = create_person(party_id: party_id)
+      id = create_person
+      party_id = DB[:people].where(id: id).get(:party_id)
       role_ids = party_role_ids(party_id)
       address_ids = party_address_ids(party_id)
       contact_method_ids = party_contact_method_ids(party_id)

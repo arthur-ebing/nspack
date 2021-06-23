@@ -26,54 +26,12 @@ module RawMaterialsApp
       RawMaterialsApp::BinLoadRepo.any_instance.stubs(:find_bin_load_purpose).returns(entity)
       res = RawMaterialsApp::TaskPermissionCheck::BinLoadPurpose.call(:edit, 1)
       assert res.success, 'Should be able to edit a bin_load_purpose'
-
-      # RawMaterialsApp::BinLoadRepo.any_instance.stubs(:find_bin_load_purpose).returns(entity(completed: true))
-      # res = RawMaterialsApp::TaskPermissionCheck::BinLoadPurpose.call(:edit, 1)
-      # refute res.success, 'Should not be able to edit a completed bin_load_purpose'
     end
 
     def test_delete
       RawMaterialsApp::BinLoadRepo.any_instance.stubs(:find_bin_load_purpose).returns(entity)
       res = RawMaterialsApp::TaskPermissionCheck::BinLoadPurpose.call(:delete, 1)
       assert res.success, 'Should be able to delete a bin_load_purpose'
-
-      # RawMaterialsApp::BinLoadRepo.any_instance.stubs(:find_bin_load_purpose).returns(entity(completed: true))
-      # res = RawMaterialsApp::TaskPermissionCheck::BinLoadPurpose.call(:delete, 1)
-      # refute res.success, 'Should not be able to delete a completed bin_load_purpose'
     end
-
-    # def test_complete
-    #   RawMaterialsApp::BinLoadRepo.any_instance.stubs(:find_bin_load_purpose).returns(entity)
-    #   res = RawMaterialsApp::TaskPermissionCheck::BinLoadPurpose.call(:complete, 1)
-    #   assert res.success, 'Should be able to complete a bin_load_purpose'
-
-    #   RawMaterialsApp::BinLoadRepo.any_instance.stubs(:find_bin_load_purpose).returns(entity(completed: true))
-    #   res = RawMaterialsApp::TaskPermissionCheck::BinLoadPurpose.call(:complete, 1)
-    #   refute res.success, 'Should not be able to complete an already completed bin_load_purpose'
-    # end
-
-    # def test_approve
-    #   RawMaterialsApp::BinLoadRepo.any_instance.stubs(:find_bin_load_purpose).returns(entity(completed: true, approved: false))
-    #   res = RawMaterialsApp::TaskPermissionCheck::BinLoadPurpose.call(:approve, 1)
-    #   assert res.success, 'Should be able to approve a completed bin_load_purpose'
-
-    #   RawMaterialsApp::BinLoadRepo.any_instance.stubs(:find_bin_load_purpose).returns(entity)
-    #   res = RawMaterialsApp::TaskPermissionCheck::BinLoadPurpose.call(:approve, 1)
-    #   refute res.success, 'Should not be able to approve a non-completed bin_load_purpose'
-
-    #   RawMaterialsApp::BinLoadRepo.any_instance.stubs(:find_bin_load_purpose).returns(entity(completed: true, approved: true))
-    #   res = RawMaterialsApp::TaskPermissionCheck::BinLoadPurpose.call(:approve, 1)
-    #   refute res.success, 'Should not be able to approve an already approved bin_load_purpose'
-    # end
-
-    # def test_reopen
-    #   RawMaterialsApp::BinLoadRepo.any_instance.stubs(:find_bin_load_purpose).returns(entity)
-    #   res = RawMaterialsApp::TaskPermissionCheck::BinLoadPurpose.call(:reopen, 1)
-    #   refute res.success, 'Should not be able to reopen a bin_load_purpose that has not been approved'
-
-    #   RawMaterialsApp::BinLoadRepo.any_instance.stubs(:find_bin_load_purpose).returns(entity(completed: true, approved: true))
-    #   res = RawMaterialsApp::TaskPermissionCheck::BinLoadPurpose.call(:reopen, 1)
-    #   assert res.success, 'Should be able to reopen an approved bin_load_purpose'
-    # end
   end
 end

@@ -20,7 +20,8 @@ module MasterfilesApp
 
     def test_create_customer_variety
       attrs = fake_customer_variety.to_h.reject { |k, _| k == :id }
-      attrs[:customer_variety_varieties] = interactor.send(:repo).find_customer_variety_variety(create_customer_variety_variety)[:marketing_variety_id]
+      id = create_customer_variety_variety(force_create: true)
+      attrs[:customer_variety_varieties] = interactor.send(:repo).find_customer_variety_variety(id)[:marketing_variety_id]
       res = interactor.create_customer_variety(attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
       assert_instance_of(CustomerVariety, res.instance)
@@ -29,7 +30,8 @@ module MasterfilesApp
 
     def test_create_customer_variety_fail
       attrs = fake_customer_variety(variety_as_customer_variety_id: nil).to_h.reject { |k, _| k == :id }
-      attrs[:customer_variety_varieties] = interactor.send(:repo).find_customer_variety_variety(create_customer_variety_variety)[:marketing_variety_id]
+      id = create_customer_variety_variety(force_create: true)
+      attrs[:customer_variety_varieties] = interactor.send(:repo).find_customer_variety_variety(id)[:marketing_variety_id]
       res = interactor.create_customer_variety(attrs)
       refute res.success, 'should fail validation'
       assert_equal ['must be filled'], res.errors[:variety_as_customer_variety_id]
@@ -37,7 +39,7 @@ module MasterfilesApp
 
     def test_update_customer_variety
       id = create_customer_variety
-      variety_as_customer_variety_id = create_marketing_variety
+      variety_as_customer_variety_id = create_marketing_variety(force_create: true)
       attrs = interactor.send(:repo).find_customer_variety(id)
       attrs = attrs.to_h
       value = attrs[:variety_as_customer_variety_id]
@@ -76,7 +78,7 @@ module MasterfilesApp
     private
 
     def customer_variety_attrs
-      marketing_variety_id = create_marketing_variety
+      marketing_variety_id = create_marketing_variety(force_create: true)
       target_market_group_id = create_target_market_group
 
       {

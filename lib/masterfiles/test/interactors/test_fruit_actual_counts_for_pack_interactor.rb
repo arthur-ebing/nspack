@@ -66,7 +66,7 @@ module MasterfilesApp
     end
 
     def test_delete_fruit_actual_counts_for_pack
-      id = create_fruit_actual_counts_for_pack
+      id = create_fruit_actual_counts_for_pack(force_create: true)
       assert_count_changed(:fruit_actual_counts_for_packs, -1) do
         res = interactor.delete_fruit_actual_counts_for_pack(id)
         assert res.success, res.message

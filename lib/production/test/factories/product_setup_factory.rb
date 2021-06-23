@@ -3,6 +3,9 @@
 module ProductionApp
   module ProductSetupFactory
     def create_product_setup_template(opts = {})
+      id = get_available_factory_record(:product_setup_templates, opts)
+      return id unless id.nil?
+
       cultivar_group_id = create_cultivar_group
 
       default = {
@@ -20,6 +23,9 @@ module ProductionApp
     end
 
     def create_product_setup(opts = {})  # rubocop:disable Metrics/AbcSize
+      id = get_available_factory_record(:product_setups, opts)
+      return id unless id.nil?
+
       product_setup_template_id = create_product_setup_template
       marketing_variety_id = create_marketing_variety
       std_fruit_size_count_id = create_std_fruit_size_count
@@ -34,10 +40,8 @@ module ProductionApp
       inventory_code_id = create_inventory_code
       fruit_actual_counts_for_pack_id = create_fruit_actual_counts_for_pack
       rmt_class_id = create_rmt_class
-      basic_pack_code_id = create_basic_pack
       standard_pack_code_id = create_standard_pack
-      create_basic_packs_standard_packs(standard_pack_id: standard_pack_code_id,
-                                        basic_pack_id: basic_pack_code_id)
+      basic_pack_code_id = create_basic_pack(standard_pack_id: standard_pack_code_id)
 
       default = {
         product_setup_template_id: product_setup_template_id,

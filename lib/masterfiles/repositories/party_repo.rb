@@ -517,7 +517,7 @@ module MasterfilesApp
       role = AppConst::PARTY_ROLE_REGISTRATION_TYPES[args[:registration_type]]
       role_id = get_id(:roles, name: role)
       args[:party_role_id] = get_id(:party_roles, party_id: args.delete(:party_id), role_id: role_id)
-      raise Crossbeams::InfoError, 'Party Role not found.' unless args[:party_role_id]
+      raise Crossbeams::InfoError, 'Party Role not found for registrations.' unless args[:party_role_id]
 
       create(:registrations, args)
     end
@@ -527,7 +527,7 @@ module MasterfilesApp
       role = AppConst::PARTY_ROLE_REGISTRATION_TYPES[args[:registration_type]]
       role_id = get_id(:roles, name: role)
       args[:party_role_id] = get_id(:party_roles, party_id: args.delete(:party_id), role_id: role_id)
-      raise Crossbeams::InfoError, 'Party Role not found.' unless args[:party_role_id]
+      raise Crossbeams::InfoError, 'Party Role not found for registrations.' unless args[:party_role_id]
 
       update(:registrations, id, args)
     end

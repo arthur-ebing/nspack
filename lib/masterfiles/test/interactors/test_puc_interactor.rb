@@ -58,7 +58,7 @@ module MasterfilesApp
     end
 
     def test_delete_puc
-      id = create_puc
+      id = create_puc(force_create: true)
       assert_count_changed(:pucs, -1) do
         res = interactor.delete_puc(id)
         assert res.success, res.message

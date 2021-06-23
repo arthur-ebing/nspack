@@ -10,7 +10,7 @@ module RawMaterialsApp
     include MasterfilesApp::CultivarFactory
     include MasterfilesApp::FarmFactory
     include MasterfilesApp::DepotFactory
-    include MasterfilesApp::RmtContainerMaterialTypeFactory
+    include MasterfilesApp::RmtContainerFactory
     include RawMaterialsApp::RmtBinFactory
 
     def test_repo
@@ -43,7 +43,7 @@ module RawMaterialsApp
       id = create_bin_load
       attrs = interactor.send(:repo).find_hash(:bin_loads, id).reject { |k, _| k == :id }
       value = attrs[:bin_load_purpose_id]
-      bin_load_purpose_id = create_bin_load_purpose
+      bin_load_purpose_id = create_bin_load_purpose(force_create: true)
       attrs[:bin_load_purpose_id] = bin_load_purpose_id
       res = interactor.update_bin_load(id, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"

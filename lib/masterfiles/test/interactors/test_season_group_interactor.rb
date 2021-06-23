@@ -59,7 +59,7 @@ module MasterfilesApp
     end
 
     def test_delete_season_group
-      id = create_season_group
+      id = create_season_group(force_create: true)
       assert_count_changed(:season_groups, -1) do
         res = interactor.delete_season_group(id)
         assert res.success, res.message

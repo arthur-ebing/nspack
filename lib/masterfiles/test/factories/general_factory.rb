@@ -3,6 +3,9 @@
 module MasterfilesApp
   module GeneralFactory
     def create_masterfile_transformation(opts = {})
+      id = get_available_factory_record(:masterfile_transformations, opts)
+      return id unless id.nil?
+
       puc_id = create_puc
       default = {
         masterfile_table: 'pucs',
@@ -16,6 +19,9 @@ module MasterfilesApp
     end
 
     def create_masterfile_variant(opts = {})
+      id = get_available_factory_record(:masterfile_variants, opts)
+      return id unless id.nil?
+
       puc_id = create_puc
       default = {
         masterfile_table: 'pucs',
@@ -28,8 +34,10 @@ module MasterfilesApp
     end
 
     def create_uom(opts = {})
-      uom_type_id = create_uom_type
+      id = get_available_factory_record(:uoms, opts)
+      return id unless id.nil?
 
+      uom_type_id = create_uom_type
       default = {
         uom_type_id: uom_type_id,
         uom_code: Faker::Lorem.unique.word,
@@ -39,11 +47,14 @@ module MasterfilesApp
     end
 
     def create_uom_type(opts = {})
+      id = get_available_factory_record(:uom_types, opts)
+      return id unless id.nil?
+
       default = {
-        code: AppConst::UOM_TYPE,
+        code: Faker::Lorem.unique.word,
         active: true
       }
-      DB[:uom_types].where(default.merge(opts)).get(:id) || DB[:uom_types].insert(default.merge(opts))
+      DB[:uom_types].insert(default.merge(opts))
     end
   end
 end
