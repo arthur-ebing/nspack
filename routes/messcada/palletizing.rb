@@ -25,6 +25,13 @@ class Nspack < Roda
       res = interactor.scan_carton(res.instance) if res.success
       feedback = interactor.palletizing_robot_feedback(params[:device], res)
       Crossbeams::RobotResponder.new(feedback).render
+    rescue Rack::QueryParser::InvalidParameterError => e
+      ErrorMailer.send_exception_email(e, subject: 'Carton palletizing scan invalid parameter', message: "Invalid param from route: #{request.path} with #{request.query_string}")
+
+      feedback = MesscadaApp::RobotFeedback.new(device: '',
+                                                status: false,
+                                                line1: 'Unable to read barcode')
+      return Crossbeams::RobotResponder.new(feedback).render
     end
 
     # --------------------------------------------------------------------------
