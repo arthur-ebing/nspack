@@ -73,6 +73,7 @@ module LabelApp
       stringio = Zip::OutputStream.write_buffer do |zio|
         label_ids.each do |sub_id|
           sub_label = repo.find_label(sub_id)
+          @rotation = sub_label.print_rotation || 0
           fname, binary_data = make_label_zip(sub_label)
           zio.put_next_entry("#{fname}.zip")
           zio.write binary_data
