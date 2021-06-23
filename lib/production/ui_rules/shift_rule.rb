@@ -18,6 +18,7 @@ module UiRules
 
       set_filter_fields if %i[filter].include? @mode
       set_summary_report_fields if %i[summary_report].include? @mode
+      extended_columns(@repo, :shifts, edit_mode: !%i[show filter summary_report search].include?(@mode))
 
       form_name 'shift'
     end
@@ -124,6 +125,7 @@ module UiRules
                                     running_hours: nil,
                                     start_date_time: nil,
                                     end_date_time: nil)
+      apply_extended_column_defaults_to_form_object(:shifts)
     end
 
     def make_summary_report_object # rubocop:disable Metrics/AbcSize

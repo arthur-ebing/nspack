@@ -1,0 +1,315 @@
+---
+:caption: Shifts
+:sql: "SELECT\r\n    shifts.id,\r\n    shifts.shift_type_id,\r\n    fn_shift_type_code
+  (shifts.shift_type_id) AS shift_type_code,\r\n    employment_types.employment_type_code,\r\n
+  \   shifts.running_hours,\r\n    shifts.start_date_time,\r\n    shifts.end_date_time,\r\n
+  \   fn_current_status ('shifts', shifts.id) AS status,\r\n    shifts.created_at,\r\n
+  \   shifts.updated_at,\r\n    shifts.active,\r\n    (employment_types.employment_type_code
+  = 'PACKERS' ) AS packer,\r\n    extended_columns ->> 'people_working_on_shift' AS
+  people_working_on_shift,\r\n    extended_columns ->> 'machine_minutes' AS machine_minutes,\r\n
+  \   extended_columns ->> 'people_absent' AS people_absent,\r\n    extended_columns
+  ->> 'people_off_sick' AS people_off_sick,\r\n    extended_columns ->> 'people_on_leave'
+  AS people_on_leave\r\nFROM shifts\r\nJOIN shift_types ON shift_types.id = shifts.shift_type_id\r\nJOIN
+  employment_types ON employment_types.id = shift_types.employment_type_id\r\nORDER
+  BY\r\n    shifts.start_date_time DESC"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: shifts.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  shift_type_id:
+    :name: shift_type_id
+    :sequence_no: 2
+    :caption: Shift type
+    :namespaced_name: shifts.shift_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  shift_type_code:
+    :name: shift_type_code
+    :sequence_no: 3
+    :caption: Shift type code
+    :namespaced_name: 
+    :data_type: :string
+    :width: 240
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  employment_type_code:
+    :name: employment_type_code
+    :sequence_no: 4
+    :caption: Employment type code
+    :namespaced_name: employment_types.employment_type_code
+    :data_type: :string
+    :width: 200
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  running_hours:
+    :name: running_hours
+    :sequence_no: 5
+    :caption: Running hours
+    :namespaced_name: shifts.running_hours
+    :data_type: :number
+    :width: 150
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  start_date_time:
+    :name: start_date_time
+    :sequence_no: 6
+    :caption: Start at
+    :namespaced_name: shifts.start_date_time
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  end_date_time:
+    :name: end_date_time
+    :sequence_no: 7
+    :caption: End at
+    :namespaced_name: shifts.end_date_time
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 8
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 9
+    :caption: Created at
+    :namespaced_name: shifts.created_at
+    :data_type: :datetime
+    :width: 
+    :format: :datetime_with_secs
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 10
+    :caption: Updated at
+    :namespaced_name: shifts.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: :datetime_with_secs
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 11
+    :caption: Active
+    :namespaced_name: shifts.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packer:
+    :name: packer
+    :sequence_no: 12
+    :caption: Packer
+    :namespaced_name: 
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  people_working_on_shift:
+    :name: people_working_on_shift
+    :sequence_no: 13
+    :caption: People working on shift
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  machine_minutes:
+    :name: machine_minutes
+    :sequence_no: 14
+    :caption: Machine minutes
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  people_absent:
+    :name: people_absent
+    :sequence_no: 15
+    :caption: People absent
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  people_off_sick:
+    :name: people_off_sick
+    :sequence_no: 16
+    :caption: People off sick
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  people_on_leave:
+    :name: people_on_leave
+    :sequence_no: 17
+    :caption: People on leave
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: shifts.shift_type_id
+  :caption: Shift type
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT day_night_or_custom, id FROM shift_types ORDER BY day_night_or_custom
+- :column: shifts.start_date_time
+  :caption: Start date time
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: employment_types.employment_type_code
+  :caption: Emp Type Code
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

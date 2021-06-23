@@ -37,6 +37,11 @@ module Production
                     col.add_field :end_date_time
                   end
                 end
+                form.row do |row|
+                  row.column do |col|
+                    Crossbeams::Config::ExtendedColumnDefinitions.extended_columns_for_view(:shifts, col)
+                  end
+                end
               end
             end
 

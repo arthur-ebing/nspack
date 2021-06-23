@@ -18,6 +18,7 @@ module Production
               form.remote! if remote
               form.add_field :shift_type_id
               form.add_field :date
+              Crossbeams::Config::ExtendedColumnDefinitions.extended_columns_for_view(:shifts, form)
             end
           end
 

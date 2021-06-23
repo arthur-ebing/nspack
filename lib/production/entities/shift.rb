@@ -12,5 +12,6 @@ module ProductionApp
     attribute :packer, Types::Bool
     attribute :status, Types::String
     attribute? :active, Types::Bool
+    attribute :extended_columns, Types::Hash.optional
   end
 end

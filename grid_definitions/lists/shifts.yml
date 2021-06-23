@@ -1,5 +1,7 @@
 ---
 :dataminer_definition: shifts
+:dataminer_client_definitions:
+ 'kr': shifts_kr
 :actions:
 - :url: "/production/shifts/shifts/$:id$/edit"
   :text: edit

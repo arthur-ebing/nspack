@@ -30,6 +30,15 @@ module Crossbeams
           #   lot_number: { type: :string },
           #   comments: { type: :string }
           # }
+        },
+        shifts: {
+          'kr' => {
+            people_working_on_shift: { type: :string },
+            machine_minutes: { type: :integer },
+            people_absent: { type: :string },
+            people_off_sick: { type: :string },
+            people_on_leave: { type: :string }
+          }
         }
       }.freeze
 
@@ -52,6 +61,15 @@ module Crossbeams
           #   required(:lot_number).maybe(:string)
           #   required(:comments).maybe(:string)
           # end
+        },
+        shifts: {
+          'kr' => Dry::Schema.Params do
+            required(:people_working_on_shift).maybe(:string)
+            required(:machine_minutes).maybe(:integer, gteq?: 1, lteq?: 60)
+            required(:people_absent).maybe(:string)
+            required(:people_off_sick).maybe(:string)
+            required(:people_on_leave).maybe(:string)
+          end
         }
       }.freeze
 

@@ -3,12 +3,13 @@
 module ProductionApp
   class ShiftInteractor < BaseInteractor
     def create_shift(params) # rubocop:disable Metrics/AbcSize
+      extcols = select_extended_columns_params(params)
       res = validate_shift_params(params)
       return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
-        id = repo.create_shift(res)
+        id = repo.create_shift(add_extended_columns_to_changeset(res, repo, extcols))
         log_status(:shifts, id, 'CREATED')
         log_transaction
       end
@@ -21,12 +22,15 @@ module ProductionApp
     end
 
     def update_shift(id, params) # rubocop:disable Metrics/AbcSize
-      res = validate_update_shift_params(params)
-      return validation_failed_response(res) if res.failure?
+      parms, extcols = unwrap_extended_columns_params(params)
+      ext_res = validate_extended_columns(:shifts, params)
+      res = validate_update_shift_params(parms)
+      return mixed_validation_failed_response(res, ext_res) unless res.success? && ext_res.messages.empty?
 
       repo.check_if_shift_overlap!(res)
       repo.transaction do
-        repo.update_shift(id, res)
+        repo.update_shift(id,
+                          add_extended_columns_to_changeset(res, repo, extcols))
         log_transaction
       end
       instance = shift(id)
