@@ -14,7 +14,7 @@ module MasterfilesApp
     end
 
     def test_farm
-      MasterfilesApp::FarmRepo.any_instance.stubs(:find_farm).returns(fake_farm)
+      MasterfilesApp::FarmRepo.any_instance.stubs(:find_farm).returns(Farm.new(fake_farm))
       entity = interactor.send(:farm, 1)
       assert entity.is_a?(Farm)
     end
@@ -100,7 +100,7 @@ module MasterfilesApp
     end
 
     def fake_farm(overrides = {})
-      Farm.new(farm_attrs.merge(overrides))
+      farm_attrs.merge(overrides)
     end
 
     def interactor

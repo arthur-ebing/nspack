@@ -8,7 +8,6 @@ module MasterfilesApp
     attribute :farm_group_id, Types::Integer
     attribute :farm_code, Types::String
     attribute :description, Types::String
-    attribute :puc_id, Types::Integer
     attribute :farm_group_code, Types::String
     attribute :owner_party_role, Types::String
     attribute :pdn_region_production_region_code, Types::String

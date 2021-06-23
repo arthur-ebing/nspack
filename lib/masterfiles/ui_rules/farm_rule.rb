@@ -7,9 +7,9 @@ module UiRules
       make_form_object
       apply_form_values
 
-      common_values_for_fields common_fields
+      common_values_for_fields common_fields if %i[new edit].include? @mode
 
-      set_show_fields if %i[show reopen].include? @mode
+      set_show_fields if %i[show].include? @mode
 
       form_name 'farm'
     end
@@ -18,7 +18,6 @@ module UiRules
       owner_party_role_id_label = MasterfilesApp::PartyRepo.new.find_party_role(@form_object.owner_party_role_id)&.party_name
       pdn_region_id_label = @repo.find_hash(:production_regions, @form_object.pdn_region_id)[:production_region_code]
       farm_group_id_label = @repo.find_farm_group(@form_object.farm_group_id)&.farm_group_code
-      puc_id_label = @repo.find_puc(@form_object.puc_id)&.puc_code
       location_id_label = @repo.get(:locations, @form_object.location_id, :location_long_code)
       fields[:owner_party_role_id] = { renderer: :label,
                                        with_value: owner_party_role_id_label,
@@ -29,14 +28,15 @@ module UiRules
       fields[:farm_group_id] = { renderer: :label,
                                  with_value: farm_group_id_label,
                                  caption: 'Farm Group' }
-      fields[:puc_id] = { renderer: :label,
-                          with_value: puc_id_label,
-                          caption: 'Primary PUC' }
-      fields[:farm_code] = { renderer: :label }
+      fields[:farm_code] = { renderer: :label,
+                             caption: 'Farm' }
       fields[:description] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
-      fields[:pucs] = { renderer: :list, items: farm_puc_codes }
-      fields[:orchards] = { renderer: :list, items: farm_orchard_codes }
+      fields[:pucs] = { renderer: :list,
+                        items: farm_puc_codes,
+                        caption: 'PUCs' }
+      fields[:orchards] = { renderer: :list,
+                            items: list_orchards }
       fields[:location_id] = { renderer: :label,
                                with_value: location_id_label,
                                caption: 'Location',
@@ -59,9 +59,10 @@ module UiRules
                          disabled_options: @repo.for_select_inactive_farm_groups,
                          prompt: 'Select Farm Group' },
         puc_id: { renderer: :select,
-                  options: @repo.for_select_primary_pucs,
+                  options: @repo.for_select_pucs_with_farms,
                   disabled_options: @repo.for_select_inactive_pucs,
-                  caption: 'Primary PUC',
+                  caption: 'PUC',
+                  invisible: @mode != :new,
                   required: true },
         farm_code: { required: true },
         description: {},
@@ -101,8 +102,9 @@ module UiRules
       @repo.find_farm_puc_codes(@options[:id])
     end
 
-    def farm_orchard_codes
-      @repo.find_farm_orchard_codes(@options[:id])
+    def list_orchards
+      orchards = @repo.select_values_in_order(:orchards, %i[orchard_code description], where: { farm_id: @options[:id] }, order: :orchard_code)
+      orchards.map { |orchard_code, description| ["#{orchard_code} - #{description}"] }
     end
   end
 end

@@ -8,8 +8,7 @@ module MasterfilesApp
 
       id = nil
       repo.transaction do
-        response = repo.create_farm(res)
-        id = response
+        id = repo.create_farm(res)
         repo.create_farm_location(id, res) if AppConst::CR_RMT.create_farm_location?
         log_status(:farms, id, 'CREATED')
         log_transaction
@@ -105,7 +104,6 @@ module MasterfilesApp
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue Sequel::ForeignKeyConstraintViolation => e
-      puts e.message
       failed_response("Unable to delete farm section. It is still referenced#{e.message.partition('referenced').last}")
     end
 
@@ -119,13 +117,13 @@ module MasterfilesApp
     end
 
     def associate_farms_pucs(id, farms_pucs_ids)
-      return validation_failed_response(OpenStruct.new(messages: { farms_pucs_ids: ['You did not choose a puc'] })) if farms_pucs_ids.empty?
+      return validation_failed_response(OpenStruct.new(messages: { farms_pucs_ids: ['You did not choose a PUC'] })) if farms_pucs_ids.empty?
 
       repo.transaction do
         repo.associate_farms_pucs(id, farms_pucs_ids)
       end
       pucs = repo.find_farm_puc_codes(id).join(', ')
-      success_response('Farm => Puc associated successfully', pucs)
+      success_response('Farm => PUC associated successfully', pucs)
     end
 
     private

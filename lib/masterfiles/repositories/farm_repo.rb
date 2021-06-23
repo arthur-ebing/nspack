@@ -93,7 +93,6 @@ module MasterfilesApp
                                                         col_name: :owner_party_role }])
       return nil if hash.nil?
 
-      hash[:puc_id] = farm_primary_puc_id(id)
       Farm.new(hash)
     end
 
@@ -118,14 +117,11 @@ module MasterfilesApp
       Orchard.new(hash)
     end
 
-    def create_farm(attrs)
-      params = attrs.to_h
-      farms_pucs_ids = Array(params.to_h.delete(:puc_id))
-      farm_id = DB[:farms].insert(params)
-      farms_pucs_ids.each do |puc_id|
-        DB[:farms_pucs].insert(farm_id: farm_id,
-                               puc_id: puc_id)
-      end
+    def create_farm(res)
+      params = res.to_h
+      puc_id = params.to_h.delete(:puc_id)
+      farm_id = create(:farms, params)
+      create(:farms_pucs, farm_id: farm_id, puc_id: puc_id)
       farm_id
     end
 
@@ -166,10 +162,6 @@ module MasterfilesApp
 
     def find_farm_puc_codes(id)
       DB[:pucs].join(:farms_pucs, puc_id: :id).where(farm_id: id).order(:puc_code).select_map(:puc_code)
-    end
-
-    def find_farm_orchard_codes(id)
-      DB[:orchards].join(:farms, id: :farm_id).where(farm_id: id).order(:orchard_code).select_map(:orchard_code)
     end
 
     def find_puc_by_puc_code_and_farm(puc_code, farm_id)
@@ -264,11 +256,7 @@ module MasterfilesApp
         .select_map(%i[puc_code puc_id])
     end
 
-    def farm_primary_puc_id(farm_id)
-      DB[:pucs].join(:farms_pucs, puc_id: :id).where(farm_id: farm_id).select_map(:puc_id).first
-    end
-
-    def for_select_primary_pucs
+    def for_select_pucs_with_farms
       query = <<~SQL
         SELECT
           CONCAT(puc_code, ' ', STRING_AGG(farm_code, ', ')) AS puc_code,
