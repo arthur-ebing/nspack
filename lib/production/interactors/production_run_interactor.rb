@@ -64,7 +64,7 @@ module ProductionApp
       return failed_response("Value #{carton_number} is too big to be a carton. Perhaps you scanned a pallet number?") if res.failure?
 
       carton_equals_pallet = messcada_repo.carton_label_carton_equals_pallet(carton_number)
-      return failed_response("This Carton #{carton_number} is already a pallet and cannot be palletized") if carton_equals_pallet
+      return failed_response("This Carton #{carton_number}, carton equals pallet and cannot be palletized") if carton_equals_pallet
 
       ok_response
     end
