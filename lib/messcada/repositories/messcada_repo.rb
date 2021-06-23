@@ -674,10 +674,8 @@ module MesscadaApp
       params
     end
 
-    def find_rmt_bin_by_bin_number(bin_number)
-      DB[:rmt_bins]
-        .where(Sequel.lit("legacy_data ->> 'bin_number'") => bin_number)
-        .get(:id)
+    def find_rmt_bin_by_tipped_asset_number(bin_number)
+      get_id(:rmt_bins, tipped_asset_number: bin_number)
     end
 
     def rmt_bin_exists?(rmt_bin_id)
