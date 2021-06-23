@@ -1454,3 +1454,19 @@
   :ordered_list: false
   :ui_priority: 3
   :list_def: 
+- :column: allocated
+  :caption: Allocated?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 4
+  :list_def: true, false
+- :column: scrapped
+  :caption: Scrapped?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 5
+  :list_def: true, false

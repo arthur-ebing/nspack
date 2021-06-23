@@ -29,6 +29,9 @@ module Production
           elsif rules[:scrap_pallet]
             grid = 'stock_pallets'
             grid_key = 'scrap_reworks_pallets'
+          elsif rules[:restore_repacked_pallet]
+            grid = 'repacked_pallets'
+            grid_key = 'restore_repacked_pallets'
           else
             grid = 'stock_pallets'
             grid_key = 'reworks_pallets'

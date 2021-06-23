@@ -109,8 +109,11 @@ module ProductionApp
       DB[:pallets].where(pallet_number: pallet_numbers, scrapped: true).select_map(:pallet_number)
     end
 
-    def repacked_pallets?(pallet_numbers)
-      DB[:pallets].where(pallet_number: pallet_numbers, exit_ref:  AppConst::PALLET_EXIT_REF_REPACKED).select_map(:pallet_number)
+    def repacked_pallets?(pallet_numbers, where: {})
+      DB[:pallets]
+        .where(pallet_number: pallet_numbers)
+        .where(where)
+        .select_map(:pallet_number)
     end
 
     def shipped_pallets?(pallet_numbers)
@@ -1021,6 +1024,28 @@ module ProductionApp
       DB[:plant_resources].where(id: DB[:pallets]
                                        .where(id: pallet_id)
                                        .get(:plt_packhouse_resource_id)).get(:location_id)
+    end
+
+    def repacked_from_pallet_id_for_pallet(pallet_id)
+      DB[:pallet_sequences].where(pallet_id: pallet_id).get(:repacked_from_pallet_id)
+    end
+
+    def restore_repacked_pallet(pallet_id, original_pallet_id)
+      sequence_ids = select_values(:pallet_sequences, :id, pallet_id: pallet_id)
+      original_sequence_ids = select_values(:pallet_sequences, :id, scrapped_from_pallet_id: original_pallet_id)
+      return failed_response("Pallet #{pallet_id} or #{original_pallet_id} is missing sequences") if sequence_ids.empty? || original_sequence_ids.empty?
+
+      update_pallet(pallet_id,
+                    { scrapped: true, scrapped_at: Time.now, exit_ref: AppConst::PALLET_EXIT_REF_RESTORE_REPACKED_PALLET })
+      update_pallet_sequence(sequence_ids,
+                             { pallet_id: nil, scrapped_from_pallet_id: pallet_id, scrapped_at: Time.now, exit_ref: AppConst::PALLET_EXIT_REF_RESTORE_REPACKED_PALLET })
+
+      update_pallet(original_pallet_id,
+                    { scrapped: false, scrapped_at: nil, exit_ref: nil })
+      update_pallet_sequence(original_sequence_ids,
+                             { pallet_id: original_pallet_id, scrapped_from_pallet_id: nil, scrapped_at: nil, exit_ref: nil })
+
+      ok_response
     end
   end
 end

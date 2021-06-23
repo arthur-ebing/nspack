@@ -11,3 +11,21 @@
     :icon: printer
     :title: Print Barcode
     :loading_window: true
+:captions:
+  :conditions:
+    :restore_repacked_pallets: Restore Repacked Pallets
+:conditions:
+  :restore_repacked_pallets:
+    - :col: allocated
+      :op: "="
+      :val: false
+    - :col: scrapped
+      :op: "="
+      :val: false
+:multiselect:
+  :restore_repacked_pallets:
+    :url: "/production/reworks/reworks_run_types/$:id$/reworks_runs/multiselect_reworks_run_pallets"
+    :section_caption: 'SELECT ''Select pallets for reworks run type: '' || run_type
+      FROM reworks_run_types WHERE id = $:id$'
+    :multiselect_save_method: remote
+    :conditions: restore_repacked_pallets

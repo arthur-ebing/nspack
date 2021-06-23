@@ -484,6 +484,8 @@ module ProductionApp
 
       return bulk_update_pallet_dates(attrs) if AppConst::RUN_TYPE_BULK_UPDATE_PALLET_DATES == reworks_run_type
 
+      return restore_repacked_pallets(attrs) if AppConst::RUN_TYPE_RESTORE_REPACKED_PALLET == reworks_run_type
+
       rw_res = failed_response('create_reworks_run_record')
       repo.transaction do
         rw_res = create_reworks_run_record(attrs, nil, nil)
@@ -1289,6 +1291,41 @@ module ProductionApp
         pallet_number: instance[:pallet_number] }
     end
 
+    def restore_repacked_pallets(attrs)  # rubocop:disable Metrics/AbcSize
+      attrs = attrs.to_h
+      pallet_ids = repo.select_values(:pallet_sequences, :pallet_id, pallet_number: attrs[:pallets_selected]).uniq
+      pallet_sequence_ids = repo.pallet_sequence_ids(pallet_ids)
+
+      res = nil
+      original_pallet_ids = []
+      repo.transaction do
+        pallet_ids.each do |pallet_id|
+          res = FinishedGoodsApp::RestoreRepackedPallet.call(pallet_id)
+          return res unless res.success
+
+          original_pallet_ids << res.instance[:original_pallet_id]
+        end
+
+        reworks_run_attrs = { user: @user.user_name, reworks_run_type_id: attrs[:reworks_run_type_id], pallets_selected: attrs[:pallets_selected],
+                              pallets_affected: nil, pallet_sequence_id: nil, affected_sequences: nil, make_changes: false }
+        res = create_reworks_run_record(reworks_run_attrs, nil, nil)
+        return failed_response(unwrap_failed_response(res)) unless res.success
+
+        log_multiple_statuses(:pallets, pallet_ids, AppConst::REWORKS_SCRAPPED_STATUS)
+        log_multiple_statuses(:pallet_sequences, pallet_sequence_ids, AppConst::REWORKS_SCRAPPED_STATUS)
+        log_multiple_statuses(:pallets, original_pallet_ids, AppConst::REWORKS_RESTORE_REPACKED_PALLET_STATUS)
+        log_multiple_statuses(:pallet_sequences, repo.pallet_sequence_ids(original_pallet_ids), AppConst::REWORKS_RESTORE_REPACKED_PALLET_STATUS)
+      end
+      res
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
+      puts e.message
+      puts e.backtrace.join("\n")
+      failed_response(e.message)
+    end
+
     def production_run_details_table(production_run_id)
       Crossbeams::Layout::Table.new([], repo.production_run_details(production_run_id), [], pivot: true).render
     end
@@ -1628,7 +1665,8 @@ module ProductionApp
            AppConst::RUN_TYPE_RECALC_NETT_WEIGHT,
            AppConst::RUN_TYPE_BULK_WEIGH_BINS,
            AppConst::RUN_TYPE_BULK_UPDATE_PALLET_DATES,
-        AppConst::RUN_TYPE_TIP_MIXED_ORCHARDS
+           AppConst::RUN_TYPE_TIP_MIXED_ORCHARDS,
+           AppConst::RUN_TYPE_RESTORE_REPACKED_PALLET
         false
       else
         true
@@ -1664,13 +1702,19 @@ module ProductionApp
       missing_pallet_numbers = (pallet_numbers - existing_pallet_numbers)
       return OpenStruct.new(success: false, messages: { pallets_selected: ["#{missing_pallet_numbers.join(', ')} doesn't exist"] }, pallets_selected: pallet_numbers) unless missing_pallet_numbers.nil_or_empty?
 
-      repacked_pallets = repo.repacked_pallets?(pallet_numbers)
-      return OpenStruct.new(success: false, messages: { pallets_selected: ["#{repacked_pallets.join(', ')} have been repacked."] }, pallets_selected: pallet_numbers) unless repacked_pallets.nil_or_empty?
+      if AppConst::RUN_TYPE_RESTORE_REPACKED_PALLET == reworks_run_type
+        repacked_pallets = repo.repacked_pallets?(pallet_numbers, where: { repacked: true })
+        missing_pallets = (pallet_numbers - repacked_pallets)
+        return OpenStruct.new(success: false, messages: { pallets_selected: ["#{missing_pallets.join(', ')} cannot be restored - they are not repacked"] }, pallets_selected: pallet_numbers) unless missing_pallets.nil_or_empty?
+      else
+        repacked_pallets = repo.repacked_pallets?(pallet_numbers, where: { exit_ref:  AppConst::PALLET_EXIT_REF_REPACKED })
+        return OpenStruct.new(success: false, messages: { pallets_selected: ["#{repacked_pallets.join(', ')} have been repacked."] }, pallets_selected: pallet_numbers) unless repacked_pallets.nil_or_empty?
+      end
 
       shipped_pallets = repo.shipped_pallets?(pallet_numbers)
       return OpenStruct.new(success: false, messages: { pallets_selected: ["#{shipped_pallets.join(', ')} have been shipped."] }, pallets_selected: pallet_numbers) unless shipped_pallets.nil_or_empty?
 
-      if AppConst::RUN_TYPE_SCRAP_PALLET == reworks_run_type
+      if [AppConst::RUN_TYPE_SCRAP_PALLET, AppConst::RUN_TYPE_RESTORE_REPACKED_PALLET].include?(reworks_run_type)
         allocated_pallets = repo.allocated_pallets?(pallet_numbers)
         return OpenStruct.new(success: false, messages: { pallets_selected: ["#{allocated_pallets.join(', ')} have been allocated."] }, pallets_selected: pallet_numbers) unless allocated_pallets.nil_or_empty?
       end

@@ -97,6 +97,7 @@ INSERT INTO reworks_run_types (run_type, description) VALUES('RECALC BIN NETT WE
 INSERT INTO reworks_run_types (run_type, description) VALUES('TIP MIXED ORCHARDS', 'Tip Mixed Orchards') ON CONFLICT DO NOTHING;
 INSERT INTO reworks_run_types (run_type, description) VALUES('BINS TO PLT CONVERSION', 'Convert Bins To Pallets') ON CONFLICT DO NOTHING;
 INSERT INTO reworks_run_types (run_type, description) VALUES('TIP BINS AGAINST SUGGESTED RUN', 'Tip Bins against a suggested run') ON CONFLICT DO NOTHING;
+INSERT INTO reworks_run_types (run_type, description) VALUES('RESTORE REPACKED PALLET', 'Restore repacked pallet') ON CONFLICT DO NOTHING;
 
 -- LOCATION TYPES
 INSERT INTO location_types (location_type_code, short_code, hierarchical) VALUES('BIN_ASSET', 'BIN_ASSET', 'f') ON CONFLICT DO NOTHING;
