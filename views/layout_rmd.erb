@@ -98,6 +98,16 @@
       .rmdScanFieldGRoup button {
         color: #107FB7;
       }
+      .rmdLeds {
+        display: flex;
+        justify-content: space-around;
+      }
+
+      .rmdLedLight {
+        height: 2em;
+        width: 6em;
+        margin: 1em;
+      }
 
       /* Animate the RMD WiFi icon when a form is submitted without internet connection: */
       .wifiWait {
@@ -220,7 +230,7 @@
       <%= yield %>
     </div>
     <script src="/js/crossbeams-error.js"></script>
-    <script src="/js/crossbeams-utils.js?seq=30"></script>
+    <script src="/js/crossbeams-utils.js?seq=32"></script>
     <script src="/js/crossbeams-layout.js?seq=23"></script>
     <script src="/js/crossbeams-rmd_scan.js?seq=25" type="text/javascript"></script>
     <script src="/js/sweetalert2.min.js" type="text/javascript"></script>

@@ -599,11 +599,11 @@ const crossbeamsUtils = {
       select.removeActiveItems();
       select.setChoices(newItems, 'value', 'label', true); // seems to remove sortable...
       // Select the item if there is only one and the select is required
-      // [REVERTED - this does not fire onchange behaviours...]
-      // if (newItems.length === 1 && select.config.classNames.containerOuter.includes('cbl-input-required')) {
-      //   select.setChoiceByValue(newItems[0].value);
-      //   // GET THIS TO WORK... elem.dispatchEvent(new Event('change', { detail: elem.options[0] }));
-      // }
+      if (newItems.length === 1 && select.config.classNames.containerOuter.includes('cbl-input-required')) {
+        select.setChoiceByValue(newItems[0].value);
+        const evt = new CustomEvent('change', { bubbles: false, cancelable: false, detail: { value: newItems[0].value } });
+        elem.dispatchEvent(evt);
+      }
     } else {
       while (elem.options.length) elem.remove(0);
       newItems.forEach((item) => {
