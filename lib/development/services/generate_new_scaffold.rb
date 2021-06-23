@@ -1337,7 +1337,7 @@ module DevelopmentApp
               end
 
               def test_delete_#{opts.singlename}
-                id = create_#{opts.singlename}
+                id = create_#{opts.singlename}(force_create: true)
                 assert_count_changed(:#{opts.table}, -1) do
                   res = interactor.delete_#{opts.singlename}(id)
                   assert res.success, res.message
