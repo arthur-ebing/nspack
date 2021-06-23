@@ -1337,7 +1337,7 @@ module DevelopmentApp
               end
 
               def test_delete_#{opts.singlename}
-                id = create_#{opts.singlename}
+                id = create_#{opts.singlename}(force_create: true)
                 assert_count_changed(:#{opts.table}, -1) do
                   res = interactor.delete_#{opts.singlename}(id)
                   assert res.success, res.message
@@ -1402,6 +1402,9 @@ module DevelopmentApp
           end
           s = <<~RUBY
             def create_#{opts.inflector.singularize(table)}(opts = {})
+                  id = get_available_factory_record(:#{table}, opts)
+                  return id unless id.nil?
+
                   #{show_lkp(lkps)}default = {
                     #{fields.map { |f| render_field(f, table) }.join(",\n        ")}
                   }

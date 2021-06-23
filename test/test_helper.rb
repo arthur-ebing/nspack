@@ -62,6 +62,16 @@ class MiniTestWithHooks < Minitest::Test
     failed_response((message || 'FAILED'), instance.nil? ? nil : OpenStruct.new(instance))
   end
 
+  # For factory methods, try to use an existing record when it does not matter.
+  # (Pass force_create: true to ensure creation of a new record)
+  # A new record will always be created if there are any override values in opts.
+  def get_available_factory_record(table, opts)
+    return nil if opts.delete(:force_create) == true
+    return nil unless opts.empty?
+
+    DB[table].get(:id)
+  end
+
   def around
     Faker::UniqueGenerator.clear
     DB.transaction(rollback: :always, savepoint: true, auto_savepoint: true) do
