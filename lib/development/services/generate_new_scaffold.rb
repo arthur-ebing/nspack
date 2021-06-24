@@ -204,7 +204,7 @@ module DevelopmentApp
         decimal: 'Faker::Number.decimal',
         integer_array: 'BaseRepo.new.array_for_db_col([1, 2, 3])',
         string_array: "BaseRepo.new.array_of_text_for_db_col(['A', 'B', 'C'])",
-        jsonb: '{}'
+        jsonb: 'BaseRepo.new.hash_for_jsonb_col({})'
       }.freeze
 
       VALIDATION_EXPECT_LOOKUP = {
@@ -1398,7 +1398,8 @@ module DevelopmentApp
         dependency_tree.each do |table, fields|
           lkps = []
           fields.each do |field|
-            lkps << "#{opts.inflector.singularize(field[:ftbl])}_id = create_#{opts.inflector.singularize(field[:ftbl])}" if field[:ftbl]
+            lkps << "# #{opts.inflector.singularize(field[:ftbl])}_id = create_#{opts.inflector.singularize(field[:ftbl])}" if field[:ftbl]
+            lkps << "opts[:#{opts.inflector.singularize(field[:ftbl])}_id] ||= create_#{opts.inflector.singularize(field[:ftbl])}" if field[:ftbl]
           end
           s = <<~RUBY
             def create_#{opts.inflector.singularize(table)}(opts = {})
@@ -1425,7 +1426,7 @@ module DevelopmentApp
 
       def render_field(field, table)
         if field[:ftbl]
-          "#{field[:name]}: #{opts.inflector.singularize(field[:ftbl])}_id"
+          "# #{field[:name]}: #{opts.inflector.singularize(field[:ftbl])}_id"
         elsif field[:name] == :active
           "#{field[:name]}: true"
         else
