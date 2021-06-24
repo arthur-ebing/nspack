@@ -128,7 +128,7 @@ module EdiApp
           COALESCE(target_markets.target_market_name, target_market_groups.target_market_group_name) AS targ_mkt,
           pucs.puc_code AS farm,
           pallet_sequences.carton_quantity AS ctn_qty,
-          1 AS plt_qty,
+          (pallet_sequences.carton_quantity::numeric / pallets.carton_quantity::numeric)::numeric(8,2) AS plt_qty,
           CASE WHEN (SELECT count(*) FROM pallet_sequences m WHERE m.pallet_id = pallet_sequences.pallet_id AND NOT scrapped) > 1 THEN 'Y' ELSE 'N' END AS mixed_ind,
           COALESCE(pallets.govt_reinspection_at, pallets.govt_first_inspection_at) AS inspec_date,
           pallets.govt_first_inspection_at AS original_inspec_date,

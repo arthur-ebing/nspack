@@ -31,7 +31,7 @@ module EdiApp
           pucs.puc_code AS farm,
           pucs.gap_code AS global_gap_number,
           pallet_sequences.carton_quantity,
-          1 AS pallet_quantity,
+          (pallet_sequences.carton_quantity::numeric / pallets.carton_quantity::numeric)::numeric(8,2) AS pallet_quantity,
           CASE WHEN (SELECT count(*) FROM pallet_sequences m WHERE m.pallet_id = pallet_sequences.pallet_id AND NOT scrapped) > 1 THEN 'Y' ELSE 'N' END AS mixed_indicator,
           COALESCE(pallets.intake_created_at, pallets.govt_reinspection_at, pallets.govt_first_inspection_at, current_timestamp) AS intake_date,
           COALESCE(pallets.intake_created_at, pallets.govt_first_inspection_at, current_timestamp) AS original_intake,
