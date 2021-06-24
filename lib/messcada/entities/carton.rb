@@ -85,6 +85,7 @@ module MesscadaApp
     attribute :fruit_sticker_ids, Types::Array
     attribute :tu_sticker_ids, Types::Array
     attribute :target_customer_party_role_id, Types::Integer
+    attribute :product_chars, Types::String
   end
 
   class ScannedCartonNumber < Dry::Struct
