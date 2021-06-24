@@ -95,7 +95,7 @@ module LabelPrintingApp
       output
     end
 
-    def fields_for_label
+    def fields_for_label # rubocop:disable Metrics/AbcSize
       repo = MasterfilesApp::LabelTemplateRepo.new
       label_template = repo.find_label_template_by_name(label_name)
       raise Crossbeams::FrameworkError, "There is no label template named \"#{label_name}\"." if label_template.nil?
@@ -103,6 +103,8 @@ module LabelPrintingApp
       return [] if label_template.variable_rules.nil?
 
       label_template.variable_rules['variables'].map do |var|
+        raise Crossbeams::InfoError, "Variable \"#{var.keys.first}\" on label \"#{label_name}\" has no resolver (Perhaps an incompatible variable set was used)." if var.values.first.nil?
+
         var.values.first['resolver']
       end
     end
