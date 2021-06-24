@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/BlockLength
 module RawMaterials
   module Deliveries
     module RmtDelivery
@@ -8,9 +9,9 @@ module RawMaterials
           ui_rule = UiRules::Compiler.new(:rmt_delivery, :show, id: id)
           rules   = ui_rule.compile
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
+          layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
-            page.section do |section| # rubocop:disable Metrics/BlockLength
+            page.section do |section|
               section.add_control(control_type: :link,
                                   text: 'Back',
                                   url: back_url,
@@ -28,10 +29,10 @@ module RawMaterials
                                   loading_window: true,
                                   style: :button)
 
-              section.form do |form| # rubocop:disable Metrics/BlockLength
+              section.form do |form|
                 form.view_only!
                 form.no_submit!
-                form.row do |row| # rubocop:disable Metrics/BlockLength
+                form.row do |row|
                   row.column do |col|
                     col.add_field :season_id
                     col.add_field :farm_id
@@ -64,10 +65,45 @@ module RawMaterials
               end
             end
 
-            page.section do |section|
-              section.add_grid('rmt_bins_deliveries',
-                               "/list/rmt_bins_deliveries/grid?key=standard&delivery_id=#{id}",
-                               caption: 'Bins')
+            if ui_rule.form_object.keep_open
+              page.section do |section|
+                bin_type = nil
+                if ui_rule.form_object.bin_scan_mode == AppConst::AUTO_ALLOCATE_BIN_NUMBERS
+                  section.add_control(control_type: :link,
+                                      text: 'Create Bin Groups(Auto Allocate)',
+                                      url: "/raw_materials/deliveries/rmt_deliveries/#{id}/rmt_bins/create_bin_groups",
+                                      style: :button,
+                                      grid_id: 'rmt_bins_deliveries',
+                                      behaviour: :popup)
+                  bin_type = 'asset_number_'
+                elsif ui_rule.form_object.bin_scan_mode == AppConst::SCAN_BIN_GROUPS
+                  section.add_control(control_type: :link,
+                                      text: 'Scan Bin Groups',
+                                      url: "/raw_materials/deliveries/rmt_deliveries/#{id}/rmt_bins/create_scanned_bin_groups",
+                                      style: :button,
+                                      grid_id: 'rmt_bins_deliveries',
+                                      behaviour: :popup)
+                  bin_type = 'asset_number_'
+                elsif ui_rule.form_object.bin_scan_mode == AppConst::SCAN_BINS_INDIVIDUALLY
+                  section.add_control(control_type: :link,
+                                      text: 'New RMT Bin',
+                                      url: "/rmd/rmt_deliveries/rmt_bins/#{id}/new_delivery_bin",
+                                      style: :button,
+                                      grid_id: 'rmt_bins_deliveries',
+                                      behaviour: false)
+                  bin_type = 'asset_number_'
+                else
+                  section.add_control(control_type: :link,
+                                      text: 'New RMT Bin',
+                                      url: "/raw_materials/deliveries/rmt_deliveries/#{id}/rmt_bins/new",
+                                      style: :button,
+                                      grid_id: 'rmt_bins_deliveries',
+                                      behaviour: :popup)
+                end
+                section.add_grid('rmt_bins_deliveries',
+                                 "/list/#{bin_type}rmt_bins/grid?key=standard&delivery_id=#{id}",
+                                 caption: 'Bins')
+              end
             end
           end
 
@@ -77,3 +113,4 @@ module RawMaterials
     end
   end
 end
+# rubocop:enable Metrics/BlockLength
