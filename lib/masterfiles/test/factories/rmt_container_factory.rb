@@ -34,7 +34,9 @@ module MasterfilesApp
         description: Faker::Lorem.word,
         active: true,
         created_at: '2010-01-01 12:00',
-        updated_at: '2010-01-01 12:00'
+        updated_at: '2010-01-01 12:00',
+        rmt_inner_container_type_id: nil,
+        tare_weight: Faker::Number.decimal
       }
       DB[:rmt_container_types].insert(default.merge(opts))
     end
