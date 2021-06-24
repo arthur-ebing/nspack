@@ -44,7 +44,7 @@ module MasterfilesApp
       if name
         existing_id = DB[:roles].where(name: name).get(:id)
         existing_id ||= DB[:roles].insert(name: name)
-        return existing_id if existing_id
+        return existing_id
       end
 
       id = get_available_factory_record(:roles, opts)
