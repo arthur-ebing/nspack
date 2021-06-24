@@ -33,11 +33,11 @@ module Crossbeams
         },
         shifts: {
           'kr' => {
-            people_working_on_shift: { type: :string },
+            people_working_on_shift: { type: :integer },
             machine_minutes: { type: :integer },
-            people_absent: { type: :string },
-            people_off_sick: { type: :string },
-            people_on_leave: { type: :string }
+            people_absent: { type: :integer },
+            people_off_sick: { type: :integer },
+            people_on_leave: { type: :integer }
           }
         }
       }.freeze
@@ -64,11 +64,11 @@ module Crossbeams
         },
         shifts: {
           'kr' => Dry::Schema.Params do
-            required(:people_working_on_shift).maybe(:string)
+            required(:people_working_on_shift).maybe(:integer)
             required(:machine_minutes).maybe(:integer, gteq?: 1, lteq?: 60)
-            required(:people_absent).maybe(:string)
-            required(:people_off_sick).maybe(:string)
-            required(:people_on_leave).maybe(:string)
+            required(:people_absent).maybe(:integer)
+            required(:people_off_sick).maybe(:integer)
+            required(:people_on_leave).maybe(:integer)
           end
         }
       }.freeze
