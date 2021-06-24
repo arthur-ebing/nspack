@@ -40,13 +40,13 @@ module MesscadaApp
       create_carton_label
     end
 
-    def test_carton
-      create_carton
-    end
-
-    def test_pallet_sequence
-      create_pallet_sequence
-    end
+    # def test_carton
+    #   create_carton
+    # end
+    #
+    # def test_pallet_sequence
+    #   create_pallet_sequence
+    # end
 
     def test_pallet
       create_pallet
