@@ -2,7 +2,7 @@
 
 module QualityApp
   class PhytCleanStandardDataGlossary < BaseService
-    attr_reader :repo, :api, :season_id
+    attr_reader :repo, :api, :phyt_clean_season_id
     attr_accessor :glossary
 
     def initialize
@@ -30,7 +30,10 @@ module QualityApp
       update_orchard_test_api_attributes('isCultivarB', 'CultivarB Status')
 
       res.instance.each do |row|
-        attribute = row['cpagxmlAliasname'].downcase
+        alias_name = row['cpagxmlAliasname']
+        next unless alias_name
+
+        attribute = alias_name.downcase
         description = "#{row['controlPointGroupName']} #{row['controlPointName']} #{row['controlpointAllowedGroupName']} ".split.uniq.join(' ')
         glossary[attribute] = description
         update_orchard_test_api_attributes(attribute, description)
