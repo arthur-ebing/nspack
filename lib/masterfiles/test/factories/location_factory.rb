@@ -3,15 +3,15 @@
 module MasterfilesApp
   module LocationFactory
     def create_location(opts = {}) # rubocop:disable Metrics/AbcSize
-      location_storage_type_id = create_location_storage_type(storage_type_code: opts.delete(:storage_type_code))
-      location_type_id = create_location_type(location_type_code: opts.delete(:location_type_code))
-      location_assignment_id = create_location_assignment(assignment_code: opts.delete(:assignment_code))
-      location_storage_definition_id = create_location_storage_definition
+      id = get_available_factory_record(:locations, opts)
+      return id unless id.nil?
+
+      opts[:primary_storage_type_id] ||= create_location_storage_type(storage_type_code: opts.delete(:storage_type_code))
+      opts[:location_type_id] ||= create_location_type(location_type_code: opts.delete(:location_type_code))
+      opts[:primary_assignment_id] ||= create_location_assignment(assignment_code: opts.delete(:assignment_code))
+      opts[:location_storage_definition_id] ||= create_location_storage_definition
 
       default = {
-        primary_storage_type_id: location_storage_type_id,
-        location_type_id: location_type_id,
-        primary_assignment_id: location_assignment_id,
         location_long_code: Faker::Lorem.unique.word,
         location_description: Faker::Lorem.word,
         active: true,
@@ -23,7 +23,6 @@ module MasterfilesApp
         location_short_code: Faker::Lorem.unique.word,
         can_be_moved: false,
         print_code: Faker::Lorem.word,
-        location_storage_definition_id: location_storage_definition_id,
         can_store_stock: false,
         units_in_location: Faker::Number.number(digits: 4)
       }
@@ -31,8 +30,10 @@ module MasterfilesApp
     end
 
     def create_location_storage_type(opts = {})
-      opts[:storage_type_code] ||= Faker::Lorem.unique.word
+      id = get_available_factory_record(:location_storage_types, opts)
+      return id unless id.nil?
 
+      opts[:storage_type_code] ||= Faker::Lorem.unique.word
       default = {
         created_at: '2010-01-01 12:00',
         updated_at: '2010-01-01 12:00',
@@ -42,8 +43,10 @@ module MasterfilesApp
     end
 
     def create_location_type(opts = {})
-      opts[:location_type_code] ||= Faker::Lorem.unique.word
+      id = get_available_factory_record(:location_types, opts)
+      return id unless id.nil?
 
+      opts[:location_type_code] ||= Faker::Lorem.unique.word
       default = {
         short_code: Faker::Lorem.word,
         created_at: '2010-01-01 12:00',
@@ -55,8 +58,10 @@ module MasterfilesApp
     end
 
     def create_location_assignment(opts = {})
-      opts[:assignment_code] ||= Faker::Lorem.unique.word
+      id = get_available_factory_record(:location_assignments, opts)
+      return id unless id.nil?
 
+      opts[:assignment_code] ||= Faker::Lorem.unique.word
       default = {
         created_at: '2010-01-01 12:00',
         updated_at: '2010-01-01 12:00'
@@ -65,6 +70,9 @@ module MasterfilesApp
     end
 
     def create_location_storage_definition(opts = {})
+      id = get_available_factory_record(:location_storage_definitions, opts)
+      return id unless id.nil?
+
       default = {
         storage_definition_code: Faker::Lorem.unique.word,
         active: true,

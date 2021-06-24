@@ -24,6 +24,7 @@ module MesscadaApp
     include MasterfilesApp::PackagingFactory
     include MasterfilesApp::LabelTemplateFactory
     include MasterfilesApp::HRFactory
+    include MasterfilesApp::LocationFactory
     include MasterfilesApp::DepotFactory
     include MasterfilesApp::PortTypeFactory
     include MasterfilesApp::VesselFactory

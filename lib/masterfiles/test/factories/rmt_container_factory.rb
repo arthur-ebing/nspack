@@ -3,21 +3,20 @@
 module MasterfilesApp
   module RmtContainerFactory
     def create_rmt_container_material_owner(opts = {})
-      rmt_container_material_type_id = create_rmt_container_material_type
-      party_role_id = create_party_role
+      id = get_available_factory_record(:rmt_container_material_owners, opts)
+      return id unless id.nil?
 
-      default = {
-        rmt_container_material_type_id: rmt_container_material_type_id,
-        rmt_material_owner_party_role_id: party_role_id
-      }
-      DB[:rmt_container_material_owners].insert(default.merge(opts))
+      opts[:rmt_container_material_type_id] ||= create_rmt_container_material_type
+      opts[:rmt_material_owner_party_role_id] ||= create_party_role(party_type: 'O', name: AppConst::ROLE_IMPLEMENTATION_OWNER)
+      DB[:rmt_container_material_owners].insert(opts)
     end
 
     def create_rmt_container_material_type(opts = {})
-      rmt_container_type_id = create_rmt_container_type
+      id = get_available_factory_record(:rmt_container_material_types, opts)
+      return id unless id.nil?
 
+      opts[:rmt_container_type_id] ||= create_rmt_container_type
       default = {
-        rmt_container_type_id: rmt_container_type_id,
         container_material_type_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
         active: true,
@@ -29,6 +28,9 @@ module MasterfilesApp
     end
 
     def create_rmt_container_type(opts = {})
+      id = get_available_factory_record(:rmt_container_types, opts)
+      return id unless id.nil?
+
       default = {
         container_type_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,

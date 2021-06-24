@@ -11,6 +11,7 @@ module RawMaterialsApp
     include MasterfilesApp::FarmFactory
     include MasterfilesApp::CalendarFactory
     include MasterfilesApp::RmtContainerFactory
+    include MasterfilesApp::LocationFactory
     include RawMaterialsApp::RmtDeliveryFactory
     include ProductionApp::ProductionRunFactory
     include ProductionApp::ResourceFactory
