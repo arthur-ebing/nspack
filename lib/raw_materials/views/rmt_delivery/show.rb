@@ -4,7 +4,7 @@
 module RawMaterials
   module Deliveries
     module RmtDelivery
-      class Show
+      class Show # rubocop:disable Metrics/ClassLength
         def self.call(id, back_url:) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:rmt_delivery, :show, id: id)
           rules   = ui_rule.compile
@@ -65,7 +65,6 @@ module RawMaterials
                 end
               end
             end
-
             if ui_rule.form_object.keep_open
               page.section do |section|
                 bin_type = nil
@@ -105,9 +104,14 @@ module RawMaterials
                                  "/list/#{bin_type}rmt_bins/grid?key=standard&delivery_id=#{id}",
                                  caption: 'Bins')
               end
+            else
+              page.section do |section|
+                section.add_grid('rmt_bins_deliveries',
+                                 "/list/rmt_bins_deliveries/grid?key=standard&delivery_id=#{id}",
+                                 caption: 'Bins')
+              end
             end
           end
-
           layout
         end
       end
