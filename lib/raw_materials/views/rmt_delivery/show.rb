@@ -34,6 +34,7 @@ module RawMaterials
                 form.no_submit!
                 form.row do |row|
                   row.column do |col|
+                    col.add_field :id
                     col.add_field :season_id
                     col.add_field :farm_id
                     col.add_field :puc_id
