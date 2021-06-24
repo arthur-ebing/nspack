@@ -70,7 +70,7 @@ module Crossbeams
       required = options[:required].nil? || options[:required] ? ' required' : ''
       autofocus = autofocus_for_field(name)
       @fields << <<~HTML
-        <tr id="#{form_name}_#{name}_row"#{field_error_state}#{initial_visibilty(options)}><th align="left">#{label}#{field_error_message}</th>
+        <tr id="#{form_name}_#{name}_row"#{field_error_state}#{initial_visibilty(options)}><th class="tl">#{label}#{field_error_message}</th>
         <td><div class="rmdScanFieldGroup"><input class="pa2#{field_error_class}#{field_upper_class(options)}" id="#{form_name}_#{name}" type="#{data_type}"#{decimal_or_int(data_type, options)} name="#{form_name}[#{name}]" placeholder="#{for_scan}#{label}"#{scan_opts(options)} #{render_behaviours} style="width:#{width}rem;" value="#{field_value(form_state[name])}"#{required}#{autofocus}#{lookup_data(options)}#{submit_form(options)}#{set_readonly(form_state[name], for_scan)}#{attr_upper(options)}>#{clear_button(for_scan)}</div>#{hidden_scan_type(name, options)}#{lookup_display(name, options)}
         </td></tr>
       HTML
@@ -89,7 +89,7 @@ module Crossbeams
     def add_toggle(name, label, options = {}) # rubocop:disable Metrics/AbcSize
       @current_field = name
       @fields << <<~HTML
-        <tr id="#{form_name}_#{name}_row"#{field_error_state}#{initial_visibilty(options)}><th align="left"><label for="#{form_name}_#{name}">#{label}</label>#{field_error_message}</th>
+        <tr id="#{form_name}_#{name}_row"#{field_error_state}#{initial_visibilty(options)}><th class="tl"><label for="#{form_name}_#{name}">#{label}</label>#{field_error_message}</th>
         <td>
             <input name="#{form_name}[#{name}]" type="hidden" value="f">
           <label class="switch">
@@ -121,7 +121,7 @@ module Crossbeams
       autofocus = autofocus_for_field(name)
       value = form_state[name] || options[:value]
       @fields << <<~HTML
-        <tr id="#{form_name}_#{name}_row"#{field_error_state}#{initial_visibilty(options)}><th align="left">#{label}#{field_error_message}</th>
+        <tr id="#{form_name}_#{name}_row"#{field_error_state}#{initial_visibilty(options)}><th class="tl">#{label}#{field_error_message}</th>
         <td><select class="pa2#{field_error_class}" id="#{form_name}_#{name}" name="#{form_name}[#{name}]" #{required}#{autofocus} #{render_behaviours}>
           #{make_prompt(options[:prompt])}#{build_options(items, value)}
         </select>
@@ -143,14 +143,15 @@ module Crossbeams
     # @option options [Boolean] :hide_on_load should this element be hidden when the form loads?
     # @option options [String] :value_class a string of css class(es) to wrap around the label value.
     # @return [void]
-    def add_label(name, label, value, hidden_value = nil, options = {}) # rubocop:disable Metrics/AbcSize
+    def add_label(name, label, value, hidden_value = nil, options = {}) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       tr_css_class = options[:as_table_cell] ? ' class="hover-row"' : ''
+      th_css_class = options[:as_table_cell] ? ' class="rmd-table-cell tl"' : ' class="tl"'
       td_css_class = options[:as_table_cell] ? ' class="rmd-table-cell"' : ''
       v_classes = [options[:value_class]]
       v_classes << 'pa2 bg-moon-gray br2' unless options[:as_table_cell]
       div_css_class = v_classes.compact.empty? ? '' : %( class="#{v_classes.compact.join(' ')}")
       @fields << <<~HTML
-        <tr id="#{form_name}_#{name}_row"#{initial_visibilty(options)}#{tr_css_class}><th#{td_css_class} align="left">#{label}</th>
+        <tr id="#{form_name}_#{name}_row"#{initial_visibilty(options)}#{tr_css_class}><th#{th_css_class}>#{label}</th>
         <td#{td_css_class}><div#{div_css_class} id="#{form_name}_#{name}_value">#{field_value(value) || '&nbsp;'}</div>#{hidden_label(name, hidden_value)}
         </td></tr>
       HTML
@@ -189,9 +190,25 @@ module Crossbeams
 
       id = options[:id] || "btn_#{caption.hash}"
       @buttons << <<~HTML
-        <button id="#{id}" formaction="#{action}" type="submit" data-disable-with="Processing..." class="dim br2 pa3 bn white bg-gray mr3" data-rmd-btn="Y"#{initial_visibilty(options)} />
+        <button id="#{id}" formaction="#{action}" type="submit" data-disable-with="Processing..." class="dim br2 mb2 pa3 bn white bg-gray mr3" data-rmd-btn="Y"#{initial_visibilty(options)}>
           #{caption}
         </button>
+      HTML
+    end
+
+    def add_status_leds(colour = :green)
+      key = { green: 'gray', red: 'gray', orange: 'gray' }
+      key[colour] = colour.to_s
+      @fields << <<~HTML
+        <tr>
+          <td colspan="2">
+          <div class="rmdLeds">
+            <div id="led_red" class="rmdLedLight bg-#{key[:red]}"></div>
+            <div id="led_orange" class="rmdLedLight bg-#{key[:orange]}"></div>
+            <div id="led_green" class="rmdLedLight bg-#{key[:green]}"></div>
+            </div>
+          </td>
+        </tr>
       HTML
     end
 
@@ -406,7 +423,7 @@ module Crossbeams
       <<~HTML
         <button type="button" title="Clear input" class="pa2 white ba bw1 br1 b--silver dim dib f6 bg-silver rmdClear" data-rmd-clear="y">
           <svg class="cbl-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M0 10l7-7h13v14H7l-7-7zm14.41 0l2.13-2.12-1.42-1.42L13 8.6l-2.12-2.13-1.42 1.42L11.6 10l-2.13 2.12 1.42 1.42L13 11.4l2.12 2.13 1.42-1.42L14.4 10z"/></svg>
-        </buton>
+        </button>
       HTML
     end
 

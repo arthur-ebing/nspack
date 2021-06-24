@@ -14,4 +14,10 @@ module RmdHelpers
   def rmd_error_message(str)
     %(<span class="red">#{str}</span>)
   end
+
+  def display_worker_name(identifier)
+    return '' unless defined?(MesscadaApp::HrRepo)
+
+    MesscadaApp::HrRepo.new.contract_worker_name(identifier)
+  end
 end
