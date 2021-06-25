@@ -13,7 +13,7 @@ module Crossbeams
             integrate_extended_fg: false,
             max_rmt_bins_on_load: 50,
             max_pallets_on_load: 96,
-            use_inspection_destination_for_load_out: false,
+            use_inspection_destination_for_load_out: true,
             valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } },
       hl: { place_of_issue_for_addendum: 'PLZ',
             vgm_required: false,
