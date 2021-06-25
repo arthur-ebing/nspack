@@ -80,6 +80,10 @@ module MesserverApp
 
     def print_published_label(label_template_name, vars, quantity, printer, host = nil)
       res = post_print_or_preview(print_published_label_uri(host), label_template_name, vars, quantity: quantity, printer: printer)
+      # Test a print for a specific label - alter no of F-vars as required:
+      # testvars = {}
+      # 19.times { |n| testvars["F#{n}".to_sym] = "ABC#{n}" }
+      # res = post_print_or_preview(print_published_label_uri(host), 'C4SC', testvars, quantity: 1, printer: 'PRN-01')
       unless res.success
         res = if res.instance[:response_code].to_s == '404'
                 failed_response("The label (#{label_template_name}) or printer was not found. Has it been published yet?")
