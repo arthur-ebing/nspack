@@ -1,1 +1,12 @@
 <%= @layout.render %>
+<% if @layout.includes_javascript? %>
+  <% content_for :late_javascript do %>
+    <script>
+      (function() {
+        document.addEventListener('DOMContentLoaded', () => {
+          <%= @layout.render_dom_loaded_js %>
+        });
+      }).call(this);
+    </script>
+  <% end %>
+<% end %>
