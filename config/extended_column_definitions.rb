@@ -65,7 +65,7 @@ module Crossbeams
         shifts: {
           'kr' => Dry::Schema.Params do
             required(:people_working_on_shift).maybe(:integer)
-            required(:machine_minutes).maybe(:integer, gteq?: 1, lteq?: 60)
+            required(:machine_minutes).maybe(:integer, gteq?: 1, lteq?: 800)
             required(:people_absent).maybe(:integer)
             required(:people_off_sick).maybe(:integer)
             required(:people_on_leave).maybe(:integer)
