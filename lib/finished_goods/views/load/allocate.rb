@@ -56,7 +56,7 @@ module FinishedGoods
                                "/finished_goods/dispatch/loads/#{id}/allocate/grid",
                                is_multiselect: true,
                                multiselect_url: "/finished_goods/dispatch/loads/#{id}/allocate_multiselect",
-                               multiselect_params: { id: id },
+                               multiselect_params: {},
                                caption: "Choose #{palbin}s")
             end
           end

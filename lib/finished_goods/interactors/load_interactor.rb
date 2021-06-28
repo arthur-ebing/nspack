@@ -136,7 +136,7 @@ module FinishedGoodsApp
     end
 
     def col_defs_for_allocate_grid(columns) # rubocop:disable Metrics/AbcSize
-      Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
+      Crossbeams::DataGrid::ColumnDefiner.new(for_multiselect: true).make_columns do |mk|
         mk.action_column do |act|
           act.popup_view_link '/list/stock_pallet_sequences/with_params?key=standard&pallet_id=$:id$',
                               id: 'id',
