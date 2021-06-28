@@ -103,7 +103,7 @@ module LabelPrintingApp
       return [] if label_template.variable_rules.nil?
 
       label_template.variable_rules['variables'].map do |var|
-        raise Crossbeams::InfoError, "Variable \"#{var.keys.first}\" on label \"#{label_name}\" has no resolver (Perhaps an incompatible variable set was used)." if var.values.first.nil?
+        raise Crossbeams::FrameworkError, "Variable \"#{var.keys.first}\" on label \"#{label_name}\" has no resolver (Perhaps an incompatible variable set was used)." if var.values.first.nil?
 
         var.values.first['resolver']
       end

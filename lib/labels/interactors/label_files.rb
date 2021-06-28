@@ -222,6 +222,10 @@ module LabelApp
         baseline_x.content = adjust[:baseline_x]
         baseline_y.content = adjust[:baseline_y]
       end
+
+      # Rotated 90 or -90 degrees, so swap width and height:
+      doc.at_xpath('//image_height').content = image_width
+      doc.at_xpath('//image_width').content = image_height
       # puts doc.to_xml
       # File.open('vars.xml', 'w') { |f| f << doc.to_xml }
       doc.to_xml.gsub(/>\s+</, '><')
