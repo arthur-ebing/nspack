@@ -87,6 +87,13 @@ class Nspack < Roda
                                                     line1: unwrap_failed_response(res))
                    end
         Crossbeams::RobotResponder.new(feedback).render
+      rescue Rack::QueryParser::InvalidParameterError => e
+        ErrorMailer.send_exception_email(e, subject: 'Carton verification invalid parameter', message: "Invalid param from route: #{request.path} with #{request.query_string}")
+
+        feedback = MesscadaApp::RobotFeedback.new(device: '',
+                                                  status: false,
+                                                  line1: 'Unable to read barcode')
+        return Crossbeams::RobotResponder.new(feedback).render
       end
     end
 
