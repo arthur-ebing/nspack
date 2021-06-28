@@ -41,8 +41,8 @@
   THEN 'inprogress'\r\n        WHEN vw_pallets.inspected AND NOT vw_pallets.govt_inspection_passed
   THEN 'error'\r\n        WHEN vw_pallets.pallet_verification_failed THEN 'error'\r\n
   \       END AS colour_rule\r\n\r\nFROM vw_pallets\r\nLEFT JOIN vw_pallet_sequences_aggregated
-  aggregated ON aggregated.pallet_id = vw_pallets.pallet_id\r\n\r\nORDER BY pallet_number
-  DESC"
+  aggregated ON aggregated.pallet_id = vw_pallets.pallet_id\r\n\r\nORDER BY load_id,
+  pallet_number DESC"
 :limit: 
 :offset: 
 :external_settings:

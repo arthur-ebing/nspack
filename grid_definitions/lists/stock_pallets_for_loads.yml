@@ -7,7 +7,7 @@
   :icon: list
   :popup: true
 - :url: "/finished_goods/dispatch/loads/$:load_id$/unship/$:pallet_number$"
-  :text: Unship and Unallocate
+  :text: unship and unallocate
   :icon: edit
   :hide_if_false: shipped
   :has_permission:
