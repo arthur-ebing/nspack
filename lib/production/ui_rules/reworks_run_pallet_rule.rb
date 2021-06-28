@@ -122,6 +122,7 @@ module UiRules
                                                  prompt: 'Select Fruit Sticker 2',
                                                  searchable: true,
                                                  remove_search_for_small_list: false }
+      fields[:batch_number] = { invisible: !AppConst::CR_PROD.capture_batch_number_for_pallets? }
     end
 
     def make_form_object  # rubocop:disable Metrics/AbcSize

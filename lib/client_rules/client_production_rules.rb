@@ -22,7 +22,8 @@ module Crossbeams
             carton_equals_pallet: { default: false, can_override: true },
             capture_product_setup_class: false,
             link_target_markets_to_target_customers: false,
-            require_packaging_bom: false },
+            require_packaging_bom: false,
+            capture_batch_number_for_pallets: true },
       hl: { run_allocations: true,
             pallet_label_seqs_sql: nil,
             use_gtins: false,
@@ -40,7 +41,8 @@ module Crossbeams
             carton_equals_pallet: { default: false, can_override: true },
             capture_product_setup_class: false,
             link_target_markets_to_target_customers: false,
-            require_packaging_bom: false },
+            require_packaging_bom: false,
+            capture_batch_number_for_pallets: false },
       kr: { run_allocations: true,
             pallet_label_seqs_sql: 'SELECT p.puc_code, p.gap_code, ps.gtin_code, ps.carton_quantity FROM pallet_sequences ps JOIN pucs p ON p.id = ps.puc_id WHERE ps.pallet_id = ? ORDER BY ps.pallet_sequence_number',
             use_gtins: true,
@@ -58,7 +60,8 @@ module Crossbeams
             carton_equals_pallet: { default: false, can_override: false },
             capture_product_setup_class: true,
             link_target_markets_to_target_customers: true,
-            require_packaging_bom: true },
+            require_packaging_bom: true,
+            capture_batch_number_for_pallets: false },
       um: { run_allocations: true,
             pallet_label_seqs_sql: 'SELECT o.orchard_code, m.marketing_variety_code, s.size_reference, ps.carton_quantity FROM pallet_sequences ps JOIN orchards o ON o.id = ps.orchard_id JOIN marketing_varieties m ON m.id = ps.marketing_variety_id JOIN fruit_size_references s ON s.id = ps.fruit_size_reference_id WHERE ps.pallet_id = ? ORDER BY ps.pallet_sequence_number',
             use_gtins: false,
@@ -76,7 +79,8 @@ module Crossbeams
             carton_equals_pallet: { default: false, can_override: false },
             capture_product_setup_class: false,
             link_target_markets_to_target_customers: false,
-            require_packaging_bom: false },
+            require_packaging_bom: false,
+            capture_batch_number_for_pallets: false },
       ud: { run_allocations: true,
             pallet_label_seqs_sql: nil,
             use_gtins: false,
@@ -94,7 +98,8 @@ module Crossbeams
             carton_equals_pallet: { default: false, can_override: false },
             capture_product_setup_class: false,
             link_target_markets_to_target_customers: false,
-            require_packaging_bom: false },
+            require_packaging_bom: false,
+            capture_batch_number_for_pallets: false },
       sr: { run_allocations: true,
             pallet_label_seqs_sql: nil,
             use_gtins: false,
@@ -112,7 +117,8 @@ module Crossbeams
             carton_equals_pallet: { default: false, can_override: false },
             capture_product_setup_class: false,
             link_target_markets_to_target_customers: false,
-            require_packaging_bom: false },
+            require_packaging_bom: false,
+            capture_batch_number_for_pallets: false },
       sr2: { run_allocations: true,
              pallet_label_seqs_sql: nil,
              use_gtins: false,
@@ -130,7 +136,8 @@ module Crossbeams
              carton_equals_pallet: { default: false, can_override: true },
              capture_product_setup_class: false,
              link_target_markets_to_target_customers: false,
-             require_packaging_bom: false }
+             require_packaging_bom: false,
+             capture_batch_number_for_pallets: false }
     }.freeze
     # ALLOW_OVERFULL_REWORKS_PALLETIZING
     # BYPASS_QUALITY_TEST_LOAD_CHECK
@@ -298,6 +305,12 @@ module Crossbeams
       return 'Show and capture packaging bom on product_setups and pallet_sequences forms.' if explain
 
       setting(:require_packaging_bom)
+    end
+
+    def capture_batch_number_for_pallets?(explain: false)
+      return 'Capture batch number on pallets.' if explain
+
+      setting(:capture_batch_number_for_pallets)
     end
   end
 end

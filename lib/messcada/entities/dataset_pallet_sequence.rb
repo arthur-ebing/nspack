@@ -256,7 +256,8 @@ module MesscadaApp
           WHERE sq.id = pallet_sequences.id
           GROUP BY sq.id) AS tu_stickers,
          pallet_sequences.target_customer_party_role_id,
-         fn_party_role_name(pallet_sequences.target_customer_party_role_id) AS target_customer
+         fn_party_role_name(pallet_sequences.target_customer_party_role_id) AS target_customer,
+         pallets.batch_number
 
         FROM pallet_sequences
         JOIN pallets ON pallets.id = pallet_sequences.pallet_id

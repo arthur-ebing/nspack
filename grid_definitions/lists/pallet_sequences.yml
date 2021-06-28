@@ -93,13 +93,16 @@
   - marketing_puc
   - marketing_orchard
   - shipped_date
+  - batch_number
   ud:
   - marketing_puc
   - marketing_orchard
+  - batch_number
   sr:
   - marketing_puc
   - marketing_orchard
   - shipped_date
+  - batch_number
   srp:
   - marketing_puc
   - marketing_orchard
@@ -107,9 +110,12 @@
   - marketing_puc
   - marketing_orchard
   - shipped_date
+  - batch_number
   sr2:
   - marketing_puc
   - marketing_orchard
   - shipped_date
+  - batch_number
   kr:
   - shipped_date
+  - batch_number

@@ -36,11 +36,18 @@
   - shipped_date
   hl:
   - shipped_date
+  - batch_number
   um:
   - shipped_date
+  - batch_number
   sr:
   - shipped_date
+  - batch_number
   sr2:
   - shipped_date
+  - batch_number
   kr:
   - shipped_date
+  - batch_number
+  ud:
+  - batch_number

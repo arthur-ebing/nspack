@@ -36,9 +36,9 @@
   \   failed_otmc,\r\n    created_by,\r\n    verified_by,\r\n    edi_size_count,\r\n
   \   target_customer_party_role_id,\r\n    target_customer,\r\n    consignment_note_number,\r\n
   \   dispatch_note,\r\n    customer_order_number,\r\n    customer_reference, \r\n
-  \   depot,\r\n    po_file_name,\r\n    CASE WHEN fn_pallet_verification_failed (pallet_id)
-  THEN\r\n        'error'\r\n    ELSE\r\n        colour_rule\r\n    END AS colour_rule\r\nFROM\r\n
-  \   vw_pallet_sequence_flat"
+  \   depot,\r\n    po_file_name,\r\n    batch_number,\r\n    CASE WHEN fn_pallet_verification_failed
+  (pallet_id) THEN\r\n        'error'\r\n    ELSE\r\n        colour_rule\r\n    END
+  AS colour_rule\r\nFROM\r\n    vw_pallet_sequence_flat"
 :limit: 
 :offset: 
 :external_settings:
@@ -2467,9 +2467,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  batch_number:
+    :name: batch_number
+    :sequence_no: 152
+    :caption: Batch number
+    :namespaced_name: batch_number
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 152
+    :sequence_no: 153
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

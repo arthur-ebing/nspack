@@ -21,10 +21,12 @@
   ud:
   - fruit_sticker
   - fruit_sticker_2
+  - batch_number
   sr:
   - fruit_sticker
   - fruit_sticker_2
   - shipped_date
+  - batch_number
   srp:
   - fruit_sticker
   - fruit_sticker_2
@@ -32,6 +34,7 @@
   - fruit_sticker
   - fruit_sticker_2
   - shipped_date
+  - batch_number
   hb:
   - fruit_sticker
   - fruit_sticker_2
@@ -40,9 +43,12 @@
   - fruit_sticker
   - fruit_sticker_2
   - shipped_date
+  - batch_number
   um:
   - fruit_sticker
   - fruit_sticker_2
   - shipped_date
+  - batch_number
   kr:
   - shipped_date
+  - batch_number

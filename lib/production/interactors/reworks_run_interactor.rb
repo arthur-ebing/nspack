@@ -984,11 +984,14 @@ module ProductionApp
       instance = pallet(pallet_number)
 
       before_attrs = { fruit_sticker_pm_product_id: instance[:fruit_sticker_pm_product_id],
-                       fruit_sticker_pm_product_2_id: instance[:fruit_sticker_pm_product_2_id] }
+                       fruit_sticker_pm_product_2_id: instance[:fruit_sticker_pm_product_2_id],
+                       batch_number: instance[:batch_number] }
       before_descriptions_state = { fruit_sticker: fruit_sticker(instance[:fruit_sticker_pm_product_id]),
-                                    fruit_sticker_2: fruit_sticker(instance[:fruit_sticker_pm_product_2_id]) }
+                                    fruit_sticker_2: fruit_sticker(instance[:fruit_sticker_pm_product_2_id]),
+                                    batch_number: instance[:batch_number] }
       after_descriptions_state = { fruit_sticker: fruit_sticker(attrs[:fruit_sticker_pm_product_id]),
-                                   fruit_sticker_2: fruit_sticker(attrs[:fruit_sticker_pm_product_2_id]) }
+                                   fruit_sticker_2: fruit_sticker(attrs[:fruit_sticker_pm_product_2_id]),
+                                   batch_number: attrs[:batch_number] }
       change_descriptions = { before: before_descriptions_state.sort.to_h, after: after_descriptions_state.sort.to_h }
       repo.transaction do
         repo.update_pallet(instance[:id], attrs)

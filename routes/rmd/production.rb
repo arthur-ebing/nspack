@@ -189,7 +189,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
         form_state = { gross_weight: pallet_sequence[:gross_weight]&.to_f,
                        print_pallet_label: AppConst::PRINT_PALLET_LABEL_AT_PALLET_VERIFICATION,
-                       qty_to_print: 4 }
+                       qty_to_print: 4,
+                       batch_number: pallet_sequence[:batch_number] }
         form_state.merge!(retrieve_from_local_store(:errors).to_h)
         form = Crossbeams::RMDForm.new(form_state,
                                        form_name: :verify_pallet_sequence,
@@ -252,6 +253,11 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         form.add_label(:nett_weight,
                        'Nett Weight',
                        pallet_sequence[:nett_weight]&.to_f)
+        if AppConst::CR_PROD.capture_batch_number_for_pallets?
+          form.add_field(:batch_number,
+                         'Batch Number',
+                         required: true)
+        end
         if AppConst::PRINT_PALLET_LABEL_AT_PALLET_VERIFICATION && pallet_sequence[:pallet_sequence_number] == 1
           form.add_toggle(:print_pallet_label,
                           'Print pallet label')

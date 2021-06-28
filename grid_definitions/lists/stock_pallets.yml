@@ -127,25 +127,25 @@
     :op: "="
     :val: false
   :unallocated_pallet_stock_for_order:
-    - :col: vw_pallets.in_stock
-      :op: "="
-      :val: true
-    - :col: vw_pallets.zero_load_id
-      :op: IN
-      :val: "$:load_id$,0"
-    - :col: aggregated.rmt_grades
-      :op: "="
-      :val: false
-    - :col: vw_pallet_sequences.packed_tm_group_id
-      :op: "="
-      :val: "$:packed_tm_group_id$"
-    - :col: vw_pallet_sequences.marketing_org_party_role_id
-      :op: "="
-      :val: "$:marketing_org_party_role_id$"
-    - :col: vw_pallet_sequences.target_customer_party_role_id
-      :op: "="
-      :val: "$:target_customer_party_role_id$"
-      :optional: true
+  - :col: vw_pallets.in_stock
+    :op: "="
+    :val: true
+  - :col: vw_pallets.zero_load_id
+    :op: IN
+    :val: "$:load_id$,0"
+  - :col: aggregated.rmt_grades
+    :op: "="
+    :val: false
+  - :col: vw_pallet_sequences.packed_tm_group_id
+    :op: "="
+    :val: "$:packed_tm_group_id$"
+  - :col: vw_pallet_sequences.marketing_org_party_role_id
+    :op: "="
+    :val: "$:marketing_org_party_role_id$"
+  - :col: vw_pallet_sequences.target_customer_party_role_id
+    :op: "="
+    :val: "$:target_customer_party_role_id$"
+    :optional: true
   :unallocated_bin_stock:
   - :col: vw_pallets.in_stock
     :op: "="
@@ -280,13 +280,16 @@
   - marketing_puc
   - marketing_orchard
   - shipped_date
+  - batch_number
   ud:
   - marketing_puc
   - marketing_orchard
+  - batch_number
   sr:
   - marketing_puc
   - marketing_orchard
   - shipped_date
+  - batch_number
   srp:
   - marketing_puc
   - marketing_orchard
@@ -294,9 +297,12 @@
   - marketing_puc
   - marketing_orchard
   - shipped_date
+  - batch_number
   sr2:
   - marketing_puc
   - marketing_orchard
   - shipped_date
+  - batch_number
   kr:
   - shipped_date
+  - batch_number
