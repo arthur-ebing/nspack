@@ -77,6 +77,7 @@ Lint/Env:
     - '**/*.rb'
   Exclude:
     - '**/config/app_const.rb'
+    - '**/config/client_settings_loader.rb'
     - '**/config/environment.rb'
     - '**/config/puma.rb'
     - 'app_loader.rb'
