@@ -5,9 +5,7 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 module MesscadaApp
   class TestCartonVerification < MiniTestWithHooks
     include Crossbeams::Responses
-    include CartonLabelFactory
     include CartonFactory
-    include PalletSequenceFactory
     include PalletFactory
     include ProductionApp::ProductionRunFactory
     include ProductionApp::ResourceFactory
