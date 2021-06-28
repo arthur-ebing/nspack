@@ -485,7 +485,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           if res.success
             update_grid_row(id, changes: {
                               container_type_code: res.instance[:container_type_code],
-                              inner_container_type: res.instance[:inner_container_type],
+                              inner_container_type: res.instance[:rmt_inner_container_type],
                               description: res.instance[:description]
                             },
                                 notice: res.message)
