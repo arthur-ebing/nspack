@@ -19,5 +19,16 @@ module MasterfilesApp
       }
       DB[:ports].insert(default.merge(opts))
     end
+
+    def create_port_type(opts = {})
+      default = {
+        port_type_code: Faker::Lorem.unique.word,
+        description: Faker::Lorem.word,
+        active: true,
+        created_at: '2010-01-01 12:00',
+        updated_at: '2010-01-01 12:00'
+      }
+      DB[:port_types].insert(default.merge(opts))
+    end
   end
 end

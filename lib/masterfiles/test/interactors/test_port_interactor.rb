@@ -5,7 +5,6 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 module MasterfilesApp
   class TestPortInteractor < MiniTestWithHooks
     include PortFactory
-    include PortTypeFactory
     include VesselFactory
     include DepotFactory
 

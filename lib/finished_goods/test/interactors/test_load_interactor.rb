@@ -9,9 +9,7 @@ module FinishedGoodsApp
     include MasterfilesApp::DepotFactory
     include MasterfilesApp::VesselFactory
     include MasterfilesApp::PortFactory
-    include MasterfilesApp::PortTypeFactory
     include VoyageFactory
-    include VoyagePortFactory
 
     def test_repo
       repo = interactor.send(:repo)

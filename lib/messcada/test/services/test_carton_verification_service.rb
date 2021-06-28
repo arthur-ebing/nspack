@@ -26,7 +26,6 @@ module MesscadaApp
     include MasterfilesApp::HRFactory
     include MasterfilesApp::LocationFactory
     include MasterfilesApp::DepotFactory
-    include MasterfilesApp::PortTypeFactory
     include MasterfilesApp::VesselFactory
     include MasterfilesApp::PortFactory
     include MasterfilesApp::QualityFactory
@@ -35,7 +34,6 @@ module MesscadaApp
     include RawMaterialsApp::RmtDeliveryFactory
     include FinishedGoodsApp::LoadFactory
     include FinishedGoodsApp::VoyageFactory
-    include FinishedGoodsApp::VoyagePortFactory
 
     def test_carton_label
       create_carton_label

@@ -7,13 +7,11 @@ module FinishedGoodsApp
     include FinishedGoodsApp::TitanFactory
     include FinishedGoodsApp::LoadFactory
     include FinishedGoodsApp::VoyageFactory
-    include FinishedGoodsApp::VoyagePortFactory
     include FinishedGoodsApp::GovtInspectionFactory
     include MasterfilesApp::PartyFactory
     include MasterfilesApp::DepotFactory
     include MasterfilesApp::VesselFactory
     include MasterfilesApp::PortFactory
-    include MasterfilesApp::PortTypeFactory
     include MasterfilesApp::TargetMarketFactory
 
     def test_repo

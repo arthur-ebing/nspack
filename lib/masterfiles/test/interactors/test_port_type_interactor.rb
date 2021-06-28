@@ -4,7 +4,7 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
 module MasterfilesApp
   class TestPortTypeInteractor < MiniTestWithHooks
-    include PortTypeFactory
+    include PortFactory
 
     def test_repo
       repo = interactor.send(:repo)
