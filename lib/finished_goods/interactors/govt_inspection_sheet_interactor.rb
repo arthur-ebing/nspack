@@ -448,16 +448,15 @@ module FinishedGoodsApp
     end
 
     def validate_add_pallet_govt_inspection_params(id, params) # rubocop:disable Metrics/AbcSize
-      res = AddGovtInspectionPalletSchema.call(params.merge!(govt_inspection_sheet_id: id))
-      return validation_failed_response(res) if res.failure?
-
-      attrs = repo.scan_pallet_or_carton(res)
+      attrs = repo.scan_pallet_or_carton(params)
       pallet_number = repo.get(:pallets, attrs[:pallet_id], :pallet_number)
 
       check_pallet!(:not_shipped, pallet_number)
       check_pallet!(:not_failed_otmc, pallet_number)
       check_pallet!(:verification_passed, pallet_number)
       check_pallet!(:pallet_weight, pallet_number)
+
+      attrs[:govt_inspection_sheet_id] = id
       if repo.get(:govt_inspection_sheets, attrs[:govt_inspection_sheet_id], :reinspection)
         check_pallet!(:inspected, pallet_number)
       else
@@ -465,7 +464,7 @@ module FinishedGoodsApp
       end
 
       res = CreateGovtInspectionPalletSchema.call(attrs)
-      return validation_failed_response(res) if res.failure?
+      return unwrap_failed_response(validation_failed_response(res)) if res.failure?
 
       success_response('Passed Validation', res.to_h)
     rescue Crossbeams::InfoError => e

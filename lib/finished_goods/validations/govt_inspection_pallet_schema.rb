@@ -22,11 +22,6 @@ module FinishedGoodsApp
     optional(:failure_remarks).maybe(Types::StrippedString)
   end
 
-  AddGovtInspectionPalletSchema = Dry::Schema.Params do
-    required(:scanned_number).filled(:string)
-    required(:govt_inspection_sheet_id).filled(:integer)
-  end
-
   FailGovtInspectionPalletSchema = Dry::Schema.Params do
     optional(:id).filled(:integer)
     required(:failure_reason_id).filled(:integer)
