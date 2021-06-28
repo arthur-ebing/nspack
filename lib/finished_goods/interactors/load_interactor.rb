@@ -121,25 +121,34 @@ module FinishedGoodsApp
     end
 
     def allocate_grid(load_id)
-      yml = YAML.load_file('grid_definitions/dataminer_queries/stock_pallets_for_loads.yml')
-      query = <<~SQL
-        #{yml[:sql].split('ORDER BY').first}
-        WHERE vw_pallets.pallet_id IN ?
-        ORDER BY pallet_number DESC
-      SQL
+      file = 'grid_definitions/dataminer_queries/stock_pallets_for_loads.yml'
+      rpt = dataminer_report(file)
+
       pallet_ids = repo.find_pallets_for_for_load(load_id)
-      row_defs = DB[query, pallet_ids].all
+      param = Crossbeams::Dataminer::QueryParameter.new('vw_pallets.pallet_id', Crossbeams::Dataminer::OperatorValue.new('IN', pallet_ids))
+      rpt.replace_where(Array(param))
+
+      row_defs = report_rows(rpt)
+
+      # yml = YAML.load_file('grid_definitions/dataminer_queries/stock_pallets_for_loads.yml')
+      # query = <<~SQL
+      #   #{yml[:sql].split('ORDER BY').first}
+      #   WHERE vw_pallets.pallet_id IN ?
+      #   ORDER BY pallet_number DESC
+      # SQL
+      # pallet_ids = repo.find_pallets_for_for_load(load_id)
+      # row_defs = DB[query, pallet_ids].all
       {
-        columnDefs: col_defs_for_allocate_grid(yml[:columns]),
+        columnDefs: col_defs_for_allocate_grid(rpt),
         rowDefs: row_defs
       }.to_json
     end
 
-    def col_defs_for_allocate_grid(columns) # rubocop:disable Metrics/AbcSize
+    def col_defs_for_allocate_grid(rpt)
       Crossbeams::DataGrid::ColumnDefiner.new(for_multiselect: true).make_columns do |mk|
         mk.action_column do |act|
-          act.popup_view_link '/list/stock_pallet_sequences/with_params?key=standard&pallet_id=$:id$',
-                              id: 'id',
+          act.popup_view_link '/list/stock_pallet_sequences/with_params?key=standard&pallet_id=$col1$',
+                              col1: 'id',
                               icon: 'list',
                               title: 'Pallet sequences for Pallet No $:pallet_number$'
           # - :url: "/list/stock_pallet_sequences/with_params?key=standard&pallet_id=$:id$"
@@ -155,22 +164,48 @@ module FinishedGoodsApp
           #   - load
           #   - can_unship
         end
-        columns.each do |k, v|
-          case v[:data_type]
-          when :integer
-            mk.integer k, v[:caption], hide: v[:hide], width: v[:width]
-          when :string
-            mk.col k, v[:caption], hide: v[:hide], width: v[:width]
-          when :boolean
-            mk.boolean k, v[:caption], hide: v[:hide], width: v[:width]
-          when :datetime
-            mk.col k, v[:caption], hide: v[:hide], width: v[:width], data_type: :datetime
-          else
-            next
-          end
+        rpt.ordered_columns.each do |col|
+          mk.column_from_dataminer col
         end
       end
     end
+
+    # def col_defs_for_allocate_grid(columns)
+    #   Crossbeams::DataGrid::ColumnDefiner.new(for_multiselect: true).make_columns do |mk|
+    #     mk.action_column do |act|
+    #       act.popup_view_link '/list/stock_pallet_sequences/with_params?key=standard&pallet_id=$:id$',
+    #                           id: 'id',
+    #                           icon: 'list',
+    #                           title: 'Pallet sequences for Pallet No $:pallet_number$'
+    #       # - :url: "/list/stock_pallet_sequences/with_params?key=standard&pallet_id=$:id$"
+    #       #   :text: sequences
+    #       #   :title: Pallet sequences for Pallet No $:pallet_number$
+    #       #   :icon: list
+    #       #   :popup: true
+    #       # - :url: "/finished_goods/dispatch/loads/$:load_id$/unship/$:pallet_number$"
+    #       #   :text: Unship and Unallocate
+    #       #   :icon: edit
+    #       #   :hide_if_false: shipped
+    #       #   :has_permission:
+    #       #   - load
+    #       #   - can_unship
+    #     end
+    #     columns.each do |k, v|
+    #       case v[:data_type]
+    #       when :integer
+    #         mk.integer k, v[:caption], hide: v[:hide], width: v[:width]
+    #       when :string
+    #         mk.col k, v[:caption], hide: v[:hide], width: v[:width]
+    #       when :boolean
+    #         mk.boolean k, v[:caption], hide: v[:hide], width: v[:width]
+    #       when :datetime
+    #         mk.col k, v[:caption], hide: v[:hide], width: v[:width], data_type: :datetime
+    #       else
+    #         next
+    #       end
+    #     end
+    #   end
+    # end
 
     def truck_arrival(id, params) # rubocop:disable Metrics/AbcSize
       vehicle_res = LoadVehicleSchema.call(params)
@@ -374,6 +409,18 @@ module FinishedGoodsApp
     def check_pallets!(check, pallet_numbers, load_id = nil)
       res = MesscadaApp::TaskPermissionCheck::Pallets.call(check, pallet_number: pallet_numbers, load_id: load_id)
       raise Crossbeams::InfoError, res.message unless res.success
+    end
+
+    def dataminer_report(file)
+      persistor = Crossbeams::Dataminer::YamlPersistor.new(file)
+      Crossbeams::Dataminer::Report.load(persistor)
+    end
+
+    def report_rows(rpt)
+      DB[rpt.runnable_sql].to_a.map do |m|
+        m.each_key { |k| m[k] = m[k].to_f if m[k].is_a?(BigDecimal) }
+        m
+      end
     end
 
     def repo
