@@ -120,6 +120,58 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
+    def allocate_grid(load_id)
+      yml = YAML.load_file('grid_definitions/dataminer_queries/stock_pallets_for_loads.yml')
+      query = <<~SQL
+        #{yml[:sql].split('ORDER BY').first}
+        WHERE vw_pallets.pallet_id IN ?
+        ORDER BY pallet_number DESC
+      SQL
+      pallet_ids = repo.find_pallets_for_for_load(load_id)
+      row_defs = DB[query, pallet_ids].all
+      {
+        columnDefs: col_defs_for_allocate_grid(yml[:columns]),
+        rowDefs: row_defs
+      }.to_json
+    end
+
+    def col_defs_for_allocate_grid(columns) # rubocop:disable Metrics/AbcSize
+      Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
+        mk.action_column do |act|
+          act.popup_view_link '/list/stock_pallet_sequences/with_params?key=standard&pallet_id=$:id$',
+                              id: 'id',
+                              icon: 'list',
+                              title: 'Pallet sequences for Pallet No $:pallet_number$'
+          # - :url: "/list/stock_pallet_sequences/with_params?key=standard&pallet_id=$:id$"
+          #   :text: sequences
+          #   :title: Pallet sequences for Pallet No $:pallet_number$
+          #   :icon: list
+          #   :popup: true
+          # - :url: "/finished_goods/dispatch/loads/$:load_id$/unship/$:pallet_number$"
+          #   :text: Unship and Unallocate
+          #   :icon: edit
+          #   :hide_if_false: shipped
+          #   :has_permission:
+          #   - load
+          #   - can_unship
+        end
+        columns.each do |k, v|
+          case v[:data_type]
+          when :integer
+            mk.integer k, v[:caption], hide: v[:hide], width: v[:width]
+          when :string
+            mk.col k, v[:caption], hide: v[:hide], width: v[:width]
+          when :boolean
+            mk.boolean k, v[:caption], hide: v[:hide], width: v[:width]
+          when :datetime
+            mk.col k, v[:caption], hide: v[:hide], width: v[:width], data_type: :datetime
+          else
+            next
+          end
+        end
+      end
+    end
+
     def truck_arrival(id, params) # rubocop:disable Metrics/AbcSize
       vehicle_res = LoadVehicleSchema.call(params)
       return validation_failed_response(vehicle_res) if vehicle_res.failure?

@@ -5,7 +5,6 @@ module UiRules
     def generate_rules
       make_form_object
       apply_form_values
-      append_allocatable_pallets if %i[allocate].include? @mode
 
       add_progress_step
       add_controls
@@ -286,10 +285,6 @@ module UiRules
       hash = @repo.find_load(@options[:id]).to_h
       hash[:pallet_list] = nil
       @form_object = OpenStruct.new(hash)
-    end
-
-    def append_allocatable_pallets
-      @form_object.pallet_ids = @repo.find_pallets_for_for_load(@options[:id])
     end
 
     def make_new_form_object

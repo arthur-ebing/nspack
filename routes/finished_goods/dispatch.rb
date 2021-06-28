@@ -380,6 +380,12 @@ class Nspack < Roda
       end
 
       r.on 'allocate' do
+        r.on 'grid' do
+          interactor.allocate_grid(id)
+          # rescue StandardError => e
+          #   show_json_exception(e)
+        end
+
         r.get do       # SHOW
           check_auth!('dispatch', 'edit')
           interactor.assert_permission!(:edit, id)
