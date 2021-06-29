@@ -686,7 +686,11 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'puc_changed' do
-        orchards = interactor.puc_orchards(params[:reworks_run_sequence_farm_id], params[:changed_value])
+        orchards = if params[:changed_value].blank? || params[:reworks_run_sequence_farm_id].blank?
+                     []
+                   else
+                     interactor.puc_orchards(params[:reworks_run_sequence_farm_id], params[:changed_value])
+                   end
         json_actions([OpenStruct.new(type: :replace_select_options,
                                      dom_id: 'reworks_run_sequence_orchard_id',
                                      options_array: orchards),
@@ -900,7 +904,11 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'mark_changed' do
-        pm_marks = MasterfilesApp::BomRepo.new.for_select_pm_marks(where: { mark_id: params[:changed_value] })
+        pm_marks = if params[:changed_value].blank?
+                     []
+                   else
+                     MasterfilesApp::BomRepo.new.for_select_pm_marks(where: { mark_id: params[:changed_value] })
+                   end
         json_actions([OpenStruct.new(type: :replace_select_options,
                                      dom_id: 'reworks_run_sequence_pm_mark_id',
                                      options_array: pm_marks)])
