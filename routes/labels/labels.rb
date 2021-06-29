@@ -351,6 +351,10 @@ class Nspack < Roda
           r.redirect('/labels/labels/labels/import')
         end
       end
+
+      r.on 'view_variables' do
+        show_page { Labels::Labels::Label::Variables.call }
+      end
     end
   end
 end
