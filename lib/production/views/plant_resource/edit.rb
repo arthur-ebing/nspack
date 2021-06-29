@@ -28,6 +28,7 @@ module Production
               form.add_field :packhouse_no
               form.add_field :edi_out_value
               form.add_field :carton_equals_pallet
+              form.add_field :rmd_mode
             end
           end
 

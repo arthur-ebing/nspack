@@ -29,6 +29,8 @@ class Nspack < Roda
             update_grid_row(id, changes: { ip_address: res.instance[:ip_address],
                                            start_page: res.instance[:start_page],
                                            active: res.instance[:active],
+                                           act_as_system_resource_code: res.instance[:act_as_system_resource_code],
+                                           act_as_reader_id: res.instance[:act_as_reader_id],
                                            hybrid_device: res.instance[:hybrid_device],
                                            scan_with_camera: res.instance[:scan_with_camera] },
                                 notice: res.message)

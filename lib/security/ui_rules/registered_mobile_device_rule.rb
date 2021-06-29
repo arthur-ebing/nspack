@@ -21,6 +21,7 @@ module UiRules
       fields[:active] = { renderer: :label, as_boolean: true }
       fields[:scan_with_camera] = { renderer: :label, as_boolean: true }
       fields[:hybrid_device] = { renderer: :label, as_boolean: true }
+      fields[:act_as_robot] = { renderer: :label, with_value: act_as_robot_label, invisible: @form_object.act_as_system_resource_id.nil? }
     end
 
     def common_fields
@@ -35,7 +36,8 @@ module UiRules
         start_page_program_function_id: { renderer: :select, options: SecurityApp::MenuRepo.new.program_functions_for_rmd_select, caption: 'Start Page', prompt: true },
         active: { renderer: :checkbox },
         scan_with_camera: { renderer: :checkbox },
-        hybrid_device: { renderer: :checkbox, hint: hybrid_hint }
+        hybrid_device: { renderer: :checkbox, hint: hybrid_hint },
+        act_as_robot: { renderer: :select, options: ProductionApp::ResourceRepo.new.for_select_robots_for_rmd(@options[:id]), prompt: true }
       }
     end
 
@@ -43,11 +45,17 @@ module UiRules
       make_new_form_object && return if @mode == :new
 
       @form_object = @repo.find_registered_mobile_device(@options[:id])
+      # Do this dance to get the act_as_robot method into the object as an attribute
+      @form_object = OpenStruct.new(@form_object.to_h.merge(act_as_robot: @form_object.act_as_robot))
     end
 
     def make_new_form_object
       @form_object = OpenStruct.new(ip_address: nil,
                                     start_page_program_function_id: nil)
+    end
+
+    def act_as_robot_label
+      "#{@form_object.act_as_system_resource_code} - #{@form_object.act_as_reader_id}"
     end
   end
 end

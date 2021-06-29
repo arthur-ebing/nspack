@@ -54,6 +54,13 @@ module ProductionApp
       failed_response(e.message)
     end
 
+    def rmd_mode_cleared?(current, res)
+      return false unless current.resource_properties && current.resource_properties['rmd_mode'] == 't'
+      return false if res[:resource_properties][:rmd_mode] == 't'
+
+      true
+    end
+
     def update_plant_resource(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_plant_resource_params(params)
       return validation_failed_response(res) if res.failure?
@@ -62,6 +69,7 @@ module ProductionApp
       name_changed = current.plant_resource_code != res[:plant_resource_code]
       repo.transaction do
         repo.update_plant_resource(id, res, name_changed)
+        repo.remove_rmd_mode(id) if rmd_mode_cleared?(current, res)
         log_transaction
       end
       instance = plant_resource_for_grid(id)

@@ -19,10 +19,10 @@ module SecurityApp
                             parent_tables: [{ parent_table: :program_functions,
                                               foreign_key: :start_page_program_function_id,
                                               columns: [:program_function_name],
-                                              flatten_columns: { program_function_name: :start_page } }])
-      # DB[:registered_mobile_devices].left_join(:program_functions, id: :start_page_program_function_id)
-      #                               .select(Sequel[:registered_mobile_devices].*, Sequel[:program_functions][:program_function_name])
-      #                               .where(Sequel[:registered_mobile_devices][:id] => id).first
+                                              flatten_columns: { program_function_name: :start_page } },
+                                            { parent_table: :system_resources,
+                                              foreign_key: :act_as_system_resource_id,
+                                              flatten_columns: { system_resource_code: :act_as_system_resource_code } }])
     end
 
     # Is the given ip address for an active registered mobile device?

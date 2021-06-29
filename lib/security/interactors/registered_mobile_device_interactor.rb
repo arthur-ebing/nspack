@@ -51,12 +51,15 @@ module SecurityApp
       validation_failed_response(OpenStruct.new(messages: { ip_address: ['This registered mobile device already exists'] }))
     end
 
-    def update_registered_mobile_device(id, params)
+    def update_registered_mobile_device(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_registered_mobile_device_params(params)
       return validation_failed_response(res) if res.failure?
 
+      attrs = res.to_h
+      robot = attrs.delete(:act_as_robot)
+      res_id, read_id = (robot || '').split('_')
       repo.transaction do
-        repo.update_registered_mobile_device(id, res)
+        repo.update_registered_mobile_device(id, attrs.merge(act_as_system_resource_id: res_id, act_as_reader_id: read_id))
         log_transaction
       end
       instance = registered_mobile_device(id)

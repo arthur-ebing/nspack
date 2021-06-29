@@ -67,7 +67,13 @@ module UiRules
                                                 options: representative_resources(rules[:represents]),
                                                 invisible: rules[:represents].nil?,
                                                 caption: 'Represents Resource' }
-      fields[:carton_equals_pallet] = { renderer: :checkbox, parent_field: :resource_properties }
+      fields[:carton_equals_pallet] = { renderer: :checkbox,
+                                        parent_field: :resource_properties,
+                                        invisible: !at_module_level? }
+      fields[:rmd_mode] = { renderer: :checkbox,
+                            parent_field: :resource_properties,
+                            invisible: !at_module_level?,
+                            hint: "Set this to true if the robot's functions are to be handled by a Registerd Mobile Device." }
     end
 
     def set_print_fields
@@ -118,6 +124,12 @@ module UiRules
                                     packpoint: false,
                                     # plant_resource_attributes: nil,
                                     description: nil)
+    end
+
+    def at_module_level?
+      return false if @form_object.system_resource_id.nil?
+
+      @repo.system_resource_type_from_resource(@form_object.system_resource_id) == Crossbeams::Config::ResourceDefinitions::MODULE
     end
 
     def representative_resources(code)

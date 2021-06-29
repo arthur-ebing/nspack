@@ -22,6 +22,7 @@ module Security
               form.add_field :active
               form.add_field :scan_with_camera
               form.add_field :hybrid_device
+              form.add_field :act_as_robot
             end
           end
 

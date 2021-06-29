@@ -220,6 +220,10 @@ module ProductionApp
       DB[:system_resource_types].where(system_resource_type_code: system_resource_type).get(:id)
     end
 
+    def system_resource_type_from_resource(system_resource_id)
+      DB[:system_resource_types].where(id: DB[:system_resources].where(id: system_resource_id).get(:system_resource_type_id)).get(:system_resource_type_code)
+    end
+
     def plant_resource_id_for_system_code(system_code)
       DB[:plant_resources].where(system_resource_id: DB[:system_resources].where(system_resource_code: system_code).get(:id)).get(:id)
     end
@@ -568,6 +572,28 @@ module ProductionApp
       bin_filler ? update_bin_filler_robot_button_roles(plant_resource_id, attrs) : update_plant_resource(plant_resource_id, attrs)
 
       success_response("Applied #{label_to_print}", label_to_print: label_to_print)
+    end
+
+    def for_select_robots_for_rmd(rmd_id)
+      query = <<~SQL
+        SELECT CONCAT_WS(' - ', sr.system_resource_code, CASE pbs.scanner_code when '1' THEN 'Left' WHEN '2' THEN 'Right' ELSE null END) AS key_name,
+          sr.id::text || '_' || coalesce(pbs.scanner_code, '1') AS id
+        FROM plant_resources pr
+        JOIN system_resources sr ON sr.id = pr.system_resource_id
+        LEFT JOIN palletizing_bay_states pbs ON pbs.palletizing_robot_code = sr.system_resource_code
+        WHERE pr.resource_properties ->> 'rmd_mode' = 't'
+        AND NOT EXISTS(SELECT id FROM registered_mobile_devices
+                WHERE act_as_system_resource_id = sr.id
+                  AND act_as_reader_id = COALESCE(pbs.scanner_code, '1')
+                  AND id <> ?)
+        ORDER BY sr.system_resource_code, coalesce(pbs.scanner_code, '1')
+      SQL
+      DB[query, rmd_id].select_map(%i[key_name id])
+    end
+
+    def remove_rmd_mode(plant_resource_id)
+      sysres_id = DB[:plant_resources].where(id: plant_resource_id).get(:system_resource_id)
+      DB[:registered_mobile_devices].where(act_as_system_resource_id: sysres_id).update(act_as_system_resource_id: nil, act_as_reader_id: nil)
     end
 
     private

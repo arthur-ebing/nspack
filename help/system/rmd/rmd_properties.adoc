@@ -9,6 +9,7 @@ Start Page:: This is the page that will open after a user logs in. If left blank
 Active:: Must be `true` for the device to behave as a mobile device. Set to `false` to disable the behaviour if required. `False` for this setting has the equivalent effect of the RMD entry not existing.
 Scan with camera:: If `true`, a button appears on all scan forms that allows the user to use the device's camera for scanning instead of the device's own scanner. Use this when operating a tablet or cellphone without built-in scanner. Note: this option can also be toggled from the menu on the device -- useful if the image scanner is not working for some reason.
 Hybrid device:: Set this to `true` for a device (like a tablet) that will use the desktop aspects of the system as well as the RMD aspects.
+Act as robot:: Choose an available robot device to be able to perform robot functions on this device instead of the robot.
 
 === Device notes
 
