@@ -42,6 +42,7 @@ module FinishedGoods
                     col.add_field :internal_order_number
                     col.add_field :remarks
                     col.add_field :pricing_per_kg
+                    col.add_field :pricing_per_carton
                   end
                 end
               end
@@ -69,15 +70,14 @@ module FinishedGoods
               form.submit_captions 'Close'
             end
             page.section do |section|
-              grid_id = ui_rule.form_object.pricing_per_kg ? 'order_items_price_per_kg' : 'order_items'
               section.add_control(control_type: :link,
                                   text: 'New Order Item',
                                   url: "/finished_goods/orders/order_items/new?order_id=#{id}",
                                   visible: !ui_rule.form_object.allocated,
                                   behaviour: :popup,
                                   style: :button)
-              section.add_grid(grid_id,
-                               "/list/#{grid_id}/grid?key=on_order&order_id=#{id}",
+              section.add_grid('order_items',
+                               "/finished_goods/orders/orders/#{id}/order_items_grid",
                                caption: 'Order Items',
                                height: 20)
             end

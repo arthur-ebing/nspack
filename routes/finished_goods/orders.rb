@@ -65,6 +65,12 @@ class Nspack < Roda
         end
       end
 
+      r.on 'order_items_grid' do
+        interactor.order_items_grid(id)
+      rescue StandardError => e
+        show_json_exception(e)
+      end
+
       r.is do
         r.get do       # SHOW
           check_auth!('orders', 'read')

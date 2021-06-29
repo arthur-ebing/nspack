@@ -6,11 +6,6 @@
   :icon: view-show
   :title: View
   :popup: true
-#- :url: "/finished_goods/orders/order_items/$:id$/edit"
-#  :text: edit
-#  :icon: edit
-#  :title: Edit
-#  :popup: true
 - :url: "/finished_goods/orders/order_items/$:id$"
   :text: delete
   :icon: delete
@@ -26,32 +21,8 @@
   :icon: information-solid
   :title: Status
   :popup: true
-:edit_rules:
-  :url: "/finished_goods/orders/order_items/$:id$/inline_edit"
-  :editable_fields:
-    carton_quantity:
-      :editor: :numeric
-    price_per_carton:
-      :editor: :numeric
 :conditions:
   :on_order:
     - :col: order_items.order_id
       :op: =
       :val: "$:order_id$"
-:hide_for_client:
-  hb:
-    - price_per_kg
-  um:
-    - price_per_kg
-  ud:
-    - price_per_kg
-  sr:
-    - price_per_kg
-  srp:
-    - price_per_kg
-  hl:
-    - price_per_kg
-  sr2:
-    - price_per_kg
-  kr:
-    - price_per_kg

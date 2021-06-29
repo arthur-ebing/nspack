@@ -36,7 +36,13 @@ module UiRules
       fields[:customer_order_number] = { renderer: :label }
       fields[:internal_order_number] = { renderer: :label }
       fields[:remarks] = { renderer: :label }
-      fields[:pricing_per_kg] = { renderer: :label, as_boolean: true }
+      fields[:pricing_per_kg] = { renderer: :label,
+                                  hide_on_load: !@form_object.pricing_per_kg,
+                                  as_boolean: true }
+      fields[:pricing_per_carton] = { renderer: :label,
+                                      hide_on_load: @form_object.pricing_per_kg,
+                                      with_value: !@form_object.pricing_per_kg,
+                                      as_boolean: true }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
