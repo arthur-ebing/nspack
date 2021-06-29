@@ -96,6 +96,8 @@ INSERT INTO reworks_run_types (run_type, description) VALUES('UNTIP BINS', 'Unti
 INSERT INTO reworks_run_types (run_type, description) VALUES('RECALC BIN NETT WEIGHT', 'Recalc Bin Nett Weight') ON CONFLICT DO NOTHING;
 INSERT INTO reworks_run_types (run_type, description) VALUES('TIP MIXED ORCHARDS', 'Tip Mixed Orchards') ON CONFLICT DO NOTHING;
 INSERT INTO reworks_run_types (run_type, description) VALUES('BINS TO PLT CONVERSION', 'Convert Bins To Pallets') ON CONFLICT DO NOTHING;
+INSERT INTO reworks_run_types (run_type, description) VALUES('CHANGE RUN ORCHARD', 'Change production run orchard') ON CONFLICT DO NOTHING;
+INSERT INTO reworks_run_types (run_type, description) VALUES('BATCH PRINT LABELS', 'Batch print labels') ON CONFLICT DO NOTHING;
 INSERT INTO reworks_run_types (run_type, description) VALUES('TIP BINS AGAINST SUGGESTED RUN', 'Tip Bins against a suggested run') ON CONFLICT DO NOTHING;
 INSERT INTO reworks_run_types (run_type, description) VALUES('RESTORE REPACKED PALLET', 'Restore repacked pallet') ON CONFLICT DO NOTHING;
 

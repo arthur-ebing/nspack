@@ -190,6 +190,110 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
+    r.on 'change_run_orchard' do
+      reworks_run_type_id = ProductionApp::ReworksRepo.new.get_reworks_run_type_id(AppConst::RUN_TYPE_CHANGE_RUN_ORCHARD)
+      r.is do
+        r.get do
+          show_partial_or_page(r) { Production::Reworks::ReworksRun::ChangeRunOrchard.call(reworks_run_type_id, remote: fetch?(r)) }
+        end
+
+        r.post do
+          store_locally(:change_run_orchard_changes, params[:change_run_orchard])
+          res = interactor.validate_change_run_orchard_params(params[:change_run_orchard])
+          if res.success
+            show_partial_or_page(r) do
+              Production::Reworks::ReworksRun::ChangeRunOrchardDetails.call(reworks_run_type_id,
+                                                                            params[:change_run_orchard],
+                                                                            form_values: params[:change_run_orchard])
+            end
+          else
+            re_show_form(r, res, url: '/production/reworks/change_run_orchard') do
+              Production::Reworks::ReworksRun::ChangeRunOrchard.call(reworks_run_type_id,
+                                                                     form_values: params[:change_run_orchard],
+                                                                     form_errors: res.errors,
+                                                                     remote: fetch?(r))
+            end
+          end
+        end
+      end
+
+      r.on 'orchard_changed' do
+        change_run_orchard_params = retrieve_from_local_store(:change_run_orchard_changes)
+        res = interactor.resolve_run_orchard_change(change_run_orchard_params, params[:change_run_orchard_production_run_id], params[:changed_value])
+        store_locally(:change_run_orchard_changes, res.instance)
+        json_actions([OpenStruct.new(type: :replace_input_value,
+                                     dom_id: 'change_run_orchard_from_orchard_id',
+                                     value: res.instance[:orchard_id]),
+                      OpenStruct.new(type: :show_element,
+                                     dom_id: 'change_run_orchard_allow_orchard_mixing_field_wrapper'),
+                      OpenStruct.new(type: res.instance[:allow_orchard_mixing] ? :show_element : :hide_element,
+                                     dom_id: 'change_run_orchard_allow_cultivar_mixing_field_wrapper'),
+                      OpenStruct.new(type: :replace_inner_html,
+                                     dom_id: 'change_run_orchard_error_description',
+                                     value: res.success ? '' : res.message.to_s),
+                      OpenStruct.new(type: res.success ? :show_element : :hide_element,
+                                     dom_id: 'change_run_orchard_accept_button')])
+      end
+
+      r.on 'allow_orchard_mixing_changed' do
+        change_run_orchard_params = retrieve_from_local_store(:change_run_orchard_changes).merge(allow_orchard_mixing: params[:changed_value] == 't')
+        res = interactor.resolve_missing_tipped_cultivars(change_run_orchard_params)
+        store_locally(:change_run_orchard_changes, res.instance)
+        json_actions([OpenStruct.new(type: :replace_input_value,
+                                     dom_id: 'change_run_orchard_from_orchard_id',
+                                     value: res.instance[:orchard_id]),
+                      OpenStruct.new(type: :show_element,
+                                     dom_id: 'change_run_orchard_allow_orchard_mixing_field_wrapper'),
+                      OpenStruct.new(type: res.instance[:allow_orchard_mixing] ? :show_element : :hide_element,
+                                     dom_id: 'change_run_orchard_allow_cultivar_mixing_field_wrapper'),
+                      OpenStruct.new(type: :replace_inner_html,
+                                     dom_id: 'change_run_orchard_error_description',
+                                     value: res.success ? '' : res.message.to_s),
+                      OpenStruct.new(type: res.success ? :show_element : :hide_element,
+                                     dom_id: 'change_run_orchard_accept_button')])
+      end
+
+      r.on 'allow_cultivar_mixing_changed' do
+        change_run_orchard_params = retrieve_from_local_store(:change_run_orchard_changes).merge(allow_cultivar_mixing: params[:changed_value] == 't')
+        res = interactor.resolve_missing_tipped_cultivars(change_run_orchard_params)
+        store_locally(:change_run_orchard_changes, res.instance)
+        json_actions([OpenStruct.new(type: :replace_input_value,
+                                     dom_id: 'change_run_orchard_from_orchard_id',
+                                     value: res.instance[:orchard_id]),
+                      OpenStruct.new(type: :show_element,
+                                     dom_id: 'change_run_orchard_allow_orchard_mixing_field_wrapper'),
+                      OpenStruct.new(type: res.instance[:allow_orchard_mixing] ? :show_element : :hide_element,
+                                     dom_id: 'change_run_orchard_allow_cultivar_mixing_field_wrapper'),
+                      OpenStruct.new(type: :replace_inner_html,
+                                     dom_id: 'change_run_orchard_error_description',
+                                     value: res.success ? '' : res.message.to_s),
+                      OpenStruct.new(type: res.success ? :show_element : :hide_element,
+                                     dom_id: 'change_run_orchard_accept_button')])
+      end
+
+      r.on 'submit_change_run_orchard' do
+        params = retrieve_from_local_store(:change_run_orchard_changes)
+        store_locally(:change_run_orchard_changes, params)
+        res = interactor.change_run_orchard(params)
+        if res.success
+          flash[:notice] = res.message
+          if fetch?(r)
+            redirect_via_json(retrieve_from_local_store(:list_url))
+          else
+            r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
+          end
+        else
+          re_show_form(r, res, url: '/production/reworks/change_run_orchard') do
+            res[:message] = unwrap_failed_response(res)
+            Production::Reworks::ReworksRun::ChangeRunOrchardDetails.call(reworks_run_type_id,
+                                                                          params,
+                                                                          form_values: res.instance,
+                                                                          form_errors: res.errors)
+          end
+        end
+      end
+    end
+
     r.on 'reworks_runs',  Integer do |id|
       # Check for notfound:
       r.on !interactor.exists?(:reworks_runs, id) do
@@ -244,6 +348,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             check_auth!('reworks', 'new')
             if ProductionApp::ReworksRepo.new.find_reworks_run_type(id)[:run_type] == AppConst::RUN_TYPE_CHANGE_DELIVERIES_ORCHARDS
               show_partial_or_page(r) { Production::Reworks::ChangeDeliveriesOrchard::SelectOrchards.call(remote: fetch?(r)) }
+            elsif ProductionApp::ReworksRepo.new.find_reworks_run_type(id)[:run_type] == AppConst::RUN_TYPE_CHANGE_RUN_ORCHARD
+              show_partial_or_page(r) { Production::Reworks::ReworksRun::ChangeRunOrchard.call(id, remote: fetch?(r)) }
             else
               show_partial_or_page(r) { Production::Reworks::ReworksRun::New.call(id, remote: fetch?(r)) }
             end

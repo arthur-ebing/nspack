@@ -1047,5 +1047,71 @@ module ProductionApp
 
       ok_response
     end
+
+    def details_for_production_run(production_run_id)
+      query = <<~SQL
+        SELECT production_runs.id, fn_production_run_code(production_runs.id) AS production_run_code,
+        production_runs.allow_orchard_mixing,
+        production_runs.allow_cultivar_mixing,
+        production_runs.allow_cultivar_group_mixing,
+        production_runs.active_run_stage,
+        production_runs.started_at,
+        production_run_stats.bins_tipped, COALESCE(production_run_stats.bins_tipped_weight, 0) AS bins_tipped_weight,
+        production_run_stats.carton_labels_printed,
+        production_run_stats.cartons_verified, production_run_stats.cartons_verified_weight,
+        production_run_stats.pallets_palletized_full, production_run_stats.pallets_palletized_partial,
+        production_run_stats.pallet_weight,
+        production_run_stats.inspected_pallets,
+        production_run_stats.rebins_created, production_run_stats.rebins_weight,
+        production_runs.puc_id,
+        production_runs.orchard_id,
+        farms.farm_code,
+        pucs.puc_code,
+        orchards.orchard_code,
+        cultivar_groups.cultivar_group_code,
+        cultivars.cultivar_name,
+        packhouses.plant_resource_code AS packhouse_code,
+        production_runs.re_executed_at,
+        lines.plant_resource_code AS line_code,
+        (SELECT COUNT(DISTINCT pallet_id) FROM pallet_sequences WHERE production_run_id = production_runs.id AND verified) AS verified_pallets,
+        COALESCE((SELECT SUM(COALESCE(standard_product_weights.nett_weight, 0))
+             FROM cartons
+             JOIN carton_labels ON carton_labels.id = cartons.carton_label_id
+             LEFT JOIN cultivars ON cultivars.id = carton_labels.cultivar_id
+                 LEFT JOIN commodities ON commodities.id = cultivars.commodity_id
+             LEFT OUTER JOIN standard_product_weights ON standard_product_weights.commodity_id = commodities.id
+               AND standard_product_weights.standard_pack_id = carton_labels.standard_pack_code_id
+             WHERE production_run_id = production_runs.id
+            ), 0) AS carton_weight
+        FROM production_runs
+        LEFT JOIN cultivar_groups ON cultivar_groups.id = production_runs.cultivar_group_id
+        LEFT JOIN cultivars ON cultivars.id = production_runs.cultivar_id
+        JOIN plant_resources packhouses ON packhouses.id = production_runs.packhouse_resource_id
+        JOIN plant_resources lines ON lines.id = production_runs.production_line_id
+        JOIN production_run_stats ON production_run_stats.production_run_id = production_runs.id
+        JOIN farms ON farms.id = production_runs.farm_id
+        LEFT JOIN orchards ON orchards.id = production_runs.orchard_id
+        JOIN pucs ON pucs.id = production_runs.puc_id
+        WHERE production_runs.id = #{production_run_id}
+      SQL
+
+      DB[query].first
+    end
+
+    def production_run_objects(production_run_id)
+      {
+        tipped_bin_ids: select_values(:rmt_bins, :id, production_run_tipped_id: production_run_id),
+        carton_label_ids: select_values(:carton_labels, :id, production_run_id: production_run_id),
+        pallet_sequence_ids: select_values(:pallet_sequences, :id, production_run_id: production_run_id)
+      }
+    end
+
+    def find_rmt_bin_column_ids(column, where: {}, exclude: {})
+      DB[:rmt_bins]
+        .where(where)
+        .exclude(exclude)
+        .distinct
+        .select_map(column.to_sym)
+    end
   end
 end

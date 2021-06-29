@@ -152,6 +152,107 @@ module ProductionApp
       end
     end
 
+    def validate_change_run_orchard_params(params)
+      res = validate_production_run_params(params)
+      return validation_failed_response(res) if res.failure?
+
+      res = validate_production_run_input(res)
+      return validation_failed_response(res) unless res.success
+
+      success_response('ok', params)
+    end
+
+    def validate_production_run_input(params)
+      production_run_id = params[:production_run_id]
+      production_run = repo.production_run_exists?(production_run_id)
+      return OpenStruct.new(success: false, messages: { production_run_id: ["#{production_run_id} doesn't exist"] }, production_run_id: production_run_id) if production_run.nil_or_empty?
+
+      OpenStruct.new(success: true, instance:  params)
+    end
+
+    def resolve_run_orchard_change(params, production_run_id, orchard_id)
+      run = production_run(production_run_id)
+      params = params.merge({ orchard_id: orchard_id,
+                              allow_orchard_mixing: run[:allow_orchard_mixing],
+                              allow_cultivar_mixing: run[:allow_cultivar_mixing],
+                              allow_cultivar_group_mixing: run[:allow_cultivar_group_mixing] })
+
+      res = resolve_missing_tipped_orchards(params)
+      return res unless res.success
+
+      res = resolve_missing_tipped_cultivars(params)
+      return res unless res.success
+
+      success_response('ok', res.instance)
+    end
+
+    def resolve_missing_tipped_orchards(params) # rubocop:disable Metrics/AbcSize
+      return success_response('ok', params.to_h) if params[:allow_orchard_mixing]
+
+      orchard_ids = repo.find_rmt_bin_column_ids(:orchard_id,
+                                                 where: { production_run_tipped_id: params[:production_run_id].to_i },
+                                                 exclude: { orchard_id: params[:orchard_id].to_i })
+      return success_response('ok', params.to_h) if orchard_ids.nil_or_empty?
+
+      orchard_codes = repo.select_values(:orchards, :orchard_code, { id: orchard_ids }).sort
+      msg = "Note: Some tipped bins have different orchard than the run.<br> Orchards:<br> #{orchard_codes.join('<br>')} <br> Set allow orchard_mixing."
+      failed_response(msg, params)
+    end
+
+    def resolve_missing_tipped_cultivars(params) # rubocop:disable Metrics/AbcSize
+      return resolve_missing_tipped_orchards(params) unless params[:allow_orchard_mixing]
+
+      return success_response('ok', params.to_h) if params[:allow_cultivar_mixing]
+
+      orchard_cultivar_ids = farm_repo.find_orchard(params[:orchard_id].to_i)&.cultivar_ids.to_a
+      cultivar_ids = repo.find_rmt_bin_column_ids(:cultivar_id,
+                                                  where: { production_run_tipped_id: params[:production_run_id].to_i },
+                                                  exclude: { cultivar_id: orchard_cultivar_ids })
+      return success_response('ok', params.to_h) if cultivar_ids.nil_or_empty?
+
+      cultivar_codes = repo.select_values(:cultivars, :cultivar_name, { id: cultivar_ids }).sort
+      msg = "Note: Some tipped bins have different cultivar than the run.<br> Cultivars:<br> #{cultivar_codes.join('<br>')} <br> Set allow allow_cultivar_mixing."
+      failed_response(msg, params)
+    end
+
+    def change_run_orchard(params) # rubocop:disable Metrics/AbcSize
+      res = validate_run_cultivar_group_mixing(params)
+      return validation_failed_response(res) unless res.success
+
+      res = validate_reworks_change_run_orchard_params(res.instance)
+      return validation_failed_response(res) if res.failure?
+
+      Job::ApplyRunOrchardChanges.enqueue(res.to_h, @user.user_name)
+      success_response('Production run orchard changes has been enqued.')
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
+      failed_response(e.message)
+    end
+
+    def validate_run_cultivar_group_mixing(params) # rubocop:disable Metrics/AbcSize
+      return success_response('ok', params) if params[:allow_cultivar_group_mixing]
+
+      bin_cultivar_group_id = repo.select_values(:rmt_bins, :cultivar_group_id, { production_run_tipped_id: params[:production_run_id] }).uniq.first
+      return success_response('ok', params) if bin_cultivar_group_id.nil_or_empty?
+
+      orchard_cultivar_ids = farm_repo.find_orchard(params[:orchard_id].to_i)&.cultivar_ids.to_a
+      orchard_cultivar_group_id = repo.select_values(:cultivars, :cultivar_group_id, { id: orchard_cultivar_ids }).uniq.first
+      message = "INVALID CULTIVAR GROUP: Tipped Bins requires: #{find_cultivar_group_code(bin_cultivar_group_id)}. Orchard is: #{cultivar_group_code(orchard_cultivar_group_id)}"
+      return OpenStruct.new(success: false,  messages: { orchard_id: [message] }, orchard_id: params[:orchard_id]) unless orchard_cultivar_group_id == bin_cultivar_group_id
+
+      success_response('ok', params)
+    end
+
+    def find_cultivar_group_code(cultivar_group_id)
+      repo.get(:cultivar_groups, cultivar_group_id, :cultivar_group_code)
+    end
+
+    def production_run_objects(production_run_id)
+      repo.production_run_objects(production_run_id)
+    end
+
     def validate_change_delivery_orchard_screen_params(params) # rubocop:disable Metrics/AbcSize
       res = validate_only_cultivar_change(params)
       if res.failure?
@@ -288,7 +389,7 @@ module ProductionApp
     end
 
     def calc_changes_made(to_orchard, to_cultivar, delivery_ids) # rubocop:disable Metrics/AbcSize
-      orchard = MasterfilesApp::FarmRepo.new.find_farm_orchard_by_orchard_id(to_orchard)
+      orchard = farm_repo.find_farm_orchard_by_orchard_id(to_orchard)
       cultivar = MasterfilesApp::CultivarRepo.new.find_cultivar(to_cultivar)&.cultivar_name
 
       changes = []
@@ -1334,15 +1435,15 @@ module ProductionApp
     end
 
     def farm_pucs(farm_id)
-      MasterfilesApp::FarmRepo.new.selected_farm_pucs(where: { farm_id: farm_id })
+      farm_repo.selected_farm_pucs(where: { farm_id: farm_id })
     end
 
     def puc_orchards(farm_id, puc_id)
-      MasterfilesApp::FarmRepo.new.selected_farm_orchard_codes(farm_id, puc_id)
+      farm_repo.selected_farm_orchard_codes(farm_id, puc_id)
     end
 
     def orchard_cultivars(cultivar_group_id, orchard_id)
-      orchard = MasterfilesApp::FarmRepo.new.find_orchard(orchard_id)
+      orchard = farm_repo.find_orchard(orchard_id)
       orchard.cultivar_ids.nil_or_empty? ? MasterfilesApp::CultivarRepo.new.for_select_cultivars(where: { cultivar_group_id: cultivar_group_id }) : MasterfilesApp::CultivarRepo.new.for_select_cultivars(where: { id: orchard.cultivar_ids.to_a })
     end
 
@@ -1509,6 +1610,10 @@ module ProductionApp
 
     def fruit_size_repo
       @fruit_size_repo ||= MasterfilesApp::FruitSizeRepo.new
+    end
+
+    def farm_repo
+      @farm_repo ||= MasterfilesApp::FarmRepo.new
     end
 
     def reworks_run(id)
@@ -1896,6 +2001,18 @@ module ProductionApp
 
     def validate_clone_sequence_params(params)
       ReworksRunCloneSequenceSchema.call(params)
+    end
+
+    def validate_production_run_params(params)
+      ProductionRunChangeSchema.call(params)
+    end
+
+    def validate_run_orchard_change_params(params)
+      ProductionRunOrchardChangeSchema.call(params)
+    end
+
+    def validate_reworks_change_run_orchard_params(params)
+      ReworksRunChangeRunOrchardSchema.call(params)
     end
   end
 end

@@ -23,13 +23,11 @@ module UiRules
     end
 
     def set_show_fields  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
-      if @form_object[:has_children]
-        compact_header(columns: %i[deliveries production_runs tipped_bins carton_labels cartons pallet_sequences
-                                   shipped_pallet_sequences inspected_pallet_sequences],
-                       display_columns: 2)
-      end
-
       reworks_run_type_id_label = @repo.find_hash(:reworks_run_types, @form_object.reworks_run_type_id)[:run_type]
+      if @form_object[:has_children]
+        change_run_orchard = AppConst::RUN_TYPE_CHANGE_RUN_ORCHARD == reworks_run_type_id_label
+        change_run_orchard ? make_compact_header_table(%i[tipped_bins carton_labels pallet_sequences], 3) : make_compact_header_table
+      end
       scrap_reason_id_label = MasterfilesApp::QualityRepo.new.find_scrap_reason(@form_object.scrap_reason_id)&.scrap_reason
       @rules[:scrap_pallet] = AppConst::RUN_TYPE_SCRAP_PALLET == reworks_run_type_id_label
       @rules[:tip_bins] = AppConst::RUN_TYPE_TIP_BINS == reworks_run_type_id_label
@@ -215,7 +213,7 @@ module UiRules
       end
 
       hash = @repo.find_reworks_run(@options[:id]).to_h
-      hash = hash.merge(make_compact_details(hash[:pallets_affected])) if hash[:has_children]
+      hash = hash.merge(make_compact_details(hash[:reworks_run_type_id], hash[:pallets_affected])) if hash[:has_children]
 
       @form_object = OpenStruct.new(hash)
     end
@@ -233,9 +231,15 @@ module UiRules
       @rules[:tip_bins] || @rules[:weigh_rmt_bins] || @rules[:scrap_bin] || @rules[:unscrap_bin] || @rules[:bulk_bin_run_update] || @rules[:bulk_weigh_bins] || @rules[:untip_bins] || @rules[:tip_mixed_orchards]
     end
 
-    def make_compact_details(affected_deliveries)
-      deliveries_ids = affected_deliveries.split("\n").map(&:strip).reject(&:empty?)
-      res = @repo.change_objects_counts(deliveries_ids)
+    def make_compact_details(reworks_run_type_id, affected_ids)
+      affected_ids = affected_ids.split("\n").map(&:strip).reject(&:empty?)
+      reworks_run_type = @repo.find_hash(:reworks_run_types, reworks_run_type_id)[:run_type]
+      change_run_orchard = AppConst::RUN_TYPE_CHANGE_RUN_ORCHARD == reworks_run_type
+      change_run_orchard ? production_run_compact_details(affected_ids) : delivery_compact_details(affected_ids)
+    end
+
+    def delivery_compact_details(affected_delivery_ids)
+      res = @repo.change_objects_counts(affected_delivery_ids)
       { deliveries: res[:deliveries],
         production_runs: res[:production_runs],
         tipped_bins: res[:tipped_bins],
@@ -244,6 +248,19 @@ module UiRules
         pallet_sequences: res[:pallet_sequences],
         shipped_pallet_sequences: res[:shipped_pallet_sequences],
         inspected_pallet_sequences: res[:inspected_pallet_sequences] }
+    end
+
+    def production_run_compact_details(affected_run_ids)
+      res = @repo.production_run_objects(affected_run_ids)
+      { tipped_bins: res[:tipped_bin_ids].nil_or_empty? ? 0 : res[:tipped_bin_ids].count,
+        carton_labels: res[:carton_label_ids].nil_or_empty? ? 0 : res[:carton_label_ids].count,
+        pallet_sequences: res[:pallet_sequence_ids].nil_or_empty? ? 0 : res[:pallet_sequence_ids].count }
+    end
+
+    def make_compact_header_table(columns = nil, display_columns = 2)
+      compact_header(columns: columns || %i[deliveries production_runs tipped_bins carton_labels cartons pallet_sequences
+                                            shipped_pallet_sequences inspected_pallet_sequences],
+                     display_columns: display_columns)
     end
 
     def add_behaviours
