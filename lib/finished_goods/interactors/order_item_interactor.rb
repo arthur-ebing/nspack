@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  class OrderItemInteractor < BaseInteractor
+  class OrderItemInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_order_item(params) # rubocop:disable Metrics/AbcSize
       res = validate_order_item_params(params)
       return validation_failed_response(res) if res.failure?
@@ -76,8 +76,29 @@ module FinishedGoodsApp
       failed_response("Unable to delete order item. It is still referenced#{e.message.partition('referenced').last}")
     end
 
-    def find_pallets_for_order_item(id)
-      repo.find_pallets_for_order_item(id)
+    def allocate_grid(id)
+      load_id, pallet_ids = repo.find_pallets_for_order_item(id)
+      rpt = dataminer_report('stock_pallets_for_loads.yml', conditions: [{ col: 'vw_pallets.pallet_id', op: 'IN', val: pallet_ids }])
+
+      row_defs = dataminer_report_rows(rpt)
+      {
+        multiselect_ids: repo.select_values(:pallets, :id, load_id: load_id),
+        columnDefs: col_defs_for_allocate_grid(rpt),
+        rowDefs: row_defs
+      }.to_json
+    end
+
+    def col_defs_for_allocate_grid(rpt)
+      Crossbeams::DataGrid::ColumnDefiner.new(for_multiselect: true).make_columns do |mk|
+        mk.action_column do |act|
+          act.popup_view_link '/list/stock_pallet_sequences/with_params?key=standard&pallet_id=$col1$',
+                              col1: 'id',
+                              icon: 'list',
+                              text: 'sequences',
+                              title: 'Pallet sequences for Pallet No $:pallet_number$'
+        end
+        dataminer_report_columns(mk, rpt)
+      end
     end
 
     def assert_permission!(task, id = nil)

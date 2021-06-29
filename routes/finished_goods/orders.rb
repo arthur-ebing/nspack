@@ -117,11 +117,6 @@ class Nspack < Roda
         handle_not_found(r)
       end
 
-      r.on 'find_pallets_for_order_item' do
-        load_id, pallet_ids = interactor.find_pallets_for_order_item(id)
-        r.redirect "/list/stock_pallets_for_loads/multi?key=allocate_pallets_for_order_item&id=#{id}&load_id=#{load_id}&pallet_ids=#{pallet_ids.join(',')}"
-      end
-
       r.on 'edit' do   # EDIT
         check_auth!('orders', 'edit')
         interactor.assert_permission!(:edit, id)
@@ -143,12 +138,26 @@ class Nspack < Roda
       end
 
       r.on 'allocate' do
-        res = interactor.allocate_to_order_item(id, multiselect_grid_choices(params))
-        if res.success
-          flash[:notice] = res.message
-          redirect_via_json "/finished_goods/orders/orders/#{res.instance.order_id}"
-        else
-          re_show_form(r, res, url: request.fullpath) { FinishedGoods::Orders::OrderItem::Allocate.call(id) }
+        r.on 'grid' do
+          interactor.allocate_grid(id)
+        rescue StandardError => e
+          show_json_exception(e)
+        end
+
+        r.get do  # SHOW
+          check_auth!('dispatch', 'edit')
+          interactor.assert_permission!(:edit, id)
+          show_partial_or_page(r) { FinishedGoods::Orders::OrderItem::Allocate.call(id) }
+        end
+
+        r.post do # UPDATE
+          res = interactor.allocate_to_order_item(id, multiselect_grid_choices(params))
+          if res.success
+            flash[:notice] = res.message
+            r.redirect "/finished_goods/orders/orders/#{res.instance.order_id}"
+          else
+            re_show_form(r, res, url: request.fullpath) { FinishedGoods::Orders::OrderItem::Allocate.call(id) }
+          end
         end
       end
 

@@ -29,9 +29,6 @@ module FinishedGoodsApp
       compile_order_items_from_pallet_sequences.each do |order_item|
         order_item_id = nil
         pallet_sequence_ids = order_item.delete(:pallet_sequence_ids)
-        # treatment_ids = Array(order_item[:treatment_ids] || [0])
-        # treatment_ids.sort.each do |treatment_id|
-        #   order_item[:treatment_id] = treatment_id.zero? ? nil : treatment_id
         order_item = OrderItemSchema.call(order_item).to_h
         next unless current_order_items
 
@@ -45,7 +42,6 @@ module FinishedGoodsApp
             break
           end
         end
-        # end
 
         order_item_id ||= create_order_item(order_item)
         link_order_items_pallet_sequences(order_item_id, pallet_sequence_ids)
@@ -97,13 +93,11 @@ module FinishedGoodsApp
             pallet_sequences.grade_id,
             pallet_sequences.mark_id,
             pallet_sequences.marketing_variety_id,
-            pallet_sequences.carton_quantity,
             pallet_sequences.sell_by_code,
             pallet_sequences.pallet_format_id,
             pallet_sequences.pm_mark_id,
             pallet_sequences.pm_bom_id,
             pallet_sequences.rmt_class_id,
-            pallet_sequences.treatment_ids AS treatment_ids,
             SUM(pallet_sequences.carton_quantity) AS carton_quantity,
             null AS price_per_carton,
             null AS price_per_kg
@@ -127,13 +121,11 @@ module FinishedGoodsApp
             pallet_sequences.grade_id,
             pallet_sequences.mark_id,
             pallet_sequences.marketing_variety_id,
-            pallet_sequences.carton_quantity,
             pallet_sequences.sell_by_code,
             pallet_sequences.pallet_format_id,
             pallet_sequences.pm_mark_id,
             pallet_sequences.pm_bom_id,
-            pallet_sequences.rmt_class_id,
-            pallet_sequences.treatment_ids
+            pallet_sequences.rmt_class_id
       SQL
       DB[query, order_id].all
     end

@@ -16,7 +16,7 @@
   :icon: delete
   :is_delete: true
   :popup: true
-- :url: "/finished_goods/orders/order_items/$:id$/find_pallets_for_order_item"
+- :url: "/finished_goods/orders/order_items/$:id$/allocate"
   :text: allocate pallets
   :icon: edit
   :popup: true

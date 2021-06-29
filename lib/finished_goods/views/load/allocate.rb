@@ -40,18 +40,6 @@ module FinishedGoods
 
             page.add_notice "Use the checkboxes and save selection button to select #{palbin}s from the grid below. - Or add #{palbin}s by listing #{palbin} numbers in the box above and pressing Allocate pasted #{palbin}s."
             page.section do |section|
-              # section.add_grid('stock_pallets_for_loads',
-              #                  '/list/stock_pallets_for_loads/grid_multi',
-              #                  caption: "Choose #{palbin}s",
-              #                  is_multiselect: true,
-              #                  can_be_cleared: true,
-              #                  multiselect_url: "/finished_goods/dispatch/loads/#{id}/allocate_multiselect",
-              #                  multiselect_key: ui_rule.form_object.rmt_load ? 'allocate_palbins' : 'allocate_pallets',
-              #                  height: 30,
-              #                  multiselect_params: {
-              #                    id: id,
-              #                    pallet_ids: ui_rule.form_object.pallet_ids
-              #                  })
               section.add_grid('stock_pallets_for_loads',
                                "/finished_goods/dispatch/loads/#{id}/allocate/grid",
                                is_multiselect: true,
