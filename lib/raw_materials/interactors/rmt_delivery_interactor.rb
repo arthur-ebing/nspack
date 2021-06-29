@@ -94,6 +94,20 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
+    def update_reference_number(id, params)
+      repo.transaction do
+        repo.update(:rmt_deliveries, id, params)
+        log_status(:rmt_deliveries, id, AppConst::RMT_BIN_REFERENCE_NUMBER_OVERRIDE)
+        log_transaction
+      end
+      instance = rmt_delivery(id)
+      success_response("Updated RMT delivery #{instance.id}", instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      failed_response(e.message)
+    end
+
     def validate_batch_number(batch_number)
       return validation_failed_response(OpenStruct.new(messages: { batch_number: ['Must be filled'] })) if batch_number.empty?
       return validation_failed_response(OpenStruct.new(messages: { batch_number: ['Batch already exists'] })) if repo.exists?(:rmt_deliveries, batch_number: batch_number)

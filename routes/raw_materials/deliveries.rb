@@ -117,6 +117,26 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
 
+      r.on 'edit_ref_number' do
+        r.get do
+          show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::EditRefNumber.call(id) }
+        end
+
+        r.post do
+          res = interactor.update_reference_number(id, params[:rmt_delivery])
+          if res.success
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
+          else
+            re_show_form(r, res, url: "/raw_materials/deliveries/rmt_deliveries/#{id}/edit_ref_number") do
+              RawMaterials::Deliveries::RmtDelivery::EditRefNumber.call(id, form_values: params[:rmt_delivery],
+                                                                            form_errors: res.errors,
+                                                                            remote: fetch?(r))
+            end
+          end
+        end
+      end
+
       r.on 'edit' do   # EDIT
         check_auth!('deliveries', 'edit')
         interactor.assert_permission!(:edit, id)

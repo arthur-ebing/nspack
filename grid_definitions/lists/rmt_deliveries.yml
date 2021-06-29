@@ -16,6 +16,10 @@
   :text: date received
   :icon: edit
   :popup: true
+- :url: "/raw_materials/deliveries/rmt_deliveries/$:id$/edit_ref_number"
+  :text: edit ref number
+  :icon: edit
+  :popup: true
 - :url: "/raw_materials/deliveries/rmt_deliveries/$:id$/receive"
   :text: receive delivery
   :icon: edit
