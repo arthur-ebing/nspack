@@ -309,7 +309,6 @@ layout = Crossbeams::Layout::Page.build(rules) do |page|
                 "/development/logging/logged_actions/#{id}/grid",
                 is_multiselect: true,
                 multiselect_url: '/save/data/here',
-                multiselect_params: {},
                 caption: 'Column details')
 end
 ----
@@ -353,3 +352,50 @@ def col_defs_for_logged_actions(logged_action) # rubocop:disable Metrics/AbcSize
   end
 end
 ----
+
+=== Interactor code - using a grid query
+
+There are some helper methods in `BaseInteractor` for building a grid in code using the SQL from a grid or report:
+
+dataminer_report:: Get an initialised report object: `dataminer_report(file, for_grid: true, conditions: [])`.
+
+File must not include the path - just `filename.yml`. Set `for_grid` to false to use a system report. Conditions is an array of hashes in the form `{ col: 'colname', op: '=', val: 123 }`.
+
+dataminer_report_columns:: Get grid column definitions: `dataminer_report_columns(maker, rpt)`
+dataminer_report_rows:: Get grid row data: `dataminer_report_rows(rpt)`
+
+Here is an example of usage:
+
+[source,ruby]
+----
+def allocate_grid(load_id)
+  pallet_ids = repo.find_pallets_for_for_load(load_id)
+  rpt = dataminer_report('stock_pallets_for_loads.yml',           #<1>
+                         conditions: [{ col: 'vw_pallets.pallet_id',
+                                        op: 'IN',
+                                        val: pallet_ids }])
+
+  row_defs = dataminer_report_rows(rpt)                           #<2>
+  {
+    multiselect_ids: repo.select_values(:pallets, :id, load_id: load_id),
+    columnDefs: col_defs_for_allocate_grid(rpt),
+    rowDefs: row_defs
+  }.to_json
+end
+
+def col_defs_for_allocate_grid(rpt)
+  Crossbeams::DataGrid::ColumnDefiner.new(for_multiselect: true).make_columns do |mk|
+    mk.action_column do |act|
+      act.popup_view_link '/list/stock_pallet_sequences/with_params?key=standard&pallet_id=$col1$',
+                          col1: 'id',
+                          icon: 'list',
+                          text: 'sequences',
+                          title: 'Pallet sequences for Pallet No $:pallet_number$'
+    end
+    dataminer_report_columns(mk, rpt)                             #<3>
+  end
+end
+----
+<1> Get a report object with conditions applied.
+<2> Run the report to generate rows for the grid.
+<3> Get the grid columns from the report.

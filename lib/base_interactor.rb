@@ -252,4 +252,49 @@ class BaseInteractor # rubocop:disable Metrics/ClassLength
   def robot_print_base_ulr(ip)
     "http://#{ip}:2080/"
   end
+
+  # Instantiate a dataminer report (grid or system) with a WHERE clause.
+  #
+  # @param yaml_file_name [string] - the file name of the report - excluding path, including extension.
+  # @param for_grid [boolean] - default is true - load a grid query, else load a system report query.
+  # @param conditions [array] - query conditions as array of hashes with keys: :col, :op, :val.
+  # @return [Crossbeams::DataminerReport]
+  def dataminer_report(yaml_file_name, for_grid: true, conditions: [])
+    rpt_path = if for_grid
+                 'grid_definitions/dataminer_queries'
+               else
+                 'reports'
+               end
+    file = File.join(ENV['ROOT'], rpt_path, yaml_file_name)
+    persistor = Crossbeams::Dataminer::YamlPersistor.new(file)
+    rpt = Crossbeams::Dataminer::Report.load(persistor)
+    params = []
+    conditions.each do |condition|
+      params << Crossbeams::Dataminer::QueryParameter.new(condition[:col], Crossbeams::Dataminer::OperatorValue.new(condition[:op], condition[:val]))
+    end
+    rpt.replace_where(params) unless params.empty?
+    rpt
+  end
+
+  # Get an array of grid column definitions from a dataminer report.
+  #
+  # @param maker [ColumnDefiner] - the column definer used to build the columns.
+  # @param rpt [Crossbeams::Dataminer::Report] - the report from which to build columns.
+  # @return [void]
+  def dataminer_report_columns(maker, rpt)
+    rpt.ordered_columns.each do |col|
+      maker.column_from_dataminer col
+    end
+  end
+
+  # Run a Dataminer report and return rows for rendering in a grid.
+  #
+  # @param rpt [Crossbeams::Dataminer::Report] - the report from which to build columns.
+  # @return [array] - rows suitable for a grid.
+  def dataminer_report_rows(rpt)
+    DB[rpt.runnable_sql].to_a.map do |row|
+      row.each_key { |key| row[key] = row[key].to_f if row[key].is_a?(BigDecimal) }
+      row
+    end
+  end
 end

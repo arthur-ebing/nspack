@@ -55,9 +55,7 @@ module FinishedGoods
               section.add_grid('stock_pallets_for_loads',
                                "/finished_goods/dispatch/loads/#{id}/allocate/grid",
                                is_multiselect: true,
-                               multiselect_key: 'stub',
                                multiselect_url: "/finished_goods/dispatch/loads/#{id}/allocate_multiselect",
-                               multiselect_params: {},
                                caption: "Choose #{palbin}s")
             end
           end

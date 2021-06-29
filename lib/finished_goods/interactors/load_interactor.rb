@@ -121,14 +121,10 @@ module FinishedGoodsApp
     end
 
     def allocate_grid(load_id)
-      file = 'grid_definitions/dataminer_queries/stock_pallets_for_loads.yml'
-      rpt = dataminer_report(file)
-
       pallet_ids = repo.find_pallets_for_for_load(load_id)
-      param = Crossbeams::Dataminer::QueryParameter.new('vw_pallets.pallet_id', Crossbeams::Dataminer::OperatorValue.new('IN', pallet_ids))
-      rpt.replace_where(Array(param))
+      rpt = dataminer_report('stock_pallets_for_loads.yml', conditions: [{ col: 'vw_pallets.pallet_id', op: 'IN', val: pallet_ids }])
 
-      row_defs = report_rows(rpt)
+      row_defs = dataminer_report_rows(rpt)
       {
         multiselect_ids: repo.select_values(:pallets, :id, load_id: load_id),
         columnDefs: col_defs_for_allocate_grid(rpt),
@@ -145,9 +141,7 @@ module FinishedGoodsApp
                               text: 'sequences',
                               title: 'Pallet sequences for Pallet No $:pallet_number$'
         end
-        rpt.ordered_columns.each do |col|
-          mk.column_from_dataminer col
-        end
+        dataminer_report_columns(mk, rpt)
       end
     end
 
@@ -353,18 +347,6 @@ module FinishedGoodsApp
     def check_pallets!(check, pallet_numbers, load_id = nil)
       res = MesscadaApp::TaskPermissionCheck::Pallets.call(check, pallet_number: pallet_numbers, load_id: load_id)
       raise Crossbeams::InfoError, res.message unless res.success
-    end
-
-    def dataminer_report(file)
-      persistor = Crossbeams::Dataminer::YamlPersistor.new(file)
-      Crossbeams::Dataminer::Report.load(persistor)
-    end
-
-    def report_rows(rpt)
-      DB[rpt.runnable_sql].to_a.map do |m|
-        m.each_key { |k| m[k] = m[k].to_f if m[k].is_a?(BigDecimal) }
-        m
-      end
     end
 
     def repo
