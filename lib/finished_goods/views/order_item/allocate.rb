@@ -16,6 +16,7 @@ module FinishedGoods
             page.add_grid('stock_pallets_for_order_items',
                           "/finished_goods/orders/order_items/#{id}/allocate/grid",
                           is_multiselect: true,
+                          can_be_cleared: true,
                           multiselect_url: "/finished_goods/orders/order_items/#{id}/allocate",
                           caption: 'Choose pallets')
             page.form(&:no_submit!)
