@@ -215,12 +215,6 @@ module FinishedGoodsApp
       @header = { 'Authorization' => "Bearer #{res.instance['token']}" }
     end
 
-    def parse_json_or_rescue(body)
-      JSON.parse(body)
-    rescue JSON::ParserError
-      body
-    end
-
     class TitanHttpResponder
       include Crossbeams::Responses
       def format_response(response, _context) # rubocop:disable Metrics/AbcSize
@@ -240,6 +234,12 @@ module FinishedGoodsApp
           instance = JSON.parse(response.body)
           failed_response("Response code: #{response.code}", instance)
         end
+      end
+
+      def parse_json_or_rescue(body)
+        JSON.parse(body)
+      rescue JSON::ParserError
+        body
       end
     end
   end
