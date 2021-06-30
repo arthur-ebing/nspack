@@ -384,5 +384,10 @@ module FinishedGoodsApp
         .where(Sequel[:vehicle_jobs][:id] => vehicle_job_id)
         .get(:location_long_code)
     end
+
+    def valid_pallet_numbers_for_govt_inspections
+      pallet_ids = DB[:pallet_sequences].where(verification_passed: false).select_map(:pallet_id)
+      DB[:pallets].where(shipped: false).exclude(id: pallet_ids).select_map(:pallet_number)
+    end
   end
 end

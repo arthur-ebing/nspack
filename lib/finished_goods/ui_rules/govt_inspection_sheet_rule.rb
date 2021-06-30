@@ -105,8 +105,10 @@ module UiRules
                                   prompt: true,
                                   required: false },
         upn: { renderer: :label, caption: 'UPN' },
-        scanned_number: { renderer: :input,
-                          caption: 'Pallet Number',
+        scanned_number: { caption: 'Pallet Number',
+                          # renderer: :select,
+                          # options: @repo.valid_pallet_numbers_for_govt_inspections,
+                          renderer: :input,
                           subtype: :numeric,
                           hide_on_load: @form_object.completed },
         reinspection: { renderer: :checkbox,
@@ -126,24 +128,30 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(inspector_id: nil,
-                                    inspection_billing_party_role_id: @party_repo.find_party_role_from_party_name_for_role(AppConst::DEFAULT_INSPECTION_BILLING, AppConst::ROLE_BILLING_CLIENT),
-                                    exporter_party_role_id: @party_repo.find_party_role_from_party_name_for_role(AppConst::DEFAULT_EXPORTER, AppConst::ROLE_EXPORTER),
-                                    booking_reference: @repo.get_last(:govt_inspection_sheets, :booking_reference),
-                                    results_captured: nil,
-                                    results_captured_at: nil,
-                                    api_results_received: nil,
-                                    use_inspection_destination_for_load_out: AppConst::CR_FG.use_inspection_destination_for_load_out?,
-                                    completed: nil,
-                                    completed_at: nil,
-                                    inspected: nil,
-                                    inspection_point: @repo.get_last(:govt_inspection_sheets, :inspection_point),
-                                    awaiting_inspection_results: nil,
-                                    packed_tm_group_id: @repo.get_last(:govt_inspection_sheets, :packed_tm_group_id),
-                                    destination_region_id: @repo.get_last(:govt_inspection_sheets, :destination_region_id),
-                                    destination_country_id: @repo.get_last(:govt_inspection_sheets, :destination_country_id),
-                                    reinspection: @mode == :reinspection,
-                                    scanned_number: nil)
+      @form_object = OpenStruct.new(
+        inspector_id: nil,
+        inspection_billing_party_role_id: @party_repo.find_party_role_from_party_name_for_role(
+          AppConst::DEFAULT_INSPECTION_BILLING, AppConst::ROLE_BILLING_CLIENT
+        ),
+        exporter_party_role_id: @party_repo.find_party_role_from_party_name_for_role(
+          AppConst::DEFAULT_EXPORTER, AppConst::ROLE_EXPORTER
+        ),
+        booking_reference: @repo.get_last(:govt_inspection_sheets, :booking_reference),
+        results_captured: nil,
+        results_captured_at: nil,
+        api_results_received: nil,
+        use_inspection_destination_for_load_out: AppConst::CR_FG.use_inspection_destination_for_load_out?,
+        completed: nil,
+        completed_at: nil,
+        inspected: nil,
+        inspection_point: @repo.get_last(:govt_inspection_sheets, :inspection_point),
+        awaiting_inspection_results: nil,
+        packed_tm_group_id: @repo.get_last(:govt_inspection_sheets, :packed_tm_group_id),
+        destination_region_id: @repo.get_last(:govt_inspection_sheets, :destination_region_id),
+        destination_country_id: @repo.get_last(:govt_inspection_sheets, :destination_country_id),
+        reinspection: @mode == :reinspection,
+        scanned_number: nil
+      )
     end
 
     private
