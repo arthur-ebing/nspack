@@ -37,7 +37,7 @@ module UiRules
                                     with_value: @form_object.contract_type_code,
                                     caption: 'Contract Type' }
       fields[:wage_level_id] = { renderer: :label,
-                                 with_value: @form_object.wage_level,
+                                 with_value: UtilityFunctions.delimited_number(@form_object.wage_level),
                                  caption: 'Wage Level' }
       fields[:shift_type_id] = { renderer: :label,
                                  with_value: @form_object.shift_type_code,

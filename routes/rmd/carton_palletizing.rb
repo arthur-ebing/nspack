@@ -9,21 +9,62 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # LOGIN AND ASSIGN BAY
     # --------------------------------------------------------------------------
     r.on 'login_to_bay' do
-      # Choose palletizing bay & login
-      # store locally
-      # get: show form or redirect
-      # post: redirect
-      feedback = MesscadaApp::RobotFeedback.new(
-        device: 'PTM-28',
-        status: true,
-        reader_id: '1'
-        # line1: 'Fred Jones',
-        # line2: 'Logged on'
-      )
-      show_robot_page(r, { device: 'PTM-28', reader_id: '1', identifier: '171807252866' }, feedback)
+      res = interactor.rmd_settings_for_ip(request.ip)
+      raise Crossbeams::InfoError, res.message unless res.success
+
+      settings = res.instance
+      if AppConst::CR_PROD.incentive_palletizing
+        form_state = {
+          device: settings.device,
+          reader_id: settings.reader_id,
+          identifier: nil
+        }
+        err_msg = retrieve_from_local_store(:error)
+        form_state.merge!(error_message: errs) if err_msg
+        form = Crossbeams::RMDForm.new(form_state,
+                                       form_name: :palletizing,
+                                       # notes: notice,
+                                       # scan_with_camera: @rmd_scan_with_camera,
+                                       caption: 'Login for Carton Palletizing',
+                                       action: '/rmd/carton_palletizing/login',
+                                       button_caption: 'Login')
+
+        form.add_label(:device, 'Device', settings.device, settings.device)
+        form.add_label(:reader_id, 'Reader', settings.reader_id, settings.reader_id, hide_on_load: true)
+        form.add_section_header('Please type in your personnel number to login')
+        form.add_field(:identifier, 'Personnel number')
+        form.add_csrf_tag csrf_tag
+        view(inline: form.render, layout: :layout_rmd)
+      else
+        res = interactor.rmd_initial_state(device: settings.device, reader_id: settings.reader_id)
+        feedback = interactor.palletizing_robot_feedback(settings.device, res)
+        show_robot_page(r, { device: settings.device, reader_id: settings.reader_id, identifier: '' }, feedback)
+      end
     end
 
-    # Maybe check if user has been logged off via another device logon...
+    r.post 'login' do
+      res = MesscadaApp::AddSystemResourceIncentiveToParams.call(params[:palletizing].merge(identifier_is_person: true), get_group_incentive: false)
+      if res.success
+        hr_interactor = MesscadaApp::HrInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+        res = hr_interactor.login_with_no(res.instance)
+      end
+
+      feedback = if res.success
+                   s_res = interactor.rmd_initial_state(device: params[:palletizing][:device], reader_id: params[:palletizing][:reader_id])
+                   interactor.palletizing_robot_feedback(params[:palletizing][:device], s_res)
+                 else
+                   MesscadaApp::RobotFeedback.new(device: params[:palletizing][:device],
+                                                  status: false,
+                                                  line1: 'Cannot login',
+                                                  line4: res.message)
+                 end
+      if res.success
+        show_robot_page(r, { device: params[:palletizing][:device], reader_id: params[:palletizing][:reader_id], identifier: res.instance[:identifier] }, feedback)
+      else
+        store_locally(:error, res.message)
+        r.redirect '/rmd/carton_palletizing/login_to_bay'
+      end
+    end
 
     r.on 'confirm_choice' do
       stash = retrieve_from_local_store(:robot_feedback)
@@ -59,7 +100,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       form.add_label(:line2, '', robot_feedback.line2, robot_feedback.line2, lcd_opts)
       form.add_label(:line3, '', robot_feedback.line3, robot_feedback.line3, lcd_opts)
       form.add_label(:line4, '', robot_feedback.line4, robot_feedback.line4, lcd_opts)
-      form.add_label(:line5, '', robot_feedback.line5, robot_feedback.line5, lcd_opts)
+      form.add_label(:line5, '', robot_feedback.line5 || '', robot_feedback.line5, lcd_opts)
       colour = :orange
       form.add_status_leds(colour)
       form.add_section_header(robot_feedback.confirm_text)
@@ -86,6 +127,11 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       store_locally(:robot_feedback, stash) # Immediately store in case of reload
       identifier = stash.delete(:identifier)
       robot_feedback = MesscadaApp::RobotFeedback.new(stash)
+
+      # Check if this RMD is no longer acting as this device...
+      res = interactor.rmd_settings_for_ip(request.ip)
+      raise Crossbeams::InfoError, res.message unless res.success
+
       form_state = {
         device: robot_feedback.device,
         reader_id: robot_feedback.reader_id,

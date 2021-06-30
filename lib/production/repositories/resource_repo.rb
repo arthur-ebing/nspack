@@ -596,6 +596,20 @@ module ProductionApp
       DB[:registered_mobile_devices].where(act_as_system_resource_id: sysres_id).update(act_as_system_resource_id: nil, act_as_reader_id: nil)
     end
 
+    def device_handled_by_rmd?(device)
+      prop = DB[:plant_resources].where(system_resource_id: DB[:system_resources].where(system_resource_code: device).get(:id)).get(:resource_properties)
+      prop && prop['rmd_mode'] == 't'
+    end
+
+    def rmd_device_settings_for_ip(ip_address)
+      system_resource_id, reader_id = get_value(:registered_mobile_devices, %i[act_as_system_resource_id act_as_reader_id], ip_address: ip_address)
+      return failed_response("This device (ip #{ip_address}) is not acting as a robot device") if system_resource_id.nil?
+
+      device = get_value(:system_resources, :system_resource_code, id: system_resource_id)
+      instance = OpenStruct.new(device: device, reader_id: reader_id)
+      success_response('ok', instance)
+    end
+
     private
 
     def button_points_to_packpoint?(button_system_resource_id)

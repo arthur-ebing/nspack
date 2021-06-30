@@ -2,6 +2,19 @@
 
 module MesscadaApp
   class PalletizingInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+    def device_handled_by_rmd?(device)
+      ProductionApp::ResourceRepo.new.device_handled_by_rmd?(device)
+    end
+
+    def rmd_settings_for_ip(ip_address)
+      ProductionApp::ResourceRepo.new.rmd_device_settings_for_ip(ip_address)
+    end
+
+    def rmd_initial_state(params)
+      state_machine = state_machine(params)
+      success_response('ok', current_bay_attributes(state_machine))
+    end
+
     def scan_carton(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       res = validate_scan(params)
       return validation_failed_response(res) if res.failure?

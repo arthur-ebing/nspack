@@ -18,7 +18,7 @@ module UiRules
     def mod_hash(hash, data) # rubocop:disable Metrics/AbcSize
       keys = Set.new
       data.each { |_, v| v[:applications].each { |a| keys << a } }
-      keys.each do |app|
+      keys.sort.each do |app|
         hs = { app: app, rows: [] }
         data.each do |k, v|
           hs[:rows] << { variable: k, group: v[:group], resolver: v[:resolver] } if v[:applications].include?(app)

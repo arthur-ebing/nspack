@@ -16,6 +16,15 @@ class Nspack < Roda
       return Crossbeams::RobotResponder.new(feedback).render
     end
 
+    if interactor.device_handled_by_rmd?(params[:device])
+      feedback = MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                status: false,
+                                                line1: 'Application not available',
+                                                line2: 'RMD (mobile device) is',
+                                                line3: "acting as #{params[:device]}")
+      return Crossbeams::RobotResponder.new(feedback).render
+    end
+
     # --------------------------------------------------------------------------
     # SCAN CARTON - either to add to a pallet, as a QC carton or to return to bay
     # messcada/palletize/scan_carton
