@@ -179,6 +179,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'new' do
+        check_auth!(['product setups', 'packing specifications'], 'new')
         res = stepper.current(params[:packing_specification_wizard])
         params = stepper.form_state
         if res.success
@@ -198,7 +199,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'edit' do
-        check_auth!('packing specifications', 'edit')
+        check_auth!(['product setups', 'packing specifications'], 'edit')
         res = stepper.current(params[:packing_specification_wizard])
         params = stepper.form_state
         if res.success
@@ -219,7 +220,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
       r.is do
         r.get do
-          check_auth!('packing specifications', 'new')
+          check_auth!(['product setups', 'packing specifications'], 'new')
           stepper.current(params)
           show_partial_or_page(r) do
             stepper.form.call(form_values: stepper.form_state)
