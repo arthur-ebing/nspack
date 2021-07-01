@@ -28,7 +28,7 @@ class FixPalletSequenceBulkProductionRunUpdate < BaseScript
       ORDER BY id
     SQL
     reworks_runs = DB[query].all
-    return failed_response("There are no #{AppConst::REWORKS_ACTION_BULK_PRODUCTION_RUN_UPDATE} reworks_runs to fix") if reworks_runs.empty?
+    return failed_response("There are no #{AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE} reworks_runs to fix") if reworks_runs.empty?
 
     reworks_run_ids = reworks_runs.map { |r| r[:id] }
     p "Reworks_runs records affected: #{reworks_run_ids.count}"
