@@ -235,6 +235,7 @@ class Nspack < Roda
             flash[:notice] = res.message
             redirect_to_last_grid(r)
           else
+            # TODO: fix broken params for Labels::Labels::Label::Approve
             re_show_form(r, res) { Labels::Labels::Label::Approve.call(id, params[:label], res.errors) }
           end
         end
