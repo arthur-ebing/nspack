@@ -17,10 +17,10 @@
 # Live  : RACK_ENV=production ruby scripts/base_script.rb FixPalletSequenceBulkProductionRunUpdate
 # Dev   : ruby scripts/base_script.rb FixPalletSequenceBulkProductionRunUpdate
 #
-class FixPalletSequenceBulkProductionRunUpdate < BaseScript
+class FixPalletSequenceBulkProductionRunUpdate < BaseScript # rubocop:disable Metrics/ClassLength
   def run # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
     query = <<~SQL
-      SELECT reworks_runs.id, pallets_affected
+      SELECT reworks_runs.id, reworks_runs.reworks_run_type_id, pallets_affected
              ,COALESCE(reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' -> 'before', null) AS before_state
       FROM reworks_runs
       JOIN reworks_run_types ON reworks_run_types.id = reworks_runs.reworks_run_type_id
@@ -31,20 +31,23 @@ class FixPalletSequenceBulkProductionRunUpdate < BaseScript
     return failed_response("There are no #{AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE} reworks_runs to fix") if reworks_runs.empty?
 
     reworks_run_ids = reworks_runs.map { |r| r[:id] }
-    p "Reworks_runs records affected: #{reworks_run_ids.count}"
+    p "#{reworks_run_ids.count} reworks_runs records affected"
 
     text_data = []
     reworks_runs.each do |reworks_run|
-      pallet_numbers = reworks_run[:pallets_affected][0]
+      reworks_run_type_id = reworks_run[:reworks_run_type_id]
+      pallet_numbers = reworks_run[:pallets_affected]&.to_ary
       next if pallet_numbers.nil_or_empty?
 
-      pallet_numbers = pallet_numbers.gsub(/['"]/, '').split("\n")
-      pallet_numbers = pallet_numbers.map(&:strip).reject(&:empty?)
-      pallet_sequence_ids = DB["SELECT DISTINCT id FROM pallet_sequences WHERE pallet_number IN ('#{pallet_numbers.join('\',\'')}') AND pallet_id IS NOT NULL"].map { |r| r[:id] } unless pallet_numbers.nil_or_empty?
+      pallet_sequence_ids = DB[:pallet_sequences]
+                            .where(pallet_number: pallet_numbers)
+                            .exclude(pallet_id: nil)
+                            .distinct
+                            .select_map(:id)
 
       from_production_run_id = reworks_run[:before_state].to_h['production_run_id']
       pallet_sequence_ids.each do |pallet_sequence_id|
-        before_state = get_audit_before_state(pallet_sequence_id)
+        before_state = get_audit_before_state(pallet_sequence_id, reworks_run_type_id)
         next if before_state.nil_or_empty?
 
         attrs = resolve_before_state_attrs(before_state)
@@ -79,7 +82,7 @@ class FixPalletSequenceBulkProductionRunUpdate < BaseScript
 
       Results:
       --------
-      data: Updated reworks_runs(#{reworks_run_ids.join(',')})
+      data: Updated reworks_runs records where id IN (#{reworks_run_ids.join(',')})
 
       text data:
       #{text_data.join("\n")}
@@ -97,7 +100,7 @@ class FixPalletSequenceBulkProductionRunUpdate < BaseScript
     end
   end
 
-  def get_audit_before_state(pallet_sequence_id)
+  def get_audit_before_state(pallet_sequence_id, reworks_run_type_id)
     query = <<~SQL
       SELECT DISTINCT row_data_id,
              row_data -> 'production_run_id' AS production_run_id,
@@ -117,7 +120,7 @@ class FixPalletSequenceBulkProductionRunUpdate < BaseScript
       WHERE table_name = 'pallet_sequences'
        AND action = 'U'
        AND row_data_id = #{pallet_sequence_id}
-       AND route_url = '/production/reworks/reworks_run_types/56/reworks_runs/multiselect_reworks_run_bulk_production_run_update'
+       AND route_url = '/production/reworks/reworks_run_types/#{reworks_run_type_id}/reworks_runs/multiselect_reworks_run_bulk_production_run_update'
        ORDER BY logged_actions.event_id;
     SQL
     DB[query].first
