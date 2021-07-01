@@ -502,7 +502,7 @@ module ProductionApp
       case reworks_run_type
       when AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE
         message = "#{AppConst::REWORKS_ACTION_BULK_PALLET_RUN_UPDATE} was successful"
-        children = pallet_number_sequences(attrs[:pallets_selected])
+        children = repo.select_values(:pallet_sequences, :id, { pallet_number: attrs[:pallets_selected], production_run_id: attrs[:from_production_run_id] })
         before_attrs = production_run_attrs(attrs[:from_production_run_id], production_run(attrs[:from_production_run_id]))
         after_attrs = production_run_attrs(attrs[:to_production_run_id], production_run(attrs[:to_production_run_id]))
         change_descriptions = { before: production_run_details(attrs[:from_production_run_id]).sort.to_h,
