@@ -320,7 +320,16 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   # @param functional_area_id [nil,integer] the functional area. Optional, typically set by the route
   # @return [void]
   def check_auth!(programs, sought_permission, functional_area_id = nil)
-    raise Crossbeams::AuthorizationError unless authorised?(programs, sought_permission, functional_area_id)
+    return if authorised?(programs, sought_permission, functional_area_id)
+
+    puts <<~STR unless AppConst.test?
+      ----
+        Authorization error for user "#{current_user.login_name}".
+        User does not have permission "#{sought_permission}" for program(s) "#{Array(programs).join(', ')}".
+        The functional area id is "#{functional_area_id || current_functional_area}".
+      ----
+    STR
+    raise Crossbeams::AuthorizationError
   end
 
   # Raises an authorization exception if not running in development mode.
