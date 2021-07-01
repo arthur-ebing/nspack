@@ -177,7 +177,9 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       jasper_params = JasperParams.new('govt_finding_sheet',
                                        current_user.login_name,
                                        govt_inspection_sheet_id: id)
-      jasper_params.parent_folder = AppConst::RPT_INDUSTRY
+      interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      ph_code = interactor.govt_inspection_sheet_packhouse_code(id)
+      jasper_params.parent_folder = AppConst::CR_FG.reporting_industry(plant_resource_code: ph_code)
       res = CreateJasperReport.call(jasper_params)
 
       if res.success

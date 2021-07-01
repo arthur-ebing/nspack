@@ -63,7 +63,7 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { CLM_BUTTON_CAPTION_FORMAT: 'A format for captions to display on label printer robot buttons. See AppConst for more.' },
     { DEFAULT_CARGO_TEMP_ON_ARRIVAL: 'The cargo temperature_code to default for containers on truck arrival.' },
     # { BASE_PACK_EQUALS_STD_PACK: 'If true, creating a std pack will automatically create a basic pack.' },
-    { RPT_INDUSTRY: 'Industry specific reporting folder' },
+    # { RPT_INDUSTRY: 'Industry specific reporting folder' },
     { INCENTIVISED_LABELING: 'True if a worker must be logged-in to print a carton label.' },
     { PS_APPLY_SUBSTITUTES: 'If true, include extra substitute columns in PS EDI out.' },
     { BIN_ASSET_REGEX: 'One or more regular expressions (delimited by commas) to validate the format of typed-in bin asset numbers.' },

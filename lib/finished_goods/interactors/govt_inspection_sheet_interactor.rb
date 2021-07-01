@@ -471,6 +471,10 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
+    def govt_inspection_sheet_packhouse_code(id)
+      repo.govt_inspection_sheet_packhouse_code(id)
+    end
+
     private
 
     def repo

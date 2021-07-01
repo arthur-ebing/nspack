@@ -10,6 +10,7 @@ module Crossbeams
     CLIENT_SETTINGS = {
       hb: { place_of_issue_for_addendum: 'PLZ',
             vgm_required: false,
+            reporting_industry: { default: 'citrus', can_override: true },
             integrate_extended_fg: false,
             max_rmt_bins_on_load: 80,
             max_pallets_on_load: 96,
@@ -17,6 +18,7 @@ module Crossbeams
             valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } },
       hl: { place_of_issue_for_addendum: 'PLZ',
             vgm_required: false,
+            reporting_industry: { default: nil, can_override: false },
             integrate_extended_fg: false,
             max_rmt_bins_on_load: 50,
             max_pallets_on_load: 120,
@@ -24,6 +26,7 @@ module Crossbeams
             valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } },
       kr: { place_of_issue_for_addendum: 'CPT',
             vgm_required: true,
+            reporting_industry: { default: nil, can_override: false },
             integrate_extended_fg: true,
             max_rmt_bins_on_load: 50,
             max_pallets_on_load: 50,
@@ -31,6 +34,7 @@ module Crossbeams
             valid_pallet_destination: { failed: [/\AREWORKS$/], pending: [/\AREWORKS$/, /\ARA_10/, /\APACKHSE/], loaded: [/\APART_PALLETS/] } },
       um: { place_of_issue_for_addendum: nil,
             vgm_required: true,
+            reporting_industry: { default: nil, can_override: false },
             integrate_extended_fg: false,
             max_rmt_bins_on_load: 78,
             max_pallets_on_load: 40,
@@ -38,6 +42,7 @@ module Crossbeams
             valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } },
       ud: { place_of_issue_for_addendum: 'PLZ',
             vgm_required: true,
+            reporting_industry: { default: 'citrus', can_override: false },
             integrate_extended_fg: false,
             max_rmt_bins_on_load: 50,
             max_pallets_on_load: 50,
@@ -45,6 +50,7 @@ module Crossbeams
             valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } },
       sr: { place_of_issue_for_addendum: 'PLZ',
             vgm_required: true,
+            reporting_industry: { default: nil, can_override: false },
             integrate_extended_fg: false,
             max_rmt_bins_on_load: 80,
             max_pallets_on_load: 80,
@@ -52,6 +58,7 @@ module Crossbeams
             valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } },
       sr2: { place_of_issue_for_addendum: 'PLZ',
              vgm_required: true,
+             reporting_industry: { default: nil, can_override: false },
              integrate_extended_fg: false,
              max_rmt_bins_on_load: 80,
              max_pallets_on_load: 80,
@@ -69,7 +76,6 @@ module Crossbeams
     # IN_TRANSIT_LOCATION
     # LOCATION_TYPES_COLD_BAY_DECK
     # PALLET_WEIGHT_REQUIRED_FOR_INSPECTION
-    # RPT_INDUSTRY
     # TEMP_TAIL_REQUIRED_TO_SHIP
 
     def initialize(client_code)
@@ -140,6 +146,19 @@ module Crossbeams
       return 'Default value for govt_inspection_sheets.use_inspection_destination_for_load_out.' if explain
 
       setting(:use_inspection_destination_for_load_out)
+    end
+
+    def reporting_industry(plant_resource_code: nil, explain: false)
+      return "Reporting industry. Blank for default, otherwise citrus or melons. Used in Japser reporting to load different finding sheet reports. Setting: #{setting(:reporting_industry).inspect}" if explain
+
+      reporting_industry = setting(:reporting_industry)
+      return reporting_industry[:default] unless reporting_industry[:can_override]
+      return reporting_industry[:default] if plant_resource_code.nil?
+
+      ph_industry = DB[:plant_resources]
+                    .where(plant_resource_code: plant_resource_code)
+                    .get(Sequel.lit("resource_properties ->> 'reporting_industry'"))
+      ph_industry.nil_or_empty? ? reporting_industry[:default] : ph_industry
     end
   end
 end

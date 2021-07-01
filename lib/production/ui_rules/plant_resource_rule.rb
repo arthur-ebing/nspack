@@ -74,6 +74,10 @@ module UiRules
                             parent_field: :resource_properties,
                             invisible: !at_module_level?,
                             hint: "Set this to true if the robot's functions are to be handled by a Registerd Mobile Device." }
+      fields[:reporting_industry] = { renderer: :select,
+                                      options: [['Default', ''], %w[Citrus citrus], %w[Melons melons]],
+                                      parent_field: :resource_properties,
+                                      invisible: !at_ph_level }
     end
 
     def set_print_fields

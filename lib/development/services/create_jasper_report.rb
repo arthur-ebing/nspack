@@ -16,7 +16,7 @@ require 'drb/drb'
 # A note about report variants...
 # -------------------------------
 # A report dir in the JAPSER_REPORTS_PATH will be available for all installations.
-# A report dir in a sub dir named by the RPT_INDUSTRY will be specific to the current installation's industry.
+# A report dir in a sub dir named by the client rule for reporting_industry will be specific to the current installation's industry.
 # A report dir in a sub dir named by the CLIENT_CODE will be specific to the current implementation (client) only.
 #
 # This service will check to see if there is a client-specific report and use it if present by overwriting the parent_folder value.
@@ -127,11 +127,12 @@ class CreateJasperReport < BaseService # rubocop:disable Metrics/ClassLength
     File.relative_path(File.join(ENV['ROOT'], 'public'), file)
   end
 
-  def log_report_details
+  def log_report_details # rubocop:disable Metrics/AbcSize
     puts "--- JASPER REPORT : #{jasper_params.report_name} :: #{Time.now}"
     puts "USER   : #{jasper_params.user_name}"
     puts "MODE   : #{show_mode}"
     puts "PARAMS : #{jasper_params.params.inspect}"
+    puts "PATH   : #{report_dir}"
     puts '-'
   end
 

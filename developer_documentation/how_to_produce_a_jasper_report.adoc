@@ -23,7 +23,7 @@ Reports are stored in 3 ways - per system, per industry or per client.
 * The per-industry reports will differ per industry (melons vs citrus for example).
 * The per-client reports are tailored specifically to the client.
 
-For a per-industry report, the `parent_folder` parameter must be set to the value of `AppConst::RPT_INDUSTRY`.
+For a per-industry report, the `parent_folder` parameter must be set to the value of `AppConst::CR_FG.reporting_industry`. (This client rule can accept a plant resource code for the packhouse as a parameter if required. A site can have packhouses packing different fruit - e.g. one for melons and one for sitrus).
 
 For a per-client report, the system will ignore the `parent_folder` parameter and use the client-specific version of the report (if it exists). i.e. this report will be used instead of a per-system or per-industry report without any need to specify this in the calling code.
 
@@ -78,7 +78,7 @@ Available `jasper_params` attributes are:
 |Same as `report_name`
 
 |parent_folder
-|Provided if the report dir is not an immediate subdir of `JASPER_REPORTS_PATH`. Typically set to `AppConst::RPT_INDUSTRY`
+|Provided if the report dir is not an immediate subdir of `JASPER_REPORTS_PATH`. Typically set to `AppConst::CR_FG.reporting_industry`
 |`nil`
 
 |printer

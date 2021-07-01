@@ -29,6 +29,7 @@ module Production
               form.add_field :edi_out_value
               form.add_field :carton_equals_pallet
               form.add_field :rmd_mode
+              form.add_field :reporting_industry
             end
           end
 
