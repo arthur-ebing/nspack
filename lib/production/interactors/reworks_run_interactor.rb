@@ -253,6 +253,65 @@ module ProductionApp
       repo.production_run_objects(production_run_id)
     end
 
+    def validate_change_bin_delivery_params(params)
+      res = validate_delivery_params(params)
+      return validation_failed_response(res) if res.failure?
+
+      res = validate_rmt_deliveries(res)
+      return validation_failed_response(res) unless res.success
+
+      success_response('ok', params)
+    end
+
+    def validate_rmt_deliveries(params) # rubocop:disable Metrics/AbcSize
+      from_delivery_id = params[:from_delivery_id]
+      to_delivery_id = params[:to_delivery_id]
+      from_delivery = repo.details_for_rmt_delivery(from_delivery_id)
+      return OpenStruct.new(success: false, messages: { from_delivery_id: ["#{from_delivery_id} doesn't exist"] }, from_delivery_id: from_delivery_id) if from_delivery.nil_or_empty?
+
+      return OpenStruct.new(success: false, messages: { to_delivery_id: ['From delivery same as to delivery. Please enter a different delivery'] }, to_delivery_id: to_delivery_id) if from_delivery_id == to_delivery_id
+
+      to_delivery = repo.details_for_rmt_delivery(to_delivery_id)
+      return OpenStruct.new(success: false, messages: { to_delivery_id: ["#{to_delivery_id} doesn't exist"] }, to_delivery_id: to_delivery_id) if to_delivery.nil_or_empty?
+
+      error_msg = resolve_setup_requirements(from_delivery, to_delivery)
+      return OpenStruct.new(success: false, messages: { to_delivery_id: [error_msg] }, to_delivery_id: to_delivery_id) unless error_msg.nil_or_empty?
+
+      OpenStruct.new(success: true, instance:  params)
+    end
+
+    def resolve_setup_requirements(from_instance, to_instance) # rubocop:disable Metrics/AbcSize
+      return "INVALID FARM: From: #{from_instance[:farm_code]}. To: #{to_instance[:farm_code]}" unless from_instance[:farm_id] == to_instance[:farm_id]
+      return "INVALID ORCHARD: From: #{from_instance[:orchard_code]}. To: #{to_instance[:orchard_code]}" unless from_instance[:orchard_id] == to_instance[:orchard_id]
+      return "INVALID CULTIVAR GROUP: From: #{from_instance[:cultivar_group_code]}. To: #{to_instance[:cultivar_group_code]}" unless from_instance[:cultivar_group_id] == to_instance[:cultivar_group_id]
+      return "INVALID CULTIVAR: From: #{from_instance[:cultivar_name]}. To: #{to_instance[:cultivar_name]}" unless from_instance[:cultivar_id] == to_instance[:cultivar_id]
+    end
+
+    def change_bin_delivery(reworks_run_type_id, multiselect_list, attrs)  # rubocop:disable Metrics/AbcSize
+      res = resolve_rmt_bins_from_multiselect(reworks_run_type_id, multiselect_list)
+      return validation_failed_response(res) unless res.success
+
+      rmt_bin_ids = res.instance[:pallets_selected].split("\n")
+      repo.transaction do
+        repo.update_rmt_bin(rmt_bin_ids, { rmt_delivery_id: attrs[:to_delivery_id] })
+        id = repo.create_reworks_run({ user: @user.user_name,
+                                       reworks_run_type_id: attrs[:reworks_run_type_id],
+                                       pallets_selected: "{ #{rmt_bin_ids.join(',')} }",
+                                       pallets_affected: "{ #{rmt_bin_ids.join(',')} }",
+                                       changes_made: resolve_changes_made(before: { rmt_delivery_id: attrs[:from_delivery_id] },
+                                                                          after: { rmt_delivery_id: attrs[:to_delivery_id] }) })
+        log_status(:reworks_runs, id, 'CREATED')
+        log_multiple_statuses(:rmt_bins, rmt_bin_ids, AppConst::REWORKS_ACTION_CHANGE_BIN_DELIVERY)
+        log_transaction
+      end
+      success_response('Bin delivery change was successful.')
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
+      failed_response(e.message)
+    end
+
     def validate_change_delivery_orchard_screen_params(params) # rubocop:disable Metrics/AbcSize
       res = validate_only_cultivar_change(params)
       if res.failure?
@@ -447,7 +506,7 @@ module ProductionApp
 
       reworks_run_type = reworks_run_type(reworks_run_type_id)
       rmt_bins = case reworks_run_type
-                 when AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE, AppConst::RUN_TYPE_UNTIP_BINS
+                 when AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE, AppConst::RUN_TYPE_UNTIP_BINS, AppConst::RUN_TYPE_CHANGE_BIN_DELIVERY
                    selected_bins(multiselect_list)
                  else
                    selected_rmt_bins(multiselect_list)
@@ -2013,6 +2072,10 @@ module ProductionApp
 
     def validate_reworks_change_run_orchard_params(params)
       ReworksRunChangeRunOrchardSchema.call(params)
+    end
+
+    def validate_delivery_params(params)
+      DeliveryChangeSchema.call(params)
     end
   end
 end

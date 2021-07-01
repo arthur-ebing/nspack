@@ -294,6 +294,52 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
+    r.on 'change_bin_delivery' do
+      reworks_run_type_id = ProductionApp::ReworksRepo.new.get_reworks_run_type_id(AppConst::RUN_TYPE_CHANGE_BIN_DELIVERY)
+      r.is do
+        r.get do
+          show_partial_or_page(r) { Production::Reworks::ReworksRun::ChangeBinDelivery.call(reworks_run_type_id, remote: fetch?(r)) }
+        end
+
+        r.post do
+          store_locally(:change_bin_delivery_changes, params[:change_bin_delivery])
+          res = interactor.validate_change_bin_delivery_params(params[:change_bin_delivery])
+          if res.success
+            show_partial_or_page(r) do
+              Production::Reworks::ReworksRun::ChangeBinDeliveryDetails.call(params[:change_bin_delivery])
+            end
+          else
+            re_show_form(r, res, url: '/production/reworks/change_bin_delivery') do
+              Production::Reworks::ReworksRun::ChangeBinDelivery.call(reworks_run_type_id,
+                                                                      form_values: params[:change_bin_delivery],
+                                                                      form_errors: res.errors,
+                                                                      remote: fetch?(r))
+            end
+          end
+        end
+      end
+
+      r.on 'multiselect_rmt_bin_deliveries_submit' do
+        attrs = retrieve_from_local_store(:change_bin_delivery_changes)
+        store_locally(:change_bin_delivery_changes, attrs)
+        res = interactor.change_bin_delivery(reworks_run_type_id, multiselect_grid_choices(params), attrs)
+
+        if res.success
+          flash[:notice] = res.message
+          if fetch?(r)
+            redirect_via_json(retrieve_from_local_store(:list_url))
+          else
+            r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
+          end
+        else
+          re_show_form(r, res, url: '/production/reworks/change_bin_delivery') do
+            res[:message] = unwrap_failed_response(res)
+            Production::Reworks::ReworksRun::ChangeBinDeliveryDetails.call(attrs)
+          end
+        end
+      end
+    end
+
     r.on 'reworks_runs',  Integer do |id|
       # Check for notfound:
       r.on !interactor.exists?(:reworks_runs, id) do
@@ -350,6 +396,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
               show_partial_or_page(r) { Production::Reworks::ChangeDeliveriesOrchard::SelectOrchards.call(remote: fetch?(r)) }
             elsif ProductionApp::ReworksRepo.new.find_reworks_run_type(id)[:run_type] == AppConst::RUN_TYPE_CHANGE_RUN_ORCHARD
               show_partial_or_page(r) { Production::Reworks::ReworksRun::ChangeRunOrchard.call(id, remote: fetch?(r)) }
+            elsif ProductionApp::ReworksRepo.new.find_reworks_run_type(id)[:run_type] == AppConst::RUN_TYPE_CHANGE_BIN_DELIVERY
+              show_partial_or_page(r) { Production::Reworks::ReworksRun::ChangeBinDelivery.call(id, remote: fetch?(r)) }
             else
               show_partial_or_page(r) { Production::Reworks::ReworksRun::New.call(id, remote: fetch?(r)) }
             end

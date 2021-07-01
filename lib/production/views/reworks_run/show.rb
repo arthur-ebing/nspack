@@ -8,6 +8,7 @@ module Production
           ui_rule = UiRules::Compiler.new(:reworks_run, :show, id: id)
           rules   = ui_rule.compile
 
+          caption = rules[:bin_run_type] ? 'Bins' : 'Pallets'
           layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
             page.form do |form|
@@ -31,7 +32,7 @@ module Production
               end
             end
             if rules[:show_changes_made]
-              page.add_notice 'The changes below were made to the affected pallets:', inline_caption: true
+              page.add_notice "The changes below were made to the affected #{caption}:", inline_caption: true
               page.section do |section|
                 if rules[:array_of_changes_made]
                   rules[:changes_made_array_count].times do |i|

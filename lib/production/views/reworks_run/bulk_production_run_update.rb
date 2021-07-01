@@ -31,6 +31,7 @@ module Production
                   col.add_field :from_production_run_id
                   col.add_field :to_production_run_id
                 end
+                row.blank_column
               end
             end
             page.section do |section|

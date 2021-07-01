@@ -228,4 +228,10 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
     optional(:allow_cultivar_mixing).maybe(:bool)
     optional(:allow_cultivar_group_mixing).maybe(:bool)
   end
+
+  DeliveryChangeSchema = Dry::Schema.Params do
+    required(:reworks_run_type_id).filled(:integer)
+    required(:from_delivery_id).filled(:integer)
+    required(:to_delivery_id).filled(:integer)
+  end
 end

@@ -1113,5 +1113,21 @@ module ProductionApp
         .distinct
         .select_map(column.to_sym)
     end
+
+    def details_for_rmt_delivery(rmt_delivery_id)
+      query = <<~SQL
+        SELECT rmt_deliveries.id, rmt_deliveries.farm_id, rmt_deliveries.orchard_id, cultivars.cultivar_group_id,
+               rmt_deliveries.cultivar_id, farms.farm_code, orchards.orchard_code, cultivar_groups.cultivar_group_code,
+               cultivars.cultivar_name
+        FROM rmt_deliveries
+        JOIN farms ON farms.id = rmt_deliveries.farm_id
+        JOIN orchards ON orchards.id = rmt_deliveries.orchard_id
+        JOIN cultivars ON cultivars.id = rmt_deliveries.cultivar_id
+        LEFT JOIN cultivar_groups ON cultivar_groups.id = cultivars.cultivar_group_id
+        WHERE rmt_deliveries.id = #{rmt_delivery_id}
+      SQL
+
+      DB[query].first
+    end
   end
 end
