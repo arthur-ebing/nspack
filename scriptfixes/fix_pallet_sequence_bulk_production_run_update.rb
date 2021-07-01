@@ -35,7 +35,10 @@ class FixPalletSequenceBulkProductionRunUpdate < BaseScript
 
     text_data = []
     reworks_runs.each do |reworks_run|
-      pallet_numbers = reworks_run[:pallets_affected][0].gsub(/['"]/, '').split("\n")
+      pallet_numbers = reworks_run[:pallets_affected][0]
+      next if pallet_numbers.nil_or_empty?
+
+      pallet_numbers = pallet_numbers.gsub(/['"]/, '').split("\n")
       pallet_numbers = pallet_numbers.map(&:strip).reject(&:empty?)
       pallet_sequence_ids = DB["SELECT DISTINCT id FROM pallet_sequences WHERE pallet_number IN ('#{pallet_numbers.join('\',\'')}') AND pallet_id IS NOT NULL"].map { |r| r[:id] } unless pallet_numbers.nil_or_empty?
 
@@ -107,13 +110,15 @@ class FixPalletSequenceBulkProductionRunUpdate < BaseScript
              row_data -> 'cultivar_id' AS cultivar_id,
              row_data -> 'season_id' AS season_id,
              row_data -> 'marketing_puc_id' AS marketing_puc_id,
-             row_data -> 'marketing_orchard_id' AS marketing_orchard_id
+             row_data -> 'marketing_orchard_id' AS marketing_orchard_id,
+             logged_actions.event_id
       FROM audit.logged_actions
       LEFT JOIN audit.logged_action_details ON logged_action_details.transaction_id = logged_actions.transaction_id
       WHERE table_name = 'pallet_sequences'
        AND action = 'U'
        AND row_data_id = #{pallet_sequence_id}
-       AND route_url = '/production/reworks/reworks_run_types/56/reworks_runs/multiselect_reworks_run_bulk_production_run_update';
+       AND route_url = '/production/reworks/reworks_run_types/56/reworks_runs/multiselect_reworks_run_bulk_production_run_update'
+       ORDER BY logged_actions.event_id;
     SQL
     DB[query].first
   end
