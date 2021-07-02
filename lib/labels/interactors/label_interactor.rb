@@ -233,8 +233,11 @@ module LabelApp
 
       repo.update_label(id, sample_data: repo.hash_for_jsonb_col(params))
 
+      print_repo = LabelApp::PrinterRepo.new
+      host = print_repo.remote_printer_ip(printer_code)
+
       mes_repo = MesserverApp::MesserverRepo.new
-      mes_repo.print_published_label(instance.label_name, params, quantity, printer_code)
+      mes_repo.print_published_label(instance.label_name, params, quantity, printer_code, host)
     end
 
     def email_preview(id, params) # rubocop:disable Metrics/AbcSize
