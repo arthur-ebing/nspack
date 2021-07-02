@@ -93,7 +93,7 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def delete_farm_section(id) # rubocop:disable Metrics/AbcSize
+    def delete_farm_section(id)
       name = farm_section(id).farm_section_name
       repo.transaction do
         repo.delete_farm_section(id)

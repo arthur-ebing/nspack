@@ -18,7 +18,7 @@ module DM
                                      rows: 25 } },
                     name: 'report' }
 
-        layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
+        layout = Crossbeams::Layout::Page.build(rules) do |page|
           # page.form_object ui_rule.form_object
           page.form_object obj
           page.form_values form_values

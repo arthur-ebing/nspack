@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Nspack < Roda
-  route 'grids', 'development' do |r| # rubocop:disable Metrics/BlockLength
+  route 'grids', 'development' do |r|
     # LISTS
     # --------------------------------------------------------------------------
     r.on 'lists' do

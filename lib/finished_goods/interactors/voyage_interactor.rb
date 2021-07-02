@@ -2,7 +2,7 @@
 
 module FinishedGoodsApp
   class VoyageInteractor < BaseInteractor
-    def create_voyage(params) # rubocop:disable Metrics/AbcSize
+    def create_voyage(params)
       res = validate_voyage_params(params)
       return validation_failed_response(res) if res.failure?
 

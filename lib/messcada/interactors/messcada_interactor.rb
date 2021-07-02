@@ -272,7 +272,7 @@ module MesscadaApp
       failed_response(e.message)
     end
 
-    def carton_verification(params)  # rubocop:disable Metrics/AbcSize
+    def carton_verification(params) # rubocop:disable Metrics/AbcSize
       res = CartonAndPalletVerificationSchema.call(params)
       return validation_failed_response(res) if res.failure?
 
@@ -294,7 +294,7 @@ module MesscadaApp
       failed_response(e.message)
     end
 
-    def carton_verification_and_weighing(params)  # rubocop:disable Metrics/AbcSize
+    def carton_verification_and_weighing(params) # rubocop:disable Metrics/AbcSize
       res = CartonVerificationAndWeighingSchema.call(params)
       return validation_failed_response(res) if res.failure?
 
@@ -320,7 +320,7 @@ module MesscadaApp
       failed_response(e.message)
     end
 
-    def carton_verification_and_weighing_and_labeling(params, request_ip)  # rubocop:disable Metrics/AbcSize
+    def carton_verification_and_weighing_and_labeling(params, request_ip) # rubocop:disable Metrics/AbcSize
       res = CartonVerificationAndWeighingSchema.call(params)
       return validation_failed_response(res) if res.failure?
 
@@ -395,7 +395,7 @@ module MesscadaApp
       repo.pallet_exists?(pallet_number)
     end
 
-    def pallet_weighing_for_labeling(user, params)  # rubocop:disable Metrics/AbcSize
+    def pallet_weighing_for_labeling(user, params) # rubocop:disable Metrics/AbcSize
       res = if AppConst::COMBINE_CARTON_AND_PALLET_VERIFICATION
               carton_to_be_verified(params)
             else
@@ -415,7 +415,7 @@ module MesscadaApp
       failed_response(e.message)
     end
 
-    def fg_pallet_weighing(params)  # rubocop:disable Metrics/AbcSize
+    def fg_pallet_weighing(params) # rubocop:disable Metrics/AbcSize
       params[:bin_number] = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: params[:bin_number]).pallet_number
       res = FgPalletWeighingSchema.call(params)
       return validation_failed_response(res) if res.failure?

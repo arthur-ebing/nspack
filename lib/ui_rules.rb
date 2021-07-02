@@ -137,7 +137,7 @@ module UiRules
       field
     end
 
-    def apply_extended_column_defaults_to_form_object(table) # rubocop:disable Metrics/AbcSize
+    def apply_extended_column_defaults_to_form_object(table)
       config = Crossbeams::Config::ExtendedColumnDefinitions.config_for(table)
       return if config.nil?
 

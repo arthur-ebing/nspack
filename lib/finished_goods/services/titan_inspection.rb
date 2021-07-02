@@ -89,7 +89,7 @@ module FinishedGoodsApp
       ok_response
     end
 
-    def update_govt_inspection_pallets(results) # rubocop:disable Metrics/AbcSize
+    def update_govt_inspection_pallets(results)
       failure_type_id = repo.get_id_or_create(:inspection_failure_types,
                                               failure_type_code: 'TITAN Inspections')
       pallets = results.pallets
@@ -111,7 +111,7 @@ module FinishedGoodsApp
       end
     end
 
-    def log_titan_request(request_type, res) # rubocop:disable Metrics/AbcSize
+    def log_titan_request(request_type, res)
       result_doc = res.instance
       result_doc = { message: res.message } if result_doc.empty?
       @inspection_message_id = res.instance['inspectionMessageId']
@@ -152,7 +152,7 @@ module FinishedGoodsApp
       log_titan_request('Request Reinspection', res)
     end
 
-    def validation_call # rubocop:disable Metrics/AbcSize
+    def validation_call
       auth_token_call if header.nil?
       url = "#{AppConst::TITAN_ENVIRONMENT}/pi/ProductInspection/InspectionMessages/ValidationResult?inspectionMessageId=#{inspection_message_id}"
       @header.delete('api-version')

@@ -22,7 +22,7 @@ module UiRules
       form_name 'bin_asset_transaction'
     end
 
-    def set_show_fields # rubocop:disable Metrics/AbcSize
+    def set_show_fields
       fields[:asset_transaction_type_id] = { renderer: :label, with_value: @form_object.transaction_type_code, caption: 'Transaction Type Code' }
       fields[:quantity_bins] = { renderer: :label, caption: 'Total Qty Empty Bins' }
       fields[:reference_number] = { renderer: :label }

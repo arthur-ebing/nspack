@@ -14,7 +14,7 @@ module MasterfilesApp
       RmtContainerTypeSchema.call(params)
     end
 
-    def create_rmt_container_type(params) # rubocop:disable Metrics/AbcSize
+    def create_rmt_container_type(params)
       res = validate_rmt_container_type_params(params)
       return validation_failed_response(res) if res.failure?
 

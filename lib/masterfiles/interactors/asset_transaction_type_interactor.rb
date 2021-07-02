@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class AssetTransactionTypeInteractor < BaseInteractor
-    def create_asset_transaction_type(params) # rubocop:disable Metrics/AbcSize
+    def create_asset_transaction_type(params)
       res = validate_asset_transaction_type_params(params)
       return validation_failed_response(res) if res.failure?
 

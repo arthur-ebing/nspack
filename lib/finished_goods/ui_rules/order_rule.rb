@@ -292,7 +292,7 @@ module UiRules
                                    options_array: fields[:currency_id][:options])])
     end
 
-    def deal_type_changed # rubocop:disable Metrics/AbcSize
+    def deal_type_changed
       form_object_merge!(params)
       @form_object[:deal_type_id] = params[:changed_value].to_i
       @form_object[:incoterm_id] = params[:order_incoterm_id].to_i
@@ -304,7 +304,7 @@ module UiRules
                                    options_array: fields[:customer_payment_term_set_id][:options])])
     end
 
-    def incoterm_changed # rubocop:disable Metrics/AbcSize
+    def incoterm_changed
       form_object_merge!(params)
       @form_object[:incoterm_id] = params[:changed_value].to_i
       @form_object[:deal_type_id] = params[:order_deal_type_id].to_i

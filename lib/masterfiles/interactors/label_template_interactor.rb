@@ -80,7 +80,7 @@ module MasterfilesApp
 
     private
 
-    def validate_published_labels(params) # rubocop:disable Metrics/AbcSize
+    def validate_published_labels(params)
       res = LabelTemplatePublishSchema.call(params)
       return res if res.failure?
       return res unless matching_variable_set?(res)

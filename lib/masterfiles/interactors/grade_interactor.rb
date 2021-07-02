@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class GradeInteractor < BaseInteractor
-    def create_grade(params) # rubocop:disable Metrics/AbcSize
+    def create_grade(params)
       res = validate_grade_params(params)
       return validation_failed_response(res) if res.failure?
 

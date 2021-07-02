@@ -2,7 +2,7 @@
 
 module DevelopmentApp
   class AddressTypeInteractor < BaseInteractor
-    def create_address_type(params) # rubocop:disable Metrics/AbcSize
+    def create_address_type(params)
       res = validate_address_type_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -34,7 +34,7 @@ module DevelopmentApp
       failed_response(e.message)
     end
 
-    def delete_address_type(id) # rubocop:disable Metrics/AbcSize
+    def delete_address_type(id)
       name = find_address_type(id).address_type
       repo.transaction do
         repo.delete_address_type(id)

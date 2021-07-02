@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class DealTypeInteractor < BaseInteractor
-    def create_deal_type(params) # rubocop:disable Metrics/AbcSize
+    def create_deal_type(params)
       res = validate_deal_type_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -34,7 +34,7 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def delete_deal_type(id) # rubocop:disable Metrics/AbcSize
+    def delete_deal_type(id)
       name = deal_type(id).deal_type
       repo.transaction do
         repo.delete_deal_type(id)

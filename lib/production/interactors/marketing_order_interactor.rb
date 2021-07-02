@@ -2,7 +2,7 @@
 
 module ProductionApp
   class OrderInteractor < BaseInteractor
-    def create_marketing_order(params) # rubocop:disable Metrics/AbcSize
+    def create_marketing_order(params)
       res = validate_marketing_order_params(params)
       return validation_failed_response(res) if res.failure?
 

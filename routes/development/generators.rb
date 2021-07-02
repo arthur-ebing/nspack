@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Nspack < Roda
-  route 'generators', 'development' do |r| # rubocop:disable Metrics/BlockLength
+  route 'generators', 'development' do |r|
     # SCAFFOLDS
     # --------------------------------------------------------------------------
     r.on 'scaffolds' do

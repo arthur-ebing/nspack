@@ -2,7 +2,7 @@
 
 module UiRules
   class ReworksRunPalletRule < Base # rubocop:disable Metrics/ClassLength
-    def generate_rules  # rubocop:disable Metrics/AbcSize,  Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+    def generate_rules # rubocop:disable Metrics/AbcSize,  Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       @repo = ProductionApp::ReworksRepo.new
 
       make_form_object
@@ -70,7 +70,7 @@ module UiRules
                       caption: 'Representative sequence' }
     end
 
-    def set_pallet_sequence_changes  # rubocop:disable Metrics/AbcSize
+    def set_pallet_sequence_changes # rubocop:disable Metrics/AbcSize
       rules[:left_record] = sequence_setup_data(@options[:id])
       rules[:right_record] = sequence_edit_data(@options[:attrs])
       rules[:no_changes_made] = rules[:left_record] == rules[:right_record]
@@ -125,7 +125,7 @@ module UiRules
       fields[:batch_number] = { invisible: !AppConst::CR_PROD.capture_batch_number_for_pallets? }
     end
 
-    def make_form_object  # rubocop:disable Metrics/AbcSize
+    def make_form_object # rubocop:disable Metrics/AbcSize
       if @mode == :show_changes
         @form_object = OpenStruct.new(id: @options[:id],
                                       params: @options[:attrs],

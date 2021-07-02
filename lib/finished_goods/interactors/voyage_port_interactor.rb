@@ -20,7 +20,7 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def update_voyage_port(id, params) # rubocop:disable Metrics/AbcSize
+    def update_voyage_port(id, params)
       res = validate_voyage_port_params(params)
       return validation_failed_response(res) if res.failure?
 

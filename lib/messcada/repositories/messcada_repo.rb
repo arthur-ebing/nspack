@@ -28,7 +28,7 @@ module MesscadaApp
       find_pallet_flat(id)
     end
 
-    def find_pallet_sequence_flat(id) # rubocop:disable Metrics/AbcSize
+    def find_pallet_sequence_flat(id)
       hash = find_with_association(:pallet_sequences, id,
                                    parent_tables: [{ parent_table: :farms,
                                                      foreign_key: :farm_id,
@@ -346,7 +346,7 @@ module MesscadaApp
       success_response('ok', instance)
     end
 
-    def complete_external_bin_tipping(bin_number, run_id) # rubocop:disable Metrics/AbcSize
+    def complete_external_bin_tipping(bin_number, run_id)
       url = "#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/integrate?type=bin_tipped&record_id=#{bin_number}&model=BinsTipped&nspack_run_id=#{run_id}"
       http = Crossbeams::HTTPCalls.new
       res = http.request_get(url)
@@ -602,7 +602,7 @@ module MesscadaApp
     end
 
     # Return status of GLN numbers as specified in AppConst.
-    def gln_status # rubocop:disable Metrics/AbcSize
+    def gln_status
       AppConst::GLN_OR_LINE_NUMBERS.map do |gln|
         no = if exists?(:pg_class, relname: "gln_seq_for_#{gln}")
                DB["SELECT last_value FROM gln_seq_for_#{gln}"].get(:last_value)
@@ -731,7 +731,7 @@ module MesscadaApp
       !scanned_cartons.nil_or_empty?
     end
 
-    def can_pallet_become_rebin?(pallet_number) # rubocop:disable Metrics/AbcSize
+    def can_pallet_become_rebin?(pallet_number)
       !DB[:cartons]
         .select(:carton_label_id)
         .join(:carton_labels, id: :carton_label_id)

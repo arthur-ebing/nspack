@@ -19,7 +19,7 @@ module UiRules
       form_name 'rebin'
     end
 
-    def common_fields # rubocop:disable Metrics/AbcSize
+    def common_fields
       {
         qty_bins_to_create: { required: true },
         rmt_class_id: { renderer: :select, options: MasterfilesApp::FruitRepo.new.for_select_rmt_classes,

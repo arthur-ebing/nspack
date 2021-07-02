@@ -330,7 +330,7 @@ module MasterfilesApp
       DB[:orchards].where(farm_section_id: id).select_map(:id)
     end
 
-    def update_farm_section(id, params) # rubocop:disable Metrics/AbcSize
+    def update_farm_section(id, params)
       orchard_ids = params.delete(:orchard_ids).map(&:to_i)
       current_orchards = DB[:orchards].where(farm_section_id: id).select_map(:id)
       new_orchards = orchard_ids - current_orchards

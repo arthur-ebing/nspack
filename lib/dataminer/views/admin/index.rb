@@ -21,7 +21,7 @@ module DM
                          end
         new_url = '/dataminer/admin/new/'
 
-        layout = Crossbeams::Layout::Page.build({}) do |page| # rubocop:disable Metrics/BlockLength
+        layout = Crossbeams::Layout::Page.build({}) do |page|
           page.section do |section|
             section.add_control(control_type: :link, text: button_caption, url: new_url, style: :button)
           end

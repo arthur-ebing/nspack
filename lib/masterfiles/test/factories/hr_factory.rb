@@ -81,7 +81,7 @@ module MasterfilesApp
       DB[:contract_worker_packer_roles].insert(default.merge(opts))
     end
 
-    def create_contract_worker(opts = {}) # rubocop:disable Metrics/AbcSize
+    def create_contract_worker(opts = {})
       id = get_available_factory_record(:contract_workers, opts)
       return id unless id.nil?
 

@@ -16,7 +16,7 @@ class ImportMasterfilesCsv < BaseScript # rubocop:disable Metrics/ClassLength
   attr_reader :table_name, :input_filename, :output_filename,
               :table_rules, :csv_data, :insert_statement
 
-  def run  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+  def run # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
     return failed_response('Missing arguments') if args.nil_or_empty?
 
     @table_name = args.first
@@ -191,7 +191,7 @@ class ImportMasterfilesCsv < BaseScript # rubocop:disable Metrics/ClassLength
     row_values
   end
 
-  def column_row_value(row_data, col)  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+  def column_row_value(row_data, col) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
     csv_value = column_csv_value(row_data, col)
 
     return alt_column_value(row_data, col) if csv_value.nil_or_empty? && COLUMN_CSV_MAP.include?(col.to_sym) && !COLUMN_CSV_MAP[col.to_sym][:alt_column].nil_or_empty?
@@ -211,7 +211,7 @@ class ImportMasterfilesCsv < BaseScript # rubocop:disable Metrics/ClassLength
     end
   end
 
-  def column_csv_value(row_data, col)  # rubocop:disable Metrics/AbcSize
+  def column_csv_value(row_data, col) # rubocop:disable Metrics/AbcSize
     return row_data[col] unless COLUMN_CSV_MAP.include?(col.to_sym) && !COLUMN_CSV_MAP[col.to_sym][:column_name].nil_or_empty?
 
     column_name = COLUMN_CSV_MAP[col.to_sym][:column_name]
@@ -239,7 +239,7 @@ class ImportMasterfilesCsv < BaseScript # rubocop:disable Metrics/ClassLength
     "(#{DB[MF_COLUMN_LOOKUP_DEFINITIONS[col.to_sym][:subquery], *val].sql})"
   end
 
-  def validate_column_lookup_array_value(col, val)  # rubocop:disable Metrics/AbcSize
+  def validate_column_lookup_array_value(col, val) # rubocop:disable Metrics/AbcSize
     return 'NULL' if  val.to_s.nil_or_empty?
 
     val = val.split('|').map(&:strip).reject(&:empty?)
@@ -297,7 +297,7 @@ class ImportMasterfilesCsv < BaseScript # rubocop:disable Metrics/ClassLength
     "INSERT INTO farms_pucs (puc_id, farm_id) VALUES( (SELECT id FROM pucs WHERE puc_code = '#{puc_code}'), (SELECT id FROM farms WHERE farm_code = '#{farm_code}') );\n"
   end
 
-  def create_record(row_data, col)  # rubocop:disable Metrics/AbcSize
+  def create_record(row_data, col) # rubocop:disable Metrics/AbcSize
     create_table = COLUMN_CSV_MAP[col.to_sym][:create_table].to_s
     return failed_response("No table definitions set for table  : #{create_table}.") if MF_TABLE_DEFINITIONS[create_table.to_sym].nil_or_empty?
 

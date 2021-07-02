@@ -31,7 +31,7 @@ module MasterfilesApp
       res
     end
 
-    def update_inspector(id, params) # rubocop:disable Metrics/AbcSize
+    def update_inspector(id, params)
       res = InspectorSchema.call(params)
       return validation_failed_response(res) if res.failure?
 

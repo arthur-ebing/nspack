@@ -99,7 +99,7 @@ module RawMaterialsApp
       log_multiple_statuses(:rmt_bins, bin_ids, 'BIN UNALLOCATED FROM LOAD', user_name: user.user_name)
     end
 
-    def ship_bin_load(bin_load_id, user, status = 'SHIPPED') # rubocop:disable Metrics/AbcSize
+    def ship_bin_load(bin_load_id, user, status = 'SHIPPED')
       params = { shipped: true,
                  shipped_at: Time.now }
       params.merge!(completed: true, completed_at: Time.now) unless get(:bin_loads, bin_load_id, :completed)
@@ -163,7 +163,7 @@ module RawMaterialsApp
       end
     end
 
-    def unship_deliveries(bin_load_id, user) # rubocop:disable Metrics/AbcSize
+    def unship_deliveries(bin_load_id, user)
       ds = DB[:rmt_deliveries].join(:rmt_bins, rmt_delivery_id: :id).join(:bin_load_products, id: :bin_load_product_id).join(:bin_loads, id: :bin_load_id)
       rmt_delivery_ids = ds.where(Sequel[:bin_loads][:id] => bin_load_id).select_map(Sequel[:rmt_deliveries][:id]).uniq
       rmt_delivery_ids.each do |rmt_delivery_id|

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
-class Nspack < Roda # rubocop:disable Metrics/ClassLength
+class Nspack < Roda
   route 'buildups', 'rmd' do |r|
     interactor = FinishedGoodsApp::BuildupsInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
@@ -259,4 +258,3 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     view(inline: form.render, layout: :layout_rmd)
   end
 end
-# rubocop:enable Metrics/BlockLength

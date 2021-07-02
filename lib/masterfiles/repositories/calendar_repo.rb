@@ -76,7 +76,7 @@ module MasterfilesApp
         .select_map([:season_code, Sequel[:seasons][:id]])
     end
 
-    def for_select_seasons_for_cultivar(cultivar_id) # rubocop:disable Metrics/AbcSize
+    def for_select_seasons_for_cultivar(cultivar_id)
       DB[:seasons]
         .join(:cultivars, commodity_id: :commodity_id)
         .where(Sequel[:cultivars][:id] => cultivar_id)

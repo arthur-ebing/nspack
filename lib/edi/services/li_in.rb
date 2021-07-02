@@ -183,7 +183,7 @@ module EdiApp
       end
     end
 
-    def get_party_role_id(party_role_name, role_name) # rubocop:disable Metrics/AbcSize
+    def get_party_role_id(party_role_name, role_name)
       return nil if party_role_name.nil_or_empty?
 
       role_id = repo.get_id(:roles, name: role_name)

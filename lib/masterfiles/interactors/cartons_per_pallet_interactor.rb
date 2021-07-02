@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class CartonsPerPalletInteractor < BaseInteractor
-    def create_cartons_per_pallet(params) # rubocop:disable Metrics/AbcSize
+    def create_cartons_per_pallet(params)
       res = validate_cartons_per_pallet_params(params)
       return validation_failed_response(res) if res.failure?
 

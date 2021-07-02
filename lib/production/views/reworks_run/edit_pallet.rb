@@ -4,11 +4,11 @@ module Production
   module Reworks
     module ReworksRun
       class EditPallet
-        def self.call(reworks_run_type_id, pallet_number, back_url:)  # rubocop:disable Metrics/AbcSize
+        def self.call(reworks_run_type_id, pallet_number, back_url:) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:reworks_run_pallet, :edit_pallet, reworks_run_type_id: reworks_run_type_id, pallet_number: pallet_number)
           rules   = ui_rule.compile
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
+          layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.section do |section|
               section.add_control(control_type: :link,
@@ -17,9 +17,9 @@ module Production
                                   style: :back_button)
             end
             page.add_text rules[:compact_header]
-            page.section do |section| # rubocop:disable Metrics/BlockLength
-              section.row do |row| # rubocop:disable Metrics/BlockLength
-                row.column do |col| # rubocop:disable Metrics/BlockLength
+            page.section do |section|
+              section.row do |row|
+                row.column do |col|
                   col.add_control(control_type: :link,
                                   text: 'shipping details',
                                   url: "/production/reworks/pallets/#{pallet_number}/pallet_shipping_details",

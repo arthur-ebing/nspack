@@ -77,7 +77,7 @@ module ProductionApp
         ).map { |r| [r[:plant_resource_code], r[:id]] }
     end
 
-    def for_select_packhouse_lines(packhouse_id) # rubocop:disable Metrics/AbcSize
+    def for_select_packhouse_lines(packhouse_id)
       DB[:plant_resources]
         .join(:tree_plant_resources, descendant_plant_resource_id: :id)
         .join(:plant_resource_types, id: Sequel[:plant_resources][:plant_resource_type_id])
@@ -122,7 +122,7 @@ module ProductionApp
         .get(Sequel[:commodities][:id])
     end
 
-    def for_select_template_commodity_marketing_varieties(product_setup_template_id, commodity_id, cultivar_id = nil)  # rubocop:disable Metrics/AbcSize
+    def for_select_template_commodity_marketing_varieties(product_setup_template_id, commodity_id, cultivar_id = nil) # rubocop:disable Metrics/AbcSize
       ds = DB[:marketing_varieties]
            .join(:marketing_varieties_for_cultivars, marketing_variety_id: :id)
            .join(:cultivars, id: :cultivar_id)
@@ -280,7 +280,7 @@ module ProductionApp
       find_gtin_code(gtin_id)
     end
 
-    def resolve_gtin_attrs(attrs) # rubocop:disable Metrics/AbcSize
+    def resolve_gtin_attrs(attrs)
       std_fruit_size_count_id = attrs[:std_fruit_size_count_id].nil_or_empty? ? find_setup_std_fruit_size_count_id(attrs[:fruit_size_reference_id], attrs[:fruit_actual_counts_for_pack_id]) : attrs[:std_fruit_size_count_id]
       commodity_id = attrs[:commodity_id].nil_or_empty? ? find_size_count_commodity(std_fruit_size_count_id) : attrs[:commodity_id]
       fruit_size_reference_id = attrs[:fruit_size_reference_id]
@@ -333,7 +333,7 @@ module ProductionApp
       recalc
     end
 
-    def for_select_cultivar_group_marketing_varieties(cultivar_group_id) # rubocop:disable Metrics/AbcSize
+    def for_select_cultivar_group_marketing_varieties(cultivar_group_id)
       DB[:marketing_varieties]
         .join(:marketing_varieties_for_cultivars, marketing_variety_id: :id)
         .join(:cultivars, id: :cultivar_id)

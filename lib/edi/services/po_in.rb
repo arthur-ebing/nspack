@@ -73,7 +73,7 @@ module EdiApp
       end
     end
 
-    def create_missing_masterfiles # rubocop:disable Metrics/AbcSize
+    def create_missing_masterfiles
       progress = {}
       records.each do |_, pallet|
         pallet[:missing_mf].each do |code, rule|

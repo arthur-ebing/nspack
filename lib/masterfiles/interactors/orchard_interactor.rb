@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class OrchardInteractor < BaseInteractor
-    def create_orchard(params) # rubocop:disable Metrics/AbcSize
+    def create_orchard(params)
       res = validate_orchard_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -20,7 +20,7 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def update_orchard(id, params) # rubocop:disable Metrics/AbcSize
+    def update_orchard(id, params)
       res = validate_orchard_params(params)
       return validation_failed_response(res) if res.failure?
 

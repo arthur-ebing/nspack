@@ -2,7 +2,7 @@
 
 module UiRules
   class ReworksRunRule < Base # rubocop:disable Metrics/ClassLength
-    def generate_rules  # rubocop:disable Metrics/AbcSize
+    def generate_rules # rubocop:disable Metrics/AbcSize
       @repo = ProductionApp::ReworksRepo.new
       make_form_object
       apply_form_values
@@ -22,7 +22,7 @@ module UiRules
       form_name 'reworks_run'
     end
 
-    def set_show_fields  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+    def set_show_fields # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       reworks_run_type_id_label = @repo.find_hash(:reworks_run_types, @form_object.reworks_run_type_id)[:run_type]
       if @form_object[:has_children]
         change_run_orchard = AppConst::RUN_TYPE_CHANGE_RUN_ORCHARD == reworks_run_type_id_label
@@ -124,7 +124,7 @@ module UiRules
       end
     end
 
-    def common_fields  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+    def common_fields # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       reworks_run_type_id_label = @form_object.reworks_run_type_id.nil_or_empty? ? '' : @repo.find_hash(:reworks_run_types, @form_object.reworks_run_type_id)[:run_type]
       @rules[:scrap_pallet] = AppConst::RUN_TYPE_SCRAP_PALLET == reworks_run_type_id_label
       @rules[:scrap_bin] = AppConst::RUN_TYPE_SCRAP_BIN == reworks_run_type_id_label
@@ -229,7 +229,7 @@ module UiRules
                                     allow_cultivar_mixing: true)
     end
 
-    def bin_run_type?  # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+    def bin_run_type? # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       @rules[:tip_bins] || @rules[:weigh_rmt_bins] || @rules[:scrap_bin] || @rules[:unscrap_bin] || @rules[:bulk_bin_run_update] || @rules[:bulk_weigh_bins] || @rules[:untip_bins] || @rules[:tip_mixed_orchards] || @rules[:change_bin_delivery]
     end
 

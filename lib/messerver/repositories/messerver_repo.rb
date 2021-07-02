@@ -267,7 +267,7 @@ module MesserverApp
       failed_response("There was an error: #{e.message}")
     end
 
-    def request_uri(uri) # rubocop:disable Metrics/AbcSize
+    def request_uri(uri)
       http = Net::HTTP.new(uri.host, uri.port)
       http.open_timeout = 5
       http.read_timeout = 10

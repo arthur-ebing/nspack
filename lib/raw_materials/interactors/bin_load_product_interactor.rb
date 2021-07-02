@@ -2,7 +2,7 @@
 
 module RawMaterialsApp
   class BinLoadProductInteractor < BaseInteractor
-    def create_bin_load_product(params) # rubocop:disable Metrics/AbcSize
+    def create_bin_load_product(params)
       res = validate_bin_load_product_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -36,7 +36,7 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def delete_bin_load_product(id) # rubocop:disable Metrics/AbcSize
+    def delete_bin_load_product(id)
       instance = bin_load_product(id)
       bin_ids = repo.select_values(:rmt_bins, :id, bin_load_product_id: id)
 

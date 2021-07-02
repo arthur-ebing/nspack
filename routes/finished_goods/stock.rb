@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Nspack < Roda
-  route 'stock', 'finished_goods' do |r| # rubocop:disable Metrics/BlockLength
+  route 'stock', 'finished_goods' do |r|
     # --------------------------------------------------------------------------
     # SET LOCAL PALLET TO IN STOCK
     # --------------------------------------------------------------------------

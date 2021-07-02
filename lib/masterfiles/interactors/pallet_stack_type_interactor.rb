@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class PalletStackTypeInteractor < BaseInteractor
-    def create_pallet_stack_type(params) # rubocop:disable Metrics/AbcSize
+    def create_pallet_stack_type(params)
       res = validate_pallet_stack_type_params(params)
       return validation_failed_response(res) if res.failure?
 

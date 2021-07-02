@@ -14,7 +14,7 @@ module MesscadaApp
       @carton_palletizing = carton_palletizing
     end
 
-    def call  # rubocop:disable Metrics/AbcSize
+    def call # rubocop:disable Metrics/AbcSize
       res = NewPalletSequenceObject.call(user_name, carton_id, carton_quantity, carton_palletizing)
       return res unless res.success
 

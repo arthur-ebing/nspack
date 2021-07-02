@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Nspack < Roda
-  route 'dashboards', 'production' do |r| # rubocop:disable Metrics/BlockLength
+  route 'dashboards', 'production' do |r|
     layout_to_use = if params[:fullpage] && params[:fullpage].downcase == 'y'
                       'layout_dash_content'
                     else

@@ -3,12 +3,12 @@
 module Production
   module Reworks
     module ReworksRun
-      class EditPalletSequence # rubocop:disable Metrics/ClassLength
-        def self.call(id, back_url:, form_values: nil, form_errors: nil)  # rubocop:disable Metrics/AbcSize
+      class EditPalletSequence
+        def self.call(id, back_url:, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:reworks_run_sequence, :edit_pallet_sequence, pallet_sequence_id: id, form_values: form_values)
           rules   = ui_rule.compile
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
+          layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
@@ -18,7 +18,7 @@ module Production
                                   url: back_url,
                                   style: :back_button)
             end
-            page.form do |form| # rubocop:disable Metrics/BlockLength
+            page.form do |form|
               form.caption 'Edit Pallet Sequence'
               form.action "/production/reworks/pallet_sequences/#{id}/edit_reworks_pallet_sequence"
               form.method :update
@@ -33,7 +33,7 @@ module Production
                   col.expand_collapse button: true, mini: false
                 end
               end
-              form.row do |row| # rubocop:disable Metrics/BlockLength
+              form.row do |row|
                 row.column do |col|
                   col.fold_up do |fold|
                     fold.caption 'Fruit details'
@@ -68,7 +68,7 @@ module Production
                   end
                 end
               end
-              form.row do |row| # rubocop:disable Metrics/BlockLength
+              form.row do |row|
                 row.column do |col|
                   col.fold_up do |fold|
                     fold.caption 'Packaging details'

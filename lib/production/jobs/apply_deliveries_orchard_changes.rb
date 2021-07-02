@@ -7,7 +7,7 @@ module ProductionApp
 
       self.maximum_retry_count = 0
 
-      def run(params)  # rubocop:disable Metrics/AbcSize
+      def run(params) # rubocop:disable Metrics/AbcSize
         @repo = ProductionApp::ReworksRepo.new
         change_attrs = params[0][:change_attrs]
         reworks_run_attrs = params[0][:reworks_run_attrs]

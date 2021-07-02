@@ -344,7 +344,7 @@ module FinishedGoodsApp
       !DB[query, govt_inspection_sheet_id].single_value
     end
 
-    def scan_pallet_or_carton(params) # rubocop:disable Metrics/AbcSize
+    def scan_pallet_or_carton(params)
       args = MesscadaApp::MesscadaRepo.new.parse_pallet_or_carton_number(params)
       if args[:carton_number]
         args[:carton_id] = get_id(:cartons, carton_label_id: args[:carton_number])

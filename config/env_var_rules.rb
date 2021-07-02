@@ -164,7 +164,7 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     STR
   end
 
-  def list_keys # rubocop:disable Metrics/AbcSize
+  def list_keys
     (NO_OVERRIDE.map { |a| a.keys.first } + CAN_OVERRIDE.map { |a| a.keys.first } + MUST_OVERRIDE.map { |a| a.keys.first } + OPTIONAL.map { |a| a.keys.first }).sort.join("\n")
   end
 

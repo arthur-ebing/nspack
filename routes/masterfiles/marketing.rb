@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-class Nspack < Roda # rubocop:disable Metrics/ClassLength
-  route 'marketing', 'masterfiles' do |r| # rubocop:disable Metrics/BlockLength
+class Nspack < Roda
+  route 'marketing', 'masterfiles' do |r|
     # MARKS
     # --------------------------------------------------------------------------
-    r.on 'marks', Integer do |id| # rubocop:disable Metrics/BlockLength
+    r.on 'marks', Integer do |id|
       interactor = MasterfilesApp::MarkInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
@@ -74,7 +74,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     # CUSTOMER VARIETIES
     # --------------------------------------------------------------------------
-    r.on 'customer_varieties', Integer do |id| # rubocop:disable Metrics/BlockLength
+    r.on 'customer_varieties', Integer do |id|
       interactor = MasterfilesApp::CustomerVarietyInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
@@ -159,7 +159,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
-    r.on 'customer_varieties' do # rubocop:disable Metrics/BlockLength
+    r.on 'customer_varieties' do
       interactor = MasterfilesApp::CustomerVarietyInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       r.on 'variety_as_customer_variety_changed' do

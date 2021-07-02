@@ -3,7 +3,7 @@
 module Development
   module Documentation
     class LayoutIcons
-      def self.call # rubocop:disable Metrics/AbcSize
+      def self.call
         body = Crossbeams::Layout::Icon.available_icons.map { |i| "<li class='pa2'>#{Crossbeams::Layout::Icon.render(i, css_class: 'mr1')} Crossbeams::Layout::Icon.render(<strong>:#{i}</strong>)</li>" }.join
 
         layout = Crossbeams::Layout::Page.build({}) do |page|

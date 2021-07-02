@@ -29,7 +29,7 @@ module Crossbeams
       end
     end
 
-    def method_missing_keys(rules) # rubocop:disable Metrics/AbcSize
+    def method_missing_keys(rules)
       # First find the line number of the first method in the file.
       fn = nil
       start_line = rules.map do |m|

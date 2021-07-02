@@ -138,7 +138,7 @@ module MesscadaApp
         all_ok
       end
 
-      def not_on_inspection_sheet_check # rubocop:disable Metrics/AbcSize
+      def not_on_inspection_sheet_check
         ds = DB[:govt_inspection_pallets]
         ds = ds.join(:govt_inspection_sheets, id: Sequel[:govt_inspection_pallets][:govt_inspection_sheet_id])
         ds = ds.join(:pallets, id: Sequel[:govt_inspection_pallets][:pallet_id])

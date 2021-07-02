@@ -4,10 +4,10 @@ module Production
   module ProductSetups
     module ProductSetup
       class Show
-        def self.call(id, back_url: nil)  # rubocop:disable Metrics/AbcSize
+        def self.call(id, back_url: nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:product_setup, :show, id: id)
           rules   = ui_rule.compile
-          layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
+          layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.section do |section|
               section.add_control(control_type: :link,
@@ -15,7 +15,7 @@ module Production
                                   url: back_url,
                                   style: :back_button)
             end
-            page.form do |form| # rubocop:disable Metrics/BlockLength
+            page.form do |form|
               # form.caption 'Product Setup'
               form.view_only!
               form.no_submit!
@@ -31,7 +31,7 @@ module Production
                   col.expand_collapse button: true, mini: false
                 end
               end
-              form.row do |row| # rubocop:disable Metrics/BlockLength
+              form.row do |row|
                 row.column do |col|
                   col.fold_up do |fold|
                     fold.caption 'Fruit details'

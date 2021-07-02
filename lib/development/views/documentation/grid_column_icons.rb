@@ -10,7 +10,7 @@ module Development
         # css = File.read(File.join(ENV['ROOT'], 'public/css/jquery.contextMenu.min.css'))
         # icons = css.split(/\.context-menu-icon-/).select { |s| s.include?(':before{content') }.map { |s| s[0, s.index(':before')] }
 
-        layout = Crossbeams::Layout::Page.build({}) do |page| # rubocop:disable Metrics/BlockLength
+        layout = Crossbeams::Layout::Page.build({}) do |page|
           page.section do |section|
             section.add_text 'Grid icons for icon columns', wrapper: :h1
             section.add_control(control_type: :link, text: 'Back to documentation home', url: '/developer_documentation/start.adoc', style: :back_button)

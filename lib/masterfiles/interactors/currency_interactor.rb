@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class CurrencyInteractor < BaseInteractor
-    def create_currency(params) # rubocop:disable Metrics/AbcSize
+    def create_currency(params)
       res = validate_currency_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -34,7 +34,7 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def delete_currency(id) # rubocop:disable Metrics/AbcSize
+    def delete_currency(id)
       name = currency(id).currency
       repo.transaction do
         repo.delete_currency(id)

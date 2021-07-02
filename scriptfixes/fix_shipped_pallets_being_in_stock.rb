@@ -10,7 +10,7 @@
 # New workflow is that shipped pallets cant be reinspected.
 #
 class FixShippedPalletsBeingInStock < BaseScript
-  def run # rubocop:disable Metrics/AbcSize
+  def run
     query = <<~SQL
       SELECT
         pallets.id,

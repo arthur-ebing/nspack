@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class EmploymentTypeInteractor < BaseInteractor
-    def create_employment_type(params) # rubocop:disable Metrics/AbcSize
+    def create_employment_type(params)
       res = validate_employment_type_params(params)
       return validation_failed_response(res) if res.failure?
 

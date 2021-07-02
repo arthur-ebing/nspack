@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-class Nspack < Roda # rubocop:disable Metrics/ClassLength
-  route 'costs', 'masterfiles' do |r| # rubocop:disable Metrics/BlockLength
+class Nspack < Roda
+  route 'costs', 'masterfiles' do |r|
     # COST TYPES
     # --------------------------------------------------------------------------
-    r.on 'cost_types', Integer do |id| # rubocop:disable Metrics/BlockLength
+    r.on 'cost_types', Integer do |id|
       interactor = RawMaterialsApp::RmtDeliveryInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
@@ -70,7 +70,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     # COSTS
     # --------------------------------------------------------------------------
-    r.on 'costs', Integer do |id| # rubocop:disable Metrics/BlockLength
+    r.on 'costs', Integer do |id|
       interactor = RawMaterialsApp::RmtDeliveryInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:

@@ -8,7 +8,7 @@ module RawMaterials
           ui_rule = UiRules::Compiler.new(:bin_load_product, :show, id: id)
           rules   = ui_rule.compile
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
+          layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form do |form|
               form.view_only!

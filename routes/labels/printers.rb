@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Nspack < Roda
-  route 'printers', 'labels' do |r| # rubocop:disable Metrics/BlockLength
+  route 'printers', 'labels' do |r|
     # PRINTERS
     # --------------------------------------------------------------------------
     r.on 'printers', Integer do |id|
@@ -42,7 +42,7 @@ class Nspack < Roda
 
     # PRINTER APPLICATIONS
     # --------------------------------------------------------------------------
-    r.on 'printer_applications', Integer do |id| # rubocop:disable Metrics/BlockLength
+    r.on 'printer_applications', Integer do |id|
       interactor = LabelApp::PrinterInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:

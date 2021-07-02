@@ -4,7 +4,7 @@ module Production
   module Runs
     module ProductionRun
       class SelectLabelLine
-        def self.call # rubocop:disable Metrics/AbcSize
+        def self.call
           ui_rule = UiRules::Compiler.new(:production_run_select, :select_label_run)
           rules   = ui_rule.compile
 

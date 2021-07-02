@@ -8,9 +8,9 @@ module Production
           ui_rule = UiRules::Compiler.new(:production_run, :show, id: id)
           rules   = ui_rule.compile
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
+          layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
-            page.form do |form| # rubocop:disable Metrics/BlockLength
+            page.form do |form|
               # form.caption 'Production Run'
               form.view_only!
               form.row do |row|

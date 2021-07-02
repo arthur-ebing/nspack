@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class PmSubtypeInteractor < BaseInteractor
-    def create_pm_subtype(params) # rubocop:disable Metrics/AbcSize
+    def create_pm_subtype(params)
       res = validate_pm_subtype_params(params)
       return validation_failed_response(res) if res.failure?
 

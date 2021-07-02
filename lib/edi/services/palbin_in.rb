@@ -31,7 +31,7 @@ module EdiApp
 
     private
 
-    def create_records # rubocop:disable Metrics/AbcSize
+    def create_records
       repo.transaction do
         location_id = AppConst::CR_RMT.pending_delivery_location
         parsed_bins.each do |attrs|

@@ -2,7 +2,7 @@
 
 module FinishedGoodsApp
   class LoadContainerInteractor < BaseInteractor
-    def create_load_container(params) # rubocop:disable Metrics/AbcSize
+    def create_load_container(params)
       res = validate_load_container_params(params)
       return validation_failed_response(res) if res.failure?
 

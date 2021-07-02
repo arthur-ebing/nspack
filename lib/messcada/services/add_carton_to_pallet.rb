@@ -39,7 +39,7 @@ module MesscadaApp
       repo.carton_pallet_sequence(carton_id).nil?
     end
 
-    def add_carton_to_pallet  # rubocop:disable Metrics/AbcSize
+    def add_carton_to_pallet # rubocop:disable Metrics/AbcSize
       new_sequence = NewSequence.call(pallet_id, carton_id)
       if new_sequence
         res = NewPalletSequence.call(@user_name, carton_id, pallet_id, 1, true, mix_rule_scope)

@@ -4,7 +4,7 @@ module Masterfiles
   module Locations
     module Location
       class PrintBarcode
-        def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
+        def self.call(id, form_values: nil, form_errors: nil)
           ui_rule = UiRules::Compiler.new(:location, :print_barcode, id: id, form_values: form_values)
           rules   = ui_rule.compile
 

@@ -68,7 +68,7 @@ module FinishedGoodsApp
       messages << 'Created load container'
     end
 
-    def update_container # rubocop:disable Metrics/AbcSize
+    def update_container
       return if @container_id.nil?
 
       # compare instance with container_params

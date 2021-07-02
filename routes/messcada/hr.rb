@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
-class Nspack < Roda # rubocop:disable Metrics/ClassLength
+class Nspack < Roda
   route 'hr', 'messcada' do |r|
     interactor = MesscadaApp::HrInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
@@ -141,4 +140,3 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
   end
 end
-# rubocop:enable Metrics/BlockLength

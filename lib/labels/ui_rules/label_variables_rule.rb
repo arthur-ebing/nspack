@@ -15,7 +15,7 @@ module UiRules
       # read shared config
     end
 
-    def mod_hash(hash, data) # rubocop:disable Metrics/AbcSize
+    def mod_hash(hash, data)
       keys = Set.new
       data.each { |_, v| v[:applications].each { |a| keys << a } }
       keys.sort.each do |app|

@@ -2,7 +2,7 @@
 
 module UiRules
   class ProductSetupTemplateRule < Base # rubocop:disable Metrics/ClassLength
-    def generate_rules  # rubocop:disable Metrics/AbcSize
+    def generate_rules
       @repo = ProductionApp::ProductSetupRepo.new
       make_form_object
       apply_form_values
@@ -21,7 +21,7 @@ module UiRules
       form_name 'product_setup_template'
     end
 
-    def set_show_fields  # rubocop:disable Metrics/AbcSize
+    def set_show_fields # rubocop:disable Metrics/AbcSize
       cultivar_group_id_label = @repo.find_hash(:cultivar_groups, @form_object.cultivar_group_id)[:cultivar_group_code]
       cultivar_id_label = MasterfilesApp::CultivarRepo.new.find_cultivar(@form_object.cultivar_id)&.cultivar_name
       packhouse_resource_id_label = ProductionApp::ResourceRepo.new.find_plant_resource(@form_object.packhouse_resource_id)&.plant_resource_code
@@ -39,7 +39,7 @@ module UiRules
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
-    def common_fields  # rubocop:disable Metrics/AbcSize
+    def common_fields # rubocop:disable Metrics/AbcSize
       {
         id: { renderer: :hidden, value: @options[:id] },
         template_name: { required: true },

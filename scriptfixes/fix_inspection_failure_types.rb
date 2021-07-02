@@ -9,7 +9,7 @@
 # inspection_failure_types.failure_type_code should be unique
 #
 class FixInspectionFailureTypes < BaseScript
-  def run  # rubocop:disable Metrics/AbcSize
+  def run # rubocop:disable Metrics/AbcSize
     failure_type_codes = DB[:inspection_failure_types]
                          .order(:failure_type_code)
                          .distinct(:failure_type_code)

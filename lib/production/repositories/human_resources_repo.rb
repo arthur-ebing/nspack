@@ -62,7 +62,7 @@ module ProductionApp
       end
     end
 
-    def create_shift(attrs) # rubocop:disable Metrics/AbcSize
+    def create_shift(attrs)
       attrs = attrs.to_h
       date = attrs.delete(:date)
 

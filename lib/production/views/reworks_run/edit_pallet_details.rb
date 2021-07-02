@@ -4,7 +4,7 @@ module Production
   module Reworks
     module ReworksRun
       class EditPalletDetails
-        def self.call(pallet_number, reworks_run_type_id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
+        def self.call(pallet_number, reworks_run_type_id, form_values: nil, form_errors: nil)
           ui_rule = UiRules::Compiler.new(:reworks_run_pallet, :edit_pallet_details, pallet_number: pallet_number, reworks_run_type_id: reworks_run_type_id, form_values: form_values)
           rules   = ui_rule.compile
 

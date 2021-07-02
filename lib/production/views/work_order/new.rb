@@ -4,7 +4,7 @@ module Production
   module Orders
     module WorkOrder
       class New
-        def self.call(form_values: nil, form_errors: nil, remote: true, marketing_order_id: nil) # rubocop:disable Metrics/AbcSize
+        def self.call(form_values: nil, form_errors: nil, remote: true, marketing_order_id: nil)
           ui_rule = UiRules::Compiler.new(:work_order, :new, form_values: form_values, marketing_order_id: marketing_order_id)
           rules   = ui_rule.compile
 

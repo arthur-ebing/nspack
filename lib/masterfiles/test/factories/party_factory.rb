@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   module PartyFactory # rubocop:disable Metrics/ModuleLength
-    def create_person(opts = {}) # rubocop:disable Metrics/AbcSize
+    def create_person(opts = {})
       id = get_available_factory_record(:people, opts)
       return id unless id.nil?
 
@@ -20,7 +20,7 @@ module MasterfilesApp
       person_id
     end
 
-    def create_organization(opts = {}) # rubocop:disable Metrics/AbcSize
+    def create_organization(opts = {})
       id = get_available_factory_record(:organizations, opts)
       return id unless id.nil?
 
@@ -57,7 +57,7 @@ module MasterfilesApp
       DB[:roles].insert(default.merge(opts))
     end
 
-    def create_party_role(opts = {}) # rubocop:disable Metrics/AbcSize
+    def create_party_role(opts = {})
       id = get_available_factory_record(:party_roles, opts)
       return id unless id.nil?
 

@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class InventoryCodeInteractor < BaseInteractor
-    def create_inventory_code(params) # rubocop:disable Metrics/AbcSize
+    def create_inventory_code(params)
       res = validate_inventory_code_params(params)
       return validation_failed_response(res) if res.failure?
 

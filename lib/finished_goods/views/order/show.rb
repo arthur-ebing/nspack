@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
 module FinishedGoods
   module Orders
     module Order
@@ -89,4 +88,3 @@ module FinishedGoods
     end
   end
 end
-# rubocop:enable Metrics/BlockLength

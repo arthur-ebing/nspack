@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
-
 # ****************************************************************************************************************************************
 #
 # TODO: think through system + framework db with same connection, diff reports path, but same prep dir. (do not list same dir twice......)
@@ -128,4 +126,3 @@ class Nspack < Roda
     end
   end
 end
-# rubocop:enable Metrics/BlockLength

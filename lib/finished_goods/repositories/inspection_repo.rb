@@ -69,7 +69,7 @@ module FinishedGoodsApp
       PalletForInspection.new(hash)
     end
 
-    def create_inspection(params) # rubocop:disable Metrics/AbcSize
+    def create_inspection(params)
       pallet_number = params[:pallet_number] || params
       pallet = find_pallet_for_inspection(pallet_number)
       raise Crossbeams::InfoError, "Pallet: #{pallet_number} not found" unless pallet

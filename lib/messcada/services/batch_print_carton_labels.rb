@@ -27,7 +27,7 @@ module MesscadaApp
       end
     end
 
-    def call # rubocop:disable Metrics/AbcSize
+    def call
       attrs = prepare_carton_label_record
 
       repo.transaction do

@@ -74,7 +74,7 @@ module UiRules
       }
     end
 
-    def make_form_object # rubocop:disable Metrics/AbcSize
+    def make_form_object
       if @mode == :new
         make_new_form_object
         return

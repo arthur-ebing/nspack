@@ -2,7 +2,7 @@
 
 module RawMaterialsApp
   class RmtBinInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
-    def validate_delivery(id) # rubocop:disable Metrics/AbcSize
+    def validate_delivery(id)
       delivery = find_rmt_delivery(id)
       return failed_response("Delivery: #{id} does not exist") unless delivery
       return failed_response("Delivery: #{id} has already been tipped") if delivery[:delivery_tipped]
@@ -264,7 +264,7 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def create_bins_for_kr(missing_bins) # rubocop:disable Metrics/AbcSize
+    def create_bins_for_kr(missing_bins)
       missing_bins.each do |b|
         res = MesscadaApp::BinIntegration.new(b, nil).bin_attributes
         return res unless res.success
@@ -502,7 +502,7 @@ module RawMaterialsApp
       LabelPrintingApp::PrintLabel.call(label_name, instance, print_params)
     end
 
-    def pre_print_bin_labels(params) # rubocop:disable Metrics/AbcSize
+    def pre_print_bin_labels(params)
       res = validate_bin_label_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -527,7 +527,7 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def create_bin_labels(params) # rubocop:disable Metrics/AbcSize
+    def create_bin_labels(params)
       repo.transaction do
         bin_asset_numbers = params[:bin_asset_numbers].split(',')
         bin_asset_numbers.each do |bin_asset_number|

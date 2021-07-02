@@ -14,7 +14,7 @@ module MasterfilesApp
       ProductionRegionSchema.call(params)
     end
 
-    def create_production_region(params) # rubocop:disable Metrics/AbcSize
+    def create_production_region(params)
       res = validate_production_region_params(params)
       return validation_failed_response(res) if res.failure?
 

@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
 module RawMaterials
   module Deliveries
     module RmtDelivery
-      class Edit # rubocop:disable Metrics/ClassLength
+      class Edit
         def self.call(id, is_update: nil, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:rmt_delivery, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
@@ -122,4 +121,3 @@ module RawMaterials
     end
   end
 end
-# rubocop:enable Metrics/BlockLength

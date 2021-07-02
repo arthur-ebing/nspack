@@ -20,7 +20,7 @@ module Development
           layout
         end
 
-        def self.save_snippet_form(section, path, code) # rubocop:disable Metrics/AbcSize
+        def self.save_snippet_form(section, path, code)
           if !File.exist?(File.join(ENV['ROOT'], path))
             section.form do |form|
               form.form_config = {

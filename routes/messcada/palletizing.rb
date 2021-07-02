@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
 class Nspack < Roda
   route 'carton_palletizing', 'messcada' do |r|
     # palletizing interactor...
@@ -124,4 +123,3 @@ class Nspack < Roda
     end
   end
 end
-# rubocop:enable Metrics/BlockLength

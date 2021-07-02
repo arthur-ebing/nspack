@@ -10,7 +10,7 @@ module EdiApp
       @flow_type = flow_type
     end
 
-    def validate_xml_schema(file_path) # rubocop:disable Metrics/AbcSize
+    def validate_xml_schema(file_path)
       schema_file = File.expand_path("../schemas/#{flow_type.downcase}.xsd", __dir__)
       raise "There is no XSD schema for EDI flow type #{flow_type}" unless File.exist?(schema_file)
 

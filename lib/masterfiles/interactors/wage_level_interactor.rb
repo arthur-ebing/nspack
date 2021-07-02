@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class WageLevelInteractor < BaseInteractor
-    def create_wage_level(params) # rubocop:disable Metrics/AbcSize
+    def create_wage_level(params)
       res = validate_wage_level_params(params)
       return validation_failed_response(res) if res.failure?
 

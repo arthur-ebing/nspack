@@ -167,7 +167,7 @@ module EdiApp
       end
     end
 
-    def file_row_for_grid(file, options = {}) # rubocop:disable Metrics/AbcSize
+    def file_row_for_grid(file, options = {})
       flow = work_out_flow_type(file.basename.to_s)
       {
         id: yield,

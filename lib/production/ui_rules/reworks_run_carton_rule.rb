@@ -47,7 +47,7 @@ module UiRules
                      })
     end
 
-    def make_form_object  # rubocop:disable Metrics/AbcSize
+    def make_form_object # rubocop:disable Metrics/AbcSize
       if @mode == :manage
         sequence = find_sequence(@options[:id])
         @form_object = OpenStruct.new(pallet_sequence_id: @options[:id],

@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
-
 class Nspack < Roda
   route 'reports', 'dataminer' do |r|
     interactor = DataminerApp::DataminerInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
@@ -84,5 +82,3 @@ class Nspack < Roda
     end
   end
 end
-
-# rubocop:enable Metrics/BlockLength

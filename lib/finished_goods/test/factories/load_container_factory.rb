@@ -2,7 +2,7 @@
 
 module FinishedGoodsApp
   module LoadContainerFactory
-    def create_load_container(opts = {}) # rubocop:disable Metrics/AbcSize
+    def create_load_container(opts = {})
       load_id = create_load
       cargo_temperature_id = create_cargo_temperature
       container_stack_type_id = create_container_stack_type

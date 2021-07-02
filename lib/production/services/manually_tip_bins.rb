@@ -21,7 +21,7 @@ module ProductionApp
 
     private
 
-    def manually_tip_bins  # rubocop:disable Metrics/AbcSize
+    def manually_tip_bins # rubocop:disable Metrics/AbcSize
       rmt_bin_numbers.each  do |rmt_bin_number|
         @bin_number = rmt_bin_number
         @rmt_bin_id = find_rmt_bin

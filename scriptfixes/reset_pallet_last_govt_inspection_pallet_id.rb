@@ -15,7 +15,7 @@
 # Dev   : ruby scripts/base_script.rb ResetPalletLastGovtInspectionPalletId
 #
 class ResetPalletLastGovtInspectionPalletId < BaseScript
-  def run  # rubocop:disable Metrics/AbcSize
+  def run # rubocop:disable Metrics/AbcSize
     repacked_pallet_ids = DB[:pallets]
                           .exclude(last_govt_inspection_pallet_id: nil)
                           .where(:repacked)

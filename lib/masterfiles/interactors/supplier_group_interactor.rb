@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class SupplierGroupInteractor < BaseInteractor
-    def create_supplier_group(params) # rubocop:disable Metrics/AbcSize
+    def create_supplier_group(params)
       res = validate_supplier_group_params(params)
       return validation_failed_response(res) if res.failure?
 

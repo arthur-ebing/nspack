@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength, Metrics/ClassLength
 module Production
   module PackingSpecifications
     module PackingSpecification
@@ -32,7 +31,7 @@ module Production
                   col.expand_collapse button: true, mini: false
                 end
               end
-              form.row do |row| # rubocop:disable Metrics/BlockLength
+              form.row do |row|
                 row.column do |col|
                   col.fold_up do |fold|
                     fold.caption 'Fruit details'
@@ -115,4 +114,4 @@ module Production
     end
   end
 end
-# rubocop:enable Metrics/BlockLength, Metrics/ClassLength
+# rubocop:enable

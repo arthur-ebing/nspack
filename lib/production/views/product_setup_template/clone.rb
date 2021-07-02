@@ -4,12 +4,12 @@ module Production
   module ProductSetups
     module ProductSetupTemplate
       class Clone
-        def self.call(id, form_values: nil, form_errors: nil)  # rubocop:disable Metrics/AbcSize
+        def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:product_setup_template, :clone, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
           cloned_from = ProductionApp::ProductSetupRepo.new.find_product_setup_template(id)&.template_name
-          layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
+          layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors

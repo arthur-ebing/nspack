@@ -4,7 +4,7 @@ module FinishedGoods
   module Ecert
     module EcertTrackingUnit
       class Status
-        def self.call(res: nil, form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
+        def self.call(res: nil, form_values: nil, form_errors: nil, remote: true)
           ui_rule = UiRules::Compiler.new(:ecert_tracking_unit_status, :new, res: res, form_values: form_values)
           rules   = ui_rule.compile
 

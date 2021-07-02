@@ -11,7 +11,7 @@
 # problem in the code
 #
 class FixReworksBulkProductionRunUpdate < BaseScript
-  def run  # rubocop:disable Metrics/AbcSize
+  def run # rubocop:disable Metrics/AbcSize
     query = <<~SQL
       SELECT reworks_runs.id,pallets_affected,COALESCE(reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' -> 'after', null) AS after_state
       FROM reworks_runs

@@ -7,7 +7,7 @@ module Production
         def self.call(step, params = nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:bulk_tip_bin_process, nil)
           rules   = ui_rule.compile
-          layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
+          layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
 
             page.section do |section|
@@ -15,7 +15,7 @@ module Production
               # section.show_border!
             end
 
-            page.section do |section| # rubocop:disable Metrics/BlockLength
+            page.section do |section|
               case step
               when 0
                 section.add_grid('select_bins',

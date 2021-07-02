@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  module PackagingFactory  # rubocop:disable Metrics/ModuleLength
+  module PackagingFactory # rubocop:disable Metrics/ModuleLength
     def create_pallet_base(opts = {})
       id = get_available_factory_record(:pallet_bases, opts)
       return id unless id.nil?
@@ -107,7 +107,7 @@ module MasterfilesApp
       DB[:pm_subtypes].insert(default.merge(opts))
     end
 
-    def create_pm_product(opts = {}) # rubocop:disable Metrics/AbcSize
+    def create_pm_product(opts = {})
       id = get_available_factory_record(:pm_products, opts)
       return id unless id.nil?
 

@@ -6,7 +6,7 @@ module ProductionApp
                 :scrap_reason_id, :scrap_remarks, :make_changes,  :reworks_run_booleans, :reworks_action, :changes,
                 :affected_pallet_sequences, :allow_cultivar_group_mixing, :pallet_ids
 
-    def initialize(params, reworks_action, changes)  # rubocop:disable Metrics/AbcSize
+    def initialize(params, reworks_action, changes) # rubocop:disable Metrics/AbcSize
       @repo = ProductionApp::ReworksRepo.new
       @user_name = params[:user]
       @reworks_run_type = @repo.where_hash(:reworks_run_types, id: params[:reworks_run_type_id])
@@ -28,7 +28,7 @@ module ProductionApp
       @scrap_remarks = params[:remarks]
     end
 
-    def call # rubocop:disable Metrics/AbcSize
+    def call
       res = create_reworks_run
       raise Crossbeams::InfoError, unwrap_failed_response(res) unless res.success
 
@@ -83,7 +83,7 @@ module ProductionApp
       AppConst::RUN_TYPE_RECALC_NETT_WEIGHT == reworks_run_type[:run_type]
     end
 
-    def create_reworks_run  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity,  Metrics/PerceivedComplexity
+    def create_reworks_run # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity,  Metrics/PerceivedComplexity
       reworks_run_attrs = resolve_reworks_run_attrs
       id = repo.create_reworks_run(reworks_run_attrs.to_h)
       attrs = pallet_update_attrs
@@ -98,7 +98,7 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def resolve_reworks_run_attrs  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def resolve_reworks_run_attrs # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       {
         user: user_name,
         reworks_run_type_id: reworks_run_type[:id],
@@ -163,7 +163,7 @@ module ProductionApp
       repo.find_reworks_run(id)
     end
 
-    def move_stock_pallet  # rubocop:disable Metrics/AbcSize
+    def move_stock_pallet # rubocop:disable Metrics/AbcSize
       location_long_code = if reworks_run_booleans[:scrap_pallets]
                              AppConst::SCRAP_LOCATION
                            elsif reworks_run_booleans[:unscrap_pallets]

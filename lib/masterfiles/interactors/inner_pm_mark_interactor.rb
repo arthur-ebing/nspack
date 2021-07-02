@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class InnerPmMarkInteractor < BaseInteractor
-    def create_inner_pm_mark(params) # rubocop:disable Metrics/AbcSize
+    def create_inner_pm_mark(params)
       res = validate_inner_pm_mark_params(params)
       return validation_failed_response(res) if res.failure?
 

@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class ShiftTypeInteractor < BaseInteractor
-    def create_shift_type(params) # rubocop:disable Metrics/AbcSize
+    def create_shift_type(params)
       res = validate_shift_type_params(params)
       return validation_failed_response(res) if res.failure?
 

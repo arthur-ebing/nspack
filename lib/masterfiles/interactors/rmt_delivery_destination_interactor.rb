@@ -14,7 +14,7 @@ module MasterfilesApp
       RmtDeliveryDestinationSchema.call(params)
     end
 
-    def create_rmt_delivery_destination(params) # rubocop:disable Metrics/AbcSize
+    def create_rmt_delivery_destination(params)
       res = validate_rmt_delivery_destination_params(params)
       return validation_failed_response(res) if res.failure?
 

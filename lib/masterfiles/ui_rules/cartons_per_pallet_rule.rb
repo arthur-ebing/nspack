@@ -14,7 +14,7 @@ module UiRules
       form_name 'cartons_per_pallet'
     end
 
-    def set_show_fields # rubocop:disable Metrics/AbcSize
+    def set_show_fields
       pallet_format_id_label = @repo.find_hash(:pallet_formats, @form_object.pallet_format_id)[:description]
       basic_pack_id_label = MasterfilesApp::FruitSizeRepo.new.find_hash(:basic_pack_codes,  @form_object.basic_pack_id)[:basic_pack_code]
       fields[:description] = { renderer: :label }

@@ -22,7 +22,7 @@ module MesscadaApp
 
     private
 
-    def make_pallet_sequence_object  # rubocop:disable Metrics/AbcSize
+    def make_pallet_sequence_object # rubocop:disable Metrics/AbcSize
       attrs = pallet_sequence_carton_params.to_h.merge(pallet_sequence_pallet_params).to_h
       attrs = attrs.merge(created_by: user_name).to_h
       res = validate_pallet_sequence_params(attrs)

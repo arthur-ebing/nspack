@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-class Nspack < Roda # rubocop:disable Metrics/ClassLength
-  route 'orders', 'production' do |r| # rubocop:disable Metrics/BlockLength
+class Nspack < Roda
+  route 'orders', 'production' do |r|
     # MARKETING ORDERS
     # --------------------------------------------------------------------------
-    r.on 'marketing_orders', Integer do |id| # rubocop:disable Metrics/BlockLength
+    r.on 'marketing_orders', Integer do |id|
       interactor = ProductionApp::OrderInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
@@ -18,7 +18,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         show_partial_or_page(r) { Production::Orders::MarketingOrder::Edit.call(id) }
       end
 
-      r.on 'new_work_order' do   # rubocop:disable Metrics/BlockLength
+      r.on 'new_work_order' do
         r.get do
           interactor.assert_permission!(:edit, id)
           show_partial_or_page(r) { Production::Orders::WorkOrder::New.call(marketing_order_id: id, remote: fetch?(r)) }
@@ -107,7 +107,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     # WORK ORDERS
     # --------------------------------------------------------------------------
-    r.on 'work_orders', Integer do |id| # rubocop:disable Metrics/BlockLength
+    r.on 'work_orders', Integer do |id|
       interactor = ProductionApp::WorkOrderInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:

@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class PmProductInteractor < BaseInteractor
-    def create_pm_product(params) # rubocop:disable Metrics/AbcSize
+    def create_pm_product(params)
       res = validate_pm_product_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -34,7 +34,7 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def delete_pm_product(id) # rubocop:disable Metrics/AbcSize
+    def delete_pm_product(id)
       name = pm_product(id).product_code
       repo.transaction do
         repo.delete_pm_product(id)

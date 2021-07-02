@@ -25,7 +25,7 @@ module QualityApp
 
     private
 
-    def parse_glossary(res) # rubocop:disable Metrics/AbcSize
+    def parse_glossary(res)
       update_orchard_test_api_attributes('phytoData', 'PhytoData Classification')
       update_orchard_test_api_attributes('isCultivarB', 'CultivarB Status')
 

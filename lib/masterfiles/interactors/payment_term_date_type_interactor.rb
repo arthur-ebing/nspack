@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class PaymentTermDateTypeInteractor < BaseInteractor
-    def create_payment_term_date_type(params) # rubocop:disable Metrics/AbcSize
+    def create_payment_term_date_type(params)
       res = validate_payment_term_date_type_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -34,7 +34,7 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def delete_payment_term_date_type(id) # rubocop:disable Metrics/AbcSize
+    def delete_payment_term_date_type(id)
       name = payment_term_date_type(id).type_of_date
       repo.transaction do
         repo.delete_payment_term_date_type(id)

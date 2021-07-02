@@ -22,7 +22,7 @@ module ProductionApp
 
     private
 
-    def change_run_orchard  # rubocop:disable Metrics/AbcSize
+    def change_run_orchard # rubocop:disable Metrics/AbcSize
       repo.transaction do
         repo.update_production_run(production_run_id,
                                    params.to_h.slice(:orchard_id, :allow_orchard_mixing, :allow_cultivar_mixing, :allow_cultivar_group_mixing))

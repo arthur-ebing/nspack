@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class ContractWorkerPackerRoleInteractor < BaseInteractor
-    def create_contract_worker_packer_role(params) # rubocop:disable Metrics/AbcSize
+    def create_contract_worker_packer_role(params)
       res = validate_contract_worker_packer_role_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -33,7 +33,7 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def delete_contract_worker_packer_role(id) # rubocop:disable Metrics/AbcSize
+    def delete_contract_worker_packer_role(id)
       name = contract_worker_packer_role(id).packer_role
       repo.transaction do
         repo.delete_contract_worker_packer_role(id)

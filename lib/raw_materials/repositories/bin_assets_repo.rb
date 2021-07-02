@@ -127,7 +127,7 @@ module RawMaterialsApp
     # @param [Integer] quantity
     # @param [Integer] location_id
     # @param [Bool] add: add or subtract
-    def update_bin_asset_location_qty(owner_id, quantity, location_id, add: false) # rubocop:disable Metrics/AbcSize
+    def update_bin_asset_location_qty(owner_id, quantity, location_id, add: false)
       location = DB[:bin_asset_locations].where(rmt_container_material_owner_id: owner_id,
                                                 location_id: location_id)
       return failed_response('Bin Asset location does not exist') unless location.first
@@ -206,7 +206,7 @@ module RawMaterialsApp
       values
     end
 
-    def rmt_delivery_code(del_id) # rubocop:disable Metrics/AbcSize
+    def rmt_delivery_code(del_id)
       DB[:rmt_deliveries].join(:farms, id: :farm_id)
                          .join(:orchards, id: Sequel[:rmt_deliveries][:orchard_id])
                          .where(Sequel[:rmt_deliveries][:id] => del_id)

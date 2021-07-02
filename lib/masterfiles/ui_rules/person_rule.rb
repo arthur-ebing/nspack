@@ -14,7 +14,7 @@ module UiRules
       form_name 'person'
     end
 
-    def set_show_fields # rubocop:disable Metrics/AbcSize
+    def set_show_fields
       fields[:party_name] = { renderer: :label, caption: 'Full Name' }
       fields[:surname] = { renderer: :label }
       fields[:first_name] = { renderer: :label }

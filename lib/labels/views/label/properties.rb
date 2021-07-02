@@ -4,7 +4,7 @@ module Labels
   module Labels
     module Label
       class Properties
-        def self.call(id, form_values = nil, form_errors = nil) # rubocop:disable Metrics/AbcSize
+        def self.call(id, form_values = nil, form_errors = nil)
           ui_rule = UiRules::Compiler.new(:label, :properties, id: id, form_values: form_values)
           rules   = ui_rule.compile
 

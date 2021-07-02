@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
 module FinishedGoods
   module Dispatch
     module Load
-      class Show # rubocop:disable Metrics/ClassLength
+      class Show
         def self.call(id) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:load, :show, id: id)
           rules   = ui_rule.compile
@@ -200,4 +199,3 @@ module FinishedGoods
     end
   end
 end
-# rubocop:enable Metrics/BlockLength

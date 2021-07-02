@@ -14,7 +14,7 @@ module UiRules
       form_name 'payment_term_date_type'
     end
 
-    def set_show_fields # rubocop:disable Metrics/AbcSize
+    def set_show_fields
       fields[:type_of_date] = { renderer: :label }
       fields[:no_days_after_etd] = { renderer: :label }
       fields[:no_days_after_eta] = { renderer: :label }

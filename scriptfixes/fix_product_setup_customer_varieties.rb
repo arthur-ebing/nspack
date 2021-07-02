@@ -11,7 +11,7 @@
 # on product_setups, carton_labels, cartons and pallet_sequences
 #
 class FixProductSetupCustomerVarieties < BaseScript
-  def run  # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
+  def run # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
     query = <<~SQL
       SELECT id, customer_variety_id
       FROM product_setups

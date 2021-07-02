@@ -411,7 +411,7 @@ module LabelApp
       end
     end
 
-    def approve_or_reject_a_label(id, params) # rubocop:disable Metrics/AbcSize
+    def approve_or_reject_a_label(id, params)
       res = if params[:approve_action] == 'a'
               approve_a_record(:labels, id, params.merge(enqueue_job: false))
             else

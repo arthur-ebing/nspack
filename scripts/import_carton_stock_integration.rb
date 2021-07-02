@@ -237,7 +237,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     pm_bom_ids.first
   end
 
-  def get_pm_mark_id(args) # rubocop:disable Metrics/AbcSize
+  def get_pm_mark_id(args)
     mark_id = get_id_or_error(:marks, mark_code: args.brand)
     tu_id = get_id_or_error(:inner_pm_marks, inner_pm_mark_code: args.tu_mark, tu_mark: true)
     tu = @repo.get(:inner_pm_marks, tu_id, :inner_pm_mark_code) || args.tu_mark
@@ -350,7 +350,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     success_response('Created carton', id)
   end
 
-  def create_pallet_sequence(params) # rubocop:disable Metrics/AbcSize
+  def create_pallet_sequence(params)
     res = MesscadaApp::PalletSequenceContract.new.call(params)
     return failed_response("can't create_pallet_sequence #{validation_failed_response(res).errors}") if res.failure?
     return failed_response(@pallet_errors.uniq.sort.join("\n")) unless @pallet_errors.empty?

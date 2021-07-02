@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
-class Nspack < Roda # rubocop:disable Metrics/ClassLength
+class Nspack < Roda
   route 'production', 'rmd' do |r|
     # --------------------------------------------------------------------------
     # PALLET ENQUIRY
@@ -1190,7 +1189,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
   end
 
-  def print_pallet_sequence_label(id, interactor) # rubocop:disable Metrics/AbcSize
+  def print_pallet_sequence_label(id, interactor)
     res = interactor.print_pallet_label_from_sequence(id,
                                                       pallet_label_name: params[:pallet][:pallet_label_name],
                                                       no_of_prints: params[:pallet][:qty_to_print],
@@ -1277,4 +1276,3 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     form.add_label(:bom, 'Pallet Label', carton_label[:label_name])
   end
 end
-# rubocop:enable Metrics/BlockLength

@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
-
 # TODO: Check that user has permission.
 # - get pf.id and restricted_access values for url (could be more than one menu item and with/without restriction)
 # Check if user has access
@@ -19,7 +17,7 @@
 # - url might not be a program function.
 #   = then ok to continue.
 #   = unless url was entered in browser (is there a difference in the referer?)
-class Nspack < Roda # rubocop:disable Metrics/ClassLength
+class Nspack < Roda
   # Generic grid lists.
   route('list') do |r|
     r.on :id do |id|
@@ -190,5 +188,3 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
   end
 end
-
-# rubocop:enable Metrics/BlockLength

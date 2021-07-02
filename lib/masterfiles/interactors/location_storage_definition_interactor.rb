@@ -14,7 +14,7 @@ module MasterfilesApp
       LocationStorageDefinitionSchema.call(params)
     end
 
-    def create_location_storage_definition(params) # rubocop:disable Metrics/AbcSize
+    def create_location_storage_definition(params)
       res = validate_location_storage_definition_params(params)
       return validation_failed_response(res) if res.failure?
 

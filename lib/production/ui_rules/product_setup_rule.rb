@@ -2,7 +2,7 @@
 
 module UiRules
   class ProductSetupRule < Base # rubocop:disable Metrics/ClassLength
-    def generate_rules # rubocop:disable Metrics/AbcSize
+    def generate_rules
       @repo = ProductionApp::ProductSetupRepo.new
       @fruit_size_repo = MasterfilesApp::FruitSizeRepo.new
       @party_repo = MasterfilesApp::PartyRepo.new
@@ -22,7 +22,7 @@ module UiRules
       form_name 'product_setup'
     end
 
-    def set_show_fields  # rubocop:disable Metrics/AbcSize
+    def set_show_fields # rubocop:disable Metrics/AbcSize
       product_setup_template_id_label = @repo.get(:product_setup_templates, @form_object.product_setup_template_id, :template_name)
       marketing_variety_id_label = @repo.get(:marketing_varieties, @form_object.marketing_variety_id, :marketing_variety_code)
       customer_variety_id_label = MasterfilesApp::MarketingRepo.new.find_customer_variety(@form_object.customer_variety_id)&.variety_as_customer_variety
@@ -137,7 +137,7 @@ module UiRules
                              hide_on_load: !@rules[:gtins_required] }
     end
 
-    def common_fields  # rubocop:disable Metrics/AbcSize
+    def common_fields # rubocop:disable Metrics/AbcSize
       product_setup_template_id = @options[:product_setup_template_id].nil_or_empty? ? @repo.find_product_setup(@options[:id]).product_setup_template_id : @options[:product_setup_template_id]
       product_setup_template = @repo.find_product_setup_template(product_setup_template_id)
       product_setup_template_id_label = product_setup_template&.template_name

@@ -362,7 +362,7 @@ module ProductionApp
       success_response("Allocated Target Customer #{target_customer}", target_customer: target_customer)
     end
 
-    def copy_allocations_for_run(product_resource_allocation_id, allocation_ids, product_setup_id, args) # rubocop:disable Metrics/AbcSize
+    def copy_allocations_for_run(product_resource_allocation_id, allocation_ids, product_setup_id, args)
       xtra = []
       xtra << ", label_template_id = #{args[:label_template_id]}" unless args[:label_template_id].to_s.nil_or_empty?
 

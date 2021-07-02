@@ -4,7 +4,7 @@ module Masterfiles
   module Hr
     module ContractWorkerPackerRole
       class Edit
-        def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
+        def self.call(id, form_values: nil, form_errors: nil)
           ui_rule = UiRules::Compiler.new(:contract_worker_packer_role, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 

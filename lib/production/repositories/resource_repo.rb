@@ -46,7 +46,7 @@ module ProductionApp
         .get(:production_line_id)
     end
 
-    def for_select_plant_resource_codes(plant_resource_type_code) # rubocop:disable Metrics/AbcSize
+    def for_select_plant_resource_codes(plant_resource_type_code)
       type = where_hash(:plant_resource_types, plant_resource_type_code: plant_resource_type_code, active: true)
       return [] if type.nil?
 
@@ -282,7 +282,7 @@ module ProductionApp
       failed_response("GLN #{gln} has already been used")
     end
 
-    def delete_plant_resource(id) # rubocop:disable Metrics/AbcSize
+    def delete_plant_resource(id)
       DB[:tree_plant_resources].where(ancestor_plant_resource_id: id).or(descendant_plant_resource_id: id).delete
       system_resource_id = find_plant_resource(id)&.system_resource_id
       DB[:palletizing_bay_states].where(palletizing_bay_resource_id: id).delete

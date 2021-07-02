@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class ScrapReasonInteractor < BaseInteractor
-    def create_scrap_reason(params)  # rubocop:disable Metrics/AbcSize
+    def create_scrap_reason(params)
       res = validate_scrap_reason_params(params)
       return validation_failed_response(res) if res.failure?
 

@@ -123,7 +123,7 @@ module DataminerApp
       report_lookup.map { |id, lkp| { id: id, db: lkp[:db], file: lkp[:file], caption: lkp[:caption], crosstab: lkp[:crosstab] } }
     end
 
-    def get_reports_for(key, path) # rubocop:disable Metrics/AbcSize
+    def get_reports_for(key, path)
       lkp = {}
       ymlfiles = File.join(path, '**', '*.yml')
       yml_list = Dir.glob(ymlfiles)

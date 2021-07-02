@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class MasterfileTransformationInteractor < BaseInteractor
-    def create_masterfile_transformation(params) # rubocop:disable Metrics/AbcSize
+    def create_masterfile_transformation(params)
       res = validate_masterfile_transformation_params(params)
       return validation_failed_response(res) if res.failure?
 

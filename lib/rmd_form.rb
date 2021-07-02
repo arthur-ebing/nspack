@@ -86,7 +86,7 @@ module Crossbeams
     # @param options (Hash) options for the field
     # @option options [Boolean] :hide_on_load should this element be hidden when the form loads?
     # @return [void]
-    def add_toggle(name, label, options = {}) # rubocop:disable Metrics/AbcSize
+    def add_toggle(name, label, options = {})
       @current_field = name
       @fields << <<~HTML
         <tr id="#{form_name}_#{name}_row"#{field_error_state}#{initial_visibilty(options)}><th class="tl"><label for="#{form_name}_#{name}">#{label}</label>#{field_error_message}</th>
@@ -393,7 +393,7 @@ module Crossbeams
       ' data-lookup="Y"'
     end
 
-    def lookup_display(name, options) # rubocop:disable Metrics/AbcSize
+    def lookup_display(name, options)
       return '' unless options[:lookup]
 
       <<~HTML

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Nspack < Roda
-  route 'logging', 'development' do |r| # rubocop:disable Metrics/BlockLength
+  route 'logging', 'development' do |r|
     #
     # LOGGED ACTION DETAILS
     # --------------------------------------------------------------------------

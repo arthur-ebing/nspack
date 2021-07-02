@@ -2,7 +2,7 @@
 
 module DM
   module Admin
-    class Debug # rubocop:disable Metrics/ClassLength
+    class Debug
       include DataminerHelpers
 
       def call(id, opts) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
@@ -16,7 +16,7 @@ module DM
         sqlfmt = ->(c) { "<pre>#{sql_to_highlight(c)}</pre>" }
         caption = opts[:grid_caption] && opts[:grid_caption] != opts[:caption] ? "#{opts[:caption]} (captioned: #{opts[:grid_caption]})" : opts[:caption]
         layout = Crossbeams::Layout::Page.new form_object: {}
-        layout.build do |page, _| # rubocop:disable Metrics/BlockLength
+        layout.build do |page, _|
           page.fold_up do |fold|
             fold.open!
             fold.caption 'SQL'

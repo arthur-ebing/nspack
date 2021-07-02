@@ -84,7 +84,7 @@ module Production
           ar.map { |a| summary_block(a) }
         end
 
-        def self.summary_block(item) # rubocop:disable Metrics/AbcSize
+        def self.summary_block(item)
           <<~HTML
             <div class="outline pa2 mr3 mt2 tc" style="min-width:230px;background:#e6f4f1;">
               <p class="fw6 f4 mt0 pb1 bb">#{item[:ph]} #{item[:cv]} #{item[:pack]}</p>

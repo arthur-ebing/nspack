@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
-# rubocop:disable Metrics/ClassLength
-
 class Nspack < Roda
   route 'bin_assets', 'raw_materials' do |r|
     interactor = RawMaterialsApp::BinAssetTransactionInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
@@ -22,7 +19,7 @@ class Nspack < Roda
       end
     end
 
-    r.on 'bin_asset_transactions' do # rubocop:disable Metrics/BlockLength
+    r.on 'bin_asset_transactions' do
       stepper = interactor.stepper
       r.on 'bin_asset_transaction_items' do
         r.on 'owner_changed' do
@@ -249,5 +246,3 @@ class Nspack < Roda
     end
   end
 end
-# rubocop:enable Metrics/BlockLength
-# rubocop:enable Metrics/ClassLength

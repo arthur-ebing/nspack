@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class PmTypeInteractor < BaseInteractor
-    def create_pm_type(params) # rubocop:disable Metrics/AbcSize
+    def create_pm_type(params)
       res = validate_pm_type_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -34,7 +34,7 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def delete_pm_type(id) # rubocop:disable Metrics/AbcSize
+    def delete_pm_type(id)
       name = pm_type(id).pm_type_code
       repo.transaction do
         repo.delete_pm_type(id)

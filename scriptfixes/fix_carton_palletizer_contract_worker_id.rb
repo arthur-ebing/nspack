@@ -15,7 +15,7 @@
 # Dev   : ruby scripts/base_script.rb FixCartonPalletizerContractWorkerId
 #
 class FixCartonPalletizerContractWorkerId < BaseScript
-  def run  # rubocop:disable Metrics/AbcSize
+  def run # rubocop:disable Metrics/AbcSize
     query = <<~SQL
       SELECT DISTINCT palletizer_identifier_id
       FROM cartons

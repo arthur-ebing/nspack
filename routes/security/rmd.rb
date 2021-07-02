@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
-
 class Nspack < Roda
   route 'rmd', 'security' do |r|
     # REGISTERED MOBILE DEVICES
@@ -80,5 +78,3 @@ class Nspack < Roda
     end
   end
 end
-
-# rubocop:enable Metrics/BlockLength

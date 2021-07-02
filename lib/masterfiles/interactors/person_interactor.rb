@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class PersonInteractor < BaseInteractor
-    def create_person(params) # rubocop:disable Metrics/AbcSize
+    def create_person(params)
       res = validate_person_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -37,7 +37,7 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def delete_person(id) # rubocop:disable Metrics/AbcSize
+    def delete_person(id)
       name = person(id).party_name
       repo.transaction do
         repo.delete_person(id)

@@ -36,7 +36,7 @@ module MesscadaApp
       repo.carton_label_carton_equals_pallet(scanned_params[:carton_label_id])
     end
 
-    def resolve_scanned_number_params # rubocop:disable Metrics/AbcSize
+    def resolve_scanned_number_params
       args = repo.parse_pallet_or_carton_number({ scanned_number: scanned_number.to_s })
       if args[:carton_number]
         args[:carton_label_id] = scanned_number

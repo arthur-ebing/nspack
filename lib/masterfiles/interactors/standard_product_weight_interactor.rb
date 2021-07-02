@@ -26,7 +26,7 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def update_standard_product_weight(id, params)  # rubocop:disable Metrics/AbcSize
+    def update_standard_product_weight(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_standard_product_weight_params(params)
       return validation_failed_response(res) if res.failure?
 

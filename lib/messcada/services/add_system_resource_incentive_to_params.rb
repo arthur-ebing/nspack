@@ -6,7 +6,7 @@ module MesscadaApp
   class AddSystemResourceIncentiveToParams < BaseService
     attr_reader :params, :get_group_incentive, :sys_res, :repo, :resource_repo, :device, :origin, :has_button
 
-    def initialize(params, has_button: false, get_group_incentive: true) # rubocop:disable Metrics/AbcSize
+    def initialize(params, has_button: false, get_group_incentive: true)
       super()
       @params = params
       @has_button = has_button

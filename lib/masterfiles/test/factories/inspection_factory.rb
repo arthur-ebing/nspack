@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   module InspectionFactory
-    def create_inspection_type(opts = {}) # rubocop:disable Metrics/AbcSize
+    def create_inspection_type(opts = {})
       inspection_failure_type_id = create_inspection_failure_type
 
       default = {

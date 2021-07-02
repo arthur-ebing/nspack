@@ -13,7 +13,7 @@ module FinishedGoodsApp
       ok_response
     end
 
-    def create_voyage  # rubocop:disable Metrics/AbcSize
+    def create_voyage # rubocop:disable Metrics/AbcSize
       res = validate_voyage_params(params)
       return validation_failed_response(res) if res.failure?
 

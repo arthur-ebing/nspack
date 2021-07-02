@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class PortTypeInteractor < BaseInteractor
-    def create_port_type(params) # rubocop:disable Metrics/AbcSize
+    def create_port_type(params)
       res = validate_port_type_params(params)
       return validation_failed_response(res) if res.failure?
 

@@ -56,7 +56,7 @@ module MasterfilesApp
       DB[:inventory_codes].insert(default.merge(opts))
     end
 
-    def create_basic_pack(opts = {}) # rubocop:disable Metrics/AbcSize
+    def create_basic_pack(opts = {})
       id = get_available_factory_record(:basic_pack_codes, opts)
       return id unless id.nil?
 
@@ -93,7 +93,7 @@ module MasterfilesApp
       DB[:standard_pack_codes].insert(default.merge(opts))
     end
 
-    def create_std_fruit_size_count(opts = {}) # rubocop:disable Metrics/AbcSize
+    def create_std_fruit_size_count(opts = {})
       id = get_available_factory_record(:std_fruit_size_counts, opts)
       return id unless id.nil?
 
@@ -119,7 +119,7 @@ module MasterfilesApp
       DB[:std_fruit_size_counts].insert(default.merge(opts))
     end
 
-    def create_fruit_actual_counts_for_pack(opts = {}) # rubocop:disable Metrics/AbcSize
+    def create_fruit_actual_counts_for_pack(opts = {})
       id = get_available_factory_record(:fruit_actual_counts_for_packs, opts)
       return id unless id.nil?
 

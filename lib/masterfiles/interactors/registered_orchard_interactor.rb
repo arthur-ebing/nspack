@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class RegisteredOrchardInteractor < BaseInteractor
-    def create_registered_orchard(params) # rubocop:disable Metrics/AbcSize
+    def create_registered_orchard(params)
       res = validate_registered_orchard_params(params)
       return validation_failed_response(res) if res.failure?
 

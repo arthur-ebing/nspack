@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
-class Nspack < Roda # rubocop:disable Metrics/ClassLength
-  route 'carton_palletizing', 'rmd' do |r| # rubocop:disable Metrics/BlockLength
+class Nspack < Roda
+  route 'carton_palletizing', 'rmd' do |r|
     interactor = MesscadaApp::PalletizingInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
     # --------------------------------------------------------------------------
@@ -273,4 +272,3 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       identifier: res.instance[:identifier] }
   end
 end
-# rubocop:enable Metrics/BlockLength

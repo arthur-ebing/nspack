@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-class Nspack < Roda # rubocop:disable Metrics/ClassLength
-  route 'reports', 'production' do |r| # rubocop:disable Metrics/BlockLength
+class Nspack < Roda
+  route 'reports', 'production' do |r|
     # PACKOUT RUNS REPORT
     # --------------------------------------------------------------------------
     r.on 'packout_runs' do

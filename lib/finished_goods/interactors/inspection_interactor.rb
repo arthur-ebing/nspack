@@ -31,7 +31,7 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def delete_inspection(id) # rubocop:disable Metrics/AbcSize
+    def delete_inspection(id)
       name = inspection(id).inspection_type_code
       repo.transaction do
         repo.delete_inspection(id)

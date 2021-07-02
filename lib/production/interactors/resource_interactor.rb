@@ -2,7 +2,7 @@
 
 module ProductionApp
   class ResourceInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
-    def create_root_plant_resource(params) # rubocop:disable Metrics/AbcSize
+    def create_root_plant_resource(params)
       res = validate_plant_resource_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -20,7 +20,7 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def add_3_4_buttons # rubocop:disable Metrics/AbcSize
+    def add_3_4_buttons
       qry = <<~SQL
         SELECT id, (SELECT id FROM plant_resource_types WHERE plant_resource_type_code = 'ROBOT_BUTTON') AS btn_type_id, plant_resource_code, description
         FROM plant_resources
@@ -36,7 +36,7 @@ module ProductionApp
       end
     end
 
-    def create_plant_resource(parent_id, params) # rubocop:disable Metrics/AbcSize
+    def create_plant_resource(parent_id, params)
       res = validate_plant_resource_params(params)
       return validation_failed_response(res) if res.failure?
 

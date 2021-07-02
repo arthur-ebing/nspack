@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
-class Nspack < Roda # rubocop:disable Metrics/ClassLength
+class Nspack < Roda
   route 'reworks', 'production' do |r|
     # REWORKS RUNS
     # --------------------------------------------------------------------------
@@ -1207,4 +1206,3 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
   end
 end
-# rubocop:enable Metrics/BlockLength

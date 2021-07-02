@@ -2,7 +2,7 @@
 
 module ProductionApp
   module PackingSpecificationFactory
-    def create_packing_specification_item(opts = {}) # rubocop:disable Metrics/AbcSize
+    def create_packing_specification_item(opts = {})
       id = get_available_factory_record(:packing_specification_items, opts)
       return id unless id.nil?
 

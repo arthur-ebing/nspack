@@ -22,7 +22,7 @@ module ProductionApp
       DB[:product_setup_templates].insert(default.merge(opts))
     end
 
-    def create_product_setup(opts = {})  # rubocop:disable Metrics/AbcSize
+    def create_product_setup(opts = {})
       id = get_available_factory_record(:product_setups, opts)
       return id unless id.nil?
 
@@ -75,7 +75,7 @@ module ProductionApp
       DB[:product_setups].insert(default.merge(opts))
     end
 
-    def create_gtin(opts = {}) # rubocop:disable Metrics/AbcSize
+    def create_gtin(opts = {})
       default = {
         transaction_number: Faker::Lorem.unique.word,
         gtin_code: Faker::Lorem.word,

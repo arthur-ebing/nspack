@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
 class Nspack < Roda
   route 'production', 'messcada' do |r|
     # --------------------------------------------------------------------------
@@ -30,7 +29,7 @@ class Nspack < Roda
 
     r.on 'carton_verification' do
       interactor = MesscadaApp::MesscadaInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-      r.on 'weighing' do # rubocop:disable Metrics/BlockLength
+      r.on 'weighing' do
         r.on 'labeling' do
           # --------------------------------------------------------------------------
           # CARTON/FG BIN VERIFICATION + WEIGHING + LABELING
@@ -125,4 +124,3 @@ class Nspack < Roda
     end
   end
 end
-# rubocop:enable Metrics/BlockLength

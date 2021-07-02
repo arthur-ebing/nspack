@@ -31,7 +31,7 @@ module FinishedGoodsApp
       repo.pallet(pallet_id)
     end
 
-    def repack_pallet  # rubocop:disable Metrics/AbcSize
+    def repack_pallet # rubocop:disable Metrics/AbcSize
       res = repo.repack_pallet(pallet_id, user_name)
       return res unless res.success
 
@@ -50,7 +50,7 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def move_stock_pallet # rubocop:disable Metrics/AbcSize
+    def move_stock_pallet
       opts = { pallet_id => MasterfilesApp::LocationRepo.new.find_location_by_location_long_code(AppConst::SCRAP_LOCATION)&.id,
                new_pallet_id => packhouse_location_id }
 
@@ -73,7 +73,7 @@ module FinishedGoodsApp
       ids
     end
 
-    def create_reworks_run  # rubocop:disable Metrics/AbcSize
+    def create_reworks_run
       reworks_run_type_id = repo.get_reworks_run_type_id(AppConst::RUN_TYPE_SCRAP_PALLET)
       return failed_response("Reworks Run Type : #{AppConst::RUN_TYPE_SCRAP_PALLET} does not exist. Perhaps required seeds were not run. Please contact support.") if reworks_run_type_id.nil?
 

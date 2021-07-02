@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class TreatmentInteractor < BaseInteractor
-    def create_treatment(params) # rubocop:disable Metrics/AbcSize
+    def create_treatment(params)
       res = validate_treatment_params(params)
       return validation_failed_response(res) if res.failure?
 

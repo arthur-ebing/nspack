@@ -4,7 +4,7 @@ module Masterfiles
   module Farms
     module FarmSection
       class New
-        def self.call(id, form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
+        def self.call(id, form_values: nil, form_errors: nil, remote: true)
           ui_rule = UiRules::Compiler.new(:farm_section, :new, farm_id: id, form_values: form_values)
           rules   = ui_rule.compile
 

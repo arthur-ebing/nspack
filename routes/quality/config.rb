@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
-class Nspack < Roda # rubocop:disable Metrics/ClassLength
+class Nspack < Roda
   route 'config', 'quality' do |r|
     # ORCHARD TEST TYPES
     # --------------------------------------------------------------------------
@@ -127,4 +126,3 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
   end
 end
-# rubocop:enable Metrics/BlockLength

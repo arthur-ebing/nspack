@@ -4,7 +4,7 @@ module RawMaterials
   module Deliveries
     module RmtDeliveryCost
       class Edit
-        def self.call(rmt_delivery_id, cost_id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
+        def self.call(rmt_delivery_id, cost_id, form_values: nil, form_errors: nil)
           ui_rule = UiRules::Compiler.new(:rmt_delivery_cost, :edit, rmt_delivery_id: rmt_delivery_id, cost_id: cost_id, form_values: form_values)
           rules   = ui_rule.compile
 

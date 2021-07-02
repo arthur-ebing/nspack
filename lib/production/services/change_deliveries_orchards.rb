@@ -26,7 +26,7 @@ module ProductionApp
 
     private
 
-    def change_deliveries_orchards  # rubocop:disable Metrics/AbcSize
+    def change_deliveries_orchards # rubocop:disable Metrics/AbcSize
       res = validate_orchard_change_params(change_attrs)
       return validation_failed_response(res) if res.failure?
 
@@ -106,7 +106,7 @@ module ProductionApp
       change_attrs[:ignore_runs_that_allow_mixing] && !change_attrs[:allow_cultivar_mixing] && repo.invalidates_marketing_varieties?(production_runs, change_attrs[:to_cultivar])
     end
 
-    def update_orchard_changes  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def update_orchard_changes # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       # repo.transaction do
       unless reworks_run_attrs[:changes_made].nil_or_empty?
         send_bus_message("Cascading orchard change - updating #{delivery_ids.count} deliveries records", message_type: :information, target_user: reworks_run_attrs[:user_name])
@@ -127,7 +127,7 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def update_objects_changes(pallets_selected, table_name)  # rubocop:disable Metrics/AbcSize
+    def update_objects_changes(pallets_selected, table_name) # rubocop:disable Metrics/AbcSize
       res = calc_changes_made(table_name, pallets_selected)
       return unless res.success
 

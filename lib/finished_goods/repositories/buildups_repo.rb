@@ -22,7 +22,7 @@ module FinishedGoodsApp
       DB[:pallets].where(pallet_number: pallets, carton_quantity: 0).select_map(:pallet_number)
     end
 
-    def get_build_up_pallets(pallets) # rubocop:disable Metrics/AbcSize
+    def get_build_up_pallets(pallets)
       cond = pallets.map { |p| "'#{p}' = ANY (b.source_pallets)" }.join(' or ')
       query = "SELECT *
                FROM pallet_buildups b

@@ -127,7 +127,7 @@ class CreateJasperReport < BaseService # rubocop:disable Metrics/ClassLength
     File.relative_path(File.join(ENV['ROOT'], 'public'), file)
   end
 
-  def log_report_details # rubocop:disable Metrics/AbcSize
+  def log_report_details
     puts "--- JASPER REPORT : #{jasper_params.report_name} :: #{Time.now}"
     puts "USER   : #{jasper_params.user_name}"
     puts "MODE   : #{show_mode}"

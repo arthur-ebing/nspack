@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
 module Production
   module Runs
     module ProductionRun
@@ -55,4 +54,3 @@ module Production
     end
   end
 end
-# rubocop:enable Metrics/BlockLength

@@ -2,7 +2,7 @@
 
 module ProductionApp
   module ReworksFactory
-    def create_reworks_run(opts = {})  # rubocop:disable Metrics/AbcSize
+    def create_reworks_run(opts = {})
       reworks_run_type_id = create_reworks_run_type
       scrap_reason_id = create_scrap_reason
 

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
-class Nspack < Roda # rubocop:disable Metrics/ClassLength
+class Nspack < Roda
   route 'viewer', 'edi' do |r|
     interactor = EdiApp::ViewerInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
@@ -218,4 +217,3 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
   end
 end
-# rubocop:enable Metrics/BlockLength

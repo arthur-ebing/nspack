@@ -17,7 +17,7 @@ module QualityApp
       @user = OpenStruct.new(user_name: 'ApiPhytCleanStandardData')
     end
 
-    def call # rubocop:disable Metrics/AbcSize
+    def call
       raise ArgumentError, 'PhytClean Season not set' if phyt_clean_season_id.nil?
 
       QualityApp::CreateOrchardTestResults.call(@user)

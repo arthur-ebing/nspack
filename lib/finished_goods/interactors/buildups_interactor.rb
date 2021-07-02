@@ -76,7 +76,7 @@ module FinishedGoodsApp
       success_response('ok', pallet_buildup)
     end
 
-    def delete_pallet_buildup(id) # rubocop:disable Metrics/AbcSize
+    def delete_pallet_buildup(id)
       repo.transaction do
         repo.delete_pallet_buildup(id)
         log_transaction

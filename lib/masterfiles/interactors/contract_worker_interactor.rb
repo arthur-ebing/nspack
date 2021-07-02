@@ -20,7 +20,7 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def update_contract_worker(id, params) # rubocop:disable Metrics/AbcSize
+    def update_contract_worker(id, params)
       res = validate_contract_worker_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -68,7 +68,7 @@ module MasterfilesApp
       success_response('Successfully de-linked identifier from worker', in_use: false, contract_worker: nil)
     end
 
-    def link_to_personnel_identifier(id, params) # rubocop:disable Metrics/AbcSize
+    def link_to_personnel_identifier(id, params)
       res = validate_contract_worker_link_params(params.merge(id: id))
       return validation_failed_response(res) if res.failure?
 

@@ -15,7 +15,7 @@ module MesscadaApp
       @prod_repo = ProductionApp::ProductionRunRepo.new
     end
 
-    def call  # rubocop:disable Metrics/AbcSize
+    def call # rubocop:disable Metrics/AbcSize
       return failed_response("Pallet :#{pallet_id} does not exist") unless pallet_exists?
 
       return failed_response("Carton :#{carton_id} does not exist") unless carton_exists?

@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/ClassLength
-# rubocop:disable Metrics/BlockLength
-
 class Nspack < Roda
   route 'masterfiles', 'development' do |r|
     # ROLES
@@ -415,6 +412,3 @@ class Nspack < Roda
     end
   end
 end
-
-# rubocop:enable Metrics/ClassLength
-# rubocop:enable Metrics/BlockLength

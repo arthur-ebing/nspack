@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   module LocationFactory
-    def create_location(opts = {}) # rubocop:disable Metrics/AbcSize
+    def create_location(opts = {})
       id = get_available_factory_record(:locations, opts)
       return id unless id.nil?
 

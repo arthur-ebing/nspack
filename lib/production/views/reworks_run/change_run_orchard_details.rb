@@ -8,7 +8,7 @@ module Production
           ui_rule = UiRules::Compiler.new(:change_run_orchard, :details, reworks_run_type_id: reworks_run_type_id, attrs: attrs, form_values: form_values)
           rules   = ui_rule.compile
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
+          layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors

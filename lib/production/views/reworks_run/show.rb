@@ -4,12 +4,12 @@ module Production
   module Reworks
     module ReworksRun
       class Show
-        def self.call(id)  # rubocop:disable Metrics/AbcSize
+        def self.call(id) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:reworks_run, :show, id: id)
           rules   = ui_rule.compile
 
           caption = rules[:bin_run_type] ? 'Bins' : 'Pallets'
-          layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
+          layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form do |form|
               # form.caption 'Reworks Run'

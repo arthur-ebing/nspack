@@ -213,7 +213,7 @@ module ProductionApp
       DB[:pallet_sequences].where(id: sequence_ids).where(attrs).map { |p| p[:id] }
     end
 
-    def scrapping_reworks_run(pallet_numbers, attrs, reworks_run_booleans, user_name)  # rubocop:disable Metrics/AbcSize
+    def scrapping_reworks_run(pallet_numbers, attrs, reworks_run_booleans, user_name)
       pallet_ids = find_pallet_ids_from_pallet_number(pallet_numbers)
       pallet_sequence_ids = find_sequence_ids_from_pallet_number(pallet_numbers)
       status = reworks_run_booleans[:scrap_pallets] ? AppConst::PALLET_SCRAPPED : AppConst::PALLET_UNSCRAPPED
@@ -291,7 +291,7 @@ module ProductionApp
       new_pallet_id
     end
 
-    def clone_pallet_sequences(old_pallet_id, pallet_id, sequence_ids, user_name)  # rubocop:disable Metrics/AbcSize
+    def clone_pallet_sequences(old_pallet_id, pallet_id, sequence_ids, user_name) # rubocop:disable Metrics/AbcSize
       pallet = pallet(pallet_id)
       repack_attrs = { pallet_id: pallet[:id], pallet_number: pallet[:pallet_number], repacked_from_pallet_id: old_pallet_id,
                        repacked_at: Time.now, created_at: Time.now, updated_at: Time.now, created_by: user_name }
@@ -389,7 +389,7 @@ module ProductionApp
       DB[query, id].first.select { |key, _| data_ar.include?(key) }
     end
 
-    def sequence_edit_data(attrs)  # rubocop:disable Metrics/AbcSize
+    def sequence_edit_data(attrs) # rubocop:disable Metrics/AbcSize
       party_repo = MasterfilesApp::PartyRepo.new
       args = { basic_pack_code_id: attrs[:basic_pack_code_id], std_fruit_size_count_id: attrs[:std_fruit_size_count_id] }
       fruit_actual_counts_for_pack_id = get_value(:fruit_actual_counts_for_packs, :id, args)
@@ -668,7 +668,7 @@ module ProductionApp
       DB[query].map { |s| [s[:farm_orchard_code], s[:id]] }
     end
 
-    def for_select_template_commodity_marketing_varieties(commodity_id, cultivar_id = nil)  # rubocop:disable Metrics/AbcSize
+    def for_select_template_commodity_marketing_varieties(commodity_id, cultivar_id = nil) # rubocop:disable Metrics/AbcSize
       ds = DB[:marketing_varieties]
            .join(:marketing_varieties_for_cultivars, marketing_variety_id: :id)
            .join(:cultivars, id: :cultivar_id)
@@ -920,7 +920,7 @@ module ProductionApp
       DB[query].all
     end
 
-    def change_objects_counts(delivery_ids, ignore_runs_that_allow_mixing = false)  # rubocop:disable Metrics/AbcSize
+    def change_objects_counts(delivery_ids, ignore_runs_that_allow_mixing = false) # rubocop:disable Metrics/AbcSize
       production_runs = deliveries_production_runs(delivery_ids, ignore_runs_that_allow_mixing)
 
       tipped_bins_query = <<~SQL

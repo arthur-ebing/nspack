@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-class Nspack < Roda # rubocop:disable Metrics/ClassLength
-  route 'deliveries', 'raw_materials' do |r| # rubocop:disable Metrics/BlockLength
+class Nspack < Roda
+  route 'deliveries', 'raw_materials' do |r|
     # --------------------------------------------------------------------------
     # RMT DELIVERIES
     # --------------------------------------------------------------------------
-    r.on 'rmt_deliveries', Integer do |id| # rubocop:disable Metrics/BlockLength
+    r.on 'rmt_deliveries', Integer do |id|
       interactor = RawMaterialsApp::RmtDeliveryInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
@@ -143,7 +143,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::Edit.call(id) }
       end
 
-      r.is do # rubocop:disable Metrics/BlockLength
+      r.is do
         r.get do       # SHOW
           check_auth!('deliveries', 'read')
           show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::Show.call(id, back_url: back_button_url) }
@@ -174,20 +174,20 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
 
-      r.on 'rmt_bins' do # rubocop:disable Metrics/BlockLength
+      r.on 'rmt_bins' do
         interactor = RawMaterialsApp::RmtBinInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
         r.on 'new' do    # NEW
           check_auth!('deliveries', 'new')
           show_partial_or_page(r) { RawMaterials::Deliveries::RmtBin::New.call(id, remote: fetch?(r)) }
         end
 
-        r.on 'create_bin_groups' do # rubocop:disable Metrics/BlockLength
+        r.on 'create_bin_groups' do
           r.get do
             check_auth!('deliveries', 'new')
             show_partial_or_page(r) { RawMaterials::Deliveries::RmtBin::NewBinGroup.call(id, remote: fetch?(r)) }
           end
 
-          r.post do # rubocop:disable Metrics/BlockLength
+          r.post do
             params[:rmt_bin].merge!(qty_bins: 1)
             res = interactor.create_bin_groups(id, params[:rmt_bin])
             if res.success
@@ -248,13 +248,13 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           end
         end
 
-        r.on 'create_scanned_bin_groups' do # rubocop:disable Metrics/BlockLength
+        r.on 'create_scanned_bin_groups' do
           r.get do
             check_auth!('deliveries', 'new')
             show_partial_or_page(r) { RawMaterials::Deliveries::RmtBin::ScanBinGroup.call(id, remote: fetch?(r)) }
           end
 
-          r.post do # rubocop:disable Metrics/BlockLength
+          r.post do
             res = interactor.create_scanned_bin_groups(id, params[:rmt_bin])
             if res.success
               row_keys = %i[
@@ -331,7 +331,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           end
         end
 
-        r.post do # rubocop:disable Metrics/BlockLength        # CREATE
+        r.post do
           res = interactor.create_rmt_bin(id, params[:rmt_bin])
           if res.success
             row_keys = %i[
@@ -386,7 +386,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
-    r.on 'rmt_deliveries' do # rubocop:disable Metrics/BlockLength
+    r.on 'rmt_deliveries' do
       interactor = RawMaterialsApp::RmtDeliveryInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('deliveries', 'new')
@@ -493,7 +493,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
-    r.on 'rmt_delivery_costs', Integer do |rmt_delivery_id| # rubocop:disable Metrics/BlockLength
+    r.on 'rmt_delivery_costs', Integer do |rmt_delivery_id|
       interactor = RawMaterialsApp::RmtDeliveryInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       r.on 'edit', Integer do |cost_id|   # EDIT
@@ -582,7 +582,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # --------------------------------------------------------------------------
     # RMT BINS
     # --------------------------------------------------------------------------
-    r.on 'rmt_bins', Integer do |id| # rubocop:disable Metrics/BlockLength
+    r.on 'rmt_bins', Integer do |id|
       interactor = RawMaterialsApp::RmtBinInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
@@ -596,13 +596,13 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         show_partial { RawMaterials::Deliveries::RmtBin::Edit.call(id) }
       end
 
-      r.is do # rubocop:disable Metrics/BlockLength
+      r.is do
         r.get do       # SHOW
           check_auth!('deliveries', 'read')
           show_partial { RawMaterials::Deliveries::RmtBin::Show.call(id) }
         end
 
-        r.patch do # rubocop:disable Metrics/BlockLength     # UPDATE
+        r.patch do
           res = interactor.update_rmt_bin(id, params[:rmt_bin])
           if res.success
             row_keys = %i[
@@ -677,7 +677,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
-    r.on 'rmt_bins' do # rubocop:disable Metrics/BlockLength
+    r.on 'rmt_bins' do
       interactor = RawMaterialsApp::RmtBinInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       r.on 'new' do    # NEW
@@ -698,7 +698,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
 
-      r.on 'rmt_container_type_combo_changed' do # rubocop:disable Metrics/BlockLength
+      r.on 'rmt_container_type_combo_changed' do
         actions = []
         if !params[:changed_value].to_s.empty?
           rmt_container_material_type_ids = MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_rmt_container_material_types(where: { rmt_container_type_id: params[:changed_value] })

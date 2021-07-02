@@ -14,7 +14,7 @@ module UiRules
       form_name 'ecert_tracking_unit'
     end
 
-    def set_show_fields # rubocop:disable Metrics/AbcSize
+    def set_show_fields
       fields[:pallet_id] = { renderer: :label, with_value: @form_object.pallet_number, caption: 'Pallet' }
       fields[:ecert_agreement_id] = { renderer: :label, with_value: @form_object.ecert_agreement_code, caption: 'Ecert Agreement' }
       fields[:business_id] = { renderer: :label }

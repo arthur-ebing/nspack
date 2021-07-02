@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength, Metrics/ClassLength
 module FinishedGoods
   module Inspection
     module GovtInspectionSheet
@@ -156,4 +155,4 @@ module FinishedGoods
     end
   end
 end
-# rubocop:enable Metrics/BlockLength, Metrics/ClassLength
+# rubocop:enable

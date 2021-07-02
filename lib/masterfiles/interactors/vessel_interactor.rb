@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class VesselInteractor < BaseInteractor
-    def create_vessel(params) # rubocop:disable Metrics/AbcSize
+    def create_vessel(params)
       res = validate_vessel_params(params)
       return validation_failed_response(res) if res.failure?
 

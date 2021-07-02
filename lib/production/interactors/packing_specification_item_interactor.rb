@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ProductionApp
-  class PackingSpecificationItemInteractor < BaseInteractor  # rubocop:disable Metrics/ClassLength
+  class PackingSpecificationItemInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def refresh_packing_specification_items # rubocop:disable Metrics/AbcSize
       repo.select_values(:product_setup_templates, :id).each do |product_setup_template_id|
         product_setup_ids = repo.select_values(:product_setups,
@@ -85,7 +85,7 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def delete_packing_specification_item(id) # rubocop:disable Metrics/AbcSize
+    def delete_packing_specification_item(id)
       name = packing_specification_item(id).description
       repo.transaction do
         repo.delete_packing_specification_item(id)

@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
 module FinishedGoods
   module Dispatch
     module Voyage
@@ -68,4 +67,3 @@ module FinishedGoods
     end
   end
 end
-# rubocop:enable Metrics/BlockLength

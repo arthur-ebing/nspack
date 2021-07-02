@@ -16,7 +16,7 @@ module UiRules
       form_name 'summary'
     end
 
-    def common_fields  # rubocop:disable Metrics/AbcSize
+    def common_fields # rubocop:disable Metrics/AbcSize
       compact_header(columns: %i[deliveries production_runs tipped_bins carton_labels pallet_sequences
                                  shipped_pallet_sequences inspected_pallet_sequences],
                      display_columns: 2)
@@ -68,7 +68,7 @@ module UiRules
       }
     end
 
-    def make_form_object  # rubocop:disable Metrics/AbcSize
+    def make_form_object # rubocop:disable Metrics/AbcSize
       affected_deliveries = @options[:form_values][:affected_deliveries]
       allow_cultivar_mixing = @options[:form_values][:allow_cultivar_mixing] == 't'
       ignore_runs_that_allow_mixing = @options[:form_values][:ignore_runs_that_allow_mixing] == 't'

@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class PackingMethodInteractor < BaseInteractor
-    def create_packing_method(params)  # rubocop:disable Metrics/AbcSize
+    def create_packing_method(params)
       res = validate_packing_method_params(params)
       return validation_failed_response(res) if res.failure?
 

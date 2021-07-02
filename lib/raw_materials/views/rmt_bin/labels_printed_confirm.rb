@@ -4,7 +4,7 @@ module RawMaterials
   module Deliveries
     module RmtBin
       class LabelsPrintedConfirm
-        def self.call(form_values: nil, notice: nil, remote: true) # rubocop:disable Metrics/AbcSize
+        def self.call(form_values: nil, notice: nil, remote: true)
           ui_rule = UiRules::Compiler.new(:pre_print_bin_label, :confirm, form_values: form_values)
           rules   = ui_rule.compile
 

@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class IncotermInteractor < BaseInteractor
-    def create_incoterm(params) # rubocop:disable Metrics/AbcSize
+    def create_incoterm(params)
       res = validate_incoterm_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -34,7 +34,7 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def delete_incoterm(id) # rubocop:disable Metrics/AbcSize
+    def delete_incoterm(id)
       name = incoterm(id).incoterm
       repo.transaction do
         repo.delete_incoterm(id)

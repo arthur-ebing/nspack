@@ -9,9 +9,9 @@ module Development
           rules   = ui_rule.compile
           no_other_details = rules[:other_details] ? rules[:other_details].empty? : false
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
+          layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
-            page.form do |form| # rubocop:disable Metrics/BlockLength
+            page.form do |form|
               form.view_only!
               form.caption "Status for #{table_name}"
               form.no_submit! unless remote

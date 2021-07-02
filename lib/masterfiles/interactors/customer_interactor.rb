@@ -44,7 +44,7 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def delete_customer(id) # rubocop:disable Metrics/AbcSize
+    def delete_customer(id)
       name = customer(id).customer
       repo.transaction do
         repo.delete_customer(id)

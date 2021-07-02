@@ -195,7 +195,7 @@ module MesscadaApp
       update(:group_incentives, group_incentive_id, attrs)
     end
 
-    def append_worker_targets(attrs) # rubocop:disable Metrics/AbcSize
+    def append_worker_targets(attrs)
       return unless attrs.key?(:contract_worker_ids)
       return unless AppConst::CR_PROD.group_incentive_has_packer_roles?
 

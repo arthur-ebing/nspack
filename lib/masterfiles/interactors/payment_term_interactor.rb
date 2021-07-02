@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class PaymentTermInteractor < BaseInteractor
-    def create_payment_term(params) # rubocop:disable Metrics/AbcSize
+    def create_payment_term(params)
       res = validate_payment_term_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -34,7 +34,7 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def delete_payment_term(id) # rubocop:disable Metrics/AbcSize
+    def delete_payment_term(id)
       name = payment_term(id).short_description
       repo.transaction do
         repo.delete_payment_term(id)

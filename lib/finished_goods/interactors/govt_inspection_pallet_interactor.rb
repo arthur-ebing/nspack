@@ -71,7 +71,7 @@ module FinishedGoodsApp
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 
-    def reject_to_repack(multiselect_list)  # rubocop:disable Metrics/AbcSize
+    def reject_to_repack(multiselect_list) # rubocop:disable Metrics/AbcSize
       return failed_response('Pallet selection cannot be empty') if multiselect_list.nil_or_empty?
 
       pallet_ids = repo.select_values(:pallet_sequences, :pallet_id, id: multiselect_list).uniq
@@ -104,7 +104,7 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def create_reworks_run(pallet_numbers)  # rubocop:disable Metrics/AbcSize
+    def create_reworks_run(pallet_numbers)
       reworks_run_type_id = reworks_repo.get_reworks_run_type_id(AppConst::RUN_TYPE_SCRAP_PALLET)
       return failed_response("Reworks Run Type : #{AppConst::RUN_TYPE_SCRAP_PALLET} does not exist. Perhaps required seeds were not run. Please contact support.") if reworks_run_type_id.nil?
 

@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
-# rubocop:disable Metrics/ClassLength
-
 class Nspack < Roda
   route 'raw_materials', 'masterfiles' do |r|
     # RMT DELIVERY DESTINATIONS
@@ -218,5 +215,3 @@ class Nspack < Roda
     end
   end
 end
-# rubocop:enable Metrics/BlockLength
-# rubocop:enable Metrics/ClassLength

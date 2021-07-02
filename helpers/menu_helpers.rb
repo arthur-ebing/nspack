@@ -5,7 +5,7 @@ module MenuHelpers
   end
 
   # Set instance vars related to registered mobile devices.
-  def check_registered_mobile_device # rubocop:disable Metrics/AbcSize
+  def check_registered_mobile_device
     @rmd_start_page = nil
     @rmd_scan_with_camera = false
     @hybrid_device = true

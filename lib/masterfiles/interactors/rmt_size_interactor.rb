@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class RmtSizeInteractor < BaseInteractor
-    def create_rmt_size(params) # rubocop:disable Metrics/AbcSize
+    def create_rmt_size(params)
       res = validate_rmt_size_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -34,7 +34,7 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def delete_rmt_size(id) # rubocop:disable Metrics/AbcSize
+    def delete_rmt_size(id)
       name = rmt_size(id).size_code
       repo.transaction do
         repo.delete_rmt_size(id)

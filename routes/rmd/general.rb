@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
-class Nspack < Roda # rubocop:disable Metrics/ClassLength
+class Nspack < Roda
   # RMD USER MENU PAGE
   # --------------------------------------------------------------------------
   route 'home', 'rmd' do
@@ -10,7 +9,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
   end
 
   # route rmd/utilities/lookup/location/id/16
-  route 'utilities', 'rmd' do |r| # rubocop:disable Metrics/BlockLength
+  route 'utilities', 'rmd' do |r|
     # RMD LOOKUP A VALUE
     # --------------------------------------------------------------------------
     r.on 'lookup', String, String, String do |scan_type, scan_field, scan_value|
@@ -30,7 +29,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     # RMD BARCODE CHECK PAGE
     # --------------------------------------------------------------------------
-    r.is 'check_barcode' do # # rubocop:disable Metrics/BlockLength
+    r.is 'check_barcode' do
       r.get do
         form = Crossbeams::RMDForm.new({},
                                        form_name: :barcodes,
@@ -152,4 +151,3 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
   end
 end
-# rubocop:enable Metrics/BlockLength

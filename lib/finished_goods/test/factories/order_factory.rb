@@ -2,7 +2,7 @@
 
 module FinishedGoodsApp
   module OrderFactory
-    def create_order(opts = {}) # rubocop:disable Metrics/AbcSize
+    def create_order(opts = {})
       id = get_available_factory_record(:orders, opts)
       return id unless id.nil?
 
@@ -34,7 +34,7 @@ module FinishedGoodsApp
       DB[:orders].insert(default.merge(opts))
     end
 
-    def create_order_item(opts = {}) # rubocop:disable Metrics/AbcSize
+    def create_order_item(opts = {})
       id = get_available_factory_record(:order_items, opts)
       return id unless id.nil?
 

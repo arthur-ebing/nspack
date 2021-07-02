@@ -2,7 +2,7 @@
 
 module ProductionApp
   module ProductionRunFactory
-    def create_production_run(opts = {}) # rubocop:disable Metrics/AbcSize
+    def create_production_run(opts = {})
       id = get_available_factory_record(:production_runs, opts)
       return id unless id.nil?
 

@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class SeasonInteractor < BaseInteractor
-    def create_season(attrs) # rubocop:disable Metrics/AbcSize
+    def create_season(attrs)
       res = validate_season_params(attrs)
       return validation_failed_response(res) if res.failure?
 
@@ -20,7 +20,7 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def update_season(id, attrs) # rubocop:disable Metrics/AbcSize
+    def update_season(id, attrs)
       res = validate_season_params(attrs)
       return validation_failed_response(res) if res.failure?
 

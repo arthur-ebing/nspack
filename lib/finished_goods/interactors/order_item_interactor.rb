@@ -2,7 +2,7 @@
 
 module FinishedGoodsApp
   class OrderItemInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
-    def create_order_item(params) # rubocop:disable Metrics/AbcSize
+    def create_order_item(params)
       res = validate_order_item_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -62,7 +62,7 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def delete_order_item(id) # rubocop:disable Metrics/AbcSize
+    def delete_order_item(id)
       name = order_item(id).id
       repo.transaction do
         repo.delete_order_item(id)

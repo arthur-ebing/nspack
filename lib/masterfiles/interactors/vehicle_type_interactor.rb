@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class VehicleTypeInteractor < BaseInteractor
-    def create_vehicle_type(params) # rubocop:disable Metrics/AbcSize
+    def create_vehicle_type(params)
       res = validate_vehicle_type_params(params)
       return validation_failed_response(res) if res.failure?
 

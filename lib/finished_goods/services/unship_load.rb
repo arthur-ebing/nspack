@@ -11,7 +11,7 @@ module FinishedGoodsApp
       @user = user
     end
 
-    def call # rubocop:disable Metrics/AbcSize
+    def call
       res = TaskPermissionCheck::Load.call(:unship, load_id)
       raise Crossbeams::InfoError, res.message unless res.success
 

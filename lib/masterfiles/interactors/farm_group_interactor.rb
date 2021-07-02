@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class FarmGroupInteractor < BaseInteractor
-    def create_farm_group(params) # rubocop:disable Metrics/AbcSize
+    def create_farm_group(params)
       res = validate_farm_group_params(params)
       return validation_failed_response(res) if res.failure?
 

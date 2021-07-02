@@ -22,7 +22,7 @@ module Production
           allocation(recs.first)
         end
 
-        def self.allocation(rec) # rubocop:disable Metrics/AbcSize
+        def self.allocation(rec)
           return 'Nothing allocated' if rec.nil?
 
           size = if rec[:size_ref] && rec[:actual_count]

@@ -16,7 +16,7 @@ module UiRules
       form_name 'target_market'
     end
 
-    def set_show_fields # rubocop:disable Metrics/AbcSize
+    def set_show_fields
       fields[:target_market_name] = { renderer: :label }
       fields[:tm_group_ids] = { renderer: :list, caption: 'Groups', items: @repo.target_market_group_names_for(@options[:id]) }
       fields[:country_ids] = { renderer: :list, caption: 'Countries', items: @repo.destination_country_names_for(@options[:id]) }

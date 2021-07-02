@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
-class Nspack < Roda # rubocop:disable Metrics/ClassLength
-  route 'quality', 'masterfiles' do |r| # rubocop:disable Metrics/BlockLength
+class Nspack < Roda
+  route 'quality', 'masterfiles' do |r|
     # PALLET VERIFICATION FAILURE REASONS
     # --------------------------------------------------------------------------
-    r.on 'pallet_verification_failure_reasons', Integer do |id| # rubocop:disable Metrics/BlockLength
+    r.on 'pallet_verification_failure_reasons', Integer do |id|
       interactor = MasterfilesApp::PalletVerificationFailureReasonInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
@@ -74,7 +73,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     # SCRAP REASONS
     # --------------------------------------------------------------------------
-    r.on 'scrap_reasons', Integer do |id| # rubocop:disable Metrics/BlockLength
+    r.on 'scrap_reasons', Integer do |id|
       interactor = MasterfilesApp::ScrapReasonInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
@@ -476,4 +475,3 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
   end
 end
-# rubocop:enable Metrics/BlockLength

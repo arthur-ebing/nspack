@@ -4,7 +4,7 @@ module Masterfiles
   module Config
     module LabelTemplate
       class Variables
-        def self.call(id, source, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
+        def self.call(id, source, form_values: nil, form_errors: nil)
           ui_rule = UiRules::Compiler.new(:label_template, :variables, id: id, form_values: form_values)
           rules   = ui_rule.compile
 

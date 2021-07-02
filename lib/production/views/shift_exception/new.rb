@@ -4,7 +4,7 @@ module Production
   module Shifts
     module ShiftException
       class New
-        def self.call(parent_id, contract_worker_id, form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
+        def self.call(parent_id, contract_worker_id, form_values: nil, form_errors: nil, remote: true)
           ui_rule = UiRules::Compiler.new(:shift_exception, :new, form_values: form_values, contract_worker_id: contract_worker_id, shift_id: parent_id)
           rules   = ui_rule.compile
 

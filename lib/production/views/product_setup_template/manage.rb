@@ -8,7 +8,7 @@ module Production
           ui_rule = UiRules::Compiler.new(:product_setup_template, :manage, id: id)
           rules   = ui_rule.compile
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
+          layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             if AppConst::CR_PROD.use_packing_specifications?
               page.section do |section|

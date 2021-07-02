@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
 class Nspack < Roda
   route 'xml', 'messcada' do |r|
     response['Content-Type'] = 'application/xml'
@@ -109,4 +108,3 @@ class Nspack < Roda
     end
   end
 end
-# rubocop:enable Metrics/BlockLength

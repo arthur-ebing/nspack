@@ -24,7 +24,7 @@ module FinishedGoodsApp
         titan_inspection: :titan_inspection_check
       }.freeze
 
-      def call # rubocop:disable Metrics/AbcSize
+      def call
         return failed_response "Value #{id} is too big to be a Inspection Sheet. Perhaps you scanned a pallet number?" if id.to_i > AppConst::MAX_DB_INT
 
         @entity = @repo.find_govt_inspection_sheet(id)

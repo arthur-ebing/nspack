@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/ClassLength
-# rubocop:disable Metrics/BlockLength
-
 class Nspack < Roda
   route 'target_markets', 'masterfiles' do |r|
     # TARGET MARKET GROUP TYPES
@@ -440,6 +437,3 @@ class Nspack < Roda
     end
   end
 end
-
-# rubocop:enable Metrics/ClassLength
-# rubocop:enable Metrics/BlockLength

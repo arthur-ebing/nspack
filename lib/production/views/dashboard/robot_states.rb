@@ -3,7 +3,7 @@
 module Production
   module Dashboards
     module Dashboard
-      class RobotStates # rubocop:disable Metrics/ClassLength
+      class RobotStates
         def self.call
           Crossbeams::Layout::Page.build({}) do |page|
             page.add_text 'Robot states', wrapper: :h2

@@ -30,7 +30,7 @@ module FinishedGoodsApp
       success_response('Found Tracking Unit', instance)
     end
 
-    def elot(params, body) # rubocop:disable Metrics/AbcSize
+    def elot(params, body)
       auth_token_call if header.nil?
 
       url = "#{AppConst::E_CERT_ENVIRONMENT}tur.ecert.co.za/api/TrackingUnit/eLot?#{params}"

@@ -2,7 +2,7 @@
 
 module DevelopmentApp
   class ContactMethodTypeInteractor < BaseInteractor
-    def create_contact_method_type(params) # rubocop:disable Metrics/AbcSize
+    def create_contact_method_type(params)
       res = validate_contact_method_type_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -34,7 +34,7 @@ module DevelopmentApp
       failed_response(e.message)
     end
 
-    def delete_contact_method_type(id) # rubocop:disable Metrics/AbcSize
+    def delete_contact_method_type(id)
       name = find_contact_method_type(id).contact_method_type
       repo.transaction do
         repo.delete_contact_method_type(id)

@@ -2,7 +2,7 @@
 
 module RawMaterialsApp
   class BinLoadInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
-    def create_bin_load(params) # rubocop:disable Metrics/AbcSize
+    def create_bin_load(params)
       res = validate_bin_load_params(params)
       return validation_failed_response(res) if res.failure?
 

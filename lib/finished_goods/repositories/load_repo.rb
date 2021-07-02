@@ -179,7 +179,7 @@ module FinishedGoodsApp
       DB[:pallet_sequences].where(id: new_pallet_sequence_ids).update(target_customer_party_role_id: target_customer_id)
     end
 
-    def allocate_pallets(load_id, pallet_numbers, user) # rubocop:disable Metrics/AbcSize
+    def allocate_pallets(load_id, pallet_numbers, user)
       return if pallet_numbers.nil_or_empty?
 
       pallet_ids = select_values(:pallets, :id, pallet_number: pallet_numbers)

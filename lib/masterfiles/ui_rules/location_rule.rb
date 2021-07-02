@@ -2,7 +2,7 @@
 
 module UiRules
   class LocationRule < Base # rubocop:disable Metrics/ClassLength
-    def generate_rules  # rubocop:disable Metrics/AbcSize
+    def generate_rules
       @repo = MasterfilesApp::LocationRepo.new
       @print_repo = LabelApp::PrinterRepo.new
       make_form_object
@@ -90,7 +90,7 @@ module UiRules
       @form_object = OpenStruct.new(@form_object.to_h.merge(printer: @print_repo.default_printer_for_application(AppConst::PRINT_APP_LOCATION), no_of_prints: 1)) if @mode == :print_barcode
     end
 
-    def make_new_form_object # rubocop:disable Metrics/AbcSize
+    def make_new_form_object
       parent = @options[:id].nil? ? nil : @repo.find_location(@options[:id])
 
       types = @repo.for_select_location_types(where: { hierarchical: true })

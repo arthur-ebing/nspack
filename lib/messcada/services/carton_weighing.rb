@@ -26,7 +26,7 @@ module MesscadaApp
 
     private
 
-    def carton_weighing  # rubocop:disable Metrics/AbcSize
+    def carton_weighing # rubocop:disable Metrics/AbcSize
       return failed_response("Carton / Bin:#{carton_label_id} not verified") unless carton_label_carton_exists?
 
       if provide_pack_type
@@ -74,7 +74,7 @@ module MesscadaApp
       repo.find_standard_pack(plant_resource_button_indicator)
     end
 
-    def update_carton(id, attrs)  # rubocop:disable Metrics/AbcSize
+    def update_carton(id, attrs) # rubocop:disable Metrics/AbcSize
       repo.update_carton_label(carton_label_id, { standard_pack_code_id: standard_pack_code_id }) if provide_pack_type
       repo.update_carton(id, attrs)
       return unless carton_is_pallet

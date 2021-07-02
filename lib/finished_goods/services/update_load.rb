@@ -12,7 +12,7 @@ module FinishedGoodsApp
       @user = user
     end
 
-    def call # rubocop:disable Metrics/AbcSize
+    def call
       res = find_voyage
       res = create_voyage unless res.success
       return res unless res.success

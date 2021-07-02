@@ -9,7 +9,7 @@
 # update cartons.pallet_sequence_id to repacked pallet_sequence_id if pallet.has_individual_cartons
 #
 class FixCartonPalletSequence < BaseScript
-  def run  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+  def run # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
     query = <<~SQL
       SELECT pallet_sequences.id, pallet_sequences.repacked_from_pallet_id,
       pallet_sequences.pallet_sequence_number
@@ -86,7 +86,7 @@ class FixCartonPalletSequence < BaseScript
 
   private
 
-  def repacked_from_pallet_cartons(pallet_id, pallet_sequence_number)  # rubocop:disable Metrics/AbcSize
+  def repacked_from_pallet_cartons(pallet_id, pallet_sequence_number) # rubocop:disable Metrics/AbcSize
     sequence_id = DB[:pallet_sequences]
                   .where(scrapped_from_pallet_id: pallet_id)
                   .where(pallet_sequence_number: pallet_sequence_number)

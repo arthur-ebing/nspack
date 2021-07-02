@@ -51,7 +51,7 @@ module SecurityApp
       validation_failed_response(OpenStruct.new(messages: { ip_address: ['This registered mobile device already exists'] }))
     end
 
-    def update_registered_mobile_device(id, params) # rubocop:disable Metrics/AbcSize
+    def update_registered_mobile_device(id, params)
       res = validate_registered_mobile_device_params(params)
       return validation_failed_response(res) if res.failure?
 

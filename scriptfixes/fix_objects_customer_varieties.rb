@@ -11,7 +11,7 @@
 # on product_setups, carton_labels, cartons and pallet_sequences
 #
 class FixObjectsCustomerVarieties < BaseScript
-  def run  # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
+  def run # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
     query = <<~SQL
       SELECT DISTINCT customer_variety_id
       FROM carton_labels

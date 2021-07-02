@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class InspectionFailureTypeInteractor < BaseInteractor
-    def create_inspection_failure_type(params) # rubocop:disable Metrics/AbcSize
+    def create_inspection_failure_type(params)
       res = validate_inspection_failure_type_params(params)
       return validation_failed_response(res) if res.failure?
 

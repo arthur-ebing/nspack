@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
 module Quality
   module Config
     module OrchardTestType
@@ -50,4 +49,3 @@ module Quality
     end
   end
 end
-# rubocop:enable Metrics/BlockLength

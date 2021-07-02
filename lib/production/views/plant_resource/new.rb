@@ -4,7 +4,7 @@ module Production
   module Resources
     module PlantResource
       class New
-        def self.call(id: nil, form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
+        def self.call(id: nil, form_values: nil, form_errors: nil, remote: true)
           ui_rule = UiRules::Compiler.new(:plant_resource, :new, parent_id: id, form_values: form_values)
           rules   = ui_rule.compile
 

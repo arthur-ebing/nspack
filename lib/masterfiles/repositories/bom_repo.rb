@@ -162,7 +162,7 @@ module MasterfilesApp
       DB[query].all unless id.nil?
     end
 
-    def for_select_pm_boms(where: {}, exclude: {}, active: true) # rubocop:disable Metrics/AbcSize
+    def for_select_pm_boms(where: {}, exclude: {}, active: true)
       DB[:pm_boms]
         .left_outer_join(:pm_boms_products, pm_bom_id: Sequel[:pm_boms][:id])
         .left_outer_join(:pm_products, id: Sequel[:pm_boms_products][:pm_product_id])
@@ -192,7 +192,7 @@ module MasterfilesApp
       DB[query, where[:std_fruit_size_count_id], where[:basic_pack_id]].select_map(%i[bom_code id])
     end
 
-    def for_select_pm_marks(where: {}, active: true) # rubocop:disable Metrics/AbcSize
+    def for_select_pm_marks(where: {}, active: true)
       DB[:pm_marks]
         .join(:marks, id: :mark_id)
         .where(Sequel[:pm_marks][:active] => active)
@@ -416,7 +416,7 @@ module MasterfilesApp
         .first
     end
 
-    def available_for_clone_fruit_count_products(pm_bom_id, pm_subtype_id) # rubocop:disable Metrics/AbcSize
+    def available_for_clone_fruit_count_products(pm_bom_id, pm_subtype_id)
       return nil if pm_subtype_id.nil_or_empty?
 
       DB[:pm_products]

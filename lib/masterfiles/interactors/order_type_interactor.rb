@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class OrderTypeInteractor < BaseInteractor
-    def create_order_type(params) # rubocop:disable Metrics/AbcSize
+    def create_order_type(params)
       res = validate_order_type_params(params)
       return validation_failed_response(res) if res.failure?
 

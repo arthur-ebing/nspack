@@ -22,7 +22,7 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def update_pm_boms_product(id, params)  # rubocop:disable Metrics/AbcSize
+    def update_pm_boms_product(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_pm_boms_product_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -38,7 +38,7 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def delete_pm_boms_product(id)  # rubocop:disable Metrics/AbcSize
+    def delete_pm_boms_product(id) # rubocop:disable Metrics/AbcSize
       instance = pm_boms_product(id)
       name = instance.id
       pm_bom_id = instance.pm_bom_id
@@ -81,7 +81,7 @@ module MasterfilesApp
       res
     end
 
-    def update_quantity(bom_product_id, params)  # rubocop:disable Metrics/AbcSize
+    def update_quantity(bom_product_id, params) # rubocop:disable Metrics/AbcSize
       pm_bom_id = DB[:pm_boms_products].where(id: bom_product_id).get(:pm_bom_id)
 
       repo.transaction do

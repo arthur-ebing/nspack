@@ -17,7 +17,7 @@
 class UdFixMissingIncentives < BaseScript
   require 'csv'
 
-  def run # rubocop:disable Metrics/AbcSize
+  def run
     updates = calculate_updates
 
     unless debug_mode

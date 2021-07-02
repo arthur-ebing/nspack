@@ -16,7 +16,7 @@ module UiRules
       form_name 'season'
     end
 
-    def set_show_fields # rubocop:disable Metrics/AbcSize
+    def set_show_fields
       fields[:season_group_id] = { renderer: :label,
                                    with_value: @repo.find_season_group(@form_object.season_group_id)&.season_group_code }
       fields[:commodity_id] = { renderer: :label,

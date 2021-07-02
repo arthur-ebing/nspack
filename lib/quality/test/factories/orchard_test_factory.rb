@@ -2,7 +2,7 @@
 
 module QualityApp
   module OrchardTestFactory
-    def create_orchard_test_type(opts = {}) # rubocop:disable Metrics/AbcSize
+    def create_orchard_test_type(opts = {})
       id = get_available_factory_record(:orchard_test_types, opts)
       return id unless id.nil?
 

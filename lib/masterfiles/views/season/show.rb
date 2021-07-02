@@ -4,7 +4,7 @@ module Masterfiles
   module Calendar
     module Season
       class Show
-        def self.call(id) # rubocop:disable Metrics/AbcSize
+        def self.call(id)
           ui_rule = UiRules::Compiler.new(:season, :show, id: id)
           rules   = ui_rule.compile
 

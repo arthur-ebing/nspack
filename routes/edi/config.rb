@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-class Nspack < Roda # rubocop:disable  Metrics/ClassLength
-  route 'config', 'edi' do |r| # rubocop:disable Metrics/BlockLength
+class Nspack < Roda
+  route 'config', 'edi' do |r|
     interactor = EdiApp::EdiOutRuleInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
     # EDI OUT RULES
     # --------------------------------------------------------------------------
-    r.on 'edi_out_rules', Integer do |id| # rubocop:disable Metrics/BlockLength
+    r.on 'edi_out_rules', Integer do |id|
       r.on 'edit' do   # EDIT
         check_auth!('config', 'edit')
         interactor.assert_permission!(:edit, id)
@@ -14,7 +14,7 @@ class Nspack < Roda # rubocop:disable  Metrics/ClassLength
         show_partial_or_page(r) { Edi::Config::EdiOutRule::Edit.call(id) }
       end
 
-      r.is do # rubocop:disable Metrics/BlockLength
+      r.is do
         r.get do       # SHOW
           check_auth!('config', 'read')
           show_partial { Edi::Config::EdiOutRule::Show.call(id) }
@@ -51,13 +51,13 @@ class Nspack < Roda # rubocop:disable  Metrics/ClassLength
       end
     end
 
-    r.on 'edi_out_rules' do # rubocop:disable Metrics/BlockLength
+    r.on 'edi_out_rules' do
       r.get do
         check_auth!('config', 'new')
         show_partial_or_page(r) { Edi::Config::EdiOutRule::New.call(remote: fetch?(r)) }
       end
 
-      r.post do # rubocop:disable Metrics/BlockLength
+      r.post do
         params[:edi_out_rule].delete_if { |_k, v| v.nil_or_empty? }
         if params[:edi_out_rule][:flow_type].nil_or_empty?
           res = OpenStruct.new(message: 'Validation Error', errors: { flow_type: ['must be filled'] })
@@ -93,7 +93,7 @@ class Nspack < Roda # rubocop:disable  Metrics/ClassLength
       end
     end
 
-    r.on 'flow_type_changed' do # rubocop:disable Metrics/BlockLength
+    r.on 'flow_type_changed' do
       unless params[:changed_value].nil_or_empty?
         repo = EdiApp::EdiOutRepo.new
         rules_template = AppConst::EDI_OUT_RULES_TEMPLATE
@@ -144,7 +144,7 @@ class Nspack < Roda # rubocop:disable  Metrics/ClassLength
                                    dom_id: 'edi_out_rule_party_role_id_field_wrapper')])
     end
 
-    r.on 'destination_type_changed' do # rubocop:disable Metrics/BlockLength
+    r.on 'destination_type_changed' do
       case params[:changed_value]
       when AppConst::DEPOT_DESTINATION_TYPE
         depots = MasterfilesApp::DepotRepo.new.for_select_depots

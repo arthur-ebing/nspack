@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class VoyageTypeInteractor < BaseInteractor
-    def create_voyage_type(params) # rubocop:disable Metrics/AbcSize
+    def create_voyage_type(params)
       res = validate_voyage_type_params(params)
       return validation_failed_response(res) if res.failure?
 

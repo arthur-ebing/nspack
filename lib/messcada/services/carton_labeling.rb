@@ -55,7 +55,7 @@ module MesscadaApp
         .gsub('$:orchard_code$', farm_codes[:orchard_code].to_s)
     end
 
-    def carton_labeling  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+    def carton_labeling # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       res = retrieve_resource_cached_setup_data
       return res unless res.success
 
@@ -98,7 +98,7 @@ module MesscadaApp
       setup_data[:production_run_data][:target_customer_party_role_id] || setup_data[:setup_data][:target_customer_party_role_id]
     end
 
-    def resolve_marketing_attrs # rubocop:disable Metrics/AbcSize
+    def resolve_marketing_attrs
       @dedicated_pack = !params[:bin_number].nil_or_empty?
       attrs = dedicated_pack ? dp_bin_farm_attrs : production_run_farm_attrs
 

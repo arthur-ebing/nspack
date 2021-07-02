@@ -158,7 +158,7 @@ module UiRules
                                    dom_id: 'packing_specification_wizard_fruit_actual_counts_for_pack_id_field_wrapper')])
     end
 
-    def basic_pack_changed # rubocop:disable Metrics/AbcSize
+    def basic_pack_changed
       form_object_merge!(params)
       @form_object[:basic_pack_code_id] = params[:changed_value].to_i
       @form_object[:commodity_id] = params[:packing_specification_wizard_commodity_id].to_i
@@ -170,7 +170,7 @@ module UiRules
                                    options_array: fields[:fruit_actual_counts_for_pack_id][:options])])
     end
 
-    def std_fruit_size_count_changed # rubocop:disable Metrics/AbcSize
+    def std_fruit_size_count_changed
       form_object_merge!(params)
       @form_object[:std_fruit_size_count_id] = params[:changed_value].to_i
       @form_object[:commodity_id] = params[:packing_specification_wizard_commodity_id].to_i

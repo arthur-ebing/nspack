@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module ProductionApp  # rubocop:disable Metrics/ModuleLength
+module ProductionApp # rubocop:disable Metrics/ModuleLength
   ReworksRunSchema = Dry::Schema.Params do
     optional(:id).filled(:integer)
     required(:user).filled(Types::StrippedString)

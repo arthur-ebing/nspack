@@ -145,7 +145,7 @@ module FinishedGoodsApp
       end
     end
 
-    def truck_arrival(id, params) # rubocop:disable Metrics/AbcSize
+    def truck_arrival(id, params)
       vehicle_res = LoadVehicleSchema.call(params)
       return validation_failed_response(vehicle_res) if vehicle_res.failure?
 

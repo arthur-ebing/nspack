@@ -9,7 +9,7 @@
 # There was a bug in the nett weight calculation on the fn_pallet_seq_nett_weight_calc trigger
 #
 class FixPalletNettWeights < BaseScript
-  def run  # rubocop:disable Metrics/AbcSize
+  def run # rubocop:disable Metrics/AbcSize
     query = <<~SQL
       SELECT id FROM pallets
        WHERE gross_weight IS NOT NULL

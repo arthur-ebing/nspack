@@ -462,7 +462,7 @@ module MesscadaApp
       success_response('ok', current_bay_attributes(state_machine, confirm))
     end
 
-    def return_pallet_to_bay(state_machine, params)  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def return_pallet_to_bay(state_machine, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       carton_number = params[:carton_number]
       return failed_response("Cannot return pallet to bay. #{state_machine.current} state", current_bay_attributes(state_machine, { carton_number: carton_number })) unless state_machine.target.action == :return_to_bay
 

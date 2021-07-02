@@ -59,7 +59,7 @@ module MesscadaApp
       ok_response
     end
 
-    def set_pallet_params  # rubocop:disable Metrics/AbcSize
+    def set_pallet_params # rubocop:disable Metrics/AbcSize
       if !carton_equals_pallet && AppConst::USE_CARTON_PALLETIZING && carton_quantity == 1
         partially_palletized = true
         status = AppConst::PALLETIZING

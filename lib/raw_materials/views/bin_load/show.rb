@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
 module RawMaterials
   module Dispatch
     module BinLoad
@@ -81,4 +80,3 @@ module RawMaterials
     end
   end
 end
-# rubocop:enable Metrics/BlockLength

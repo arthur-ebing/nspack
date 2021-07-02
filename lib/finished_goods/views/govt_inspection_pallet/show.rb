@@ -4,7 +4,7 @@ module FinishedGoods
   module Inspection
     module GovtInspectionPallet
       class Show
-        def self.call(id) # rubocop:disable Metrics/AbcSize
+        def self.call(id)
           ui_rule = UiRules::Compiler.new(:govt_inspection_pallet, :show, id: id)
           rules   = ui_rule.compile
 

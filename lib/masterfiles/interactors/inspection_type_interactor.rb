@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class InspectionTypeInteractor < BaseInteractor
-    def create_inspection_type(params) # rubocop:disable Metrics/AbcSize
+    def create_inspection_type(params)
       res = validate_inspection_type_params(params)
       return validation_failed_response(res) if res.failure?
 

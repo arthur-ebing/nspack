@@ -100,7 +100,7 @@ module FinishedGoodsApp
       TitanInspectionFlat.new(hash)
     end
 
-    def compile_inspection(govt_inspection_sheet_id) # rubocop:disable Metrics/AbcSize
+    def compile_inspection(govt_inspection_sheet_id)
       govt_inspection_sheet = GovtInspectionRepo.new.find_govt_inspection_sheet(govt_inspection_sheet_id)
       { consignmentNumber: govt_inspection_sheet.consignment_note_number,
         bookingRef: govt_inspection_sheet.booking_reference,

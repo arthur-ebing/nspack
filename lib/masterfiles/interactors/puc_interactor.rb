@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class PucInteractor < BaseInteractor
-    def create_puc(params) # rubocop:disable Metrics/AbcSize
+    def create_puc(params)
       res = validate_puc_params(params)
       return validation_failed_response(res) if res.failure?
 

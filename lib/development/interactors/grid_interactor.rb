@@ -1,10 +1,7 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/ClassLength
-# rubocop:disable Metrics/AbcSize
-
 module DevelopmentApp
-  class GridInteractor < BaseInteractor
+  class GridInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def list_grids
       row_defs = []
       dm_path  = Pathname.new('grid_definitions/dataminer_queries')
@@ -250,7 +247,7 @@ module DevelopmentApp
        { headerName: 'URL', field: 'url', width: 500 }]
     end
 
-    def action_row_defs(file)
+    def action_row_defs(file) # rubocop:disable Metrics/AbcSize
       rows = []
       (load_list_file(file)[:actions] || []).each do |action|
         if action[:separator]
@@ -308,5 +305,3 @@ module DevelopmentApp
     end
   end
 end
-# rubocop:enable Metrics/ClassLength
-# rubocop:enable Metrics/AbcSize

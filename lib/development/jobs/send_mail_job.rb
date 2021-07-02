@@ -43,7 +43,7 @@ module DevelopmentApp
       mail['reply_to'] = options[:from] if options[:from] && AppConst::EMAIL_REQUIRES_REPLY_TO
     end
 
-    def process_attachments(mail, options) # rubocop:disable Metrics/AbcSize
+    def process_attachments(mail, options)
       (options[:attachments] || []).each do |rule|
         assert_attachment_ok!(rule)
         if rule[:path]

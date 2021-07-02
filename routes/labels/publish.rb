@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
-
 class Nspack < Roda
   # route 'publish', 'labels' do |r|
   route 'publish', 'labels' do |r|
@@ -71,4 +69,3 @@ class Nspack < Roda
     end
   end
 end
-# rubocop:enable Metrics/BlockLength

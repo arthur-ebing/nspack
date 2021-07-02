@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class RegistrationInteractor < BaseInteractor
-    def create_registration(params) # rubocop:disable Metrics/AbcSize
+    def create_registration(params)
       res = validate_registration_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -34,7 +34,7 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def delete_registration(id) # rubocop:disable Metrics/AbcSize
+    def delete_registration(id)
       name = registration(id).registration_type
       repo.transaction do
         repo.delete_registration(id)

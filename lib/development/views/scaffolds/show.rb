@@ -3,12 +3,12 @@
 module Development
   module Generators
     module Scaffolds
-      class Show # rubocop:disable Metrics/ClassLength
+      class Show
         def self.call(results) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
           ui_rule = UiRules::Compiler.new(:scaffolds, :new)
           rules   = ui_rule.compile
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
+          layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.section do |section|
               section.add_text <<~HTML
                 <p>
@@ -202,7 +202,7 @@ module Development
           layout
         end
 
-        def self.save_snippet_form(section, path, code) # rubocop:disable Metrics/AbcSize
+        def self.save_snippet_form(section, path, code)
           if !File.exist?(File.join(ENV['ROOT'], path))
             section.form do |form|
               form.form_config = {

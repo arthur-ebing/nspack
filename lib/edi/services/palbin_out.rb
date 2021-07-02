@@ -9,7 +9,7 @@ module EdiApp
       super(AppConst::EDI_FLOW_PALBIN, edi_out_transaction_id, logger)
     end
 
-    def call # rubocop:disable Metrics/AbcSize
+    def call
       log('Starting transform...')
       prepare_data
       return success_response('No data for PALBIN') if record_entries.length.zero?

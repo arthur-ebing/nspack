@@ -202,7 +202,7 @@ module UtilityFunctions # rubocop:disable Metrics/ModuleLength
   #
   # @param size [integer] the size in bytes
   # @return [string] the human-readable version of the size
-  def filesize(size) # rubocop:disable Metrics/AbcSize
+  def filesize(size)
     units = %w[B KiB MiB GiB TiB Pib EiB]
 
     return '0.0 B' if size.zero?

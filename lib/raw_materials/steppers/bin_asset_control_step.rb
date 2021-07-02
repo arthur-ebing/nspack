@@ -28,7 +28,7 @@ module RawMaterialsApp
       write(read.merge(bin_sets: bin_sets))
     end
 
-    def add_bin_set(set) # rubocop:disable Metrics/AbcSize
+    def add_bin_set(set)
       sets = bin_sets
       sets.each do |r|
         same_owner = r[:rmt_material_owner_party_role_id] == set[:rmt_material_owner_party_role_id]

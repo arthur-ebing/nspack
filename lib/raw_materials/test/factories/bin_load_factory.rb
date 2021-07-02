@@ -44,7 +44,7 @@ module RawMaterialsApp
       bin_load_id
     end
 
-    def create_bin_load_product(opts = {}) # rubocop:disable Metrics/AbcSize
+    def create_bin_load_product(opts = {})
       bin_load_id = opts[:bin_load_id] || create_bin_load
       cultivar_id = create_cultivar
       cultivar_group_id = create_cultivar_group

@@ -95,7 +95,7 @@ class MesscadaXMLInterpreter
 
   private
 
-  def validate_root_and_attributes(root, attrs = {}) # rubocop:disable Metrics/AbcSize
+  def validate_root_and_attributes(root, attrs = {})
     raise Crossbeams::FrameworkError, %(XML root "#{schema.children.first.node_name}" is expected to be "#{root}".) unless schema.children.first.node_name == root
 
     attrs.each do |key, val|

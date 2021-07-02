@@ -5,7 +5,7 @@ module MasterfilesApp
     attr_reader :repo, :user, :party_role_id, :role_id
     attr_accessor :params
 
-    def initialize(role, params, user) # rubocop:disable Metrics/AbcSize
+    def initialize(role, params, user)
       @repo = PartyRepo.new
       @user = user
       @params = params

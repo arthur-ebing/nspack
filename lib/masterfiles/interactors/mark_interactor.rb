@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class MarkInteractor < BaseInteractor
-    def create_mark(params) # rubocop:disable Metrics/AbcSize
+    def create_mark(params)
       res = validate_mark_params(params)
       return validation_failed_response(res) if res.failure?
 

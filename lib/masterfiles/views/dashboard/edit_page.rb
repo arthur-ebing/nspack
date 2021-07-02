@@ -4,7 +4,7 @@ module Masterfiles
   module Config
     module Dashboard
       class EditPage
-        def self.call(key, index) # rubocop:disable Metrics/AbcSize
+        def self.call(key, index)
           ui_rule = UiRules::Compiler.new(:dashboard, :edit_page, key: key, index: index)
           rules   = ui_rule.compile
 

@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength, Metrics/ClassLength
 class Nspack < Roda
   route 'dispatch', 'finished_goods' do |r|
     # VOYAGES_PORTS
@@ -571,4 +570,4 @@ class Nspack < Roda
     end
   end
 end
-# rubocop:enable Metrics/BlockLength, Metrics/ClassLength
+# rubocop:enable

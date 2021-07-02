@@ -2,7 +2,7 @@
 
 module ProductionApp
   class ProductSetupInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
-    def create_product_setup(params)  # rubocop:disable Metrics/AbcSize
+    def create_product_setup(params) # rubocop:disable Metrics/AbcSize
       res = validate_product_setup_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -124,7 +124,7 @@ module ProductionApp
                                     cell_transformers: { quantity: :decimal }).render
     end
 
-    def add_pm_bom_products_packaging_marks(pm_bom_products, pm_mark_id) # rubocop:disable Metrics/AbcSize
+    def add_pm_bom_products_packaging_marks(pm_bom_products, pm_mark_id)
       packaging_marks = MasterfilesApp::BomRepo.new.find_packaging_marks_by_fruitspec_mark(pm_mark_id)
       return pm_bom_products if packaging_marks.nil_or_empty?
 

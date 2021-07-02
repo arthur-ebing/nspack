@@ -4,7 +4,7 @@ module Masterfiles
   module Config
     module Dashboard
       class ImagePage
-        def self.call(key, mode) # rubocop:disable Metrics/AbcSize
+        def self.call(key, mode)
           ui_rule = UiRules::Compiler.new(:dashboard, mode, key: key)
           rules   = ui_rule.compile
           action = mode == :new_image_page ? 'save' : 'update'

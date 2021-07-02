@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
-# rubocop:disable Metrics/ClassLength
-
 class Nspack < Roda
   route 'human_resources', 'masterfiles' do |r|
     # EMPLOYMENT TYPES
@@ -554,5 +551,3 @@ class Nspack < Roda
     end
   end
 end
-# rubocop:enable Metrics/BlockLength
-# rubocop:enable Metrics/ClassLength

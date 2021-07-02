@@ -167,7 +167,7 @@ module MasterfilesApp
       success_response("Created new dashboard #{key}: #{params[:description]}")
     end
 
-    def update_dashboard(key, params) # rubocop:disable Metrics/AbcSize
+    def update_dashboard(key, params)
       config = load_config('dashboards.yml')
       config[key]['description'] = params[:description]
       rewrite_config('dashboards.yml', config)

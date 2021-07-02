@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class PalletVerificationFailureReasonInteractor < BaseInteractor
-    def create_pallet_verification_failure_reason(params)  # rubocop:disable Metrics/AbcSize
+    def create_pallet_verification_failure_reason(params)
       res = validate_pallet_verification_failure_reason_params(params)
       return validation_failed_response(res) if res.failure?
 

@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class StandardPackInteractor < BaseInteractor
-    def create_standard_pack(params) # rubocop:disable Metrics/AbcSize
+    def create_standard_pack(params)
       res = validate_standard_pack_params(params)
       return validation_failed_response(res) if res.failure?
 

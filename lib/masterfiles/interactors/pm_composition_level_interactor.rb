@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class PmCompositionLevelInteractor < BaseInteractor
-    def create_pm_composition_level(params)  # rubocop:disable Metrics/AbcSize
+    def create_pm_composition_level(params)
       res = validate_pm_composition_level_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -36,7 +36,7 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def delete_pm_composition_level(id)  # rubocop:disable Metrics/AbcSize
+    def delete_pm_composition_level(id) # rubocop:disable Metrics/AbcSize
       name = pm_composition_level(id).description
       repo.transaction do
         repo.delete_pm_composition_level(id)

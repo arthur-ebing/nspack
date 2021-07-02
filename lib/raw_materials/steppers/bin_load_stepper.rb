@@ -93,7 +93,7 @@ module RawMaterialsApp
       loaded_bins
     end
 
-    def progress # rubocop:disable Metrics/AbcSize
+    def progress
       return '' if current_step.nil?
 
       progress_text = ''

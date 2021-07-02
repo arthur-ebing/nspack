@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
 class Nspack < Roda
-  route 'rmt', 'messcada' do |r| # rubocop:disable Metrics/BlockLength
+  route 'rmt', 'messcada' do |r|
     # --------------------------------------------------------------------------
     # RMT BIN WEIGHING
     # view-source:http://192.168.43.254:9296/messcada/rmt/bin_weighing?bin_number=1234&gross_weight=600.23&measurement_unit=KG
@@ -72,4 +71,3 @@ class Nspack < Roda
     end
   end
 end
-# rubocop:enable Metrics/BlockLength

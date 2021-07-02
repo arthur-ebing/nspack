@@ -7,10 +7,10 @@ module FinishedGoods
         ui_rule = UiRules::Compiler.new(:govt_inspection_sheet, :show, id: id)
         rules   = ui_rule.compile
 
-        layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
+        layout = Crossbeams::Layout::Page.build(rules) do |page|
           page.form_object ui_rule.form_object
           page.add_text rules[:compact_header]
-          page.form do |form| # rubocop:disable Metrics/BlockLength
+          page.form do |form|
             form.action url
             form.no_submit!
             form.remote! if remote

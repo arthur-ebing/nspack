@@ -40,7 +40,7 @@ module MasterfilesApp
       success_response("Deleted location type #{name}")
     end
 
-    def create_root_location(params) # rubocop:disable Metrics/AbcSize
+    def create_root_location(params)
       res = validate_location_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -57,7 +57,7 @@ module MasterfilesApp
       validation_failed_response(OpenStruct.new(messages: { receiving_bay_type_location: [e.message] }))
     end
 
-    def create_location(parent_id, params) # rubocop:disable Metrics/AbcSize
+    def create_location(parent_id, params)
       res = validate_location_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -277,7 +277,7 @@ module MasterfilesApp
       LocationStorageTypeSchema.call(params)
     end
 
-    def stock_grid_col_defs(type)  # rubocop:disable Metrics/AbcSize
+    def stock_grid_col_defs(type) # rubocop:disable Metrics/AbcSize
       col_names = stock_grid_col_names(type)
 
       Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|

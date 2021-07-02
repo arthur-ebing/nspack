@@ -4,7 +4,7 @@ module QualityApp
   class PhytCleanApi < BaseRepo
     attr_reader :http, :header
 
-    def auth_token_call # rubocop:disable Metrics/AbcSize
+    def auth_token_call
       @http = Crossbeams::HTTPCalls.new(call_logger: call_logger, open_timeout: AppConst::PHYT_CLEAN_OPEN_TIMEOUT, read_timeout: AppConst::PHYT_CLEAN_READ_TIMEOUT)
       url = "#{AppConst::PHYT_CLEAN_ENVIRONMENT}/api/oauth2/token"
       raise Crossbeams::InfoError, 'Service Unavailable: Failed to connect to remote server.' unless http.can_ping?(url)
@@ -39,7 +39,7 @@ module QualityApp
       success_response('Received glossary', instance)
     end
 
-    def request_phyt_clean_standard_data(phyt_clean_season_id, puc_ids) # rubocop:disable Metrics/AbcSize
+    def request_phyt_clean_standard_data(phyt_clean_season_id, puc_ids)
       auth_token_call if header.nil?
 
       url = "#{AppConst::PHYT_CLEAN_ENVIRONMENT}/api/standardphytodata"

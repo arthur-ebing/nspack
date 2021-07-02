@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class BasicPackInteractor < BaseInteractor
-    def create_basic_pack(params) # rubocop:disable Metrics/AbcSize
+    def create_basic_pack(params)
       res = validate_basic_pack_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -34,7 +34,7 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def delete_basic_pack(id) # rubocop:disable Metrics/AbcSize
+    def delete_basic_pack(id)
       name = basic_pack(id).basic_pack_code
       repo.transaction do
         repo.delete_basic_pack(id)

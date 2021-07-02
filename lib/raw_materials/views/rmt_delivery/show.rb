@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
 module RawMaterials
   module Deliveries
     module RmtDelivery
-      class Show # rubocop:disable Metrics/ClassLength
+      class Show
         def self.call(id, back_url:) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:rmt_delivery, :show, id: id)
           rules   = ui_rule.compile
@@ -118,4 +117,3 @@ module RawMaterials
     end
   end
 end
-# rubocop:enable Metrics/BlockLength

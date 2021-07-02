@@ -2,7 +2,7 @@
 
 module RawMaterialsApp
   class RmtDeliveryInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
-    def create_rmt_delivery(params) # rubocop:disable Metrics/AbcSize
+    def create_rmt_delivery(params)
       res = validate_rmt_delivery_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -222,7 +222,7 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def create_cost_type(params) # rubocop:disable Metrics/AbcSize
+    def create_cost_type(params)
       res = validate_cost_type_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -271,7 +271,7 @@ module RawMaterialsApp
       failed_response("Unable to delete cost type. It is still referenced#{e.message.partition('referenced').last}")
     end
 
-    def create_cost(params) # rubocop:disable Metrics/AbcSize
+    def create_cost(params)
       res = validate_cost_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -353,7 +353,7 @@ module RawMaterialsApp
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 
-    def create_rmt_delivery_cost(id, params) # rubocop:disable Metrics/AbcSize
+    def create_rmt_delivery_cost(id, params)
       params[:rmt_delivery_id] = id
       res = validate_rmt_delivery_cost_params(params)
       return validation_failed_response(res) if res.failure?

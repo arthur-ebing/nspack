@@ -38,11 +38,11 @@ module Production
           end
 
           multi_select_caption = rules[:bin_run_type] ? 'Bins' : 'Pallets'
-          layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
+          layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
-            page.form do |form| # rubocop:disable Metrics/BlockLength
+            page.form do |form|
               form.caption 'New Reworks Run'
               form.action "/production/reworks/reworks_run_types/#{reworks_run_type_id}/reworks_runs/new"
               form.remote! if remote

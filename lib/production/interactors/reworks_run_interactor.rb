@@ -82,7 +82,7 @@ module ProductionApp
       success_response('bulk bin_tipping queued up successfully', runs: bins_to_be_tipped_individually, bg_job_bins: bg_job_bins)
     end
 
-    def tip_bin_against_run(id, column_value, bg_job_bins, bins_with_editable_suggested_runs) # rubocop:disable Metrics/AbcSize
+    def tip_bin_against_run(id, column_value, bg_job_bins, bins_with_editable_suggested_runs)
       # TODO
       # validate_if_tiping
 
@@ -263,7 +263,7 @@ module ProductionApp
       success_response('ok', params)
     end
 
-    def validate_rmt_deliveries(params) # rubocop:disable Metrics/AbcSize
+    def validate_rmt_deliveries(params)
       from_delivery_id = params[:from_delivery_id]
       to_delivery_id = params[:to_delivery_id]
       from_delivery = repo.details_for_rmt_delivery(from_delivery_id)
@@ -287,7 +287,7 @@ module ProductionApp
       return "INVALID CULTIVAR: From: #{from_instance[:cultivar_name]}. To: #{to_instance[:cultivar_name]}" unless from_instance[:cultivar_id] == to_instance[:cultivar_id]
     end
 
-    def change_bin_delivery(reworks_run_type_id, multiselect_list, attrs)  # rubocop:disable Metrics/AbcSize
+    def change_bin_delivery(reworks_run_type_id, multiselect_list, attrs) # rubocop:disable Metrics/AbcSize
       res = resolve_rmt_bins_from_multiselect(reworks_run_type_id, multiselect_list)
       return validation_failed_response(res) unless res.success
 
@@ -312,7 +312,7 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def validate_change_delivery_orchard_screen_params(params) # rubocop:disable Metrics/AbcSize
+    def validate_change_delivery_orchard_screen_params(params)
       res = validate_only_cultivar_change(params)
       if res.failure?
         error_res = validation_failed_response(res)
@@ -349,7 +349,7 @@ module ProductionApp
       FromCultivarSchema.call(params)
     end
 
-    def resolve_deliveries_from_multiselect(params, multiselect_list)  # rubocop:disable Metrics/AbcSize
+    def resolve_deliveries_from_multiselect(params, multiselect_list) # rubocop:disable Metrics/AbcSize
       return failed_response('Delivery selection cannot be empty') if multiselect_list.nil_or_empty?
 
       rmt_deliveries = selected_deliveries(multiselect_list)
@@ -518,7 +518,7 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def bulk_production_run_update(reworks_run_type_id, multiselect_list, attrs)  # rubocop:disable Metrics/AbcSize
+    def bulk_production_run_update(reworks_run_type_id, multiselect_list, attrs) # rubocop:disable Metrics/AbcSize
       return failed_response('Pallet sequence selection cannot be empty') if multiselect_list.nil_or_empty?
 
       reworks_run_type = reworks_run_type(reworks_run_type_id)
@@ -556,7 +556,7 @@ module ProductionApp
       end
     end
 
-    def resolve_update_selected_input(reworks_run_type, attrs)  # rubocop:disable Metrics/AbcSize
+    def resolve_update_selected_input(reworks_run_type, attrs) # rubocop:disable Metrics/AbcSize
       change_descriptions = {}
       case reworks_run_type
       when AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE
@@ -616,7 +616,7 @@ module ProductionApp
       end
     end
 
-    def create_reworks_run(reworks_run_type_id, params)  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+    def create_reworks_run(reworks_run_type_id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       reworks_run_type = reworks_run_type(reworks_run_type_id)
       res = validate_pallets_selected_input(reworks_run_type, params)
       return validation_failed_response(res) unless res.success
@@ -728,7 +728,7 @@ module ProductionApp
       success_response('Bins Scrapped successfully', reworks_run_id: id)
     end
 
-    def create_unscrap_bin_reworks_run(params) # rubocop:disable Metrics/AbcSize
+    def create_unscrap_bin_reworks_run(params)
       repo.unscrapped_bin_bulk_update(params)
       id = repo.create_reworks_run(user: params[:user],
                                    reworks_run_type_id: params[:reworks_run_type_id],
@@ -743,7 +743,7 @@ module ProductionApp
       success_response('Bins Unscrapped successfully', reworks_run_id: id)
     end
 
-    def print_reworks_pallet_label(pallet_number, params)  # rubocop:disable Metrics/AbcSize
+    def print_reworks_pallet_label(pallet_number, params)
       res = validate_print_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -758,7 +758,7 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def print_reworks_carton_label(sequence_id, params)  # rubocop:disable Metrics/AbcSize
+    def print_reworks_carton_label(sequence_id, params)
       res = validate_print_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -773,7 +773,7 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def clone_pallet_sequence(params)  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def clone_pallet_sequence(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       res = validate_clone_sequence_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -819,7 +819,7 @@ module ProductionApp
       }
     end
 
-    def remove_pallet_sequence(sequence_id, reworks_run_type_id)  # rubocop:disable Metrics/AbcSize
+    def remove_pallet_sequence(sequence_id, reworks_run_type_id) # rubocop:disable Metrics/AbcSize
       before_attrs = remove_sequence_changes(sequence_id)
       return failed_response('Sequence cannot be removed', pallet_number: before_attrs[:pallet_number]) if cannot_remove_sequence(before_attrs[:pallet_id])
 
@@ -849,7 +849,7 @@ module ProductionApp
         pallet_number: instance[:pallet_number] }
     end
 
-    def edit_carton_quantities(sequence_id, reworks_run_type_id, params)  # rubocop:disable Metrics/AbcSize
+    def edit_carton_quantities(sequence_id, reworks_run_type_id, params) # rubocop:disable Metrics/AbcSize
       res = validate_edit_carton_quantity_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -869,7 +869,7 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def update_reworks_run_pallet_sequence(params)  # rubocop:disable Metrics/AbcSize
+    def update_reworks_run_pallet_sequence(params) # rubocop:disable Metrics/AbcSize
       if AppConst::CR_MF.basic_pack_equals_standard_pack?
         standard_pack_id = repo.get_value(:basic_packs_standard_packs, :standard_pack_id, basic_pack_id: params[:basic_pack_code_id])
         params[:standard_pack_code_id] = standard_pack_id
@@ -894,7 +894,7 @@ module ProductionApp
       recalc
     end
 
-    def update_pallet_sequence_record(sequence_id, reworks_run_type_id, res, batch_pallet_numbers = nil)  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+    def update_pallet_sequence_record(sequence_id, reworks_run_type_id, res, batch_pallet_numbers = nil) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       batch_update = batch_pallet_numbers.nil_or_empty? ? false : true
       before_attrs = sequence_setup_attrs(sequence_id).sort.to_h
 
@@ -988,7 +988,7 @@ module ProductionApp
       pallet_numbers.join("\n")
     end
 
-    def update_reworks_production_run(params)  # rubocop:disable Metrics/AbcSize
+    def update_reworks_production_run(params) # rubocop:disable Metrics/AbcSize
       res = validate_update_reworks_production_run_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -1061,7 +1061,7 @@ module ProductionApp
         marketing_orchard: res[:marketing_orchard] }
     end
 
-    def update_reworks_farm_details(params)  # rubocop:disable Metrics/AbcSize
+    def update_reworks_farm_details(params) # rubocop:disable Metrics/AbcSize
       res = validate_update_reworks_farm_details_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -1104,7 +1104,7 @@ module ProductionApp
       log_transaction
     end
 
-    def update_pallet_gross_weight(params)  # rubocop:disable Metrics/AbcSize
+    def update_pallet_gross_weight(params) # rubocop:disable Metrics/AbcSize
       res = validate_update_gross_weight_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -1134,7 +1134,7 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def update_pallet_details(params)  # rubocop:disable Metrics/AbcSize
+    def update_pallet_details(params) # rubocop:disable Metrics/AbcSize
       res = validate_update_pallet_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -1169,7 +1169,7 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def manually_tip_bins(attrs)  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+    def manually_tip_bins(attrs) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       attrs = attrs.to_h
       avg_gross_weight = attrs[:gross_weight].nil_or_empty? ? false : true
       before_state = manually_tip_bin_before_state(attrs, avg_gross_weight)
@@ -1247,7 +1247,7 @@ module ProductionApp
       defaults
     end
 
-    def manually_untip_bins(attrs)  # rubocop:disable Metrics/AbcSize
+    def manually_untip_bins(attrs) # rubocop:disable Metrics/AbcSize
       attrs = attrs.to_h
       res = repo.where_hash(:rmt_bins, id: attrs[:pallets_selected].first)
 
@@ -1308,7 +1308,7 @@ module ProductionApp
       attrs
     end
 
-    def bulk_weigh_bins(attrs)  # rubocop:disable Metrics/AbcSize
+    def bulk_weigh_bins(attrs) # rubocop:disable Metrics/AbcSize
       attrs = attrs.to_h
       before_state = manually_weigh_rmt_bin_state(attrs[:pallets_selected].first)
 
@@ -1335,7 +1335,7 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def bulk_update_pallet_dates(attrs)  # rubocop:disable Metrics/AbcSize
+    def bulk_update_pallet_dates(attrs) # rubocop:disable Metrics/AbcSize
       attrs = attrs.to_h
       instance = pallet(attrs[:pallets_selected].first)
       before_state = { first_cold_storage_at: instance[:first_cold_storage_at] }
@@ -1365,7 +1365,7 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def manually_weigh_rmt_bin(params)  # rubocop:disable Metrics/AbcSize
+    def manually_weigh_rmt_bin(params) # rubocop:disable Metrics/AbcSize
       res = validate_manually_weigh_rmt_bin_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -1418,7 +1418,7 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def scrap_carton(carton_id, reworks_run_type_id)  # rubocop:disable Metrics/AbcSize
+    def scrap_carton(carton_id, reworks_run_type_id) # rubocop:disable Metrics/AbcSize
       before_attrs = scrap_carton_changes(carton_id)
       return failed_response('Carton cannot be scrapped', pallet_sequence_id: before_attrs[:pallet_sequence_id]) if cannot_scrap_carton(before_attrs[:pallet_sequence_id])
 
@@ -1454,7 +1454,7 @@ module ProductionApp
         pallet_number: instance[:pallet_number] }
     end
 
-    def restore_repacked_pallets(attrs)  # rubocop:disable Metrics/AbcSize
+    def restore_repacked_pallets(attrs) # rubocop:disable Metrics/AbcSize
       attrs = attrs.to_h
       pallet_ids = repo.select_values(:pallet_sequences, :pallet_id, pallet_number: attrs[:pallets_selected]).uniq
       pallet_sequence_ids = repo.pallet_sequence_ids(pallet_ids)
@@ -1571,7 +1571,7 @@ module ProductionApp
                                     cell_transformers: { quantity: :decimal }).render
     end
 
-    def add_pm_bom_products_packaging_marks(pm_bom_products, pm_mark_id) # rubocop:disable Metrics/AbcSize
+    def add_pm_bom_products_packaging_marks(pm_bom_products, pm_mark_id)
       packaging_marks = MasterfilesApp::BomRepo.new.find_packaging_marks_by_fruitspec_mark(pm_mark_id)
       return pm_bom_products if packaging_marks.nil_or_empty?
 
@@ -1858,7 +1858,7 @@ module ProductionApp
       includes_in_stock_pallets?(pallet_numbers) && Crossbeams::Config::UserPermissions.can_user?(@user, :reworks, :can_change_in_stock_pallets)  unless @user&.permission_tree.nil?
     end
 
-    def validate_pallet_numbers(reworks_run_type, pallet_numbers, production_run_id = nil)  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+    def validate_pallet_numbers(reworks_run_type, pallet_numbers, production_run_id = nil) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       pallet_numbers = pallet_numbers.split(/\n|,/).map(&:strip).reject(&:empty?)
       pallet_numbers = pallet_numbers.map { |x| x.gsub(/['"]/, '') }
 
@@ -1961,7 +1961,7 @@ module ProductionApp
       OpenStruct.new(success: true, instance: { pallets_selected: rmt_bins })
     end
 
-    def validate_production_runs(reworks_run_type, params)  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+    def validate_production_runs(reworks_run_type, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       from_production_run_id = params[:from_production_run_id]
       to_production_run_id = params[:to_production_run_id]
       pallets_selected = params[:pallets_selected]

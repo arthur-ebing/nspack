@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class ContractTypeInteractor < BaseInteractor
-    def create_contract_type(params) # rubocop:disable Metrics/AbcSize
+    def create_contract_type(params)
       res = validate_contract_type_params(params)
       return validation_failed_response(res) if res.failure?
 

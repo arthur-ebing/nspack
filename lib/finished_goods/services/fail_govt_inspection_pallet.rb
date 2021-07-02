@@ -22,7 +22,7 @@ module FinishedGoodsApp
 
     private
 
-    def fail_govt_inspection_pallet(id) # rubocop:disable Metrics/AbcSize
+    def fail_govt_inspection_pallet(id)
       govt_inspection_sheet_id = repo.get(:govt_inspection_pallets, id, :govt_inspection_sheet_id)
       reinspection = repo.get(:govt_inspection_sheets, govt_inspection_sheet_id, :reinspection)
       params[:passed] = false

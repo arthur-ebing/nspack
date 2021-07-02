@@ -18,7 +18,7 @@ module QualityApp
                  end
     end
 
-    def call # rubocop:disable Metrics/AbcSize
+    def call
       raise ArgumentError, 'PhytClean Season not set' if phyt_clean_season_id.nil?
 
       res = api.request_phyt_clean_standard_data(phyt_clean_season_id, puc_ids)

@@ -4,7 +4,7 @@ module FinishedGoods
   module Stock
     module TargetCustomer
       class AllocateTargetCustomer
-        def self.call # rubocop:disable Metrics/AbcSize
+        def self.call
           ui_rule = UiRules::Compiler.new(:target_customer, :new)
           rules   = ui_rule.compile
 

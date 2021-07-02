@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class PmBomInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
-    def create_pm_bom(params) # rubocop:disable Metrics/AbcSize
+    def create_pm_bom(params)
       res = validate_pm_bom_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -20,7 +20,7 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def update_pm_bom(id, params)  # rubocop:disable Metrics/AbcSize
+    def update_pm_bom(id, params) # rubocop:disable Metrics/AbcSize
       system_code = repo.pm_bom_system_code(id)
       params[:bom_code] = system_code
       attrs = params.merge(system_code: system_code)

@@ -135,7 +135,7 @@ module FinishedGoodsApp
         all_ok
       end
 
-      def titan_addendum_check # rubocop:disable Metrics/AbcSize
+      def titan_addendum_check
         return failed_response("Load: #{id} does not have a container") unless container?
 
         failed_pallet_numbers = []

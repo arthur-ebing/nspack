@@ -32,7 +32,7 @@ module UiRules
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
-    def common_fields  # rubocop:disable Metrics/AbcSize
+    def common_fields
       pm_bom_id = @options[:pm_bom_id] || @repo.find_pm_boms_product(@options[:id]).pm_bom_id
       pm_bom_id_label = @repo.find_pm_bom(pm_bom_id)&.bom_code
       subtypes = @rules[:is_edit] ? @repo.for_select_pm_subtypes : @repo.for_select_pm_subtypes(exclude: { pm_bom_id: pm_bom_id })

@@ -2,7 +2,7 @@
 
 module UiRules
   class ReworksRunSequenceRule < Base # rubocop:disable Metrics/ClassLength
-    def generate_rules  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+    def generate_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       @repo = ProductionApp::ReworksRepo.new
       @farm_repo = MasterfilesApp::FarmRepo.new
       @cultivar_repo = MasterfilesApp::CultivarRepo.new
@@ -76,7 +76,7 @@ module UiRules
                                                hide_on_load: !@rules[:allow_cultivar_group_mixing] }
     end
 
-    def set_pallet_sequence_fields  # rubocop:disable Metrics/AbcSize
+    def set_pallet_sequence_fields # rubocop:disable Metrics/AbcSize
       cultivar_group_id_label = @cultivar_repo.find_cultivar_group(@form_object.cultivar_group_id)&.cultivar_group_code
 
       fields[:pallet_sequence_id] = { renderer: :hidden }
@@ -111,7 +111,7 @@ module UiRules
                              required: true }
     end
 
-    def edit_sequence_fields  # rubocop:disable Metrics/AbcSize
+    def edit_sequence_fields # rubocop:disable Metrics/AbcSize
       commodity_id = @form_object[:commodity_id].nil_or_empty? ? ProductionApp::ProductSetupRepo.new.commodity_id(@form_object.cultivar_group_id, @form_object.cultivar_id) : @form_object[:commodity_id]
       commodity = MasterfilesApp::CommodityRepo.new.find_commodity(commodity_id)
       requires_standard_counts = commodity.requires_standard_counts
@@ -444,7 +444,7 @@ module UiRules
       end
     end
 
-    def edit_sequence_behaviours  # rubocop:disable Metrics/AbcSize
+    def edit_sequence_behaviours # rubocop:disable Metrics/AbcSize
       behaviours do |behaviour| # rubocop:disable Metrics/BlockLength
         behaviour.dropdown_change :basic_pack_code_id,
                                   notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/basic_pack_code_changed",

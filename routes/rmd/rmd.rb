@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-class Nspack < Roda # rubocop:disable Metrics/ClassLength
+class Nspack < Roda
   # DELIVERIES
   # --------------------------------------------------------------------------
-  route 'deliveries', 'rmd' do |r| # rubocop:disable Metrics/BlockLength
+  route 'deliveries', 'rmd' do |r|
     # PUTAWAYS
     # --------------------------------------------------------------------------
-    r.on 'putaways' do # rubocop:disable Metrics/BlockLength
+    r.on 'putaways' do
       # Interactor
       r.on 'new' do    # NEW
         # check auth...
@@ -60,10 +60,10 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
   # Bulk Stock Adjustments
   # --------------------------------------------------------------------------
-  route 'stock_adjustments', 'rmd' do |r| # rubocop:disable Metrics/BlockLength
+  route 'stock_adjustments', 'rmd' do |r|
     # ADJUST ITEM
     # --------------------------------------------------------------------------
-    r.on 'adjust_item' do # rubocop:disable Metrics/BlockLength
+    r.on 'adjust_item' do
       interactor = PackMaterialApp::MrBulkStockAdjustmentInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do
         details = retrieve_from_local_store(:stock_item_adjustment) || {}
@@ -113,10 +113,10 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
   # Printing
   # --------------------------------------------------------------------------
-  route 'printing', 'rmd' do |r| # rubocop:disable Metrics/BlockLength
+  route 'printing', 'rmd' do |r|
     # PRINT SKU LABEL
     # --------------------------------------------------------------------------
-    r.on 'sku_label' do # rubocop:disable Metrics/BlockLength
+    r.on 'sku_label' do
       interactor = PackMaterialApp::MrDeliveryItemBatchInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do
         @print_repo = LabelApp::PrinterRepo.new

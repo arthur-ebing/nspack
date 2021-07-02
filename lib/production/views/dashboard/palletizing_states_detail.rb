@@ -45,7 +45,7 @@ module Production
         #   AND palletizing_bay_resource_id IS NULL;
 
         def self.pbay_items(recs) # rubocop:disable Metrics/AbcSize
-          recs.map do |rec| # rubocop:disable Metrics/BlockLength
+          recs.map do |rec|
             # code = rec[:plant_resource_code] || "#{rec[:palletizing_robot_code]} - #{rec[:scanner_code]}"
             code = rec[:description] || "#{rec[:palletizing_robot_code]} - #{rec[:scanner_code]}"
             if rec[:current_state] == 'empty'

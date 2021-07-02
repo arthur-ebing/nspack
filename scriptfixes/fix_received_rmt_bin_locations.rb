@@ -2,7 +2,7 @@
 
 # require 'logger'
 class FixReceivedRmtBinLocations < BaseScript
-  def run # rubocop:disable Metrics/AbcSize
+  def run
     ids = DB[:rmt_bins].where(location_id: nil).exclude(bin_received_date_time: nil).select_map(:id)
     location_id = AppConst::CR_RMT.default_delivery_location
     p "Records affected: #{ids.count} moved to location_id #{location_id}"

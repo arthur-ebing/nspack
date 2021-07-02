@@ -13,7 +13,7 @@ module MesscadaApp
       @palletizing_repo = MesscadaApp::PalletizingRepo.new
     end
 
-    def call  # rubocop:disable Metrics/AbcSize
+    def call
       return failed_response("Pallet :#{pallet_id} does not exist") unless pallet_exists?
 
       return failed_response("Carton :#{carton_id} does not exist") unless carton_exists?
@@ -38,7 +38,7 @@ module MesscadaApp
       repo.carton_exists?(carton_id)
     end
 
-    def transfer_carton  # rubocop:disable Metrics/AbcSize
+    def transfer_carton # rubocop:disable Metrics/AbcSize
       new_sequence = NewSequence.new(pallet_id, carton_id).call
       if new_sequence
         res = NewPalletSequence.call(@user_name, carton_id, pallet_id, 1, true, AppConst::PALLETIZING_BAYS_PALLET_MIX)

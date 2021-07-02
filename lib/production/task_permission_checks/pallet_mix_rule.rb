@@ -52,7 +52,7 @@ module ProductionApp
         failed_response(format('Pallet %<mt1>s: %<orig>s. You are adding a sequence with %<mt2>s: %<new>s. Mixing is not allowed', mt1: mix_type, orig: orig, mt2: mix_type, new: new))
       end
 
-      def mix_tm_group_check # rubocop:disable Metrics/AbcSize
+      def mix_tm_group_check
         return ok_response if rule[:allow_tm_mix]
         return ok_response if new_sequence[:packed_tm_group_id] == oldest_sequence[:packed_tm_group_id]
 
@@ -60,7 +60,7 @@ module ProductionApp
         error('tm_group', oldest_sequence[:target_market_group_name], new)
       end
 
-      def mix_grade_check # rubocop:disable Metrics/AbcSize
+      def mix_grade_check
         return ok_response if rule[:allow_grade_mix]
         return ok_response if new_sequence[:grade_id] == oldest_sequence[:grade_id]
 
@@ -68,7 +68,7 @@ module ProductionApp
         error('grade', oldest_sequence[:grade_code], new)
       end
 
-      def mix_mark_check # rubocop:disable Metrics/AbcSize
+      def mix_mark_check
         return ok_response if rule[:allow_mark_mix]
         return ok_response if new_sequence[:mark_id] == oldest_sequence[:mark_id]
 
@@ -76,7 +76,7 @@ module ProductionApp
         error('mark', oldest_sequence[:mark_code], new)
       end
 
-      def mix_size_ref_check # rubocop:disable Metrics/AbcSize
+      def mix_size_ref_check
         return ok_response if rule[:allow_size_ref_mix]
         return ok_response if new_sequence[:fruit_size_reference_id] == oldest_sequence[:fruit_size_reference_id]
 
@@ -84,7 +84,7 @@ module ProductionApp
         error('size_ref', oldest_sequence[:size_reference], new)
       end
 
-      def mix_pack_check # rubocop:disable Metrics/AbcSize
+      def mix_pack_check
         return ok_response if rule[:allow_pack_mix]
         return ok_response if new_sequence[:standard_pack_code_id] == oldest_sequence[:standard_pack_code_id]
 
@@ -92,7 +92,7 @@ module ProductionApp
         error('pack', oldest_sequence[:standard_pack_code], new)
       end
 
-      def mix_size_count_check # rubocop:disable Metrics/AbcSize
+      def mix_size_count_check
         return ok_response if rule[:allow_std_count_mix]
         return ok_response if new_sequence[:std_fruit_size_count_id] == oldest_sequence[:std_fruit_size_count_id]
 
@@ -100,7 +100,7 @@ module ProductionApp
         error('size_count', oldest_sequence[:size_count_value], new)
       end
 
-      def mix_inventory_check # rubocop:disable Metrics/AbcSize
+      def mix_inventory_check
         return ok_response if rule[:allow_inventory_code_mix]
         return ok_response if new_sequence[:inventory_code_id] == oldest_sequence[:inventory_code_id]
 
@@ -108,7 +108,7 @@ module ProductionApp
         error('inventory', oldest_sequence[:inventory_code], new)
       end
 
-      def mix_cultivar_check # rubocop:disable Metrics/AbcSize
+      def mix_cultivar_check
         return ok_response if rule[:allow_cultivar_mix]
         return ok_response if new_sequence[:cultivar_id] == oldest_sequence[:cultivar_id]
 
@@ -116,7 +116,7 @@ module ProductionApp
         error('cultivar', oldest_sequence[:cultivar_name], new)
       end
 
-      def mix_cultivar_group_check # rubocop:disable Metrics/AbcSize
+      def mix_cultivar_group_check
         return ok_response if rule[:allow_cultivar_group_mix]
         return ok_response if new_sequence[:cultivar_group_id] == oldest_sequence[:cultivar_group_id]
 
@@ -124,7 +124,7 @@ module ProductionApp
         error('cultivar_group', oldest_sequence[:cultivar_group_code], new)
       end
 
-      def mix_puc_check # rubocop:disable Metrics/AbcSize
+      def mix_puc_check
         return ok_response if rule[:allow_puc_mix]
         return ok_response if new_sequence[:puc_id] == oldest_sequence[:puc_id]
 
@@ -132,7 +132,7 @@ module ProductionApp
         error('puc', oldest_sequence[:puc_code], new)
       end
 
-      def mix_orchard_check # rubocop:disable Metrics/AbcSize
+      def mix_orchard_check
         return ok_response if rule[:allow_orchard_mix]
         return ok_response if new_sequence[:orchard_id] == oldest_sequence[:orchard_id]
 

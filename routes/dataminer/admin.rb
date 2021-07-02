@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
-
-class Nspack < Roda # rubocop:disable Metrics/ClassLength
+class Nspack < Roda
   route 'admin', 'dataminer' do |r|
     context = { for_grid_queries: session[:dm_admin_path] == :grids, route_url: request.path, request_ip: request.ip }
     interactor = DataminerApp::DataminerInteractor.new(current_user, {}, context, {})
@@ -312,4 +310,3 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
   end
 end
-# rubocop:enable Metrics/BlockLength

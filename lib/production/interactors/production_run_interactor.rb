@@ -383,7 +383,7 @@ module ProductionApp
       res
     end
 
-    def update_product_resource_allocation(id, params) # rubocop:disable Metrics/AbcSize
+    def update_product_resource_allocation(id, params)
       params[:product_setup_id] = repo.find_packing_spec_item_setup_id(params[:packing_specification_item_id]) if AppConst::CR_PROD.use_packing_specifications?
 
       res = validate_product_resource_allocation(params)
@@ -411,7 +411,7 @@ module ProductionApp
       res
     end
 
-    def inline_edit_alloc(product_resource_allocation_id, params) # rubocop:disable Metrics/AbcSize
+    def inline_edit_alloc(product_resource_allocation_id, params)
       if params[:column_name] == 'product_setup_code'
         allocate_product_setup(product_resource_allocation_id, params)
       elsif params[:column_name] == 'label_template_name'
@@ -575,7 +575,7 @@ module ProductionApp
       success_response('Allocation copied', alloc[:production_run_id])
     end
 
-    def preview_allocation_carton_label(product_resource_allocation_id) # rubocop:disable Metrics/AbcSize
+    def preview_allocation_carton_label(product_resource_allocation_id)
       alloc = repo.find_hash(:product_resource_allocations, product_resource_allocation_id)
       return failed_response('Please choose a product setup') unless alloc[:product_setup_id]
       return failed_response('Please choose a label template') unless alloc[:label_template_id]

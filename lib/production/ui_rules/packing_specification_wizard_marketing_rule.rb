@@ -103,7 +103,7 @@ module UiRules
       end
     end
 
-    def packed_tm_group_changed # rubocop:disable Metrics/AbcSize
+    def packed_tm_group_changed
       form_object_merge!(params)
       @form_object[:packed_tm_group_id] = params[:changed_value].to_i
       @form_object[:marketing_variety_id] = params[:packing_specification_wizard_marketing_variety_id].to_i

@@ -14,7 +14,7 @@ module MasterfilesApp
       RmtClassSchema.call(params)
     end
 
-    def create_rmt_class(params) # rubocop:disable Metrics/AbcSize
+    def create_rmt_class(params)
       res = validate_rmt_class_params(params)
       return validation_failed_response(res) if res.failure?
 

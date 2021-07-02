@@ -4,7 +4,7 @@ module Production
   module Reworks
     module ReworksRun
       class BulkProductionRunUpdate
-        def self.call(id, attrs)  # rubocop:disable Metrics/AbcSize
+        def self.call(id, attrs) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:reworks_run_bulk_update, :production_run_bulk_update, id: id, attrs: attrs)
           rules   = ui_rule.compile
 
@@ -18,7 +18,7 @@ module Production
             grid_key = 'reworks_bulk_update_bins'
           end
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
+          layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form do |form|
               form.view_only!
