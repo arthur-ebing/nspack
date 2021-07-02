@@ -939,6 +939,9 @@ module DevelopmentApp
         <<~RUBY
           r.on '#{opts.table}' do
             interactor = #{opts.classnames[:namespaced_interactor]}.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+            # r.on 'ui_change', String do |change_type| # Handle UI behaviours
+            #   handle_ui_change(:#{opts.singlename}, change_type.to_sym, params)
+            # end
             r.on 'new' do    # NEW
               check_auth!('#{opts.program_text}', 'new')#{on_new_lastgrid.chomp}
               show_partial_or_page(r) { #{opts.classnames[:view_prefix]}::New.call(remote: fetch?(r)) }
@@ -1114,12 +1117,30 @@ module DevelopmentApp
                 @form_object = OpenStruct.new(#{struct_fields.join(UtilityFunctions.comma_newline_and_spaces(36))})
               end
 
+              # def handle_behaviour
+              #   case @mode
+              #   when :some_change_type
+              #     some_change_type_change
+              #   else
+              #     unhandled_behaviour!
+              #   end
+              # end
+
               # private
 
               # def add_approve_behaviours
               #   behaviours do |behaviour|
               #     behaviour.enable :reject_reason, when: :approve_action, changes_to: ['r']
               #   end
+              # end
+
+              # def some_change_type_change
+              #   if @params[:changed_value].empty?
+              #     sel = []
+              #   else
+              #     sel = @repo.for_select_somethings(where: { an_id: @params[:changed_value] })
+              #   end
+              #   json_replace_select_options('#{opts.singlename}_an_id', sel)
               # end
             end
           end
