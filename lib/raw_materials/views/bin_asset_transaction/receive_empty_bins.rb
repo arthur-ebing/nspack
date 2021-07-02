@@ -4,7 +4,7 @@ module RawMaterials
   module BinAssets
     module BinAssetTransaction
       class ReceiveBinAssets
-        def self.call(form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
+        def self.call(form_values: nil, form_errors: nil, remote: true)
           ui_rule = UiRules::Compiler.new(:bin_asset_transaction, :receive, form_values: form_values)
           rules   = ui_rule.compile
 

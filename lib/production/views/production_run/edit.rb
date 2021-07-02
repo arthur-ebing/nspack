@@ -4,7 +4,7 @@ module Production
   module Runs
     module ProductionRun
       class Edit
-        def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
+        def self.call(id, form_values: nil, form_errors: nil)
           ui_rule = UiRules::Compiler.new(:production_run, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 

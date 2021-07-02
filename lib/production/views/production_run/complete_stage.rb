@@ -4,7 +4,7 @@ module Production
   module Runs
     module ProductionRun
       class CompleteStage
-        def self.call(id, res, complete_run: false) # rubocop:disable Metrics/AbcSize
+        def self.call(id, res, complete_run: false)
           ui_rule = UiRules::Compiler.new(:production_run, :complete_stage, id: id, complete_run: complete_run)
           rules   = ui_rule.compile
           url_suffix = complete_run ? 'run' : 'stage'

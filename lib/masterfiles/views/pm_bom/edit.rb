@@ -4,7 +4,7 @@ module Masterfiles
   module Packaging
     module PmBom
       class Edit
-        def self.call(id, is_update: nil, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
+        def self.call(id, is_update: nil, form_values: nil, form_errors: nil)
           ui_rule = UiRules::Compiler.new(:pm_bom, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 

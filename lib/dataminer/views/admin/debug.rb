@@ -5,7 +5,7 @@ module DM
     class Debug
       include DataminerHelpers
 
-      def call(id, opts) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
+      def call(id, opts) # rubocop:disable Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
         cols = opts[:columnDefs]
         cols.shift
         heads = Set.new

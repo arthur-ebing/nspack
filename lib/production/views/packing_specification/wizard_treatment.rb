@@ -4,7 +4,7 @@ module Production
   module PackingSpecifications
     module PackingSpecification
       class WizardTreatment
-        def self.call(form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
+        def self.call(form_values: nil, form_errors: nil)
           mode = form_values[:mode] || :new
           ui_rule = UiRules::Compiler.new(:packing_specification_wizard_treatment, mode, form_values: form_values)
           rules   = ui_rule.compile

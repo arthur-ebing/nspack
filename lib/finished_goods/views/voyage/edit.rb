@@ -4,7 +4,7 @@ module FinishedGoods
   module Dispatch
     module Voyage
       class Edit
-        def self.call(id, back_url: nil, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
+        def self.call(id, back_url: nil, form_values: nil, form_errors: nil)
           ui_rule = UiRules::Compiler.new(:voyage, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 

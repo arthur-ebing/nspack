@@ -4,7 +4,7 @@ module Masterfiles
   module Fruit
     module StandardProductWeight
       class New
-        def self.call(form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
+        def self.call(form_values: nil, form_errors: nil, remote: true)
           ui_rule = UiRules::Compiler.new(:standard_product_weight, :new, form_values: form_values)
           rules   = ui_rule.compile
 

@@ -4,7 +4,7 @@ module Production
   module ProductSetups
     module ProductSetupTemplate
       class Manage
-        def self.call(id) # rubocop:disable Metrics/AbcSize
+        def self.call(id)
           ui_rule = UiRules::Compiler.new(:product_setup_template, :manage, id: id)
           rules   = ui_rule.compile
 

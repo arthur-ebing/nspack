@@ -8,7 +8,7 @@ module Labels
       class EmailPreview
         extend LabelVariableFields
 
-        def self.call(id, form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
+        def self.call(id, form_values: nil, form_errors: nil, remote: true)
           label, rules, xml_vars = vars_for_label(id) do |rule_base|
             rule_base[:fields] = {
               to: { renderer: :email, required: true }, # email type does not allow for more than one...Need a control for this

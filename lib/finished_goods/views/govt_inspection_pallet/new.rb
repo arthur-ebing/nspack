@@ -4,7 +4,7 @@ module FinishedGoods
   module Inspection
     module GovtInspectionPallet
       class New
-        def self.call(form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
+        def self.call(form_values: nil, form_errors: nil, remote: true)
           ui_rule = UiRules::Compiler.new(:govt_inspection_pallet, :new, form_values: form_values)
           rules   = ui_rule.compile
 

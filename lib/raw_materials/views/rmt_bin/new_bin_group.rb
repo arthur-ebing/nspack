@@ -4,7 +4,7 @@ module RawMaterials
   module Deliveries
     module RmtBin
       class NewBinGroup
-        def self.call(id, form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
+        def self.call(id, form_values: nil, form_errors: nil, remote: true)
           ui_rule = UiRules::Compiler.new(:rmt_bin_group, :new, delivery_id: id, form_values: form_values)
           rules   = ui_rule.compile
 

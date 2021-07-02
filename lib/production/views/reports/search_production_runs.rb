@@ -4,7 +4,7 @@ module Production
   module Reports
     module Packout
       class SearchProductionRuns
-        def self.call(mode: :packout) # rubocop:disable Metrics/AbcSize
+        def self.call(mode: :packout)
           ui_rule = UiRules::Compiler.new(:packout_runs_report, mode)
           rules   = ui_rule.compile
           layout = Crossbeams::Layout::Page.build(rules) do |page|

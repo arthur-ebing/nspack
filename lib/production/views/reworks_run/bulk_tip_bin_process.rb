@@ -4,7 +4,7 @@ module Production
   module Runs
     module ReworksRun
       class BulkTipBinProcess
-        def self.call(step, params = nil) # rubocop:disable Metrics/AbcSize
+        def self.call(step, params = nil)
           ui_rule = UiRules::Compiler.new(:bulk_tip_bin_process, nil)
           rules   = ui_rule.compile
           layout = Crossbeams::Layout::Page.build(rules) do |page|

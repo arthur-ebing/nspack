@@ -4,7 +4,7 @@ module Production
   module Shifts
     module Shift
       class Edit
-        def self.call(id, form_values: nil, form_errors: nil, current_user: nil) # rubocop:disable Metrics/AbcSize
+        def self.call(id, form_values: nil, form_errors: nil, current_user: nil)
           ui_rule = UiRules::Compiler.new(:shift, :edit, id: id, form_values: form_values, current_user: current_user)
           rules   = ui_rule.compile
 

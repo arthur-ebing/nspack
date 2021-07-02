@@ -4,7 +4,7 @@ module RawMaterials
   module BinAssets
     module BinAssetTransactionItem
       class New
-        def self.call(form_values: nil, form_errors: nil, remote: true, interactor: nil) # rubocop:disable Metrics/AbcSize
+        def self.call(form_values: nil, form_errors: nil, remote: true, interactor: nil)
           ui_rule = UiRules::Compiler.new(:bin_asset_transaction_item, :new, form_values: form_values, interactor: interactor)
           rules   = ui_rule.compile
 

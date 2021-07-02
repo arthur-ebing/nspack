@@ -4,7 +4,7 @@ module RawMaterials
   module Deliveries
     module RmtBin
       class Edit
-        def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+        def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/CyclomaticComplexity
           ui_rule = UiRules::Compiler.new(:rmt_bin, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 

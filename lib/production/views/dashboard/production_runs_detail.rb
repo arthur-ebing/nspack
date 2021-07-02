@@ -21,7 +21,7 @@ module Production
           HTML
         end
 
-        def self.runs(recs) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
+        def self.runs(recs) # rubocop:disable Metrics/PerceivedComplexity
           recs.map do |rec|
             target_markets = ProductionApp::DashboardRepo.new.tm_for_run(rec[:id])
             tm_cartons = if target_markets.empty?

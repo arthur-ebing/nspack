@@ -4,7 +4,7 @@ module Development
   module Transactions
     module Transaction
       class List
-        def self.call(table_name, id) # rubocop:disable Metrics/AbcSize
+        def self.call(table_name, id)
           ui_rule = UiRules::Compiler.new(:transaction, :list, table_name: table_name, id: id)
           rules   = ui_rule.compile
 

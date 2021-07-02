@@ -4,7 +4,7 @@ module Production
   module Runs
     module Rebins
       class CreateRebins
-        def self.call(id, form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
+        def self.call(id, form_values: nil, form_errors: nil, remote: true)
           ui_rule = UiRules::Compiler.new(:rebin, :new, production_run_id: id, form_values: form_values)
           rules   = ui_rule.compile
 

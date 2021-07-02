@@ -4,7 +4,7 @@ module Masterfiles
   module Locations
     module Location
       class NewFlat
-        def self.call(location_type_code, form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
+        def self.call(location_type_code, form_values: nil, form_errors: nil, remote: true)
           ui_rule = UiRules::Compiler.new(:location, :new_flat, location_type_code: location_type_code, form_values: form_values)
           rules   = ui_rule.compile
 

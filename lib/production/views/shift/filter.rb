@@ -4,7 +4,7 @@ module Production
   module Production
     module Shift
       class Filter
-        def self.call(employment_type) # rubocop:disable Metrics/AbcSize
+        def self.call(employment_type)
           ui_rule = UiRules::Compiler.new(:shift, :filter, employment_type: employment_type)
           rules   = ui_rule.compile
 

@@ -4,7 +4,7 @@ module FinishedGoods
   module Dispatch
     module Load
       class New
-        def self.call(form_values: nil, form_errors: nil, back_url: '/list/loads') # rubocop:disable Metrics/AbcSize
+        def self.call(form_values: nil, form_errors: nil, back_url: '/list/loads')
           ui_rule = UiRules::Compiler.new(:load, :new, form_values: form_values)
           rules   = ui_rule.compile
 

@@ -4,7 +4,7 @@ module FinishedGoods
   module Orders
     module OrderItem
       class Show
-        def self.call(id) # rubocop:disable Metrics/AbcSize
+        def self.call(id)
           ui_rule = UiRules::Compiler.new(:order_item, :show, id: id)
           rules   = ui_rule.compile
 

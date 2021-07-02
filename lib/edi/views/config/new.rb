@@ -4,7 +4,7 @@ module Edi
   module Config
     module EdiOutRule
       class New
-        def self.call(form_values: nil, form_errors: nil, remote: true, mode: :new) # rubocop:disable Metrics/AbcSize
+        def self.call(form_values: nil, form_errors: nil, remote: true, mode: :new)
           ui_rule = UiRules::Compiler.new(:edi_out, mode, form_values: form_values)
           rules   = ui_rule.compile
 

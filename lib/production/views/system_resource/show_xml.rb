@@ -4,7 +4,7 @@ module Production
   module Resources
     module SystemResource
       class ShowXml
-        def self.call(res, id = nil) # rubocop:disable Metrics/AbcSize
+        def self.call(res, id = nil)
           rules = {}
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|

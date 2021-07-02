@@ -4,7 +4,7 @@ module Masterfiles
   module Config
     module Dashboard
       class NewTextPage
-        def self.call(key) # rubocop:disable Metrics/AbcSize
+        def self.call(key)
           ui_rule = UiRules::Compiler.new(:dashboard, :new_text_page, key: key)
           rules   = ui_rule.compile
 

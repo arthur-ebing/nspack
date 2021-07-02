@@ -4,7 +4,7 @@ module Labels
   module Publish
     module Publish
       class Summary
-        def self.call(id) # rubocop:disable Metrics/AbcSize
+        def self.call(id)
           summary = BaseRepo.new.find_hash(:label_publish_logs, id)[:publish_summary]
 
           layout = Crossbeams::Layout::Page.build({}) do |page|

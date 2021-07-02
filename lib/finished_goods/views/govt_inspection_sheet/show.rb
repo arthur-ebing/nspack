@@ -4,7 +4,7 @@ module FinishedGoods
   module Inspection
     module GovtInspectionSheet
       class Show
-        def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
+        def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
           ui_rule = UiRules::Compiler.new(:govt_inspection_sheet, :show, id: id, form_values: form_values)
           rules   = ui_rule.compile
 

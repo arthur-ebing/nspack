@@ -4,7 +4,7 @@ module Labels
   module Labels
     module Label
       class Variables
-        def self.call # rubocop:disable Metrics/AbcSize
+        def self.call
           ui_rule = UiRules::Compiler.new(:label_variables, id: nil)
           rules   = ui_rule.compile
 

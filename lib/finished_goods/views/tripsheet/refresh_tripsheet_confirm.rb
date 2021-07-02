@@ -3,7 +3,7 @@
 module FinishedGoods
   module Tripsheet
     class RefreshTripsheetConfirm
-      def self.call(id, url: nil, notice: nil, remote: true) # rubocop:disable Metrics/AbcSize
+      def self.call(id, url: nil, notice: nil, remote: true)
         ui_rule = UiRules::Compiler.new(:govt_inspection_sheet, :show, id: id)
         rules   = ui_rule.compile
 

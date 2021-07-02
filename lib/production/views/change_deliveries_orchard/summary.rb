@@ -4,7 +4,7 @@ module Production
   module Reworks
     module ChangeDeliveriesOrchard
       class Summary
-        def self.call(form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
+        def self.call(form_values: nil, form_errors: nil, remote: true)
           ui_rule = UiRules::Compiler.new(:apply_change_deliveries_orchard_changes, :select_orchards, form_values: form_values)
           rules   = ui_rule.compile
 

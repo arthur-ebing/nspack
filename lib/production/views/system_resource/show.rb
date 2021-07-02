@@ -4,7 +4,7 @@ module Production
   module Resources
     module SystemResource
       class Show
-        def self.call(id) # rubocop:disable Metrics/AbcSize
+        def self.call(id)
           ui_rule = UiRules::Compiler.new(:system_resource, :show, id: id)
           rules   = ui_rule.compile
 

@@ -13,7 +13,7 @@ module Production
           layout
         end
 
-        def self.draw_boxes # rubocop:disable Metrics/AbcSize
+        def self.draw_boxes
           last_day_for_summary = ProductionApp::DashboardRepo.new.last_day_for_summary
           ctn_recs = ProductionApp::DashboardRepo.new.carton_summary
           plt_recs = ProductionApp::DashboardRepo.new.pallet_summary
@@ -50,7 +50,7 @@ module Production
           ar.join
         end
 
-        def self.calculate_summary(last_day_for_summary, ctn, plt) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+        def self.calculate_summary(last_day_for_summary, ctn, plt) # rubocop:disable Metrics/CyclomaticComplexity
           # Do for last 2 days
           ctn_recs = ctn.select { |r| r[:date] == last_day_for_summary } # Date.today } # 2020-07-20
           plt_recs = plt.select { |r| r[:date] == last_day_for_summary } # Date.today }

@@ -4,7 +4,7 @@ module RawMaterials
   module Dispatch
     module BinLoadProduct
       class ScanBins
-        def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
+        def self.call(id, form_values: nil, form_errors: nil)
           ui_rule = UiRules::Compiler.new(:bin_load_product, :scan_bins, id: id, form_values: form_values)
           rules = ui_rule.compile
 

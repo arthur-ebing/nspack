@@ -4,7 +4,7 @@ module Development
   module Masterfiles
     module User
       class PermissionTree
-        def self.call(id, form_values = nil, form_errors = nil) # rubocop:disable Metrics/AbcSize
+        def self.call(id, form_values = nil, form_errors = nil)
           ui_rule = UiRules::Compiler.new(:user, :permission_tree, id: id, form_values: form_values)
           rules   = ui_rule.compile
 

@@ -4,7 +4,7 @@ module Production
   module Runs
     module ProductionRun
       class Show
-        def self.call(id) # rubocop:disable Metrics/AbcSize
+        def self.call(id)
           ui_rule = UiRules::Compiler.new(:production_run, :show, id: id)
           rules   = ui_rule.compile
 

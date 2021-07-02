@@ -4,7 +4,7 @@ module Production
   module Reports
     module Packout
       class Edit
-        def self.call # rubocop:disable Metrics/AbcSize
+        def self.call
           ui_rule = UiRules::Compiler.new(:packout_report, :edit)
           rules   = ui_rule.compile
           layout = Crossbeams::Layout::Page.build(rules) do |page|

@@ -1,7 +1,7 @@
 module Rmd
   module Home
     class Show
-      def self.call(menu_items) # rubocop:disable Metrics/AbcSize
+      def self.call(menu_items)
         rules = {}
 
         layout = Crossbeams::Layout::Page.build(rules) do |page|

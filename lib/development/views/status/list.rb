@@ -4,7 +4,7 @@ module Development
   module Statuses
     module Status
       class List
-        def self.call(table_name, id, remote: false) # rubocop:disable Metrics/AbcSize
+        def self.call(table_name, id, remote: false)
           ui_rule = UiRules::Compiler.new(:status, :list, table_name: table_name, id: id)
           rules   = ui_rule.compile
 

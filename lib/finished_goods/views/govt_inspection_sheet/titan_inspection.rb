@@ -4,7 +4,7 @@ module FinishedGoods
   module Inspection
     module GovtInspectionSheet
       class TitanInspection
-        def self.call(govt_inspection_sheet_id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
+        def self.call(govt_inspection_sheet_id, form_values: nil, form_errors: nil)
           ui_rule = UiRules::Compiler.new(:titan_inspection, :inspection, govt_inspection_sheet_id: govt_inspection_sheet_id, form_values: form_values)
           rules   = ui_rule.compile
 

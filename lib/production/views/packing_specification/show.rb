@@ -4,7 +4,7 @@ module Production
   module PackingSpecifications
     module PackingSpecification
       class Show
-        def self.call(id, back_url:) # rubocop:disable Metrics/AbcSize
+        def self.call(id, back_url:)
           ui_rule = UiRules::Compiler.new(:packing_specification_item, :show, id: id)
           rules   = ui_rule.compile
 

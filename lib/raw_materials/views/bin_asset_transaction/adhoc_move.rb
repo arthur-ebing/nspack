@@ -4,7 +4,7 @@ module RawMaterials
   module BinAssets
     module BinAssetTransaction
       class AdhocMove
-        def self.call(form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
+        def self.call(form_values: nil, form_errors: nil, remote: true)
           ui_rule = UiRules::Compiler.new(:bin_asset_transaction, :adhoc, form_values: form_values, adhoc_type: 'move')
           rules   = ui_rule.compile
 

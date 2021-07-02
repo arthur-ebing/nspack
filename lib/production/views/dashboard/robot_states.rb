@@ -31,7 +31,7 @@ module Production
           HTML
         end
 
-        def self.robots(recs) # rubocop:disable Metrics/AbcSize
+        def self.robots(recs)
           recs.map do |rec|
             <<~HTML
               <div class="outline pa2 mr3 mt2 bg-white" style="min-width:230px">
@@ -75,7 +75,7 @@ module Production
           HTML
         end
 
-        def self.indiv(login, group_incentive, system_resource_id) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
+        def self.indiv(login, group_incentive, system_resource_id) # rubocop:disable Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
           return '' if group_incentive
           return '' unless login
 

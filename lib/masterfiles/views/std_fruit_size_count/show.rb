@@ -4,7 +4,7 @@ module Masterfiles
   module Fruit
     module StdFruitSizeCount
       class Show
-        def self.call(id) # rubocop:disable Metrics/AbcSize
+        def self.call(id)
           ui_rule = UiRules::Compiler.new(:std_fruit_size_count, :show, id: id)
           rules   = ui_rule.compile
 

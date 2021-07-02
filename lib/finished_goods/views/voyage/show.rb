@@ -4,7 +4,7 @@ module FinishedGoods
   module Dispatch
     module Voyage
       class Show
-        def self.call(id, back_url: nil) # rubocop:disable Metrics/AbcSize
+        def self.call(id, back_url: nil)
           ui_rule = UiRules::Compiler.new(:voyage, :show, id: id)
           rules   = ui_rule.compile
 

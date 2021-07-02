@@ -17,7 +17,7 @@ module Labels
         end
 
         # Multi label: get variables from all sub-labels and assemble.
-        def rules_for_multiple(repo, obj, as_labels) # rubocop:disable Metrics/AbcSize
+        def rules_for_multiple(repo, obj, as_labels)
           count = 0
           xml_vars = []
           vartypes = []

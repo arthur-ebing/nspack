@@ -46,7 +46,7 @@ module Production
           end
         end
 
-        def self.total_items(recs) # rubocop:disable Metrics/AbcSize
+        def self.total_items(recs)
           recs.map do |rec|
             percentage = if rec[:qty_tipped].zero? || rec[:qty_bins].zero?
                            0
@@ -69,7 +69,7 @@ module Production
           end
         end
 
-        def self.week_items(recs) # rubocop:disable Metrics/AbcSize
+        def self.week_items(recs)
           recs.map do |rec|
             percentage = if rec[:qty_tipped].zero? || rec[:qty_bins].zero?
                            0

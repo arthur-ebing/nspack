@@ -4,7 +4,7 @@ module FinishedGoods
   module Dispatch
     module Load
       class TitanAddendum
-        def self.call(load_id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
+        def self.call(load_id, form_values: nil, form_errors: nil)
           ui_rule = UiRules::Compiler.new(:titan_addendum, :new, load_id: load_id, form_values: form_values)
           rules   = ui_rule.compile
 

@@ -4,7 +4,7 @@ module Production
   module Reworks
     module ReworksRun
       class ChangeRunOrchardDetails
-        def self.call(reworks_run_type_id, attrs, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
+        def self.call(reworks_run_type_id, attrs, form_values: nil, form_errors: nil)
           ui_rule = UiRules::Compiler.new(:change_run_orchard, :details, reworks_run_type_id: reworks_run_type_id, attrs: attrs, form_values: form_values)
           rules   = ui_rule.compile
 

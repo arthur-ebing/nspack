@@ -4,7 +4,7 @@ module Production
   module Runs
     module ProductionRun
       class ShowBinTippingCriteria
-        def self.call(id) # rubocop:disable Metrics/AbcSize
+        def self.call(id)
           ui_rule = UiRules::Compiler.new(:bin_tipping_criteria, :show, production_run_id: id)
           rules   = ui_rule.compile
 

@@ -4,7 +4,7 @@ module Development
   module Statuses
     module Status
       class Show
-        def self.call(table_name, id, remote: false) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
+        def self.call(table_name, id, remote: false) # rubocop:disable Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
           ui_rule = UiRules::Compiler.new(:status, :show, table_name: table_name, id: id)
           rules   = ui_rule.compile
           no_other_details = rules[:other_details] ? rules[:other_details].empty? : false

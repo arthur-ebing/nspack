@@ -4,7 +4,7 @@ module Production
   module Runs
     module ProductionRun
       class New
-        def self.call(form_values: nil, form_errors: nil, remote: true, is_second_form: false) # rubocop:disable Metrics/AbcSize
+        def self.call(form_values: nil, form_errors: nil, remote: true, is_second_form: false)
           ui_rule = UiRules::Compiler.new(:production_run, :new, form_values: form_values, is_second_form: is_second_form)
           rules   = ui_rule.compile
 

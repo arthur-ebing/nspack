@@ -4,7 +4,7 @@ module Edi
   module Receipts
     module EdiInTransaction
       class Show
-        def self.call(id) # rubocop:disable Metrics/AbcSize
+        def self.call(id)
           ui_rule = UiRules::Compiler.new(:edi_in_transaction, :show, id: id)
           rules   = ui_rule.compile
 

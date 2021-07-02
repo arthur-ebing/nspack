@@ -4,7 +4,7 @@ module Production
   module Runs
     module ReworksRun
       class SearchUntippedBins
-        def self.call(form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
+        def self.call(form_values: nil, form_errors: nil, remote: true)
           ui_rule = UiRules::Compiler.new(:bulk_tip_bin_process, nil, form_values: form_values)
           rules   = ui_rule.compile
           layout = Crossbeams::Layout::Page.build(rules) do |page|

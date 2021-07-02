@@ -4,7 +4,7 @@ module RawMaterials
   module BinAssets
     module BinAssetTransaction
       class Show
-        def self.call(id) # rubocop:disable Metrics/AbcSize
+        def self.call(id)
           ui_rule = UiRules::Compiler.new(:bin_asset_transaction, :show, id: id)
           rules   = ui_rule.compile
 

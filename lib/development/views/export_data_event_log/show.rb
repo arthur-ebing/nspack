@@ -4,7 +4,7 @@ module Development
   module Logging
     module ExportDataEventLog
       class Show
-        def self.call(id) # rubocop:disable Metrics/AbcSize
+        def self.call(id)
           ui_rule = UiRules::Compiler.new(:export_data_event_log, :show, id: id)
           rules   = ui_rule.compile
 

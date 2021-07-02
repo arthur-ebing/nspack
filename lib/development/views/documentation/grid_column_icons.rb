@@ -3,7 +3,7 @@
 module Development
   module Documentation
     class GridColumnIcons
-      def self.call # rubocop:disable Metrics/AbcSize
+      def self.call
         # get list of app_icons
         filenames = Dir.children(File.join(ENV['ROOT'], 'public/app_icons')).map { |f| f.delete_suffix('.svg') }.sort
 

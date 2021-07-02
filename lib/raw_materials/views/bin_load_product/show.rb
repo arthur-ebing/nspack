@@ -4,7 +4,7 @@ module RawMaterials
   module Dispatch
     module BinLoadProduct
       class Show
-        def self.call(id) # rubocop:disable Metrics/AbcSize
+        def self.call(id)
           ui_rule = UiRules::Compiler.new(:bin_load_product, :show, id: id)
           rules   = ui_rule.compile
 

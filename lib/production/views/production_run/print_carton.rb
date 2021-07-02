@@ -4,7 +4,7 @@ module Production
   module Runs
     module ProductionRun
       class PrintCarton
-        def self.call(attrs, request_ip, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
+        def self.call(attrs, request_ip, form_values: nil, form_errors: nil)
           ui_rule = UiRules::Compiler.new(:production_run_product_setup, :print_barcode, attrs: attrs, request_ip: request_ip, form_values: form_values)
           rules   = ui_rule.compile
 
