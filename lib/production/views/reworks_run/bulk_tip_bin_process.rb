@@ -45,7 +45,7 @@ module Production
 
                 section.add_grid('edit_suggested_runs',
                                  '/production/reworks/edit_suggested_runs',
-                                 caption: 'Edit Sugested Runs',
+                                 caption: 'Edit Suggested Runs',
                                  height: 40)
               when 3
                 section.add_control(control_type: :link,
