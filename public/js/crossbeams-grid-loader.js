@@ -1687,7 +1687,6 @@ const crossbeamsGridStaticLoader = {
    * Statically load a grid with column and row values.
    */
   loadGrid: (gridId, colDefs, rowDefs, fieldUpdateUrl, extraContext, multiselectIds) => {
-    console.log('Load grid:', fieldUpdateUrl, extraContext, multiselectIds);
     const gridOptions = crossbeamsGridStore.getGrid(gridId);
     // find grid
     const newColDefs = crossbeamsGridStaticLoader.translateColDefs(colDefs);

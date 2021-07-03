@@ -537,7 +537,7 @@ groupDefaultExpanded:: Level to which the tree should be expanded. If `-1`, the 
 |none. Only applicable if `col_defs` has been set.
 
 |options - :extra_context
-|Extra context for the grid. e.g. `{ keyColumn: 'name' }` when the row key is not named `id`.
+|Extra context for the grid. e.g. `{ keyColumn: 'name' }` so editable grids return this column value from the row as a param.
 |A Hash.
 |none. Only applicable if `col_defs` has been set.
 

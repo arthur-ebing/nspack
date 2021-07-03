@@ -148,66 +148,11 @@ class Nspack < Roda
         r.is do
           @page = interactor.edit_report(id)
           if @page.success
-            store_locally(:dm_admin_page, @page)
-            view('dataminer/admin/edit')
+            show_page { DM::Admin::Edit.call(@page) }
           else
             flash[:error] = @page.message
             r.redirect '/dataminer/admin'
           end
-        end
-
-        r.on 'colour_grid' do
-          @page = retrieve_from_local_store(:dm_admin_page)
-          store_locally(:dm_admin_page, @page)
-          rows = []
-          @page.report.external_settings[:colour_key].each do |k, v|
-            rows << { id: k, description: v, colour_rule: k }
-          end
-
-          cols = Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
-            mk.col 'id', nil, hide: true
-            mk.col 'description', nil, editable: true, width: 500
-            mk.col 'colour_rule'
-          end
-
-          {
-            extraContext: { keyColumn: 'id' },
-            multiselect_ids: [],
-            fieldUpdateUrl: "/dataminer/admin/#{id}/save_colour_key_desc",
-            tree: nil,
-            columnDefs: cols,
-            rowDefs: rows
-          }.to_json
-        end
-
-        r.on 'columns_grid' do
-          @page = retrieve_from_local_store(:dm_admin_page)
-          store_locally(:dm_admin_page, @page)
-
-          {
-            extraContext: { keyColumn: 'name' },
-            multiselect_ids: [],
-            fieldUpdateUrl: @page.save_url,
-            tree: nil,
-            columnDefs: @page.col_defs,
-            rowDefs: @page.row_defs
-          }.to_json
-        end
-
-        r.on 'params_grid' do
-          # NOTE: This relies on the fact that the params_grid url comes after the
-          #       columns grid url in the page, so it'll be loaded last.
-          #       If that ever changes, the retrieve+store in columns_grid above
-          #       will not work properly!
-          @page = retrieve_from_local_store(:dm_admin_page)
-
-          {
-            multiselect_ids: [],
-            fieldUpdateUrl: nil,
-            tree: nil,
-            columnDefs: @page.col_defs_params,
-            rowDefs: @page.row_defs_params
-          }.to_json
         end
       end
 
@@ -222,7 +167,7 @@ class Nspack < Roda
 
       r.on 'save' do
         r.post do
-          res = interactor.save_report(id, params)
+          res = interactor.save_report(id, params[:report])
           if res.success
             flash[:notice] = "Report's header has been changed."
           else
