@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+echo "Running todo check..."
+./bin/run-todo-checks.bash
+
 echo "Running pre-push hook"
 ./bin/run-tests.bash
 
