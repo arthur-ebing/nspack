@@ -438,6 +438,15 @@ e.g.
 section.add_grid 'tickets', '/list/tickets', caption: 'Movie tickets', height: 8
 ----
 
+A grid can also be rendered with all its data (instead of using a URL as a callback to build the rows).
+
+e.g.
+[source,ruby]
+----
+section.add_grid 'tickets', nil, caption: 'Movie tickets', height: 8,
+                 cold_defs: col_defs, row_defs: row_defs
+----
+
 |===
 |attribute |description |possible values |default
 
@@ -465,6 +474,109 @@ section.add_grid 'tickets', '/list/tickets', caption: 'Movie tickets', height: 8
 |Make the grid fit the available height of its parent element. Note that if the grid is in a section, you can call `fit_height!` on the section and the grid will adjust. If the grid is not in a section, the parent element must have the css property `display:flex`.
 |`true` or `false`
 |`nil` - effectively `false`.
+
+|options - :colour_key
+|A hash of `colour name: description` to annotate what coloured rows signify.
+|Hash
+|None.
+
+|options - :grid_params (See under **lookup** below for main usage)
+a|A hash of parameters.
+
+if `bookmark_row_on_action` is true, the grid will render with a bookmark.
+
+if `query_string` is present, this will be added as the querystring of the callback URL.
+|Hash
+|None.
+
+4+|**The following options are applicable when loading a list grid as a tree**
+
+|options - :tree
+a|A hash of tree configuration attributes
+
+tree_column:: The column that contains the tree hierarchy - by convention, usually `path_array`.
+tree_caption:: The caption for the tree column.
+suppress_node_counts:: Boolean - show/hide counts per tree level.
+groupDefaultExpanded:: Level to which the tree should be expanded. If `-1`, the tree is fully expanded.
+
+|Hash
+|None.
+
+4+|**The following options are applicable when loading a lookup grid**
+
+|options - :lookup_key
+|The lookup key in a list YAML file to match.
+|String
+|none.
+
+|options - :grid_params
+|A hash of parameters. Applied to the lookup section of a lookup YAML file.
+|Hash
+|None.
+
+4+|**The following options are applicable when loading data with the grid (no URL callback)**
+
+|options - :col_defs
+|Column definitions
+|An array of columns. Typically use ColumnDefiner to generate.
+|none.
+
+|options - :row_defs
+|Row data
+|An array of rows of hashes.
+|none. Only applicable if `col_defs` has been set.
+
+|options - :multiselect_ids
+|Pre-selected rows for a multiselect grid
+|An array of row ids.
+|none. Only applicable if `col_defs` has been set.
+
+|options - :field_update_url
+|The URL to call when an editable cell is updated.
+|A string.
+|none. Only applicable if `col_defs` has been set.
+
+|options - :extra_context
+|Extra context for the grid. e.g. `{ keyColumn: 'name' }` when the row key is not named `id`.
+|A Hash.
+|none. Only applicable if `col_defs` has been set.
+
+4+|**The following options are applicable to multiselect grids**
+
+|options - :is_multiselect
+|Set to true if the grid should render with multiselect chackboxes.
+|Boolean
+|`false`
+
+|options - :multiselect_url
+|The URL to call when saving multiselect choices.
+|String
+|none. Required if `is_multiselect` is `true`.
+
+|options - :multiselect_key
+|The multiselect key in a list YAML file to match.
+|String
+|none.
+
+|options - :multiselect_params
+|Parameters to be applied to the list YAML query.
+|Hash
+|none.
+
+|options - :can_be_cleared
+|Can the user save the grid without any selected rows?
+|Boolean
+|`false`
+
+|options - :multiselect_save_method
+a|How to call the multiselect_url.
+
+http:: normal request
+remote:: fetch request
+dialog:: remote rendered in a dialog
+loading:: remote rendered in a loading window
+|String, can be `http`, `dialog`, `remote`, `loading`
+|`http`.
 
 |===
 

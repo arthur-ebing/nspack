@@ -1686,13 +1686,22 @@ const crossbeamsGridStaticLoader = {
   /**
    * Statically load a grid with column and row values.
    */
-  loadGrid: (gridId, colDefs, rowDefs) => {
+  loadGrid: (gridId, colDefs, rowDefs, fieldUpdateUrl, extraContext, multiselectIds) => {
+    console.log('Load grid:', fieldUpdateUrl, extraContext, multiselectIds);
     const gridOptions = crossbeamsGridStore.getGrid(gridId);
     // find grid
     const newColDefs = crossbeamsGridStaticLoader.translateColDefs(colDefs);
     gridOptions.api.setColumnDefs(newColDefs);
     gridOptions.api.setRowData(rowDefs);
-    crossbeamsGridStaticLoader.applyGeneralGridUi(gridOptions, newColDefs);
+    crossbeamsGridStaticLoader.applyGeneralGridUi(gridOptions, newColDefs, fieldUpdateUrl, extraContext);
+
+    if (multiselectIds) {
+      gridOptions.api.forEachNode((node) => {
+        if (node.data && multiselectIds.includes(node.data.id)) {
+          node.setSelected(true);
+        }
+      });
+    }
   },
 };
 

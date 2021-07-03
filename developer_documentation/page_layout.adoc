@@ -24,10 +24,10 @@ end
 ----
 <1> rules is the page_config.
 <2> The form object that contains the field values to bind to the form.
-<3> These values (a Hash or nil) will take precedence ov the values in form_object when present.
+<3> These values (a Hash or nil) will take precedence over the values in form_object when present.
 <4> A Hash of errors or nil - for errors to be displayed in the form next to the relevant field.
 <5> The form action to be called on submit.
-<6> Optional. Call this to make the form call the action remotely - vi a javascript `fetch` call.
+<6> Optional. Call this to make the form call the action remotely - via javascript `fetch` call.
 <7> A field to be rendered. The form object should return a value when sent this method, and the rules should include a renderer spec for it.
 
 == Sections
