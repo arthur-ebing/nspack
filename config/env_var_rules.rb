@@ -83,7 +83,7 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { PHYT_CLEAN_SEASON_ID: 'optional. PhytClean Standard Data season id' },
     { BYPASS_QUALITY_TEST_LOAD_CHECK: 'optional. Bypasses Quality checks at Pallet Loading' },
     { BYPASS_QUALITY_TEST_PRE_RUN_CHECK: 'optional. Bypasses Quality checks before a run is started' },
-    { ALLOW_CULTIVAR_GROUP_MIXING: 'Allow users to set allow_cultivar_group_mixing flag on production_runs' },
+    # { ALLOW_CULTIVAR_GROUP_MIXING: 'Allow users to set allow_cultivar_group_mixing flag on production_runs' },
     { TEMP_TAIL_REQUIRED_TO_SHIP: 'optional. Makes temp tail required on all loads' },
     { VAT_FACTOR: 'To calculate vat amounts for the delivery cost invoice report' },
     { USE_CARTON_PALLETIZING: 'Use carton palletizing application. Default false' },

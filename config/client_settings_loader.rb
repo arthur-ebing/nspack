@@ -132,7 +132,16 @@ class AppClientSettingsLoader # rubocop:disable Metrics/ClassLength
     DEFAULT_DEPOT: { env_key: 'DEFAULT_DEPOT', desc: 'Default Depot for new dispatch loads.' },
     # TODO: FROM_DEPOT THAT DEFAULTS TO DEFAULT_DEPOT << must become a rule>>
     TEMP_TAIL_REQUIRED_TO_SHIP: { env_key: 'TEMP_TAIL_REQUIRED_TO_SHIP', boolean: true, desc: 'optional. Makes temp tail required on all loads' },
-    ROBOT_DISPLAY_LINES: { env_key: 'ROBOT_DISPLAY_LINES', default: 0, format: :integer, desc: 'Do all robots on site have the same no of lines? If so, set to 4 or 5 as required.' }
+    ROBOT_DISPLAY_LINES: { env_key: 'ROBOT_DISPLAY_LINES', default: 0, format: :integer, desc: 'Do all robots on site have the same no of lines? If so, set to 4 or 5 as required.' },
+    ADDENDUM_PLACE_OF_ISSUE: { env_key: 'ADDENDUM_PLACE_OF_ISSUE', default: 'CPT', validation_regex: /cpt|dbn|plz|mpm|oth/i, desc: 'Exporter ceritficate place of issue for addendum. Can be CPT, DBN. MPM, PLZ or OTH.' },
+    GOVT_INSPECTION_SIGNEE_CAPTION: { env_key: 'GOVT_INSPECTION_SIGNEE_CAPTION', default: 'Packhouse manager', desc: 'Inspection report - Signee caption - only needs to be set if it should not be "Packhouse manager"' },
+    CONTINUOUS_GOVT_INSPECTION_SHEETS: { env_key: 'CONTINUOUS_GOVT_INSPECTION_SHEETS', boolean: true, desc: 'Are inspection sheets open-ended?' },
+    HIDE_INTAKE_TRIP_SHEET_ON_GOVT_INSPECTION_SHEET: { env_key: 'HIDE_INTAKE_TRIP_SHEET_ON_GOVT_INSPECTION_SHEET', boolean: true, desc: 'Determines if tripsheet can be created or not' },
+    EDI_AUTO_CREATE_MF: { env_key: 'EDI_AUTO_CREATE_MF', boolean: true, desc: 'For EDI in, do we create missing masterfiles automatically?' },
+    PS_APPLY_SUBSTITUTES: { env_key: 'PS_APPLY_SUBSTITUTES', boolean: true, desc: 'If true, include extra substitute columns in PS EDI out.' },
+    USE_EXTENDED_PALLET_PICKLIST: { env_key: 'USE_EXTENDED_PALLET_PICKLIST', desc: 'Jasper report for picklist. If extended, use "dispatch_picklist", else use "picklist".' },
+    BYPASS_QUALITY_TEST_PRE_RUN_CHECK: { env_key: 'BYPASS_QUALITY_TEST_PRE_RUN_CHECK', default: true, desc: 'optional. Bypasses Quality checks before a run is started' },
+    BYPASS_QUALITY_TEST_LOAD_CHECK: { env_key: 'BYPASS_QUALITY_TEST_LOAD_CHECK', default: true, desc: 'optional. Bypasses Quality checks at Pallet Loading' }
   }.freeze
 
   FIXED_RULES = {
@@ -224,7 +233,32 @@ class AppClientSettingsLoader # rubocop:disable Metrics/ClassLength
                                desc: 'Number of passenger instance as set in /etc/nginx/conf.d/mod-http-passenger.conf' },
     PASSENGER_USAGE_LEVEL: { env_key: 'PASSENGER_USAGE_LEVEL',
                              default: 'INFO',
-                             desc: 'Lowest state for passenger usage to send emails. Can be INFO, BUSY or HIGH.' }
+                             desc: 'Lowest state for passenger usage to send emails. Can be INFO, BUSY or HIGH.' },
+    EDI_NETWORK_ADDRESS: { env_key: 'EDI_NETWORK_ADDRESS', default: '999', desc: 'Network address for sending EDI documents' },
+    EDI_RECEIVE_DIR: { env_key: 'EDI_RECEIVE_DIR', desc: '' },
+    SOLAS_VERIFICATION_METHOD: { env_key: 'SOLAS_VERIFICATION_METHOD', desc: 'SOLAS verification method (1 or 2). required for some EDI out documents' },
+    SAMSA_ACCREDITATION: { env_key: 'SAMSA_ACCREDITATION', desc: 'For sending EDI documents' },
+    JASPER_REPORTS_PATH: { env_key: 'JASPER_REPORTS_PATH', desc: "Full path to client's Jasper report definitions" },
+    JRUBY_JASPER_HOST_PORT: { env_key: 'JRUBY_JASPER_HOST_PORT', desc: 'IP address of jruby jasper reporting engine in the format HOST:PORT' },
+    TITAN_ENVIRONMENT: { env_key: 'TITAN_ENVIRONMENT', default: 'UAT', desc: "Titan API environment for government inspections. { UAT: 'uat', STAGING: 'staging', PRODUCTION: '' }" },
+    TITAN_INSPECTION_API_USER_ID: { env_key: 'TITAN_INSPECTION_API_USER_ID', desc: 'Titan API_UserId for government inspections.' },
+    TITAN_INSPECTION_API_SECRET: { env_key: 'TITAN_INSPECTION_API_SECRET', desc: 'Titan API_Secret for government inspections.' },
+    TITAN_ADDENDUM_API_USER_ID: { env_key: 'TITAN_ADDENDUM_API_USER_ID', desc: 'Titan API_UserId for government addenda.' },
+    TITAN_ADDENDUM_API_SECRET: { env_key: 'TITAN_ADDENDUM_API_SECRET', desc: 'Titan API_Secret for government addenda.' },
+    PHYT_CLEAN_API_USERNAME: { env_key: 'PHYT_CLEAN_API_USERNAME', desc: 'optional. PhytClean API User Name' },
+    PHYT_CLEAN_API_PASSWORD: { env_key: 'PHYT_CLEAN_API_PASSWORD', desc: 'optional. PhytClean API Password' },
+    PHYT_CLEAN_SEASON_ID: { env_key: 'PHYT_CLEAN_SEASON_ID', desc: 'optional. PhytClean Standard Data season id' },
+    PHYT_CLEAN_OPEN_TIMEOUT: { env_key: 'PHYT_CLEAN_OPEN_TIMEOUT', default: 5, format: :integer, desc: 'PHYTCLEAN: Time in seconds to wait for API connection' },
+    PHYT_CLEAN_READ_TIMEOUT: { env_key: 'PHYT_CLEAN_READ_TIMEOUT', default: 10, format: :integer, desc: 'PHYTCLEAN: Time in seconds to wait for API response' },
+    PHYT_CLEAN_SEASON_END_DATE: { env_key: 'PHYT_CLEAN_SEASON_END_DATE', desc: 'End date of phytclean season. Set it to stop running Phytclean updates after this date. Optional or YYYY-MM-DD format' },
+    E_CERT_ENVIRONMENT: { env_key: 'E_CERT_ENVIRONMENT', default: 'QA', desc: 'optional. eCert API Environment' },
+    E_CERT_API_CLIENT_ID: { env_key: 'E_CERT_API_CLIENT_ID', desc: 'optional. eCert API  Client ID' },
+    E_CERT_API_CLIENT_SECRET: { env_key: 'E_CERT_API_CLIENT_SECRET', desc: 'optional. eCert API Secret' },
+    E_CERT_BUSINESS_ID: { env_key: 'E_CERT_BUSINESS_ID', desc: 'optional. eCert API Business ID' },
+    E_CERT_BUSINESS_NAME: { env_key: 'E_CERT_BUSINESS_NAME', desc: 'optional. eCert API Business Name' },
+    E_CERT_INDUSTRY: { env_key: 'E_CERT_INDUSTRY', desc: 'optional. eCert API Industry' },
+    E_CERT_OPEN_TIMEOUT: { env_key: 'E_CERT_OPEN_TIMEOUT', default: 5, format: :integer, desc: 'E-CERT: Time in seconds to wait for API connection' },
+    E_CERT_READ_TIMEOUT: { env_key: 'E_CERT_READ_TIMEOUT', default: 10, format: :integer, desc: 'E-CERT: Time in seconds to wait for API response' }
   }.freeze
 
   DEVELOPER_RULES = {
@@ -276,9 +310,13 @@ class AppClientSettingsLoader # rubocop:disable Metrics/ClassLength
     out
   end
 
-  def self.get_rule(name, rule) # rubocop:disable Metrics/AbcSize
+  def self.get_rule(name, rule) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
     val = if rule[:boolean]
-            make_boolean(rule[:env_key])
+            if rule[:default]
+              make_boolean(rule[:env_key], default_true: true)
+            else
+              make_boolean(rule[:env_key])
+            end
           elsif rule[:format]
             ENV.fetch(rule[:env_key], rule[:default]).to_i # Currently only an integer format...
           elsif rule[:array_split]
@@ -287,6 +325,7 @@ class AppClientSettingsLoader # rubocop:disable Metrics/ClassLength
             ENV.fetch(rule[:env_key], rule[:default])
           end
     raise %(ENV variable "#{rule[:env_key]} must be provided") if rule[:required] && val.nil_or_empty?
+    raise %(ENV variable "#{rule[:env_key]} value #{val} does not match #{rule[:validation_regex]}") if rule[:validation_regex] && !val.match?(rule[:validation_regex])
 
     [name, val]
   end
@@ -316,7 +355,7 @@ class AppClientSettingsLoader # rubocop:disable Metrics/ClassLength
     end
   end
 
-  def self.env_var_file # rubocop:disable Metrics/AbcSize
+  def self.env_var_file
     out = ['']
     RULES.sort.each do |name, rule|
       out << env_var_line(name, rule)
