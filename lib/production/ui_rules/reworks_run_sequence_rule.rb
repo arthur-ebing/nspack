@@ -15,7 +15,7 @@ module UiRules
 
       @rules[:require_packaging_bom] = AppConst::CR_PROD.require_packaging_bom?
       @rules[:pm_boms_products] = pm_boms_products(@form_object[:pm_bom_id]) unless @form_object[:pm_bom_id].nil_or_empty?
-      @rules[:allow_cultivar_group_mixing] = AppConst::ALLOW_CULTIVAR_GROUP_MIXING
+      @rules[:allow_cultivar_group_mixing] = AppConst::CR_PROD.can_mix_cultivar_groups?
       @rules[:gtins_required] = AppConst::CR_PROD.use_gtins?
       @rules[:use_packing_specifications] = AppConst::CR_PROD.use_packing_specifications?
       @rules[:basic_pack_equals_standard_pack] = AppConst::CR_MF.basic_pack_equals_standard_pack?

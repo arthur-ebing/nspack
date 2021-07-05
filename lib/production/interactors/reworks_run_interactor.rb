@@ -369,7 +369,7 @@ module ProductionApp
       delivery_ids = params[:affected_deliveries].split("\n").map(&:strip).reject(&:empty?)
       allow_cultivar_mixing = params[:allow_cultivar_mixing] == 't'
       ignore_runs_that_allow_mixing = params[:ignore_runs_that_allow_mixing] == 't'
-      allow_cultivar_group_mixing = false unless AppConst::ALLOW_CULTIVAR_GROUP_MIXING && !params[:allow_cultivar_group_mixing].nil?
+      allow_cultivar_group_mixing = false unless AppConst::CR_PROD.can_mix_cultivar_groups? && !params[:allow_cultivar_group_mixing].nil?
 
       change_attrs = { delivery_ids: resolve_deliveries(delivery_ids),
                        from_orchard: params[:from_orchard].to_i,
@@ -695,7 +695,7 @@ module ProductionApp
     end
 
     def create_reworks_run_record(attrs, reworks_action, changes) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
-      attrs[:allow_cultivar_group_mixing] = false unless AppConst::ALLOW_CULTIVAR_GROUP_MIXING && !attrs[:allow_cultivar_group_mixing].nil?
+      attrs[:allow_cultivar_group_mixing] = false unless AppConst::CR_PROD.can_mix_cultivar_groups? && !attrs[:allow_cultivar_group_mixing].nil?
 
       res = validate_reworks_run_params(attrs)
       return validation_failed_response(res) if res.failure?
@@ -1965,7 +1965,7 @@ module ProductionApp
       from_production_run_id = params[:from_production_run_id]
       to_production_run_id = params[:to_production_run_id]
       pallets_selected = params[:pallets_selected]
-      allow_cultivar_group_mixing = params[:allow_cultivar_group_mixing] == 't' if AppConst::ALLOW_CULTIVAR_GROUP_MIXING
+      allow_cultivar_group_mixing = params[:allow_cultivar_group_mixing] == 't' if AppConst::CR_PROD.can_mix_cultivar_groups?
 
       return OpenStruct.new(success: false, messages: { to_production_run_id: ["#{to_production_run_id} should be different"] }, to_production_run_id: to_production_run_id) unless from_production_run_id != to_production_run_id
 
@@ -1975,7 +1975,7 @@ module ProductionApp
       new_production_run = repo.production_run_exists?(from_production_run_id)
       return OpenStruct.new(success: false, messages: { to_production_run_id: ["#{to_production_run_id} doesn't exist"] }, to_production_run_id: to_production_run_id) if new_production_run.nil_or_empty?
 
-      if AppConst::ALLOW_CULTIVAR_GROUP_MIXING && allow_cultivar_group_mixing
+      if AppConst::CR_PROD.can_mix_cultivar_groups? && allow_cultivar_group_mixing
         same_commodity = repo.same_commodity?(from_production_run_id, to_production_run_id)
         return OpenStruct.new(success: false, messages: { to_production_run_id: ["#{from_production_run_id} and #{to_production_run_id} belongs to different same_commodities"] }, to_production_run_id: to_production_run_id) unless same_commodity
       else
