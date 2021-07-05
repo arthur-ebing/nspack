@@ -79,9 +79,7 @@ module MasterfilesApp
       production_region_id = create_production_region
       farm_group_id = create_farm_group
       puc_id = create_puc
-      location_id = create_location(storage_type_code: AppConst::STORAGE_TYPE_BIN_ASSET,
-                                    location_type_code: AppConst::LOCATION_TYPES_FARM,
-                                    assignment_code: AppConst::EMPTY_BIN_STORAGE)
+      location_id = create_location
       {
         id: 1,
         owner_party_role_id: party_role_id,

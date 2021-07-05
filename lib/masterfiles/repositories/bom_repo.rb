@@ -311,7 +311,7 @@ module MasterfilesApp
           JOIN pm_products ON pm_products.id = pm_boms_products.pm_product_id
           JOIN pm_subtypes ON pm_subtypes.id = pm_products.pm_subtype_id
           JOIN pm_types ON pm_types.id = pm_subtypes.pm_type_id
-          JOIN pm_composition_levels ON pm_composition_levels.id = pm_types.pm_composition_level_id
+          LEFT JOIN pm_composition_levels ON pm_composition_levels.id = pm_types.pm_composition_level_id
           WHERE pm_boms_products.pm_bom_id = ?
           #{exclude_str}
           ORDER BY pm_composition_levels.composition_level

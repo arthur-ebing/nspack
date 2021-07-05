@@ -23,4 +23,4 @@ end
 
 runner = GlobalSeedRunner.new
 runner.run_gln_setup
-# runner.run_masterfile_setup
+runner.run_masterfile_setup

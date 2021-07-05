@@ -51,7 +51,7 @@ module MasterfilesApp
       return id unless id.nil?
 
       default = {
-        code: AppConst::UOM_TYPE,
+        code: Faker::Lorem.unique.word,
         active: true
       }
       DB[:uom_types].insert(default.merge(opts))
