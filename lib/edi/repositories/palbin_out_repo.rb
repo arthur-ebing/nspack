@@ -29,7 +29,7 @@ module EdiApp
         JOIN pucs ON pucs.id = pallet_sequences.puc_id
         JOIN orchards ON orchards.id = pallet_sequences.orchard_id
         JOIN cultivar_groups ON cultivar_groups.id = pallet_sequences.cultivar_group_id
-        JOIN cultivars ON cultivars.id = pallet_sequences.cultivar_id
+        LEFT JOIN cultivars ON cultivars.id = pallet_sequences.cultivar_id
         JOIN commodities ON commodities.id = cultivar_groups.commodity_id
         JOIN grades ON grades.id = pallet_sequences.grade_id
         JOIN standard_pack_codes ON standard_pack_codes.id = pallet_sequences.standard_pack_code_id
