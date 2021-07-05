@@ -1743,7 +1743,7 @@ module DevelopmentApp
                     ui_rule = UiRules::Compiler.new(:#{opts.singlename}, :new, form_values: form_values)
                     rules   = ui_rule.compile
 
-                    layout = Crossbeams::Layout::Page.build(rules) do |page|
+                    Crossbeams::Layout::Page.build(rules) do |page|
                       page.form_object ui_rule.form_object
                       page.form_values form_values
                       page.form_errors form_errors
@@ -1754,8 +1754,6 @@ module DevelopmentApp
                         #{form_fields}
                       end
                     end
-
-                    layout
                   end
                 end
               end
@@ -1776,7 +1774,7 @@ module DevelopmentApp
                     ui_rule = UiRules::Compiler.new(:#{opts.singlename}, :edit, id: id, form_values: form_values)
                     rules   = ui_rule.compile
 
-                    layout = Crossbeams::Layout::Page.build(rules) do |page|
+                    Crossbeams::Layout::Page.build(rules) do |page|
                       page.form_object ui_rule.form_object
                       page.form_values form_values
                       page.form_errors form_errors
@@ -1788,8 +1786,6 @@ module DevelopmentApp
                         #{form_fields}
                       end
                     end
-
-                    layout
                   end
                 end
               end
@@ -1810,7 +1806,7 @@ module DevelopmentApp
                     ui_rule = UiRules::Compiler.new(:#{opts.singlename}, :show, id: id)
                     rules   = ui_rule.compile
 
-                    layout = Crossbeams::Layout::Page.build(rules) do |page|
+                    Crossbeams::Layout::Page.build(rules) do |page|
                       page.form_object ui_rule.form_object
                       page.form do |form|
                         # form.caption '#{opts.text_name}'
@@ -1818,8 +1814,6 @@ module DevelopmentApp
                         #{form_fields(true)}
                       end
                     end
-
-                    layout
                   end
                 end
               end
@@ -1840,7 +1834,7 @@ module DevelopmentApp
                     ui_rule = UiRules::Compiler.new(:#{opts.singlename}, :complete, id: id)
                     rules   = ui_rule.compile
 
-                    layout = Crossbeams::Layout::Page.build(rules) do |page|
+                    Crossbeams::Layout::Page.build(rules) do |page|
                       page.form_object ui_rule.form_object
                       page.form do |form|
                         form.caption 'Complete #{opts.text_name}'
@@ -1852,8 +1846,6 @@ module DevelopmentApp
                         #{form_fields(true)}
                       end
                     end
-
-                    layout
                   end
                 end
               end
@@ -1874,7 +1866,7 @@ module DevelopmentApp
                     ui_rule = UiRules::Compiler.new(:#{opts.singlename}, :approve, id: id)
                     rules   = ui_rule.compile
 
-                    layout = Crossbeams::Layout::Page.build(rules) do |page|
+                    Crossbeams::Layout::Page.build(rules) do |page|
                       page.form_object ui_rule.form_object
                       page.form do |form|
                         form.caption 'Approve or Reject #{opts.text_name}'
@@ -1885,8 +1877,6 @@ module DevelopmentApp
                         #{form_fields(true)}
                       end
                     end
-
-                    layout
                   end
                 end
               end
@@ -1907,7 +1897,7 @@ module DevelopmentApp
                     ui_rule = UiRules::Compiler.new(:#{opts.singlename}, :reopen, id: id)
                     rules   = ui_rule.compile
 
-                    layout = Crossbeams::Layout::Page.build(rules) do |page|
+                    Crossbeams::Layout::Page.build(rules) do |page|
                       page.form_object ui_rule.form_object
                       page.form do |form|
                         form.caption 'Reopen #{opts.text_name}'
@@ -1918,8 +1908,6 @@ module DevelopmentApp
                         #{form_fields(true)}
                       end
                     end
-
-                    layout
                   end
                 end
               end
