@@ -1461,7 +1461,7 @@
   :default_value:
   :ordered_list: false
   :ui_priority: 4
-  :list_def: true, false
+  :list_def: [true, false]
 - :column: scrapped
   :caption: Scrapped?
   :data_type: :boolean
@@ -1469,4 +1469,4 @@
   :default_value:
   :ordered_list: false
   :ui_priority: 5
-  :list_def: true, false
+  :list_def: [true, false]
