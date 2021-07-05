@@ -1438,14 +1438,22 @@
   :ordered_list: false
   :ui_priority: 1
   :list_def: 
-- :column: pallet_number
+- :column: repacked_to_pallet_number
   :caption: Pallet number
   :data_type: :string
   :control_type: :text
   :default_value: 
   :ordered_list: false
   :ui_priority: 2
-  :list_def: 
+  :list_def:
+- :column: repacked_from_pallet_number
+  :caption: From Pallet number
+  :data_type: :string
+  :control_type: :text
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 3
+  :list_def:
 - :column: repacked_at
   :caption: Repacked at
   :data_type: :date
