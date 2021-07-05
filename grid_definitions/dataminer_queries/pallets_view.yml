@@ -2480,7 +2480,7 @@
 - :column: vw_pallets.shipped_at
   :caption: Shipped at
   :data_type: :datetime
-  :control_type: :text
+  :control_type: :daterange
   :default_value: 
   :ordered_list: false
   :ui_priority: 1
@@ -2488,7 +2488,7 @@
 - :column: vw_pallets.created_at
   :caption: Created at
   :data_type: :datetime
-  :control_type: :text
+  :control_type: :daterange
   :default_value: 
   :ordered_list: false
   :ui_priority: 1

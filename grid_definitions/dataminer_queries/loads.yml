@@ -908,7 +908,7 @@
 - :column: loads.shipped_at
   :caption: Shipped at
   :data_type: :datetime
-  :control_type: :text
+  :control_type: :daterange
   :default_value: 
   :ordered_list: false
   :ui_priority: 7
@@ -916,7 +916,7 @@
 - :column: loads.created_at
   :caption: Created at
   :data_type: :datetime
-  :control_type: :text
+  :control_type: :daterange
   :default_value: 
   :ordered_list: false
   :ui_priority: 8
@@ -924,7 +924,7 @@
 - :column: pol_voyage_ports.eta
   :caption: ETA
   :data_type: :datetime
-  :control_type: :text
+  :control_type: :daterange
   :default_value: 
   :ordered_list: false
   :ui_priority: 9
@@ -932,7 +932,7 @@
 - :column: pol_voyage_ports.ata
   :caption: ATA
   :data_type: :datetime
-  :control_type: :text
+  :control_type: :daterange
   :default_value: 
   :ordered_list: false
   :ui_priority: 10
@@ -940,7 +940,7 @@
 - :column: pod_voyage_ports.etd
   :caption: ETD
   :data_type: :datetime
-  :control_type: :text
+  :control_type: :daterange
   :default_value: 
   :ordered_list: false
   :ui_priority: 11
@@ -948,7 +948,7 @@
 - :column: pod_voyage_ports.atd
   :caption: ATD
   :data_type: :datetime
-  :control_type: :text
+  :control_type: :daterange
   :default_value: 
   :ordered_list: false
   :ui_priority: 12

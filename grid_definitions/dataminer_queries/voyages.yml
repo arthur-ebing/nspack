@@ -421,7 +421,7 @@
 - :column: voyages.completed_at
   :caption: Completed at
   :data_type: :datetime
-  :control_type: :text
+  :control_type: :daterange
   :default_value: 
   :ordered_list: false
   :ui_priority: 5
