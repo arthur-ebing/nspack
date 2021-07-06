@@ -802,7 +802,7 @@ module ProductionApp
       template = product_setup_repo.find_product_setup_template(run.product_setup_template_id)
 
       errors = {}
-      unless AppConst::ALLOW_CULTIVAR_GROUP_MIXING && instance[:allow_cultivar_group_mixing]
+      unless AppConst::CR_PROD.can_mix_cultivar_groups? && instance[:allow_cultivar_group_mixing]
         errors[:cultivar_group_id] = ['does not match the template'] if template.cultivar_group_id != instance[:cultivar_group_id]
       end
       unless template.season_id.nil?

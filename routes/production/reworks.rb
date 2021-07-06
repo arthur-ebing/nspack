@@ -790,7 +790,7 @@ class Nspack < Roda
 
       r.on 'allow_cultivar_group_mixing_changed' do
         old_production_run_id = params[:reworks_run_sequence_old_production_run_id]
-        allow_cultivar_group_mixing = if params[:changed_value] == 't' && AppConst::ALLOW_CULTIVAR_GROUP_MIXING
+        allow_cultivar_group_mixing = if params[:changed_value] == 't' && AppConst::CR_PROD.can_mix_cultivar_groups?
                                         true
                                       else
                                         false

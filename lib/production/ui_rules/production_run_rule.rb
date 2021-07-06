@@ -11,7 +11,7 @@ module UiRules
       make_form_object
       apply_form_values
 
-      @rules[:allow_cultivar_group_mixing] = AppConst::ALLOW_CULTIVAR_GROUP_MIXING
+      @rules[:allow_cultivar_group_mixing] = AppConst::CR_PROD.can_mix_cultivar_groups?
       @rules[:show_bin_tipping_control_data] = (AppConst::CLIENT_CODE == 'kr')
       @rules[:show_bin_tipping_criteria] = (AppConst::CLIENT_CODE == 'kr')
       @rules[:use_packing_specifications] = AppConst::CR_PROD.use_packing_specifications?
@@ -217,7 +217,7 @@ module UiRules
       group_ids = @repo.select_values(:cultivars, :cultivar_group_id, id: cultivar_ids.to_a).uniq
       cultivar_groups = @cultivar_repo.for_select_cultivar_groups(where: { id: group_ids })
 
-      cultivars = if @form_object.cultivar_group_id.nil_or_empty?
+      cultivars = if @form_object.allow_cultivar_mixing
                     []
                   elsif @form_object.orchard_id.nil_or_empty?
                     @cultivar_repo.for_select_cultivars(where: { cultivar_group_id: @form_object.cultivar_group_id })
@@ -250,6 +250,7 @@ module UiRules
         cultivar_id: { renderer: :select,
                        options: cultivars,
                        disabled_options: MasterfilesApp::CultivarRepo.new.for_select_inactive_cultivars,
+                       prompt: true,
                        caption: 'Cultivar' },
         product_setup_template_id: { renderer: :label,
                                      with_value: product_setup_template_name,

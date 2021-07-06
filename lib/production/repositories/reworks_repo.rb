@@ -496,7 +496,7 @@ module ProductionApp
     end
 
     def for_select_production_runs(production_run_id, allow_cultivar_group_mixing = false)
-      conditions = if AppConst::ALLOW_CULTIVAR_GROUP_MIXING && allow_cultivar_group_mixing
+      conditions = if AppConst::CR_PROD.can_mix_cultivar_groups? && allow_cultivar_group_mixing
                      " AND cultivar_groups.commodity_id = (SELECT cultivar_groups.commodity_id FROM production_runs
                                                            LEFT JOIN cultivar_groups ON cultivar_groups.id = production_runs.cultivar_group_id
                                                            WHERE production_runs.id = #{production_run_id})"

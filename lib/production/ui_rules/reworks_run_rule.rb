@@ -11,7 +11,7 @@ module UiRules
       @rules[:single_pallet_selected] = @form_object.pallets_selected.split("\n").length == 1 unless @form_object.pallets_selected.nil_or_empty?
       @rules[:scan_rmt_bin_asset_numbers] = AppConst::USE_PERMANENT_RMT_BIN_BARCODES
       @rules[:has_children] = @form_object.has_children
-      @rules[:allow_cultivar_group_mixing] = AppConst::ALLOW_CULTIVAR_GROUP_MIXING
+      @rules[:allow_cultivar_group_mixing] = AppConst::CR_PROD.can_mix_cultivar_groups?
 
       common_values_for_fields common_fields
 
