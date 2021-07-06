@@ -9,6 +9,7 @@ class AppClientSettingsLoader # rubocop:disable Metrics/ClassLength
     PROVIDE_PACK_TYPE_AT_VERIFICATION: { env_key: 'PROVIDE_PACK_TYPE_AT_VERIFICATION',
                                          boolean: true,
                                          desc: 'Provide pack type at carton verification' },
+    # NB: When converting to client rule, note that this const is part of program_function menu rules in db/menu
     USE_CARTON_PALLETIZING: { env_key: 'USE_CARTON_PALLETIZING',
                               boolean: true,
                               desc: 'Use carton palletizing application. Default false' },
@@ -127,22 +128,22 @@ class AppClientSettingsLoader # rubocop:disable Metrics/ClassLength
     LOCATION_TYPES_COLD_BAY_DECK: { env_key: 'LOCATION_TYPES_COLD_BAY_DECK',
                                     default: 'DECK',
                                     desc: 'The code for location types that serve as bays in cold storage. Default is "DECK"' },
+    ADDENDUM_PLACE_OF_ISSUE: { env_key: 'ADDENDUM_PLACE_OF_ISSUE', default: 'CPT', validation_regex: /cpt|dbn|plz|mpm|oth/i, desc: 'Exporter ceritficate place of issue for addendum. Can be CPT, DBN. MPM, PLZ or OTH.' },
+    BYPASS_QUALITY_TEST_LOAD_CHECK: { env_key: 'BYPASS_QUALITY_TEST_LOAD_CHECK', boolean: true, default: true, desc: 'optional. Bypasses Quality checks at Pallet Loading' },
+    BYPASS_QUALITY_TEST_PRE_RUN_CHECK: { env_key: 'BYPASS_QUALITY_TEST_PRE_RUN_CHECK', boolean: true, default: true, desc: 'optional. Bypasses Quality checks before a run is started' },
+    CONTINUOUS_GOVT_INSPECTION_SHEETS: { env_key: 'CONTINUOUS_GOVT_INSPECTION_SHEETS', boolean: true, desc: 'Are inspection sheets open-ended?' },
+    DEFAULT_DEPOT: { env_key: 'DEFAULT_DEPOT', desc: 'Default Depot for new dispatch loads.' },
     DEFAULT_EXPORTER: { env_key: 'DEFAULT_EXPORTER', desc: 'Default Exporter Party for new loads and inspections.' },
     DEFAULT_INSPECTION_BILLING: { env_key: 'DEFAULT_INSPECTION_BILLING', desc: 'Default Inspection Billing Party for new inspections.' },
-    DEFAULT_DEPOT: { env_key: 'DEFAULT_DEPOT', desc: 'Default Depot for new dispatch loads.' },
-    FROM_DEPOT: { env_key: 'FROM_DEPOT', default_env_var: 'DEFAULT_DEPOT', desc: 'Default Depot for new dispatch loads.' },
-    TEMP_TAIL_REQUIRED_TO_SHIP: { env_key: 'TEMP_TAIL_REQUIRED_TO_SHIP', boolean: true, desc: 'optional. Makes temp tail required on all loads' },
-    INCENTIVISED_LABELING: { env_key: 'INCENTIVISED_LABELING', boolean: true, desc: 'True if a worker must be logged-in to print a carton label.' },
-    ROBOT_DISPLAY_LINES: { env_key: 'ROBOT_DISPLAY_LINES', default: 0, format: :integer, desc: 'Do all robots on site have the same no of lines? If so, set to 4 or 5 as required.' },
-    ADDENDUM_PLACE_OF_ISSUE: { env_key: 'ADDENDUM_PLACE_OF_ISSUE', default: 'CPT', validation_regex: /cpt|dbn|plz|mpm|oth/i, desc: 'Exporter ceritficate place of issue for addendum. Can be CPT, DBN. MPM, PLZ or OTH.' },
-    GOVT_INSPECTION_SIGNEE_CAPTION: { env_key: 'GOVT_INSPECTION_SIGNEE_CAPTION', default: 'Packhouse manager', desc: 'Inspection report - Signee caption - only needs to be set if it should not be "Packhouse manager"' },
-    CONTINUOUS_GOVT_INSPECTION_SHEETS: { env_key: 'CONTINUOUS_GOVT_INSPECTION_SHEETS', boolean: true, desc: 'Are inspection sheets open-ended?' },
-    HIDE_INTAKE_TRIP_SHEET_ON_GOVT_INSPECTION_SHEET: { env_key: 'HIDE_INTAKE_TRIP_SHEET_ON_GOVT_INSPECTION_SHEET', boolean: true, desc: 'Determines if tripsheet can be created or not' },
     EDI_AUTO_CREATE_MF: { env_key: 'EDI_AUTO_CREATE_MF', boolean: true, desc: 'For EDI in, do we create missing masterfiles automatically?' },
+    FROM_DEPOT: { env_key: 'FROM_DEPOT', default_env_var: 'DEFAULT_DEPOT', desc: 'Default Depot for new dispatch loads.' },
+    GOVT_INSPECTION_SIGNEE_CAPTION: { env_key: 'GOVT_INSPECTION_SIGNEE_CAPTION', default: 'Packhouse manager', desc: 'Inspection report - Signee caption - only needs to be set if it should not be "Packhouse manager"' },
+    HIDE_INTAKE_TRIP_SHEET_ON_GOVT_INSPECTION_SHEET: { env_key: 'HIDE_INTAKE_TRIP_SHEET_ON_GOVT_INSPECTION_SHEET', boolean: true, desc: 'Determines if tripsheet can be created or not' },
+    INCENTIVISED_LABELING: { env_key: 'INCENTIVISED_LABELING', boolean: true, desc: 'True if a worker must be logged-in to print a carton label.' },
     PS_APPLY_SUBSTITUTES: { env_key: 'PS_APPLY_SUBSTITUTES', boolean: true, desc: 'If true, include extra substitute columns in PS EDI out.' },
-    USE_EXTENDED_PALLET_PICKLIST: { env_key: 'USE_EXTENDED_PALLET_PICKLIST', boolean: true, desc: 'Jasper report for picklist. If extended, use "dispatch_picklist", else use "picklist".' },
-    BYPASS_QUALITY_TEST_PRE_RUN_CHECK: { env_key: 'BYPASS_QUALITY_TEST_PRE_RUN_CHECK', boolean: true, default: true, desc: 'optional. Bypasses Quality checks before a run is started' },
-    BYPASS_QUALITY_TEST_LOAD_CHECK: { env_key: 'BYPASS_QUALITY_TEST_LOAD_CHECK', boolean: true, default: true, desc: 'optional. Bypasses Quality checks at Pallet Loading' }
+    ROBOT_DISPLAY_LINES: { env_key: 'ROBOT_DISPLAY_LINES', default: 0, format: :integer, desc: 'Do all robots on site have the same no of lines? If so, set to 4 or 5 as required.' },
+    TEMP_TAIL_REQUIRED_TO_SHIP: { env_key: 'TEMP_TAIL_REQUIRED_TO_SHIP', boolean: true, desc: 'optional. Makes temp tail required on all loads' },
+    USE_EXTENDED_PALLET_PICKLIST: { env_key: 'USE_EXTENDED_PALLET_PICKLIST', boolean: true, desc: 'Jasper report for picklist. If extended, use "dispatch_picklist", else use "picklist".' }
   }.freeze
 
   FIXED_RULES = {
@@ -238,7 +239,7 @@ class AppClientSettingsLoader # rubocop:disable Metrics/ClassLength
                              default: 'INFO',
                              desc: 'Lowest state for passenger usage to send emails. Can be INFO, BUSY or HIGH.' },
     EDI_NETWORK_ADDRESS: { env_key: 'EDI_NETWORK_ADDRESS', default: '999', desc: 'Network address for sending EDI documents' },
-    EDI_RECEIVE_DIR: { env_key: 'EDI_RECEIVE_DIR', desc: '' },
+    EDI_RECEIVE_DIR: { env_key: 'EDI_RECEIVE_DIR', desc: 'The directory to which received EDI files are copied (by the EdiReceiveCheck script) to be processed by the receive EDI job.' },
     SOLAS_VERIFICATION_METHOD: { env_key: 'SOLAS_VERIFICATION_METHOD', desc: 'SOLAS verification method (1 or 2). required for some EDI out documents' },
     SAMSA_ACCREDITATION: { env_key: 'SAMSA_ACCREDITATION', desc: 'For sending EDI documents' },
     JASPER_REPORTS_PATH: { env_key: 'JASPER_REPORTS_PATH', desc: "Full path to client's Jasper report definitions" },
@@ -302,6 +303,27 @@ class AppClientSettingsLoader # rubocop:disable Metrics/ClassLength
     Hash[array.map { |w, h| ["#{w}x#{h}", { 'width': w, 'height': h }] }].freeze
   end
 
+  def self.client_settings_with_desc # rubocop:disable Metrics/AbcSize
+    out = []
+    FIXED_RULES.each do |name, rule|
+      out << { key: name, desc: rule[:desc], env_val: get_env_val(rule[:env_key]), const_val: get_rule(name, rule).last }
+    end
+    out << { key: '<strong>TRUE CLIENT SETTINGS</strong>', desc: '', env_val: '', const_val: '<em><strong>Stored in .env.local</strong></em>' }
+    RULES.each do |name, rule|
+      out << { key: name, desc: rule[:desc], env_val: get_env_val(rule[:env_key]), const_val: get_rule(name, rule).last }
+    end
+    out << { key: '<strong>TO BE REPLACED WITH CLIENT RULES</strong>', desc: '', env_val: '', const_val: '<em><strong>Stored in .env.local - to become client rules</strong></em>' }
+    REPLACE_RULES.each do |name, rule|
+      out << { key: name, desc: rule[:desc], env_val: get_env_val(rule[:env_key]), const_val: get_rule(name, rule).last }
+    end
+    out << { key: '<strong>DEVELOPMENT SETTINGS</strong>', desc: '', env_val: '', const_val: '<em><strong>Rules for development</strong></em>' }
+    DEVELOPER_RULES.each do |name, rule|
+      out << { key: name, desc: rule[:desc], env_val: get_env_val(rule[:env_key]), const_val: get_rule(name, rule).last }
+    end
+
+    out
+  end
+
   def self.client_settings
     out = []
     FIXED_RULES.each do |name, rule|
@@ -318,6 +340,10 @@ class AppClientSettingsLoader # rubocop:disable Metrics/ClassLength
     end
 
     out
+  end
+
+  def self.get_env_val(name)
+    ENV[name]
   end
 
   def self.get_rule(name, rule) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
@@ -339,10 +365,23 @@ class AppClientSettingsLoader # rubocop:disable Metrics/ClassLength
           else
             ENV.fetch(rule[:env_key], rule[:default])
           end
-    raise %(ENV variable "#{rule[:env_key]} must be provided") if rule[:required] && val.nil_or_empty?
+    raise %(ENV variable "#{rule[:env_key]} must be provided") if rule[:required] && (val.nil? || val.empty?)
     raise %(ENV variable "#{rule[:env_key]} value #{val} does not match #{rule[:validation_regex]}") if rule[:validation_regex] && !val.match?(rule[:validation_regex])
 
     [name, val]
+  end
+
+  def self.new_env_var_line(name, rule)
+    evar = ENV[rule[:env_key]]
+    comment = evar.nil? ? '# ' : ''
+    val = evar || rule[:default]
+    if rule[:required]
+      "#{name}=#{val} (REQUIRED) [#{rule[:desc]}]"
+    elsif rule[:default] && !comment.empty?
+      "#{comment}#{name}=#{val} (this is default, only change if not this value) [#{rule[:desc]}]"
+    else
+      "#{comment}#{name}=#{val} (OPTIONAL) [#{rule[:desc]}]"
+    end
   end
 
   def self.env_var_line(name, rule) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
@@ -384,5 +423,25 @@ class AppClientSettingsLoader # rubocop:disable Metrics/ClassLength
       out << env_var_line(name, rule)
     end
     out.join("\n")
+  end
+
+  def self.new_env_var_file(required_values_only: false)
+    out = ['']
+    add_rules(RULES, out, required_values_only)
+    out << "\n# THESE SETTINGS WILL BE REPLACED BY CLIENT RULES...\n"
+    add_rules(REPLACE_RULES, out, required_values_only)
+    unless required_values_only
+      out << "\n# THESE SETTINGS ARE TYPICALLY ONLY USED FOR DEBUGGING/DEVELOPER USAGE...\n"
+      add_rules(DEVELOPER_RULES, out, required_values_only)
+    end
+    out.join("\n")
+  end
+
+  def self.add_rules(rules, out, required_values_only)
+    rules.sort.each do |name, rule|
+      next if required_values_only && !rule[:required]
+
+      out << new_env_var_line(name, rule)
+    end
   end
 end

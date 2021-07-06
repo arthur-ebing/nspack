@@ -19,21 +19,23 @@ Development environment variables are set in the `.env` file in the root dir.
 
 Per-machine overrides can be specified in a `.env.local` file (which is not checked in to version control).
 
+Client settings can be checked in-app from the link:/client_settings[] link.
+
 === Client settings
 
 Client settings are defined in the `.env.local` file on the client's server.
 
-Rules for environment variables are defined in `config/env_var_rules`. Whenever a new client setting is required, this file must be updated with the variable and its description.
+Rules for environment variables are defined in `config/client_settings_loader.rb`. Whenever a new client setting is required, this file must be updated with the variable and its rules and description.
 
 Environment variables are classified in one of the folowing ways:
 
-NO_OVERRIDE :: These are set in .env file and are fixed - never to be changed. e.g. `APP_CAPTION`.
-CAN_OVERRIDE :: These are set in `.env`, but can be changed in `.env.local`. e.g. `DATABASE_URL`.
-MUST_OVERRIDE :: These are not set in `.env` - only in `.env.local` and they are required. e.g. `SYSTEM_MAIL_SENDER`.
-OPTIONAL :: These are optinal settings (typically for developers only) that do not have to be present. e.g. `LOGSQLTOFILE`.
+FIXED_RULES :: These are set in the `.env` file and are fixed - never to be changed. e.g. `APP_CAPTION`.
+RULES :: These are set in `.env.local`. and are a mix of optional and required settings that are not rules. e.g. `SYSTEM_MAIL_SENDER`. These are the main per-client settings.
+DEVELOPER_RULES :: These are set in `.env.local` and are typically set to alter logging behaviour. e.g. `VERBOSE_ROBOT_FEEDBACK_LOGGING`.
+Other :: There are other optional settings (typically for developers only) that do not have to be present and are not loaded into `AppConst`. e.g. `LOGSQLTOFILE`.
 
 
-Use `bundle exec rake developers:setup` to get `.env.local` to add any required environment variables that are missing.
+Use `bundle exec rake developers:setup` to get `.env.local` to add any required environment variables. All required veriables are appended to the file each time, so careful culling of the file is required after the task is run.
 
 === AppConst
 
@@ -45,33 +47,45 @@ Reference a constant in code like this:
 AppConst::CLIENT_CODE
 ----
 
-.config/app_const.rb
+AppConst has several fixed constants like this:
 [source,ruby]
 ----
-class AppConst
-  # Client-specific code
-  CLIENT_CODE = ENV.fetch('CLIENT_CODE')
-  IMPLEMENTATION_OWNER = ENV.fetch('IMPLEMENTATION_OWNER')   <1>
-
-  # Constants for roles:
-  ROLE_IMPLEMENTATION_OWNER = 'IMPLEMENTATION_OWNER'         <2>
-  ROLE_CUSTOMER = 'CUSTOMER'
-
-  # Que
-  QUEUE_NAME = ENV.fetch('QUEUE_NAME', 'default')            <3>
-
-  # Boolean settings
-  USE_BINS = make_boolean('USE_BINS')                        <4>
-  USE_BINS = make_boolean('USE_BINS', required: true)        <5>
-  USE_BINS = make_boolean('USE_BINS', default_true: true)    <6>
-end
+BUILDUP_PALLET_MIX = 'BUILDUP'
+PALLETIZING_PALLET_MIX = 'PALLETIZING'
 ----
-<1> Set a constant from a required environment variable. If not set, the application will raise an exception and not start.
-<2> A string constant value. (Not configurable via environment variable)
-<3> This constant is supplied by the environment variable but has a default value if there is no ENV var.
-<4> This will be true/false and defaults to `false`. Environment variables that start with t/T/y/Y (True, Yes, y, yabba dabba doo) will be set to `true` - any others will be `false`.
-<5> This will be true/false and will raise an exception (which prevents the app from starting) if the environment variable is not set.
-<6> This will be true/false and defaults to `true` instead of false.
+
+but there are also constants that are loaded from environment variables -- the _client settings_.
+
+Client settings are loaded from `ClientSettingsLoader` according to the rules in that file -- e.g.
+
+.config/client_settings_loader.rb
+[source,ruby]
+----
+# Use :env_key as the ENVIRONMENT VARIABLE name in .env.local:
+# e.g.
+# CLIENT_CODE=acme
+# GLN_OR_LINE_NUMBERS=123,456,999
+
+RULES = {
+  CLIENT_CODE: { env_key: 'CLIENT_CODE',                                      <1>
+                 required: true,                                              <2>
+                 desc: 'Short, lowercase code to identify...(trimmed)' },     <3>
+  GLN_OR_LINE_NUMBERS: { env_key: 'GLN_OR_LINE_NUMBERS',
+                         required: true,
+                         array_split: ',',                                    <4>
+                         desc: 'A comma-separated list of GLN ...(trimmed)' },
+  EST_PALLETS_PACKED_PER_YEAR: { env_key: 'EST_PALLETS_PACKED_PER_YEAR',
+                                 default: 25_000,                             <5>
+                                 format: :integer,                            <6>
+                                 desc: 'An estimate of ...(trimmed)' },
+}
+----
+<1> The hash's key (`CLIENT_CODE`) will be used for `AppConst::CLIENT_CODE` and the value of `:env_key` (here also `CLIENT_CODE`) is the environment variable name used to load the value.
+<2> If `required` is `true`, an exception will be raised if there is no matching environment variable at startup.
+<3> A description is always required for documentation purposes.
+<4> The `:array_split` value is the string for the loader to use to split the env var's value into an array.
+<5> A `:default` value is applied if there is no matching environment variable.
+<6> Specify `:integer` as the `:format` value to store the const as an integer.
 
 == Client Rules
 

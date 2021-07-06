@@ -314,10 +314,13 @@ class Nspack < Roda
     end
 
     r.is 'client_settings' do
-      require './config/env_var_rules'
+      settings = []
+      AppClientSettingsLoader.client_settings_with_desc.each do |set|
+        settings << { key: %(<span class="fw5 near-black">#{set[:key]}</span><br><span class="f6">#{set[:desc]}</span>),
+                      env_val: set[:env_val].to_s.gsub(',', ', '),
+                      const_val: set[:const_val] }
+      end
 
-      en = EnvVarRules.new
-      settings = en.client_settings
       @layout = Crossbeams::Layout::Page.build do |page, _|
         page.section do |section|
           section.add_text("Client Settings &mdash; for <span class='orange'>#{AppConst::CLIENT_CODE}</span> (<span class='orange'>#{AppConst::CLIENT_SET[AppConst::CLIENT_CODE]}</span>)", wrapper: :h2)
@@ -329,13 +332,11 @@ class Nspack < Roda
             kl.check_client_setting_keys.each do |msg|
               section.add_notice msg, notice_type: :warning
             end
-            # section.add_text key_problem unless key_problem.nil?
             section.add_table(kl.to_table, %i[method value description], cell_classes: { method: ->(_) { 'pad' },
                                                                                          value: ->(_) { 'pad' },
                                                                                          description: ->(_) { 'pad' } })
           end
           section.add_text('Constants', wrapper: :h3)
-          section.add_text('Note: some values have spaces inserted after commas to make the display wrap better. Be aware of this if copying a setting from here.', wrapper: :em)
           section.add_table(settings, %i[key env_val const_val], header_captions: { env_val: 'Environment variable value', const_val: 'Value in AppConst' })
         end
       end

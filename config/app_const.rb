@@ -12,31 +12,6 @@ class AppConst # rubocop:disable Metrics/ClassLength
     ENV['RACK_ENV'] == 'test'
   end
 
-  # Any value that starts with y, Y, t or T is considered true.
-  # All else is false.
-  def self.check_true(val)
-    val.match?(/^[TtYy]/)
-  end
-
-  # Take an environment variable and interpret it
-  # as a boolean.
-  #
-  # If required is true, the variable MUST have a value.
-  # If default_true is true, the value will be set to true if the variable has no value.
-  def self.make_boolean(key, required: false, default_true: false)
-    val = if required
-            ENV.fetch(key)
-          else
-            ENV.fetch(key, default_true ? 't' : 'f')
-          end
-    check_true(val)
-  end
-
-  # Helper to create hash of label sizes from a 2D array.
-  def self.make_label_size_hash(array)
-    Hash[array.map { |w, h| ["#{w}x#{h}", { 'width': w, 'height': h }] }].freeze
-  end
-
   # Client-specific code
   CLIENT_SET = {
     'hb' => 'Habata (Badlands)',
@@ -48,25 +23,20 @@ class AppConst # rubocop:disable Metrics/ClassLength
     'kr' => 'Kromco'
   }.freeze
 
+  # Load the client settings from ENV:
   AppClientSettingsLoader.client_settings.each do |set|
     AppConst.const_set(set.first, set.last)
   end
-  # CLIENT_CODE = ENV.fetch('CLIENT_CODE')
   raise 'CLIENT_CODE must be lowercase.' unless CLIENT_CODE == CLIENT_CODE.downcase
   raise "Unknown CLIENT_CODE - #{CLIENT_CODE}" unless CLIENT_SET.keys.include?(CLIENT_CODE)
 
-  # IMPLEMENTATION_OWNER = ENV.fetch('IMPLEMENTATION_OWNER')
   SHOW_DB_NAME = ENV.fetch('DATABASE_URL').rpartition('@').last
-  # URL_BASE = ENV.fetch('URL_BASE')
-  # URL_BASE_IP = ENV.fetch('URL_BASE_IP')
-  # APP_CAPTION = ENV.fetch('APP_CAPTION')
 
   # A struct that can be used to alter the client code while tests are running.
   # All the CB_ classes will use this value as the client_code, which allows
   # for testing different values for a setting.
   # Be sure to set client_code = boot_client_code at the end of tests for consistency.
   TEST_SETTINGS = OpenStruct.new(client_code: CLIENT_CODE, boot_client_code: CLIENT_CODE)
-  # VERBOSE_ROBOT_FEEDBACK_LOGGING = make_boolean('VERBOSE_ROBOT_FEEDBACK_LOGGING')
 
   # Load client-specific rules:
   # NB: these must start with CR_ and the class must start with "Client".
@@ -82,60 +52,13 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # labeling cached setup data path
   LABELING_CACHED_DATA_FILEPATH = File.expand_path('../tmp/run_cache', __dir__)
 
-  # carton verification
-  # CARTON_EQUALS_PALLET = make_boolean('CARTON_EQUALS_PALLET')
-  # CARTON_VERIFICATION_REQUIRED = make_boolean('CARTON_VERIFICATION_REQUIRED')
-  # PROVIDE_PACK_TYPE_AT_VERIFICATION = make_boolean('PROVIDE_PACK_TYPE_AT_VERIFICATION')
-  # USE_LABEL_ID_ON_BIN_LABEL = make_boolean('USE_LABEL_ID_ON_BIN_LABEL')
-
-  # carton palletizing
-  # USE_CARTON_PALLETIZING = make_boolean('USE_CARTON_PALLETIZING')
-  # DEFAULT_PALLET_LABEL_NAME = ENV['DEFAULT_PALLET_LABEL_NAME']
-  # AUTO_PRINT_PALLET_LABEL_ON_BAY = make_boolean('AUTO_PRINT_PALLET_LABEL_ON_BAY')
-  # ALLOW_OVERFULL_PALLETIZING = make_boolean('ALLOW_OVERFULL_PALLETIZING')
-  # ALLOW_OVERFULL_REWORKS_PALLETIZING = make_boolean('ALLOW_OVERFULL_REWORKS_PALLETIZING')
-
   # General
   DEFAULT_KEY = 'DEFAULT'
 
-  # Production Runs
-  # ALLOW_CULTIVAR_GROUP_MIXING = make_boolean('ALLOW_CULTIVAR_GROUP_MIXING')
-
   # Integration
-  # INTEGRATE_WITH_EXTERNAL_RMT_SYSTEM = make_boolean('INTEGRATE_WITH_EXTERNAL_RMT_SYSTEM')
-  # RMT_INTEGRATION_SERVER_URI = ENV['RMT_INTEGRATION_SERVER_URI']
   raise 'RMT Integration server uri is required' if CR_PROD.integrate_with_external_rmt_system && !RMT_INTEGRATION_SERVER_URI
 
-  # Deliveries
-  # DELIVERY_DEFAULT_FARM = ENV['DEFAULT_FARM']
-  # DELIVERY_CAPTURE_INNER_BINS = make_boolean('CAPTURE_INNER_BINS')
-  # DELIVERY_CAPTURE_BIN_WEIGHT_AT_FRUIT_RECEPTION = make_boolean('CAPTURE_BIN_WEIGHT_AT_FRUIT_RECEPTION')
-  # DELIVERY_DEFAULT_RMT_CONTAINER_TYPE = ENV.fetch('DEFAULT_RMT_CONTAINER_TYPE')
-  # DELIVERY_CAPTURE_CONTAINER_MATERIAL = make_boolean('CAPTURE_CONTAINER_MATERIAL')
-  # DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER = make_boolean('CAPTURE_CONTAINER_MATERIAL_OWNER')
-  # DELIVERY_CAPTURE_DAMAGED_BINS = make_boolean('CAPTURE_DAMAGED_BINS')
-  # DELIVERY_USE_DELIVERY_DESTINATION = make_boolean('USE_DELIVERY_DESTINATION')
-  # DELIVERY_CAPTURE_EMPTY_BINS = make_boolean('CAPTURE_EMPTY_BINS')
-  # DELIVERY_CAPTURE_TRUCK_AT_FRUIT_RECEPTION = make_boolean('CAPTURE_TRUCK_AT_FRUIT_RECEPTION')
-  # USE_PERMANENT_RMT_BIN_BARCODES = make_boolean('USE_PERMANENT_RMT_BIN_BARCODES')
-  # BULK_BIN_ASSET_NUMBER_ENTRY = make_boolean('BULK_BIN_ASSET_NUMBER_ENTRY')
-  # ALLOW_AUTO_BIN_ASSET_NUMBER_ALLOCATION = make_boolean('ALLOW_AUTO_BIN_ASSET_NUMBER_ALLOCATION')
-  # EDIT_BIN_RECEIVED_DATE = make_boolean('EDIT_BIN_RECEIVED_DATE')
-  # BIN_SCANNING_BATCH_SIZE = ENV.fetch('BIN_SCANNING_BATCH_SIZE', 10)
-  # # Regular expression(s) to validate bin asset numbers when present (in case they are typed in incorrectly)
-  # # If more than one format is required, separate with commas (no spaces).
-  # BIN_ASSET_REGEX = ENV.fetch('BIN_ASSET_REGEX', '.+')
-  # VAT_FACTOR = ENV['VAT_FACTOR']
-
-  # Resources
-  # PHC_LEVEL = ENV.fetch('PHC_LEVEL')
-  # GLN_OR_LINE_NUMBERS = ENV.fetch('GLN_OR_LINE_NUMBERS').split(',')
-  # EST_PALLETS_PACKED_PER_YEAR = ENV.fetch('EST_PALLETS_PACKED_PER_YEAR', 25_000).to_i
-
   # Constants for pallet movements:
-  # ALLOW_EXPORT_PALLETS_TO_BYPASS_INSPECTION = make_boolean('ALLOW_EXPORT_PALLETS_TO_BYPASS_INSPECTION')
-  # CALCULATE_PALLET_DECK_POSITIONS = make_boolean('CALCULATE_PALLET_DECK_POSITIONS')
-  # PALLET_MIX_RULES_SCOPE = ENV.fetch('PALLET_MIX_RULES_SCOPE', '').split(',')
   BUILDUP_PALLET_MIX = 'BUILDUP'
   PALLETIZING_PALLET_MIX = 'PALLETIZING'
   PALLETIZING_BAYS_PALLET_MIX = 'PALLETIZING_BAYS'
@@ -212,14 +135,6 @@ class AppConst # rubocop:disable Metrics/ClassLength
   PM_SUBTYPE_RU_LABOUR = 'RU_LABOUR'
   PM_SUBTYPE_RI_LABOUR = 'RI_LABOUR'
 
-  # Pallet verification
-  # REQUIRE_FRUIT_STICKER_AT_PALLET_VERIFICATION = make_boolean('REQUIRE_FRUIT_STICKER_AT_PALLET_VERIFICATION')
-  # COMBINE_CARTON_AND_PALLET_VERIFICATION = make_boolean('COMBINE_CARTON_AND_PALLET_VERIFICATION')
-  # CAPTURE_PALLET_WEIGHT_AT_VERIFICATION = make_boolean('CAPTURE_PALLET_WEIGHT_AT_VERIFICATION')
-  # PALLET_IS_IN_STOCK_WHEN_VERIFIED = make_boolean('PALLET_IS_IN_STOCK_WHEN_VERIFIED')
-  # PALLET_WEIGHT_REQUIRED_FOR_INSPECTION = make_boolean('PALLET_WEIGHT_REQUIRED_FOR_INSPECTION')
-  # PRINT_PALLET_LABEL_AT_PALLET_VERIFICATION = make_boolean('PRINT_PALLET_LABEL_AT_PALLET_VERIFICATION')
-
   # Constants for pallets exit_ref
   PALLET_EXIT_REF_SCRAPPED = 'SCRAPPED'
   PALLET_EXIT_REF_SCRAPPED_BY_BUILDUP = 'SCRAPPED_BY_BUILDUP'
@@ -236,9 +151,6 @@ class AppConst # rubocop:disable Metrics/ClassLength
 
   # Constants for location assignments:
   WAREHOUSE_RECEIVING_AREA = 'WAREHOUSE_RECEIVING_AREA'
-
-  # Constants for dispatch:
-  # DEFAULT_CARGO_TEMP_ON_ARRIVAL = ENV['DEFAULT_CARGO_TEMP_ON_ARRIVAL']
 
   # Constants for roles:
   ROLE_IMPLEMENTATION_OWNER = 'IMPLEMENTATION_OWNER'
@@ -271,18 +183,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   PACKED_TM_GROUP = 'PACKED'
 
   # Defaults for Packaging
-  # DEFAULT_FG_PACKAGING_TYPE = ENV.fetch('DEFAULT_FG_PACKAGING_TYPE', 'CARTON') # Can be BIN or CARTON
-  # REQUIRE_PACKAGING_BOM = make_boolean('REQUIRE_PACKAGING_BOM')
-  # BASE_PACK_EQUALS_STD_PACK = make_boolean('BASE_PACK_EQUALS_STD_PACK')
-  # REQUIRE_EXTENDED_PACKAGING = make_boolean('REQUIRE_EXTENDED_PACKAGING')
   PM_TYPE_FRUIT = 'FRUIT'
-
-  # Default packing method
-  # DEFAULT_PACKING_METHOD = ENV.fetch('DEFAULT_PACKING_METHOD', 'NORMAL')
-
-  # First Intake
-  # DEFAULT_FIRST_INTAKE_LOCATION = ENV['DEFAULT_FIRST_INTAKE_LOCATION']
-  # CREATE_STOCK_AT_FIRST_INTAKE = make_boolean('CREATE_STOCK_AT_FIRST_INTAKE')
 
   # Default UOM TYPE
   UOM_TYPE = 'INVENTORY'
@@ -345,12 +246,6 @@ class AppConst # rubocop:disable Metrics/ClassLength
   REWORKS_MOVE_PALLET_BUSINESS_PROCESS = 'MOVE_PALLET'
   REWORKS_BULK_UPDATE_PALLET_DATES = 'REWORKS BULK UPDATE PALLET DATES'
 
-  # farm_puc_orgs and registered_orchards
-  # USE_MARKETING_PUC = make_boolean('USE_MARKETING_PUC')
-
-  # GTINS
-  # GTINS_REQUIRED = make_boolean('GTINS_REQUIRED')
-
   # Routes that do not require login:
   BYPASS_LOGIN_ROUTES = [
     '/masterfiles/config/label_templates/published',
@@ -366,36 +261,9 @@ class AppConst # rubocop:disable Metrics/ClassLength
   FIELDS_TO_EXCLUDE_FROM_DIFF = %w[label_json png_image].freeze
 
   # MesServer
-  # LABEL_SERVER_URI = ENV.fetch('LABEL_SERVER_URI')
   raise 'LABEL_SERVER_URI must end with a "/"' unless LABEL_SERVER_URI.end_with?('/')
 
   POST_FORM_BOUNDARY = 'AaB03x'
-
-  # Labels
-  # SHARED_CONFIG_HOST_PORT = ENV.fetch('SHARED_CONFIG_HOST_PORT')
-  # LABEL_VARIABLE_SETS = ENV.fetch('LABEL_VARIABLE_SETS').strip.split(',')
-  # LABEL_PUBLISH_NOTIFY_URLS = ENV.fetch('LABEL_PUBLISH_NOTIFY_URLS', '').split(',')
-  # BATCH_PRINT_MAX_LABELS = ENV.fetch('BATCH_PRINT_MAX_LABELS', 20).to_i
-  # PREVIEW_PRINTER_TYPE = ENV.fetch('PREVIEW_PRINTER_TYPE', 'zebra')
-
-  # Label sizes. The arrays contain width then height.
-  # DEFAULT_LABEL_DIMENSION = ENV.fetch('DEFAULT_LABEL_DIMENSION', '84x64')
-  # LABEL_SIZES = if ENV['LABEL_SIZES']
-  #                 AppConst.make_label_size_hash(ENV['LABEL_SIZES'].split(';').map { |s| s.split(',') })
-  #               else
-  #                 AppConst.make_label_size_hash(
-  #                   [
-  #                     [84,   64], [97,   78], [100,  70], [100,  84], [100, 100], [130, 100], [145,  50], [150, 100]
-  #                   ]
-  #                 )
-  #               end
-
-  # Label names for barcode printing:
-  # LABEL_LOCATION_BARCODE = ENV.fetch('LABEL_LOCATION_BARCODE', 'NSPACK_LOCATION')
-  # LABEL_BIN_BARCODE = ENV.fetch('LABEL_BIN_BARCODE', 'MAIN_BIN')
-  # LABEL_CARTON_VERIFICATION = ENV.fetch('LABEL_CARTON_VERIFICATION', 'BIN_VERIFICATION')
-  # LABEL_PACKPOINT_BARCODE = ENV.fetch('LABEL_PACKPOINT_BARCODE', 'PACKPOINT')
-  # LABEL_PERSONNEL_BARCODE = ENV.fetch('LABEL_PERSONNEL_BARCODE', 'PERSONNEL')
 
   COST_UNITS = %w[BIN PALLET LOAD DELIVERY].freeze
 
@@ -465,24 +333,13 @@ class AppConst # rubocop:disable Metrics/ClassLength
     }
   }.freeze
 
-  # Que
-  # QUEUE_NAME = ENV.fetch('QUEUE_NAME', 'default')
-
   # Mail
-  # ERROR_MAIL_RECIPIENTS = ENV.fetch('ERROR_MAIL_RECIPIENTS')
-  # LEGACY_SYSTEM_ERROR_RECIPIENTS = ENV['LEGACY_SYSTEM_ERROR_RECIPIENTS']
-  # ERROR_MAIL_PREFIX = ENV.fetch('ERROR_MAIL_PREFIX')
-  # SYSTEM_MAIL_SENDER = ENV.fetch('SYSTEM_MAIL_SENDER')
-  # EMAIL_REQUIRES_REPLY_TO = make_boolean('EMAIL_REQUIRES_REPLY_TO')
   EMAIL_GROUP_LABEL_APPROVERS = 'label_approvers'
   EMAIL_GROUP_LABEL_PUBLISHERS = 'label_publishers'
   EMAIL_GROUP_EDI_NOTIFIERS = 'edi_notifiers'
   USER_EMAIL_GROUPS = [EMAIL_GROUP_LABEL_APPROVERS, EMAIL_GROUP_LABEL_PUBLISHERS, EMAIL_GROUP_EDI_NOTIFIERS].freeze
 
   # Business Processes
-  # PROCESS_DELIVERIES = 'DELIVERIES'
-  # PROCESS_VEHICLE_JOBS = 'VEHICLE JOBS'
-  # PROCESS_BULK_STOCK_ADJUSTMENTS = 'BULK STOCK ADJUSTMENTS'
   PROCESS_ADHOC_TRANSACTIONS = 'ADHOC_TRANSACTIONS'
   PROCESS_RECEIVE_EMPTY_BINS = 'RECEIVE_EMPTY_BINS'
   PROCESS_ISSUE_EMPTY_BINS = 'ISSUE_EMPTY_BINS'
@@ -495,7 +352,6 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # Locations: Location Types
   LOCATION_TYPES_WAREHOUSE = 'WAREHOUSE'
   LOCATION_TYPES_RECEIVING_BAY = 'RECEIVING BAY'
-  # LOCATION_TYPES_COLD_BAY_DECK = ENV.fetch('LOCATION_TYPES_COLD_BAY_DECK', 'DECK')
   LOCATION_TYPES_BIN_ASSET = 'BIN_ASSET'
   LOCATION_TYPES_FARM = 'FARM'
 
@@ -503,60 +359,15 @@ class AppConst # rubocop:disable Metrics/ClassLength
   ONSITE_FULL_BIN_LOCATION = 'ONSITE_FULL_BIN'
 
   # Loads:
-  # DEFAULT_EXPORTER = ENV['DEFAULT_EXPORTER']
-  # DEFAULT_INSPECTION_BILLING = ENV['DEFAULT_INSPECTION_BILLING']
-  # DEFAULT_DEPOT = ENV['DEFAULT_DEPOT']
-  # FROM_DEPOT = ENV['FROM_DEPOT'] || DEFAULT_DEPOT
   IN_TRANSIT_LOCATION = 'IN_TRANSIT_EX_PACKHSE'
   SCRAP_LOCATION = 'SCRAP_PACKHSE'
   UNSCRAP_LOCATION = 'UNSCRAP_PACKHSE'
   UNTIP_LOCATION = 'UNTIPPED_BIN'
-  # TEMP_TAIL_REQUIRED_TO_SHIP = make_boolean('TEMP_TAIL_REQUIRED_TO_SHIP')
   # Constants for port types:
   PORT_TYPE_POL = 'POL'
   PORT_TYPE_POD = 'POD'
 
-  # CLM_BUTTON_CAPTION_FORMAT
-  #
-  # This string provides a format for captions to display on buttons
-  # of robots that print carton labels.
-  # The string can contain any text and fruitspec tokens that are
-  # delimited by $: and $. e.g. 'Count: $:actual_count_for_pack$'
-  #
-  # The possible fruitspec tokens are:
-  # HBL: 'COUNT: $:actual_count_for_pack$'
-  # UM : 'SIZE: $:size_reference$'
-  # SR : '$:size_ref_or_count$ $:product_chars$ $:target_market_group_name$'
-  # * actual_count_for_pack
-  # * basic_pack_code
-  # * commodity_code
-  # * grade_code
-  # * mark_code
-  # * marketing_variety_code
-  # * org_code
-  # * product_chars
-  # * size_count_value
-  # * size_reference
-  # * size_ref_or_count
-  # * standard_pack_code
-  # * target_market_group_name
-  # CLM_BUTTON_CAPTION_FORMAT = ENV['CLM_BUTTON_CAPTION_FORMAT']
-
-  # Does this installation require login when printing a label from a robot?
-  # INCENTIVISED_LABELING = make_boolean('INCENTIVISED_LABELING')
-
-  # pi Robots can display 6 lines of text, while T2n robots can only display 4.
-  # If all robots on site are homogenous, set the value here.
-  # Else it will be looked up from the module name.
-  # ROBOT_DISPLAY_LINES = ENV.fetch('ROBOT_DISPLAY_LINES', 0).to_i
   ROBOT_MSG_SEP = '###'
-
-  # Max number of passenger instances - used for designating high, busy or over usage
-  # MAX_PASSENGER_INSTANCES = ENV.fetch('MAX_PASSENGER_INSTANCES', 30).to_i
-  # Lowest state for passenger usage to send emails. Can be INFO, BUSY or HIGH.
-  # PASSENGER_USAGE_LEVEL = ENV.fetch('PASSENGER_USAGE_LEVEL', 'INFO')
-
-  # ERP_PURCHASE_INVOICE_URI = ENV.fetch('ERP_PURCHASE_INVOICE_URI', 'default')
 
   BIG_ZERO = BigDecimal('0')
   # The maximum size of an integer in PostgreSQL
@@ -600,24 +411,11 @@ class AppConst # rubocop:disable Metrics/ClassLength
     'Production runs' => [{ key: 'LINE', optional: true }]
   }.freeze
 
-  # Addendum: place of issue for export certificate
-  # ADDENDUM_PLACE_OF_ISSUE = ENV.fetch('ADDENDUM_PLACE_OF_ISSUE', 'CPT')
-  # raise Crossbeams::FrameworkError, "#{ADDENDUM_PLACE_OF_ISSUE} is not a valid code" unless ADDENDUM_PLACE_OF_ISSUE.match?(/cpt|dbn|plz|mpm|oth/i)
-
-  # Inspection - Signee caption
-  # GOVT_INSPECTION_SIGNEE_CAPTION = ENV.fetch('GOVT_INSPECTION_SIGNEE_CAPTION', 'Packhouse manager')
-  # CONTINUOUS_GOVT_INSPECTION_SHEETS = make_boolean('CONTINUOUS_GOVT_INSPECTION_SHEETS')
-  # HIDE_INTAKE_TRIP_SHEET_ON_GOVT_INSPECTION_SHEET = make_boolean('HIDE_INTAKE_TRIP_SHEET_ON_GOVT_INSPECTION_SHEET')
-
   # EDI Settings
-  # EDI_NETWORK_ADDRESS = ENV.fetch('EDI_NETWORK_ADDRESS', '999')
-  # EDI_RECEIVE_DIR = ENV['EDI_RECEIVE_DIR']
   EDI_FLOW_PS = 'PS'
   EDI_FLOW_PO = 'PO'
   EDI_FLOW_UISTK = 'UISTK'
   EDI_FLOW_PALBIN = 'PALBIN'
-  # EDI_AUTO_CREATE_MF = make_boolean('EDI_AUTO_CREATE_MF')
-  # PS_APPLY_SUBSTITUTES = make_boolean('PS_APPLY_SUBSTITUTES')
   DEPOT_DESTINATION_TYPE = 'DEPOT'
   PARTY_ROLE_DESTINATION_TYPE = 'PARTY_ROLE'
   DESTINATION_TYPES = [DEPOT_DESTINATION_TYPE, PARTY_ROLE_DESTINATION_TYPE].freeze
@@ -698,22 +496,10 @@ class AppConst # rubocop:disable Metrics/ClassLength
     Vessels: { table_name: 'vessels', column_name: 'vessel_code' }
   }.freeze
 
-  # SOLAS_VERIFICATION_METHOD = ENV['SOLAS_VERIFICATION_METHOD']
-  # SAMSA_ACCREDITATION = ENV['SAMSA_ACCREDITATION']
-
-  # RPT_INDUSTRY = ENV['RPT_INDUSTRY']
-  # JASPER_REPORTS_PATH = ENV['JASPER_REPORTS_PATH']
-  # JRUBY_JASPER_HOST_PORT = ENV.fetch('JRUBY_JASPER_HOST_PORT')
-  # USE_EXTENDED_PALLET_PICKLIST = make_boolean('USE_EXTENDED_PALLET_PICKLIST')
-
   # Titan: Govt Inspections
   TITAN_API_HOST = { UAT: 'https://uatapigateway.ppecb.com',
                      STAGING: 'https://stagingapigateway.ppecb.com',
                      PRODUCTION: 'https://apigateway.ppecb.com' }[TITAN_ENVIRONMENT.to_sym]
-  # TITAN_INSPECTION_API_USER_ID = ENV['TITAN_INSPECTION_API_USER_ID']
-  # TITAN_INSPECTION_API_SECRET = ENV['TITAN_INSPECTION_API_SECRET']
-  # TITAN_ADDENDUM_API_USER_ID = ENV['TITAN_ADDENDUM_API_USER_ID']
-  # TITAN_ADDENDUM_API_SECRET = ENV['TITAN_ADDENDUM_API_SECRET']
 
   # QUALITY APP result types
   PASS_FAIL = 'Pass/Fail'
@@ -721,27 +507,12 @@ class AppConst # rubocop:disable Metrics/ClassLength
   QUALITY_RESULT_TYPE = [PASS_FAIL, CLASSIFICATION].freeze
   PHYT_CLEAN_STANDARD = 'PhytCleanStandardData'
   QUALITY_API_NAMES = [PHYT_CLEAN_STANDARD].freeze
-  # BYPASS_QUALITY_TEST_PRE_RUN_CHECK = make_boolean('BYPASS_QUALITY_TEST_PRE_RUN_CHECK', default_true: true)
-  # BYPASS_QUALITY_TEST_LOAD_CHECK = make_boolean('BYPASS_QUALITY_TEST_LOAD_CHECK', default_true: true)
 
   # PhytClean
   PHYT_CLEAN_ENVIRONMENT = 'https://www.phytclean.co.za'
-  # PHYT_CLEAN_API_USERNAME = ENV['PHYT_CLEAN_API_USERNAME']
-  # PHYT_CLEAN_API_PASSWORD = ENV['PHYT_CLEAN_API_PASSWORD']
-  # PHYT_CLEAN_SEASON_ID = ENV['PHYT_CLEAN_SEASON_ID']
-  # PHYT_CLEAN_OPEN_TIMEOUT = ENV.fetch('PHYT_CLEAN_OPEN_TIMEOUT', 5).to_i
-  # PHYT_CLEAN_READ_TIMEOUT = ENV.fetch('PHYT_CLEAN_READ_TIMEOUT', 10).to_i
-  # PHYT_CLEAN_SEASON_END_DATE = ENV['PHYT_CLEAN_SEASON_END_DATE']
 
   # eCert
   E_CERT_PROTOCOL = { QA: 'http://qa.', PRODUCTION: 'https://' }[E_CERT_ENVIRONMENT.to_sym]
-  # E_CERT_API_CLIENT_ID = ENV['E_CERT_API_CLIENT_ID']
-  # E_CERT_API_CLIENT_SECRET = ENV['E_CERT_API_CLIENT_SECRET']
-  # E_CERT_BUSINESS_ID = ENV['E_CERT_BUSINESS_ID']
-  # E_CERT_BUSINESS_NAME = ENV['E_CERT_BUSINESS_NAME']
-  # E_CERT_INDUSTRY = ENV['E_CERT_INDUSTRY']
-  # E_CERT_OPEN_TIMEOUT = ENV.fetch('E_CERT_OPEN_TIMEOUT', 5).to_i
-  # E_CERT_READ_TIMEOUT = ENV.fetch('E_CERT_READ_TIMEOUT', 10).to_i
 
   ASSET_TRANSACTION_TYPES = { adhoc_move: 'ADHOC_MOVE',
                               adhoc_create: 'ADHOC_CREATE',
