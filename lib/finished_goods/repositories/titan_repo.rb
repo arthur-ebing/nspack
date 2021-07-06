@@ -4,12 +4,16 @@ module FinishedGoodsApp
   class TitanRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     crud_calls_for :titan_requests, name: :titan_request
 
-    def find_pallet_for_titan(pallet_id)
+    def find_pallet_for_titan(pallet_id) # rubocop:disable Metrics/AbcSize
       oldest_id = DB[:pallet_sequences].where(pallet_id: pallet_id).order(:id).get(:id)
       query = MesscadaApp::DatasetPalletSequence.call('WHERE pallet_sequences.id = ? AND pallet_sequences.pallet_id IS NOT NULL')
       hash = DB[query, oldest_id].first
       raise Crossbeams::FrameworkError, "Pallet not found for pallet_id: #{pallet_id}" if hash.nil_or_empty?
 
+      if hash[:nett_weight_per_carton].zero? || hash[:gross_weight_per_carton].zero?
+        hash[:nett_weight_per_carton] = get_value(:standard_product_weights, :nett_weight, { commodity_id: hash[:commodity_id], standard_pack_id: hash[:standard_pack_id] })
+        hash[:gross_weight_per_carton] = get_value(:standard_product_weights, :gross_weight, { commodity_id: hash[:commodity_id], standard_pack_id: hash[:standard_pack_id] })
+      end
       PalletForTitan.new(hash)
     end
 
@@ -146,17 +150,19 @@ module FinishedGoodsApp
       inspection_pallet_sequences = []
       pallet_sequence_ids.each do |pallet_sequence_id|
         pallet_sequence = find_pallet_sequence_for_titan(pallet_sequence_id)
-        inspection_pallet_sequences << { ssccReference: pallet_sequence.pallet_number,
-                                         palletQty: pallet_sequence.carton_quantity,
-                                         ssccSequenceNumber: pallet_sequence.pallet_sequence_number,
-                                         puc: pallet_sequence.puc,
-                                         orchard: pallet_sequence.orchard,
-                                         phytoData: pallet_sequence.phyto_data || '',
-                                         packCode: pallet_sequence.std_pack,
-                                         packDate: pallet_sequence.palletized_at,
-                                         sizeCount: pallet_sequence.actual_count.nil_or_empty? ? pallet_sequence.size_ref : pallet_sequence.actual_count.to_i,
-                                         inventoryCode: pallet_sequence.inventory_code,
-                                         prePackingTreatment: 'NA' }
+        inspection_pallet_sequences << {
+          ssccReference: pallet_sequence.pallet_number,
+          palletQty: pallet_sequence.carton_quantity,
+          ssccSequenceNumber: pallet_sequence.pallet_sequence_number,
+          puc: pallet_sequence.puc,
+          orchard: pallet_sequence.orchard,
+          phytoData: pallet_sequence.phyto_data || '',
+          packCode: pallet_sequence.std_pack,
+          packDate: pallet_sequence.palletized_at,
+          sizeCount: pallet_sequence.actual_count.nil_or_empty? ? pallet_sequence.size_ref : pallet_sequence.actual_count.to_i,
+          inventoryCode: pallet_sequence.inventory_code,
+          prePackingTreatment: 'NA'
+        }
       end
       inspection_pallet_sequences
     end
