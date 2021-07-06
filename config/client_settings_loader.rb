@@ -132,6 +132,7 @@ class AppClientSettingsLoader # rubocop:disable Metrics/ClassLength
     DEFAULT_DEPOT: { env_key: 'DEFAULT_DEPOT', desc: 'Default Depot for new dispatch loads.' },
     FROM_DEPOT: { env_key: 'FROM_DEPOT', default_env_var: 'DEFAULT_DEPOT', desc: 'Default Depot for new dispatch loads.' },
     TEMP_TAIL_REQUIRED_TO_SHIP: { env_key: 'TEMP_TAIL_REQUIRED_TO_SHIP', boolean: true, desc: 'optional. Makes temp tail required on all loads' },
+    INCENTIVISED_LABELING: { env_key: 'INCENTIVISED_LABELING', boolean: true, desc: 'True if a worker must be logged-in to print a carton label.' },
     ROBOT_DISPLAY_LINES: { env_key: 'ROBOT_DISPLAY_LINES', default: 0, format: :integer, desc: 'Do all robots on site have the same no of lines? If so, set to 4 or 5 as required.' },
     ADDENDUM_PLACE_OF_ISSUE: { env_key: 'ADDENDUM_PLACE_OF_ISSUE', default: 'CPT', validation_regex: /cpt|dbn|plz|mpm|oth/i, desc: 'Exporter ceritficate place of issue for addendum. Can be CPT, DBN. MPM, PLZ or OTH.' },
     GOVT_INSPECTION_SIGNEE_CAPTION: { env_key: 'GOVT_INSPECTION_SIGNEE_CAPTION', default: 'Packhouse manager', desc: 'Inspection report - Signee caption - only needs to be set if it should not be "Packhouse manager"' },
@@ -139,9 +140,9 @@ class AppClientSettingsLoader # rubocop:disable Metrics/ClassLength
     HIDE_INTAKE_TRIP_SHEET_ON_GOVT_INSPECTION_SHEET: { env_key: 'HIDE_INTAKE_TRIP_SHEET_ON_GOVT_INSPECTION_SHEET', boolean: true, desc: 'Determines if tripsheet can be created or not' },
     EDI_AUTO_CREATE_MF: { env_key: 'EDI_AUTO_CREATE_MF', boolean: true, desc: 'For EDI in, do we create missing masterfiles automatically?' },
     PS_APPLY_SUBSTITUTES: { env_key: 'PS_APPLY_SUBSTITUTES', boolean: true, desc: 'If true, include extra substitute columns in PS EDI out.' },
-    USE_EXTENDED_PALLET_PICKLIST: { env_key: 'USE_EXTENDED_PALLET_PICKLIST', desc: 'Jasper report for picklist. If extended, use "dispatch_picklist", else use "picklist".' },
-    BYPASS_QUALITY_TEST_PRE_RUN_CHECK: { env_key: 'BYPASS_QUALITY_TEST_PRE_RUN_CHECK', default: true, desc: 'optional. Bypasses Quality checks before a run is started' },
-    BYPASS_QUALITY_TEST_LOAD_CHECK: { env_key: 'BYPASS_QUALITY_TEST_LOAD_CHECK', default: true, desc: 'optional. Bypasses Quality checks at Pallet Loading' }
+    USE_EXTENDED_PALLET_PICKLIST: { env_key: 'USE_EXTENDED_PALLET_PICKLIST', boolean: true, desc: 'Jasper report for picklist. If extended, use "dispatch_picklist", else use "picklist".' },
+    BYPASS_QUALITY_TEST_PRE_RUN_CHECK: { env_key: 'BYPASS_QUALITY_TEST_PRE_RUN_CHECK', boolean: true, default: true, desc: 'optional. Bypasses Quality checks before a run is started' },
+    BYPASS_QUALITY_TEST_LOAD_CHECK: { env_key: 'BYPASS_QUALITY_TEST_LOAD_CHECK', boolean: true, default: true, desc: 'optional. Bypasses Quality checks at Pallet Loading' }
   }.freeze
 
   FIXED_RULES = {
