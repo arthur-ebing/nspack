@@ -380,16 +380,15 @@ class AppConst # rubocop:disable Metrics/ClassLength
 
   # Label sizes. The arrays contain width then height.
   # DEFAULT_LABEL_DIMENSION = ENV.fetch('DEFAULT_LABEL_DIMENSION', '84x64')
-  LABEL_SIZES = if ENV['LABEL_SIZES']
-                  AppConst.make_label_size_hash(ENV['LABEL_SIZES'].split(';').map { |s| s.split(',') })
-                else
-                  AppConst.make_label_size_hash(
-                    [
-                      [84,   64], [84,  100], [97,   78], [78,   97], [77,  130], [100,  70],
-                      [100,  84], [100, 100], [105, 250], [130, 100], [145,  50], [100, 150]
-                    ]
-                  )
-                end
+  # LABEL_SIZES = if ENV['LABEL_SIZES']
+  #                 AppConst.make_label_size_hash(ENV['LABEL_SIZES'].split(';').map { |s| s.split(',') })
+  #               else
+  #                 AppConst.make_label_size_hash(
+  #                   [
+  #                     [84,   64], [97,   78], [100,  70], [100,  84], [100, 100], [130, 100], [145,  50], [150, 100]
+  #                   ]
+  #                 )
+  #               end
 
   # Label names for barcode printing:
   # LABEL_LOCATION_BARCODE = ENV.fetch('LABEL_LOCATION_BARCODE', 'NSPACK_LOCATION')
@@ -507,7 +506,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # DEFAULT_EXPORTER = ENV['DEFAULT_EXPORTER']
   # DEFAULT_INSPECTION_BILLING = ENV['DEFAULT_INSPECTION_BILLING']
   # DEFAULT_DEPOT = ENV['DEFAULT_DEPOT']
-  FROM_DEPOT = ENV['FROM_DEPOT'] || DEFAULT_DEPOT
+  # FROM_DEPOT = ENV['FROM_DEPOT'] || DEFAULT_DEPOT
   IN_TRANSIT_LOCATION = 'IN_TRANSIT_EX_PACKHSE'
   SCRAP_LOCATION = 'SCRAP_PACKHSE'
   UNSCRAP_LOCATION = 'UNSCRAP_PACKHSE'

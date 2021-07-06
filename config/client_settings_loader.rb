@@ -130,7 +130,7 @@ class AppClientSettingsLoader # rubocop:disable Metrics/ClassLength
     DEFAULT_EXPORTER: { env_key: 'DEFAULT_EXPORTER', desc: 'Default Exporter Party for new loads and inspections.' },
     DEFAULT_INSPECTION_BILLING: { env_key: 'DEFAULT_INSPECTION_BILLING', desc: 'Default Inspection Billing Party for new inspections.' },
     DEFAULT_DEPOT: { env_key: 'DEFAULT_DEPOT', desc: 'Default Depot for new dispatch loads.' },
-    # TODO: FROM_DEPOT THAT DEFAULTS TO DEFAULT_DEPOT << must become a rule>>
+    FROM_DEPOT: { env_key: 'FROM_DEPOT', default_env_var: 'DEFAULT_DEPOT', desc: 'Default Depot for new dispatch loads.' },
     TEMP_TAIL_REQUIRED_TO_SHIP: { env_key: 'TEMP_TAIL_REQUIRED_TO_SHIP', boolean: true, desc: 'optional. Makes temp tail required on all loads' },
     ROBOT_DISPLAY_LINES: { env_key: 'ROBOT_DISPLAY_LINES', default: 0, format: :integer, desc: 'Do all robots on site have the same no of lines? If so, set to 4 or 5 as required.' },
     ADDENDUM_PLACE_OF_ISSUE: { env_key: 'ADDENDUM_PLACE_OF_ISSUE', default: 'CPT', validation_regex: /cpt|dbn|plz|mpm|oth/i, desc: 'Exporter ceritficate place of issue for addendum. Can be CPT, DBN. MPM, PLZ or OTH.' },
@@ -197,7 +197,9 @@ class AppClientSettingsLoader # rubocop:disable Metrics/ClassLength
     DEFAULT_LABEL_DIMENSION: { env_key: 'DEFAULT_LABEL_DIMENSION',
                                default: '84x64',
                                desc: 'User`s preferred label dimension in mm (width then height) e.g. 100x100' },
-    # TODO: rule for LABEL_SIZES...
+    LABEL_SIZES: { env_key: 'LABEL_SIZES',
+                   label_sizes: true,
+                   desc: 'Possible label sizes for designing in format "w,h;w,h;w,h...". e.g. 100,100;150,100;84,64' },
     LABEL_LOCATION_BARCODE: { env_key: 'LABEL_LOCATION_BARCODE',
                               default: 'NSPACK_LOCATION',
                               desc: 'Label name for Locations' },
@@ -288,7 +290,14 @@ class AppClientSettingsLoader # rubocop:disable Metrics/ClassLength
   end
 
   # Helper to create hash of label sizes from a 2D array.
-  def self.make_label_size_hash(array)
+  def self.make_label_size_hash(str)
+    array = if str.nil? || str.empty?
+              [
+                [84,   64], [97,   78], [100,  70], [100,  84], [100, 100], [130, 100], [145,  50], [150, 100]
+              ]
+            else
+              str.split(';').map { |s| s.split(',') }
+            end
     Hash[array.map { |w, h| ["#{w}x#{h}", { 'width': w, 'height': h }] }].freeze
   end
 
@@ -317,6 +326,11 @@ class AppClientSettingsLoader # rubocop:disable Metrics/ClassLength
             else
               make_boolean(rule[:env_key])
             end
+          elsif rule[:default_env_var]
+            thisval = ENV[rule[:env_key]]
+            thisval || ENV[rule[:default_env_var]]
+          elsif rule[:label_sizes]
+            make_label_size_hash(ENV[rule[:env_key]])
           elsif rule[:format]
             ENV.fetch(rule[:env_key], rule[:default]).to_i # Currently only an integer format...
           elsif rule[:array_split]
