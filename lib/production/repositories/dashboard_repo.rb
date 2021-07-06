@@ -281,6 +281,7 @@ module ProductionApp
           JOIN voyage_ports pod_voyage_ports ON pod_voyage_ports.id = loads.pod_voyage_port_id
           JOIN ports pol_port ON pol_port.id = pol_voyage_ports.port_id
           JOIN ports pod_port ON pod_port.id = pod_voyage_ports.port_id
+          WHERE NOT loads.rmt_load
         ) sub_pallets
         GROUP BY load_year, load_week, pol, pod, packed_tm_group
         ORDER BY load_year DESC, load_week DESC, pol, pod, packed_tm_group
@@ -318,6 +319,7 @@ module ProductionApp
           JOIN voyage_ports pod_voyage_ports ON pod_voyage_ports.id = loads.pod_voyage_port_id
           JOIN ports pol_port ON pol_port.id = pol_voyage_ports.port_id
           JOIN ports pod_port ON pod_port.id = pod_voyage_ports.port_id
+          WHERE NOT loads.rmt_load
         ) sub_pallets
         GROUP BY load_day, pol, pod, packed_tm_group
         ORDER BY load_day DESC, pol, pod, packed_tm_group
