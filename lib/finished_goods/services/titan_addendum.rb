@@ -49,7 +49,7 @@ module FinishedGoodsApp
     # CALLS
     # --------------------------------------------------------------------------
     def request_addendum_call
-      url = "#{AppConst::TITAN_ENVIRONMENT}/ec/ExportCertification/Addendum"
+      url = "#{AppConst::TITAN_API_HOST}/ec/ExportCertification/Addendum"
 
       @payload = repo.compile_addendum(load_id)
       res = http.json_post(url, payload, header)
@@ -57,7 +57,7 @@ module FinishedGoodsApp
     end
 
     def cancel_addendum_call
-      url = "#{AppConst::TITAN_ENVIRONMENT}/ec/ExportCertification/Addendum/CancelAddendum"
+      url = "#{AppConst::TITAN_API_HOST}/ec/ExportCertification/Addendum/CancelAddendum"
 
       @payload = { transactionId: api_request.transaction_id, requestId: api_request.request_id.to_s }
       res = http.json_post(url, payload, header)
@@ -65,7 +65,7 @@ module FinishedGoodsApp
     end
 
     def addendum_status_call
-      url = "#{AppConst::TITAN_ENVIRONMENT}/ec/ExportCertification/Addendum/AddendumStatus?transactionId=#{api_request.transaction_id}"
+      url = "#{AppConst::TITAN_API_HOST}/ec/ExportCertification/Addendum/AddendumStatus?transactionId=#{api_request.transaction_id}"
       @payload = { url: url }
       res = http.request_get(url, header)
       log_titan_request('Addendum Status', res)
@@ -75,7 +75,7 @@ module FinishedGoodsApp
       @http = Crossbeams::HTTPCalls.new(responder: TitanHttpResponder.new)
       raise Crossbeams::InfoError, 'Service Unavailable: Failed to connect to remote server.' unless http.can_ping?('ppecb.com')
 
-      url = "#{AppConst::TITAN_ENVIRONMENT}/oauth/ApiAuth"
+      url = "#{AppConst::TITAN_API_HOST}/oauth/ApiAuth"
       params = { API_UserId: AppConst::TITAN_ADDENDUM_API_USER_ID, API_Secret: AppConst::TITAN_ADDENDUM_API_SECRET }
 
       res = http.json_post(url, params)

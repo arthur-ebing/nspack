@@ -20,7 +20,7 @@ module FinishedGoodsApp
     def tracking_unit_status(pallet_number)
       auth_token_call if header.nil?
 
-      url = "#{AppConst::E_CERT_ENVIRONMENT}tur.ecert.co.za/api/TrackingUnit/GetTrackingUnitStatus?trackingUnitId=#{pallet_number}"
+      url = "#{AppConst::E_CERT_PROTOCOL}tur.ecert.co.za/api/TrackingUnit/GetTrackingUnitStatus?trackingUnitId=#{pallet_number}"
       http = Crossbeams::HTTPCalls.new(call_logger: call_logger, open_timeout: AppConst::E_CERT_OPEN_TIMEOUT, read_timeout: AppConst::E_CERT_READ_TIMEOUT)
 
       res = http.request_get(url, header)
@@ -33,7 +33,7 @@ module FinishedGoodsApp
     def elot(params, body)
       auth_token_call if header.nil?
 
-      url = "#{AppConst::E_CERT_ENVIRONMENT}tur.ecert.co.za/api/TrackingUnit/eLot?#{params}"
+      url = "#{AppConst::E_CERT_PROTOCOL}tur.ecert.co.za/api/TrackingUnit/eLot?#{params}"
       http = Crossbeams::HTTPCalls.new(call_logger: call_logger, open_timeout: AppConst::E_CERT_OPEN_TIMEOUT, read_timeout: AppConst::E_CERT_READ_TIMEOUT)
       res = http.json_post(url, body, header)
       return failed_response(res.message) unless res.success

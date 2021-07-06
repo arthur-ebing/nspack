@@ -133,7 +133,7 @@ module FinishedGoodsApp
     # --------------------------------------------------------------------------
     def inspection_call
       auth_token_call if header.nil?
-      url = "#{AppConst::TITAN_ENVIRONMENT}/pi/ProductInspection/consignment"
+      url = "#{AppConst::TITAN_API_HOST}/pi/ProductInspection/consignment"
       @payload = TitanRepo.new.compile_inspection(govt_inspection_sheet_id)
       @payload[:transactionType] = '202'
       @header['api-version'] = '2.0'
@@ -144,7 +144,7 @@ module FinishedGoodsApp
 
     def reinspection_call
       auth_token_call if header.nil?
-      url = "#{AppConst::TITAN_ENVIRONMENT}/pi/ProductReInspection/consignment"
+      url = "#{AppConst::TITAN_API_HOST}/pi/ProductReInspection/consignment"
       @payload = TitanRepo.new.compile_inspection(govt_inspection_sheet_id)
       @payload[:transactionType] = '203'
 
@@ -154,7 +154,7 @@ module FinishedGoodsApp
 
     def validation_call
       auth_token_call if header.nil?
-      url = "#{AppConst::TITAN_ENVIRONMENT}/pi/ProductInspection/InspectionMessages/ValidationResult?inspectionMessageId=#{inspection_message_id}"
+      url = "#{AppConst::TITAN_API_HOST}/pi/ProductInspection/InspectionMessages/ValidationResult?inspectionMessageId=#{inspection_message_id}"
       @header.delete('api-version')
 
       res = http.request_get(url, header)
@@ -164,7 +164,7 @@ module FinishedGoodsApp
 
     def update_inspection_call
       auth_token_call if header.nil?
-      url = "#{AppConst::TITAN_ENVIRONMENT}/pi/ProductInspection/consignment"
+      url = "#{AppConst::TITAN_API_HOST}/pi/ProductInspection/consignment"
       @payload = TitanRepo.new.compile_inspection(govt_inspection_sheet_id)
       @payload[:inspectionMessageId] = inspection_message_id
       @payload[:transactionType] = '202'
@@ -176,7 +176,7 @@ module FinishedGoodsApp
 
     def update_reinspection_call
       auth_token_call if header.nil?
-      url = "#{AppConst::TITAN_ENVIRONMENT}/pi/ProductInspection/consignment"
+      url = "#{AppConst::TITAN_API_HOST}/pi/ProductInspection/consignment"
       @payload = TitanRepo.new.compile_inspection(govt_inspection_sheet_id)
       @payload[:inspectionMessageId] = inspection_message_id
       @payload[:transactionType] = '203'
@@ -187,7 +187,7 @@ module FinishedGoodsApp
 
     def delete_inspection_call
       auth_token_call if header.nil?
-      url = "#{AppConst::TITAN_ENVIRONMENT}/pi/ProductInspection/consignment"
+      url = "#{AppConst::TITAN_API_HOST}/pi/ProductInspection/consignment"
       @payload = { inspectionMessageId: inspection_message_id }
 
       res = http.json_delete(url, payload, header)
@@ -196,7 +196,7 @@ module FinishedGoodsApp
 
     def request_results_call
       auth_token_call if header.nil?
-      url = "#{AppConst::TITAN_ENVIRONMENT}/pi/ProductInspection/InspectionResult?consignmentNumber=#{@govt_inspection_sheet.consignment_note_number}"
+      url = "#{AppConst::TITAN_API_HOST}/pi/ProductInspection/InspectionResult?consignmentNumber=#{@govt_inspection_sheet.consignment_note_number}"
 
       res = http.request_get(url, header)
       log_titan_request('Results', res)
@@ -206,7 +206,7 @@ module FinishedGoodsApp
       @http = Crossbeams::HTTPCalls.new(responder: TitanHttpResponder.new)
       raise Crossbeams::InfoError, 'Service Unavailable: Failed to connect to remote server.' unless http.can_ping?('ppecb.com')
 
-      url = "#{AppConst::TITAN_ENVIRONMENT}/oauth/ApiAuth"
+      url = "#{AppConst::TITAN_API_HOST}/oauth/ApiAuth"
       params = { API_UserId: AppConst::TITAN_INSPECTION_API_USER_ID, API_Secret: AppConst::TITAN_INSPECTION_API_SECRET }
 
       res = http.json_post(url, params)

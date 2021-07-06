@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require File.expand_path('../../config/env_var_rules.rb', __dir__)
+require File.expand_path('../../config/client_settings_loader.rb', __dir__)
 require File.expand_path('../../helpers/utility_functions.rb', __dir__)
 
 # Rake tasks for setting up development environment.
@@ -27,14 +27,14 @@ class AppDevTasks
         puts @logs.join("\n") unless @logs.empty?
       end
 
-      desc 'List of ENV variables'
-      task :listenv do
-        EnvVarRules.new.print
+      desc 'Client settings: list of all possible ENV variables'
+      task :client_settings do
+        puts AppClientSettingsLoader.new_env_var_file
       end
 
-      desc 'Validate presence of ENV variables'
-      task :validateenv do
-        EnvVarRules.new.validate
+      desc 'Client settings: list only required ENV variables'
+      task :client_settings_required do
+        puts AppClientSettingsLoader.new_env_var_file(required_values_only: true)
       end
 
       desc 'Clear the SQL log file'
@@ -83,7 +83,7 @@ class AppDevTasks
     target = File.join(root_path, '.env.local')
     FileUtils.touch(target) unless File.exist?(target)
 
-    EnvVarRules.new.add_missing_to_local
+    File.open(target, 'a') { |f| f << AppClientSettingsLoader.new_env_var_file(required_values_only: true) }
   end
 
   def prep_required_paths
