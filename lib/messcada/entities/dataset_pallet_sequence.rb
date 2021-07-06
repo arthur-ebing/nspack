@@ -76,7 +76,7 @@ module MesscadaApp
           pallet_sequences.product_resource_allocation_id AS resource_allocation_id,
           pallets.gross_weight,
           pallets.nett_weight,
-          (COALESCE(pallets.gross_weight, 0) / COALESCE(pallets.carton_quantity, 1)) AS gross_weight_per_carton,
+          (( COALESCE(pallets.gross_weight, 0) - pallet_bases.material_mass ) / COALESCE(pallets.carton_quantity, 1)) AS gross_weight_per_carton,
           (COALESCE(pallets.nett_weight, 0) / COALESCE(pallets.carton_quantity, 1)) AS nett_weight_per_carton,
           pallets.allocated,
           pallets.in_stock,
