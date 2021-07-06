@@ -509,7 +509,7 @@ module MasterfilesApp
     end
 
     def find_registration_code_for_party_role(type, party_role_id)
-      DB[:registrations].where(registration_type: type, party_role_id: party_role_id).get(:registration_code)
+      DB[:registrations].where(registration_type: type, party_role_id: party_role_id).get(:registration_code) || 'Party not Registered'
     end
 
     def create_registration(res)
