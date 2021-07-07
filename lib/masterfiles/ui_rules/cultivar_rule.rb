@@ -27,10 +27,14 @@ module UiRules
 
     def common_fields
       {
-        commodity_id: { renderer: :select, options: MasterfilesApp::CommodityRepo.new.for_select_commodities },
+        commodity_id: { renderer: :select,
+                        options: MasterfilesApp::CommodityRepo.new.for_select_commodities,
+                        required: true,
+                        prompt: 'Select Commodity'},
         cultivar_group_id: { renderer: :select,
                              options: @repo.for_select_cultivar_groups,
                              disabled_options: @repo.for_select_inactive_cultivar_groups,
+                             required: true,
                              prompt: 'Select Cultivar Group' },
         cultivar_name: { required: true },
         cultivar_code: {},
