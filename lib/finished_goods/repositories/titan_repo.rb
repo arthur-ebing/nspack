@@ -14,6 +14,8 @@ module FinishedGoodsApp
         hash[:nett_weight_per_carton] = get_value(:standard_product_weights, :nett_weight, { commodity_id: hash[:commodity_id], standard_pack_id: hash[:standard_pack_id] })
         hash[:gross_weight_per_carton] = get_value(:standard_product_weights, :gross_weight, { commodity_id: hash[:commodity_id], standard_pack_id: hash[:standard_pack_id] })
       end
+      hash[:bin] = get(:standard_pack_codes, hash[:standard_pack_id], :bin) || false
+
       PalletForTitan.new(hash)
     end
 
@@ -133,7 +135,7 @@ module FinishedGoodsApp
                                 inspectionSampleWeight: pallet.nett_weight_per_carton.to_f.round(3),
                                 nettWeightPack: pallet.nett_weight_per_carton.to_f.round(3),
                                 grossWeightPack: pallet.gross_weight_per_carton.to_f.round(3),
-                                carton: 'C',
+                                carton: pallet.bin ? 'B' : 'C',
                                 cartonQty: pallet.pallet_carton_quantity,
                                 targetRegion: govt_inspection_sheet.destination_region,
                                 targetCountry: govt_inspection_sheet.destination_country,

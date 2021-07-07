@@ -45,6 +45,7 @@ module FinishedGoodsApp
     attribute :pallet_number, Types::String
     attribute :phc, Types::String
     attribute :shipped_at, Types::DateTime
+    attribute :bin, Types::Bool
   end
 
   class PalletSequenceForTitan < Dry::Struct
