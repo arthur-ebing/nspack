@@ -35,7 +35,8 @@ class Nspack < Roda
       r.on 'print_delivery' do
         jasper_params = JasperParams.new('delivery',
                                          current_user.login_name,
-                                         delivery_id: id)
+                                         delivery_id: id,
+                                         client_code: AppConst::CLIENT_CODE)
         res = CreateJasperReport.call(jasper_params)
 
         if res.success
