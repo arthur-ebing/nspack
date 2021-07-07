@@ -217,7 +217,7 @@ module UiRules
       group_ids = @repo.select_values(:cultivars, :cultivar_group_id, id: cultivar_ids.to_a).uniq
       cultivar_groups = @cultivar_repo.for_select_cultivar_groups(where: { id: group_ids })
 
-      cultivars = if @form_object.allow_cultivar_mixing
+      cultivars = if @form_object.cultivar_group_id.nil_or_empty? # allow_cultivar_mixing
                     []
                   elsif @form_object.orchard_id.nil_or_empty?
                     @cultivar_repo.for_select_cultivars(where: { cultivar_group_id: @form_object.cultivar_group_id })

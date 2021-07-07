@@ -112,8 +112,11 @@ module UiRules
     end
 
     def edit_sequence_fields # rubocop:disable Metrics/AbcSize
-      commodity_id = @form_object[:commodity_id].nil_or_empty? ? ProductionApp::ProductSetupRepo.new.get_commodity_id(@form_object.cultivar_group_id, @form_object.cultivar_id) : @form_object[:commodity_id]
+      # commodity_id = @form_object[:commodity_id].nil_or_empty? ? ProductionApp::ProductSetupRepo.new.get_commodity_id(@form_object.cultivar_group_id, @form_object.cultivar_id) : @form_object[:commodity_id]
+      commodity_id = @form_object[:commodity_id].nil_or_empty? ? @repo.get(:cultivar_groups, @form_object.cultivar_group_id, :commodity_id) : @form_object[:commodity_id]
       commodity = MasterfilesApp::CommodityRepo.new.find_commodity(commodity_id)
+      raise Crossbeams::FrameworkError, 'No commodity for cultivar group or sequence' if commodity.nil?
+
       requires_standard_counts = commodity.requires_standard_counts
       default_mkting_org_id = @form_object[:marketing_org_party_role_id].nil_or_empty? ? MasterfilesApp::PartyRepo.new.find_party_role_from_party_name_for_role(AppConst::CR_PROD.default_marketing_org, AppConst::ROLE_MARKETER) : @form_object[:marketing_org_party_role_id]
       default_pm_type_id = @form_object[:pm_type_id].nil_or_empty? ? MasterfilesApp::BomRepo.new.find_pm_type(DB[:pm_types].where(pm_type_code: AppConst::DEFAULT_FG_PACKAGING_TYPE).select_map(:id))&.id : @form_object[:pm_type_id]

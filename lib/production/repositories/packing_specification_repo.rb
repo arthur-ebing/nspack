@@ -121,7 +121,8 @@ module ProductionApp
       hash[:packing_specification_code] = product_setup_partial_code(hash)
       return hash if hash[:step] < 1
 
-      hash[:commodity_id] ||= ProductionApp::ProductSetupRepo.new.get_commodity_id(hash[:cultivar_group_id], hash[:cultivar_id])
+      # hash[:commodity_id] ||= ProductionApp::ProductSetupRepo.new.get_commodity_id(hash[:cultivar_group_id], hash[:cultivar_id])
+      hash[:commodity_id] ||= get(:cultivar_groups, hash[:cultivar_group_id], :commodity_id)
       hash[:commodity] = get(:commodities, hash[:commodity_id], :code)
       hash[:marketing_variety] = get(:marketing_varieties, hash[:marketing_variety_id], :marketing_variety_code)
       hash[:std_fruit_size_count] = MasterfilesApp::FruitSizeRepo.new.find_std_fruit_size_count(hash[:std_fruit_size_count_id])&.size_count_value
