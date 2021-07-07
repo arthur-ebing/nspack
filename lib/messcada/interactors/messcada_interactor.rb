@@ -360,7 +360,7 @@ module MesscadaApp
     def verify_pallet_sequence(pallet_sequence_id, verified_by, params) # rubocop:disable Metrics/AbcSize
       return validation_failed_response(messages: { verification_failure_reason: ['is missing'] }) if params[:verification_result] == 'failed' && params[:verification_failure_reason].nil_or_empty?
 
-      pallet_id = get_pallet_sequence_pallet_id(pallet_sequence_id)
+      pallet_id = repo.get(:pallet_sequences, pallet_sequence_id, :pallet_id)
       changeset = pallet_changes_on_verify(params)
 
       repo.transaction do
@@ -381,18 +381,6 @@ module MesscadaApp
     rescue Crossbeams::InfoError => e
       ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message(__method__))
       failed_response(e.message)
-    end
-
-    def get_pallet_sequence_pallet_id(id)
-      repo.get(:pallet_sequences, id, :pallet_id)
-    end
-
-    # def get_pallet_by_carton_label_id(carton_label_id)
-    #   repo.get_pallet_by_carton_label_id(carton_label_id)
-    # end
-
-    def pallet_exists?(pallet_number)
-      repo.pallet_exists?(pallet_number)
     end
 
     def pallet_weighing_for_labeling(user, params) # rubocop:disable Metrics/AbcSize
@@ -422,7 +410,7 @@ module MesscadaApp
 
       pallet_number = res[:bin_number]
 
-      return failed_response("Pallet Number :#{pallet_number} could not be found") unless pallet_exists?(pallet_number)
+      return failed_response("Pallet Number :#{pallet_number} could not be found") unless repo.pallet_exists?(pallet_number)
 
       fpw_res = nil
       repo.transaction do
