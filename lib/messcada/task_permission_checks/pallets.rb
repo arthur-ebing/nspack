@@ -25,6 +25,7 @@ module MesscadaApp
         inspected: :inspected_check,
         not_inspected: :not_inspected_check,
         not_failed_otmc: :not_failed_otmc_check,
+        full_build_status: :full_build_status_check,
         verification_passed: :verification_passed_check,
         pallet_weight: :pallet_weight_check,
         rmt_grade: :rmt_grade_check,
@@ -138,6 +139,13 @@ module MesscadaApp
         all_ok
       end
 
+      def full_build_status_check
+        errors = DB[:pallets].where(id: pallet_ids).exclude(build_status: 'FULL').select_map(:pallet_number)
+        return failed_response "Pallet: #{errors.join(', ')} incomplete build status." unless errors.empty?
+
+        all_ok
+      end
+
       def not_on_inspection_sheet_check
         ds = DB[:govt_inspection_pallets]
         ds = ds.join(:govt_inspection_sheets, id: Sequel[:govt_inspection_pallets][:govt_inspection_sheet_id])
@@ -202,7 +210,7 @@ module MesscadaApp
       end
 
       def allocate_check
-        tasks = %i[not_on_load not_shipped in_stock not_failed_otmc rmt_grade order_spec]
+        tasks = %i[not_on_load not_shipped in_stock not_failed_otmc full_build_status rmt_grade order_spec]
         tasks.each do |task|
           check = CHECKS[task]
           raise ArgumentError, "Task \"#{task}\" is unknown for #{self.class}." if check.nil?

@@ -67,6 +67,7 @@ module FinishedGoodsApp
         check_pallets!(:not_shipped, pallet_numbers)
         check_pallets!(:not_on_load, pallet_numbers, id)
         check_pallets!(:not_failed_otmc, pallet_numbers)
+        check_pallets!(:full_build_status, pallet_numbers)
         check_pallets!(:rmt_grade, pallet_numbers, id)
 
         all_ok
