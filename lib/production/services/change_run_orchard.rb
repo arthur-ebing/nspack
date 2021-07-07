@@ -31,10 +31,6 @@ module ProductionApp
 
         change_attrs = params.to_h.slice(:orchard_id)
         objects_reworks_run_attrs = resolve_reworks_run_attrs(parent_id)
-        update_objects_changes('rmt_bins',
-                               repo.select_values(:rmt_bins, :id, { production_run_tipped_id: production_run_id }),
-                               change_attrs,
-                               objects_reworks_run_attrs)
         update_objects_changes('carton_labels',
                                repo.select_values(:carton_labels, :id, { production_run_id: production_run_id }),
                                change_attrs,
