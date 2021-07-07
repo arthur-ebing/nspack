@@ -160,7 +160,7 @@ module FinishedGoodsApp
           phytoData: pallet_sequence.phyto_data || '',
           packCode: pallet_sequence.std_pack,
           packDate: pallet_sequence.palletized_at || pallet_sequence.partially_palletized_at,
-          # TODO: remove partially_palletized_at should only use palletized_at
+          # FIXME: remove partially_palletized_at should only use palletized_at
           sizeCount: pallet_sequence.actual_count.nil_or_empty? ? pallet_sequence.size_ref : pallet_sequence.actual_count.to_i,
           inventoryCode: pallet_sequence.inventory_code,
           prePackingTreatment: 'NA'
