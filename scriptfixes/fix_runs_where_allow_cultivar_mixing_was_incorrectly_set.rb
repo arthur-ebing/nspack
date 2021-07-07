@@ -20,7 +20,7 @@
 class FixRunsWhereAllowCultivarMixingWasIncorrectlySet < BaseScript
   def run # rubocop:disable Metrics/AbcSize
     parse_args
-    status = 'DISALLOWED_CULTIVAR_MIXING'
+    status = 'REPLACE_CULTIVAR_FIX'
     @carton_label_ids = nil
     @pallet_sequence_ids = nil
 
@@ -36,10 +36,10 @@ class FixRunsWhereAllowCultivarMixingWasIncorrectlySet < BaseScript
       p "@pallet_sequence_ids: #{@pallet_sequence_ids}"
       pallet_ids = ps.select_map(:pallet_id).uniq
       ps.update(cultivar_id: @cultivar_id)
-      log_multiple_statuses(:pallets, pallet_ids, status, user_name: 'System')
+      log_multiple_statuses(:pallets, pallet_ids, status, user_name: 'System', comment: 'Run was incorrectly setup without cultivar_id')
 
       DB[:production_runs].where(id: @production_run_id).update(allow_cultivar_mixing: false)
-      log_status(:production_runs, @production_run_id, status, user_name: 'System')
+      log_status(:production_runs, @production_run_id, status, user_name: 'System', comment: 'Run was incorrectly setup without cultivar_id')
 
       raise Crossbeams::InfoError, 'Debug mode' if debug_mode
     end
