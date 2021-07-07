@@ -13,9 +13,9 @@
 #
 # To run:
 # -------
-# Debug : DEBUG=y RACK_ENV=production ruby scripts/base_script.rb FixRunsWhereAllowCultivarMixingWasIncorrectlySet
-# Live  : RACK_ENV=production ruby scripts/base_script.rb FixRunsWhereAllowCultivarMixingWasIncorrectlySet
-# Dev   : ruby scripts/base_script.rb FixRunsWhereAllowCultivarMixingWasIncorrectlySet
+# Debug : DEBUG=y RACK_ENV=production ruby scripts/base_script.rb FixRunsWhereAllowCultivarMixingWasIncorrectlySet production_run_id cultivar_name
+# Live  : RACK_ENV=production ruby scripts/base_script.rb FixRunsWhereAllowCultivarMixingWasIncorrectlySet production_run_id cultivar_name
+# Dev   : ruby scripts/base_script.rb FixRunsWhereAllowCultivarMixingWasIncorrectlySet production_run_id cultivar_name
 #
 class FixRunsWhereAllowCultivarMixingWasIncorrectlySet < BaseScript
   def run # rubocop:disable Metrics/AbcSize
@@ -38,7 +38,7 @@ class FixRunsWhereAllowCultivarMixingWasIncorrectlySet < BaseScript
       ps.update(cultivar_id: @cultivar_id)
       log_multiple_statuses(:pallets, pallet_ids, status, user_name: 'System', comment: 'Run was incorrectly setup without cultivar_id')
 
-      DB[:production_runs].where(id: @production_run_id).update(allow_cultivar_mixing: false)
+      DB[:production_runs].where(id: @production_run_id).update(allow_cultivar_mixing: false, cultivar_id: @cultivar_id)
       log_status(:production_runs, @production_run_id, status, user_name: 'System', comment: 'Run was incorrectly setup without cultivar_id')
 
       raise Crossbeams::InfoError, 'Debug mode' if debug_mode
