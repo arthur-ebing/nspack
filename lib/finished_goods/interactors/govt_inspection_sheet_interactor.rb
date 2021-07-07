@@ -453,6 +453,7 @@ module FinishedGoodsApp
 
       check_pallet!(:not_shipped, pallet_number)
       check_pallet!(:not_failed_otmc, pallet_number)
+      check_pallet!(:full_build_status, pallet_number)
       check_pallet!(:verification_passed, pallet_number)
       check_pallet!(:pallet_weight, pallet_number)
 
