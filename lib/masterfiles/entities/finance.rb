@@ -18,6 +18,7 @@ module MasterfilesApp
     attribute :contact_people, Types::Array
     attribute :customer_party_role_id, Types::Integer
     attribute :customer, Types::String
+    attribute :financial_account_code, Types::String
     attribute? :active, Types::Bool
   end
 

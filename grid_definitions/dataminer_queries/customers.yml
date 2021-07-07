@@ -1,13 +1,13 @@
 ---
 :caption: Customers
 :sql: "SELECT\r\n    customers.id,\r\n    customers.customer_party_role_id,\r\n    fn_party_role_name
-  (customers.customer_party_role_id) AS customer,\r\n    customers.default_currency_id,\r\n
-  \   currencies.currency AS default_currency,\r\n    customers.currency_ids,\r\n
-  \   (\r\n        SELECT array_agg(currency ORDER BY currency)\r\n        FROM currencies\r\n
-  \       WHERE id = ANY(customers.currency_ids)\r\n    ) AS currencies,\r\n    (\r\n
-  \       SELECT array_agg(fn_party_role_name (c.contact_person_id))\r\n        FROM
-  ( SELECT unnest(c.contact_person_ids) contact_person_id\r\n               FROM customers
-  c\r\n               WHERE c.id = customers.id) c\r\n    ) AS contact_people,\r\n
+  (customers.customer_party_role_id) AS customer,\r\n    financial_account_code,\r\n
+  \   customers.default_currency_id,\r\n    currencies.currency AS default_currency,\r\n
+  \   customers.currency_ids,\r\n    (\r\n        SELECT array_agg(currency ORDER
+  BY currency)\r\n        FROM currencies\r\n        WHERE id = ANY(customers.currency_ids)\r\n
+  \   ) AS currencies,\r\n    (\r\n        SELECT array_agg(fn_party_role_name (c.contact_person_id))\r\n
+  \       FROM ( SELECT unnest(c.contact_person_ids) contact_person_id\r\n               FROM
+  customers c\r\n               WHERE c.id = customers.id) c\r\n    ) AS contact_people,\r\n
   \   fn_current_status ('customers', customers.id) AS status,\r\n    customers.active,\r\n
   \   customers.created_at,\r\n    customers.updated_at\r\nFROM customers\r\n         LEFT
   JOIN currencies ON currencies.id = customers.default_currency_id\r\n"
@@ -63,9 +63,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  financial_account_code:
+    :name: financial_account_code
+    :sequence_no: 4
+    :caption: Financial account code
+    :namespaced_name: financial_account_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   default_currency_id:
     :name: default_currency_id
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Default currency
     :namespaced_name: customers.default_currency_id
     :data_type: :integer
@@ -81,7 +97,7 @@
     :group_max: false
   default_currency:
     :name: default_currency
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Default currency
     :namespaced_name: currencies.currency
     :data_type: :string
@@ -97,7 +113,7 @@
     :group_max: false
   currency_ids:
     :name: currency_ids
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Currency ids
     :namespaced_name: customers.currency_ids
     :data_type: :string
@@ -113,7 +129,7 @@
     :group_max: false
   currencies:
     :name: currencies
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Currencies
     :namespaced_name: 
     :data_type: :string
@@ -129,7 +145,7 @@
     :group_max: false
   contact_people:
     :name: contact_people
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Contact people
     :namespaced_name: 
     :data_type: :string
@@ -145,7 +161,7 @@
     :group_max: false
   status:
     :name: status
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Status
     :namespaced_name: 
     :data_type: :string
@@ -161,7 +177,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Active
     :namespaced_name: customers.active
     :data_type: :boolean
@@ -177,7 +193,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Created at
     :namespaced_name: customers.created_at
     :data_type: :datetime
@@ -193,7 +209,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Updated at
     :namespaced_name: customers.updated_at
     :data_type: :datetime

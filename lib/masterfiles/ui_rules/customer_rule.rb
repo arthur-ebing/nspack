@@ -22,6 +22,7 @@ module UiRules
       fields[:contact_people] = { renderer: :list,
                                   items: @form_object.contact_people }
       fields[:customer] = { renderer: :label }
+      fields[:financial_account_code] = { renderer: :label }
       fields[:active] = { renderer: :label,
                           as_boolean: true }
     end
@@ -41,6 +42,7 @@ module UiRules
                                prompt: true,
                                required: true,
                                caption: 'Default Currency' },
+        financial_account_code: {},
         contact_person_ids: { renderer: :multi,
                               options: @party_repo.for_select_party_roles(AppConst::ROLE_CUSTOMER_CONTACT_PERSON),
                               selected: @form_object.contact_person_ids,
@@ -81,7 +83,8 @@ module UiRules
 
     def make_new_form_object
       @form_object = OpenStruct.new(default_currency_id: @repo.get_id(:currencies, currency: 'ZAR'),
-                                    customer_party_role_id: nil)
+                                    customer_party_role_id: nil,
+                                    financial_account_code: nil)
     end
 
     private

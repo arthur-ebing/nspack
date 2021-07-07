@@ -74,6 +74,7 @@ module MasterfilesApp
         id: 1,
         customer_party_role_id: party_role_id,
         customer: 'ABC',
+        financial_account_code: Faker::Lorem.word,
         currency_ids: [currency_id],
         currencies: %w[ZAR],
         default_currency_id: currency_id,

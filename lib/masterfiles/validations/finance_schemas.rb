@@ -17,6 +17,7 @@ module MasterfilesApp
     optional(:company_reg_no).maybe(Types::StrippedString)
     required(:default_currency_id).filled(:integer)
     optional(:contact_person_ids).maybe(:array).each(:integer)
+    required(:financial_account_code).maybe(Types::StrippedString)
   end
 
   CustomerSchema = Dry::Schema.Params do
@@ -25,6 +26,7 @@ module MasterfilesApp
     required(:customer_party_role_id).filled(:integer)
     optional(:contact_person_ids).maybe(:array).each(:integer)
     optional(:currency_ids).maybe(:array).each(:integer)
+    required(:financial_account_code).maybe(Types::StrippedString)
   end
 
   DealTypeSchema = Dry::Schema.Params do

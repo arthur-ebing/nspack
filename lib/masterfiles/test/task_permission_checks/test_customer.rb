@@ -18,6 +18,7 @@ module MasterfilesApp
         contact_people: %w[A B C],
         customer_party_role_id: 1,
         customer: 'ABC',
+        financial_account_code: Faker::Lorem.word,
         active: true
       }
       MasterfilesApp::Customer.new(base_attrs.merge(attrs))

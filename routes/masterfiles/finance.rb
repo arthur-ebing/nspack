@@ -111,6 +111,7 @@ class Nspack < Roda
               contact_people
               customer_party_role_id
               customer
+              financial_account_code
               active
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys),
@@ -179,6 +180,7 @@ class Nspack < Roda
             contact_people
             customer_party_role_id
             customer
+            financial_account_code
             active
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),

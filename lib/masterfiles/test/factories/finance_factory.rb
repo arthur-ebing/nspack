@@ -76,6 +76,7 @@ module MasterfilesApp
         default_currency_id: currency_id,
         currency_ids: BaseRepo.new.array_for_db_col([currency_id]),
         customer_party_role_id: party_role_id,
+        financial_account_code: Faker::Lorem.word,
         contact_person_ids: BaseRepo.new.array_for_db_col([party_role_id]),
         active: true,
         created_at: '2010-01-01 12:00',
