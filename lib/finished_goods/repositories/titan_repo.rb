@@ -20,7 +20,7 @@ module FinishedGoodsApp
     def find_pallet_sequence_for_titan(id)
       query = MesscadaApp::DatasetPalletSequence.call('WHERE pallet_sequences.id = ?')
       hash = DB[query, id].first
-      raise Crossbeams::FrameworkError, "Pallet Sequence not found for pallet_sequence_id: #{pallet_sequence_id}" if hash.nil_or_empty?
+      raise Crossbeams::FrameworkError, "Pallet Sequence not found for pallet_sequence_id: #{id}" if hash.nil_or_empty?
 
       hash[:pallet_percentage] = hash[:pallet_carton_quantity].zero? ? 0 : (hash[:carton_quantity] / hash[:pallet_carton_quantity].to_f).round(3)
       PalletSequenceForTitan.new(hash)
@@ -148,6 +148,7 @@ module FinishedGoodsApp
       pallet_sequence_ids = select_values(:pallet_sequences, :id, pallet_id: pallet_id)
 
       inspection_pallet_sequences = []
+
       pallet_sequence_ids.each do |pallet_sequence_id|
         pallet_sequence = find_pallet_sequence_for_titan(pallet_sequence_id)
         inspection_pallet_sequences << {
@@ -158,7 +159,8 @@ module FinishedGoodsApp
           orchard: pallet_sequence.orchard,
           phytoData: pallet_sequence.phyto_data || '',
           packCode: pallet_sequence.std_pack,
-          packDate: pallet_sequence.palletized_at,
+          packDate: pallet_sequence.palletized_at || pallet_sequence.partially_palletized_at,
+          # TODO: remove partially_palletized_at should only use palletized_at
           sizeCount: pallet_sequence.actual_count.nil_or_empty? ? pallet_sequence.size_ref : pallet_sequence.actual_count.to_i,
           inventoryCode: pallet_sequence.inventory_code,
           prePackingTreatment: 'NA'
