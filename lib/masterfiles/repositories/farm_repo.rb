@@ -230,16 +230,6 @@ module MasterfilesApp
         .map { |r| [r[:farm_code], r[:id]] }
     end
 
-    def selected_farm_orchard_codes(farm_id, puc_id)
-      return [] if farm_id.nil? || puc_id.nil?
-
-      DB[:orchards]
-        .where(farm_id: farm_id)
-        .where(puc_id: puc_id)
-        .order(:orchard_code)
-        .select_map(%i[orchard_code id])
-    end
-
     def selected_puc_orchard_codes(puc_id)
       DB[:orchards]
         .where(farm_id: DB[:farms_pucs].where(puc_id: puc_id).select(:farm_id))

@@ -221,7 +221,7 @@ module FinishedGoodsApp
         .select_map(:pallet_id)
     end
 
-    def find_pallets_for_for_load(id) # rubocop:disable Metrics/AbcSize
+    def list_pallets_for_load(id) # rubocop:disable Metrics/AbcSize
       load = find_load(id)
       params = {
         packed_tm_group_id: load.packed_tm_group_id,
