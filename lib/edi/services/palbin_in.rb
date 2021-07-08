@@ -92,10 +92,11 @@ module EdiApp
                  gross_weight: palbin[:gross_weight],
                  nett_weight: palbin[:nett_weight] }
 
-        hash[:orchard_id] = get_masterfile_id(:orchards, orchard_code: palbin[:orchard], farm_id: hash[:farm_id], puc_id: hash[:puc_id])
+        hash[:orchard_id] = get_masterfile_id(:orchards,  orchard_code: palbin[:orchard], farm_id: hash[:farm_id], puc_id: hash[:puc_id],
+                                                          search_info: { orchard_code: palbin[:orchard], farm_code: palbin[:farm], puc_code: palbin[:puc] })
         commodity_id = get_masterfile_id(:commodities, code: palbin[:commodity])
-        hash[:cultivar_id] = get_masterfile_id(:cultivars, cultivar_name: palbin[:cultivar], commodity_id: commodity_id)
-
+        hash[:cultivar_id] = get_masterfile_id(:cultivars, cultivar_name: palbin[:cultivar], commodity_id: commodity_id,
+                                                           search_info: { cultivar_name: palbin[:cultivar], commodity_code: palbin[:commodity] })
         hash[:season_id] = MasterfilesApp::CalendarRepo.new.get_season_id(hash[:cultivar_id], hash[:bin_received_date_time])
         missing_masterfiles << "seasons: cultivar: #{palbin[:cultivar]}, received: #{hash[:bin_received_date_time]}" if hash[:season_id].nil?
 
@@ -111,15 +112,16 @@ module EdiApp
       nil
     end
 
-    def get_masterfile_id(table_name, args)
-      get_masterfile_value(table_name, :id, args)
+    def get_masterfile_id(table_name, args, search_info: {})
+      get_masterfile_value(table_name, :id, args, search_info)
     end
 
-    def get_masterfile_value(table_name, column, args)
+    def get_masterfile_value(table_name, column, args, search_info: {})
       value = repo.get_value(table_name, column, args)
       return value unless value.nil?
 
-      missing_masterfiles << "#{table_name}.#{column} #{args}"
+      search_info = args if search_info.empty?
+      missing_masterfiles << "#{table_name}.#{column} #{search_info}"
       nil
     end
   end

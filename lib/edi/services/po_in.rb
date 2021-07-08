@@ -172,14 +172,15 @@ module EdiApp
       rec[:missing_mf][:fruit_size_reference_id] = { mode: :direct, raise: false, keys: { size_count: seq[:size_count] } } if fruit_size_reference_id.nil?
 
       basic_pack_code_id = po_repo.find_basic_pack_id(standard_pack_code_id)
+      basic_pack_code = po_repo.get(:basic_pack_codes, basic_pack_code_id, :basic_pack_code)
       rec[:lookup_data][:basic_pack_code_id] = basic_pack_code_id
-      rec[:missing_mf][:basic_pack_code_id] = { mode: :direct, raise: false, keys: { size_count: seq[:size_count] } } if basic_pack_code_id.nil?
+      rec[:missing_mf][:basic_pack_code_id] = { mode: :direct, raise: false, keys: { standard_pack_code: seq[:pack] } } if basic_pack_code_id.nil?
 
       pallet_format_id, cartons_per_pallet_id = po_repo.find_pallet_format_and_cpp_id(seq[:pallet_btype], tot_cartons, basic_pack_code_id)
       rec[:lookup_data][:pallet_format_id] = pallet_format_id
-      rec[:missing_mf][:pallet_format_id] = { mode: :direct, raise: true, keys: { pallet_btype: seq[:pallet_btype], cartons: tot_cartons, basic_pack_code_id: basic_pack_code_id } } if pallet_format_id.nil?
+      rec[:missing_mf][:pallet_format_id] = { mode: :direct, raise: true, keys: { pallet_btype: seq[:pallet_btype], cartons: tot_cartons, basic_pack_code: basic_pack_code } } if pallet_format_id.nil?
       rec[:lookup_data][:cartons_per_pallet_id] = cartons_per_pallet_id
-      rec[:missing_mf][:cartons_per_pallet_id] = { mode: :direct, raise: true, keys: { pallet_btype: seq[:pallet_btype], cartons: tot_cartons, basic_pack_code_id: basic_pack_code_id } } if cartons_per_pallet_id.nil?
+      rec[:missing_mf][:cartons_per_pallet_id] = { mode: :direct, raise: true, keys: { pallet_btype: seq[:pallet_btype], cartons: tot_cartons, basic_pack_code: basic_pack_code } } if cartons_per_pallet_id.nil?
 
       # pallet_format_id: 0, # lookup
       rec[:record] = {
@@ -221,27 +222,29 @@ module EdiApp
       tran_date = time_from_date_val(seq[:tran_date])
 
       puc_id = po_repo.find_puc_id(seq[:farm])
+      puc_code = po_repo.get(:pucs, puc_id, :puc_code)
       rec[:lookup_data][:puc_id] = puc_id
       rec[:missing_mf][:puc_id] = { mode: :direct, raise: true, keys: { farm: seq[:farm] } } if puc_id.nil?
 
       farm_id = po_repo.find_farm_id(puc_id)
       rec[:lookup_data][:farm_id] = farm_id
-      rec[:missing_mf][:farm_id] = { mode: :indirect, raise: true, keys: { puc_id: puc_id } } if farm_id.nil?
+      rec[:missing_mf][:farm_id] = { mode: :indirect, raise: true, keys: { puc_code: puc_code } } if farm_id.nil?
       orchard_id = po_repo.find_orchard_id(farm_id, seq[:orchard])
       rec[:lookup_data][:orchard_id] = orchard_id
-      rec[:missing_mf][:orchard_id] = { mode: :direct, raise: false, keys: { farm_id: farm_id, orchard: seq[:orchard] } } if orchard_id.nil?
+      rec[:missing_mf][:orchard_id] = { mode: :direct, raise: false, keys: { farm: seq[:farm], orchard: seq[:orchard] } } if orchard_id.nil?
       marketing_variety_id = po_repo.find_marketing_variety_id(seq[:variety])
       rec[:lookup_data][:marketing_variety_id] = marketing_variety_id
       rec[:missing_mf][:marketing_variety_id] = { mode: :direct, raise: true, keys: { variety: seq[:variety] } } if marketing_variety_id.nil?
       cultivar_id = po_repo.find_cultivar_id_from_mkv(marketing_variety_id)
+      cultivar_name = po_repo.get(:cultivars, cultivar_id, :cultivar_name)
       rec[:lookup_data][:cultivar_id] = cultivar_id
-      rec[:missing_mf][:cultivar_id] = { mode: :indirect, keys: { marketing_variety_id: marketing_variety_id } } if cultivar_id.nil?
+      rec[:missing_mf][:cultivar_id] = { mode: :indirect, keys: { marketing_variety: seq[:variety] } } if cultivar_id.nil?
       cultivar_group_id = po_repo.find_cultivar_group_id(cultivar_id)
       rec[:lookup_data][:cultivar_group_id] = cultivar_group_id
-      rec[:missing_mf][:cultivar_group_id] = { mode: :indirect, keys: { cultivar_id: cultivar_id } } if cultivar_group_id.nil?
+      rec[:missing_mf][:cultivar_group_id] = { mode: :indirect, keys: { cultivar_name: cultivar_name } } if cultivar_group_id.nil?
       season_id = po_repo.find_season_id(inspec_date || tran_date, cultivar_id)
       rec[:lookup_data][:season_id] = season_id
-      rec[:missing_mf][:season_id] = { mode: :direct, raise: true, keys: { date: inspec_date || tran_date, cultivar_id: cultivar_id } } if season_id.nil?
+      rec[:missing_mf][:season_id] = { mode: :direct, raise: true, keys: { date: inspec_date || tran_date, cultivar_name: cultivar_name } } if season_id.nil?
       marketing_org_party_role_id = MasterfilesApp::PartyRepo.new.find_party_role_from_org_code_for_role(seq[:orgzn], AppConst::ROLE_MARKETER)
       marketing_org_party_role_id = po_repo.find_variant_id(:marketing_party_roles, seq[:orgzn]) if marketing_org_party_role_id.nil?
       rec[:lookup_data][:marketing_org_party_role_id] = marketing_org_party_role_id
