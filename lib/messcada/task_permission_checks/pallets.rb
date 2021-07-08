@@ -140,8 +140,9 @@ module MesscadaApp
       end
 
       def full_build_status_check
-        errors = DB[:pallets].where(id: pallet_ids).where(build_status: 'PARTIAL').select_map(:pallet_number)
-        return failed_response "Pallet: #{errors.join(', ')} incomplete build status." unless errors.empty?
+        # FIXME: temporary switch-off
+        # errors = DB[:pallets].where(id: pallet_ids).where(build_status: 'PARTIAL').select_map(:pallet_number)
+        # return failed_response "Pallet: #{errors.join(', ')} incomplete build status." unless errors.empty?
 
         all_ok
       end
