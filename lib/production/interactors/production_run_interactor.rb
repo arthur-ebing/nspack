@@ -520,8 +520,8 @@ module ProductionApp
       return success_response('ok', instance) if res[:changed_value].nil?
 
       instance[:orchards] = farm_repo.for_select_orchards(where: { farm_id: params[:production_run_farm_id],
-                                                                   puc_id: res[:changed_value] }),
-                            instance[:orchards].unshift(['', ''])
+                                                                   puc_id: res[:changed_value] })
+      instance[:orchards].unshift(['', ''])
 
       cultivar_ids = repo.select_values(:orchards, :cultivar_ids, puc_id: res[:changed_value]).flatten.uniq
       group_ids = repo.select_values(:cultivars, :cultivar_group_id, id: cultivar_ids.to_a).uniq
