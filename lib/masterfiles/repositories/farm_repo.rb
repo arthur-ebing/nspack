@@ -76,41 +76,38 @@ module MasterfilesApp
     end
 
     def find_farm(id)
-      hash = find_with_association(:farms,
-                                   id,
-                                   parent_tables: [{ parent_table: :farm_groups,
-                                                     columns: [:farm_group_code],
-                                                     flatten_columns: { farm_group_code: :farm_group_code } },
-                                                   { parent_table: :production_regions,
-                                                     columns: [:production_region_code],
-                                                     foreign_key: :pdn_region_id,
-                                                     flatten_columns: { production_region_code: :pdn_region_production_region_code } },
-                                                   { parent_table: :locations,
-                                                     columns: [:location_long_code],
-                                                     flatten_columns: { location_long_code: :location_long_code } }],
-                                   lookup_functions: [{ function: :fn_party_role_name,
-                                                        args: [:owner_party_role_id],
-                                                        col_name: :owner_party_role }])
+      hash = find_with_association(
+        :farms, id,
+        parent_tables: [{ parent_table: :farm_groups,
+                          flatten_columns: { farm_group_code: :farm_group_code } },
+                        { parent_table: :production_regions,
+                          foreign_key: :pdn_region_id,
+                          flatten_columns: { production_region_code: :pdn_region_production_region_code } },
+                        { parent_table: :locations,
+                          flatten_columns: { location_long_code: :location_long_code } }],
+        lookup_functions: [{ function: :fn_party_role_name,
+                             args: [:owner_party_role_id],
+                             col_name: :owner_party_role }]
+      )
       return nil if hash.nil?
 
       Farm.new(hash)
     end
 
     def find_orchard(id)
-      hash = find_with_association(:orchards,
-                                   id,
-                                   parent_tables: [{ parent_table: :farms,
-                                                     columns: [:farm_code],
-                                                     flatten_columns: { farm_code: :farm } },
-                                                   { parent_table: :farm_sections,
-                                                     columns: %i[farm_section_name farm_manager_party_role_id],
-                                                     flatten_columns: { farm_section_name: :farm_section_name, farm_manager_party_role_id: :farm_manager_party_role_id } },
-                                                   { parent_table: :pucs,
-                                                     columns: [:puc_code],
-                                                     flatten_columns: { puc_code: :puc_code } }],
-                                   sub_tables: [{ sub_table: :cultivars,
-                                                  id_keys_column: :cultivar_ids,
-                                                  columns: %i[id cultivar_name] }])
+      hash = find_with_association(
+        :orchards, id,
+        parent_tables: [{ parent_table: :farms,
+                          flatten_columns: { farm_code: :farm } },
+                        { parent_table: :farm_sections,
+                          flatten_columns: { farm_section_name: :farm_section_name,
+                                             farm_manager_party_role_id: :farm_manager_party_role_id } },
+                        { parent_table: :pucs,
+                          flatten_columns: { puc_code: :puc_code } }],
+        sub_tables: [{ sub_table: :cultivars,
+                       id_keys_column: :cultivar_ids,
+                       columns: %i[id cultivar_name] }]
+      )
       return nil if hash.nil?
 
       hash[:cultivar_names] = hash[:cultivars].map { |r| r[:cultivar_name] }.sort.join(',')
