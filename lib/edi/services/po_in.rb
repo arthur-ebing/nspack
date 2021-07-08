@@ -101,32 +101,35 @@ module EdiApp
       end
     end
 
-    def check_missing_mf # rubocop:disable Metrics/AbcSize
+    def check_missing_mf
       auto_create = AppConst::EDI_AUTO_CREATE_MF
       errs = []
       records.each do |_, pallet|
-        pallet[:missing_mf].each do |code, rule|
-          errs << "Missing masterfile - #{code}, #{rule[:keys].inspect}" if rule[:raise] || !auto_create
-        end
+        missing_mf = [pallet[:missing_mf]]
+        pallet[:sub_records].each { |rec|  missing_mf << rec[:missing_mf] }
 
-        pallet[:sub_records].each do |rec|
-          rec[:missing_mf].each do |code, rule|
-            errs << "Missing masterfile - #{code}, #{rule[:keys].inspect}" if rule[:raise] || !auto_create
-          end
+        missing_mf.flatten.each do |code, rule|
+          errs << error_message(code, rule) if rule[:raise] || !auto_create
         end
       end
 
-      if errs.empty?
-        ok_response
-      else
-        note = <<~STR
-          Please add the missing masterfiles or create variants for them if applicable.
+      return failed_response_message(errs) unless errs.empty?
 
-          Then go to #{AppConst::URL_BASE.chomp('/')}/edi/viewer/received/errors
-          Select the line for file #{file_name} and click on "re-process this file" to retry this process.
-        STR
-        failed_response('Missing masterfiles', "\n#{errs.uniq.join("\n").gsub('{', '(').gsub('}', ')')}\n\n#{note}")
-      end
+      ok_response
+    end
+
+    def error_message(code, rule)
+      "Missing masterfile - #{code}, #{(rule[:error_comment] || rule[:keys]).inspect}"
+    end
+
+    def failed_response_message(errs)
+      note = <<~STR
+        Please add the missing masterfiles or create variants for them if applicable.
+
+        Then go to #{AppConst::URL_BASE.chomp('/')}/edi/viewer/received/errors
+        Select the line for file #{file_name} and click on "re-process this file" to retry this process.
+      STR
+      failed_response('Missing masterfiles', "\n#{errs.uniq.join("\n").gsub('{', '(').gsub('}', ')')}\n\n#{note}")
     end
 
     def sum_cartons(sequences)
@@ -174,13 +177,29 @@ module EdiApp
       basic_pack_code_id = po_repo.find_basic_pack_id(standard_pack_code_id)
       basic_pack_code = po_repo.get(:basic_pack_codes, basic_pack_code_id, :basic_pack_code)
       rec[:lookup_data][:basic_pack_code_id] = basic_pack_code_id
-      rec[:missing_mf][:basic_pack_code_id] = { mode: :direct, raise: false, keys: { standard_pack_code: seq[:pack] } } if basic_pack_code_id.nil?
+      if basic_pack_code_id.nil?
+        rec[:missing_mf][:basic_pack_code_id] = { mode: :direct,
+                                                  raise: false,
+                                                  keys: { standard_pack_code_id: standard_pack_code_id },
+                                                  error_comment: { standard_pack_code: seq[:pack] } }
+      end
 
       pallet_format_id, cartons_per_pallet_id = po_repo.find_pallet_format_and_cpp_id(seq[:pallet_btype], tot_cartons, basic_pack_code_id)
       rec[:lookup_data][:pallet_format_id] = pallet_format_id
-      rec[:missing_mf][:pallet_format_id] = { mode: :direct, raise: true, keys: { pallet_btype: seq[:pallet_btype], cartons: tot_cartons, basic_pack_code: basic_pack_code } } if pallet_format_id.nil?
+      if pallet_format_id.nil?
+        rec[:missing_mf][:pallet_format_id] = { mode: :direct,
+                                                raise: true,
+                                                keys: { pallet_btype: seq[:pallet_btype], cartons: tot_cartons, basic_pack_code_id: basic_pack_code_id },
+                                                error_comment: { pallet_btype: seq[:pallet_btype], cartons: tot_cartons, basic_pack_code: basic_pack_code } }
+      end
+
       rec[:lookup_data][:cartons_per_pallet_id] = cartons_per_pallet_id
-      rec[:missing_mf][:cartons_per_pallet_id] = { mode: :direct, raise: true, keys: { pallet_btype: seq[:pallet_btype], cartons: tot_cartons, basic_pack_code: basic_pack_code } } if cartons_per_pallet_id.nil?
+      if cartons_per_pallet_id.nil?
+        rec[:missing_mf][:cartons_per_pallet_id] = { mode: :direct,
+                                                     raise: true,
+                                                     keys: { pallet_btype: seq[:pallet_btype], cartons: tot_cartons, basic_pack_code_id: basic_pack_code_id },
+                                                     error_comment: { pallet_btype: seq[:pallet_btype], cartons: tot_cartons, basic_pack_code: basic_pack_code } }
+      end
 
       # pallet_format_id: 0, # lookup
       rec[:record] = {
@@ -228,36 +247,64 @@ module EdiApp
 
       farm_id = po_repo.find_farm_id(puc_id)
       rec[:lookup_data][:farm_id] = farm_id
-      rec[:missing_mf][:farm_id] = { mode: :indirect, raise: true, keys: { puc_code: puc_code } } if farm_id.nil?
+      rec[:missing_mf][:farm_id] = { mode: :indirect, raise: true, keys: { puc_id: puc_id }, error_comment: { puc:  puc_code } } if farm_id.nil?
+
       orchard_id = po_repo.find_orchard_id(farm_id, seq[:orchard])
       rec[:lookup_data][:orchard_id] = orchard_id
-      rec[:missing_mf][:orchard_id] = { mode: :direct, raise: false, keys: { farm: seq[:farm], orchard: seq[:orchard] } } if orchard_id.nil?
+      if orchard_id.nil?
+        rec[:missing_mf][:orchard_id] = { mode: :direct,
+                                          raise: false,
+                                          keys: { farm_id: farm_id, orchard: seq[:orchard] },
+                                          error_comment: { farm: seq[:farm], orchard: seq[:orchard]  } }
+      end
+
       marketing_variety_id = po_repo.find_marketing_variety_id(seq[:variety])
       rec[:lookup_data][:marketing_variety_id] = marketing_variety_id
       rec[:missing_mf][:marketing_variety_id] = { mode: :direct, raise: true, keys: { variety: seq[:variety] } } if marketing_variety_id.nil?
+
       cultivar_id = po_repo.find_cultivar_id_from_mkv(marketing_variety_id)
       cultivar_name = po_repo.get(:cultivars, cultivar_id, :cultivar_name)
       rec[:lookup_data][:cultivar_id] = cultivar_id
-      rec[:missing_mf][:cultivar_id] = { mode: :indirect, keys: { marketing_variety: seq[:variety] } } if cultivar_id.nil?
+      if cultivar_id.nil?
+        rec[:missing_mf][:cultivar_id] = { mode: :indirect,
+                                           keys: { marketing_variety_id: marketing_variety_id },
+                                           error_comment: { marketing_variety: seq[:variety] } }
+      end
+
       cultivar_group_id = po_repo.find_cultivar_group_id(cultivar_id)
       rec[:lookup_data][:cultivar_group_id] = cultivar_group_id
-      rec[:missing_mf][:cultivar_group_id] = { mode: :indirect, keys: { cultivar_name: cultivar_name } } if cultivar_group_id.nil?
+      if cultivar_group_id.nil?
+        rec[:missing_mf][:cultivar_group_id] = { mode: :indirect,
+                                                 keys: { cultivar_id: cultivar_id },
+                                                 error_comment: { cultivar_name: cultivar_name } }
+      end
+
       season_id = po_repo.find_season_id(inspec_date || tran_date, cultivar_id)
       rec[:lookup_data][:season_id] = season_id
-      rec[:missing_mf][:season_id] = { mode: :direct, raise: true, keys: { date: inspec_date || tran_date, cultivar_name: cultivar_name } } if season_id.nil?
+      if season_id.nil?
+        rec[:missing_mf][:season_id] = { mode: :direct,
+                                         raise: true,
+                                         keys: { date: inspec_date || tran_date, cultivar_id: cultivar_id },
+                                         error_comment: { date: inspec_date || tran_date, cultivar_name: cultivar_name } }
+      end
+
       marketing_org_party_role_id = MasterfilesApp::PartyRepo.new.find_party_role_from_org_code_for_role(seq[:orgzn], AppConst::ROLE_MARKETER)
       marketing_org_party_role_id = po_repo.find_variant_id(:marketing_party_roles, seq[:orgzn]) if marketing_org_party_role_id.nil?
       rec[:lookup_data][:marketing_org_party_role_id] = marketing_org_party_role_id
       rec[:missing_mf][:marketing_org_party_role_id] = { mode: :direct, keys: { orgzn: seq[:orgzn], role: AppConst::ROLE_MARKETER } } if marketing_org_party_role_id.nil?
+
       packed_tm_group_id = po_repo.find_packed_tm_group_id(seq[:targ_mkt])
       rec[:lookup_data][:packed_tm_group_id] = packed_tm_group_id
       rec[:missing_mf][:packed_tm_group_id] = { mode: :direct, raise: false, keys: { targ_mkt: seq[:targ_mkt] } } if packed_tm_group_id.nil?
+
       mark_id = po_repo.find_mark_id(seq[:mark])
       rec[:lookup_data][:mark_id] = mark_id
       rec[:missing_mf][:mark_id] = { mode: :direct, raise: false, keys: { mark: seq[:mark] } } if mark_id.nil?
+
       inventory_code_id = po_repo.find_inventory_code_id(seq[:inv_code])
       rec[:lookup_data][:inventory_code_id] = inventory_code_id
       rec[:missing_mf][:inventory_code_id] = { mode: :direct, raise: false, keys: { inv_code: seq[:inv_code] } } if inventory_code_id.nil?
+
       grade_id = po_repo.find_grade_id(seq[:grade])
       rec[:lookup_data][:grade_id] = grade_id
       rec[:missing_mf][:grade_id] = { mode: :direct, keys: { grade: seq[:grade] } } if grade_id.nil?

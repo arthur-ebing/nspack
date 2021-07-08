@@ -86,17 +86,18 @@ module EdiApp
                  puc_id: get_masterfile_or_variant(:pucs, puc_code: palbin[:puc]),
                  rmt_class_id: get_masterfile_id(:rmt_classes, rmt_class_code: palbin[:grade]),
                  rmt_container_type_id: get_masterfile_id(:rmt_container_types, container_type_code: 'BIN'),
-                 rmt_container_material_type_id: get_masterfile_value(:standard_pack_codes, :rmt_container_material_type_id, standard_pack_code: palbin[:pack]),
+                 rmt_container_material_type_id: get_masterfile_value(:standard_pack_codes, :rmt_container_material_type_id,
+                                                                      { standard_pack_code: palbin[:pack] }),
                  bin_fullness: AppConst::BIN_FULL,
                  qty_bins: 1,
                  gross_weight: palbin[:gross_weight],
                  nett_weight: palbin[:nett_weight] }
 
-        hash[:orchard_id] = get_masterfile_id(:orchards,  orchard_code: palbin[:orchard], farm_id: hash[:farm_id], puc_id: hash[:puc_id],
-                                                          search_info: { orchard_code: palbin[:orchard], farm_code: palbin[:farm], puc_code: palbin[:puc] })
+        hash[:orchard_id] = get_masterfile_id(:orchards, { orchard_code: palbin[:orchard], farm_id: hash[:farm_id], puc_id: hash[:puc_id] },
+                                              error_comment: { orchard_code: palbin[:orchard], farm_code: palbin[:farm], puc_code: palbin[:puc] })
         commodity_id = get_masterfile_id(:commodities, code: palbin[:commodity])
-        hash[:cultivar_id] = get_masterfile_id(:cultivars, cultivar_name: palbin[:cultivar], commodity_id: commodity_id,
-                                                           search_info: { cultivar_name: palbin[:cultivar], commodity_code: palbin[:commodity] })
+        hash[:cultivar_id] = get_masterfile_id(:cultivars, { cultivar_name: palbin[:cultivar], commodity_id: commodity_id },
+                                               error_comment: { cultivar_name: palbin[:cultivar], commodity_code: palbin[:commodity] })
         hash[:season_id] = MasterfilesApp::CalendarRepo.new.get_season_id(hash[:cultivar_id], hash[:bin_received_date_time])
         missing_masterfiles << "seasons: cultivar: #{palbin[:cultivar]}, received: #{hash[:bin_received_date_time]}" if hash[:season_id].nil?
 
@@ -112,16 +113,15 @@ module EdiApp
       nil
     end
 
-    def get_masterfile_id(table_name, args, search_info: {})
-      get_masterfile_value(table_name, :id, args, search_info)
+    def get_masterfile_id(table_name, args, error_comment: nil)
+      get_masterfile_value(table_name, :id, args, error_comment)
     end
 
-    def get_masterfile_value(table_name, column, args, search_info: {})
+    def get_masterfile_value(table_name, column, args, error_comment: nil)
       value = repo.get_value(table_name, column, args)
       return value unless value.nil?
 
-      search_info = args if search_info.empty?
-      missing_masterfiles << "#{table_name}.#{column} #{search_info}"
+      missing_masterfiles << "#{table_name}.#{column} #{error_comment || args}"
       nil
     end
   end
