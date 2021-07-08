@@ -211,6 +211,7 @@ module ProductionApp # rubocop:disable Metrics/ModuleLength
   end
 
   ProductionRunChangeSchema = Dry::Schema.Params do
+    required(:reworks_run_type_id).filled(:integer)
     required(:production_run_id).filled(:integer)
   end
 
@@ -227,6 +228,12 @@ module ProductionApp # rubocop:disable Metrics/ModuleLength
     optional(:allow_orchard_mixing).maybe(:bool)
     optional(:allow_cultivar_mixing).maybe(:bool)
     optional(:allow_cultivar_group_mixing).maybe(:bool)
+  end
+
+  ReworksRunChangeRunCultivarSchema = Dry::Schema.Params do
+    required(:reworks_run_type_id).filled(:integer)
+    required(:production_run_id).filled(:integer)
+    required(:cultivar_id).filled(:integer)
   end
 
   DeliveryChangeSchema = Dry::Schema.Params do

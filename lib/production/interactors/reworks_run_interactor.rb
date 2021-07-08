@@ -152,7 +152,7 @@ module ProductionApp
       end
     end
 
-    def validate_change_run_orchard_params(params)
+    def validate_change_run_details_params(params)
       res = validate_production_run_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -170,8 +170,8 @@ module ProductionApp
       OpenStruct.new(success: true, instance:  params)
     end
 
-    def resolve_run_orchard_change(params, production_run_id, orchard_id)
-      run = production_run(production_run_id)
+    def resolve_run_orchard_change(params, orchard_id)
+      run = production_run(params[:production_run_id])
       params = params.merge({ orchard_id: orchard_id,
                               allow_orchard_mixing: run[:allow_orchard_mixing],
                               allow_cultivar_mixing: run[:allow_cultivar_mixing],
@@ -251,6 +251,23 @@ module ProductionApp
 
     def production_run_objects(production_run_id)
       repo.production_run_objects(production_run_id)
+    end
+
+    def update_run_cultivar(params) # rubocop:disable Metrics/AbcSize
+      res = validate_reworks_change_run_cultivar_params(params)
+      return validation_failed_response(res) if res.failure?
+
+      from_cutivar_id = repo.get(:production_runs, res[:production_run_id], :cultivar_id)
+      message = 'INVALID CULTIVAR: Selected cultivar is the same as the cultivar on the run. Please select a different cultivar'
+      return failed_response(message, res.to_h)  if from_cutivar_id == res[:cultivar_id]
+
+      Job::ApplyRunCultivarChanges.enqueue(res.to_h, @user.user_name)
+      success_response('Production run cultivar changes has been enqued.')
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
+      failed_response(e.message)
     end
 
     def validate_change_bin_delivery_params(params)
@@ -2072,6 +2089,10 @@ module ProductionApp
 
     def validate_reworks_change_run_orchard_params(params)
       ReworksRunChangeRunOrchardSchema.call(params)
+    end
+
+    def validate_reworks_change_run_cultivar_params(params)
+      ReworksRunChangeRunCultivarSchema.call(params)
     end
 
     def validate_delivery_params(params)

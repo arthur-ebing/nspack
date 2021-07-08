@@ -100,7 +100,8 @@ INSERT INTO reworks_run_types (run_type, description) VALUES('CHANGE RUN ORCHARD
 INSERT INTO reworks_run_types (run_type, description) VALUES('BATCH PRINT LABELS', 'Batch print labels') ON CONFLICT DO NOTHING;
 INSERT INTO reworks_run_types (run_type, description) VALUES('TIP BINS AGAINST SUGGESTED RUN', 'Tip Bins against a suggested run') ON CONFLICT DO NOTHING;
 INSERT INTO reworks_run_types (run_type, description) VALUES('RESTORE REPACKED PALLET', 'Restore repacked pallet') ON CONFLICT DO NOTHING;
-INSERT INTO reworks_run_types (run_type, description) VALUES('CHANGE BIN DELIVERY', 'Change bin deliveryproduction run orchard') ON CONFLICT DO NOTHING;
+INSERT INTO reworks_run_types (run_type, description) VALUES('CHANGE BIN DELIVERY', 'Change bin delivery') ON CONFLICT DO NOTHING;
+INSERT INTO reworks_run_types (run_type, description) VALUES('CHANGE RUN CULTIVAR', 'Change production run cultivar') ON CONFLICT DO NOTHING;
 
 -- LOCATION TYPES
 INSERT INTO location_types (location_type_code, short_code, hierarchical) VALUES('BIN_ASSET', 'BIN_ASSET', 'f') ON CONFLICT DO NOTHING;

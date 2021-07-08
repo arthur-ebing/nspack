@@ -24,9 +24,9 @@ module UiRules
 
     def set_show_fields # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       reworks_run_type_id_label = @repo.find_hash(:reworks_run_types, @form_object.reworks_run_type_id)[:run_type]
+      @rules[:change_run_details] = [AppConst::RUN_TYPE_CHANGE_RUN_ORCHARD, AppConst::RUN_TYPE_CHANGE_RUN_CULTIVAR].include?(reworks_run_type_id_label)
       if @form_object[:has_children]
-        change_run_orchard = AppConst::RUN_TYPE_CHANGE_RUN_ORCHARD == reworks_run_type_id_label
-        change_run_orchard ? make_compact_header_table(%i[tipped_bins carton_labels pallet_sequences], 3) : make_compact_header_table
+        @rules[:change_run_details] ? make_compact_header_table(%i[tipped_bins carton_labels pallet_sequences], 3) : make_compact_header_table
       end
       scrap_reason_id_label = MasterfilesApp::QualityRepo.new.find_scrap_reason(@form_object.scrap_reason_id)&.scrap_reason
       @rules[:scrap_pallet] = AppConst::RUN_TYPE_SCRAP_PALLET == reworks_run_type_id_label
@@ -236,8 +236,8 @@ module UiRules
     def make_compact_details(reworks_run_type_id, affected_ids)
       affected_ids = affected_ids.split("\n").map(&:strip).reject(&:empty?)
       reworks_run_type = @repo.find_hash(:reworks_run_types, reworks_run_type_id)[:run_type]
-      change_run_orchard = AppConst::RUN_TYPE_CHANGE_RUN_ORCHARD == reworks_run_type
-      change_run_orchard ? production_run_compact_details(affected_ids) : delivery_compact_details(affected_ids)
+      change_run_details = [AppConst::RUN_TYPE_CHANGE_RUN_ORCHARD, AppConst::RUN_TYPE_CHANGE_RUN_CULTIVAR].include?(reworks_run_type)
+      change_run_details ? production_run_compact_details(affected_ids) : delivery_compact_details(affected_ids)
     end
 
     def delivery_compact_details(affected_delivery_ids)

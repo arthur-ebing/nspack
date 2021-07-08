@@ -3,9 +3,9 @@
 module Production
   module Reworks
     module ReworksRun
-      class ChangeRunOrchard
+      class ChangeRunDetails
         def self.call(reworks_run_type_id, form_values: nil, form_errors: nil, remote: true)
-          ui_rule = UiRules::Compiler.new(:change_run_orchard, :new, form_values: form_values, reworks_run_type_id: reworks_run_type_id)
+          ui_rule = UiRules::Compiler.new(:change_run_details, :new, form_values: form_values, reworks_run_type_id: reworks_run_type_id)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
@@ -13,8 +13,8 @@ module Production
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.caption 'Change Run Orchard'
-              form.action '/production/reworks/change_run_orchard'
+              form.caption 'Change Run Details'
+              form.action '/production/reworks/change_run_details'
               form.submit_captions 'Next'
               form.remote! if remote
               form.row do |row|
