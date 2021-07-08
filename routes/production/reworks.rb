@@ -189,36 +189,58 @@ class Nspack < Roda
       end
     end
 
-    r.on 'change_run_orchard' do
-      reworks_run_type_id = ProductionApp::ReworksRepo.new.get_reworks_run_type_id(AppConst::RUN_TYPE_CHANGE_RUN_ORCHARD)
+    r.on 'change_run_details' do
+      r.on 'display_run_details_page'  do
+        change_run_details = retrieve_from_local_store(:change_run_details)
+        reworks_run_type = ProductionApp::ReworksRepo.new.find_reworks_run_type(change_run_details[:reworks_run_type_id])[:run_type]
+        if reworks_run_type == AppConst::RUN_TYPE_CHANGE_RUN_ORCHARD
+          show_partial_or_page(r) do
+            Production::Reworks::ReworksRun::ChangeRunOrchardDetails.call(change_run_details[:reworks_run_type_id],
+                                                                          change_run_details,
+                                                                          form_values: change_run_details)
+          end
+        elsif reworks_run_type == AppConst::RUN_TYPE_CHANGE_RUN_CULTIVAR
+          show_partial_or_page(r) do
+            Production::Reworks::ReworksRun::ChangeRunCultivarDetails.call(change_run_details[:reworks_run_type_id],
+                                                                           change_run_details,
+                                                                           form_values: change_run_details)
+          end
+        end
+      end
+
       r.is do
         r.get do
-          show_partial_or_page(r) { Production::Reworks::ReworksRun::ChangeRunOrchard.call(reworks_run_type_id, remote: fetch?(r)) }
+          show_partial_or_page(r) { Production::Reworks::ReworksRun::ChangeRunDetails.call(remote: fetch?(r)) }
         end
 
         r.post do
-          store_locally(:change_run_orchard_changes, params[:change_run_orchard])
-          res = interactor.validate_change_run_orchard_params(params[:change_run_orchard])
+          res = interactor.validate_change_run_details_params(params[:change_run_details])
           if res.success
-            show_partial_or_page(r) do
-              Production::Reworks::ReworksRun::ChangeRunOrchardDetails.call(reworks_run_type_id,
-                                                                            params[:change_run_orchard],
-                                                                            form_values: params[:change_run_orchard])
-            end
+            store_locally(:change_run_details, res.instance)
+            r.redirect '/production/reworks/change_run_details/display_run_details_page'
           else
-            re_show_form(r, res, url: '/production/reworks/change_run_orchard') do
-              Production::Reworks::ReworksRun::ChangeRunOrchard.call(reworks_run_type_id,
-                                                                     form_values: params[:change_run_orchard],
+            re_show_form(r, res, url: '/production/reworks/change_run_details') do
+              Production::Reworks::ReworksRun::ChangeRunDetails.call(params[:change_run_details][:reworks_run_type_id],
+                                                                     form_values: params[:change_run_details],
                                                                      form_errors: res.errors,
                                                                      remote: fetch?(r))
             end
           end
         end
       end
+    end
+
+    r.on 'change_run_orchard' do
+      reworks_run_type_id = ProductionApp::ReworksRepo.new.get_reworks_run_type_id(AppConst::RUN_TYPE_CHANGE_RUN_ORCHARD)
+      r.is do
+        r.get do
+          show_partial_or_page(r) { Production::Reworks::ReworksRun::ChangeRunDetails.call(reworks_run_type_id, remote: fetch?(r)) }
+        end
+      end
 
       r.on 'orchard_changed' do
-        change_run_orchard_params = retrieve_from_local_store(:change_run_orchard_changes)
-        res = interactor.resolve_run_orchard_change(change_run_orchard_params, params[:change_run_orchard_production_run_id], params[:changed_value])
+        change_run_orchard_params = { reworks_run_type_id: reworks_run_type_id, production_run_id: params[:change_run_orchard_production_run_id] }
+        res = interactor.resolve_run_orchard_change(change_run_orchard_params, params[:changed_value])
         store_locally(:change_run_orchard_changes, res.instance)
         json_actions([OpenStruct.new(type: :replace_input_value,
                                      dom_id: 'change_run_orchard_from_orchard_id',
@@ -272,7 +294,6 @@ class Nspack < Roda
 
       r.on 'submit_change_run_orchard' do
         params = retrieve_from_local_store(:change_run_orchard_changes)
-        store_locally(:change_run_orchard_changes, params)
         res = interactor.change_run_orchard(params)
         if res.success
           flash[:notice] = res.message
@@ -288,6 +309,34 @@ class Nspack < Roda
                                                                           params,
                                                                           form_values: res.instance,
                                                                           form_errors: res.errors)
+          end
+        end
+      end
+    end
+
+    r.on 'change_run_cultivar' do
+      reworks_run_type_id = ProductionApp::ReworksRepo.new.get_reworks_run_type_id(AppConst::RUN_TYPE_CHANGE_RUN_CULTIVAR)
+      r.is do
+        r.get do
+          show_partial_or_page(r) { Production::Reworks::ReworksRun::ChangeRunDetails.call(reworks_run_type_id, remote: fetch?(r)) }
+        end
+
+        r.patch do
+          res = interactor.update_run_cultivar(params[:change_run_details])
+          if res.success
+            flash[:notice] = res.message
+            if fetch?(r)
+              redirect_via_json(retrieve_from_local_store(:list_url))
+            else
+              r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
+            end
+          else
+            re_show_form(r, res, url: '/production/reworks/change_run_cultivar') do
+              Production::Reworks::ReworksRun::ChangeRunCultivarDetails.call(reworks_run_type_id,
+                                                                             res.instance,
+                                                                             form_values: res.instance,
+                                                                             form_errors: res.errors)
+            end
           end
         end
       end
@@ -391,11 +440,12 @@ class Nspack < Roda
           r.get do
             store_locally(:list_url, back_button_url)
             check_auth!('reworks', 'new')
-            if ProductionApp::ReworksRepo.new.find_reworks_run_type(id)[:run_type] == AppConst::RUN_TYPE_CHANGE_DELIVERIES_ORCHARDS
+            reworks_run_type = ProductionApp::ReworksRepo.new.find_reworks_run_type(id)[:run_type]
+            if reworks_run_type == AppConst::RUN_TYPE_CHANGE_DELIVERIES_ORCHARDS
               show_partial_or_page(r) { Production::Reworks::ChangeDeliveriesOrchard::SelectOrchards.call(remote: fetch?(r)) }
-            elsif ProductionApp::ReworksRepo.new.find_reworks_run_type(id)[:run_type] == AppConst::RUN_TYPE_CHANGE_RUN_ORCHARD
-              show_partial_or_page(r) { Production::Reworks::ReworksRun::ChangeRunOrchard.call(id, remote: fetch?(r)) }
-            elsif ProductionApp::ReworksRepo.new.find_reworks_run_type(id)[:run_type] == AppConst::RUN_TYPE_CHANGE_BIN_DELIVERY
+            elsif [AppConst::RUN_TYPE_CHANGE_RUN_ORCHARD, AppConst::RUN_TYPE_CHANGE_RUN_CULTIVAR].include?(reworks_run_type)
+              show_partial_or_page(r) { Production::Reworks::ReworksRun::ChangeRunDetails.call(id, remote: fetch?(r)) }
+            elsif reworks_run_type == AppConst::RUN_TYPE_CHANGE_BIN_DELIVERY
               show_partial_or_page(r) { Production::Reworks::ReworksRun::ChangeBinDelivery.call(id, remote: fetch?(r)) }
             else
               show_partial_or_page(r) { Production::Reworks::ReworksRun::New.call(id, remote: fetch?(r)) }
