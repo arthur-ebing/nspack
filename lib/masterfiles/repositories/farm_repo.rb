@@ -312,12 +312,8 @@ module MasterfilesApp
       hash = DB[query, id].first
       return nil if hash.nil?
 
-      hash[:orchard_ids] = orchard_ids(hash[:id])
+      hash[:orchard_ids] = select_values(:orchards, :id, farm_section_id: hash[:id])
       FarmSection.new(hash)
-    end
-
-    def orchard_ids(id)
-      DB[:orchards].where(farm_section_id: id).select_map(:id)
     end
 
     def update_farm_section(id, params)
