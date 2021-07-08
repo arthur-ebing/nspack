@@ -75,7 +75,7 @@ module EdiApp
       @parsed_bins = []
       @edi_records.each do |params|
         res = EdiPalbinInSchema.call(params)
-        raise Crossbeams::InfoError, "Validation error: #{res.messages}" if res.failure?
+        raise Crossbeams::InfoError, "Validation error: #{validation_failed_response(res).errors}" if res.failure?
 
         palbin = res.to_h
         match_data << palbin[:sscc]
