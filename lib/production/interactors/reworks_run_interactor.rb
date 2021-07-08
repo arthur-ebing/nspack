@@ -1498,7 +1498,7 @@ module ProductionApp
     end
 
     def puc_orchards(farm_id, puc_id)
-      farm_repo.selected_farm_orchard_codes(farm_id, puc_id)
+      farm_repo.for_select_orchards(where: { farm_id: farm_id, puc_id: puc_id })
     end
 
     def orchard_cultivars(cultivar_group_id, orchard_id)

@@ -205,7 +205,7 @@ module UiRules
 
         orchard_renderer = {
           renderer: :select,
-          options: @farm_repo.selected_farm_orchard_codes(@form_object.farm_id, @form_object.puc_id),
+          options: @farm_repo.for_select_orchards(where: { farm_id: @form_object.farm_id, puc_id: @form_object.puc_id }),
           disabled_options: @farm_repo.for_select_inactive_orchards,
           prompt: true,
           caption: 'Orchard'
