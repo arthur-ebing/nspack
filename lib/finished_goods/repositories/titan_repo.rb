@@ -94,6 +94,7 @@ module FinishedGoodsApp
       hash[:inspection_message_id] = ds.exclude(inspection_message_id: nil).get(:inspection_message_id)
       result_doc = ds.where(request_type: 'Results').get(:result_doc) || {}
       hash[:upn] = result_doc['upn']
+      hash[:titan_inspector] = result_doc['inspector']
       hash[:pallets] = []
       consignment_lines = result_doc['consignmentLines'] || []
       consignment_lines.each do |line|

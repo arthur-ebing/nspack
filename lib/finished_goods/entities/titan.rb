@@ -23,6 +23,7 @@ module FinishedGoodsApp
     attribute :request_type, Types::String
     attribute :success, Types::String
     attribute :upn, Types::String
+    attribute :titan_inspector, Types::String
     attribute :pallets, Types::Array
     attribute :reinspection, Types::Bool
     attribute :validated, Types::Bool

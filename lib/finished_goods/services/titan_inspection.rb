@@ -81,7 +81,7 @@ module FinishedGoodsApp
     def update_govt_inspection
       results = FinishedGoodsApp::TitanRepo.new.find_titan_inspection(govt_inspection_sheet_id)
 
-      repo.update_govt_inspection_sheet(govt_inspection_sheet_id, upn: results.upn)
+      repo.update_govt_inspection_sheet(govt_inspection_sheet_id, upn: results.upn, titan_inspector: results.titan_inspector)
       repo.log_status(:govt_inspection_sheets, govt_inspection_sheet_id, 'TITAN_RESULTS_RECEIVED', user_name: @user.user_name)
 
       update_govt_inspection_pallets(results)

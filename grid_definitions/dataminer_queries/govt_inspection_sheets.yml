@@ -4,11 +4,11 @@
   govt_inspection_sheets.id) AS status,\r\n       fn_party_role_name(exporter_party_role_id)
   \                              AS exporter,\r\n       fn_party_role_name(inspector_party_role_id)
   \                             AS inspector,\r\n       inspectors.inspector_code,\r\n
-  \      fn_party_role_name(inspection_billing_party_role_id)                     AS
-  inspection_billing,\r\n       govt_inspection_sheets.consignment_note_number,\r\n       booking_reference,\r\n
-  \      inspection_point,\r\n       destination_region_name AS destination_region,\r\n
-  \      results_captured,\r\n       results_captured_at,\r\n       api_results_received,\r\n
-  \      completed,\r\n       completed_at,\r\n       govt_inspection_sheets.inspected,\r\n
+  \      titan_inspector,\r\n       fn_party_role_name(inspection_billing_party_role_id)
+  \                    AS inspection_billing,\r\n       govt_inspection_sheets.consignment_note_number,\r\n
+  \      booking_reference,\r\n       inspection_point,\r\n       destination_region_name
+  AS destination_region,\r\n       results_captured,\r\n       results_captured_at,\r\n
+  \      api_results_received,\r\n       completed,\r\n       completed_at,\r\n       govt_inspection_sheets.inspected,\r\n
   \      reinspection,\r\n       awaiting_inspection_results,\r\n       cancelled_id,\r\n
   \      cancelled,\r\n       cancelled_at,\r\n\r\n       govt_inspection_sheets.tripsheet_created,\r\n
   \      govt_inspection_sheets.tripsheet_loaded,\r\n       govt_inspection_sheets.tripsheet_loaded_at,\r\n
@@ -118,9 +118,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  titan_inspector:
+    :name: titan_inspector
+    :sequence_no: 6
+    :caption: Titan inspector
+    :namespaced_name: titan_inspector
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   inspection_billing:
     :name: inspection_billing
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Inspection billing
     :namespaced_name: 
     :data_type: :string
@@ -136,9 +152,9 @@
     :group_max: false
   consignment_note_number:
     :name: consignment_note_number
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Consignment note number
-    :namespaced_name: 
+    :namespaced_name: govt_inspection_sheets.consignment_note_number
     :data_type: :string
     :width: 180
     :format: 
@@ -152,7 +168,7 @@
     :group_max: false
   booking_reference:
     :name: booking_reference
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Booking reference
     :namespaced_name: booking_reference
     :data_type: :string
@@ -168,7 +184,7 @@
     :group_max: false
   inspection_point:
     :name: inspection_point
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Inspection point
     :namespaced_name: inspection_point
     :data_type: :string
@@ -184,7 +200,7 @@
     :group_max: false
   destination_region:
     :name: destination_region
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Destination region
     :namespaced_name: destination_region_name
     :data_type: :string
@@ -200,7 +216,7 @@
     :group_max: false
   results_captured:
     :name: results_captured
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Results captured
     :namespaced_name: results_captured
     :data_type: :boolean
@@ -216,7 +232,7 @@
     :group_max: false
   results_captured_at:
     :name: results_captured_at
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Results captured at
     :namespaced_name: results_captured_at
     :data_type: :datetime
@@ -232,7 +248,7 @@
     :group_max: false
   api_results_received:
     :name: api_results_received
-    :sequence_no: 13
+    :sequence_no: 14
     :caption: Api results
     :namespaced_name: api_results_received
     :data_type: :boolean
@@ -248,7 +264,7 @@
     :group_max: false
   completed:
     :name: completed
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: Completed
     :namespaced_name: completed
     :data_type: :boolean
@@ -264,7 +280,7 @@
     :group_max: false
   completed_at:
     :name: completed_at
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Completed at
     :namespaced_name: completed_at
     :data_type: :datetime
@@ -280,7 +296,7 @@
     :group_max: false
   inspected:
     :name: inspected
-    :sequence_no: 16
+    :sequence_no: 17
     :caption: Inspected
     :namespaced_name: govt_inspection_sheets.inspected
     :data_type: :boolean
@@ -296,7 +312,7 @@
     :group_max: false
   reinspection:
     :name: reinspection
-    :sequence_no: 17
+    :sequence_no: 18
     :caption: Reinspection
     :namespaced_name: reinspection
     :data_type: :boolean
@@ -312,7 +328,7 @@
     :group_max: false
   awaiting_inspection_results:
     :name: awaiting_inspection_results
-    :sequence_no: 18
+    :sequence_no: 19
     :caption: Awaiting inspection results
     :namespaced_name: awaiting_inspection_results
     :data_type: :boolean
@@ -328,7 +344,7 @@
     :group_max: false
   cancelled_id:
     :name: cancelled_id
-    :sequence_no: 19
+    :sequence_no: 20
     :caption: Cancelled Id
     :namespaced_name: cancelled_id
     :data_type: :integer
@@ -344,7 +360,7 @@
     :group_max: false
   cancelled:
     :name: cancelled
-    :sequence_no: 20
+    :sequence_no: 21
     :caption: Cancelled
     :namespaced_name: cancelled
     :data_type: :boolean
@@ -360,7 +376,7 @@
     :group_max: false
   cancelled_at:
     :name: cancelled_at
-    :sequence_no: 21
+    :sequence_no: 22
     :caption: Cancelled at
     :namespaced_name: cancelled_at
     :data_type: :datetime
@@ -376,7 +392,7 @@
     :group_max: false
   tripsheet_created:
     :name: tripsheet_created
-    :sequence_no: 22
+    :sequence_no: 23
     :caption: Tripsheet created
     :namespaced_name: govt_inspection_sheets.tripsheet_created
     :data_type: :boolean
@@ -392,7 +408,7 @@
     :group_max: false
   tripsheet_loaded:
     :name: tripsheet_loaded
-    :sequence_no: 23
+    :sequence_no: 24
     :caption: Tripsheet loaded
     :namespaced_name: govt_inspection_sheets.tripsheet_loaded
     :data_type: :boolean
@@ -408,7 +424,7 @@
     :group_max: false
   tripsheet_loaded_at:
     :name: tripsheet_loaded_at
-    :sequence_no: 24
+    :sequence_no: 25
     :caption: Tripsheet loaded at
     :namespaced_name: govt_inspection_sheets.tripsheet_loaded_at
     :data_type: :datetime
@@ -424,7 +440,7 @@
     :group_max: false
   tripsheet_offloaded:
     :name: tripsheet_offloaded
-    :sequence_no: 25
+    :sequence_no: 26
     :caption: Tripsheet offloaded
     :namespaced_name: govt_inspection_sheets.tripsheet_offloaded
     :data_type: :boolean
@@ -440,7 +456,7 @@
     :group_max: false
   tripsheet_offloaded_at:
     :name: tripsheet_offloaded_at
-    :sequence_no: 26
+    :sequence_no: 27
     :caption: Tripsheet offloaded at
     :namespaced_name: govt_inspection_sheets.tripsheet_offloaded_at
     :data_type: :datetime
@@ -456,7 +472,7 @@
     :group_max: false
   upn:
     :name: upn
-    :sequence_no: 27
+    :sequence_no: 28
     :caption: UPN
     :namespaced_name: govt_inspection_sheets.upn
     :data_type: :string
@@ -472,7 +488,7 @@
     :group_max: false
   created_by:
     :name: created_by
-    :sequence_no: 28
+    :sequence_no: 29
     :caption: Created by
     :namespaced_name: created_by
     :data_type: :string
@@ -488,7 +504,7 @@
     :group_max: false
   pallet_numbers:
     :name: pallet_numbers
-    :sequence_no: 29
+    :sequence_no: 30
     :caption: Pallet Numbers
     :namespaced_name: 
     :data_type: :string
@@ -504,7 +520,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 30
+    :sequence_no: 31
     :caption: Active
     :namespaced_name: govt_inspection_sheets.active
     :data_type: :boolean
@@ -520,7 +536,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 31
+    :sequence_no: 32
     :caption: Created at
     :namespaced_name: govt_inspection_sheets.created_at
     :data_type: :datetime
@@ -536,7 +552,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 32
+    :sequence_no: 33
     :caption: Updated at
     :namespaced_name: govt_inspection_sheets.updated_at
     :data_type: :datetime
@@ -552,7 +568,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 33
+    :sequence_no: 34
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
