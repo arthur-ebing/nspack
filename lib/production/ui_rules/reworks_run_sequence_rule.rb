@@ -150,7 +150,7 @@ module UiRules
                                             caption: 'Std Size Count',
                                             prompt: 'Select Size Count',
                                             searchable: true,
-                                            invisible: !requires_standard_counts,
+                                            hide_on_load: !requires_standard_counts,
                                             remove_search_for_small_list: false }
       fields[:basic_pack_code_id] =  { renderer: :select,
                                        options: @fruit_size_repo.for_select_basic_packs,
@@ -171,7 +171,7 @@ module UiRules
                                           remove_search_for_small_list: false }
       fields[:actual_count] =  { readonly: true,
                                  caption: 'Actual Count',
-                                 invisible: !requires_standard_counts }
+                                 hide_on_load: !requires_standard_counts }
       fields[:fruit_size_reference_id] =  { renderer: :select,
                                             options: @fruit_size_repo.for_select_fruit_size_references,
                                             disabled_options: @fruit_size_repo.for_select_inactive_fruit_size_references,
@@ -245,7 +245,7 @@ module UiRules
                                prompt: 'Select PKG Mark',
                                searchable: true,
                                remove_search_for_small_list: false,
-                               invisible: !@rules[:require_packaging_bom] }
+                               hide_on_load: !@rules[:require_packaging_bom] }
       fields[:product_chars] =  {}
       fields[:inventory_code_id] =  { renderer: :select,
                                       options: @fruit_repo.for_select_inventory_codes,
