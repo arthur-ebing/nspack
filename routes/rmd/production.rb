@@ -353,7 +353,7 @@ class Nspack < Roda
           if interactor.carton_label_pallet_exists?(carton_number)
             store_locally(:errors, errors: val_res.errors, error_message: "Pallet already created from this carton: #{carton_number}")
 
-            pallet_number = messcada_repo.carton_label_pallet_number(carton_number)
+            pallet_number = MesscadaApp::MesscadaRepo.new.carton_label_pallet_number(carton_number)
             pallet_sequence_id = interactor.find_pallet_sequence_by_pallet_number_and_pallet_sequence_number(pallet_number, 1)
             r.redirect("/rmd/production/palletizing/print_or_edit_pallet_view/#{pallet_sequence_id}")
           else
