@@ -1194,6 +1194,13 @@ class Nspack < Roda
         redirect_via_json "/production/reworks/reworks_run_types/#{reworks_run_type_id}/pallets/#{res.instance[:pallet_number]}/edit_pallet"
       end
 
+      r.on 'scrap_sequence' do
+        check_auth!('reworks', 'delete')
+        res = interactor.scrap_pallet_sequence(id, reworks_run_type_id)
+        flash[:notice] = res.message
+        redirect_via_json "/production/reworks/reworks_run_types/#{reworks_run_type_id}/pallets/#{res.instance[:pallet_number]}/edit_pallet"
+      end
+
       r.on 'edit_carton_quantities' do
         res = interactor.edit_carton_quantities(id, reworks_run_type_id, params)
         if res.success

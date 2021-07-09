@@ -837,7 +837,8 @@ module ProductionApp
     end
 
     def remove_pallet_sequence(sequence_id, reworks_run_type_id) # rubocop:disable Metrics/AbcSize
-      before_attrs = remove_sequence_changes(sequence_id)
+      arr = %i[pallet_number pallet_id removed_from_pallet removed_from_pallet_at removed_from_pallet_id carton_quantity exit_ref]
+      before_attrs = pallet_sequence(sequence_id).to_h.slice(*arr)
       return failed_response('Sequence cannot be removed', pallet_number: before_attrs[:pallet_number]) if cannot_remove_sequence(before_attrs[:pallet_id])
 
       repo.transaction do
@@ -845,7 +846,7 @@ module ProductionApp
         repo.remove_pallet_sequence(sequence_id)
         rw_res = create_reworks_run_record(reworks_run_attrs,
                                            AppConst::REWORKS_ACTION_REMOVE,
-                                           before: before_attrs.sort.to_h, after: remove_sequence_changes(sequence_id).sort.to_h)
+                                           before: before_attrs.sort.to_h, after: pallet_sequence(sequence_id).to_h.slice(*arr).sort.to_h)
         return failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
 
         log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id], before_attrs[:pallet_id], sequence_id, AppConst::REWORKS_ACTION_REMOVE)
@@ -855,15 +856,26 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def remove_sequence_changes(sequence_id)
-      instance = pallet_sequence(sequence_id)
-      { removed_from_pallet: instance[:removed_from_pallet],
-        removed_from_pallet_at: instance[:removed_from_pallet_at],
-        removed_from_pallet_id: instance[:removed_from_pallet_id],
-        pallet_id: instance[:pallet_id],
-        carton_quantity: instance[:carton_quantity],
-        exit_ref: instance[:exit_ref],
-        pallet_number: instance[:pallet_number] }
+    def scrap_pallet_sequence(sequence_id, reworks_run_type_id) # rubocop:disable Metrics/AbcSize
+      arr = %i[pallet_number pallet_id removed_from_pallet removed_from_pallet_at removed_from_pallet_id carton_quantity exit_ref]
+      before_attrs = pallet_sequence(sequence_id).to_h.slice(*arr)
+      return failed_response('Sequence cannot be scrapped', pallet_number: before_attrs[:pallet_number]) unless allow_sequence_scrapping?(sequence_id)
+
+      carton_id = repo.get_value(:cartons, :id, pallet_sequence_id: sequence_id)
+      repo.transaction do
+        reworks_run_attrs = reworks_run_attrs(sequence_id, reworks_run_type_id)
+        repo.scrap_carton(carton_id)
+        repo.remove_pallet_sequence(sequence_id)
+        rw_res = create_reworks_run_record(reworks_run_attrs,
+                                           AppConst::REWORKS_ACTION_REMOVE,
+                                           before: before_attrs.sort.to_h, after: pallet_sequence(sequence_id).to_h.slice(*arr).sort.to_h)
+        return failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
+
+        log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id], before_attrs[:pallet_id], sequence_id, AppConst::REWORKS_ACTION_REMOVE)
+      end
+      success_response('Pallet Sequence scrapped successfully', pallet_number: before_attrs.to_h[:pallet_number])
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def edit_carton_quantities(sequence_id, reworks_run_type_id, params) # rubocop:disable Metrics/AbcSize
@@ -1436,14 +1448,15 @@ module ProductionApp
     end
 
     def scrap_carton(carton_id, reworks_run_type_id) # rubocop:disable Metrics/AbcSize
-      before_attrs = scrap_carton_changes(carton_id)
-      return failed_response('Carton cannot be scrapped', pallet_sequence_id: before_attrs[:pallet_sequence_id]) if cannot_scrap_carton(before_attrs[:pallet_sequence_id])
+      arr = %i[scrapped scrapped_at scrapped_reason pallet_sequence_id scrapped_sequence_id pallet_id pallet_number]
+      before_attrs = carton_scrap_attributes(carton_id).to_h.slice(*arr)
+      return failed_response('Carton cannot be scrapped. Scrap the pallet sequence instead', pallet_sequence_id: before_attrs[:pallet_sequence_id]) if cannot_scrap_carton(before_attrs[:pallet_sequence_id])
 
       repo.transaction do
         original_pallet_sequence_id = before_attrs[:pallet_sequence_id]
         repo.scrap_carton(carton_id)
         prod_repo.decrement_sequence(original_pallet_sequence_id) unless original_pallet_sequence_id.nil?
-        after_attrs = scrap_carton_changes(carton_id)
+        after_attrs = carton_scrap_attributes(carton_id).to_h.slice(*arr)
         reworks_run_attrs = { user: @user.user_name,
                               reworks_run_type_id: reworks_run_type_id,
                               pallets_selected: "{ #{before_attrs[:pallet_number]} }",
@@ -1458,17 +1471,6 @@ module ProductionApp
       success_response('Carton scrapped successfully', pallet_sequence_id: before_attrs.to_h[:pallet_sequence_id])
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
-    end
-
-    def scrap_carton_changes(carton_id)
-      instance = carton_scrap_attributes(carton_id)
-      { scrapped: instance[:scrapped],
-        scrapped_at: instance[:scrapped_at],
-        scrapped_reason: instance[:scrapped_reason],
-        pallet_sequence_id: instance[:pallet_sequence_id],
-        scrapped_sequence_id: instance[:scrapped_sequence_id],
-        pallet_id: instance[:pallet_id],
-        pallet_number: instance[:pallet_number] }
     end
 
     def restore_repacked_pallets(attrs) # rubocop:disable Metrics/AbcSize
@@ -1795,6 +1797,14 @@ module ProductionApp
 
     def cannot_remove_sequence(pallet_id)
       repo.unscrapped_sequences_count(pallet_id).<= 1
+    end
+
+    def allow_sequence_scrapping?(pallet_sequence_id)
+      pallet_id = repo.get(:pallet_sequences, pallet_sequence_id, :pallet_id)
+      allow = repo.individual_cartons?(pallet_sequence_id)
+      allow = false unless repo.pallet_sequence_carton_quantity(pallet_sequence_id) == 1
+      allow = false if cannot_remove_sequence(pallet_id)
+      allow
     end
 
     def cannot_scrap_carton(pallet_sequence_id)

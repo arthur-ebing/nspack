@@ -43,6 +43,12 @@
   :icon: list
   :title: Cartons for Pallet No $:pallet_number$ Sequence $:pallet_sequence_number$
   :hide_if_false: has_individual_cartons
+- :url: "/production/reworks/pallet_sequences/$:id$/scrap_sequence"
+  :text: Scrap
+  :icon: delete
+  :is_delete: true
+  :popup: true
+  :hide_if_false: has_individual_cartons
 :captions:
   :conditions:
     :active: Active Pallet Sequences
