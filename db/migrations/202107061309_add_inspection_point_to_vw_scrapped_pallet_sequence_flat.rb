@@ -250,7 +250,9 @@ CREATE OR REPLACE VIEW public.vw_scrapped_pallet_sequence_flat
 
   down do
     run <<~SQL
-CREATE OR REPLACE VIEW public.vw_scrapped_pallet_sequence_flat
+      DROP VIEW public.vw_scrapped_pallet_sequence_flat;
+
+CREATE VIEW public.vw_scrapped_pallet_sequence_flat
  AS
  SELECT ps.id,
     ps.scrapped_from_pallet_id AS pallet_id,
