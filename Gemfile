@@ -31,6 +31,8 @@ gem 'tilt'
 # gem 'tiny_tds' -- Required if dataminer has to run MSSqlServer reports.
 gem 'yard'
 
+gem 'rack-mini-profiler'
+
 gem 'crossbeams-dataminer', git: 'https://github.com/NoSoft-SA/crossbeams-dataminer.git'
 gem 'crossbeams-label_designer', git: 'https://github.com/NoSoft-SA/crossbeams-label_designer.git'
 gem 'crossbeams-layout', git: 'https://github.com/NoSoft-SA/crossbeams-layout.git'

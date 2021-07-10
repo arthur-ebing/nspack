@@ -159,6 +159,8 @@ class Nspack < Roda
       @user_has_rmd_menu_items = @registered_mobile_device || does_user_have_rmd_menu_items?
     end
 
+    Rack::MiniProfiler.authorize_request if AppConst.development? # || current_user.i_want_to_profile
+
     r.root do
       # TODO: Config this, and maybe set it up per user.
       if @registered_mobile_device && !@hybrid_device
