@@ -35,7 +35,7 @@ end
 
 use Rack::MiniProfiler
 Rack::MiniProfiler.config.position = 'bottom-left'
-Rack::MiniProfiler.config.skip_paths = [/debug/, /messcada/]
+Rack::MiniProfiler.config.skip_paths = [/debug/, /messcada/, /terminus/]
 Rack::MiniProfiler.config.authorization_mode = :allow_authorized
 
 run Nspack
