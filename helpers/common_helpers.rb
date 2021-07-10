@@ -20,6 +20,20 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     show_page_in_layout('layout_rmd', &block)
   end
 
+  # Display the last lines of a log file in the browser
+  # @param name [string] - the title for the log file
+  # @param file [string] - the file path
+  # @param lines [integer] - the number of lines to show
+  def view_log_file(name, file, lines)
+    view(inline: <<~HTML)
+      <h1>#{name}</h1>
+      <p>Showing last #{lines} lines<br>(add <em>?lines=nn</em> to the URL to change no of lines shown)<p>
+      <pre>
+      #{`tail -n#{lines} #{file}`}
+      </pre>
+    HTML
+  end
+
   # Render a block of Crossbeams::Layout DSL as string.
   #
   # @return [String] HTML layout and content string.
