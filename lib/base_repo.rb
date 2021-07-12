@@ -528,6 +528,14 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
     DB[Sequel[:audit][:status_logs]].multi_insert(items)
   end
 
+  # Convert all empty string values in a hash to nil
+  #
+  # @param hash [hash] - the hash to transform
+  # @return [Hash] the transformed hash
+  def convert_empty_values(hash)
+    hash.transform_values { |v| v == '' ? nil : v }
+  end
+
   # Update a row with the next document sequence number.
   #
   # Gets DocumentSequence to return the update SQL to run.
