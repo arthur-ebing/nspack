@@ -130,6 +130,8 @@ module MasterfilesApp
       link_ids = DB[:marketing_varieties_for_cultivars].select_map(:marketing_variety_id)
       marketing_variety_ids = DB[:marketing_varieties].select_map(:id)
       orphan_ids = marketing_variety_ids - link_ids
+      DB[:customer_variety_varieties].where(marketing_variety_id: orphan_ids).delete
+      DB[:customer_varieties].where(variety_as_customer_variety_id: orphan_ids).delete
       DB[:marketing_varieties].where(id: orphan_ids).delete
     end
 
