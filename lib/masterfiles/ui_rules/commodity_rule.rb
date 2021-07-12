@@ -16,9 +16,9 @@ module UiRules
     def set_show_fields
       fields[:commodity_group_id] = { renderer: :label,
                                       with_value: @repo.find_commodity_group(@form_object.commodity_group_id)&.code }
-      fields[:code] = { renderer: :label }
+      fields[:code] = { caption: 'Commodity Code', renderer: :label }
       fields[:description] = { renderer: :label }
-      fields[:hs_code] = { renderer: :label, caption: 'HS code' }
+      fields[:hs_code] = { renderer: :label, caption: 'HS Code' }
       fields[:requires_standard_counts] = { renderer: :label, as_boolean: true }
       fields[:use_size_ref_for_edi] = { renderer: :label, as_boolean: true }
       fields[:active] = { renderer: :label, as_boolean: true }
@@ -29,9 +29,12 @@ module UiRules
         commodity_group_id: { renderer: :select,
                               options: @repo.for_select_commodity_groups,
                               disabled_options: @repo.for_select_inactive_commodity_groups },
-        code: { required: true },
+        code: { caption: 'Commodity Code', required: true },
         description: { required: true },
-        hs_code: { required: true, caption: 'HS code' },
+        hs_code: { caption: 'HS code',
+                   hint: 'The Harmonized System is an international nomenclature for the classification of products.
+                          It allows participating countries to classify traded goods on a common basis for customs purposes.
+                          At the international level, the Harmonized System (HS) for classifying goods is a six-digit code system' },
         requires_standard_counts: { renderer: :checkbox },
         use_size_ref_for_edi: { renderer: :checkbox },
         active: { renderer: :checkbox }
