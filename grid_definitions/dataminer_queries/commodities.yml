@@ -125,7 +125,7 @@
   use_size_ref_for_edi:
     :name: use_size_ref_for_edi
     :sequence_no: 8
-    :caption: Use size ref for edi
+    :caption: Use size ref for EDI
     :namespaced_name: commodities.use_size_ref_for_edi
     :data_type: :boolean
     :width: 150
