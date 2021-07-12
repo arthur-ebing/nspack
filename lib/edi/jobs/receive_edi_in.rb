@@ -61,6 +61,7 @@ module EdiApp
                        has_missing_master_files: false,
                        valid: false,
                        has_discrepancies: false,
+                       recordset: nil,
                        notes: nil)
       end
 

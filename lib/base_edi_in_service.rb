@@ -64,13 +64,15 @@ class BaseEdiInService < BaseService
 
   def build_records(file_path)
     file_type = check_file_type(file_path)
-    if file_type == :xml
+    case file_type
+    when :xml
       build_xml_records(file_path)
-    elsif file_type == :csv
+    when :csv
       build_csv_records(file_path)
     else
       build_flat_file_records(file_path)
     end
+    @edi_result[:recordset] = @edi_records
   end
 
   def build_csv_records(file_path)
