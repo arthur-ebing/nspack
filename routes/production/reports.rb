@@ -34,7 +34,8 @@ class Nspack < Roda
                                        carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
                                        use_packed_weight: use_derived_weight != 't',
                                        use_derived_weight: use_derived_weight == 't',
-                                       dispatched_only: dispatches_only == 't')
+                                       dispatched_only: dispatches_only == 't',
+                                       client_code: AppConst::CLIENT_CODE)
       res = CreateJasperReport.call(jasper_params)
 
       store_locally(:dispatches_only, dispatches_only)

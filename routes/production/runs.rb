@@ -376,7 +376,8 @@ class Nspack < Roda
                                          carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
                                          use_packed_weight: true,
                                          use_derived_weight: false,
-                                         dispatched_only: true)
+                                         dispatched_only: true,
+                                         client_code: AppConst::CLIENT_CODE)
         res = CreateJasperReport.call(jasper_params)
 
         if res.success
@@ -393,7 +394,8 @@ class Nspack < Roda
                                          carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
                                          use_packed_weight: false,
                                          use_derived_weight: true,
-                                         dispatched_only: true)
+                                         dispatched_only: true,
+                                         client_code: AppConst::CLIENT_CODE)
         res = CreateJasperReport.call(jasper_params)
 
         if res.success
@@ -410,7 +412,8 @@ class Nspack < Roda
                                          carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
                                          use_packed_weight: true,
                                          use_derived_weight: false,
-                                         dispatched_only: false)
+                                         dispatched_only: false,
+                                         client_code: AppConst::CLIENT_CODE)
         res = CreateJasperReport.call(jasper_params)
 
         if res.success
@@ -427,7 +430,8 @@ class Nspack < Roda
                                          carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
                                          use_packed_weight: false,
                                          use_derived_weight: true,
-                                         dispatched_only: false)
+                                         dispatched_only: false,
+                                         client_code: AppConst::CLIENT_CODE)
         res = CreateJasperReport.call(jasper_params)
 
         if res.success
