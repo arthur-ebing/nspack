@@ -1141,8 +1141,9 @@ class Nspack < Roda
       r.redirect("/rmd/finished_goods/scan_tripsheet_pallet/#{id}")
     end
 
-    r.on 'print_pallet_tripsheet', Integer do |id|
-      jasper_params = JasperParams.new('interwarehouse',
+    r.on 'print_tripsheet', Integer do |id|
+      rpt_name = MesscadaApp::MesscadaRepo.new.find_vehicle_stock_type(id) == AppConst::PALLET_STOCK_TYPE ? 'interwarehouse' : 'delivery_tripsheet'
+      jasper_params = JasperParams.new(rpt_name,
                                        current_user.login_name,
                                        vehicle_job_id: id)
       res = CreateJasperReport.call(jasper_params)

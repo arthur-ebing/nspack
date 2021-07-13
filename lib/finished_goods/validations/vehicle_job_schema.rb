@@ -20,5 +20,7 @@ module FinishedGoodsApp
     required(:stock_type_id).filled(:integer)
     optional(:loaded_at).maybe(:time)
     optional(:offloaded_at).maybe(:time)
+    optional(:rmt_delivery_id).maybe(:integer)
+    optional(:items_moved_from_job_id).maybe(:integer)
   end
 end

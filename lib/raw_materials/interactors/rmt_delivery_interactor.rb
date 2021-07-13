@@ -2,6 +2,109 @@
 
 module RawMaterialsApp
   class RmtDeliveryInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+    def create_delivery_tripsheet(delivery_id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      stock_type_id = MesscadaApp::MesscadaRepo.new.get_value(:stock_types, :id, stock_type_code: AppConst::BIN_STOCK_TYPE)
+      params.merge!(business_process_id: repo.get_value(:business_processes, :id, process: AppConst::DELIVERY_TRIPSHEET_BUSINESS_PROCESS),
+                    stock_type_id: stock_type_id, rmt_delivery_id: delivery_id)
+      res = validate_tripsheet_params(params)
+      return validation_failed_response(res) if res.failure?
+
+      error_bins = []
+      repo.transaction do
+        vehicle_job_id = insp_repo.create_vehicle_job(res)
+        bins = repo.select_values(:rmt_bins, :id, rmt_delivery_id: delivery_id)
+        bins.each do |bin_id|
+          if insp_repo.vehicle_job_unit_in_different_tripsheet?(bin_id, vehicle_job_id)
+            error_bins << bin_id
+          else
+            res = validate_vehicle_job_unit_params(stock_item_id: bin_id, stock_type_id: stock_type_id,
+                                                   vehicle_job_id: vehicle_job_id)
+            raise Crossbeams::InfoError, unwrap_failed_response(validation_failed_response(res)) if res.failure?
+
+            insp_repo.create_vehicle_job_unit(res)
+            log_status(:rmt_bins, bin_id, AppConst::RMT_BIN_ADDED_TO_DELIVERY_TRIPSHEET)
+          end
+        end
+
+        raise Crossbeams::InfoError, 'Tripsheet Not Created: All bins belongs to other tripsheets' if bins.size == error_bins.size
+
+        repo.update_rmt_delivery(delivery_id, tripsheet_created: true, tripsheet_created_at: Time.now)
+        log_status(:rmt_deliveries, delivery_id, AppConst::DELIVERY_TRIPSHEET_CREATED)
+        log_transaction
+      end
+      success_response("Tripsheet Created #{!error_bins.empty? ? ". Following bins on other tripsheets: #{error_bins.join(',')}" : nil}")
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      failed_response(e.message)
+    end
+
+    def refresh_delivery_tripheet(id) # rubocop:disable Metrics/AbcSize
+      tripheet_discreps = repo.delivery_tripsheet_discreps(id)
+      unless tripheet_discreps.empty?
+        repo.transaction do
+          vehicle_loaded = repo.get_value(:rmt_deliveries, :tripsheet_loaded, id: id)
+          vehicle_job_id = repo.get_id(:vehicle_jobs, rmt_delivery_id: id)
+          stock_type_id = MesscadaApp::MesscadaRepo.new.get_value(:stock_types, :id, stock_type_code: AppConst::BIN_STOCK_TYPE)
+          (remove = tripheet_discreps.find_all { |d| !d[:bin_id] }.map { |v| v[:vehicle_job_unit_id] }).empty? ? nil : insp_repo.delete(:vehicle_job_units, remove)
+          tripheet_discreps.find_all { |d| !d[:vehicle_job_unit_id] }.map { |v| v[:bin_id] }.each do |b|
+            res = validate_vehicle_job_unit_params(stock_item_id: b, stock_type_id: stock_type_id,
+                                                   vehicle_job_id: vehicle_job_id)
+            raise Crossbeams::InfoError, unwrap_failed_response(validation_failed_response(res)) if res.failure?
+
+            insp_repo.create_vehicle_job_unit(res)
+            log_status(:rmt_bins, b, AppConst::RMT_BIN_ADDED_TO_DELIVERY_TRIPSHEET)
+            log_status(:rmt_bins, b, AppConst::RMT_BIN_LOADED_ON_VEHICLE) if vehicle_loaded
+          end
+          log_status(:rmt_deliveries, id, AppConst::DELIVERY_TRIPSHEET_REFRESHED)
+          log_transaction
+        end
+      end
+      success_response('Delivery Tripsheet Rfreshed')
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      failed_response(e.message)
+    end
+
+    def cancel_delivery_tripheet(id) # rubocop:disable Metrics/AbcSize
+      offloaded_bins = insp_repo.offloaded_delivery_bins_size(id)
+      return failed_response("Couldn't cancel tripsheet: #{offloaded_bins} bins have already been offloaded") unless offloaded_bins.zero?
+
+      repo.transaction do
+        vehicle_job_id = repo.get_id(:vehicle_jobs, rmt_delivery_id: id)
+        bins = repo.select_values(:vehicle_job_units, :stock_item_id, vehicle_job_id: vehicle_job_id)
+        repo.update(:rmt_deliveries, id, tripsheet_created: false, tripsheet_created_at: nil, tripsheet_loaded: false, tripsheet_loaded_at: nil)
+        insp_repo.delete_vehicle_job(vehicle_job_id)
+        log_multiple_statuses(:rmt_bins, bins, AppConst::DELIVERY_TRIPSHEET_CANCELED)
+        log_status(:rmt_deliveries, id, AppConst::DELIVERY_TRIPSHEET_CANCELED)
+      end
+
+      success_response 'Tripsheet deleted successfully'
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      failed_response(e.message)
+    end
+
+    def start_bins_trip(id) # rubocop:disable Metrics/AbcSize
+      repo.transaction do
+        vehicle_job_id = repo.get_value(:vehicle_jobs, :id, rmt_delivery_id: id)
+        repo.update(:rmt_deliveries, id, tripsheet_loaded: true, tripsheet_loaded_at: Time.now)
+        repo.update(:vehicle_jobs, vehicle_job_id, loaded_at: Time.now)
+        insp_repo.load_vehicle_job_units(vehicle_job_id)
+
+        log_status(:rmt_deliveries, id, AppConst::RMT_BIN_LOADED_ON_VEHICLE)
+        log_multiple_statuses(:rmt_bins, repo.select_values(:vehicle_job_units, :stock_item_id, vehicle_job_id: vehicle_job_id), AppConst::RMT_BIN_LOADED_ON_VEHICLE)
+      end
+
+      success_response('Vehicle Loaded')
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      failed_response(e.message)
+    end
+
     def create_rmt_delivery(params)
       res = validate_rmt_delivery_params(params)
       return validation_failed_response(res) if res.failure?
@@ -416,6 +519,10 @@ module RawMaterialsApp
       @repo ||= RmtDeliveryRepo.new
     end
 
+    def insp_repo
+      @insp_repo ||= FinishedGoodsApp::GovtInspectionRepo.new
+    end
+
     def rmt_delivery(id)
       repo.find_rmt_delivery(id)
     end
@@ -438,6 +545,14 @@ module RawMaterialsApp
 
     def validate_cost_params(params)
       MasterfilesApp::CostSchema.call(params)
+    end
+
+    def validate_tripsheet_params(params)
+      FinishedGoodsApp::TripsheetSchema.call(params)
+    end
+
+    def validate_vehicle_job_unit_params(params)
+      FinishedGoodsApp::VehicleJobUnitSchema.call(params)
     end
   end
 end

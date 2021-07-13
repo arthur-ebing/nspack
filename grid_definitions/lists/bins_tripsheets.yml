@@ -1,0 +1,15 @@
+---
+:dataminer_definition: vehicle_jobs
+:actions:
+- :url: "/rmd/finished_goods/print_tripsheet/$:id$"
+  :text: print_tripsheet
+  :icon: printer
+  :hide_if_true: offloaded
+  :title: Print
+  :loading_window: true
+:conditions:
+  :standard:
+    - :col: vehicle_jobs.stock_type_id
+      :op: =
+      :val: $:stock_type_id$
+      :optional: true

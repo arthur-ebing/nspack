@@ -64,14 +64,14 @@ module FinishedGoodsApp
       GovtInspectionSheet.new(hash)
     end
 
-    def pallet_in_different_tripsheet?(pallet_id, vehicle_job_id)
+    def vehicle_job_unit_in_different_tripsheet?(vehicle_job_unit_id, vehicle_job_id)
       query = <<~SQL
         SELECT u.id
         FROM  vehicle_job_units u
         JOIN vehicle_jobs j on j.id=u.vehicle_job_id
         WHERE u.stock_item_id = ? and u.vehicle_job_id <> ? and j.offloaded_at is null
       SQL
-      !DB[query, pallet_id, vehicle_job_id].empty?
+      !DB[query, vehicle_job_unit_id, vehicle_job_id].empty?
     end
 
     def clone_govt_inspection_sheet(id, user)
@@ -296,6 +296,29 @@ module FinishedGoodsApp
       DB[query, govt_inspection_sheet_id].first[:num_offloaded_plts]
     end
 
+    def offloaded_delivery_bins_size(delivery_id)
+      query = <<~SQL
+        SELECT *
+        FROM rmt_deliveries
+        INNER JOIN vehicle_jobs ON (vehicle_jobs.rmt_delivery_id = rmt_deliveries.id)
+        INNER JOIN vehicle_job_units ON (vehicle_job_units.vehicle_job_id = vehicle_jobs.id)
+        WHERE (rmt_deliveries.id = ?) AND (vehicle_job_units.offloaded_at IS NOT NULL)
+      SQL
+
+      DB[query, delivery_id].count
+    end
+
+    def offloaded_vehicle_job_units_size(id)
+      query = <<~SQL
+        SELECT *
+        FROM vehicle_jobs
+        INNER JOIN vehicle_job_units ON (vehicle_job_units.vehicle_job_id = vehicle_jobs.id)
+        WHERE (vehicle_jobs.id = ?) AND (vehicle_job_units.offloaded_at IS NOT NULL)
+      SQL
+
+      DB[query, id].count
+    end
+
     def find_vehicle_job_unit_by(key, val)
       hash = DB[:vehicle_job_units].where(Sequel[:vehicle_job_units][key] => val).first
       return nil if hash.nil?
@@ -394,6 +417,14 @@ module FinishedGoodsApp
       pallet_id = DB[:govt_inspection_pallets].where(govt_inspection_sheet_id: id).get(:pallet_id)
       ph_id = get_value(:pallets, :plt_packhouse_resource_id, id: pallet_id)
       get_value(:plant_resources, :plant_resource_code, id: ph_id)
+    end
+
+    def bin_from_tripsheet(bin_id, from_job_id)
+      DB[:vehicle_jobs]
+        .join(:vehicle_job_units, vehicle_job_id: :id)
+        .select(Sequel[:vehicle_jobs].*, Sequel[:vehicle_job_units][:id].as(:vehicle_job_unit_id))
+        .where(stock_item_id: bin_id, vehicle_job_id: from_job_id)
+        .first
     end
   end
 end

@@ -2,6 +2,133 @@
 
 module RawMaterialsApp
   class RmtBinInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+    def create_bin_tripsheet(planned_location_to_id, move_bins_from_another_tripsheet, vehicle_jod_id = nil) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      return failed_response('Please scan tripsheet') if move_bins_from_another_tripsheet == 't' && vehicle_jod_id.nil_or_empty?
+
+      if move_bins_from_another_tripsheet == 't' && !vehicle_jod_id.nil_or_empty?
+        tripsheet = insp_repo.find_vehicle_job(vehicle_jod_id)
+        return failed_response('Tripsheet does not exist') unless tripsheet
+        return failed_response('Tripsheet already offloaded') if tripsheet[:offloaded_at]
+        return failed_response('Trisheet already completed') if tripsheet[:loaded_at]
+
+        from_tripsheet = vehicle_jod_id
+      end
+
+      stock_type_id = repo.get_value(:stock_types, :id, stock_type_code: AppConst::BIN_STOCK_TYPE)
+      params = { business_process_id: repo.get_value(:business_processes, :id, process: AppConst::BINS_TRIPSHEET_BUSINESS_PROCESS),
+                 stock_type_id: stock_type_id, planned_location_to_id: planned_location_to_id, items_moved_from_job_id: from_tripsheet }
+      res = validate_tripsheet_params(params)
+      return failed_response(unwrap_failed_response(validation_failed_response(res))) if res.failure?
+
+      id = nil
+      repo.transaction do
+        id = insp_repo.create_vehicle_job(res)
+        log_transaction
+      end
+      success_response('Delivery Tripsheet Created', id)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      failed_response(e.message)
+    end
+
+    def add_bin_to_tripsheet(vehicle_job_id, bin_number) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      vehicle_job = insp_repo.find_vehicle_job(vehicle_job_id)
+      return failed_response('Tripsheet already offloaded') if vehicle_job[:offloaded_at]
+      return failed_response('Trisheet already completed') if vehicle_job[:loaded_at]
+      return failed_response('Bin Number: must be filled') if bin_number.nil_or_empty?
+
+      stock_type_id = repo.get_value(:stock_types, :id, stock_type_code: AppConst::BIN_STOCK_TYPE)
+      bin_id = repo.get_value(:rmt_bins, :id, bin_asset_number: bin_number)
+      return failed_response("Bin:#{bin_number} not found") unless bin_id
+      return failed_response("Bin:#{bin_number} belongs to another tripsheet") if insp_repo.vehicle_job_unit_in_different_tripsheet?(bin_id, vehicle_job_id) && repo.get_value(:vehicle_job_units, :vehicle_job_id, stock_item_id: bin_id, offloaded_at: nil) != vehicle_job[:items_moved_from_job_id]
+
+      res = validate_vehicle_job_unit_params(stock_item_id: bin_id, stock_type_id: stock_type_id, vehicle_job_id: vehicle_job_id)
+      return failed_response(unwrap_failed_response(validation_failed_response(res))) if res.failure?
+
+      msg = 'Bin Added To Tripsheet'
+      repo.transaction do
+        if (from_vehicle_job = insp_repo.bin_from_tripsheet(bin_id, vehicle_job[:items_moved_from_job_id]))
+          return failed_response("From Tripsheet: #{vehicle_job[:items_moved_from_job_id]} already loaded") if from_vehicle_job[:loaded_at]
+          return failed_response("From Tripsheet: #{vehicle_job[:items_moved_from_job_id]} already offloaded") if from_vehicle_job[:offloaded_at]
+
+          insp_repo.delete_vehicle_job_unit(from_vehicle_job[:vehicle_job_unit_id])
+          log_status(:rmt_bins, bin_id, "BIN_MOVED_FROM_SHEET(#{from_vehicle_job[:id]})_TO_SHEET(#{vehicle_job_id})")
+        end
+
+        if (vehicle_job_unit_id = repo.get_value(:vehicle_job_units, :id, stock_item_id: bin_id, vehicle_job_id: vehicle_job_id))
+          insp_repo.delete_vehicle_job_unit(vehicle_job_unit_id)
+          log_status(:rmt_bins, bin_id, AppConst::RMT_BIN_REMOVED_FROM_BINS_TRIPSHEET)
+          msg = 'Bin Removed From Tripsheet'
+        else
+          insp_repo.create_vehicle_job_unit(res)
+          log_status(:rmt_bins, bin_id, AppConst::RMT_BIN_ADDED_TO_BINS_TRIPSHEET)
+        end
+        log_transaction
+      end
+      success_response(msg)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      failed_response(e.message)
+    end
+
+    def cancel_bins_tripheet(vehicle_job_id)
+      offloaded_bins = insp_repo.offloaded_vehicle_job_units_size(vehicle_job_id)
+      return failed_response("Couldn't cancel tripsheet: #{offloaded_bins} bins have already been offloaded") unless offloaded_bins.zero?
+
+      repo.transaction do
+        bins = repo.select_values(:vehicle_job_units, :stock_item_id, vehicle_job_id: vehicle_job_id)
+        insp_repo.delete_vehicle_job(vehicle_job_id)
+        log_multiple_statuses(:rmt_bins, bins, AppConst::BIN_TRIPSHEET_CANCELED)
+      end
+
+      success_response 'Tripsheet deleted successfully'
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      failed_response(e.message)
+    end
+
+    def complete_bins_tripsheet(vehicle_job_id)
+      repo.transaction do
+        repo.update(:vehicle_jobs, vehicle_job_id, loaded_at: Time.now)
+        insp_repo.load_vehicle_job_units(vehicle_job_id)
+        log_multiple_statuses(:rmt_bins, repo.select_values(:vehicle_job_units, :stock_item_id, vehicle_job_id: vehicle_job_id), AppConst::RMT_BIN_LOADED_ON_VEHICLE)
+      end
+
+      success_response 'Tripsheet completed successfully'
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      failed_response(e.message)
+    end
+
+    def can_continue_bin_tripsheet(vehicle_job_id)
+      bin = repo.get_value(:vehicle_jobs, %i[id rmt_delivery_id], id: vehicle_job_id)
+      return failed_response("Cannot Edit Delivery Tripsheet: #{vehicle_job_id}") if !bin || bin[1]
+      return failed_response("Tripsheet: #{vehicle_job_id} already offloaded") if repo.get_value(:vehicle_jobs, :offloaded_at, id: vehicle_job_id)
+      return failed_response("Trisheet: #{vehicle_job_id} already completed") if repo.get_value(:vehicle_jobs, :loaded_at, id: vehicle_job_id)
+
+      success_response 'continue'
+    end
+
+    def validate_bins_tripsheet_to_offload_(vehicle_job_id, location_id) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      stock_type_id = repo.get_value(:stock_types, :id, stock_type_code: AppConst::BIN_STOCK_TYPE)
+      vehicle_job = insp_repo.find_vehicle_job(vehicle_job_id)
+      return failed_response("Tripsheet: #{vehicle_job_id} does not exist") unless vehicle_job && vehicle_job[:stock_type_id] == stock_type_id
+      return failed_response("Tripsheet: #{vehicle_job_id} already offloaded") if vehicle_job[:offloaded_at]
+      return failed_response('Vehicle not loaded') unless vehicle_job[:loaded_at]
+      return failed_response('Location does not store bins') unless locn_repo.location_storage_types(location_id).include?(AppConst::STORAGE_TYPE_BINS)
+      return failed_response("Incorrect location scanned. Scanned tripsheet is destined for:#{locn_repo.find_location(vehicle_job[:planned_location_to_id])[:location_long_code]}") unless location_id.to_i == vehicle_job[:planned_location_to_id]
+
+      success_response('')
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      failed_response(e.message)
+    end
+
     def validate_delivery(id)
       delivery = find_rmt_delivery(id)
       return failed_response("Delivery: #{id} does not exist") unless delivery
@@ -12,6 +139,58 @@ module RawMaterialsApp
       return failed_response("All #{delivery[:quantity_bins_with_fruit]} bins have already been received(scanned)")  unless delivery[:quantity_bins_with_fruit] > RawMaterialsApp::RmtDeliveryRepo.new.delivery_bin_count(id)
 
       ok_response
+    end
+
+    def validate_bin_to_offload(id, bin_asset_number)
+      bin = repo.get_value(:rmt_bins, %i[id scrapped], bin_asset_number: bin_asset_number)
+      return failed_response("Bin: #{bin_asset_number} does not exist") unless bin
+      return failed_response("Bin: #{bin_asset_number} has been scrapped") if bin[1]
+      return failed_response("Bin: #{bin_asset_number} is not on tripsheet") unless repo.get_value(:vehicle_job_units, :id, stock_item_id: bin[0], vehicle_job_id: id)
+      return failed_response("Bin: #{bin_asset_number} has already been offloaded") if repo.get_value(:vehicle_job_units, :offloaded_at, stock_item_id: bin[0], vehicle_job_id: id)
+
+      success_response('ok', bin[0])
+    end
+
+    def offload_bin(vehicle_job_id, bin_id) # rubocop:disable Metrics/AbcSize
+      vehicle_job_unit = insp_repo.find_vehicle_job_unit_by(:stock_item_id, bin_id)
+      instance = { vehicle_job_offloaded: false, vehicle_job_id: vehicle_job_unit[:vehicle_job_id] }
+
+      repo.transaction do
+        unless vehicle_job_unit[:offloaded_at]
+          repo.update(:vehicle_job_units, vehicle_job_unit[:id], offloaded_at: Time.now)
+          log_status(:rmt_bins, bin_id, AppConst::RMT_BIN_OFFLOADED)
+        end
+
+        tripsheet_bins = repo.tripsheet_bins(vehicle_job_unit[:vehicle_job_id])
+        if (tripsheet_bins.all.find_all { |p| !p[:offloaded_at] }).empty?
+          location_to_id = complete_bins_offload_vehicle(vehicle_job_id, tripsheet_bins.map { |b| b[:stock_item_id] })
+          instance.store(:vehicle_job_offloaded, true)
+          instance.store(:pallets_moved, tripsheet_bins.all.size)
+          instance.store(:location, repo.get(:locations, location_to_id, :location_long_code))
+        end
+      end
+
+      success_response('Bin Offloaded Successfully', instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      failed_response(e.message)
+    end
+
+    def complete_bins_offload_vehicle(vehicle_job_id, bin_ids) # rubocop:disable Metrics/AbcSize
+      repo.update(:vehicle_jobs, vehicle_job_id, offloaded_at: Time.now)
+      location_to_id = repo.get(:vehicle_jobs, vehicle_job_id, :planned_location_to_id)
+      bin_ids.each do |b|
+        res = FinishedGoodsApp::MoveStockService.new(AppConst::BIN_STOCK_TYPE, b, location_to_id, AppConst::BIN_OFFLOAD_VEHICLE_MOVE_BIN_BUSINESS_PROCESS, nil).call
+        raise res.message unless res.success
+      end
+
+      if (rmt_delivery_id = repo.get(:vehicle_jobs, vehicle_job_id, :rmt_delivery_id))
+        repo.update(:rmt_deliveries, rmt_delivery_id, tripsheet_offloaded: true, tripsheet_offloaded_at: Time.now)
+        log_status(:rmt_deliveries, rmt_delivery_id, AppConst::DELIVERY_TRIPSHEET_OFFLOADED)
+      end
+
+      location_to_id
     end
 
     def update_rmt_bin_asset_level(bin_asset_number, bin_fullness)
@@ -89,9 +268,9 @@ module RawMaterialsApp
           params[:bin_asset_number] = bin_asset_number
           id = repo.create_rmt_bin(params)
           log_status(:rmt_bins, id, 'REBIN_CREATED')
-          log_transaction
           created_rebins << rmt_bin(id)
         end
+        log_transaction
         repo.update(:bin_asset_numbers, bin_asset_numbers.map(&:first), last_used_at: Time.now)
       end
 
@@ -621,8 +800,24 @@ module RawMaterialsApp
       BinLabelSchema.call(params)
     end
 
+    def validate_tripsheet_params(params)
+      FinishedGoodsApp::TripsheetSchema.call(params)
+    end
+
     def validate_rebin_label_params(params)
       RebinLabelSchema.call(params)
+    end
+
+    def insp_repo
+      @insp_repo ||= FinishedGoodsApp::GovtInspectionRepo.new
+    end
+
+    def locn_repo
+      MasterfilesApp::LocationRepo.new
+    end
+
+    def validate_vehicle_job_unit_params(params)
+      FinishedGoodsApp::VehicleJobUnitSchema.call(params)
     end
   end
 end

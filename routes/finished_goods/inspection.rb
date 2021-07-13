@@ -214,6 +214,11 @@ class Nspack < Roda
     end
 
     r.on 'govt_inspection_sheets' do
+      r.on 'list_intake_tripsheets' do
+        stock_type_id = MesscadaApp::MesscadaRepo.new.get_value(:stock_types, :id, stock_type_code: AppConst::PALLET_STOCK_TYPE)
+        r.redirect "/list/vehicle_jobs/with_params?key=standard&stock_type_id=#{stock_type_id}"
+      end
+
       r.on 'packed_tm_group_changed' do
         actions = []
         region_list = if params[:changed_value].nil_or_empty?
@@ -587,7 +592,8 @@ class Nspack < Roda
       else
         flash[:error] = res.message
       end
-      r.redirect('/list/vehicle_jobs')
+      stock_type_id = MesscadaApp::MesscadaRepo.new.get_value(:stock_types, :id, stock_type_code: AppConst::PALLET_STOCK_TYPE)
+      r.redirect "/list/vehicle_jobs/with_params?key=standard&stock_type_id=#{stock_type_id}"
     end
 
     r.on 'open_pallet_tripsheet', Integer do |id|
@@ -599,7 +605,8 @@ class Nspack < Roda
       else
         flash[:error] = res.message
       end
-      r.redirect('/list/vehicle_jobs')
+      stock_type_id = MesscadaApp::MesscadaRepo.new.get_value(:stock_types, :id, stock_type_code: AppConst::PALLET_STOCK_TYPE)
+      r.redirect "/list/vehicle_jobs/with_params?key=standard&stock_type_id=#{stock_type_id}"
     end
   end
 

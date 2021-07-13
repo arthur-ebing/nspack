@@ -17,13 +17,20 @@ module RawMaterialsApp
     attribute :received, Types::Bool
     attribute :date_delivered, Types::DateTime
     attribute :tipping_complete_date_time, Types::DateTime
+    attribute :tripsheet_created_at, Types::DateTime
+    attribute :tripsheet_offloaded_at, Types::DateTime
+    attribute :tripsheet_loaded_at, Types::DateTime
     attribute? :keep_open, Types::Bool
     attribute? :bin_scan_mode, Types::Integer
     attribute? :current, Types::Bool
     attribute? :active, Types::Bool
+    attribute? :shipped, Types::Bool
+    attribute? :tripsheet_created, Types::Bool
+    attribute? :tripsheet_loaded, Types::Bool
+    attribute? :tripsheet_offloaded, Types::Bool
     attribute? :quantity_bins_with_fruit, Types::Integer
     attribute :reference_number, Types::String
     attribute :batch_number, Types::String
-    attribute :batch_number_updated_at, Types::String
+    attribute :batch_number_updated_at, Types::DateTime
   end
 end

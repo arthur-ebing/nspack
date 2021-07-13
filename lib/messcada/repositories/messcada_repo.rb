@@ -299,6 +299,13 @@ module MesscadaApp
       DB[:stock_types].where(stock_type_code: stock_type_code).first
     end
 
+    def find_vehicle_stock_type(id)
+      DB[:stock_types]
+        .join(:vehicle_jobs, stock_type_id: :id)
+        .where(Sequel[:vehicle_jobs][:id] => id)
+        .get(Sequel[:stock_types][:stock_type_code])
+    end
+
     def create_sequences(pallet_sequence, pallet_id)
       pallet_sequence = pallet_sequence.merge(pallet_params(pallet_id))
       create(:pallet_sequences, pallet_sequence)

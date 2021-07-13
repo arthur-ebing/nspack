@@ -177,7 +177,7 @@ module FinishedGoodsApp
       return failed_response('Pallet does not exist') unless pallet
       return failed_response('Pallet has been scrapped') if pallet[:scrapped]
       return failed_response('Pallet has been shipped') if pallet[:shipped]
-      return failed_response("Pallet:#{pallet_number} belongs to another tripsheet") if repo.pallet_in_different_tripsheet?(pallet[:id], id)
+      return failed_response("Pallet:#{pallet_number} belongs to another tripsheet") if repo.vehicle_job_unit_in_different_tripsheet?(pallet[:id], id)
       return failed_response("Cannot add:#{pallet_number}. Tripsheet has already been offloaded") if repo.get(:vehicle_jobs, id, :offloaded_at)
       return failed_response("Pallet is still on bay: #{repo.palletizing_bay_for_pallet(pallet_number)}") if pallet[:has_individual_cartons] && !pallet[:palletized]
 
@@ -189,6 +189,7 @@ module FinishedGoodsApp
       repo.transaction do
         if (vehicle_job_unit_id = repo.get_value(:vehicle_job_units, :id, stock_item_id: pallet[:id], vehicle_job_id: id))
           repo.delete_vehicle_job_unit(vehicle_job_unit_id)
+          log_status(:pallets, pallet[:id], 'REMOVED FROM TRIPSHEET')
           msg = 'Removed From Tripsheet'
         else
           return failed_response(nil, carton_required: true) if pallet[:has_individual_cartons] && AppConst::CLIENT_CODE == 'kr' && carton_number.nil?
@@ -202,7 +203,7 @@ module FinishedGoodsApp
 
           repo.create_vehicle_job_unit(res)
           log_status(:pallets, pallet[:id], 'ADDED TO TRIPSHEET')
-          msg = 'Vehicle Job Created'
+          msg = 'Pallet Added To Tripsheet'
         end
         log_transaction
       end
@@ -212,11 +213,12 @@ module FinishedGoodsApp
     end
 
     def can_continue_tripsheet(tripsheet_number)
-      return failed_response("Cannot continue intake tripsheet:#{tripsheet_number}") unless repo.exists?(:vehicle_jobs, id: tripsheet_number, govt_inspection_sheet_id: nil)
+      stock_type_id = MesscadaApp::MesscadaRepo.new.get_value(:stock_types, :id, stock_type_code: AppConst::PALLET_STOCK_TYPE)
+      return failed_response("Intake tripsheet:#{tripsheet_number} does not exist") unless repo.exists?(:vehicle_jobs, id: tripsheet_number, govt_inspection_sheet_id: nil, stock_type_id: stock_type_id)
       return failed_response("Tripsheet:#{tripsheet_number} already offloaded") unless repo.exists?(:vehicle_jobs, id: tripsheet_number, offloaded_at: nil)
       return failed_response("Tripsheet:#{tripsheet_number} has been completed") unless repo.exists?(:vehicle_jobs, id: tripsheet_number, loaded_at: nil)
 
-      success_response 'Tripsheet valid'
+      success_response 'continue'
     end
 
     def complete_pallet_tripsheet(vehicle_job_id, print, printer) # rubocop:disable Metrics/AbcSize
@@ -365,16 +367,16 @@ module FinishedGoodsApp
       res = UtilityFunctions.validate_integer_length(:vehicle_job_id, vehicle_job_id)
       return failed_response('Invalid barcode. Perhaps a pallet was scanned?') if res.failure?
 
+      stock_type_id = repo.get_value(:stock_types, :id, stock_type_code: AppConst::PALLET_STOCK_TYPE)
       vehicle_job = repo.find_vehicle_job(vehicle_job_id)
-      return failed_response('Tripsheet does not exist') unless vehicle_job
-
+      return failed_response('Tripsheet does not exist') unless vehicle_job && vehicle_job[:stock_type_id] == stock_type_id
       return failed_response('Tripsheet has already been offloaded') if vehicle_job[:offloaded_at]
       return failed_response('Vehicle not loaded') unless vehicle_job[:loaded_at]
 
       location = locn_repo.find_location(location_id)
       return failed_response('Location does not exist') if location.nil?
 
-      return failed_response('Location does not store pallets') unless location[:storage_type_code] == 'PALLETS'
+      return failed_response('Location does not store pallets') unless locn_repo.location_storage_types(location_id).include?(AppConst::STORAGE_TYPE_PALLETS)
       return failed_response("Incorrect location scanned. Scanned tripsheet is destined for:#{locn_repo.find_location(vehicle_job[:planned_location_to_id])[:location_long_code]}") unless location_id.to_i == vehicle_job[:planned_location_to_id]
 
       success_response('')

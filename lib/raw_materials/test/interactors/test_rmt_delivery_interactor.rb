@@ -96,6 +96,9 @@ module RawMaterialsApp
         date_delivered: '2010-01-01 12:00',
         tipping_complete_date_time: '2010-01-01 12:00',
         batch_number_updated_at: '2010-01-01 12:00',
+        tripsheet_created_at: '2010-01-01 12:00',
+        tripsheet_offloaded_at: '2010-01-01 12:00',
+        tripsheet_loaded_at: '2010-01-01 12:00',
         current: false,
         active: true
       }

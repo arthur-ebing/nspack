@@ -385,6 +385,58 @@ class Nspack < Roda
           end
         end
       end
+
+      r.on 'list_tripsheet' do
+        tripsheets = RawMaterialsApp::RmtDeliveryRepo.new.delivery_tripsheets(id)
+        stock_type_id = MesscadaApp::MesscadaRepo.new.get_value(:stock_types, :id, stock_type_code: AppConst::BIN_STOCK_TYPE)
+        r.redirect "/list/delivery_tripsheets/with_params?key=standard&stock_type_id=#{stock_type_id}&tripsheets=#{tripsheets.join(',')}"
+      end
+
+      r.on 'create_tripsheet' do
+        r.get do
+          show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::NewBinsTripsheet.call(id) }
+        end
+
+        r.post do
+          res = interactor.create_delivery_tripsheet(id, params[:bins_tripsheet])
+          if res.success
+            flash[:notice] = res.message
+          else
+            flash[:error] = res.message
+          end
+          r.redirect request.referer
+        end
+      end
+
+      r.on 'start_bins_trip' do
+        res = interactor.start_bins_trip(id)
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
+        r.redirect request.referer
+      end
+
+      r.on 'cancel_delivery_tripheet' do
+        res = interactor.cancel_delivery_tripheet(id)
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
+        r.redirect request.referer
+      end
+
+      r.on 'refresh_delivery_tripheet' do
+        res = interactor.refresh_delivery_tripheet(id)
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
+        r.redirect request.referer
+      end
     end
 
     r.on 'rmt_deliveries' do
@@ -580,6 +632,10 @@ class Nspack < Roda
       end
     end
 
+    r.on 'bins_tripsheets' do
+      stock_type_id = RawMaterialsApp::RmtDeliveryRepo.new.get_value(:stock_types, :id, stock_type_code: AppConst::BIN_STOCK_TYPE)
+      r.redirect "/list/bins_tripsheets/with_params?key=standard&stock_type_id=#{stock_type_id}&tripsheets="
+    end
     # --------------------------------------------------------------------------
     # RMT BINS
     # --------------------------------------------------------------------------

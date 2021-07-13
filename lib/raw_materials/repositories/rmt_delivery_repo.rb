@@ -166,6 +166,7 @@ module RawMaterialsApp
                                    id,
                                    parent_tables: [{ parent_table: :orchards, columns: [:orchard_code], flatten_columns: { orchard_code: :orchard_code } },
                                                    { parent_table: :farms, columns: [:farm_code], flatten_columns: { farm_code: :farm_code } },
+                                                   { parent_table: :rmt_sizes, columns: [:size_code], flatten_columns: { size_code: :size_code } },
                                                    { parent_table: :pucs, columns: [:puc_code], flatten_columns: { puc_code: :puc_code } },
                                                    { parent_table: :seasons, columns: [:season_code], flatten_columns: { season_code: :season_code } },
                                                    { parent_table: :rmt_classes, columns: [:rmt_class_code], flatten_columns: { rmt_class_code: :class_code } },
@@ -173,7 +174,12 @@ module RawMaterialsApp
                                                    { parent_table: :rmt_container_types, columns: [:container_type_code], flatten_columns: { container_type_code: :container_type_code } },
                                                    { parent_table: :rmt_container_material_types, columns: [:container_material_type_code], flatten_columns: { container_material_type_code: :container_material_type_code } },
                                                    # { parent_table: :party_roles, columns: [:container_material_owner_code], flatten_columns: { container_material_type_code: :container_material_type_code } },
-                                                   { parent_table: :cultivars, columns: [:cultivar_name], flatten_columns: { cultivar_name: :cultivar_name } }],
+                                                   { parent_table: :cultivars,
+                                                     foreign_key: :cultivar_id,
+                                                     flatten_columns: { cultivar_code: :cultivar_code,
+                                                                        cultivar_name: :cultivar_name,
+                                                                        commodity_id: :commodity_id } },
+                                                   { parent_table: :commodities, foreign_key: :commodity_id, flatten_columns: { code: :commodity_code } }],
                                    lookup_functions: [{ function: :fn_current_status,
                                                         args: ['rmt_bins', :id],
                                                         col_name: :status }])
@@ -509,6 +515,44 @@ module RawMaterialsApp
           ORDER BY id desc
       SQL
       DB[qry].all
+    end
+
+    def delivery_tripsheet_discreps(delivery_id)
+      query = <<~SQL
+        SELECT rmt_bins.id AS bin_id, vehicle_job_units.id AS vehicle_job_unit_id
+        FROM rmt_bins
+        LEFT JOIN vehicle_job_units ON vehicle_job_units.stock_item_id = rmt_bins.id
+        WHERE rmt_bins.rmt_delivery_id = ? AND vehicle_job_units.id IS NULL
+
+        UNION
+
+        SELECT rmt_bins.id AS bin_id, vehicle_job_units.id AS vehicle_job_unit_id
+        FROM vehicle_job_units
+        JOIN vehicle_jobs ON vehicle_jobs.id=vehicle_job_units.vehicle_job_id
+        LEFT JOIN rmt_bins ON rmt_bins.id = vehicle_job_units.stock_item_id
+        WHERE vehicle_jobs.rmt_delivery_id = ? AND rmt_bins.id IS NULL
+      SQL
+      DB[query, delivery_id, delivery_id].all
+    end
+
+    def delivery_tripsheets(delivery_id)
+      DB[:rmt_deliveries]
+        .join(:rmt_bins, rmt_delivery_id: :id)
+        .join(:vehicle_job_units, stock_item_id: :id)
+        .join(:vehicle_jobs, id: :vehicle_job_id)
+        .where(Sequel[:rmt_deliveries][:id] => delivery_id, Sequel[:vehicle_jobs][:offloaded_at] => nil)
+        .select_map(Sequel[:vehicle_jobs][:id])
+        .uniq
+    end
+
+    def tripsheet_bins(vehicle_job_id)
+      query = <<~SQL
+        SELECT u.*, b.bin_asset_number
+        FROM  vehicle_job_units u
+        JOIN rmt_bins b on b.id=u.stock_item_id
+        WHERE u.vehicle_job_id = ?
+      SQL
+      DB[query, vehicle_job_id]
     end
   end
 end

@@ -6,10 +6,10 @@
   :icon: view-show
   :title: View
   :popup: true
-- :url: "/rmd/finished_goods/print_pallet_tripsheet/$:id$"
+- :url: "/rmd/finished_goods/print_tripsheet/$:id$"
   :text: print_tripsheet
   :icon: printer
-  :hide_if_false: loaded
+  :hide_if_true: offloaded
   :title: Print
   :loading_window: true
 - :url: "/finished_goods/interwarehouse_transfers/cancel_pallet_tripsheet/$:id$"
@@ -21,3 +21,9 @@
   :text: open
   :icon: toggle-off
   :hide_if_false: can_open
+:conditions:
+  :standard:
+    - :col: vehicle_jobs.stock_type_id
+      :op: =
+      :val: $:stock_type_id$
+      :optional: true

@@ -4,7 +4,7 @@ module RawMaterials
   module Deliveries
     module RmtDelivery
       class Show
-        def self.call(id, back_url:)
+        def self.call(id, back_url:) # rubocop:disable Metrics/PerceivedComplexity
           ui_rule = UiRules::Compiler.new(:rmt_delivery, :show, id: id)
           rules   = ui_rule.compile
 
@@ -26,6 +26,47 @@ module RawMaterials
                                   text: 'Print Delivery',
                                   url: "/raw_materials/deliveries/rmt_deliveries/#{id}/print_delivery",
                                   loading_window: true,
+                                  style: :button)
+
+              section.add_control(control_type: :link,
+                                  text: 'List Tripsheets',
+                                  url: "/raw_materials/deliveries/rmt_deliveries/#{id}/list_tripsheet",
+                                  behaviour: :popup,
+                                  visible: rules[:list_tripsheets],
+                                  style: :button)
+
+              section.add_control(control_type: :link,
+                                  text: 'Create Tripsheet',
+                                  url: "/raw_materials/deliveries/rmt_deliveries/#{id}/create_tripsheet",
+                                  behaviour: :popup,
+                                  visible: rules[:create_tripsheet],
+                                  style: :button)
+
+              section.add_control(control_type: :link,
+                                  text: 'Start Bins Trip',
+                                  url: "/raw_materials/deliveries/rmt_deliveries/#{id}/start_bins_trip",
+                                  visible: rules[:start_bins_trip],
+                                  style: :button)
+
+              cancel = { control_type: :link,
+                         text: 'Cancel Tripheet',
+                         url: "/raw_materials/deliveries/rmt_deliveries/#{id}/cancel_delivery_tripheet",
+                         visible: rules[:cancel_delivery_tripheet],
+                         style: :button }
+              cancel.store(:prompt, 'Vehicle is already loaded, do you want to cancel?') if rules[:vehicle_loaded]
+              section.add_control(cancel)
+
+              section.add_control(control_type: :link,
+                                  text: 'Print Tripsheet',
+                                  url: "/rmd/finished_goods/print_tripsheet/#{rules[:vehicle_job_id]}",
+                                  visible: rules[:cancel_delivery_tripheet],
+                                  loading_window: true,
+                                  style: :button)
+
+              section.add_control(control_type: :link,
+                                  text: 'Refresh Tripsheet',
+                                  url: "/raw_materials/deliveries/rmt_deliveries/#{id}/refresh_delivery_tripheet",
+                                  visible: rules[:refresh_tripsheet],
                                   style: :button)
 
               section.form do |form|

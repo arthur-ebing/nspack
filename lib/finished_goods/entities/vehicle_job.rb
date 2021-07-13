@@ -7,6 +7,7 @@ module FinishedGoodsApp
     attribute :govt_inspection_sheet_id, Types::Integer
     attribute :planned_location_to_id, Types::Integer
     attribute :business_process_id, Types::Integer
+    attribute :items_moved_from_job_id, Types::Integer
     attribute :stock_type_id, Types::Integer
     attribute :loaded_at, Types::DateTime
     attribute :offloaded_at, Types::DateTime

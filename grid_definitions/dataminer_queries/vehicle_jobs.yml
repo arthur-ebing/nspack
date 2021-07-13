@@ -2,10 +2,12 @@
 :caption: Vehicle Jobs
 :sql: SELECT DISTINCT "vehicle_jobs"."id", "vehicle_jobs"."vehicle_number", "vehicle_jobs"."govt_inspection_sheet_id",
   "vehicle_jobs"."planned_location_to_id", "vehicle_jobs"."business_process_id", "vehicle_jobs"."stock_type_id",
-  "vehicle_jobs"."loaded_at", "vehicle_jobs"."offloaded_at", "business_processes"."process", string_agg(pallet_number::text, ', '::text)AS pallet_numbers,
+  "vehicle_jobs"."loaded_at", "vehicle_jobs"."offloaded_at", "business_processes"."process",
+  CASE WHEN stock_types.stock_type_code='PALLET' THEN string_agg("pallet_number"::text, ', '::text) ELSE string_agg(b."id"::text, ', '::text) END AS pallet_numbers,
   "govt_inspection_sheets"."booking_reference", "locations"."location_long_code" AS
   planned_location_to_location_long_code, "stock_types"."stock_type_code", fn_current_status('vehicle_jobs',
   "vehicle_jobs"."id") AS status, CASE WHEN (vehicle_jobs.loaded_at is null AND govt_inspection_sheet_id is null) THEN true ELSE false END as can_cancel,
+  CASE WHEN vehicle_jobs.offloaded_at is not null THEN true ELSE false END as offloaded,
   CASE WHEN vehicle_jobs.loaded_at is not null  THEN true ELSE false END as loaded,
   CASE WHEN (vehicle_jobs.loaded_at is not null AND vehicle_jobs.offloaded_at is null AND govt_inspection_sheet_id is null) THEN true ELSE false END as can_open,
   CASE WHEN vehicle_jobs.offloaded_at is not null THEN 'gray'
@@ -16,7 +18,7 @@
   JOIN "business_processes" ON "business_processes"."id" = "vehicle_jobs"."business_process_id" LEFT OUTER JOIN "govt_inspection_sheets"
   ON "govt_inspection_sheets"."id" = "vehicle_jobs"."govt_inspection_sheet_id" JOIN
   "locations" ON "locations"."id" = "vehicle_jobs"."planned_location_to_id" JOIN "stock_types"
-  ON "stock_types"."id" = "vehicle_jobs"."stock_type_id" JOIN pallets p on p.id=u.stock_item_id
+  ON "stock_types"."id" = "vehicle_jobs"."stock_type_id" LEFT JOIN pallets p on p.id=u.stock_item_id LEFT JOIN rmt_bins b on b.id=u.stock_item_id
   group by "vehicle_jobs"."id", "vehicle_jobs"."vehicle_number", "vehicle_jobs"."govt_inspection_sheet_id",
   "vehicle_jobs"."planned_location_to_id", "vehicle_jobs"."business_process_id", "vehicle_jobs"."stock_type_id",
   "vehicle_jobs"."loaded_at", "vehicle_jobs"."offloaded_at", "business_processes"."process",
@@ -264,6 +266,22 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  colour_rule:
+    :name: colour_rule
+    :sequence_no: 16
+    :caption: Colour rule
+    :namespaced_name:
+    :data_type: :string
+    :width:
+    :format:
+    :hide: true
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
 :query_parameter_definitions:
 - :column: vehicle_jobs.govt_inspection_sheet_id
   :caption: Govt inspection sheet
@@ -297,3 +315,11 @@
   :ordered_list: true
   :ui_priority: 1
   :list_def: SELECT stock_type_code, id FROM stock_types ORDER BY stock_type_code
+- :column: vehicle_jobs.id
+  :caption: Tripsheet Id
+  :data_type: :string
+  :control_type: :text
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:

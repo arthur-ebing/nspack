@@ -1206,6 +1206,303 @@ class Nspack < Roda
         end
       end
 
+      r.on 'create_bin_tripsheet' do
+        r.get do
+          form_state = {}
+          form_state.merge! retrieve_from_local_store(:form_state).to_h
+          error = retrieve_from_local_store(:errors)
+          notice = retrieve_from_local_store(:flash_notice)
+          form_state.merge!(error_message: error[:message], errors: error[:errors]) unless error.nil?
+          form = Crossbeams::RMDForm.new(form_state,
+                                         form_name: :tripsheet,
+                                         notes: notice,
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         caption: 'Create Bins Tripsheet',
+                                         reset_button: false,
+                                         no_submit: false,
+                                         action: '/rmd/rmt_deliveries/rmt_bins/create_bin_tripsheet',
+                                         button_caption: 'Submit')
+
+          form.behaviours do |behaviour|
+            behaviour.input_change :move_bins_from_another_tripsheet,
+                                   notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/move_bins_clicked' }]
+          end
+
+          form.add_select(:planned_location_to_id,
+                          'Location',
+                          items: MasterfilesApp::LocationRepo.new.find_locations_by_location_type_and_storage_type(AppConst::LOCATION_TYPES_WAREHOUSE, AppConst::STORAGE_TYPE_BINS),
+                          required: true,
+                          prompt: true)
+          form.add_toggle(:move_bins_from_another_tripsheet, 'Move Bins From Another Tripsheet')
+          form.add_field(:tripsheet_number, 'Tripsheet Number',
+                         scan: 'key248_all',
+                         scan_type: :vehicle_job,
+                         submit_form: false,
+                         required: false,
+                         hide_on_load: form_state[:move_bins_from_another_tripsheet] != 't',
+                         lookup: false)
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+
+        r.post do
+          res = interactor.create_bin_tripsheet(params[:tripsheet][:planned_location_to_id], params[:tripsheet][:move_bins_from_another_tripsheet], params[:tripsheet][:tripsheet_number])
+          if res.success
+            r.redirect("/rmd/rmt_deliveries/rmt_bins/add_bin_to_tripsheet/#{res.instance}")
+          else
+            store_locally(:errors, res)
+            store_locally(:form_state, params[:tripsheet])
+            r.redirect('/rmd/rmt_deliveries/rmt_bins/create_bin_tripsheet')
+          end
+        end
+      end
+
+      r.on 'move_bins_clicked' do
+        show =  case params[:changed_value]
+                when 't'
+                  true
+                when 'f', ''
+                  false
+                end
+
+        action = show ? :show_element : :hide_element
+        json_actions([OpenStruct.new(type: action, dom_id: 'tripsheet_tripsheet_number_row')])
+      end
+
+      r.on 'add_bin_to_tripsheet', Integer do |id|
+        r.get do
+          form_state = {}
+          error = retrieve_from_local_store(:errors)
+          form_state.merge!(error_message: error[:message], errors: error[:errors]) unless error.nil?
+          form = Crossbeams::RMDForm.new(form_state,
+                                         form_name: :bin,
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         caption: 'Scan Tripsheet Bin',
+                                         action: "/rmd/rmt_deliveries/rmt_bins/add_bin_to_tripsheet/#{id}",
+                                         button_caption: 'Submit')
+          form.add_label(:tripsheet_number, 'Tripsheet Number', id)
+          form.add_field(:bin_number, 'Bin Number', scan: 'key248_all', scan_type: :bin_asset, required: false, submit_form: true)
+
+          bins = RawMaterialsApp::RmtDeliveryRepo.new.tripsheet_bins(id)
+          unless bins.empty?
+            form.add_section_header('Bins On Tripsheet')
+            bins.each do |o|
+              form.add_label(:tripsheet_pallet, '', o[:bin_asset_number])
+            end
+          end
+
+          form.add_button('Cancel', "/rmd/rmt_deliveries/rmt_bins/cancel_bins_tripsheet/#{id}")
+          form.add_button('Complete', "/rmd/rmt_deliveries/rmt_bins/complete_bins_tripsheet/#{id}")
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+
+        r.post do
+          res = interactor.add_bin_to_tripsheet(id, params[:bin][:bin_number])
+          store_locally(:errors, res) unless res.success
+          r.redirect("/rmd/rmt_deliveries/rmt_bins/add_bin_to_tripsheet/#{id}")
+        end
+      end
+
+      r.on 'cancel_bins_tripsheet', Integer do |id|
+        res = interactor.cancel_bins_tripheet(id)
+        if res.success
+          store_locally(:flash_notice, res.message)
+          r.redirect('/rmd/rmt_deliveries/rmt_bins/create_bin_tripsheet')
+        else
+          store_locally(:errors, res)
+          r.redirect("/rmd/rmt_deliveries/rmt_bins/add_bin_to_tripsheet/#{id}")
+        end
+      end
+
+      r.on 'complete_bins_tripsheet', Integer do |id|
+        res = interactor.complete_bins_tripsheet(id)
+        if res.success
+          jasper_params = JasperParams.new('delivery_tripsheet',
+                                           current_user.login_name,
+                                           vehicle_job_id: id)
+          jasper_params.mode = :print
+          printer_id = LabelApp::PrinterRepo.new.default_printer_for_application(AppConst::PRINT_APP_PALLET_TRIPSHEET)
+          jasper_params.printer = LabelApp::PrinterRepo.new.find_printer(printer_id)&.printer_code
+          res = CreateJasperReport.call(jasper_params)
+
+          if res.success
+            store_locally(:flash_notice, res.message)
+            r.redirect('/rmd/rmt_deliveries/rmt_bins/create_bin_tripsheet')
+          end
+        end
+
+        store_locally(:errors, res)
+        r.redirect("/rmd/rmt_deliveries/rmt_bins/add_bin_to_tripsheet/#{id}")
+      end
+
+      r.on 'continue_bins_tripsheet' do
+        r.get do
+          form_state = {}
+          notice = retrieve_from_local_store(:flash_notice)
+          error = retrieve_from_local_store(:errors)
+          form_state.merge!(error_message: error[:message], errors: error[:errors]) unless error.nil?
+          form = Crossbeams::RMDForm.new(form_state,
+                                         form_name: :vehicle_job,
+                                         notes: notice,
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         caption: 'Scan Tripsheet',
+                                         action: '/rmd/rmt_deliveries/rmt_bins/continue_bins_tripsheet',
+                                         button_caption: 'Submit')
+
+          form.add_field(:tripsheet_number, 'Tripsheet Number', scan: 'key248_all', scan_type: :vehicle_job, submit_form: false, required: true, lookup: false)
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+
+        r.post do
+          res = interactor.can_continue_bin_tripsheet(params[:vehicle_job][:tripsheet_number])
+          if res.success
+            r.redirect("/rmd/rmt_deliveries/rmt_bins/add_bin_to_tripsheet/#{params[:vehicle_job][:tripsheet_number]}")
+          else
+            store_locally(:errors, res)
+            r.redirect('/rmd/rmt_deliveries/rmt_bins/continue_bins_tripsheet')
+          end
+        end
+      end
+
+      r.on 'offload_bins' do
+        r.get do
+          notice = retrieve_from_local_store(:flash_notice)
+          form_state = {}
+          error = retrieve_from_local_store(:error)
+          form_state.merge!(error_message: error[:message]) unless error.nil?
+          form = Crossbeams::RMDForm.new(form_state,
+                                         form_name: :vehicle,
+                                         notes: notice,
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         caption: 'Scan Tripsheet And Location',
+                                         action: '/rmd/rmt_deliveries/rmt_bins/offload_bins',
+                                         button_caption: 'Submit')
+
+          form.add_field(:vehicle_job, 'Tripsheet Number', scan: 'key248_all', scan_type: :vehicle_job, submit_form: false, required: true, lookup: false)
+          form.add_select(:location,
+                          'Location',
+                          items: MasterfilesApp::LocationRepo.new.find_locations_by_location_type_and_storage_type(AppConst::LOCATION_TYPES_WAREHOUSE, AppConst::STORAGE_TYPE_BINS),
+                          required: true,
+                          prompt: true)
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+
+        r.post do
+          res = interactor.validate_bins_tripsheet_to_offload_(params[:vehicle][:vehicle_job], params[:vehicle][:location])
+          if res.success
+            store_locally(:flash_notice, res.message)
+            r.redirect("/rmd/rmt_deliveries/rmt_bins/scan_bin_to_offload/#{params[:vehicle][:vehicle_job]}")
+          else
+            store_locally(:error, res)
+            r.redirect('/rmd/rmt_deliveries/rmt_bins/offload_bins')
+          end
+        end
+      end
+
+      r.on 'scan_bin_to_offload', Integer do |id|
+        r.get do
+          repo = FinishedGoodsApp::GovtInspectionRepo.new
+          notice = retrieve_from_local_store(:flash_notice)
+          form_state = {}
+          error = retrieve_from_local_store(:error)
+          form_state.merge!(error_message: error[:message]) unless error.nil?
+          form = Crossbeams::RMDForm.new(form_state,
+                                         form_name: :bin,
+                                         notes: notice,
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         caption: 'Offload Bin',
+                                         action: "/rmd/rmt_deliveries/rmt_bins/scan_bin_to_offload/#{id}",
+                                         button_caption: 'Submit')
+
+          bins = RawMaterialsApp::RmtDeliveryRepo.new.tripsheet_bins(id)
+          form.add_label(:location, 'Location', repo.get_vehicle_job_location(id))
+          form.add_field(:bin_number, 'Bin Number', scan: 'key248_all', scan_type: :bin_asset, required: false, submit_form: true)
+
+          unless (loaded = bins.find_all { |p| !p[:offloaded_at] }).empty?
+            form.add_section_header('Bins Still On Load')
+            loaded.each do |l|
+              form.add_label(:loaded_bin, '', l[:bin_asset_number])
+            end
+          end
+
+          unless (offloaded = bins.find_all { |p| p[:offloaded_at] }).empty?
+            form.add_section_header('Pallets Already Offloaded')
+            offloaded.each do |o|
+              form.add_label(:offloaded_bin, '', o[:bin_asset_number])
+            end
+          end
+
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+
+        r.post do
+          res = interactor.validate_bin_to_offload(id, params[:bin][:bin_number])
+          if res.success
+            bin = RawMaterialsApp::RmtDeliveryRepo.new.find_rmt_bin_flat(res.instance)
+            form = Crossbeams::RMDForm.new({ id: bin[:id] },
+                                           form_name: :bin,
+                                           scan_with_camera: @rmd_scan_with_camera,
+                                           caption: 'Confirm Offload Bin',
+                                           reset_button: false,
+                                           no_submit: false,
+                                           action: "/rmd/rmt_deliveries/rmt_bins/accept_bin_offload/#{id}",
+                                           button_caption: 'Accept')
+            form.add_label(:tripsheet, 'Tripsheet', id)
+            form.add_label(:delivery, 'Delivery', bin[:rmt_delivery_id])
+            form.add_field(:id, 'Id', required: false, hide_on_load: true)
+            form.add_label(:bin_asset_number, 'Asset Number', bin[:bin_asset_number])
+            form.add_label(:bin_fullness, 'Bin Fullness', bin[:bin_fullness])
+            form.add_label(:farm, 'Farm', bin[:farm_code])
+            form.add_label(:orchard, 'Orchard', bin[:orchard_code])
+            form.add_label(:puc, 'Puc', bin[:puc_code])
+            form.add_label(:cultivar, 'Cultivar', bin[:cultivar_name])
+            form.add_label(:commodity, 'Commodity Code', bin[:commodity_code])
+            form.add_label(:class, 'Class Code', bin[:class_code])
+            form.add_label(:size, 'Size Code', bin[:size_code])
+            form.add_label(:bin_type, 'Bin Type', bin[:container_material_type_code])
+            form.add_label(:rebin_run_id, 'Rebin Run', bin[:production_run_rebin_id])
+            form.add_button('Reject', "/rmd/rmt_deliveries/rmt_bins/reject_bin_offload/#{id}")
+            form.add_csrf_tag csrf_tag
+            view(inline: form.render, layout: :layout_rmd)
+          else
+            store_locally(:error, res)
+            r.redirect "/rmd/rmt_deliveries/rmt_bins/scan_bin_to_offload/#{id}"
+          end
+        end
+      end
+
+      r.on 'accept_bin_offload', Integer do |id|
+        res = interactor.offload_bin(id, params[:bin][:id])
+        if res.success
+          if res.instance[:vehicle_job_offloaded]
+            form = Crossbeams::RMDForm.new(nil,
+                                           form_name: :pallet,
+                                           scan_with_camera: @rmd_scan_with_camera,
+                                           caption: 'Tripsheet Completed Successfully',
+                                           action: '/',
+                                           reset_button: false,
+                                           no_submit: true,
+                                           button_caption: '')
+
+            form.add_section_header("#{res.instance[:pallets_moved]} Pallets have been moved to location #{res.instance[:location]}")
+            form.add_csrf_tag csrf_tag
+            return view(inline: form.render, layout: :layout_rmd)
+          end
+        else
+          store_locally(:error, res)
+        end
+
+        r.redirect "/rmd/rmt_deliveries/rmt_bins/scan_bin_to_offload/#{id}"
+      end
+
+      r.on 'reject_bin_offload', Integer do |id|
+        r.redirect "/rmd/rmt_deliveries/rmt_bins/scan_bin_to_offload/#{id}"
+      end
+
       r.on 'receive_single_bin_submit' do
         id = params[:rmt_bin][:delivery_id]
         params[:rmt_bin].delete_if { |k, _v| k == :delivery_id }

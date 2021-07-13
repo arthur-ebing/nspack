@@ -85,6 +85,9 @@ module RawMaterialsApp
     attribute :cultivar_name, Types::String
     attribute :season_code, Types::String
     attribute :class_code, Types::String
+    attribute :size_code, Types::String
+    attribute :commodity_id, Types::Integer
+    attribute :commodity_code, Types::String
     attribute :container_type_code, Types::String
     attribute :container_material_type_code, Types::String
     attribute :scrapped_bin_asset_number, Types::String

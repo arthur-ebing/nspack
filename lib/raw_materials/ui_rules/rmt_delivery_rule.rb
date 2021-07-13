@@ -2,10 +2,19 @@
 
 module UiRules
   class RmtDeliveryRule < Base # rubocop:disable Metrics/ClassLength
-    def generate_rules
+    def generate_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       @repo = RawMaterialsApp::RmtDeliveryRepo.new
       make_form_object
       apply_form_values
+
+      @rules[:create_tripsheet] = !@form_object.tripsheet_created && !@form_object.shipped
+      @rules[:start_bins_trip] = @form_object.tripsheet_created && !@form_object.tripsheet_loaded
+      @rules[:cancel_delivery_tripheet] = @form_object.tripsheet_created && !@form_object.tripsheet_offloaded
+      @rules[:print_delivery_tripheet] = @rules[:cancel_delivery_tripheet]
+      @rules[:vehicle_loaded] = @form_object.tripsheet_loaded
+      @rules[:vehicle_job_id] = @repo.get_value(:vehicle_jobs, :id, rmt_delivery_id: @form_object.id)
+      @rules[:refresh_tripsheet] = @form_object.tripsheet_created && !@form_object.tripsheet_offloaded && !@repo.delivery_tripsheet_discreps(@form_object.id).empty?
+      @rules[:list_tripsheets] = !@form_object.tripsheet_offloaded && !@repo.delivery_tripsheets(@form_object.id).empty?
 
       common_values_for_fields common_fields
 
