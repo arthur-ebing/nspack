@@ -6,6 +6,7 @@ module MasterfilesApp
   class TestContractWorkerInteractor < MiniTestWithHooks
     include ProductionApp::ResourceFactory
     include HRFactory
+    include MasterfilesApp::LocationFactory
 
     def test_repo
       repo = interactor.send(:repo)
