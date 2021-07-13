@@ -11,7 +11,7 @@ module FinishedGoodsApp
                           value: :id,
                           order_by: :internal_order_number
 
-    crud_calls_for :orders, name: :order, exclude: [:delete]
+    crud_calls_for :orders, name: :order, exclude: %i[create delete]
 
     build_for_select :order_items,
                      label: :sell_by_code,
@@ -98,6 +98,14 @@ module FinishedGoodsApp
       return nil if hash.nil?
 
       OrderItem.new(hash)
+    end
+
+    def create_order(res)
+      attrs = res.to_h
+      load_id = attrs.delete(:load_id)
+      order_id = create(:orders, attrs)
+      create(:orders_loads, load_id: load_id, order_id: order_id) if load_id
+      order_id
     end
 
     def delete_order(id)

@@ -408,6 +408,12 @@ class Nspack < Roda
         show_partial_or_page(r) { FinishedGoods::Dispatch::Load::New.call(form_values: form_values, back_url: request.referer) }
       end
 
+      r.on 'create_order' do    # COPY
+        check_auth!('dispatch', 'new')
+        form_values = interactor.load_entity(id).to_h
+        show_partial_or_page(r) { FinishedGoods::Orders::Order::New.call(form_values: form_values) }
+      end
+
       r.on 'edit' do   # EDIT
         check_auth!('dispatch', 'edit')
         interactor.assert_permission!(:edit, id)

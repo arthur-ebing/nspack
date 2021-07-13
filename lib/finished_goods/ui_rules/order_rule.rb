@@ -138,6 +138,7 @@ module UiRules
         customer_order_number: {},
         internal_order_number: {},
         remarks: {},
+        load_id: { hide_on_load: true },
         pricing_per_kg: { renderer: :checkbox }
       }
     end

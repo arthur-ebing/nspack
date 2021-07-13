@@ -23,6 +23,7 @@ module FinishedGoodsApp
     required(:internal_order_number).maybe(Types::StrippedString)
     required(:remarks).maybe(Types::StrippedString)
     required(:pricing_per_kg).maybe(:bool)
+    optional(:load_id).maybe(:integer)
   end
 
   OrderItemSchema = Dry::Schema.Params do

@@ -13,6 +13,10 @@
 - :url: "/finished_goods/dispatch/loads/$:id$/copy"
   :text: copy
   :icon: copy
+- :url: "/finished_goods/dispatch/loads/$:id$/create_order"
+  :text: create order
+  :icon: document-add
+  :hide_if_true: on_order
 - :url: "/finished_goods/dispatch/loads/$:id$/re_send_edi"
   :text: re-send EDI
   :icon: play
