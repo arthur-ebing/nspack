@@ -444,7 +444,8 @@ class Nspack < Roda
       r.on 'carton_packout_report' do
         jasper_params = JasperParams.new('carton_packout',
                                          current_user.login_name,
-                                         production_run_id: id)
+                                         production_run_id: id,
+                                         client_code: AppConst::CLIENT_CODE)
         res = CreateJasperReport.call(jasper_params)
 
         if res.success
