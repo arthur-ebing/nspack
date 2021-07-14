@@ -406,6 +406,17 @@ module UiRules
       @repo.find_treatment_codes(@options[:id])
     end
 
+    def handle_behaviour
+      case @mode
+      when :standard_pack_code
+        standard_pack_code_change
+      when :grade
+        grade_change
+      else
+        unhandled_behaviour!
+      end
+    end
+
     private
 
     def add_behaviours
@@ -442,6 +453,20 @@ module UiRules
                                   notify: [{ url: '/production/product_setups/product_setups/grade_changed',
                                              param_keys: %i[product_setup_standard_pack_code_id] }]
       end
+    end
+
+    def standard_pack_code_change
+      grade_id = params[:product_setup_grade_id]
+      requires_material_owner = ProductionApp::ProductSetupRepo.new.requires_material_owner?(params[:changed_value], grade_id)
+      json_actions([OpenStruct.new(type: requires_material_owner ? :show_element : :hide_element,
+                                   dom_id: 'product_setup_rmt_container_material_owner_id_field_wrapper')])
+    end
+
+    def grade_change
+      standard_pack_code_id = params[:product_setup_standard_pack_code_id]
+      requires_material_owner = ProductionApp::ProductSetupRepo.new.requires_material_owner?(standard_pack_code_id, params[:changed_value])
+      json_actions([OpenStruct.new(type: requires_material_owner ? :show_element : :hide_element,
+                                   dom_id: 'product_setup_rmt_container_material_owner_id_field_wrapper')])
     end
   end
 end

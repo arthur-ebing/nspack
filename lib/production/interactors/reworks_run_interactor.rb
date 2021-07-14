@@ -1175,8 +1175,8 @@ module ProductionApp
       requires_material_owner = repo.pallet_requires_material_owner?(pallet_number)
       before_attrs = { fruit_sticker_pm_product_id: instance[:fruit_sticker_pm_product_id],
                        fruit_sticker_pm_product_2_id: instance[:fruit_sticker_pm_product_2_id] }
-      before_attrs = before_attrs.merge(batch_number: instance[:batch_number]) if AppConst::CR_PROD.capture_batch_number_for_pallets?
-      before_attrs = before_attrs.merge(rmt_container_material_owner_id: instance[:rmt_container_material_owner_id]) if requires_material_owner
+      before_attrs[:batch_number] = instance[:batch_number] if AppConst::CR_PROD.capture_batch_number_for_pallets?
+      before_attrs[:rmt_container_material_owner_id] = instance[:rmt_container_material_owner_id] if requires_material_owner
 
       change_descriptions = { before: resolve_pallet_state(instance, requires_material_owner).sort.to_h, after: resolve_pallet_state(attrs, requires_material_owner).sort.to_h }
       repo.transaction do
@@ -1198,8 +1198,8 @@ module ProductionApp
     def resolve_pallet_state(instance, requires_material_owner)
       attrs = { fruit_sticker: fruit_sticker(instance[:fruit_sticker_pm_product_id]),
                 fruit_sticker_2: fruit_sticker(instance[:fruit_sticker_pm_product_2_id]) }
-      attrs = attrs.merge(batch_number: instance[:batch_number]) if AppConst::CR_PROD.capture_batch_number_for_pallets?
-      attrs = attrs.merge(rmt_container_material_owner: prod_setup_repo.rmt_container_material_owner_for(instance[:rmt_container_material_owner_id])) if requires_material_owner
+      attrs[:batch_number] = instance[:batch_number] if AppConst::CR_PROD.capture_batch_number_for_pallets?
+      attrs[:rmt_container_material_owner] = prod_setup_repo.rmt_container_material_owner_for(instance[:rmt_container_material_owner_id]) if requires_material_owner
       attrs
     end
 

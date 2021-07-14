@@ -493,6 +493,9 @@ module ProductionApp
     end
 
     def requires_material_owner?(standard_pack_code_id, grade_id)
+      # NOTE: This is set to true IF
+      # AppConst::CR_RMT.use_bin_asset_control? rule is set AND
+      # Standard pack is a bin AND Grade is an RMT grade.
       return false if standard_pack_code_id.nil_or_empty? || grade_id.nil_or_empty?
 
       require_owner = AppConst::CR_RMT.use_bin_asset_control?

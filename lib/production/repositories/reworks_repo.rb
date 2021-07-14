@@ -1136,6 +1136,7 @@ module ProductionApp
       oldest_sequence = DB[:pallet_sequences]
                         .where(pallet_number: pallet_number)
                         .where(pallet_sequence_number: oldest_sequence_number(pallet_number))
+                        .select(:standard_pack_code_id, :grade_id)
                         .first
       return false if oldest_sequence.nil_or_empty?
 
