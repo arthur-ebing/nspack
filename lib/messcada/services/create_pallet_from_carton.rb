@@ -76,7 +76,8 @@ module MesscadaApp
         pallet_format_id: carton[:pallet_format_id],
         plt_packhouse_resource_id: carton[:packhouse_resource_id],
         plt_line_resource_id: carton[:production_line_id],
-        palletizing_bay_resource_id: palletizing_bay_resource_id
+        palletizing_bay_resource_id: palletizing_bay_resource_id,
+        rmt_container_material_owner_id: carton[:rmt_container_material_owner_id]
       }
       params[:pallet_number] = carton[:pallet_number] if carton_equals_pallet
       params[:has_individual_cartons] = individual_cartons?

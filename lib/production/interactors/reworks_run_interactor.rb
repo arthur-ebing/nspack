@@ -1172,16 +1172,13 @@ module ProductionApp
       pallet_number = attrs.delete(:pallet_number)
       instance = pallet(pallet_number)
 
+      requires_material_owner = repo.pallet_requires_material_owner?(pallet_number)
       before_attrs = { fruit_sticker_pm_product_id: instance[:fruit_sticker_pm_product_id],
-                       fruit_sticker_pm_product_2_id: instance[:fruit_sticker_pm_product_2_id],
-                       batch_number: instance[:batch_number] }
-      before_descriptions_state = { fruit_sticker: fruit_sticker(instance[:fruit_sticker_pm_product_id]),
-                                    fruit_sticker_2: fruit_sticker(instance[:fruit_sticker_pm_product_2_id]),
-                                    batch_number: instance[:batch_number] }
-      after_descriptions_state = { fruit_sticker: fruit_sticker(attrs[:fruit_sticker_pm_product_id]),
-                                   fruit_sticker_2: fruit_sticker(attrs[:fruit_sticker_pm_product_2_id]),
-                                   batch_number: attrs[:batch_number] }
-      change_descriptions = { before: before_descriptions_state.sort.to_h, after: after_descriptions_state.sort.to_h }
+                       fruit_sticker_pm_product_2_id: instance[:fruit_sticker_pm_product_2_id] }
+      before_attrs = before_attrs.merge(batch_number: instance[:batch_number]) if AppConst::CR_PROD.capture_batch_number_for_pallets?
+      before_attrs = before_attrs.merge(rmt_container_material_owner_id: instance[:rmt_container_material_owner_id]) if requires_material_owner
+
+      change_descriptions = { before: resolve_pallet_state(instance, requires_material_owner).sort.to_h, after: resolve_pallet_state(attrs, requires_material_owner).sort.to_h }
       repo.transaction do
         repo.update_pallet(instance[:id], attrs)
         reworks_run_attrs = { user: @user.user_name, reworks_run_type_id: reworks_run_type_id, pallets_selected: Array(pallet_number),
@@ -1196,6 +1193,14 @@ module ProductionApp
       success_response('Pallet details updated successfully', pallet_number: pallet_number)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    end
+
+    def resolve_pallet_state(instance, requires_material_owner)
+      attrs = { fruit_sticker: fruit_sticker(instance[:fruit_sticker_pm_product_id]),
+                fruit_sticker_2: fruit_sticker(instance[:fruit_sticker_pm_product_2_id]) }
+      attrs = attrs.merge(batch_number: instance[:batch_number]) if AppConst::CR_PROD.capture_batch_number_for_pallets?
+      attrs = attrs.merge(rmt_container_material_owner: prod_setup_repo.rmt_container_material_owner_for(instance[:rmt_container_material_owner_id])) if requires_material_owner
+      attrs
     end
 
     def manually_tip_bins(attrs) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity

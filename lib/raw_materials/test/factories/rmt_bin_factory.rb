@@ -96,5 +96,15 @@ module RawMaterialsApp
       }
       DB[:location_storage_types].insert(default.merge(opts))
     end
+
+    def create_rmt_container_material_owner(opts = {})
+      id = get_available_factory_record(:rmt_container_material_owners, opts)
+      return id unless id.nil?
+
+      opts[:rmt_container_material_type_id] ||= create_rmt_container_material_type
+      opts[:rmt_material_owner_party_role_id] ||= create_party_role(party_type: 'O', name: AppConst::ROLE_IMPLEMENTATION_OWNER)
+
+      DB[:rmt_container_material_owners].insert(opts)
+    end
   end
 end

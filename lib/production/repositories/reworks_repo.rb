@@ -1131,5 +1131,15 @@ module ProductionApp
 
       DB[query].first
     end
+
+    def pallet_requires_material_owner?(pallet_number)
+      oldest_sequence = DB[:pallet_sequences]
+                        .where(pallet_number: pallet_number)
+                        .where(pallet_sequence_number: oldest_sequence_number(pallet_number))
+                        .first
+      return false if oldest_sequence.nil_or_empty?
+
+      ProductionApp::ProductSetupRepo.new.requires_material_owner?(oldest_sequence[:standard_pack_code_id], oldest_sequence[:grade_id])
+    end
   end
 end

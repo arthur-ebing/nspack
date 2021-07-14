@@ -35,5 +35,6 @@ module ProductionApp
     attribute :gtin_code, Types::String
     attribute :rmt_class_id, Types::Integer
     attribute :target_customer_party_role_id, Types::Integer
+    attribute :rmt_container_material_owner_id, Types::Integer
   end
 end

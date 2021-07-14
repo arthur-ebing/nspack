@@ -20,6 +20,7 @@ module Production
               form.add_field :fruit_sticker_pm_product_id
               form.add_field :fruit_sticker_pm_product_2_id
               form.add_field :batch_number
+              form.add_field :rmt_container_material_owner_id
             end
           end
 

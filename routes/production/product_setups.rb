@@ -331,6 +331,28 @@ class Nspack < Roda
                                      options_array: actual_counts)])
       end
 
+      r.on 'standard_pack_code_changed' do
+        grade_id = params[:product_setup_grade_id]
+        requires_material_owner = if grade_id.blank? || params[:changed_value].blank?
+                                    false
+                                  else
+                                    ProductionApp::ProductSetupRepo.new.requires_material_owner?(params[:changed_value], grade_id)
+                                  end
+        json_actions([OpenStruct.new(type: requires_material_owner ? :show_element : :hide_element,
+                                     dom_id: 'product_setup_rmt_container_material_owner_id_field_wrapper')])
+      end
+
+      r.on 'grade_changed' do
+        standard_pack_code_id = params[:product_setup_standard_pack_code_id]
+        requires_material_owner = if standard_pack_code_id.blank? || params[:changed_value].blank?
+                                    false
+                                  else
+                                    ProductionApp::ProductSetupRepo.new.requires_material_owner?(standard_pack_code_id, params[:changed_value])
+                                  end
+        json_actions([OpenStruct.new(type: requires_material_owner ? :show_element : :hide_element,
+                                     dom_id: 'product_setup_rmt_container_material_owner_id_field_wrapper')])
+      end
+
       r.on 'std_fruit_size_count_changed' do
         commodity_id = params[:product_setup_commodity_id]
         basic_pack_code_id = params[:product_setup_basic_pack_code_id]

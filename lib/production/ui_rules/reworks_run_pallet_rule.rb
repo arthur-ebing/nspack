@@ -4,6 +4,7 @@ module UiRules
   class ReworksRunPalletRule < Base # rubocop:disable Metrics/ClassLength
     def generate_rules # rubocop:disable Metrics/AbcSize,  Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       @repo = ProductionApp::ReworksRepo.new
+      @setup_repo = ProductionApp::ProductSetupRepo.new
 
       make_form_object
       apply_form_values
@@ -103,7 +104,8 @@ module UiRules
                                 maxvalue: AppConst::MAX_PALLET_WEIGHT }
     end
 
-    def set_edit_pallet_details_fields
+    def set_edit_pallet_details_fields # rubocop:disable Metrics/AbcSize
+      requires_material_owner = @repo.pallet_requires_material_owner?(@form_object.pallet_number)
       fields[:pallet_number] = { renderer: :hidden }
       fields[:reworks_run_type_id] = { renderer: :hidden }
       fields[:fruit_sticker_pm_product_id] = { renderer: :select,
@@ -123,6 +125,13 @@ module UiRules
                                                  searchable: true,
                                                  remove_search_for_small_list: false }
       fields[:batch_number] = { invisible: !AppConst::CR_PROD.capture_batch_number_for_pallets? }
+      fields[:rmt_container_material_owner_id] = { renderer: :select,
+                                                   options: @setup_repo.for_select_rmt_container_material_owners,
+                                                   caption: 'Rmt Container Material Owner',
+                                                   prompt: 'Select Rmt Container Material Owner',
+                                                   searchable: true,
+                                                   remove_search_for_small_list: false,
+                                                   hide_on_load: !requires_material_owner }
     end
 
     def make_form_object # rubocop:disable Metrics/AbcSize

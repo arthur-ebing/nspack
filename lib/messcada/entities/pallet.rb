@@ -50,6 +50,7 @@ module MesscadaApp
     attribute :last_govt_inspection_pallet_id, Types::Integer
     attribute? :status, Types::String
     attribute? :active, Types::Bool
+    attribute :rmt_container_material_owner_id, Types::Integer
   end
 
   class PalletFlat < Dry::Struct
@@ -103,6 +104,7 @@ module MesscadaApp
     attribute :pallet_sequence_ids, Types::IntArray
     attribute? :status, Types::String
     attribute? :active, Types::Bool
+    attribute :rmt_container_material_owner_id, Types::Integer
   end
 
   class ScannedPalletNumber < Dry::Struct

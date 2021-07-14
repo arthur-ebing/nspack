@@ -13,7 +13,8 @@ module Crossbeams
             convert_carton_to_rebins: false,
             create_farm_location: false,
             pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
-            default_delivery_location: 'FRUIT_RECEPTION_1' },
+            default_delivery_location: 'FRUIT_RECEPTION_1',
+            use_bin_asset_control: false  },
       hl: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             delivery_capture_container_material: false,
@@ -22,7 +23,8 @@ module Crossbeams
             convert_carton_to_rebins: false,
             create_farm_location: false,
             pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
-            default_delivery_location: 'FRUIT_RECEPTION_1' },
+            default_delivery_location: 'FRUIT_RECEPTION_1',
+            use_bin_asset_control: false  },
       kr: { bin_pallet_conversion_defaults: { pallet_format: { stack_type: 'BIN', pallet_base: 'S' },
                                               basic_pack: 'BX750',
                                               grade: 'SA',
@@ -39,7 +41,8 @@ module Crossbeams
             convert_carton_to_rebins: false,
             create_farm_location: false,
             pending_delivery_location: nil,
-            default_delivery_location: nil },
+            default_delivery_location: nil,
+            use_bin_asset_control: false  },
       um: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             delivery_capture_container_material: false,
@@ -48,7 +51,8 @@ module Crossbeams
             convert_carton_to_rebins: false,
             create_farm_location: false,
             pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
-            default_delivery_location: 'FRUIT RECEPTION' },
+            default_delivery_location: 'FRUIT RECEPTION',
+            use_bin_asset_control: false  },
       ud: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             delivery_capture_container_material: true,
@@ -57,7 +61,8 @@ module Crossbeams
             convert_carton_to_rebins: false,
             create_farm_location: true,
             pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
-            default_delivery_location: 'FRUIT_RECEPTION_1' },
+            default_delivery_location: 'FRUIT_RECEPTION_1',
+            use_bin_asset_control: false  },
       sr: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             delivery_capture_container_material: true,
@@ -66,7 +71,8 @@ module Crossbeams
             convert_carton_to_rebins: false,
             create_farm_location: false,
             pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
-            default_delivery_location: 'FRUIT_RECEPTION_1' },
+            default_delivery_location: 'FRUIT_RECEPTION_1',
+            use_bin_asset_control: false  },
       sr2: { bin_pallet_conversion_defaults: {},
              delivery_capture_inner_bins: false,
              delivery_capture_container_material: true,
@@ -75,7 +81,8 @@ module Crossbeams
              convert_carton_to_rebins: true,
              create_farm_location: true,
              pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
-             default_delivery_location: 'FRUIT_RECEPTION_1' }
+             default_delivery_location: 'FRUIT_RECEPTION_1',
+             use_bin_asset_control: false  }
     }.freeze
 
     def initialize(client_code)
@@ -167,6 +174,12 @@ module Crossbeams
         can_store_stock: true
       }
       repo.create(:locations, args)
+    end
+
+    def use_bin_asset_control?(explain: false)
+      return 'Use bin asset control to manage bin movements.' if explain
+
+      setting(:use_bin_asset_control)
     end
   end
 end

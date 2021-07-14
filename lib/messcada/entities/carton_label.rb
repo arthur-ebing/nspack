@@ -48,5 +48,7 @@ module MesscadaApp
     attribute :pm_mark_id, Types::Integer
     attribute :gtin_code, Types::String
     attribute :product_chars, Types::String
+    attribute :rmt_container_material_owner_id, Types::Integer
+    attribute :legacy_data, Types::Hash.optional
   end
 end

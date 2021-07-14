@@ -75,6 +75,7 @@ module Production
                     fold.add_field :pallet_label_name
                     fold.add_field :cartons_per_pallet
                     fold.add_field :description
+                    fold.add_field :rmt_container_material_owner
                   end
                 end
                 row.column do |col|

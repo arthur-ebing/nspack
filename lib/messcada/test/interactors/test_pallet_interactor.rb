@@ -14,6 +14,7 @@ module MesscadaApp
     include MasterfilesApp::PackagingFactory
     include MasterfilesApp::FruitFactory
     include ProductionApp::ResourceFactory
+    include MasterfilesApp::RmtContainerFactory
 
     def test_repo
       repo = interactor.send(:repo)
@@ -85,6 +86,7 @@ module MesscadaApp
       packhouse_resource_id = create_plant_resource
       line_resource_id = create_plant_resource
       plant_resource_id = create_plant_resource
+      rmt_container_material_owner_id = create_rmt_container_material_owner
 
       {
         id: 1,
@@ -138,7 +140,8 @@ module MesscadaApp
         target_customer: 'ABC',
         oldest_pallet_sequence_id: 1,
         pallet_sequence_ids: [1, 2, 3],
-        active: true
+        active: true,
+        rmt_container_material_owner_id: rmt_container_material_owner_id
       }
     end
 

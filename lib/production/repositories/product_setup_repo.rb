@@ -470,5 +470,35 @@ module ProductionApp
       end
       nil
     end
+
+    def for_select_rmt_container_material_owners(where: {})
+      DB[:rmt_container_material_owners]
+        .join(:rmt_container_material_types, id: :rmt_container_material_type_id)
+        .where(where)
+        .distinct
+        .select(Sequel[:rmt_container_material_owners][:id],
+                :container_material_type_code,
+                Sequel.function(:fn_party_role_name, :rmt_material_owner_party_role_id))
+        .map { |rec| ["#{rec[:container_material_type_code]} - #{rec[:fn_party_role_name]}", rec[:id]] }
+    end
+
+    def rmt_container_material_owner_for(rmt_container_material_owner_id)
+      query = <<~SQL
+        SELECT CONCAT(container_material_type_code, ' - ', fn_party_role_name(rmt_material_owner_party_role_id))
+        FROM rmt_container_material_owners
+        JOIN rmt_container_material_types ON rmt_container_material_types.id = rmt_container_material_owners.rmt_container_material_type_id
+        WHERE rmt_container_material_owners.id = ?
+      SQL
+      DB[query, rmt_container_material_owner_id].single_value
+    end
+
+    def requires_material_owner?(standard_pack_code_id, grade_id)
+      return false if standard_pack_code_id.nil_or_empty? || grade_id.nil_or_empty?
+
+      require_owner = AppConst::CR_RMT.use_bin_asset_control?
+      require_owner = false unless get(:standard_pack_codes, standard_pack_code_id, :bin)
+      require_owner = false unless get(:grades, grade_id, :rmt_grade)
+      require_owner
+    end
   end
 end

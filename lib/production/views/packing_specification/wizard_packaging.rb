@@ -50,6 +50,7 @@ module Production
                 row.column do |col|
                   col.add_field :pallet_label_name
                   col.add_field :cartons_per_pallet_id
+                  col.add_field :rmt_container_material_owner_id
                 end
               end
             end

@@ -156,6 +156,7 @@ module ProductionApp
       hash[:pallet_format] = get(:pallet_formats, hash[:pallet_format_id], :description)
       hash[:pallet_label] = get(:label_templates, hash[:pallet_label_name], :label_template_name)
       hash[:cartons_per_pallet] = get(:cartons_per_pallet, hash[:cartons_per_pallet_id], :cartons_per_pallet)
+      hash[:rmt_container_material_owner] = ProductionApp::ProductSetupRepo.new.rmt_container_material_owner_for(hash[:rmt_container_material_owner_id])
       hash[:packing_specification_code] = product_setup_partial_code(hash)
       hash
     end

@@ -190,12 +190,13 @@ module MesscadaApp
       contract.call(params)
     end
 
-    def create_carton_label(params) # rubocop:disable Metrics/AbcSize
+    def create_carton_label(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       attrs = params.to_h
 
       attrs[:treatment_ids] = resolve_col_array(attrs.delete(:treatment_ids)) if attrs.key?(:treatment_ids)
       attrs[:fruit_sticker_ids] = resolve_col_array(attrs.delete(:fruit_sticker_ids)) if attrs.key?(:fruit_sticker_ids)
       attrs[:tu_sticker_ids] = resolve_col_array(attrs.delete(:tu_sticker_ids)) if attrs.key?(:tu_sticker_ids)
+      attrs[:legacy_data] = repo.hash_for_jsonb_col(attrs.delete(:legacy_data)) if attrs.key?(:legacy_data)
 
       repo.transaction do
         @carton_label_id = repo.create_carton_label(attrs.merge(carton_equals_pallet: carton_equals_pallet, phc: phc))

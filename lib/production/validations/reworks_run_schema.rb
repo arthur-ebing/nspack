@@ -133,6 +133,7 @@ module ProductionApp # rubocop:disable Metrics/ModuleLength
     required(:fruit_sticker_pm_product_id).filled(:integer)
     required(:fruit_sticker_pm_product_2_id).maybe(:integer)
     optional(:batch_number).maybe(Types::StrippedString)
+    optional(:rmt_container_material_owner_id).maybe(:integer)
   end
 
   EditCartonQuantitySchema = Dry::Schema.Params do

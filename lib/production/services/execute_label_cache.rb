@@ -12,7 +12,8 @@ module ProductionApp
                                                resource_id: rec[:resource_id],
                                                packing_method_id: rec[:packing_method_id],
                                                label_name: rec[:label_template_name],
-                                               target_customer_party_role_id: rec[:target_customer_party_role_id])
+                                               target_customer_party_role_id: rec[:target_customer_party_role_id],
+                                               legacy_data: resolve_run_legacy_data(production_run.legacy_data.to_h))
         }
       end
       FileUtils.mkpath(AppConst::LABELING_CACHED_DATA_FILEPATH)
@@ -44,6 +45,13 @@ module ProductionApp
       raise res.message unless res.success
 
       res.instance.print_command
+    end
+
+    def resolve_run_legacy_data(data)
+      {
+        'pc_code' => data['pc_code'],
+        'track_indicator_code' => data['track_indicator_code']
+      }
     end
   end
 end
