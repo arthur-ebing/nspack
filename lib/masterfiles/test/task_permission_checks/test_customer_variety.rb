@@ -13,7 +13,8 @@ module MasterfilesApp
         packed_tm_group_id: 1,
         active: true,
         variety_as_customer_variety: 'ABC',
-        packed_tm_group: 'ABC'
+        packed_tm_group: 'ABC',
+        marketing_varieties: %w[A B C]
       }
       MasterfilesApp::CustomerVariety.new(base_attrs.merge(attrs))
     end

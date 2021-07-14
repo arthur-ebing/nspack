@@ -160,7 +160,7 @@
   marketing_size_range_mm:
     :name: marketing_size_range_mm
     :sequence_no: 7
-    :caption: Marketing size range mm
+    :caption: Marketing size range (mm)
     :namespaced_name: std_fruit_size_counts.marketing_size_range_mm
     :data_type: :string
     :width: 
@@ -224,7 +224,7 @@
   minimum_size_mm:
     :name: minimum_size_mm
     :sequence_no: 10
-    :caption: Minimum size mm
+    :caption: Minimum size (mm)
     :namespaced_name: std_fruit_size_counts.minimum_size_mm
     :data_type: :string
     :width: 
@@ -240,7 +240,7 @@
   maximum_size_mm:
     :name: maximum_size_mm
     :sequence_no: 11
-    :caption: Maximum size mm
+    :caption: Maximum size (mm)
     :namespaced_name: std_fruit_size_counts.maximum_size_mm
     :data_type: :string
     :width: 
@@ -256,7 +256,7 @@
   average_size_mm:
     :name: average_size_mm
     :sequence_no: 12
-    :caption: Average size mm
+    :caption: Average size (mm)
     :namespaced_name: std_fruit_size_counts.average_size_mm
     :data_type: :string
     :width: 
@@ -272,7 +272,7 @@
   minimum_weight_gm:
     :name: minimum_weight_gm
     :sequence_no: 13
-    :caption: Minimum weight gm
+    :caption: Minimum weight (g)
     :namespaced_name: std_fruit_size_counts.minimum_weight_gm
     :data_type: :string
     :width: 
@@ -288,7 +288,7 @@
   maximum_weight_gm:
     :name: maximum_weight_gm
     :sequence_no: 14
-    :caption: Maximum weight gm
+    :caption: Maximum weight (g)
     :namespaced_name: std_fruit_size_counts.maximum_weight_gm
     :data_type: :string
     :width: 
@@ -304,7 +304,7 @@
   average_weight_gm:
     :name: average_weight_gm
     :sequence_no: 15
-    :caption: Average weight gm
+    :caption: Average weight (g)
     :namespaced_name: std_fruit_size_counts.average_weight_gm
     :data_type: :string
     :width: 

@@ -21,9 +21,9 @@ module Masterfiles
               form.add_field :standard_pack_id
               form.add_field :gross_weight
               form.add_field :nett_weight
+              form.add_field :is_standard_carton
               form.add_field :standard_carton_nett_weight
               # form.add_field :ratio_to_standard_carton
-              form.add_field :is_standard_carton
             end
           end
 

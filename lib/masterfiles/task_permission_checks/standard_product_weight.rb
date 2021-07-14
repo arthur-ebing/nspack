@@ -8,7 +8,7 @@ module MasterfilesApp
         @task = task
         @repo = FruitSizeRepo.new
         @id = standard_product_weight_id
-        @entity = @id ? @repo.find_standard_product_weight_flat(@id) : nil
+        @entity = @id ? @repo.find_standard_product_weight(@id) : nil
       end
 
       CHECKS = {

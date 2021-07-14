@@ -1,15 +1,15 @@
 ---
 :caption: Standard Product Weights
-:sql: SELECT "standard_product_weights"."id", "standard_product_weights"."commodity_id",
-  "standard_product_weights"."standard_pack_id", "standard_product_weights"."gross_weight",
-  "standard_product_weights"."nett_weight", "standard_product_weights"."active", "standard_product_weights"."created_at",
-  "standard_product_weights"."updated_at", "commodities"."code" AS commodity_code,
-  "standard_pack_codes"."standard_pack_code", "standard_product_weights"."standard_carton_nett_weight",
-  "standard_product_weights"."ratio_to_standard_carton", "standard_product_weights"."is_standard_carton",
-  fn_current_status('standard_product_weights', "standard_product_weights"."id") AS
-  status FROM "standard_product_weights" JOIN "commodities" ON "commodities"."id"
-  = "standard_product_weights"."commodity_id" JOIN "standard_pack_codes" ON "standard_pack_codes"."id"
-  = "standard_product_weights"."standard_pack_id"
+:sql: "SELECT \r\n    standard_product_weights.id,\r\n    standard_product_weights.commodity_id,\r\n
+  \   standard_product_weights.standard_pack_id,\r\n    commodities.code AS commodity_code,\r\n
+  \   standard_pack_codes.standard_pack_code,\r\n    standard_product_weights.gross_weight,\r\n
+  \   standard_product_weights.nett_weight,\r\n    standard_product_weights.standard_carton_nett_weight,\r\n
+  \   standard_product_weights.ratio_to_standard_carton,\r\n    standard_product_weights.is_standard_carton,\r\n
+  \   fn_current_status('standard_product_weights', standard_product_weights.id) AS
+  status,\r\n    standard_product_weights.active,\r\n    standard_product_weights.created_at,\r\n
+  \   standard_product_weights.updated_at\r\nFROM standard_product_weights \r\nJOIN
+  commodities ON commodities.id = standard_product_weights.commodity_id \r\nJOIN standard_pack_codes
+  ON standard_pack_codes.id = standard_product_weights.standard_pack_id"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -62,89 +62,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  gross_weight:
-    :name: gross_weight
-    :sequence_no: 4
-    :caption: Gross weight
-    :namespaced_name: standard_product_weights.gross_weight
-    :data_type: :number
-    :width: 
-    :format: :delimited_1000
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  nett_weight:
-    :name: nett_weight
-    :sequence_no: 5
-    :caption: Nett weight
-    :namespaced_name: standard_product_weights.nett_weight
-    :data_type: :number
-    :width: 
-    :format: :delimited_1000
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  active:
-    :name: active
-    :sequence_no: 6
-    :caption: Active
-    :namespaced_name: standard_product_weights.active
-    :data_type: :boolean
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  created_at:
-    :name: created_at
-    :sequence_no: 7
-    :caption: Created at
-    :namespaced_name: standard_product_weights.created_at
-    :data_type: :datetime
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  updated_at:
-    :name: updated_at
-    :sequence_no: 8
-    :caption: Updated at
-    :namespaced_name: standard_product_weights.updated_at
-    :data_type: :datetime
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   commodity_code:
     :name: commodity_code
-    :sequence_no: 9
+    :sequence_no: 4
     :caption: Commodity code
     :namespaced_name: commodities.code
     :data_type: :string
@@ -160,7 +80,7 @@
     :group_max: false
   standard_pack_code:
     :name: standard_pack_code
-    :sequence_no: 10
+    :sequence_no: 5
     :caption: Standard pack code
     :namespaced_name: standard_pack_codes.standard_pack_code
     :data_type: :string
@@ -174,13 +94,45 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  gross_weight:
+    :name: gross_weight
+    :sequence_no: 6
+    :caption: Gross weight
+    :namespaced_name: standard_product_weights.gross_weight
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  nett_weight:
+    :name: nett_weight
+    :sequence_no: 7
+    :caption: Nett weight
+    :namespaced_name: standard_product_weights.nett_weight
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   standard_carton_nett_weight:
     :name: standard_carton_nett_weight
-    :sequence_no: 11
+    :sequence_no: 8
     :caption: Standard carton nett weight
     :namespaced_name: standard_product_weights.standard_carton_nett_weight
     :data_type: :number
-    :width: 
+    :width: 200
     :format: :delimited_1000
     :hide: false
     :pinned: 
@@ -192,7 +144,7 @@
     :group_max: false
   ratio_to_standard_carton:
     :name: ratio_to_standard_carton
-    :sequence_no: 12
+    :sequence_no: 9
     :caption: Ratio to standard carton
     :namespaced_name: standard_product_weights.ratio_to_standard_carton
     :data_type: :number
@@ -208,11 +160,11 @@
     :group_max: false
   is_standard_carton:
     :name: is_standard_carton
-    :sequence_no: 13
+    :sequence_no: 10
     :caption: Std carton?
     :namespaced_name: standard_product_weights.is_standard_carton
     :data_type: :boolean
-    :width: 100
+    :width: 110
     :format: 
     :hide: false
     :pinned: 
@@ -224,13 +176,61 @@
     :group_max: false
   status:
     :name: status
-    :sequence_no: 14
+    :sequence_no: 11
     :caption: Status
     :namespaced_name: 
     :data_type: :string
     :width: 
     :format: 
     :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 12
+    :caption: Active
+    :namespaced_name: standard_product_weights.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 13
+    :caption: Created at
+    :namespaced_name: standard_product_weights.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 14
+    :caption: Updated at
+    :namespaced_name: standard_product_weights.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
     :pinned: 
     :groupable: false
     :group_by_seq: 

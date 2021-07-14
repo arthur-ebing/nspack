@@ -18,21 +18,19 @@ module UiRules
     end
 
     def set_show_fields
-      commodity_id_label = MasterfilesApp::CommodityRepo.new.find_commodity(@form_object.commodity_id)&.code
-      uom_label = @gen_repo.find_uom(@form_object.uom_id)&.uom_code
-      fields[:commodity_id] = { renderer: :label, with_value: commodity_id_label }
-      fields[:uom_id] = { renderer: :label, with_value: uom_label, caption: 'Unit Of Measure' }
+      fields[:commodity_code] = { renderer: :label }
+      fields[:uom_code] = { renderer: :label, caption: 'Unit Of Measure' }
       fields[:size_count_description] = { renderer: :label }
-      fields[:marketing_size_range_mm] = { renderer: :label }
-      fields[:marketing_weight_range] = { renderer: :label }
+      fields[:marketing_size_range_mm] = { renderer: :label, caption: 'Marketing Size Range (mm)'  }
+      fields[:marketing_weight_range] = { renderer: :label, caption: 'Marketing Weight Range (g)' }
       fields[:size_count_interval_group] = { renderer: :label }
       fields[:size_count_value] = { renderer: :label }
-      fields[:minimum_size_mm] = { renderer: :label }
-      fields[:maximum_size_mm] = { renderer: :label }
-      fields[:average_size_mm] = { renderer: :label }
-      fields[:minimum_weight_gm] = { renderer: :label }
-      fields[:maximum_weight_gm] = { renderer: :label }
-      fields[:average_weight_gm] = { renderer: :label }
+      fields[:minimum_size_mm] = { renderer: :label, caption: 'Minimum Size (mm)' }
+      fields[:maximum_size_mm] = { renderer: :label, caption: 'Maximum Size (mm)' }
+      fields[:average_size_mm] = { renderer: :label, caption: 'Average Size (mm)' }
+      fields[:minimum_weight_gm] = { renderer: :label, caption: 'Minimum Weight (g)' }
+      fields[:maximum_weight_gm] = { renderer: :label, caption: 'Maximum Weight (g)' }
+      fields[:average_weight_gm] = { renderer: :label, caption: 'Average Weight (g)' }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
@@ -48,16 +46,16 @@ module UiRules
                   caption: 'Unit of Measure',
                   required: true  },
         size_count_description: {},
-        marketing_size_range_mm: {},
-        marketing_weight_range: {},
+        marketing_size_range_mm: { caption: 'Marketing Size Range (mm)' },
+        marketing_weight_range: { caption: 'Marketing Weight Range (g)' },
         size_count_interval_group: {},
         size_count_value: { required: true },
-        minimum_size_mm: { caption: 'min' },
-        maximum_size_mm: { caption: 'max' },
-        average_size_mm: { caption: 'avg' },
-        minimum_weight_gm: {},
-        maximum_weight_gm: {},
-        average_weight_gm: {}
+        minimum_size_mm: { caption: 'Minimum Size (mm)' },
+        maximum_size_mm: { caption: 'Maximum Size (mm)' },
+        average_size_mm: { caption: 'Average Size (mm)' },
+        minimum_weight_gm: { caption: 'Minimum Weight (g)' },
+        maximum_weight_gm: { caption: 'Maximum Weight (g)' },
+        average_weight_gm: { caption: 'Average Weight (g)' }
       }
     end
 

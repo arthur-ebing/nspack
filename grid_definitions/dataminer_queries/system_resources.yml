@@ -476,7 +476,7 @@
   pixels_mm:
     :name: pixels_mm
     :sequence_no: 29
-    :caption: Pixels mm
+    :caption: Pixels (mm)
     :namespaced_name: system_resources.pixels_mm
     :data_type: :integer
     :width: 

@@ -13,7 +13,7 @@ module MasterfilesApp
     end
 
     def test_standard_product_weight
-      MasterfilesApp::FruitSizeRepo.any_instance.stubs(:find_standard_product_weight_flat).returns(fake_standard_product_weight)
+      MasterfilesApp::FruitSizeRepo.any_instance.stubs(:find_standard_product_weight).returns(fake_standard_product_weight)
       entity = interactor.send(:standard_product_weight, 1)
       assert entity.is_a?(StandardProductWeight)
     end

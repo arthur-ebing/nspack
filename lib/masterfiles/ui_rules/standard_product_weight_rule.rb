@@ -14,40 +14,52 @@ module UiRules
       form_name 'standard_product_weight'
     end
 
-    def set_show_fields # rubocop:disable Metrics/AbcSize
-      commodity_id_label = MasterfilesApp::CommodityRepo.new.find_commodity(@form_object.commodity_id)&.code
-      standard_pack_id_label = MasterfilesApp::FruitSizeRepo.new.find_standard_pack(@form_object.standard_pack_id)&.standard_pack_code
-      fields[:commodity_id] = { renderer: :label,
-                                with_value: commodity_id_label,
-                                caption: 'Commodity Code' }
-      fields[:standard_pack_id] = { renderer: :label,
-                                    with_value: standard_pack_id_label,
-                                    caption: 'Standard Pack' }
-      fields[:gross_weight] = { renderer: :label }
-      fields[:nett_weight] = { renderer: :label }
+    def set_show_fields
+      fields[:commodity_code] = { renderer: :label }
+      fields[:standard_pack_code] = { renderer: :label }
+      fields[:gross_weight] = { renderer: :label,
+                                caption: 'Gross Weight (kg)' }
+      fields[:nett_weight] = { renderer: :label,
+                               caption: 'Nett Weight (kg)' }
       fields[:active] = { renderer: :label, as_boolean: true }
-      fields[:standard_carton_nett_weight] = { renderer: :label }
+      fields[:standard_carton_nett_weight] = { renderer: :label,
+                                               caption: 'Standard Carton Nett Weight (kg)' }
       fields[:ratio_to_standard_carton] = { renderer: :label }
       fields[:is_standard_carton] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields
       {
-        commodity_id: { renderer: :select, options: MasterfilesApp::CommodityRepo.new.for_select_commodities,
+        commodity_id: { renderer: :select,
+                        options: MasterfilesApp::CommodityRepo.new.for_select_commodities,
                         disabled_options: MasterfilesApp::CommodityRepo.new.for_select_inactive_commodities,
                         caption: 'Commodity Code',
                         required: true },
-        standard_pack_id: { renderer: :select, options: MasterfilesApp::FruitSizeRepo.new.for_select_standard_packs,
-                            disabled_options: MasterfilesApp::FruitSizeRepo.new.for_select_inactive_standard_packs,
-                            caption: 'Standard Pack',
+        standard_pack_id: { renderer: :select,
+                            options: @repo.for_select_standard_packs,
+                            disabled_options: @repo.for_select_inactive_standard_packs,
+                            caption: 'Standard Pack Code',
                             required: true },
         gross_weight: { renderer: :numeric,
+                        caption: 'Gross Weight (kg)',
                         required: true },
         nett_weight: { renderer: :numeric,
+                       caption: 'Nett Weight (kg)',
                        required: true },
-        standard_carton_nett_weight: { renderer: :numeric },
-        ratio_to_standard_carton: { renderer: :numeric },
-        is_standard_carton: { renderer: :checkbox }
+        is_standard_carton: { renderer: :checkbox,
+                              hint: 'Sets the selected standard pack code as the standard for the commodity, <br>
+                                     i.e. it is the implied packaging of any standard size count of the same commodity.' },
+        standard_carton_nett_weight: {
+          renderer: :numeric,
+          caption: 'Standard Carton Nett Weight (kg)',
+          hint: "This weight is only used for the calculation of standard cartons. <br>
+                Standard cartons for any pallet is calculated as follows: <br>
+                <blockquote>
+                  <em>carton quantity</em> &times; (<em>standard nett weight</em> of the commodity's <em>standard pack</em>) <br>
+                  &divide; (<em>standard carton nett weight</em> of the <em>standard pack</em> of the pallet)
+                </blockquote>"
+        },
+        ratio_to_standard_carton: { renderer: :numeric }
       }
     end
 
@@ -57,7 +69,7 @@ module UiRules
         return
       end
 
-      @form_object = @repo.find_standard_product_weight_flat(@options[:id])
+      @form_object = @repo.find_standard_product_weight(@options[:id])
     end
 
     def make_new_form_object

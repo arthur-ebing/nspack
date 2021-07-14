@@ -28,13 +28,13 @@ module MasterfilesApp
     end
 
     def test_edit
-      MasterfilesApp::FruitSizeRepo.any_instance.stubs(:find_standard_product_weight_flat).returns(entity)
+      MasterfilesApp::FruitSizeRepo.any_instance.stubs(:find_standard_product_weight).returns(entity)
       res = MasterfilesApp::TaskPermissionCheck::StandardProductWeight.call(:edit, 1)
       assert res.success, 'Should be able to edit a standard_product_weight'
     end
 
     def test_delete
-      MasterfilesApp::FruitSizeRepo.any_instance.stubs(:find_standard_product_weight_flat).returns(entity)
+      MasterfilesApp::FruitSizeRepo.any_instance.stubs(:find_standard_product_weight).returns(entity)
       res = MasterfilesApp::TaskPermissionCheck::StandardProductWeight.call(:delete, 1)
       assert res.success, 'Should be able to delete a standard_product_weight'
     end

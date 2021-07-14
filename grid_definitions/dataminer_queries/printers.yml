@@ -101,7 +101,7 @@
   pixels_per_mm:
     :name: pixels_per_mm
     :sequence_no: 7
-    :caption: Pixels per mm
+    :caption: Pixels per (mm)
     :namespaced_name: printers.pixels_per_mm
     :data_type: :integer
     :width: 130

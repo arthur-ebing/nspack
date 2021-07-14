@@ -87,6 +87,7 @@ module MasterfilesApp
         packed_tm_group_id: target_market_group_id,
         active: true,
         variety_as_customer_variety: 'ABC',
+        marketing_varieties: %w[A B C],
         packed_tm_group: 'ABC'
       }
     end

@@ -6,6 +6,7 @@ module MasterfilesApp
     attribute :commodity_id, Types::Integer
     attribute :commodity_code, Types::String
     attribute :uom_id, Types::Integer
+    attribute :uom_code, Types::String
     attribute :size_count_description, Types::String
     attribute :marketing_size_range_mm, Types::String
     attribute :marketing_weight_range, Types::String

@@ -177,16 +177,15 @@ module MasterfilesApp
       delete(:standard_pack_codes, id)
     end
 
-    def find_standard_product_weight_flat(id)
-      find_with_association(:standard_product_weights, id,
-                            parent_tables: [{ parent_table: :commodities,
-                                              columns: %i[code],
-                                              flatten_columns: { code: :commodity_code } },
-                                            { parent_table: :standard_pack_codes,
-                                              columns: %i[standard_pack_code],
-                                              foreign_key: :standard_pack_id,
-                                              flatten_columns: { standard_pack_code: :standard_pack_code } }],
-                            wrapper: StandardProductWeightFlat)
+    def find_standard_product_weight(id)
+      find_with_association(
+        :standard_product_weights, id,
+        parent_tables: [{ parent_table: :commodities,
+                          flatten_columns: { code: :commodity_code } },
+                        { parent_table: :standard_pack_codes, foreign_key: :standard_pack_id,
+                          flatten_columns: { standard_pack_code: :standard_pack_code } }],
+        wrapper: StandardProductWeightFlat
+      )
     end
 
     def find_std_fruit_size_count(id)
@@ -196,7 +195,8 @@ module MasterfilesApp
           commodities.code AS commodity_code,
           commodities.code || std_fruit_size_counts.size_count_value AS product_code,
           commodities.code || uoms.uom_code || std_fruit_size_counts.size_count_value AS system_code,
-          commodities.code || std_fruit_size_counts.size_count_value AS extended_description
+          commodities.code || std_fruit_size_counts.size_count_value AS extended_description,
+          uoms.uom_code
         FROM std_fruit_size_counts
         JOIN commodities ON commodities.id = std_fruit_size_counts.commodity_id
         JOIN uoms ON uoms.id = std_fruit_size_counts.uom_id

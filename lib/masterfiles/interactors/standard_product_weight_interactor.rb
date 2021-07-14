@@ -91,7 +91,7 @@ module MasterfilesApp
     end
 
     def standard_product_weight(id)
-      repo.find_standard_product_weight_flat(id)
+      repo.find_standard_product_weight(id)
     end
 
     def calculate_ratio_to_standard_carton(attrs, standard_product_weight_id = nil)
