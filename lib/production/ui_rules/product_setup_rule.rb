@@ -139,7 +139,7 @@ module UiRules
                              hide_on_load: !@rules[:gtins_required] }
       fields[:rmt_container_material_owner_id] = { renderer: :label,
                                                    with_value: rmt_container_material_owner,
-                                                   caption: 'Rmt Container Material Owner',
+                                                   caption: 'RMT Container Material Owner',
                                                    hide_on_load: !@rules[:requires_material_owner] }
     end
 
@@ -353,8 +353,8 @@ module UiRules
                      hide_on_load: !@rules[:gtins_required] },
         rmt_container_material_owner_id: { renderer: :select,
                                            options: @repo.for_select_rmt_container_material_owners,
-                                           caption: 'Rmt Container Material Owner',
-                                           prompt: 'Select Rmt Container Material Owner',
+                                           caption: 'RMT Container Material Owner',
+                                           prompt: 'Select RMT Container Material Owner',
                                            searchable: true,
                                            remove_search_for_small_list: false,
                                            hide_on_load: !@rules[:requires_material_owner] }

@@ -36,7 +36,7 @@ module MesscadaApp
       update_bin
 
       run_stats_bins_tipped = repo.get_run_bins_tipped(@run_id)
-      success_response('rmt bin tipped successfully', @run_attrs.merge(rmt_bin_id: @rmt_bin_id, run_id: @run_id, bins_tipped: run_stats_bins_tipped))
+      success_response('RMT Bin tipped successfully', @run_attrs.merge(rmt_bin_id: @rmt_bin_id, run_id: @run_id, bins_tipped: run_stats_bins_tipped))
     end
 
     def can_tip_bin? # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
@@ -56,7 +56,7 @@ module MesscadaApp
 
       run_stats_bins_tipped = repo.get_run_bins_tipped(run_res.instance)
       run_attrs = repo.get_run_setup_reqs(run_res.instance)
-      success_response('rmt bin is valid for tipping', run_attrs.merge(rmt_bin_id: @rmt_bin_id, run_id: run_res.instance, bins_tipped: run_stats_bins_tipped))
+      success_response('RMT Bin is valid for tipping', run_attrs.merge(rmt_bin_id: @rmt_bin_id, run_id: run_res.instance, bins_tipped: run_stats_bins_tipped))
     end
 
     private

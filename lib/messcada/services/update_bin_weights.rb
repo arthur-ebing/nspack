@@ -27,7 +27,7 @@ module MesscadaApp
 
       update_rmt_bin_weights(rmt_bin[:id], updates)
 
-      success_response('rmt bin weights updated successfully')
+      success_response('RMT Bin weights updated successfully')
     end
 
     private

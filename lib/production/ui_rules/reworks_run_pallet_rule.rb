@@ -127,8 +127,8 @@ module UiRules
       fields[:batch_number] = { invisible: !AppConst::CR_PROD.capture_batch_number_for_pallets? }
       fields[:rmt_container_material_owner_id] = { renderer: :select,
                                                    options: @setup_repo.for_select_rmt_container_material_owners,
-                                                   caption: 'Rmt Container Material Owner',
-                                                   prompt: 'Select Rmt Container Material Owner',
+                                                   caption: 'RMT Container Material Owner',
+                                                   prompt: 'Select RMT Container Material Owner',
                                                    searchable: true,
                                                    remove_search_for_small_list: false,
                                                    hide_on_load: !requires_material_owner }
