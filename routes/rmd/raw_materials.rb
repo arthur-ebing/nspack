@@ -1534,7 +1534,11 @@ class Nspack < Roda
                                        action: "/rmd/rmt_deliveries/rmt_bins/set_bin_level_complete/#{id}",
                                        button_caption: 'Finish')
 
-        form.add_field(:bin_asset_number, 'Asset Number', scan: 'key248_all', scan_type: :bin_asset, required: true, submit_form: false)
+        form.add_field(:bin_asset_number, 'Asset Number',
+                       scan: 'key248_all',
+                       scan_type: :bin_asset,
+                       required: false,
+                       submit_form: false)
         form.add_select(:bin_fullness, 'Bin Fullness', items: AppConst::BIN_FULLNESS_OPTIONS, prompt: true)
         form.add_button('Next Bin', "/rmd/rmt_deliveries/rmt_bins/set_bin_level_next/#{id}")
         form.add_csrf_tag csrf_tag
