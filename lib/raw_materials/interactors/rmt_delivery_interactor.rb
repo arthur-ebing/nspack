@@ -46,7 +46,8 @@ module RawMaterialsApp
           vehicle_loaded = repo.get_value(:rmt_deliveries, :tripsheet_loaded, id: id)
           vehicle_job_id = repo.get_id(:vehicle_jobs, rmt_delivery_id: id)
           stock_type_id = MesscadaApp::MesscadaRepo.new.get_value(:stock_types, :id, stock_type_code: AppConst::BIN_STOCK_TYPE)
-          (remove = tripheet_discreps.find_all { |d| !d[:bin_id] }.map { |v| v[:vehicle_job_unit_id] }).empty? ? nil : insp_repo.delete(:vehicle_job_units, remove)
+          to_remove = tripheet_discreps.find_all { |d| !d[:bin_id] }.map { |v| v[:vehicle_job_unit_id] }
+          insp_repo.delete(:vehicle_job_units, to_remove) unless to_remove.empty?
           tripheet_discreps.find_all { |d| !d[:vehicle_job_unit_id] }.map { |v| v[:bin_id] }.each do |b|
             res = validate_vehicle_job_unit_params(stock_item_id: b, stock_type_id: stock_type_id,
                                                    vehicle_job_id: vehicle_job_id)
@@ -60,7 +61,7 @@ module RawMaterialsApp
           log_transaction
         end
       end
-      success_response('Delivery Tripsheet Rfreshed')
+      success_response('Delivery Tripsheet Rereshed')
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue StandardError => e
