@@ -326,6 +326,13 @@ module FinishedGoodsApp
       VehicleJobUnit.new(hash)
     end
 
+    def find_vehicle_job_unit_by_stock_item_and_vehicle_job(stock_item_id, vehicle_job_id)
+      hash = DB[:vehicle_job_units].where(Sequel[:vehicle_job_units][:stock_item_id] => stock_item_id, Sequel[:vehicle_job_units][:vehicle_job_id] => vehicle_job_id).first
+      return nil if hash.nil?
+
+      VehicleJobUnit.new(hash)
+    end
+
     def delete_vehicle_job(vehicle_job_id)
       DB[:vehicle_job_units].where(vehicle_job_id: vehicle_job_id).delete
       DB[:vehicle_jobs].where(id: vehicle_job_id).delete
@@ -425,6 +432,19 @@ module FinishedGoodsApp
         .select(Sequel[:vehicle_jobs].*, Sequel[:vehicle_job_units][:id].as(:vehicle_job_unit_id))
         .where(stock_item_id: bin_id, vehicle_job_id: from_job_id)
         .first
+    end
+
+    def can_continue_intake_tripsheet(tripsheet_number)
+      hash = DB[:vehicle_jobs]
+             .join(:stock_types, id: :stock_type_id)
+             .where(Sequel[:vehicle_jobs][:id] => tripsheet_number, govt_inspection_sheet_id: nil, stock_type_code: AppConst::PALLET_STOCK_TYPE)
+             .first
+
+      return failed_response("Intake tripsheet:#{tripsheet_number} does not exist") unless hash
+      return failed_response("Tripsheet:#{tripsheet_number} already offloaded") if hash[:offloaded_at]
+      return failed_response("Tripsheet:#{tripsheet_number} has been completed") if hash[:loaded_at]
+
+      success_response 'continue'
     end
   end
 end

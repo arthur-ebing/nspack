@@ -213,12 +213,7 @@ module FinishedGoodsApp
     end
 
     def can_continue_tripsheet(tripsheet_number)
-      stock_type_id = MesscadaApp::MesscadaRepo.new.get_value(:stock_types, :id, stock_type_code: AppConst::PALLET_STOCK_TYPE)
-      return failed_response("Intake tripsheet:#{tripsheet_number} does not exist") unless repo.exists?(:vehicle_jobs, id: tripsheet_number, govt_inspection_sheet_id: nil, stock_type_id: stock_type_id)
-      return failed_response("Tripsheet:#{tripsheet_number} already offloaded") unless repo.exists?(:vehicle_jobs, id: tripsheet_number, offloaded_at: nil)
-      return failed_response("Tripsheet:#{tripsheet_number} has been completed") unless repo.exists?(:vehicle_jobs, id: tripsheet_number, loaded_at: nil)
-
-      success_response 'continue'
+      repo.can_continue_intake_tripsheet(tripsheet_number)
     end
 
     def complete_pallet_tripsheet(vehicle_job_id, print, printer) # rubocop:disable Metrics/AbcSize

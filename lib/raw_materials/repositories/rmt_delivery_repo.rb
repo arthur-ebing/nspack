@@ -554,5 +554,19 @@ module RawMaterialsApp
       SQL
       DB[query, vehicle_job_id]
     end
+
+    def can_continue_bin_tripsheet(tripsheet_number)
+      hash = DB[:vehicle_jobs]
+             .join(:stock_types, id: :stock_type_id)
+             .where(Sequel[:vehicle_jobs][:id] => tripsheet_number, stock_type_code: AppConst::BIN_STOCK_TYPE)
+             .first
+
+      return failed_response("Bin Tripsheet: #{tripsheet_number} does not exist") unless hash
+      return failed_response("Cannot Edit Delivery Tripsheet: #{tripsheet_number}") if hash[:rmt_delivery_id]
+      return failed_response("Tripsheet: #{tripsheet_number} already offloaded") if hash[:offloaded_at]
+      return failed_response("Trisheet: #{tripsheet_number} already completed") if hash[:loaded_at]
+
+      success_response 'continue'
+    end
   end
 end

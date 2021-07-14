@@ -1,7 +1,7 @@
 Sequel.migration do
   up do
     alter_table(:vehicle_jobs) do
-      add_column :items_moved_from_job_id, :Integer
+      add_foreign_key :items_moved_from_job_id , :vehicle_jobs, key: [:id]
     end
   end
 

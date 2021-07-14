@@ -231,8 +231,10 @@ module MasterfilesApp
     end
 
     def location_storage_types(id)
-      dataset = DB[:location_storage_types_locations].join(:location_storage_types, id: :location_storage_type_id).where(Sequel[:location_storage_types_locations][:location_id] => id)
-      select_single(dataset, :storage_type_code)
+      DB[:location_storage_types_locations]
+        .join(:location_storage_types, id: :location_storage_type_id)
+        .where(Sequel[:location_storage_types_locations][:location_id] => id)
+        .select_map(:storage_type_code)
     end
 
     def for_select_location_assignments_for(id)

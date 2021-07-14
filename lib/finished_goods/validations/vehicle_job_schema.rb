@@ -23,4 +23,15 @@ module FinishedGoodsApp
     optional(:rmt_delivery_id).maybe(:integer)
     optional(:items_moved_from_job_id).maybe(:integer)
   end
+
+  class TripsheetContract < Dry::Validation::Contract
+    params do
+      optional(:move_bins).maybe(:bool)
+      optional(:from_vehicle_job_id).maybe(:integer)
+    end
+
+    rule(:move_bins, :from_vehicle_job_id) do
+      base.failure 'Please scan tripsheet' if values[:move_bins] && values[:from_vehicle_job_id].nil_or_empty?
+    end
+  end
 end
