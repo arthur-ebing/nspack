@@ -26,7 +26,7 @@ module UiRules
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
       @options ||= {}
-      fields[:id] = { renderer: :label, caption: 'Bin Number' }
+      fields[:id] = { renderer: :label, caption: 'Delivery Id' }
       fields[:orchard_id] = { renderer: :label,
                               with_value: MasterfilesApp::FarmRepo.new.find_orchard(@form_object.orchard_id)&.orchard_code,
                               caption: 'Orchard' }
@@ -75,7 +75,7 @@ module UiRules
       fields[:keep_open] = { renderer: :label,
                              as_boolean: true }
       fields[:bin_scan_mode] = { renderer: :label,
-                                 with_value: @form_object.bin_scan_mode.nil? ? @form_object.bin_scan_mode : AppConst::BIN_SCAN_MODE_OPTIONS.find { |m| m[1] == @form_object.bin_scan_mode }[0] }
+                                 with_value: @form_object.bin_scan_mode || AppConst::BIN_SCAN_MODE_OPTIONS.find { |m| m[1] == @form_object.bin_scan_mode }[0] }
       fields[:active] = { renderer: :label,
                           as_boolean: true }
       fields[:batch_number] = { renderer: :label }
@@ -84,7 +84,7 @@ module UiRules
 
     def common_fields # rubocop:disable Metrics/AbcSize
       {
-        id: { renderer: :label, caption: 'Bin Number' },
+        id: { renderer: :label, caption: 'Delivery Id' },
         farm_id: { renderer: :select,
                    options: MasterfilesApp::FarmRepo.new.for_select_farms,
                    disabled_options: MasterfilesApp::FarmRepo.new.for_select_inactive_farms,
@@ -107,12 +107,15 @@ module UiRules
                         with_value: @options[:farm_section].to_s,
                         hide_on_load: @options[:farm_section].nil_or_empty? },
         cultivar_id: { renderer: :select,
-                       options: MasterfilesApp::CultivarRepo.new.for_select_cultivars(where: { id: @repo.get(:orchards, @form_object.orchard_id, :cultivar_ids).to_a }),
+                       options: MasterfilesApp::CultivarRepo.new.for_select_cultivars(
+                         where: { id: @repo.get(:orchards, @form_object.orchard_id, :cultivar_ids).to_a }
+                       ),
                        disabled_options: MasterfilesApp::CultivarRepo.new.for_select_inactive_cultivars,
                        caption: 'Cultivar',
                        required: true,
                        prompt: true },
-        rmt_delivery_destination_id: { renderer: :select, options: MasterfilesApp::RmtDeliveryDestinationRepo.new.for_select_rmt_delivery_destinations,
+        rmt_delivery_destination_id: { renderer: :select,
+                                       options: MasterfilesApp::RmtDeliveryDestinationRepo.new.for_select_rmt_delivery_destinations,
                                        disabled_options: MasterfilesApp::RmtDeliveryDestinationRepo.new.for_select_inactive_rmt_delivery_destinations,
                                        caption: 'Destination',
                                        required: AppConst::DELIVERY_USE_DELIVERY_DESTINATION,
@@ -191,8 +194,10 @@ module UiRules
     def add_behaviours
       behaviours do |behaviour|
         behaviour.dropdown_change :farm_id, notify: [{ url: '/raw_materials/deliveries/rmt_deliveries/farm_combo_changed' }]
-        behaviour.dropdown_change :puc_id, notify: [{ url: '/raw_materials/deliveries/rmt_deliveries/puc_combo_changed', param_keys: %i[rmt_delivery_farm_id rmt_delivery_puc_id] }]
-        behaviour.dropdown_change :orchard_id, notify: [{ url: '/raw_materials/deliveries/rmt_deliveries/orchard_combo_changed', param_keys: %i[rmt_delivery_orchard_id] }]
+        behaviour.dropdown_change :puc_id, notify: [{ url: '/raw_materials/deliveries/rmt_deliveries/puc_combo_changed',
+                                                      param_keys: %i[rmt_delivery_farm_id rmt_delivery_puc_id] }]
+        behaviour.dropdown_change :orchard_id, notify: [{ url: '/raw_materials/deliveries/rmt_deliveries/orchard_combo_changed',
+                                                          param_keys: %i[rmt_delivery_orchard_id] }]
       end
     end
   end
