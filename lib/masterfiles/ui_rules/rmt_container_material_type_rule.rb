@@ -21,7 +21,7 @@ module UiRules
     def set_show_fields
       # rmt_container_type_id_label = MasterfilesApp::RmtContainerTypeRepo.new.find_rmt_container_type(@form_object.rmt_container_type_id)&.container_type_code
       rmt_container_type_id_label = @repo.find(:rmt_container_types, MasterfilesApp::RmtContainerType, @form_object.rmt_container_type_id)&.container_type_code
-      fields[:rmt_container_type_id] = { renderer: :label, with_value: rmt_container_type_id_label, caption: 'Rmt Container Type' }
+      fields[:rmt_container_type_id] = { renderer: :label, with_value: rmt_container_type_id_label, caption: 'RMT Container Type' }
       fields[:container_material_type_code] = { renderer: :label }
       fields[:description] = { renderer: :label }
       fields[:tare_weight] = { renderer: :label }

@@ -11,7 +11,7 @@ module Masterfiles
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form do |form|
-              # form.caption 'Rmt Container Material Type'
+              # form.caption 'RMT Container Material Type'
               form.view_only!
               form.add_field :rmt_container_type_id
               form.add_field :container_material_type_code

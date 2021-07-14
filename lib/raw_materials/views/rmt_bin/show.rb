@@ -11,7 +11,7 @@ module RawMaterials
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form do |form|
-              form.caption 'Rmt Bin'
+              form.caption 'RMT Bin'
               form.view_only!
               form.add_field :bin_asset_number
               form.add_field :farm_id

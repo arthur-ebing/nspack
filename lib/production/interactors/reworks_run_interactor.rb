@@ -1226,7 +1226,7 @@ module ProductionApp
         log_status(:production_runs, attrs[:production_run_id], AppConst::REWORKS_ORCHARD_MIX) if attrs[:tip_orchard_mixing]
         log_status(:reworks_runs, rw_res.instance[:reworks_run_id], AppConst::RMT_BIN_TIPPED_MANUALLY)
       end
-      success_response('Rmt Bin tipped successfully', pallet_number: attrs[:pallets_selected])
+      success_response('RMT Bin tipped successfully', pallet_number: attrs[:pallets_selected])
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue StandardError => e
@@ -1309,7 +1309,7 @@ module ProductionApp
 
         log_status(:reworks_runs, rw_res.instance[:reworks_run_id], AppConst::RMT_BIN_UNTIPPED_MANUALLY)
       end
-      success_response('Rmt Bin untipped successfully', pallet_number: attrs[:pallets_selected])
+      success_response('RMT Bin untipped successfully', pallet_number: attrs[:pallets_selected])
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue StandardError => e
@@ -1355,7 +1355,7 @@ module ProductionApp
 
         log_status(:reworks_runs, rw_res.instance[:reworks_run_id], AppConst::BULK_WEIGH_RMT_BINS)
       end
-      success_response('Rmt Bulk Bin Weighing was successfully', pallet_number: attrs[:pallets_selected])
+      success_response('RMT Bulk Bin Weighing was successfully', pallet_number: attrs[:pallets_selected])
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue StandardError => e
@@ -1418,7 +1418,7 @@ module ProductionApp
 
         log_reworks_rmt_bin_status_and_transaction(rw_res.instance[:reworks_run_id], rmt_bin_id, AppConst::RMT_BIN_WEIGHED_MANUALLY)
       end
-      success_response('Rmt Bin weighed successfully', pallet_number: attrs[:bin_number])
+      success_response('RMT Bin weighed successfully', pallet_number: attrs[:bin_number])
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

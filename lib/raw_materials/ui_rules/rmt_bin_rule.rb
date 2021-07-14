@@ -79,7 +79,7 @@ module UiRules
       fields[:bin_fullness] = { renderer: :label }
       fields[:gross_weight] = { renderer: :label }
       fields[:nett_weight] = { renderer: :label }
-      fields[:rmt_class_id] = { renderer: :label, with_value: rmt_class_id_label, caption: 'Rmt Class' }
+      fields[:rmt_class_id] = { renderer: :label, with_value: rmt_class_id_label, caption: 'RMT Class' }
       fields[:rmt_container_material_type_id] = { renderer: :label, with_value: rmt_container_material_type_id_label, caption: 'Container Material Type' }
       fields[:rmt_material_owner_party_role_id] = { renderer: :label, with_value: rmt_material_owner_party_role_id_label, caption: 'Container Material Owner' }
       fields[:rmt_inner_container_type_id] = { renderer: :label, with_value: rmt_inner_container_type_id_label, caption: 'Inner Container Type' }

@@ -686,7 +686,7 @@ class Nspack < Roda
           end
 
           # form.add_field(:bin_asset_number, 'Bin Number', scan: 'key248_all', scan_type: :bin_asset, required: true, submit_form: false)
-          form.add_select(:rmt_class_id, 'Rmt Class', items: MasterfilesApp::FruitRepo.new.for_select_rmt_classes, prompt: true, required: true)
+          form.add_select(:rmt_class_id, 'RMT Class', items: MasterfilesApp::FruitRepo.new.for_select_rmt_classes, prompt: true, required: true)
           form.add_select(:production_line_id, 'Production Line', items: ProductionApp::ResourceRepo.new.for_select_plant_resources_of_type('LINE'), prompt: true, required: true)
           form.add_select(:production_run_rebin_id, 'Production Run', items: form_state[:production_line_id] ? ProductionApp::ProductionRunRepo.new.for_select_production_runs_for_line(form_state[:production_line_id]) : [], prompt: true, required: true)
           form.add_label(:farm, 'Farm', form_state[:farm_code])
@@ -784,7 +784,7 @@ class Nspack < Roda
             behaviour.dropdown_change :rmt_container_material_type_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/rmt_bin_rebin_container_material_type_combo_changed' }] if capture_container_material_owner
           end
 
-          form.add_select(:rmt_class_id, 'Rmt Class', items: MasterfilesApp::FruitRepo.new.for_select_rmt_classes, required: true)
+          form.add_select(:rmt_class_id, 'RMT Class', items: MasterfilesApp::FruitRepo.new.for_select_rmt_classes, required: true)
           form.add_select(:production_line_id, 'Production Line', items: ProductionApp::ResourceRepo.new.for_select_plant_resources_of_type('LINE'), prompt: true, required: true)
           form.add_select(:production_run_rebin_id, 'Production Run', items: ProductionApp::ProductionRunRepo.new.for_select_production_runs_for_line(rebin[:production_line_id]), prompt: true, required: true)
           form.add_label(:farm, 'Farm', form_state[:farm_code])
@@ -1137,7 +1137,7 @@ class Nspack < Roda
         form.add_label(:bins_received, 'Bins Received', delivery[:bins_received])
         form.add_label(:qty_bins_remaining, 'Qty Bins Remaining', delivery[:qty_bins_remaining])
         form.add_select(:rmt_container_type_id, 'Container Type', items: MasterfilesApp::RmtContainerTypeRepo.new.for_select_rmt_container_types, value: default_rmt_container_type[:id], required: true, prompt: true)
-        form.add_select(:rmt_class_id, 'Rmt Class', items: MasterfilesApp::FruitRepo.new.for_select_rmt_classes, prompt: true, required: false)
+        form.add_select(:rmt_class_id, 'RMT Class', items: MasterfilesApp::FruitRepo.new.for_select_rmt_classes, prompt: true, required: false)
 
         if capture_container_material
           form.add_select(:rmt_container_material_type_id, 'Container Material Type',
@@ -1684,7 +1684,7 @@ class Nspack < Roda
       delivery_codes = RawMaterialsApp::RmtDeliveryRepo.new.for_select_delivery_context_info unless retrieve_from_local_store(:new_bin_mode) == :edit_delivery
       delivery_codes.unshift(["#{bin_delivery[:id]}_#{bin_delivery[:puc_code]}_#{bin_delivery[:orchard_code]}_#{bin_delivery[:cultivar_code]}_#{bin_delivery[:date_delivered]}", bin_delivery[:id]]) unless bin_delivery.empty?
       form.add_select(:delivery_id, 'Delivery', items: delivery_codes.uniq, value: bin_delivery[:id], prompt: true, required: true)
-      form.add_select(:rmt_class_id, 'Rmt Class', items: MasterfilesApp::FruitRepo.new.for_select_rmt_classes, prompt: true, required: false)
+      form.add_select(:rmt_class_id, 'RMT Class', items: MasterfilesApp::FruitRepo.new.for_select_rmt_classes, prompt: true, required: false)
       form.add_select(:rmt_container_type_id, 'Container Type', items: MasterfilesApp::RmtContainerTypeRepo.new.for_select_rmt_container_types, value: default_rmt_container_type[:id],
                                                                 required: true, prompt: true)
       form.add_label(:qty_bins, 'Qty Bins', 1, 1)

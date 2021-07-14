@@ -11,7 +11,7 @@ module RawMaterials
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form do |form|
-              # form.caption 'Rmt Delivery Cost'
+              # form.caption 'RMT Delivery Cost'
               form.view_only!
               form.add_field :cost_id
               form.add_field :amount

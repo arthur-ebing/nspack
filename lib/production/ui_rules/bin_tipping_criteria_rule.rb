@@ -28,9 +28,9 @@ module UiRules
       fields[:season_code] = { renderer: :checkbox, disabled: true }
       fields[:track_indicator_code] = { renderer: :checkbox, disabled: true }
       fields[:ripe_point_code] = { renderer: :checkbox, disabled: true }
-      fields[:rmt_product_type_label] = { renderer: :label, caption: 'Rmt Product Type', min_charwidth: 30 }
+      fields[:rmt_product_type_label] = { renderer: :label, caption: 'RMT Product Type', min_charwidth: 30 }
       fields[:treatment_code_label] = { renderer: :label, caption: 'Color' }
-      fields[:rmt_size_label] = { renderer: :label, caption: 'Rmt Size' }
+      fields[:rmt_size_label] = { renderer: :label, caption: 'RMT Size' }
       fields[:ripe_point_code_label] = { renderer: :label, caption: 'Ripe Point Code' }
       fields[:pc_code_label] = { renderer: :label, caption: 'Pc Code', min_charwidth: 30 }
       fields[:product_class_code_label] = { renderer: :label, caption: 'Product Class Code' }

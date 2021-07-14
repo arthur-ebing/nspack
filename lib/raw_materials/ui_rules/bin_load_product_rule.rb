@@ -31,7 +31,7 @@ module UiRules
       fields[:farm_id] = { renderer: :label, with_value: @form_object.farm_code, caption: 'Farm' }
       fields[:puc_id] = { renderer: :label, with_value: @form_object.puc_code, caption: 'PUC' }
       fields[:orchard_id] = { renderer: :label, with_value: @form_object.orchard_code, caption: 'Orchard' }
-      fields[:rmt_class_id] = { renderer: :label, with_value: @form_object.rmt_class_code, caption: 'Rmt Class' }
+      fields[:rmt_class_id] = { renderer: :label, with_value: @form_object.rmt_class_code, caption: 'RMT Class' }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
@@ -84,7 +84,7 @@ module UiRules
                         options: @fruit_repo.for_select_rmt_classes,
                         disabled_options: @fruit_repo.for_select_inactive_rmt_classes,
                         prompt: true,
-                        caption: 'Rmt Class' }
+                        caption: 'RMT Class' }
       }
     end
 
@@ -108,7 +108,7 @@ module UiRules
       fields[:bin_ids] = { renderer: :textarea,
                            rows: 12,
                            placeholder: 'Scan bins here',
-                           caption: 'Rmt Bins',
+                           caption: 'RMT Bins',
                            required: true }
     end
 
