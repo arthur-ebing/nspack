@@ -8,7 +8,6 @@ module MesscadaApp
 
       opts[:carton_label_id] ||= create_carton_label
       opts[:palletizer_identifier_id] ||= create_personnel_identifier
-      opts[:pallet_sequence_id] ||= create_pallet_sequence
       opts[:palletizing_bay_resource_id] ||= create_plant_resource
       opts[:palletizer_contract_worker_id] ||= create_contract_worker
 

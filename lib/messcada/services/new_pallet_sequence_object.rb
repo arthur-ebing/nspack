@@ -14,6 +14,8 @@ module MesscadaApp
 
     def call
       @carton = repo.find_carton(carton_id)
+      return failed_response('Carton not found.') if carton.nil?
+
       @cartons_per_pallet = repo.find_cartons_per_pallet(carton[:cartons_per_pallet_id])
       @carton_equals_pallet = repo.carton_label_carton_equals_pallet(carton[:carton_label_id])
 
