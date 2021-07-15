@@ -24,6 +24,7 @@ module EdiApp
           (SELECT SUM(carton_quantity) FROM pallets WHERE load_id = loads.id) AS ctn_qty,
           depots.depot_code AS next_code,
           depots.depot_code AS locn_code,
+          depots.depot_code AS location_code,
           loads.customer_order_number AS master_ord,
           EXTRACT(YEAR FROM seasons.end_date)::integer AS season,
           #{load_code} AS trip_no,
