@@ -46,13 +46,18 @@ module EdiApp
       EdiOutRepo.new.flow_has_destination?(flow_type)
     end
 
-    def should_send_specific_edi?
+    def should_send_specific_edi? # rubocop:disable Metrics/AbcSize
       klass = "TaskPermissionCheck::#{flow_type.capitalize}"
       if EdiApp.const_defined?(klass)
         EdiApp.const_get(klass).call(:send_edi, party_role_id, record_id)
       else
         EdiOutRepo.new.flow_has_matching_rule(flow_type, party_role_ids: Array(party_role_id))
       end
+    rescue Crossbeams::FrameworkError => e
+      ErrorMailer.send_exception_email(e, subject: "#{self.class.name} - #{e.message}", message: "EDI OUT FLOW: #{flow_type}. From method: #{__method__}")
+      puts e.message
+      puts e.backtrace.join("\n")
+      raise
     end
   end
 end
