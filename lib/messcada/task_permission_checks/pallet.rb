@@ -61,7 +61,7 @@ module MesscadaApp
         end
 
         unless @check_pallet_ids.empty?
-          @pallet_ids = repo.select_values(:pallets, :id, pallet_number: @check_pallet_ids)
+          @pallet_ids = repo.select_values(:pallets, :id, id: @check_pallet_ids)
           errors = @check_pallet_ids - pallet_ids
           return failed_response "Pallet id: #{errors.join(', ')} doesn't exist." unless errors.empty?
         end
