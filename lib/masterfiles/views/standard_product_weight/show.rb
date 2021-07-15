@@ -13,13 +13,13 @@ module Masterfiles
             page.form do |form|
               # form.caption 'Standard Product Weight'
               form.view_only!
-              form.add_field :commodity_id
-              form.add_field :standard_pack_id
+              form.add_field :commodity_code
+              form.add_field :standard_pack_code
               form.add_field :gross_weight
               form.add_field :nett_weight
+              form.add_field :is_standard_carton
               form.add_field :standard_carton_nett_weight
               form.add_field :ratio_to_standard_carton
-              form.add_field :is_standard_carton
               form.add_field :active
             end
           end
