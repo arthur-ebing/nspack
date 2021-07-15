@@ -10,8 +10,8 @@ module FinishedGoodsApp
     required(:elot_key).maybe(Types::StrippedString)
     required(:verification_key).maybe(Types::StrippedString)
     required(:passed).filled(:bool)
-    required(:process_result).maybe(:array).each(:string)
-    required(:rejection_reasons).maybe(:array).each(:string)
+    required(:process_result).maybe(:array).maybe { each(:string) }
+    required(:rejection_reasons).maybe(:array).maybe { each(:string) }
   end
 
   EcertElotSchema = Dry::Schema.Params do
