@@ -10,6 +10,7 @@ module MasterfilesApp
       base_attrs = {
         id: 1,
         rmt_container_type_id: 1,
+        rmt_container_type: 'ABC',
         container_material_type_code: 'ABC',
         description: 'ABC',
         tare_weight: 1.0,

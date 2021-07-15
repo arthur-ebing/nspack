@@ -73,6 +73,7 @@ module MasterfilesApp
       {
         id: 1,
         rmt_container_type_id: rmt_container_type_id,
+        rmt_container_type: 'ABC',
         container_material_type_code: Faker::Lorem.unique.word,
         description: 'ABC',
         tare_weight: 1.0,

@@ -25,17 +25,12 @@ module MasterfilesApp
       DB[qry, bin_asset_number, bin_asset_number].first
     end
 
-    def for_select_party_roles
-      DB[:party_roles]
-        .join(:roles, id: :role_id)
-        .select(Sequel[:party_roles][:id], Sequel.function(:fn_party_role_name_with_role, Sequel[:party_roles][:id]))
-        .where(name: AppConst::ROLE_RMT_BIN_OWNER)
-        .order(Sequel.function(:fn_party_role_name_with_role, Sequel[:party_roles][:id]))
-        .map(%i[fn_party_role_name_with_role id])
-    end
-
     def find_rmt_container_material_type(id)
-      hash = DB[:rmt_container_material_types].where(id: id).first
+      hash = find_with_association(
+        :rmt_container_material_types, id,
+        parent_tables: [{ parent_table: :rmt_container_types, foreign_key: :rmt_container_type_id,
+                          flatten_columns: { container_type_code: :rmt_container_type } }]
+      )
       return nil if hash.nil?
 
       hash[:party_role_ids] = party_role_ids(hash[:id])

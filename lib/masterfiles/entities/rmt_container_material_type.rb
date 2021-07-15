@@ -4,6 +4,7 @@ module MasterfilesApp
   class RmtContainerMaterialType < Dry::Struct
     attribute :id, Types::Integer
     attribute :rmt_container_type_id, Types::Integer
+    attribute :rmt_container_type, Types::String
     attribute :container_material_type_code, Types::String
     attribute :description, Types::String
     attribute :tare_weight, Types::Decimal
