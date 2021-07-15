@@ -19,10 +19,10 @@ To achieve this, the `order_items.yml` file would include the following:
 [source,yaml]
 ----
 :conditions:
-  :standard:          # <1>
-    - :col: order_id  # <2>
-      :op: =          # <3>
-      :val: $:id$     # <4>
+  :standard:            <1>
+    - :col: order_id    <2>
+      :op: =            <3>
+      :val: $:id$       <4>
 ----
 <1> This matches the value of the `key` parameter from the page url.
 <2> The column to be filtered. There can be more than one set of columns (repeated with a `-` as YAML array items).
@@ -61,14 +61,16 @@ layout.build do |page, page_config|
   end
   page.section do |section|
     section.add_grid('order_grid',
-                     '/list/order_items',     # <1>
+                     '/list/order_items',                                            <1>
                      caption: 'Order Items',
-                     grid_params: params)     # <2>
+                     grid_params: params,                                            <2>
+                     colour_key: UtilityFunctions.colour_key_for_list('order_grid')) <3>
   end
 end
 ----
 <1> The url contains the yaml file name (`order_items`).
 <2> Pass in the parameters which in this case should be `{ key: 'standard', id: 1 }`. These will match in the same way as set out above.
+<3> Read the colour key (if defined) from the list YAML file's report definition.
 
 ==== 3. Several conditions in one list YAML file
 
@@ -80,18 +82,18 @@ This example of `order_items.yml` list file will return different rows for the f
 [source,yaml]
 ----
 :conditions:
-  :standard:          # <1>
+  :standard:            <1>
     - :col: order_id
       :op: =
       :val: $:id$
-  :customer:          # <2>
+  :customer:            <2>
     - :col: customer_id
       :op: =
       :val: $:id$
     - :col: active
       :op: =
       :val: $:active$
-      :optional: true # <3>
+      :optional: true   <3>
 ----
 <1> Key is `standard`, uses `WHERE order_id = 1`
 <2> Key is `customer`, uses `WHERE customer_id = 5 AND NOT active`
@@ -172,13 +174,13 @@ Columns can be specified to be calculated by the grid. This is especailly useful
 
 [source,yaml]
 ----
-:calculated_columns:                            # <1>
-  - :name: total_price                          # <2>
-    :caption: Total price                       # <3>
-    :data_type: :number                         # <4>
-    :format: :delimited_1000                    # <5>
-    :expression: quantity_required * unit_price # <6>
-    :position: 9                                # <7>
+:calculated_columns:                              <1>
+  - :name: total_price                            <2>
+    :caption: Total price                         <3>
+    :data_type: :number                           <4>
+    :format: :delimited_1000                      <5>
+    :expression: quantity_required * unit_price   <6>
+    :position: 9                                  <7>
 ----
 <1> There can be any number of calculated columns in the array.
 <2> `name` must be unique amongst all columns of the grid.
@@ -197,29 +199,29 @@ Every time an editable cell is changed, a URL will be called with the row id, th
 [source,yaml]
 ----
 :edit_rules:
-  :url: /path/to/$:id$/inline_save       # <1>
-  :editable_fields:                      # <2>
-    code:                                # <3>
+  :url: /path/to/$:id$/inline_save         <1>
+  :editable_fields:                        <2>
+    code:                                  <3>
     description:
-      :editor: :textarea                 # <4>
+      :editor: :textarea                   <4>
     amount:
-      :editor: :numeric                  # <5>
+      :editor: :numeric                    <5>
     condition:
-      :editor: :select                   # <6>
-      :width: 350                        # <7>
-      :values:                           # <8>
+      :editor: :select                     <6>
+      :width: 350                          <7>
+      :values:                             <8>
         - Ok
         - Fair
         - Poor
     role:
       :editor: :select
-      :value_sql: SELECT code FROM roles # <9>
+      :value_sql: SELECT code FROM roles   <9>
     company:
-      :editor: :search_select            # <10>
+      :editor: :search_select              <10>
       :value_sql: SELECT company FROM companies
     allocation:
-      :editor: :search_select            # <10>
-      :lookup_url: "/path/$:id%"         # <11>
+      :editor: :search_select              <10>
+      :lookup_url: "/path/$:id%"           <11>
 ----
 <1> This is required. The url should include `$:id$` which will be replaced with the row's id value.
 <2> This is required. `editable_fields` is a Hash of column names with options for editing.
@@ -274,10 +276,10 @@ Also the list or search yml must provide some config values like the following:
 [source,yaml]
 ----
 :tree:
-  :tree_column: path_array           # <1>
-  :tree_caption: Location Hierarchy  # <2>
-  :suppress_node_counts: false       # <3>
-  :groupDefaultExpanded: 1           # <4>
+  :tree_column: path_array             <1>
+  :tree_caption: Location Hierarchy    <2>
+  :suppress_node_counts: false         <3>
+  :groupDefaultExpanded: 1             <4>
 ----
 <1> `path_array` in this instance is the resultset column that contains the ancestors of the current row in an ordered array. See SQL example below.
 <2> The caption of the grid column that shows the expandable tree hierarchy.

@@ -10,6 +10,9 @@ class Nspack < Roda
 
       r.get do
         notice = retrieve_from_local_store(:flash_notice)
+        default_location = MasterfilesApp::LocationRepo.new.find_location_by_location_long_code(AppConst::DEFAULT_FIRST_INTAKE_LOCATION)
+        raise Crossbeams::InfoError, "#{AppConst::DEFAULT_FIRST_INTAKE_LOCATION} does not exist as the default first intake location" if default_location.nil?
+
         form_state = { location: MasterfilesApp::LocationRepo.new.find_location_by_location_long_code(AppConst::DEFAULT_FIRST_INTAKE_LOCATION).location_short_code }
         error = retrieve_from_local_store(:error)
         form_state.merge!(error_message: error[:message]) unless error.nil?

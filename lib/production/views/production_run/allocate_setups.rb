@@ -11,7 +11,7 @@ module Production
           grid_name = rules[:locked_allocations] ? 'production_run_allocated_setups_view' : 'production_run_allocated_setups'
 
           caption = rules[:use_packing_specifications] ? 'Packing Specifications' : 'Setups'
-          layout = Crossbeams::Layout::Page.build(rules) do |page|
+          Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
@@ -31,19 +31,10 @@ module Production
               section.fit_height!
               section.add_grid('production_run_allocated_setups',
                                "/list/#{grid_name}/grid?key=standard&production_run_id=#{id}",
+                               colour_key: UtilityFunctions.colour_key_for_list(grid_name),
                                caption: "Allocate #{caption} for production run #{ui_rule.form_object.production_run_code}")
             end
-            # show grid
-            # page.form do |form|
-            #   form.caption 'Allocate setups to Production Run'
-            #   form.action "/production/runs/production_runs/#{id}"
-            #   form.remote!
-            #   form.method :update
-            #   form.add_field :farm_id
-            # end
           end
-
-          layout
         end
       end
     end

@@ -256,6 +256,25 @@ module UtilityFunctions # rubocop:disable Metrics/ModuleLength
     Crossbeams::Layout::LoadingMessage.new(caption: message, wrap_for_centre: true).render
   end
 
+  # Fetch the colour key for a list grid.
+  #
+  # Example of usage:
+  #
+  #    section.add_grid('production_run_allocated_setups',
+  #                     "/list/#{grid_name}/grid?key=standard&production_run_id=#{id}",
+  #                     colour_key: UtilityFunctions.colour_key_for_list(grid_name),
+  #                     caption: 'Allocate')
+  #
+  # @param grid_name [string] the name of the list.
+  # @return [Hash] the colour rule key
+  def colour_key_for_list(grid_name)
+    fn = File.join('grid_definitions/lists', "#{grid_name}.yml")
+    hs = YAML.load(File.read(fn)) # rubocop:disable Security/YAMLLoad
+    rpt = File.join('grid_definitions/dataminer_queries', "#{hs[:dataminer_definition]}.yml")
+    hs = YAML.load(File.read(rpt)) # rubocop:disable Security/YAMLLoad
+    (hs[:external_settings] || {})[:colour_key]
+  end
+
   # Render an SVG icon.
   #
   # @param name [symbol] the name of the icon to render.
