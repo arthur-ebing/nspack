@@ -104,10 +104,12 @@ Conditions:
 * `notify:` Array of Hashes
 +
 Notify Hash elements:
-* `url:` String - the url to call when the selected value changes.
-* `param_keys` [OPTIONAL] Array of Symbols - If matching an id in the form, the key+value will be sent as a parameter to the `url`. You can also define non-form keys which will use the matching value in `param_values`.
-* `param_values` [OPTIONAL] Hash - a key must match a Symbol in `param_keys`. The value in the Hash will be sent with the key as a parameter to the `url`.
+  * `url:` String - the url to call when the selected value changes.
+  * `param_keys` [OPTIONAL] Array of Symbols - If matching a DOM id in the form, the key+value will be sent as a parameter to the `url`. You can also define non-form keys which will use the matching value in `param_values`.
+  * `param_values` [OPTIONAL] Hash - a key must match a Symbol in `param_keys`. The value in the Hash will be sent with the key as a parameter to the `url`.
 +
+
+NOTE: `param_keys` must include the form name if the value is to be taken from the value in the DOM. Otherwise it just matches a key in the `param_values`. For example, if the form id is `"users"` and the field name is `user_login`, the DOM key will need to be `users_user_login`.
 
 Example:
 
@@ -121,7 +123,7 @@ behaviours do |behaviour|
   # - one from the form and one defined in the UiRules file.
   behaviour.dropdown_change :function_id, notify: [{ url: '/a/path/to/somewhere' },
                                                    { url: '/a/path/to/somewhere/else',
-                                                     param_keys: %i[this_id users_user_login],
+                                                     param_keys: %i[users_user_login this_id],
                                                      param_values: { this_id: 123 }
                                                    }]
 end
