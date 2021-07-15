@@ -456,12 +456,12 @@ module MesscadaApp
     end
 
     def check_pallet!(task, pallet_number)
-      res = TaskPermissionCheck::Pallets.call(task, pallet_number: pallet_number)
+      res = TaskPermissionCheck::Pallet.call(task, pallet_number: pallet_number)
       raise Crossbeams::InfoError, res.message unless res.success
     end
 
     def assert_permission!(task, pallet_number)
-      res = TaskPermissionCheck::Pallets.call(task, pallet_number: pallet_number)
+      res = TaskPermissionCheck::Pallet.call(task, pallet_number: pallet_number)
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 

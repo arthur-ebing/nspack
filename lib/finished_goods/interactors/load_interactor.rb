@@ -345,7 +345,7 @@ module FinishedGoodsApp
     end
 
     def check_pallets!(check, pallet_numbers, load_id = nil)
-      res = MesscadaApp::TaskPermissionCheck::Pallets.call(check, pallet_number: pallet_numbers, load_id: load_id)
+      res = MesscadaApp::TaskPermissionCheck::Pallet.call(check, pallet_number: pallet_numbers, load_id: load_id)
       raise Crossbeams::InfoError, res.message unless res.success
     end
 
