@@ -122,7 +122,7 @@ module UiRules
                               disabled_options: MasterfilesApp::TargetMarketRepo.new.for_select_packed_tm_groups,
                               caption: 'Packed TM Group',
                               prompt: true,
-                              required: true },
+                              required: false },
         final_receiver_party_role_id: { renderer: :select,
                                         options: @party_repo.for_select_party_roles(AppConst::ROLE_FINAL_RECEIVER),
                                         disabled_options: @party_repo.for_select_inactive_party_roles(AppConst::ROLE_FINAL_RECEIVER),

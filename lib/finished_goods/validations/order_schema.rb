@@ -12,7 +12,7 @@ module FinishedGoodsApp
     required(:customer_payment_term_set_id).filled(:integer)
     required(:target_customer_party_role_id).maybe(:integer)
     required(:exporter_party_role_id).filled(:integer)
-    required(:packed_tm_group_id).filled(:integer)
+    required(:packed_tm_group_id).maybe(:integer)
     required(:final_receiver_party_role_id).filled(:integer)
     required(:marketing_org_party_role_id).filled(:integer)
     optional(:allocated).filled(:bool)
