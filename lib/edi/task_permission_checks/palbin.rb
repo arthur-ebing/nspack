@@ -16,6 +16,13 @@ module EdiApp
         send_edi: :send_edi_check
       }.freeze
 
+      VALID_ROLES = {
+        AppConst::ROLE_CUSTOMER => :customer_party_role_id,
+        AppConst::ROLE_EXPORTER => :exporter_party_role_id
+      }.freeze
+
+      DEPOT_VALID = true
+
       def call
         return failed_response("There is no load with id #{record_id}") unless @entity
 
@@ -28,10 +35,17 @@ module EdiApp
       private
 
       def send_edi_check
+        raise Crossbeams::FrameworkError, "AppConst::EDI_OUT_RULES_TEMPLATE is incorrectly set up for '#{AppConst::EDI_FLOW_PALBIN}'." unless app_const_rule_ok?
+
+        role_ids = VALID_ROLES.values.map { |v| @entity.send(v) }
         EdiOutRepo.new.flow_has_matching_rule(AppConst::EDI_FLOW_PALBIN,
                                               depot_ids: Array(@entity.depot_id),
-                                              party_role_ids: [@entity.customer_party_role_id,
-                                                               @entity.exporter_party_role_id])
+                                              party_role_ids: role_ids)
+      end
+
+      def app_const_rule_ok?
+        AppConst::EDI_OUT_RULES_TEMPLATE[AppConst::EDI_FLOW_PALBIN][:depot] == DEPOT_VALID &&
+          AppConst::EDI_OUT_RULES_TEMPLATE[AppConst::EDI_FLOW_PALBIN][:roles] == VALID_ROLES.keys
       end
     end
   end
