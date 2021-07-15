@@ -1556,35 +1556,26 @@ class Nspack < Roda
       end
 
       r.on 'set_bin_level_complete', Integer do |id|
-        if RawMaterialsApp::RmtDeliveryRepo.new.exists?(:rmt_bins, bin_asset_number: params[:bin][:bin_asset_number], rmt_delivery_id: id)
-          store_locally(:flash_notice, "Bin:#{params[:bin][:bin_asset_number]} level set to: #{params[:bin][:bin_fullness]} successfully")
-          interactor.update_rmt_bin_asset_level(params[:bin][:bin_asset_number], params[:bin][:bin_fullness])
-
-          delivery = interactor.get_delivery_confirmation_details(id)
-          form = Crossbeams::RMDForm.new({},
-                                         notes: nil,
-                                         form_name: :delivery,
-                                         scan_with_camera: @rmd_scan_with_camera,
-                                         caption: 'Delivery',
-                                         reset_button: false,
-                                         no_submit: true,
-                                         action: '',
-                                         button_caption: 'Cancel')
-          form.add_label(:delivery_number, 'Delivery Number', delivery[:id])
-          form.add_label(:cultivar_group_code, 'Cultivar Group', delivery[:cultivar_group_code])
-          form.add_label(:cultivar_name, 'Cultivar', delivery[:cultivar_name])
-          form.add_label(:farm_code, 'Farm', delivery[:farm_code])
-          form.add_label(:puc_code, 'PUC', delivery[:puc_code])
-          form.add_label(:orchard_code, 'Orchard', delivery[:orchard_code])
-          form.add_label(:truck_registration_number, 'Truck Reg Number', delivery[:truck_registration_number])
-          form.add_label(:date_delivered, 'Date Delivered', delivery[:date_delivered])
-          form.add_csrf_tag csrf_tag
-          view(inline: form.render, layout: :layout_rmd)
-
-        else
-          store_locally(:errors, message:  "Bin:#{params[:bin][:bin_asset_number]} does not belong to the scanned delivery:#{id}")
-          r.redirect("/rmd/rmt_deliveries/rmt_bins/set_bin_level/#{id}")
-        end
+        delivery = interactor.get_delivery_confirmation_details(id)
+        form = Crossbeams::RMDForm.new({},
+                                       notes: nil,
+                                       form_name: :delivery,
+                                       scan_with_camera: @rmd_scan_with_camera,
+                                       caption: 'Delivery',
+                                       reset_button: false,
+                                       no_submit: true,
+                                       action: '',
+                                       button_caption: 'Cancel')
+        form.add_label(:delivery_number, 'Delivery Number', delivery[:id])
+        form.add_label(:cultivar_group_code, 'Cultivar Group', delivery[:cultivar_group_code])
+        form.add_label(:cultivar_name, 'Cultivar', delivery[:cultivar_name])
+        form.add_label(:farm_code, 'Farm', delivery[:farm_code])
+        form.add_label(:puc_code, 'PUC', delivery[:puc_code])
+        form.add_label(:orchard_code, 'Orchard', delivery[:orchard_code])
+        form.add_label(:truck_registration_number, 'Truck Reg Number', delivery[:truck_registration_number])
+        form.add_label(:date_delivered, 'Date Delivered', delivery[:date_delivered])
+        form.add_csrf_tag csrf_tag
+        view(inline: form.render, layout: :layout_rmd)
       end
     end
   end
