@@ -8,18 +8,17 @@ module MesscadaApp
         @tasks = Array(tasks)
         @args = args
         @repo = MesscadaRepo.new
-        @check_carton_label_ids = Array(@args[:carton_label_id] || @args[:carton_label_ids]).flatten
+        @check_carton_label_ids = Array(@args[:carton_label_id] || @args[:carton_label_ids] || @args[:carton_number] || @args[:carton_numbers])
       end
 
       CHECKS = {
-        exists: :exists_check
       }.freeze
 
       def call
         res = exists_check
         return res unless res.success
 
-        tasks.each do |task|
+        (tasks - [:exists]).each do |task|
           check = CHECKS[task]
           raise ArgumentError, "Task \"#{task}\" is unknown for #{self.class}." if check.nil?
 
@@ -32,13 +31,10 @@ module MesscadaApp
       private
 
       def exists_check
-        unless @check_carton_label_ids.empty?
-          @carton_label_ids = repo.select_values(:carton_labels, :id, id: @check_carton_label_ids)
-          errors = @check_carton_label_ids - carton_label_ids
-          return failed_response "Carton label: #{errors.join(', ')} doesn't exist." unless errors.empty?
-        end
-
-        return failed_response 'No carton labels where given to check.' if carton_label_ids.nil_or_empty?
+        @carton_label_ids = repo.select_values(:carton_labels, :id, id: @check_carton_label_ids)
+        errors = @check_carton_label_ids - carton_label_ids
+        return failed_response "Carton label: #{errors.join(', ')} doesn't exist." unless errors.empty?
+        return failed_response 'No carton labels were given to check.' if carton_label_ids.nil_or_empty?
 
         all_ok
       end
