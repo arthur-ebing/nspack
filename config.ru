@@ -33,9 +33,12 @@ if defined?(PhusionPassenger)
   end
 end
 
-use Rack::MiniProfiler
-Rack::MiniProfiler.config.position = 'bottom-left'
-Rack::MiniProfiler.config.skip_paths = [/debug/, /messcada/, /terminus/]
-Rack::MiniProfiler.config.authorization_mode = :allow_authorized
+if ENV['MINI_PROFILER']
+  p 'Rack::MiniProfiler'
+  use Rack::MiniProfiler
+  Rack::MiniProfiler.config.position = 'bottom-left'
+  Rack::MiniProfiler.config.skip_paths = [/debug/, /messcada/, /terminus/]
+  Rack::MiniProfiler.config.authorization_mode = :allow_authorized
+end
 
 run Nspack
