@@ -2,7 +2,7 @@
 
 module MesscadaApp
   module TaskPermissionCheck
-    class Pallets < BaseService # rubocop:disable Metrics/ClassLength
+    class Pallet < BaseService # rubocop:disable Metrics/ClassLength
       attr_reader :tasks, :pallet_ids, :repo, :load_id, :order_id
       def initialize(tasks, args)
         @tasks = Array(tasks)
@@ -10,6 +10,8 @@ module MesscadaApp
         @repo = MesscadaRepo.new
         @load_id = @args[:load_id]
         @order_id = @args[:order_id]
+        @check_pallet_numbers = Array(@args[:pallet_number] || @args[:pallet_numbers])
+        @check_pallet_ids = Array(@args[:pallet_id] || @args[:pallet_ids])
       end
 
       CHECKS = {
@@ -38,7 +40,7 @@ module MesscadaApp
         res = exists_check
         return res unless res.success
 
-        tasks.each do |task|
+        (tasks - [:exists]).each do |task|
           check = CHECKS[task]
           raise ArgumentError, "Task \"#{task}\" is unknown for #{self.class}." if check.nil?
 
@@ -51,20 +53,18 @@ module MesscadaApp
       private
 
       def exists_check # rubocop:disable Metrics/AbcSize
-        if @args[:pallet_number]
-          @pallet_ids = repo.select_values(:pallets, :id, pallet_number: @args[:pallet_number])
+        if @check_pallet_numbers.length.positive?
+          @pallet_ids = repo.select_values(:pallets, :id, pallet_number: @check_pallet_numbers)
           pallets_exists = repo.select_values(:pallets, :pallet_number, id: pallet_ids)
-          errors = Array(@args[:pallet_number]) - pallets_exists
+          errors = @check_pallet_numbers - pallets_exists
           return failed_response "Pallet: #{errors.join(', ')} doesn't exist." unless errors.empty?
-        end
-
-        if @args[:pallet_id]
-          @pallet_ids = repo.select_values(:pallets, :id, pallet_number: @args[:pallet_id])
-          errors = Array(@args[:pallet_id]) - pallet_ids
+        else
+          @pallet_ids = repo.select_values(:pallets, :id, id: @check_pallet_ids)
+          errors = @check_pallet_ids - pallet_ids
           return failed_response "Pallet id: #{errors.join(', ')} doesn't exist." unless errors.empty?
         end
 
-        return failed_response 'No pallets where given to check.' if pallet_ids.nil_or_empty?
+        return failed_response 'No pallets were given to check.' if pallet_ids.nil_or_empty?
 
         all_ok
       end
