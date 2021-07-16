@@ -144,7 +144,7 @@ module UiRules
                           required: true,
                           prompt: true }
       final_receiver_label = { renderer: :label,
-                               caption: 'Exporter',
+                               caption: 'Final Receiver',
                                with_value: @party_repo.fn_party_role_name(@form_object.final_receiver_party_role_id),
                                include_hidden_field: true,
                                hidden_value: @form_object.final_receiver_party_role_id }

@@ -272,7 +272,6 @@ module UiRules
       form_object_merge!(params)
       @form_object[:customer_party_role_id] = params[:changed_value].to_i
       fields = common_fields
-      # default_currency_value = @repo.get_value(:customers, :default_currency_id, customer_party_role_id: @form_object.customer_party_role_id)
       party_id = MasterfilesApp::PartyRepo.new.find_party_role(params[:changed_value].to_i)&.party_id
       receiver_value = MasterfilesApp::PartyRepo.new.party_role_id_from_role_and_party_id(AppConst::ROLE_FINAL_RECEIVER, party_id)
 

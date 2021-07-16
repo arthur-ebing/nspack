@@ -11,8 +11,6 @@ module FinishedGoodsApp
                           value: :id,
                           order_by: :internal_order_number
 
-    crud_calls_for :orders, name: :order, exclude: %i[create delete]
-
     build_for_select :order_items,
                      label: :sell_by_code,
                      value: :id,
@@ -28,11 +26,16 @@ module FinishedGoodsApp
       hash = find_with_association(
         :orders, id,
         parent_tables: [
-          { parent_table: :order_types, foreign_key: :order_type_id, flatten_columns: { order_type: :order_type } },
-          { parent_table: :currencies, foreign_key: :currency_id, flatten_columns: { currency: :currency } },
-          { parent_table: :target_market_groups, foreign_key: :packed_tm_group_id, flatten_columns: { target_market_group_name: :packed_tm_group } },
-          { parent_table: :deal_types, foreign_key: :deal_type_id, flatten_columns: { deal_type: :deal_type } },
-          { parent_table: :incoterms, foreign_key: :incoterm_id, flatten_columns: { incoterm: :incoterm } }
+          { parent_table: :order_types, foreign_key: :order_type_id,
+            flatten_columns: { order_type: :order_type } },
+          { parent_table: :currencies, foreign_key: :currency_id,
+            flatten_columns: { currency: :currency } },
+          { parent_table: :target_market_groups, foreign_key: :packed_tm_group_id,
+            flatten_columns: { target_market_group_name: :packed_tm_group } },
+          { parent_table: :deal_types, foreign_key: :deal_type_id,
+            flatten_columns: { deal_type: :deal_type } },
+          { parent_table: :incoterms, foreign_key: :incoterm_id,
+            flatten_columns: { incoterm: :incoterm } }
         ],
         lookup_functions: [
           { function: :fn_party_role_name, args: [:target_customer_party_role_id], col_name: :target_customer },
@@ -106,6 +109,22 @@ module FinishedGoodsApp
       order_id = create(:orders, attrs)
       create(:orders_loads, load_id: load_id, order_id: order_id) if load_id
       order_id
+    end
+
+    def update_order(id, res)
+      attrs = res.to_h
+      load_ids = select_values(:orders_loads, :load_id, order_id: id)
+      load_attrs = { customer_party_role_id: attrs[:customer_party_role_id],
+                     exporter_party_role_id: attrs[:exporter_party_role_id],
+                     final_receiver_party_role_id: attrs[:final_receiver_party_role_id],
+                     customer_order_number: attrs[:customer_order_number],
+                     order_number: attrs[:internal_order_number] }
+
+      load_ids.each do |load_id|
+        LoadRepo.new.update_load(load_id, load_attrs)
+      end
+
+      update(:orders, id, attrs)
     end
 
     def delete_order(id)

@@ -20,7 +20,7 @@ module FinishedGoodsApp
       res = update_load
       return res unless res.success
 
-      update_pallets_shipped_at unless @params[:shipped_at].nil?
+      update_pallets_shipped_at
 
       res = update_load_voyage
       return res unless res.success
@@ -56,7 +56,7 @@ module FinishedGoodsApp
     end
 
     def update_pallets_shipped_at
-      repo.update_pallets_shipped_at(load_id, params[:shipped_at])
+      DB[:pallets].where(load_id: load_id).update(shipped_at: params[:shipped_at]) unless @params[:shipped_at].nil?
     end
 
     def repo

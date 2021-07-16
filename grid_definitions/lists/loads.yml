@@ -16,7 +16,7 @@
 - :url: "/finished_goods/dispatch/loads/$:id$/create_order"
   :text: create order
   :icon: document-add
-  :hide_if_true: on_order
+  :hide_if_true: on_order, rmt_load
 - :url: "/finished_goods/dispatch/loads/$:id$/re_send_edi"
   :text: re-send EDI
   :icon: play

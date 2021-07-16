@@ -13,8 +13,8 @@ module FinishedGoodsApp
       DB[:loads]
         .left_join(:orders_loads, load_id: :id)
         .where(Sequel[:loads][:active] => active)
-        .where(where)
-        .exclude(exclude)
+        .where(convert_empty_values(where))
+        .exclude(convert_empty_values(exclude))
         .distinct
         .select(Sequel[:loads][:id])
         .map { |r| [r[:id], r[:id]] }
@@ -23,40 +23,29 @@ module FinishedGoodsApp
     def find_load(id) # rubocop:disable Metrics/AbcSize
       hash = find_with_association(
         :loads, id,
-        parent_tables: [{ parent_table: :voyage_ports,
-                          columns: %i[port_id voyage_id eta ata],
-                          foreign_key: :pod_voyage_port_id,
+        parent_tables: [{ parent_table: :voyage_ports, foreign_key: :pod_voyage_port_id,
                           flatten_columns: { port_id: :pod_port_id,
                                              voyage_id: :voyage_id,
                                              eta: :eta,
                                              ata: :ata } },
-                        { parent_table: :voyage_ports,
-                          columns: %i[port_id etd atd],
-                          foreign_key: :pol_voyage_port_id,
+                        { parent_table: :voyage_ports, foreign_key: :pol_voyage_port_id,
                           flatten_columns: { port_id: :pol_port_id, etd: :etd, atd: :atd } },
-                        { parent_table: :depots,
-                          columns: %i[depot_code],
-                          foreign_key: :depot_id,
+                        { parent_table: :depots, foreign_key: :depot_id,
                           flatten_columns: { depot_code: :depot_code } },
-                        { parent_table: :voyages,
-                          columns: %i[voyage_type_id vessel_id voyage_number year voyage_code],
-                          foreign_key: :voyage_id,
+                        { parent_table: :voyages, foreign_key: :voyage_id,
                           flatten_columns: { voyage_type_id: :voyage_type_id,
                                              vessel_id: :vessel_id,
                                              voyage_number: :voyage_number,
                                              voyage_code: :voyage_code,
                                              year: :year } }],
         sub_tables: [{ sub_table: :load_voyages,
-                       columns: %i[shipping_line_party_role_id shipper_party_role_id booking_reference memo_pad],
                        one_to_one: { shipping_line_party_role_id: :shipping_line_party_role_id,
                                      shipper_party_role_id: :shipper_party_role_id,
                                      booking_reference: :booking_reference,
                                      memo_pad: :memo_pad } },
                      { sub_table: :load_vehicles,
-                       columns: %i[vehicle_number],
                        one_to_one: { vehicle_number: :vehicle_number } },
                      { sub_table: :load_containers,
-                       columns: %i[container_code cargo_temperature_id verified_gross_weight],
                        one_to_one: { container_code: :container_code,
                                      cargo_temperature_id: :cargo_temperature_id,
                                      verified_gross_weight: :verified_gross_weight } }],
@@ -113,15 +102,6 @@ module FinishedGoodsApp
       hash[:addendum] = exists?(:titan_requests, load_id: id)
 
       Load.new(hash)
-    end
-
-    def org_code_for_po(load_id)
-      pr_id = DB[:loads].where(id: load_id).get(:exporter_party_role_id)
-      DB.get(Sequel.function(:fn_party_role_org_code, pr_id))
-    end
-
-    def update_pallets_shipped_at(load_id, shipped_at)
-      DB[:pallets].where(load_id: load_id).update(shipped_at: shipped_at)
     end
 
     def update_load_otmc_results(load_id)

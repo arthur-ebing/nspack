@@ -22,7 +22,7 @@
   AS shipping_line,\r\n\r\n    orders.active,\r\n    orders.created_at,\r\n    orders.updated_at\r\n\r\nFROM
   orders\r\nJOIN currencies ON currencies.id = orders.currency_id\r\nJOIN customer_payment_term_sets
   ON customer_payment_term_sets.id = orders.customer_payment_term_set_id\r\nJOIN order_types
-  ON order_types.id = orders.order_type_id\r\nJOIN target_market_groups ON target_market_groups.id
+  ON order_types.id = orders.order_type_id\r\nLEFT JOIN target_market_groups ON target_market_groups.id
   = orders.packed_tm_group_id\r\nJOIN deal_types ON deal_types.id = orders.deal_type_id\r\nJOIN
   incoterms  ON incoterms.id = orders.incoterm_id\r\nLEFT JOIN order_items ON orders.id
   = order_items.order_id\r\nLEFT JOIN vw_loads ON order_items.load_id = vw_loads.id\r\n\r\nGROUP
