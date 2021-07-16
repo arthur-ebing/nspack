@@ -1208,11 +1208,8 @@ class Nspack < Roda
 
       r.on 'create_bin_tripsheet' do
         r.get do
-          form_state = {}
-          form_state.merge! retrieve_from_local_store(:form_state).to_h
-          error = retrieve_from_local_store(:errors)
-          notice = retrieve_from_local_store(:flash_notice)
-          form_state.merge!(error_message: error[:message], errors: error[:errors]) unless error.nil?
+          form_state = retrieve_from_local_store(:form_state).to_h
+          notice = form_state[:flash_notice]
           form = Crossbeams::RMDForm.new(form_state,
                                          form_name: :tripsheet,
                                          notes: notice,
@@ -1250,8 +1247,7 @@ class Nspack < Roda
           if res.success
             r.redirect("/rmd/rmt_deliveries/rmt_bins/add_bin_to_tripsheet/#{res.instance}")
           else
-            store_locally(:errors, res)
-            store_locally(:form_state, params[:tripsheet])
+            store_locally(:form_state, { error_message: res[:message], errors: res[:errors] }.merge!(params[:tripsheet]))
             r.redirect('/rmd/rmt_deliveries/rmt_bins/create_bin_tripsheet')
           end
         end
@@ -1307,7 +1303,7 @@ class Nspack < Roda
       r.on 'cancel_bins_tripsheet', Integer do |id|
         res = interactor.cancel_bins_tripheet(id)
         if res.success
-          store_locally(:flash_notice, res.message)
+          store_locally(:form_state, flash_notice: res.message)
           r.redirect('/rmd/rmt_deliveries/rmt_bins/create_bin_tripsheet')
         else
           store_locally(:errors, res)

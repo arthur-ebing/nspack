@@ -1145,7 +1145,9 @@ class Nspack < Roda
     end
 
     r.on 'print_tripsheet', Integer do |id|
-      rpt_name = MesscadaApp::MesscadaRepo.new.find_vehicle_stock_type(id) == AppConst::PALLET_STOCK_TYPE ? 'interwarehouse' : 'delivery_tripsheet'
+      interactor = RawMaterialsApp::RmtBinInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      rpt_name = interactor.find_vehicle_stock_type(id) == AppConst::PALLET_STOCK_TYPE ? 'interwarehouse' : 'delivery_tripsheet'
       jasper_params = JasperParams.new(rpt_name,
                                        current_user.login_name,
                                        vehicle_job_id: id)

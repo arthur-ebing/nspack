@@ -727,6 +727,10 @@ module RawMaterialsApp
       TaskPermissionCheck::RmtBin.call(task, id)
     end
 
+    def find_vehicle_stock_type(id)
+      messcada_repo.find_vehicle_stock_type(id)
+    end
+
     private
 
     def calc_rebin_params(params) # rubocop:disable Metrics/AbcSize
@@ -811,6 +815,10 @@ module RawMaterialsApp
 
     def locn_repo
       MasterfilesApp::LocationRepo.new
+    end
+
+    def messcada_repo
+      MesscadaApp::MesscadaRepo.new
     end
 
     def validate_vehicle_job_unit_params(params)
