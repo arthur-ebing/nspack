@@ -8,7 +8,7 @@ module MesscadaApp
         @tasks = Array(tasks)
         @args = args
         @repo = MesscadaRepo.new
-        @check_carton_label_ids = Array(@args[:carton_label_id] || @args[:carton_label_ids] || @args[:carton_number] || @args[:carton_numbers])
+        @check_carton_label_ids = Array(@args[:carton_label_id] || @args[:carton_label_ids])
       end
 
       CHECKS = {

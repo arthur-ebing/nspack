@@ -31,13 +31,11 @@ module MesscadaApp
       res = TaskPermissionCheck::Pallet.call(:exists, pallet_number: 'fake_pallet_number')
       refute res.success, 'Pallet should not exist'
 
-      res = TaskPermissionCheck::Pallet.call(:exists, pallet_ids: pallet_id)
+      res = TaskPermissionCheck::Pallet.call(:exists, pallet_ids: [pallet_id])
       assert res.success, 'Pallet should exist'
 
-      res = TaskPermissionCheck::Pallet.call(:exists, pallet_numbers: pallet_number)
+      res = TaskPermissionCheck::Pallet.call(:exists, pallet_numbers: [pallet_number])
       assert res.success, 'Pallet should exist'
     end
-
-
   end
 end
