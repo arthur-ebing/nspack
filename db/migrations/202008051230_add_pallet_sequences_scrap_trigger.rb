@@ -1,6 +1,5 @@
 Sequel.migration do
   up do
-    p 'TEMP: Hold this change back'
     # run <<~SQL
     #   CREATE OR REPLACE FUNCTION public.fn_scrap_pallet_sequences()
     #   RETURNS trigger AS $BODY$
@@ -50,7 +49,6 @@ Sequel.migration do
   end
 
   down do
-    p 'TEMP: Hold this change back'
     # run <<~SQL
     #   DROP TRIGGER scrap_pallet_sequences ON public.pallet_sequences;
     #   DROP FUNCTION public.fn_scrap_pallet_sequences();
