@@ -736,8 +736,7 @@ module RawMaterialsApp
     end
 
     def loaded_and_offloaded_bins(id)
-      bins = repo.tripsheet_bins(id)
-      [bins.find_all { |p| !p[:offloaded_at] }, bins.find_all { |p| p[:offloaded_at] }]
+      repo.tripsheet_bins(id).partition { |p| p[:offloaded_at].nil? }
     end
 
     def default_printer_for_application(application)
