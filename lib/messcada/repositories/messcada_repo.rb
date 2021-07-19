@@ -513,13 +513,14 @@ module MesscadaApp
     end
 
     def matching_sequence_for_carton(carton_id, pallet_id)
-      carton_rejected_fields = %i[id carton_label_id pallet_number product_resource_allocation_id fruit_sticker_pm_product_id
-                                  gross_weight nett_weight sell_by_code pallet_label_name pick_ref phc packing_method_id palletizer_contract_worker_id
-                                  palletizer_identifier_id pallet_sequence_id created_at updated_at personnel_identifier_id contract_worker_id
-                                  palletizing_bay_resource_id is_virtual scrapped scrapped_reason scrapped_at scrapped_sequence_id
-                                  group_incentive_id rmt_bin_id dp_carton gtin_code rmt_container_material_owner_id legacy_data cartons_per_pallet carton_equals_pallet]
-      attrs = find_carton(carton_id).to_h.reject { |k, _| carton_rejected_fields.include?(k) }
+      attrs = find_carton(carton_id).to_h
+      return nil unless attrs
+
       attrs[:pallet_id] = pallet_id
+      res = CartonMatchSeqSchema.call(attrs)
+      raise Crossbeams::FrameworkError, %("matching_sequence_for_carton" Schema failed with errors #{validation_failed_response(res).errors}) if res.failure?
+
+      attrs = res.to_h
       %i[treatment_ids fruit_sticker_ids tu_sticker_ids].each { |col| attrs[col] = array_for_db_col(attrs[col]) }
       get_id(:pallet_sequences, attrs)
     end

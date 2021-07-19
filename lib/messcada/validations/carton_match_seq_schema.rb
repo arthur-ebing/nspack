@@ -1,0 +1,51 @@
+# frozen_string_literal: true
+
+module MesscadaApp
+  CartonMatchSeqSchema = Dry::Schema.Params do # rubocop:disable Metrics/BlockLength
+    required(:pallet_id).filled(:integer)
+    required(:puc_id).filled(:integer)
+    required(:production_run_id).maybe(:integer)
+    required(:farm_id).filled(:integer)
+    required(:puc_id).filled(:integer)
+    required(:orchard_id).filled(:integer)
+    required(:cultivar_group_id).filled(:integer)
+    required(:cultivar_id).maybe(:integer)
+    required(:packhouse_resource_id).maybe(:integer)
+    required(:production_line_id).maybe(:integer)
+    required(:season_id).filled(:integer)
+    required(:marketing_variety_id).filled(:integer)
+    required(:customer_variety_id).maybe(:integer)
+    required(:std_fruit_size_count_id).maybe(:integer)
+    required(:basic_pack_code_id).filled(:integer)
+    required(:standard_pack_code_id).filled(:integer)
+    required(:fruit_actual_counts_for_pack_id).maybe(:integer)
+    required(:fruit_size_reference_id).maybe(:integer)
+    required(:marketing_org_party_role_id).filled(:integer)
+    required(:packed_tm_group_id).filled(:integer)
+    required(:mark_id).filled(:integer)
+    required(:inventory_code_id).filled(:integer)
+    required(:pallet_format_id).filled(:integer)
+    required(:cartons_per_pallet_id).filled(:integer)
+    required(:pm_bom_id).maybe(:integer)
+    required(:extended_columns).maybe(:hash)
+    required(:client_size_reference).maybe(Types::StrippedString)
+    required(:client_product_code).maybe(Types::StrippedString)
+    required(:marketing_order_number).maybe(Types::StrippedString)
+    required(:pm_type_id).maybe(:integer)
+    required(:pm_subtype_id).maybe(:integer)
+    required(:grade_id).filled(:integer)
+    required(:target_market_id).maybe(:integer)
+    required(:pm_mark_id).maybe(:integer)
+    required(:marketing_puc_id).maybe(:integer)
+    required(:marketing_orchard_id).maybe(:integer)
+    required(:rmt_class_id).maybe(:integer)
+    required(:packing_specification_item_id).maybe(:integer)
+    required(:tu_labour_product_id).maybe(:integer)
+    required(:ru_labour_product_id).maybe(:integer)
+    required(:target_customer_party_role_id).maybe(:integer)
+    required(:product_chars).maybe(Types::StrippedString)
+    required(:fruit_sticker_ids).maybe(:array).maybe { each(:integer) }
+    required(:tu_sticker_ids).maybe(:array).maybe { each(:integer) }
+    required(:treatment_ids).maybe(:array).maybe { each(:integer) }
+  end
+end
