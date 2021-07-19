@@ -9,17 +9,19 @@ module UiRules
 
       common_values_for_fields common_fields
 
-      set_show_fields if %i[show reopen].include? @mode
+      set_show_fields if %i[show].include? @mode
 
       form_name 'pallet_format'
     end
 
     def set_show_fields
-      pallet_base_id_label = @repo.find_hash(:pallet_bases, @form_object.pallet_base_id)[:pallet_base_code]
-      pallet_stack_type_id_label = @repo.find_hash(:pallet_stack_types, @form_object.pallet_stack_type_id)[:stack_type_code]
       fields[:description] = { renderer: :label }
-      fields[:pallet_base_id] = { renderer: :label, with_value: pallet_base_id_label, caption: 'Pallet Base' }
-      fields[:pallet_stack_type_id] = { renderer: :label, with_value: pallet_stack_type_id_label, caption: 'Pallet Stack Type' }
+      fields[:pallet_base_id] = { renderer: :label,
+                                  with_value: @form_object.pallet_base_code,
+                                  caption: 'Pallet Base' }
+      fields[:pallet_stack_type_id] = { renderer: :label,
+                                        with_value: @form_object.stack_type_code,
+                                        caption: 'Pallet Stack Type' }
       fields[:active] = { renderer: :label, as_boolean: true }
       fields[:bin] = { renderer: :label, as_boolean: true }
     end
@@ -30,12 +32,12 @@ module UiRules
         pallet_base_id: { renderer: :select,
                           options: @repo.for_select_pallet_bases,
                           disabled_options: @repo.for_select_inactive_pallet_bases,
-                          caption: 'pallet base',
+                          caption: 'Pallet Base',
                           required: true },
         pallet_stack_type_id: { renderer: :select,
                                 options: @repo.for_select_pallet_stack_types,
                                 disabled_options: @repo.for_select_inactive_pallet_stack_types,
-                                caption: 'pallet stack type',
+                                caption: 'Pallet Stack Type',
                                 required: true },
         bin: { renderer: :checkbox }
       }

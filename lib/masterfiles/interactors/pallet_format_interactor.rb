@@ -9,12 +9,11 @@ module MasterfilesApp
       id = nil
       repo.transaction do
         id = repo.create_pallet_format(res)
-        log_status('pallet_formats', id, 'CREATED')
+        log_status(:pallet_formats, id, 'CREATED')
         log_transaction
       end
       instance = pallet_format(id)
-      success_response("Created pallet format #{instance.description}",
-                       instance)
+      success_response("Created pallet format #{instance.description}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { description: ['This pallet format already exists'] }))
     rescue Crossbeams::InfoError => e
@@ -30,8 +29,9 @@ module MasterfilesApp
         log_transaction
       end
       instance = pallet_format(id)
-      success_response("Updated pallet format #{instance.description}",
-                       instance)
+      success_response("Updated pallet format #{instance.description}", instance)
+    rescue Sequel::UniqueConstraintViolation
+      validation_failed_response(OpenStruct.new(messages: { base: ['This Pallet Base and Stack Type combination already exists.'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -40,12 +40,14 @@ module MasterfilesApp
       name = pallet_format(id).description
       repo.transaction do
         repo.delete_pallet_format(id)
-        log_status('pallet_formats', id, 'DELETED')
+        log_status(:pallet_formats, id, 'DELETED')
         log_transaction
       end
       success_response("Deleted pallet format #{name}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    rescue Sequel::ForeignKeyConstraintViolation => e
+      failed_response("Unable to delete pallet format. It is still referenced#{e.message.partition('referenced').last}")
     end
 
     def assert_permission!(task, id = nil)
