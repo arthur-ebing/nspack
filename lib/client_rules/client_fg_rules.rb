@@ -15,6 +15,7 @@ module Crossbeams
             max_rmt_bins_on_load: 80,
             max_pallets_on_load: 96,
             use_inspection_destination_for_load_out: true,
+            use_continuous_govt_inspection_sheets: false,
             valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } },
       hl: { place_of_issue_for_addendum: 'PLZ',
             vgm_required: false,
@@ -23,6 +24,7 @@ module Crossbeams
             max_rmt_bins_on_load: 50,
             max_pallets_on_load: 120,
             use_inspection_destination_for_load_out: false,
+            use_continuous_govt_inspection_sheets: false,
             valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } },
       kr: { place_of_issue_for_addendum: 'CPT',
             vgm_required: true,
@@ -31,6 +33,7 @@ module Crossbeams
             max_rmt_bins_on_load: 50,
             max_pallets_on_load: 50,
             use_inspection_destination_for_load_out: false,
+            use_continuous_govt_inspection_sheets: true,
             valid_pallet_destination: { failed: [/\AREWORKS$/], pending: [/\AREWORKS$/, /\ARA_10/, /\APACKHSE/], loaded: [/\APART_PALLETS/] } },
       um: { place_of_issue_for_addendum: nil,
             vgm_required: true,
@@ -39,6 +42,7 @@ module Crossbeams
             max_rmt_bins_on_load: 78,
             max_pallets_on_load: 40,
             use_inspection_destination_for_load_out: false,
+            use_continuous_govt_inspection_sheets: false,
             valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } },
       ud: { place_of_issue_for_addendum: 'PLZ',
             vgm_required: true,
@@ -47,6 +51,7 @@ module Crossbeams
             max_rmt_bins_on_load: 50,
             max_pallets_on_load: 50,
             use_inspection_destination_for_load_out: false,
+            use_continuous_govt_inspection_sheets: false,
             valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } },
       sr: { place_of_issue_for_addendum: 'PLZ',
             vgm_required: true,
@@ -55,6 +60,7 @@ module Crossbeams
             max_rmt_bins_on_load: 80,
             max_pallets_on_load: 80,
             use_inspection_destination_for_load_out: true,
+            use_continuous_govt_inspection_sheets: false,
             valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } },
       sr2: { place_of_issue_for_addendum: 'PLZ',
              vgm_required: true,
@@ -63,6 +69,7 @@ module Crossbeams
              max_rmt_bins_on_load: 80,
              max_pallets_on_load: 80,
              use_inspection_destination_for_load_out: true,
+             use_continuous_govt_inspection_sheets: false,
              valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } }
     }.freeze
     # ALLOW_EXPORT_PALLETS_TO_BYPASS_INSPECTION
@@ -159,6 +166,12 @@ module Crossbeams
                     .where(plant_resource_code: plant_resource_code)
                     .get(Sequel.lit("resource_properties ->> 'reporting_industry'"))
       ph_industry.nil_or_empty? ? reporting_industry[:default] : ph_industry
+    end
+
+    def use_continuous_govt_inspection_sheets?(explain: false)
+      return "Are inspection sheets open-ended?" if explain
+
+      setting(:use_continuous_govt_inspection_sheets)
     end
   end
 end

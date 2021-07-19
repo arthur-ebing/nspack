@@ -131,7 +131,6 @@ class AppClientSettingsLoader # rubocop:disable Metrics/ClassLength
     ADDENDUM_PLACE_OF_ISSUE: { env_key: 'ADDENDUM_PLACE_OF_ISSUE', default: 'CPT', validation_regex: /cpt|dbn|plz|mpm|oth/i, desc: 'Exporter ceritficate place of issue for addendum. Can be CPT, DBN. MPM, PLZ or OTH.' },
     BYPASS_QUALITY_TEST_LOAD_CHECK: { env_key: 'BYPASS_QUALITY_TEST_LOAD_CHECK', boolean: true, default: true, desc: 'optional. Bypasses Quality checks at Pallet Loading' },
     BYPASS_QUALITY_TEST_PRE_RUN_CHECK: { env_key: 'BYPASS_QUALITY_TEST_PRE_RUN_CHECK', boolean: true, default: true, desc: 'optional. Bypasses Quality checks before a run is started' },
-    CONTINUOUS_GOVT_INSPECTION_SHEETS: { env_key: 'CONTINUOUS_GOVT_INSPECTION_SHEETS', boolean: true, desc: 'Are inspection sheets open-ended?' },
     DEFAULT_DEPOT: { env_key: 'DEFAULT_DEPOT', desc: 'Default Depot for new dispatch loads.' },
     DEFAULT_EXPORTER: { env_key: 'DEFAULT_EXPORTER', desc: 'Default Exporter Party for new loads and inspections.' },
     DEFAULT_INSPECTION_BILLING: { env_key: 'DEFAULT_INSPECTION_BILLING', desc: 'Default Inspection Billing Party for new inspections.' },

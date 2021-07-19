@@ -83,7 +83,7 @@ module FinishedGoods
             page.form do |form|
               # form.caption 'Govt Inspection Sheet'
               form.submit_captions 'Add Pallet'
-              if AppConst::CONTINUOUS_GOVT_INSPECTION_SHEETS
+              if AppConst::CR_FG.use_continuous_govt_inspection_sheets?
                 form.action "/finished_goods/inspection/govt_inspection_sheets/#{id}/add_inspected_pallet"
                 form.remote!
               else
