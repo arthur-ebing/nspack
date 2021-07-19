@@ -686,6 +686,7 @@ input[readonly] {
   padding: 1px 5px;
   height: 40px;
   font-size: 18px;
+  white-space: nowrap;
 }
 
 #menuSearchResults > li:last-child {

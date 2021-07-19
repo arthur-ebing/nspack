@@ -111,6 +111,8 @@ const crossbeamsMenuBuilder = (function crossbeamsMenuBuilder() {
       let progName = '';
       let funcName = '';
       let displayName = '';
+      const bodyRight = document.body.getBoundingClientRect().right;
+      const searchRect = searchBox.getBoundingClientRect();
       results.forEach((menu) => {
         funcName = menuLevels.functional_areas.find(elem => elem.id === menu.func_id).name;
         progName = menuLevels.programs[menu.func_id].find(elem => elem.id === menu.prog_id).name;
@@ -119,6 +121,13 @@ const crossbeamsMenuBuilder = (function crossbeamsMenuBuilder() {
       });
       resultsList.innerHTML = listItems;
       resultsList.style.display = 'block';
+      if (searchRect.left < bodyRight / 3) {
+        resultsList.style.left = `${searchBox.getBoundingClientRect().left}px`;
+        resultsList.style.right = '';
+      } else {
+        resultsList.style.left = '';
+        resultsList.style.right = `${bodyRight - searchBox.getBoundingClientRect().right}px`;
+      }
     });
 
     document.body.addEventListener('click', (event) => {
