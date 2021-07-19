@@ -73,11 +73,9 @@ module MasterfilesApp
       hash = find_with_association(:pallet_formats,
                                    id,
                                    parent_tables: [{ parent_table: :pallet_bases,
-                                                     columns: [:pallet_base_code],
                                                      foreign_key: :pallet_base_id,
                                                      flatten_columns: { pallet_base_code: :pallet_base_code } },
                                                    { parent_table: :pallet_stack_types,
-                                                     columns: [:stack_type_code],
                                                      flatten_columns: { stack_type_code: :stack_type_code } }])
       return nil if hash.nil?
 
