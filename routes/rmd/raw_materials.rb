@@ -1279,7 +1279,7 @@ class Nspack < Roda
           form.add_label(:tripsheet_number, 'Tripsheet Number', id)
           form.add_field(:bin_number, 'Bin Number', scan: 'key248_all', scan_type: :bin_asset, required: false, submit_form: true)
 
-          bins = RawMaterialsApp::RmtDeliveryRepo.new.tripsheet_bins(id)
+          bins = interactor.tripsheet_bins(id)
           unless bins.empty?
             form.add_section_header('Bins On Tripsheet')
             bins.each do |o|
@@ -1318,12 +1318,12 @@ class Nspack < Roda
                                            current_user.login_name,
                                            vehicle_job_id: id)
           jasper_params.mode = :print
-          printer_id = LabelApp::PrinterRepo.new.default_printer_for_application(AppConst::PRINT_APP_PALLET_TRIPSHEET)
-          jasper_params.printer = LabelApp::PrinterRepo.new.find_printer(printer_id)&.printer_code
+          printer_id = interactor.default_printer_for_application(AppConst::PRINT_APP_PALLET_TRIPSHEET)
+          jasper_params.printer = interactor.find_printer(printer_id)&.printer_code
           res = CreateJasperReport.call(jasper_params)
 
           if res.success
-            store_locally(:flash_notice, res.message)
+            store_locally(:form_state, flash_notice: res.message)
             r.redirect('/rmd/rmt_deliveries/rmt_bins/create_bin_tripsheet')
           end
         end
@@ -1379,7 +1379,7 @@ class Nspack < Roda
           form.add_field(:vehicle_job, 'Tripsheet Number', scan: 'key248_all', scan_type: :vehicle_job, submit_form: false, required: true, lookup: false)
           form.add_select(:location,
                           'Location',
-                          items: MasterfilesApp::LocationRepo.new.find_locations_by_location_type_and_storage_type(AppConst::LOCATION_TYPES_WAREHOUSE, AppConst::STORAGE_TYPE_BINS),
+                          items: interactor.find_locations_by_location_type_and_storage_type(AppConst::LOCATION_TYPES_WAREHOUSE, AppConst::STORAGE_TYPE_BINS),
                           required: true,
                           prompt: true)
           form.add_csrf_tag csrf_tag
@@ -1400,7 +1400,6 @@ class Nspack < Roda
 
       r.on 'scan_bin_to_offload', Integer do |id|
         r.get do
-          repo = FinishedGoodsApp::GovtInspectionRepo.new
           notice = retrieve_from_local_store(:flash_notice)
           form_state = {}
           error = retrieve_from_local_store(:error)
@@ -1413,18 +1412,18 @@ class Nspack < Roda
                                          action: "/rmd/rmt_deliveries/rmt_bins/scan_bin_to_offload/#{id}",
                                          button_caption: 'Submit')
 
-          bins = RawMaterialsApp::RmtDeliveryRepo.new.tripsheet_bins(id)
-          form.add_label(:location, 'Location', repo.get_vehicle_job_location(id))
+          loaded, offloaded = interactor.loaded_and_offloaded_bins(id)
+          form.add_label(:location, 'Location', interactor.get_vehicle_job_location(id))
           form.add_field(:bin_number, 'Bin Number', scan: 'key248_all', scan_type: :bin_asset, required: false, submit_form: true)
 
-          unless (loaded = bins.find_all { |p| !p[:offloaded_at] }).empty?
+          unless loaded.empty?
             form.add_section_header('Bins Still On Load')
             loaded.each do |l|
               form.add_label(:loaded_bin, '', l[:bin_asset_number])
             end
           end
 
-          unless (offloaded = bins.find_all { |p| p[:offloaded_at] }).empty?
+          unless offloaded.empty?
             form.add_section_header('Pallets Already Offloaded')
             offloaded.each do |o|
               form.add_label(:offloaded_bin, '', o[:bin_asset_number])
@@ -1438,7 +1437,7 @@ class Nspack < Roda
         r.post do
           res = interactor.validate_bin_to_offload(id, params[:bin][:bin_number])
           if res.success
-            bin = RawMaterialsApp::RmtDeliveryRepo.new.find_rmt_bin_flat(res.instance)
+            bin = interactor.find_rmt_bin_flat(res.instance)
             form = Crossbeams::RMDForm.new({ id: bin[:id] },
                                            form_name: :bin,
                                            scan_with_camera: @rmd_scan_with_camera,

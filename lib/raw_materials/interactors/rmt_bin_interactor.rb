@@ -731,6 +731,35 @@ module RawMaterialsApp
       messcada_repo.find_vehicle_stock_type(id)
     end
 
+    def tripsheet_bins(id)
+      repo.tripsheet_bins(id)
+    end
+
+    def loaded_and_offloaded_bins(id)
+      bins = repo.tripsheet_bins(id)
+      [bins.find_all { |p| !p[:offloaded_at] }, bins.find_all { |p| p[:offloaded_at] }]
+    end
+
+    def default_printer_for_application(application)
+      printer_repo.default_printer_for_application(application)
+    end
+
+    def find_printer(id)
+      printer_repo.find_printer(id)
+    end
+
+    def find_locations_by_location_type_and_storage_type(location_type_code, storage_type_code)
+      locn_repo.find_locations_by_location_type_and_storage_type(location_type_code, storage_type_code)
+    end
+
+    def get_vehicle_job_location(vehicle_job_id)
+      insp_repo.get_vehicle_job_location(vehicle_job_id)
+    end
+
+    def find_rmt_bin_flat(id)
+      repo.find_rmt_bin_flat(id)
+    end
+
     private
 
     def calc_rebin_params(params) # rubocop:disable Metrics/AbcSize
@@ -775,6 +804,10 @@ module RawMaterialsApp
 
     def repo
       @repo ||= RmtDeliveryRepo.new
+    end
+
+    def printer_repo
+      LabelApp::PrinterRepo.new
     end
 
     def rmt_bin(id)
