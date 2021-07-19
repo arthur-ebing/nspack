@@ -20,15 +20,13 @@ module FinishedGoodsApp
                      order_by: :pallet_number
 
     def find_inspection(id)
-      hash = find_with_association(:inspections, id,
-                                   parent_tables: [{ parent_table: :inspection_types,
-                                                     foreign_key: :inspection_type_id,
-                                                     columns: [:inspection_type_code],
-                                                     flatten_columns: { inspection_type_code: :inspection_type_code } },
-                                                   { parent_table: :inspectors,
-                                                     foreign_key: :inspector_id,
-                                                     columns: [:inspector_party_role_id],
-                                                     flatten_columns: { inspector_party_role_id: :inspector_party_role_id } }])
+      hash = find_with_association(
+        :inspections, id,
+        parent_tables: [{ parent_table: :inspection_types, foreign_key: :inspection_type_id,
+                          flatten_columns: { inspection_type_code: :inspection_type_code } },
+                        { parent_table: :inspectors,  foreign_key: :inspector_id,
+                          flatten_columns: { inspector_party_role_id: :inspector_party_role_id } }]
+      )
       return nil if hash.nil?
 
       hash[:inspector] = DB.get(Sequel.function(:fn_party_role_name, hash[:inspector_party_role_id]))

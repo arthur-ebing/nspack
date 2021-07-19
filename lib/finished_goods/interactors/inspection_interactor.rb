@@ -6,11 +6,14 @@ module FinishedGoodsApp
       res = InspectionPalletSchema.call(params)
       return validation_failed_response(res) if res.failure?
 
+      ids = nil
       repo.transaction do
         ids = repo.create_inspection(res)
         log_multiple_statuses(:inspections, ids, 'CREATED')
         log_transaction
       end
+      return failed_response('No inspections defined for pallet.') if ids.nil_or_empty?
+
       success_response('Created inspections', get_pallet_id(res))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
