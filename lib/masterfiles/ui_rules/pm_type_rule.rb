@@ -9,16 +9,16 @@ module UiRules
 
       common_values_for_fields common_fields
 
-      set_show_fields if %i[show reopen].include? @mode
+      set_show_fields if %i[show].include? @mode
 
       form_name 'pm_type'
     end
 
     def set_show_fields
-      fields[:pm_composition_level] = { renderer: :label,
-                                        with_value: @form_object.composition_level_description,
-                                        caption: 'Composition Level',
-                                        hide_on_load: !AppConst::REQUIRE_EXTENDED_PACKAGING }
+      fields[:pm_composition_level_id] = { renderer: :label,
+                                           with_value: @form_object.composition_level_description,
+                                           caption: 'Composition Level',
+                                           hide_on_load: !AppConst::REQUIRE_EXTENDED_PACKAGING }
       fields[:pm_type_code] = { renderer: :label,
                                 caption: 'PKG Type Code' }
       fields[:description] = { renderer: :label }
