@@ -9,12 +9,11 @@ module MasterfilesApp
       id = nil
       repo.transaction do
         id = repo.create_cartons_per_pallet(res)
-        log_status('cartons_per_pallet', id, 'CREATED')
+        log_status(:cartons_per_pallet, id, 'CREATED')
         log_transaction
       end
       instance = cartons_per_pallet(id)
-      success_response("Created cartons per pallet #{instance.description}",
-                       instance)
+      success_response("Created cartons per pallet #{instance.description}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { description: ['This cartons per pallet already exists'] }))
     rescue Crossbeams::InfoError => e
@@ -30,8 +29,9 @@ module MasterfilesApp
         log_transaction
       end
       instance = cartons_per_pallet(id)
-      success_response("Updated cartons per pallet #{instance.description}",
-                       instance)
+      success_response("Updated cartons per pallet #{instance.description}", instance)
+    rescue Sequel::UniqueConstraintViolation
+      validation_failed_response(OpenStruct.new(messages: { base: ['The Basic Pack and Pallet Format combination already exists.'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -40,7 +40,7 @@ module MasterfilesApp
       name = cartons_per_pallet(id).description
       repo.transaction do
         repo.delete_cartons_per_pallet(id)
-        log_status('cartons_per_pallet', id, 'DELETED')
+        log_status(:cartons_per_pallet, id, 'DELETED')
         log_transaction
       end
       success_response("Deleted cartons per pallet #{name}")
