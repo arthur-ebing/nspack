@@ -147,7 +147,6 @@ module UiRules
                style: :action_button,
                text: 'Ship',
                url: "/raw_materials/dispatch/bin_loads/#{id}/ship",
-               behaviour: :popup,
                icon: :checkon }
       unship = { control_type: :link,
                  style: :action_button,
