@@ -58,6 +58,7 @@ module MesscadaApp
     attribute :nett_weight, Types::Decimal
     attribute? :active, Types::Bool
     attribute :pick_ref, Types::String
+    attribute :carton_equals_pallet, Types::Bool
     attribute :grade_id, Types::Integer
     attribute :pallet_number, Types::String
     attribute :phc, Types::String

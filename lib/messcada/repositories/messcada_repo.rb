@@ -512,18 +512,15 @@ module MesscadaApp
       matching_sequences.nil? ? true : false
     end
 
-    def matching_sequence_for_carton(carton_id, pallet_id) # rubocop:disable Metrics/AbcSize
+    def matching_sequence_for_carton(carton_id, pallet_id)
       carton_rejected_fields = %i[id carton_label_id pallet_number product_resource_allocation_id fruit_sticker_pm_product_id
                                   gross_weight nett_weight sell_by_code pallet_label_name pick_ref phc packing_method_id palletizer_contract_worker_id
                                   palletizer_identifier_id pallet_sequence_id created_at updated_at personnel_identifier_id contract_worker_id
                                   palletizing_bay_resource_id is_virtual scrapped scrapped_reason scrapped_at scrapped_sequence_id
-                                  group_incentive_id rmt_bin_id dp_carton gtin_code rmt_container_material_owner_id legacy_data]
+                                  group_incentive_id rmt_bin_id dp_carton gtin_code rmt_container_material_owner_id legacy_data cartons_per_pallet carton_equals_pallet]
       attrs = find_carton(carton_id).to_h.reject { |k, _| carton_rejected_fields.include?(k) }
-      attrs[:treatment_ids] = array_for_db_col(attrs[:treatment_ids]) if attrs.key?(:treatment_ids)
-      attrs[:fruit_sticker_ids] = array_for_db_col(attrs[:fruit_sticker_ids]) if attrs.key?(:fruit_sticker_ids)
-      attrs[:tu_sticker_ids] = array_for_db_col(attrs[:tu_sticker_ids]) if attrs.key?(:tu_sticker_ids)
-
-      DB[:pallet_sequences].where(pallet_id: pallet_id).where(attrs).get(:id)
+      attrs[:pallet_id] = pallet_id
+      get_id(:pallet_sequences, prepare_values_for_db(:pallet_sequences, attrs))
     end
 
     def sequence_has_cartons?(id)
