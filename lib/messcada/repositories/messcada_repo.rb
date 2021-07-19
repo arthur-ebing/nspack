@@ -4,14 +4,14 @@ module MesscadaApp
   class MesscadaRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     crud_calls_for :carton_labels, name: :carton_label, wrapper: CartonLabel
     crud_calls_for :cartons, name: :carton, wrapper: CartonFlat
-    crud_calls_for :pallets, name: :pallet, wrapper: Pallet
-    crud_calls_for :pallet_sequences, name: :pallet_sequence, wrapper: PalletSequence
+    crud_calls_for :pallets, name: :pallet, wrapper: Pallet, exclude: [:create]
+    crud_calls_for :pallet_sequences, name: :pallet_sequence, wrapper: PalletSequence, exclude: [:create]
 
     def find_pallet_flat(id) # rubocop:disable Metrics/AbcSize
-      hash = find_with_association(:pallets, id,
-                                   lookup_functions: [{ function: :fn_current_status,
-                                                        args: ['pallets', :id],
-                                                        col_name: :status }])
+      hash = find_with_association(
+        :pallets, id,
+        lookup_functions: [{ function: :fn_current_status, args: ['pallets', :id], col_name: :status }]
+      )
       return nil if hash.nil?
 
       hash[:last_govt_inspection_sheet_id] = get(:govt_inspection_pallets, hash[:last_govt_inspection_pallet_id], :govt_inspection_sheet_id)
@@ -84,87 +84,17 @@ module MesscadaApp
     end
 
     def find_carton(id)
-      hash = DB[<<~SQL, id].first
-        SELECT cartons.id,
-          cartons.carton_label_id,
-          cartons.gross_weight,
-          cartons.nett_weight,
-          cartons.pallet_sequence_id,
-          cartons.palletizer_contract_worker_id,
-          cartons.palletizer_identifier_id,
-          cartons.palletizing_bay_resource_id,
-          cartons.scrapped,
-          cartons.scrapped_at,
-          cartons.scrapped_reason,
-          cartons.scrapped_sequence_id,
-          cartons.is_virtual,
-          cartons.active,
-          cl.production_run_id,
-          cl.farm_id,
-          cl.puc_id,
-          cl.orchard_id,
-          cl.cultivar_group_id,
-          cl.cultivar_id,
-          cl.product_resource_allocation_id,
-          cl.packhouse_resource_id,
-          cl.production_line_id,
-          cl.season_id,
-          cl.marketing_variety_id,
-          cl.customer_variety_id,
-          cl.std_fruit_size_count_id,
-          cl.basic_pack_code_id,
-          cl.standard_pack_code_id,
-          cl.fruit_actual_counts_for_pack_id,
-          cl.fruit_size_reference_id,
-          cl.marketing_org_party_role_id,
-          cl.packed_tm_group_id,
-          cl.target_market_id,
-          cl.mark_id,
-          cl.pm_mark_id,
-          cl.inventory_code_id,
-          cl.pallet_format_id,
-          cl.cartons_per_pallet_id,
-          cl.pm_bom_id,
-          cl.extended_columns,
-          cl.client_size_reference,
-          cl.client_product_code,
-          cl.treatment_ids,
-          cl.marketing_order_number,
-          cl.fruit_sticker_pm_product_id,
-          cl.pm_type_id,
-          cl.pm_subtype_id,
-          cl.sell_by_code,
-          cl.grade_id,
-          cl.product_chars,
-          cl.pallet_label_name,
-          cl.pick_ref,
-          cl.pallet_number,
-          cl.phc,
-          cl.personnel_identifier_id,
-          cl.contract_worker_id,
-          cl.packing_method_id,
-          cl.marketing_puc_id,
-          cl.marketing_orchard_id,
-          cl.group_incentive_id,
-          cl.rmt_bin_id,
-          cl.dp_carton,
-          cl.gtin_code,
-          cl.rmt_class_id,
-          cl.packing_specification_item_id,
-          cl.tu_labour_product_id,
-          cl.ru_labour_product_id,
-          cl.fruit_sticker_ids,
-          cl.tu_sticker_ids,
-          cl.target_customer_party_role_id,
-          cl.rmt_container_material_owner_id,
-          cl.legacy_data
-
-        FROM cartons
-        JOIN carton_labels cl ON cl.id = cartons.carton_label_id
-        WHERE cartons.id = ?
-      SQL
+      hash = find_with_association(:cartons, id)
       return nil if hash.nil?
 
+      label_hash = find_with_association(
+        :carton_labels, hash[:carton_label_id],
+        parent_tables: [{ parent_table: :cartons_per_pallet,
+                          flatten_columns: { cartons_per_pallet: :cartons_per_pallet } }]
+      )
+      return nil if label_hash.nil?
+
+      hash.merge!(label_hash)
       CartonFlat.new(hash)
     end
 
@@ -282,8 +212,8 @@ module MesscadaApp
       DB[:carton_labels].where(id: carton_label_id).get(:pallet_number)
     end
 
-    def create_pallet(user_name, pallet)
-      id = DB[:pallets].insert(pallet)
+    def create_pallet(user_name, attrs)
+      id = create(:pallets, attrs)
       log_status('pallets', id, AppConst::PALLETIZED_NEW_PALLET, user_name: user_name)
 
       id
@@ -308,9 +238,10 @@ module MesscadaApp
         .get(Sequel[:stock_types][:stock_type_code])
     end
 
-    def create_sequences(pallet_sequence, pallet_id)
-      pallet_sequence = pallet_sequence.merge(pallet_params(pallet_id))
-      create(:pallet_sequences, pallet_sequence)
+    def create_sequences(res)
+      attrs = res.to_h
+      attrs[:pallet_number] = DB[:pallets].where(id: attrs[:pallet_id]).get(:pallet_number)
+      create(:pallet_sequences, attrs)
     end
 
     def find_orchard_by_variant_and_puc_and_farm(variant_code, puc_id, farm_id)
@@ -415,17 +346,6 @@ module MesscadaApp
       raise res.message unless res.success
 
       JSON.parse(res.instance.body)
-    end
-
-    def pallet_params(pallet_id)
-      {
-        pallet_id: pallet_id,
-        pallet_number: find_pallet_number(pallet_id)
-      }
-    end
-
-    def find_pallet_number(id)
-      DB[:pallets].where(id: id).get(:pallet_number)
     end
 
     def get_rmt_bin_setup_reqs(bin_id)

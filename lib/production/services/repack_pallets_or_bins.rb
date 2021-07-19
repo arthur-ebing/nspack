@@ -77,7 +77,7 @@ module ProductionApp
         attrs[:standard_pack_code_id] = standard_pack_id
         attrs[:grade_id] = grade_id
 
-        MesscadaApp::MesscadaRepo.new.create_sequences(attrs, pallet_id)
+        MesscadaApp::MesscadaRepo.new.create_sequences(attrs)
       end
 
       ok_response

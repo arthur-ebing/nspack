@@ -5,23 +5,24 @@ module MesscadaApp
     attr_reader :repo, :carton_id, :carton_quantity, :pallet_id, :user_name, :carton_palletizing, :mix_rule_scope
 
     def initialize(user_name, carton_id, pallet_id, carton_quantity, carton_palletizing = false, mix_rule_scope = nil) # rubocop:disable Metrics/ParameterLists
-      @mix_rule_scope = mix_rule_scope
-      @carton_id = carton_id
-      @carton_quantity = carton_quantity
-      @pallet_id = pallet_id
-      @repo = MesscadaApp::MesscadaRepo.new
       @user_name = user_name
+      @carton_id = carton_id
+      @pallet_id = pallet_id
+      @carton_quantity = carton_quantity
       @carton_palletizing = carton_palletizing
+      @mix_rule_scope = mix_rule_scope
+      @repo = MesscadaApp::MesscadaRepo.new
     end
 
     def call # rubocop:disable Metrics/AbcSize
       res = NewPalletSequenceObject.call(user_name, carton_id, carton_quantity, carton_palletizing)
       return res unless res.success
 
-      validations = validate_pallet_mix_rules(res.instance)
+      sequence = res.instance.to_h.merge!(pallet_id: pallet_id)
+      validations = validate_pallet_mix_rules(sequence)
       return validations unless validations.success
 
-      id = repo.create_sequences(res.instance, pallet_id)
+      id = repo.create_sequences(sequence)
       repo.update_carton(carton_id, { pallet_sequence_id: id }) if !carton_equals_pallet? && AppConst::USE_CARTON_PALLETIZING
 
       success_response('ok', pallet_sequence_id: id)

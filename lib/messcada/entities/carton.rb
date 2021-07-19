@@ -43,6 +43,7 @@ module MesscadaApp
     attribute :inventory_code_id, Types::Integer
     attribute :pallet_format_id, Types::Integer
     attribute :cartons_per_pallet_id, Types::Integer
+    attribute :cartons_per_pallet, Types::String
     attribute :pm_bom_id, Types::Integer
     attribute :extended_columns, Types::Hash
     attribute :client_size_reference, Types::String

@@ -110,8 +110,8 @@ module RawMaterialsApp
       repo.log_status('pallets', pallet_id, AppConst::CREATED_FROM_BIN)
 
       seq_ids = []
-      sequences.each do |s|
-        seq_ids << @messcada_repo.create_sequences(s, pallet_id)
+      sequences.each do |sequence|
+        seq_ids << @messcada_repo.create_sequences(sequence.merge!(pallet_id: pallet_id))
       end
       repo.log_multiple_statuses(:pallet_sequences, seq_ids, AppConst::CREATED_FROM_BIN)
       bin_ids = repo.select_values(:rmt_bins, :id, bin_asset_number: bins.map { |b| b[:bin_asset_number] })
