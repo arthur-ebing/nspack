@@ -520,7 +520,8 @@ module MesscadaApp
                                   group_incentive_id rmt_bin_id dp_carton gtin_code rmt_container_material_owner_id legacy_data cartons_per_pallet carton_equals_pallet]
       attrs = find_carton(carton_id).to_h.reject { |k, _| carton_rejected_fields.include?(k) }
       attrs[:pallet_id] = pallet_id
-      get_id(:pallet_sequences, prepare_values_for_db(:pallet_sequences, attrs))
+      %i[treatment_ids fruit_sticker_ids tu_sticker_ids].each { |col| attrs[col] = array_for_db_col(attrs[col]) }
+      get_id(:pallet_sequences, attrs)
     end
 
     def sequence_has_cartons?(id)
