@@ -87,6 +87,9 @@
   - :col: vw_pallets.in_stock
     :op: "="
     :val: "$:in_stock$"
+  - :col: vw_pallets.shipped
+    :op: "="
+    :val: false
   :in_stock_depot_pallet:
   - :col: vw_pallets.in_stock
     :op: "="
