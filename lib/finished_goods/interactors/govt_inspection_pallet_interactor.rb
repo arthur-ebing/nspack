@@ -11,10 +11,6 @@ module FinishedGoodsApp
         id = repo.create_govt_inspection_pallet(res)
       end
       instance = govt_inspection_pallet(id)
-      instance.to_h.each do |key,val|
-        p "#{key} #{val.class}"
-      end
-
       success_response('Created govt inspection pallet', instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { failure_remarks: ['This govt inspection pallet already exists'] }))
