@@ -13,7 +13,7 @@ module Masterfiles
             page.form do |form|
               # form.caption 'RMT Container Material Type'
               form.view_only!
-              form.add_field :rmt_container_type_id
+              form.add_field :rmt_container_type
               form.add_field :container_material_type_code
               form.add_field :description
               form.add_field :tare_weight
