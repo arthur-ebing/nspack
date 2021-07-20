@@ -1,10 +1,14 @@
 module JsonHelpers # rubocop:disable Metrics/ModuleLength
+  def prep_hash_with_decimal_for_json(hash)
+    hash.transform_values { |v| v.is_a?(BigDecimal) ? v.to_s('F') : v }
+  end
+
   def action_add_grid_row(attrs:, grid_id: nil)
-    { addRowToGrid: { changes: attrs.merge(created_at: Time.now.to_s, updated_at: Time.now.to_s), gridId: grid_id } }
+    { addRowToGrid: { changes: prep_hash_with_decimal_for_json(attrs).merge(created_at: Time.now.to_s, updated_at: Time.now.to_s), gridId: grid_id } }
   end
 
   def action_update_grid_row(ids, changes:, grid_id: nil)
-    { updateGridInPlace: Array(ids).map { |i| { id: make_id_correct_type(i), changes: changes, gridId: grid_id } } }
+    { updateGridInPlace: Array(ids).map { |i| { id: make_id_correct_type(i), changes: prep_hash_with_decimal_for_json(changes), gridId: grid_id } } }
   end
 
   def action_delete_grid_row(id, grid_id: nil)
