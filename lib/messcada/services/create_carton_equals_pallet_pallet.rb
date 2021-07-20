@@ -82,6 +82,7 @@ module MesscadaApp
       }
       params[:pallet_number] = carton[:pallet_number]
       params[:has_individual_cartons] = individual_cartons?
+      params[:derived_weight] = true if AppConst::CR_PROD.derive_nett_weight?
       params
     end
 
