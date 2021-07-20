@@ -9,17 +9,22 @@ The EDI-IN process receives an edi file (typically from ftp, but sometimes also 
 
 A lot of infrastructure is provided by the framework so that transformations can be written to mostly concentrate on applying business logic.
 
+=== Overview
+
+.EDI-IN file processing
+image::edi_in_setup.png[EDI-IN setup]
+
 === Environment - variables and directories
 
 The `EDI_RECEIVE_DIR` environment variable is required to identify the folder from which EDI files are processed.
-e.g. `EDI_RECEIVE_DIR=/home/nspack/edi/receive`.
+e.g. `EDI_RECEIVE_DIR=/home/nspack/edi_in/receive`.
 
 A typical folder structure would look something like this:
 
 ----
 nsack
 ├── edi_filedrop                #<1>
-├── edi
+├── edi_in
 │   ├── processed               #<2>
 │   ├── process_errors          #<3>
 │   └── receive                 #<4>
