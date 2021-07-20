@@ -9,7 +9,7 @@ module UiRules
 
       common_values_for_fields common_fields
 
-      set_show_fields if %i[show reopen].include? @mode
+      set_show_fields if %i[show].include? @mode
 
       form_name 'registered_orchard'
     end
@@ -17,7 +17,7 @@ module UiRules
     def set_show_fields
       fields[:orchard_code] = { renderer: :label }
       fields[:cultivar_code] = { renderer: :label }
-      fields[:puc_code] = { renderer: :label, caption: 'PUC' }
+      fields[:puc_code] = { renderer: :label, caption: 'PUC Code' }
       fields[:description] = { renderer: :label }
       fields[:marketing_orchard] = { renderer: :label, as_boolean: true }
       fields[:active] = { renderer: :label, as_boolean: true }
@@ -27,7 +27,7 @@ module UiRules
       {
         orchard_code: { required: true },
         cultivar_code: { required: true },
-        puc_code: { required: true },
+        puc_code: { required: true, caption: 'PUC Code' },
         description: {},
         marketing_orchard: { renderer: :checkbox }
       }
