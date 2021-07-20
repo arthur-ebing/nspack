@@ -30,12 +30,12 @@
   id:
     :name: id
     :sequence_no: 1
-    :caption: Id
+    :caption: Vehicle Job Number
     :namespaced_name: vehicle_jobs.id
     :data_type: :integer
-    :width: 
+    :width: 150
     :format: 
-    :hide: true
+    :hide: false
     :pinned: 
     :groupable: true
     :group_by_seq: 
