@@ -181,7 +181,7 @@ module FinishedGoodsApp
           govt_inspection_pallets.failure_remarks,
           govt_inspection_sheets.inspected AS sheet_inspected,
           pallets.nett_weight,
-          ROUND(pallets.gross_weight) AS gross_weight,
+          ROUND(pallets.gross_weight, 2) AS gross_weight,
           pallets.carton_quantity,
           array_agg(distinct marketing_varieties.marketing_variety_code) AS marketing_varieties,
           array_agg(distinct target_market_groups.target_market_group_name) AS packed_tm_groups,
