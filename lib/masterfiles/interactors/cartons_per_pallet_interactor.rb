@@ -30,8 +30,6 @@ module MasterfilesApp
       end
       instance = cartons_per_pallet(id)
       success_response("Updated cartons per pallet #{instance.description}", instance)
-    rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { base: ['The Basic Pack and Pallet Format combination already exists.'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

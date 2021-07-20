@@ -30,8 +30,6 @@ module MasterfilesApp
       end
       instance = pallet_format(id)
       success_response("Updated pallet format #{instance.description}", instance)
-    rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { base: ['This Pallet Base and Stack Type combination already exists.'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

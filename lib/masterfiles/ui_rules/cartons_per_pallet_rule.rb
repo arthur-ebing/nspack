@@ -9,20 +9,31 @@ module UiRules
 
       common_values_for_fields common_fields
 
-      set_show_fields if %i[show reopen].include? @mode
+      set_show_fields if %i[show].include? @mode
+      edit_label_fields if %i[edit].include? @mode
 
       form_name 'cartons_per_pallet'
     end
 
     def set_show_fields
-      pallet_format_id_label = @repo.find_hash(:pallet_formats, @form_object.pallet_format_id)[:description]
-      basic_pack_id_label = MasterfilesApp::FruitSizeRepo.new.find_hash(:basic_pack_codes,  @form_object.basic_pack_id)[:basic_pack_code]
       fields[:description] = { renderer: :label }
-      fields[:pallet_format_id] = { renderer: :label, with_value: pallet_format_id_label, caption: 'Pallet Format' }
-      fields[:basic_pack_id] = { renderer: :label, with_value: basic_pack_id_label, caption: 'Basic Pack' }
       fields[:cartons_per_pallet] = { renderer: :label }
       fields[:layers_per_pallet] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
+      edit_label_fields
+    end
+
+    def edit_label_fields
+      fields[:pallet_format_id] = { renderer: :label,
+                                    with_value: @form_object.pallet_formats_description,
+                                    include_hidden_field: true,
+                                    hidden_value: @form_object.pallet_format_id,
+                                    caption: 'Pallet Format' }
+      fields[:basic_pack_id] = { renderer: :label,
+                                 with_value: @form_object.basic_pack_code,
+                                 include_hidden_field: true,
+                                 hidden_value: @form_object.basic_pack_id,
+                                 caption: 'Basic Pack' }
     end
 
     def common_fields
