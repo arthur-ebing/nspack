@@ -7,8 +7,8 @@
   \   govt_inspection_pallets.failure_reason_id,\r\n    inspection_failure_reasons.failure_reason,\r\n
   \   inspection_failure_reasons.description,\r\n    inspection_failure_reasons.main_factor,\r\n
   \   inspection_failure_reasons.secondary_factor,\r\n    govt_inspection_pallets.failure_remarks,\r\n
-  \   govt_inspection_sheets.inspected AS sheet_inspected,\r\n    pallets.gross_weight,\r\n
-  \   pallets.carton_quantity,\r\n    ARRAY_AGG(DISTINCT marketing_varieties.marketing_variety_code)
+  \   govt_inspection_sheets.inspected AS sheet_inspected,\r\n    ROUND(pallets.gross_weight,
+  2) AS gross_weight,\r\n    pallets.carton_quantity,\r\n    ARRAY_AGG(DISTINCT marketing_varieties.marketing_variety_code)
   AS marketing_varieties,\r\n    ARRAY_AGG(DISTINCT target_market_groups.target_market_group_name)
   AS packed_tm_groups,\r\n    pallet_bases.pallet_base_code AS pallet_base,\r\n\r\n
   \   (SELECT ARRAY_AGG(DISTINCT pallet_sequences.pallet_number)\r\n    FROM pallet_sequences\r\n
@@ -295,9 +295,9 @@
     :name: gross_weight
     :sequence_no: 17
     :caption: Gross weight
-    :namespaced_name: pallets.gross_weight
+    :namespaced_name: 
     :data_type: :number
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -310,10 +310,10 @@
   carton_quantity:
     :name: carton_quantity
     :sequence_no: 18
-    :caption: Carton quantity
+    :caption: Carton cty
     :namespaced_name: pallets.carton_quantity
-    :data_type: :string
-    :width: 
+    :data_type: :integer
+    :width: 100
     :format: 
     :hide: false
     :pinned: 

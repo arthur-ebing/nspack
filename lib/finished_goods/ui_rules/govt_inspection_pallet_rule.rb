@@ -46,8 +46,7 @@ module UiRules
                             caption: 'Packed TM Groups' },
         passed: { renderer: :checkbox },
         inspected: { renderer: :checkbox },
-        inspected_at: { renderer: :input,
-                        subtype: :datetime },
+        inspected_at: { renderer: :date },
         failure_reason_id: { renderer: :select,
                              options: MasterfilesApp::QualityRepo.new.for_select_inspection_failure_reasons,
                              disabled_options: MasterfilesApp::QualityRepo.new.for_select_inactive_inspection_failure_reasons,
@@ -60,7 +59,7 @@ module UiRules
     def make_form_object
       return make_new_form_object if @mode == :new
 
-      @form_object = @repo.find_govt_inspection_pallet_flat(@options[:id])
+      @form_object = @repo.find_govt_inspection_pallet(@options[:id])
     end
 
     def make_new_form_object

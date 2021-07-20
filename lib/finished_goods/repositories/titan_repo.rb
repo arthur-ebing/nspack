@@ -293,7 +293,7 @@ module FinishedGoodsApp
       pallet_ids.each do |pallet_id| # rubocop:disable Metrics/BlockLength
         pallet = find_pallet_for_titan(pallet_id)
         govt_inspection_sheet = GovtInspectionRepo.new.find_govt_inspection_sheet(pallet.govt_inspection_sheet_id)
-        govt_inspection_pallet = GovtInspectionRepo.new.find_govt_inspection_pallet_flat(pallet.govt_inspection_pallet_id)
+        govt_inspection_pallet = GovtInspectionRepo.new.find_govt_inspection_pallet(pallet.govt_inspection_pallet_id)
         details << {
           inspectedSSCC: pallet.pallet_number,
           stuffLoadDate: pallet.shipped_at.strftime('%F'),

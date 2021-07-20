@@ -25,29 +25,23 @@ module FinishedGoodsApp
                           label: :failure_remarks,
                           value: :id,
                           order_by: :failure_remarks
-    crud_calls_for :govt_inspection_pallets, name: :govt_inspection_pallet, wrapper: GovtInspectionPallet
+    crud_calls_for :govt_inspection_pallets, name: :govt_inspection_pallet, exclude: %i[create update]
 
     crud_calls_for :vehicle_jobs, name: :vehicle_job, wrapper: VehicleJob
     crud_calls_for :vehicle_job_units, name: :vehicle_job_unit, wrapper: VehicleJobUnit
 
     def find_govt_inspection_sheet(id) # rubocop:disable Metrics/AbcSize
-      hash = find_with_association(:govt_inspection_sheets, id,
-                                   parent_tables: [{ parent_table: :target_market_groups,
-                                                     columns: %i[target_market_group_name],
-                                                     foreign_key: :packed_tm_group_id,
-                                                     flatten_columns: { target_market_group_name: :packed_tm_group } },
-                                                   { parent_table: :inspectors,
-                                                     columns: %i[inspector_code],
-                                                     foreign_key: :inspector_id,
-                                                     flatten_columns: { inspector_code: :inspector_code } },
-                                                   { parent_table: :destination_regions,
-                                                     columns: %i[destination_region_name],
-                                                     foreign_key: :destination_region_id,
-                                                     flatten_columns: { destination_region_name: :destination_region } },
-                                                   { parent_table: :destination_countries,
-                                                     columns: %i[country_name],
-                                                     foreign_key: :destination_country_id,
-                                                     flatten_columns: { country_name: :destination_country } }])
+      hash = find_with_association(
+        :govt_inspection_sheets, id,
+        parent_tables: [{ parent_table: :target_market_groups, foreign_key: :packed_tm_group_id,
+                          flatten_columns: { target_market_group_name: :packed_tm_group } },
+                        { parent_table: :inspectors, foreign_key: :inspector_id,
+                          flatten_columns: { inspector_code: :inspector_code } },
+                        { parent_table: :destination_regions,  foreign_key: :destination_region_id,
+                          flatten_columns: { destination_region_name: :destination_region } },
+                        { parent_table: :destination_countries, foreign_key: :destination_country_id,
+                          flatten_columns: { country_name: :destination_country } }]
+      )
       return nil unless hash
 
       hash[:allocated] = exists?(:govt_inspection_pallets, govt_inspection_sheet_id: id)
@@ -168,7 +162,7 @@ module FinishedGoodsApp
       DB[table_name].where(args).exclude(column => nil).reverse(:id).get(column)
     end
 
-    def find_govt_inspection_pallet_flat(id)
+    def find_govt_inspection_pallet(id)
       query = <<~SQL
         SELECT
           pallets.pallet_number,
@@ -187,7 +181,7 @@ module FinishedGoodsApp
           govt_inspection_pallets.failure_remarks,
           govt_inspection_sheets.inspected AS sheet_inspected,
           pallets.nett_weight,
-          pallets.gross_weight,
+          ROUND(pallets.gross_weight) AS gross_weight,
           pallets.carton_quantity,
           array_agg(distinct marketing_varieties.marketing_variety_code) AS marketing_varieties,
           array_agg(distinct target_market_groups.target_market_group_name) AS packed_tm_groups,
@@ -221,7 +215,7 @@ module FinishedGoodsApp
       hash = DB[query, id].first
       return nil if hash.nil?
 
-      GovtInspectionPalletFlat.new(hash)
+      GovtInspectionPallet.new(hash)
     end
 
     def find_pallet_flat(id)
@@ -249,6 +243,12 @@ module FinishedGoodsApp
       return nil if hash.nil?
 
       FinishedGoodsApp::PalletFlat.new(hash)
+    end
+
+    def create_govt_inspection_pallet(res)
+      attrs = res.to_h
+      attrs[:passed] = attrs[:failure_reason_id].nil? if AppConst::CR_FG.use_continuous_govt_inspection_sheets?
+      create(:govt_inspection_pallets, attrs)
     end
 
     def update_govt_inspection_pallet(id, res)

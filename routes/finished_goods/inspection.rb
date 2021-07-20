@@ -378,31 +378,8 @@ class Nspack < Roda
       r.post do        # CREATE
         res = interactor.create_govt_inspection_pallet(params[:govt_inspection_pallet])
         if res.success
-          row_keys = %i[id
-                        pallet_number
-                        pallet_id
-                        govt_inspection_sheet_id
-                        completed
-                        passed
-                        inspected
-                        inspected_at
-                        failure_reason_id
-                        failure_reason
-                        description
-                        main_factor
-                        secondary_factor
-                        failure_remarks
-                        sheet_inspected
-                        gross_weight
-                        carton_quantity
-                        marketing_varieties
-                        packed_tm_groups
-                        pallet_base
-                        active
-                        colour_rule]
-          add_grid_row(attrs: select_attributes(res.instance, row_keys),
-                       grid_id: 'govt_inspection_pallets',
-                       notice: res.message)
+          flash[:notice] = res.message
+          redirect_via_json "/finished_goods/inspection/govt_inspection_sheets/#{res.instance.govt_inspection_sheet_id}"
         else
           re_show_form(r, res, url: '/finished_goods/inspection/govt_inspection_pallets/new') do
             FinishedGoods::Inspection::GovtInspectionPallet::New.call(form_values: params[:govt_inspection_pallet],

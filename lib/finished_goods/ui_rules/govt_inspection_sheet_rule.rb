@@ -216,12 +216,14 @@ module UiRules
                  prompt: 'Are you sure you want to reopen this inspection?',
                  icon: :back }
       toggle = @form_object.use_inspection_destination_for_load_out
-      toggle_use_inspection_destination = { control_type: :link,
-                                            style: :action_button,
-                                            text: "#{toggle ? "Don't use" : 'Use'} Destination Region for Load Out",
-                                            url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/toggle_use_inspection_destination",
-                                            prompt: "Are you sure you#{toggle ? ' do not' : ''} want to use destination region for load out?",
-                                            icon: :edit }
+      toggle_use_inspection_destination = {
+        control_type: :link,
+        style: :action_button,
+        text: "#{toggle ? "Don't use" : 'Use'} Destination Region for Load Out",
+        url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/toggle_use_inspection_destination",
+        prompt: "Are you sure you#{toggle ? ' do not' : ''} want to use destination region for load out?",
+        icon: :edit
+      }
 
       case @form_object.step
       when 0

@@ -4,18 +4,6 @@ module FinishedGoodsApp
   class GovtInspectionPallet < Dry::Struct
     attribute :id, Types::Integer
     attribute :pallet_id, Types::Integer
-    attribute :govt_inspection_sheet_id, Types::Integer
-    attribute :passed, Types::Bool
-    attribute :inspected, Types::Bool
-    attribute :inspected_at, Types::DateTime
-    attribute :failure_reason_id, Types::Integer
-    attribute :failure_remarks, Types::String
-    attribute? :active, Types::Bool
-  end
-
-  class GovtInspectionPalletFlat < Dry::Struct
-    attribute :id, Types::Integer
-    attribute :pallet_id, Types::Integer
     attribute :pallet_number, Types::String
     attribute :govt_inspection_sheet_id, Types::Integer
     attribute :completed, Types::Bool
@@ -29,8 +17,8 @@ module FinishedGoodsApp
     attribute :secondary_factor, Types::Bool
     attribute :failure_remarks, Types::String
     attribute :sheet_inspected, Types::Bool
-    attribute :nett_weight, Types::Float
-    attribute :gross_weight, Types::Float
+    attribute :nett_weight, Types::Decimal
+    attribute :gross_weight, Types::Decimal
     attribute :carton_quantity, Types::Integer
     attribute :marketing_varieties, Types::Array
     attribute :packed_tm_groups, Types::Array
