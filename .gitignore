@@ -67,7 +67,5 @@ pdf_documentation/*.png
 /app_prepared_reports/
 /ftp_transfer/
 /edi/
-/edi_filedrop/
 /.env.local*
 script_test.rb
-/edi_receive/
