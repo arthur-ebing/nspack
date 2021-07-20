@@ -15,16 +15,20 @@ module UiRules
     end
 
     def set_show_fields
-      commodity_id_label = MasterfilesApp::CommodityRepo.new.find_commodity(@form_object.commodity_id)&.code
-      fields[:commodity_id] = { renderer: :label, with_value: commodity_id_label }
+      fields[:commodity_code] = { renderer: :label,
+                                  with_value: @form_object.commodity_code }
       fields[:cultivar_group_code] = { renderer: :label }
       fields[:description] = { renderer: :label }
+      fields[:cultivars] = { renderer: :list,
+                             items: @form_object.cultivars }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields
       {
-        commodity_id: { renderer: :select, options: MasterfilesApp::CommodityRepo.new.for_select_commodities, required: true },
+        commodity_id: { renderer: :select,
+                        options: MasterfilesApp::CommodityRepo.new.for_select_commodities,
+                        required: true },
         cultivar_group_code: { required: true },
         description: {}
       }

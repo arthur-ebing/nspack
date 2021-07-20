@@ -13,7 +13,7 @@ module EdiApp
             farms.farm_code AS farm,
             pucs.puc_code AS puc,
             orchards.orchard_code AS orchard,
-            commodities.code AS commodity,
+            cultivar_groups.cultivar_group_code AS cultivar_group,
             cultivars.cultivar_name AS cultivar,
             grades.grade_code AS grade,
             standard_pack_codes.standard_pack_code AS pack,
@@ -30,7 +30,6 @@ module EdiApp
         JOIN orchards ON orchards.id = pallet_sequences.orchard_id
         JOIN cultivar_groups ON cultivar_groups.id = pallet_sequences.cultivar_group_id
         LEFT JOIN cultivars ON cultivars.id = pallet_sequences.cultivar_id
-        JOIN commodities ON commodities.id = cultivar_groups.commodity_id
         JOIN grades ON grades.id = pallet_sequences.grade_id
         JOIN standard_pack_codes ON standard_pack_codes.id = pallet_sequences.standard_pack_code_id
         JOIN fruit_size_references ON fruit_size_references.id = pallet_sequences.fruit_size_reference_id

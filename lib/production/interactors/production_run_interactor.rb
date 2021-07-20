@@ -308,8 +308,7 @@ module ProductionApp
         log_transaction
       end
       instance = production_run_flat(id)
-      success_response("Updated production run #{instance.production_run_code}",
-                       instance)
+      success_response("Updated production run #{instance.production_run_code}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -442,7 +441,7 @@ module ProductionApp
       assert_permission!(:re_configure, id)
       repo.transaction do
         repo.update_production_run(id, reconfiguring: true, setup_complete: false)
-        log_status(:production_runs, id, 'RE-CONFiGURING')
+        log_status(:production_runs, id, 'RE-CONFIGURING')
         log_transaction
       end
       success_response('Run can be re-configured', production_run_flat(id).to_h.merge(colour_rule: 'inprogress'))
@@ -564,7 +563,7 @@ module ProductionApp
         instance[:cultivars] = cultivar_repo.for_select_cultivars(where: { id: orchard.cultivar_ids.to_a })
       end
       instance[:cultivars].unshift(['', '']) # if mixed_cult
-      instance[:seasons] = MasterfilesApp::CalendarRepo.new.for_select_seasons_for_cultivar_group(res[:changed_value])
+      instance[:seasons] = MasterfilesApp::CalendarRepo.new.for_select_seasons(where: { cultivar_group_id: res[:changed_value] })
 
       success_response('ok', instance)
     end
@@ -765,18 +764,18 @@ module ProductionApp
     end
 
     def validate_new_first_production_run_params(params)
-      ProductionRunNewFirstSchema.call(params)
+      ProductionRunNewFirstContract.new.call(params)
     end
 
     def validate_new_production_run_params(params)
-      ProductionRunNewSchema.call(params)
+      ProductionRunNewContract.new.call(params)
     end
 
     def validate_production_run_params(reconfiguring, params)
       if reconfiguring
-        ProductionRunReconfigureSchema.call(params)
+        ProductionRunReconfigureContract.new.call(params)
       else
-        ProductionRunSchema.call(params)
+        ProductionRunContract.new.call(params)
       end
     end
 

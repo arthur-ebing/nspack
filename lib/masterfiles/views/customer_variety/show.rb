@@ -13,10 +13,10 @@ module Masterfiles
             page.form do |form|
               # form.caption 'Customer Variety'
               form.view_only!
-              form.add_field :variety_as_customer_variety_id
-              form.add_field :packed_tm_group_id
-              form.add_field :active
+              form.add_field :variety_as_customer_variety
+              form.add_field :packed_tm_group
               form.add_field :marketing_varieties
+              form.add_field :active
             end
           end
 

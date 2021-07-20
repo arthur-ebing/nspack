@@ -38,6 +38,16 @@ module ProductionApp
       res = interactor.create_production_run(attrs)
       refute res.success, 'should fail validation'
       assert_equal ['must be filled'], res.errors[:season_id]
+
+      attrs = fake_production_run(allow_cultivar_mixing: true).to_h.reject { |k, _| k == :id }
+      res = interactor.create_production_run(attrs)
+      refute res.success, 'should fail validation'
+      assert_equal ['Do not select a cultivar when allowing cultivar mixing.'], res.errors.values.first
+
+      attrs = fake_production_run(cultivar_id: nil, allow_cultivar_mixing: false).to_h.reject { |k, _| k == :id }
+      res = interactor.create_production_run(attrs)
+      refute res.success, 'should fail validation'
+      assert_equal ['Select a cultivar when not allowing cultivar mixing.'], res.errors.values.first
     end
 
     def test_update_production_run
@@ -100,6 +110,7 @@ module ProductionApp
         closed_at: '2010-01-01 12:00',
         re_executed_at: '2010-01-01 12:00',
         completed_at: '2010-01-01 12:00',
+        allow_cultivar_group_mixing: false,
         allow_cultivar_mixing: false,
         allow_orchard_mixing: false,
         reconfiguring: false,
@@ -110,7 +121,6 @@ module ProductionApp
         tipping: false,
         labeling: false,
         active: true,
-        allow_cultivar_group_mixing: false,
         legacy_data: {},
         legacy_bintip_criteria: {}
       }

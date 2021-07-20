@@ -10,6 +10,6 @@
     :conditions: standard
 :conditions:
   :standard:
-    - :col: cultivars.commodity_id
+    - :col: cultivar_groups.commodity_id
       :op: =
       :val: $:commodity_id$

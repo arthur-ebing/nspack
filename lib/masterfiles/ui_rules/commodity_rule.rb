@@ -34,7 +34,7 @@ module UiRules
         hs_code: { caption: 'HS code',
                    hint: 'The Harmonized System is an international nomenclature for the classification of products.
                           It allows participating countries to classify traded goods on a common basis for customs purposes.
-                          At the international level, the Harmonized System (HS) for classifying goods is a six-digit code system' },
+                          At the international level, the Harmonized System (HS) for classifying goods is a six-digit code system.' },
         requires_standard_counts: { renderer: :checkbox },
         use_size_ref_for_edi: { renderer: :checkbox },
         active: { renderer: :checkbox }

@@ -12,9 +12,10 @@ module Masterfiles
             page.form_object ui_rule.form_object
             page.form do |form|
               form.view_only!
+              form.add_field :commodity_code
               form.add_field :cultivar_group_code
               form.add_field :description
-              form.add_field :commodity_id
+              form.add_field :cultivars
               form.add_field :active
             end
           end

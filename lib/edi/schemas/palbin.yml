@@ -7,7 +7,7 @@
 :farm: :string
 :puc: :string
 :orchard: :string
-:commodity: :string
+:cultivar_group: :string
 :cultivar: :string
 :grade: :string
 :pack: :string

@@ -25,11 +25,11 @@
   AS target_market,\r\n  seasons.season_code,\r\n  pm_subtypes.subtype_code,\r\n  pm_types.pm_type_code,\r\n
   \ cartons_per_pallet.cartons_per_pallet,\r\n  pm_products.product_code,\r\n  cartons.gross_weight,\r\n
   \ cartons.nett_weight,\r\n  carton_labels.pick_ref,\r\n  cartons.pallet_sequence_id,\r\n
-  \ pallet_sequences.pallet_number,\r\n  pallet_sequences.pallet_sequence_number,\r\n
-  \ personnel_identifiers.identifier AS personnel_identifier,\r\n  contract_workers.personnel_number,\r\n
-  \ packing_methods.packing_method_code,\r\n  palletizers.identifier AS palletizer_identifier,\r\n
-  \ concat(palletizer_contract_workers.first_name, '_', palletizer_contract_workers.surname)
-  AS palletizer_contract_worker,\r\n  palletizer_contract_workers.personnel_number
+  \ coalesce(pallet_sequences.pallet_number, carton_labels.pallet_number) as pallet_number,\r\n
+  \ pallet_sequences.pallet_sequence_number,\r\n  personnel_identifiers.identifier
+  AS personnel_identifier,\r\n  contract_workers.personnel_number,\r\n  packing_methods.packing_method_code,\r\n
+  \ palletizers.identifier AS palletizer_identifier,\r\n  concat(palletizer_contract_workers.first_name,
+  '_', palletizer_contract_workers.surname) AS palletizer_contract_worker,\r\n  palletizer_contract_workers.personnel_number
   AS palletizer_personnel_number,\r\n  cartons.is_virtual,\r\n  marketing_pucs.puc_code
   AS marketing_puc,\r\n  registered_orchards.orchard_code AS marketing_orchard,\r\n
   \ carton_labels.rmt_bin_id,\r\n  carton_labels.dp_carton,\r\n  carton_labels.gtin_code,\r\n
@@ -46,7 +46,7 @@
   \ JOIN orchards ON orchards.id = carton_labels.orchard_id\r\n  JOIN cultivar_groups
   ON cultivar_groups.id = carton_labels.cultivar_group_id\r\n  LEFT JOIN cultivars
   ON cultivars.id = carton_labels.cultivar_id\r\n  LEFT JOIN commodities ON commodities.id
-  = cultivars.commodity_id\r\n  JOIN marketing_varieties ON marketing_varieties.id
+  = cultivar_groups.commodity_id\r\n  JOIN marketing_varieties ON marketing_varieties.id
   = carton_labels.marketing_variety_id\r\n  LEFT JOIN customer_varieties ON customer_varieties.id
   = carton_labels.customer_variety_id\r\n  LEFT JOIN marketing_varieties cvv ON cvv.id
   = customer_varieties.variety_as_customer_variety_id\r\n  LEFT JOIN std_fruit_size_counts
@@ -883,7 +883,7 @@
     :name: pallet_number
     :sequence_no: 51
     :caption: Pallet number
-    :namespaced_name: pallet_sequences.pallet_number
+    :namespaced_name: 
     :data_type: :string
     :width: 150
     :format: 

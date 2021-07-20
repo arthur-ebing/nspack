@@ -16,7 +16,6 @@ module Masterfiles
               form.action "/masterfiles/fruit/cultivars/#{id}"
               form.remote!
               form.method :update
-              form.add_field :commodity_id
               form.add_field :cultivar_group_id
               form.add_field :cultivar_name
               form.add_field :cultivar_code

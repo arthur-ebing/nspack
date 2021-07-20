@@ -1,21 +1,25 @@
 ---
 :caption: Customer Varieties
-:sql: 'SELECT "customer_varieties"."id", "customer_varieties"."variety_as_customer_variety_id",
-  "customer_varieties"."packed_tm_group_id", "customer_varieties"."active", "customer_varieties"."created_at",
-  "customer_varieties"."updated_at", "target_market_groups"."target_market_group_name"
-  AS packed_tm_group, "marketing_varieties"."marketing_variety_code" AS variety_as_customer_variety,
-  EXISTS(SELECT id FROM customer_variety_varieties WHERE customer_variety_varieties.customer_variety_id
-  = "customer_varieties"."id") AS has_marketing_varieties FROM "customer_varieties"
-  JOIN "target_market_groups" ON "target_market_groups"."id" = "customer_varieties"."packed_tm_group_id"
-  JOIN "marketing_varieties" ON "marketing_varieties"."id" = "customer_varieties"."variety_as_customer_variety_id"
-  ORDER BY "target_market_groups"."target_market_group_name", "marketing_varieties"."marketing_variety_code" '
+:sql: "SELECT\r\n    customer_varieties.id,\r\n    customer_varieties.variety_as_customer_variety_id,\r\n
+  \   customer_varieties.packed_tm_group_id,\r\n    target_market_groups.target_market_group_name
+  AS packed_tm_group,\r\n    marketing_varieties.marketing_variety_code AS variety_as_customer_variety,\r\n
+  \   EXISTS(SELECT id FROM customer_variety_varieties WHERE customer_variety_varieties.customer_variety_id
+  = customer_varieties.id) AS has_marketing_varieties,\r\n    (SELECT ARRAY_AGG(marketing_variety_code)\r\n
+  \   FROM marketing_varieties JOIN customer_variety_varieties ON marketing_varieties.id
+  = customer_variety_varieties.marketing_variety_id\r\n    WHERE customer_variety_id
+  = customer_varieties.id) AS marketing_varieties,\r\n    customer_varieties.active,\r\n
+  \   customer_varieties.created_at,\r\n    customer_varieties.updated_at\r\nFROM
+  customer_varieties\r\n         JOIN target_market_groups ON target_market_groups.id
+  = customer_varieties.packed_tm_group_id\r\n         JOIN marketing_varieties ON
+  marketing_varieties.id = customer_varieties.variety_as_customer_variety_id\r\nORDER
+  BY\r\n    target_market_groups.target_market_group_name,\r\n    marketing_varieties.marketing_variety_code\r\n"
 :limit: 
 :offset: 
 :external_settings: {}
 :columns:
   id:
     :name: id
-    :sequence_no: 4
+    :sequence_no: 1
     :caption: Id
     :namespaced_name: customer_varieties.id
     :data_type: :integer
@@ -31,7 +35,7 @@
     :group_max: false
   variety_as_customer_variety_id:
     :name: variety_as_customer_variety_id
-    :sequence_no: 5
+    :sequence_no: 2
     :caption: Variety as customer variety
     :namespaced_name: customer_varieties.variety_as_customer_variety_id
     :data_type: :integer
@@ -47,8 +51,8 @@
     :group_max: false
   packed_tm_group_id:
     :name: packed_tm_group_id
-    :sequence_no: 6
-    :caption: Packed tm group
+    :sequence_no: 3
+    :caption: Packed TM group
     :namespaced_name: customer_varieties.packed_tm_group_id
     :data_type: :integer
     :width: 
@@ -61,58 +65,10 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  active:
-    :name: active
-    :sequence_no: 3
-    :caption: Active
-    :namespaced_name: customer_varieties.active
-    :data_type: :boolean
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  created_at:
-    :name: created_at
-    :sequence_no: 7
-    :caption: Created at
-    :namespaced_name: customer_varieties.created_at
-    :data_type: :datetime
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  updated_at:
-    :name: updated_at
-    :sequence_no: 8
-    :caption: Updated at
-    :namespaced_name: customer_varieties.updated_at
-    :data_type: :datetime
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   packed_tm_group:
     :name: packed_tm_group
-    :sequence_no: 1
-    :caption: Packed tm group
+    :sequence_no: 4
+    :caption: Packed TM group
     :namespaced_name: target_market_groups.target_market_group_name
     :data_type: :string
     :width: 
@@ -127,7 +83,7 @@
     :group_max: false
   variety_as_customer_variety:
     :name: variety_as_customer_variety
-    :sequence_no: 2
+    :sequence_no: 5
     :caption: Variety as customer variety
     :namespaced_name: marketing_varieties.marketing_variety_code
     :data_type: :string
@@ -143,10 +99,74 @@
     :group_max: false
   has_marketing_varieties:
     :name: has_marketing_varieties
-    :sequence_no: 9
+    :sequence_no: 6
     :caption: Has marketing varieties
     :namespaced_name: 
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marketing_varieties:
+    :name: marketing_varieties
+    :sequence_no: 7
+    :caption: Marketing varieties
+    :namespaced_name: 
     :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 8
+    :caption: Active
+    :namespaced_name: customer_varieties.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 9
+    :caption: Created at
+    :namespaced_name: customer_varieties.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 10
+    :caption: Updated at
+    :namespaced_name: customer_varieties.updated_at
+    :data_type: :datetime
     :width: 
     :format: 
     :hide: true

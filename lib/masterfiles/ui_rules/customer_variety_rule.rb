@@ -10,7 +10,7 @@ module UiRules
       # common_values_for_fields common_fields
       common_values_for_fields @mode == :new ? common_fields : edit_fields
 
-      set_show_fields if %i[show reopen].include? @mode
+      set_show_fields if %i[show].include? @mode
 
       add_behaviours if %i[new].include? @mode
 
@@ -18,12 +18,13 @@ module UiRules
     end
 
     def set_show_fields
-      variety_as_customer_variety_id_label = @repo.find_hash(:marketing_varieties, @form_object.variety_as_customer_variety_id)[:marketing_variety_code]
-      packed_tm_group_id_label = @repo.find_hash(:target_market_groups, @form_object.packed_tm_group_id)[:target_market_group_name]
-      fields[:variety_as_customer_variety_id] = { renderer: :label, with_value: variety_as_customer_variety_id_label, caption: 'Variety As Customer Variety' }
-      fields[:packed_tm_group_id] = { renderer: :label, with_value: packed_tm_group_id_label, caption: 'Packed Tm Group' }
+      fields[:variety_as_customer_variety] = { renderer: :label,
+                                               caption: 'Variety As Customer Variety' }
+      fields[:packed_tm_group] = { renderer: :label,
+                                   caption: 'Packed TM Group' }
+      fields[:marketing_varieties] = { renderer: :list,
+                                       items: @form_object.marketing_varieties }
       fields[:active] = { renderer: :label, as_boolean: true }
-      fields[:marketing_varieties] = { renderer: :list, items: customer_variety_marketing_varieties }
     end
 
     def common_fields
@@ -74,10 +75,6 @@ module UiRules
       @form_object = OpenStruct.new(variety_as_customer_variety_id: nil,
                                     packed_tm_group_id: nil,
                                     customer_variety_varieties_ids: nil)
-    end
-
-    def customer_variety_marketing_varieties
-      @repo.find_customer_variety_marketing_varieties(@options[:id])
     end
 
     private

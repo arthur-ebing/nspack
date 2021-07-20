@@ -22,16 +22,15 @@ module FinishedGoodsApp
     crud_calls_for :load_containers, name: :load_container, wrapper: LoadContainer
 
     def find_load_container_flat(id)
-      hash = find_with_association(:load_containers,
-                                   id,
-                                   parent_tables: [{ parent_table: :container_stack_types,
-                                                     columns: %i[stack_type_code description],
-                                                     foreign_key: :stack_type_id,
-                                                     flatten_columns: { stack_type_code: :stack_type_code, description: :stack_type_description } },
-                                                   { parent_table: :cargo_temperatures,
-                                                     columns: %i[temperature_code set_point_temperature],
-                                                     foreign_key: :cargo_temperature_id,
-                                                     flatten_columns: { temperature_code: :cargo_temperature_code, set_point_temperature: :set_point_temperature } }])
+      hash = find_with_association(
+        :load_containers, id,
+        parent_tables: [{ parent_table: :container_stack_types,  foreign_key: :stack_type_id,
+                          flatten_columns: { stack_type_code: :stack_type_code,
+                                             description: :stack_type_description } },
+                        { parent_table: :cargo_temperatures, foreign_key: :cargo_temperature_id,
+                          flatten_columns: { temperature_code: :cargo_temperature_code,
+                                             set_point_temperature: :set_point_temperature } }]
+      )
       return nil if hash.nil?
 
       hash[:load_container_id] = id

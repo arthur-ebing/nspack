@@ -107,7 +107,7 @@ module UiRules
                                disabled_options: @cultivar_repo.for_select_inactive_cultivars,
                                caption: 'Cultivar' }
       fields[:season_id] = { renderer: :select,
-                             options: MasterfilesApp::CalendarRepo.new.for_select_seasons_for_cultivar_group(@form_object.cultivar_group_id),
+                             options: MasterfilesApp::CalendarRepo.new.for_select_seasons(where: { cultivar_group_id: @form_object.cultivar_group_id }),
                              disabled_options: MasterfilesApp::CalendarRepo.new.for_select_inactive_seasons,
                              caption: 'Season',
                              required: true }

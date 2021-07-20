@@ -11,10 +11,6 @@ module MasterfilesApp
                           value: :id,
                           order_by: :season_group_code
 
-    build_for_select :seasons,
-                     label: :season_code,
-                     value: :id,
-                     order_by: :season_code
     build_inactive_select :seasons,
                           label: :season_code,
                           value: :id,
@@ -24,14 +20,14 @@ module MasterfilesApp
     crud_calls_for :seasons, name: :season, exclude: %i[create update]
 
     def find_season(id)
-      find_with_association(:seasons, id,
-                            parent_tables: [{ parent_table: :season_groups,
-                                              columns: [:season_group_code],
-                                              flatten_columns: { season_group_code: :season_group_code } },
-                                            { parent_table: :commodities,
-                                              columns: [:code],
-                                              flatten_columns: { code: :commodity_code } }],
-                            wrapper: Season)
+      find_with_association(
+        :seasons, id,
+        parent_tables: [{ parent_table: :season_groups,
+                          flatten_columns: { season_group_code: :season_group_code } },
+                        { parent_table: :commodities,
+                          flatten_columns: { code: :commodity_code } }],
+        wrapper: Season
+      )
     end
 
     def create_season(res)
@@ -61,29 +57,19 @@ module MasterfilesApp
     def get_season_id(cultivar_id, date)
       raise ArgumentError, 'get_season_id: cultivar_id and date required' unless cultivar_id && date
 
-      commodity_id = get(:cultivars, cultivar_id, :commodity_id)
+      cultivar_group_id = get(:cultivars, cultivar_id, :cultivar_group_id)
+      commodity_id = get(:cultivar_groups, cultivar_group_id, :commodity_id)
       DB[:seasons].where(commodity_id: commodity_id).where(Sequel.lit('? between start_date and end_date', date)).get(:id)
     end
 
-    def for_select_seasons_for_cultivar_group(cultivar_group_id)
+    def for_select_seasons(where: {}, exclude: {})
       DB[:seasons]
-        .join(:cultivars, commodity_id: :commodity_id)
-        .where(cultivar_group_id: cultivar_group_id)
+        .join(:cultivar_groups, commodity_id: :commodity_id)
+        .join(:cultivars, cultivar_group_id: :id)
+        .where(convert_empty_values(where))
+        .exclude(convert_empty_values(exclude))
         .where(Sequel.lit('start_date').< Time.now)
         .where(Sequel.lit('end_date').> Time.now)
-        .order(:season_code)
-        .distinct
-        .select_map([:season_code, Sequel[:seasons][:id]])
-    end
-
-    def for_select_seasons_for_cultivar(cultivar_id)
-      DB[:seasons]
-        .join(:cultivars, commodity_id: :commodity_id)
-        .where(Sequel[:cultivars][:id] => cultivar_id)
-        .where(Sequel.lit('start_date').< Time.now)
-        .where(Sequel.lit('end_date').> Time.now)
-        .order(:season_code)
-        .distinct
         .select_map([:season_code, Sequel[:seasons][:id]])
     end
 

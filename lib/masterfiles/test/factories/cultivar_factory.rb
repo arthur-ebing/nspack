@@ -6,9 +6,8 @@ module MasterfilesApp
       id = get_available_factory_record(:cultivar_groups, opts)
       return id unless id.nil?
 
-      commodity_id = create_commodity
+      opts[:commodity_id] ||= create_commodity
       default = {
-        commodity_id: commodity_id,
         cultivar_group_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
         active: true
@@ -20,12 +19,8 @@ module MasterfilesApp
       id = get_available_factory_record(:cultivars, opts)
       return id unless id.nil?
 
-      commodity_id = create_commodity
-      cultivar_group_id = create_cultivar_group
-
+      opts[:cultivar_group_id] ||= create_cultivar_group
       default = {
-        commodity_id: commodity_id,
-        cultivar_group_id: cultivar_group_id,
         cultivar_name: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
         cultivar_code: Faker::Lorem.word,

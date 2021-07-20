@@ -125,9 +125,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     args.orchard_id = get_orchard_id(args)
 
     args.cultivar_code = args.rmt_variety
-    args.cultivar_id = get_id_or_error(:cultivars,
-                                       cultivar_name: args.rmt_variety,
-                                       commodity_id: args.commodity_id)
+    args.cultivar_id = get_id_or_error(:cultivars, cultivar_name: args.rmt_variety)
 
     args.cultivar_group_id = @repo.get(:cultivars, args.cultivar_id, :cultivar_group_id)
 

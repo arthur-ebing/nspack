@@ -282,7 +282,7 @@ module MesscadaApp
         JOIN orchards ON orchards.id = pallet_sequences.orchard_id
         JOIN cultivar_groups ON cultivar_groups.id = pallet_sequences.cultivar_group_id
         LEFT JOIN cultivars ON cultivars.id = pallet_sequences.cultivar_id
-        LEFT JOIN commodities ON commodities.id = COALESCE(cultivars.commodity_id, cultivar_groups.commodity_id)
+        LEFT JOIN commodities ON commodities.id = cultivar_groups.commodity_id
         JOIN marketing_varieties ON marketing_varieties.id = pallet_sequences.marketing_variety_id
         JOIN marks ON marks.id = pallet_sequences.mark_id
         LEFT JOIN pm_marks ON pm_marks.id = pallet_sequences.pm_mark_id

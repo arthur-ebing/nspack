@@ -111,13 +111,14 @@ module FinishedGoodsApp
         all_ok
       end
 
-      def ship_check # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+      def ship_check # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
         return failed_response("Load: #{id} has already been shipped") if shipped?
         return failed_response("Load: #{id} doesnt have pallets allocated") unless allocated?
         return failed_response("Load: #{id} truck arrival not done") unless vehicle?
         return failed_response("Load: #{id} hasn't been loaded") unless loaded?
         return failed_response("Load: #{id} requires a temp tail to be set") unless temp_tail?
         return failed_response("Load: #{id} associated order not completed") unless order_completed?
+        return failed_response "Pallet: #{rmt_palbin_doesnt_have_cultivar.join(', ')}, do not have Cultivars, Only applicable for RMT loads." unless rmt_palbin_doesnt_have_cultivar.empty?
 
         all_ok
       end
@@ -147,6 +148,11 @@ module FinishedGoodsApp
         return failed_response("Pallet: #{failed_pallet_numbers.join(', ')} not inspected, Unable to request Addendum.") unless failed_pallet_numbers.empty?
 
         all_ok
+      end
+
+      def rmt_palbin_doesnt_have_cultivar
+        pallet_ids = repo.select_values(:pallets, :id, load_id: id)
+        DB[:pallet_sequences].where(pallet_id: pallet_ids, cultivar_id: nil).select_map(:pallet_number).uniq
       end
 
       def order_completed?

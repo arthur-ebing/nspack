@@ -578,30 +578,47 @@ class Nspack < Roda
         r.patch do     # UPDATE
           res = interactor.update_production_run(id, params[:production_run])
           if res.success
-            row_keys = %i[
-              farm_id
-              puc_id
-              packhouse_resource_id
-              production_line_id
-              season_id
-              orchard_id
-              cultivar_group_id
-              cultivar_id
-              product_setup_template_id
-              cloned_from_run_id
-              active_run_stage
-              started_at
-              closed_at
-              re_executed_at
-              completed_at
-              allow_cultivar_mixing
-              allow_orchard_mixing
-              reconfiguring
-              closed
-              running
-              setup_complete
-              completed
-            ]
+            row_keys = %i[id
+                          farm_id
+                          puc_id
+                          packhouse_resource_id
+                          production_line_id
+                          season_id
+                          orchard_id
+                          cultivar_group_id
+                          cultivar_id
+                          product_setup_template_id
+                          cloned_from_run_id
+                          active_run_stage
+                          started_at
+                          closed_at
+                          re_executed_at
+                          completed_at
+                          allow_cultivar_mixing
+                          allow_orchard_mixing
+                          reconfiguring
+                          closed
+                          setup_complete
+                          completed
+                          running
+                          tipping
+                          labeling
+                          active
+                          allocation_required
+                          template_name
+                          production_run_code
+                          cloned_from_run_code
+                          cultivar_group_code
+                          cultivar_name
+                          farm_code
+                          puc_code
+                          orchard_code
+                          season_code
+                          commodity_code
+                          packhouse_code
+                          line_code
+                          status
+                          allow_cultivar_group_mixing]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
             re_show_form(r, res) { Production::Runs::ProductionRun::Edit.call(id, form_values: params[:production_run], form_errors: res.errors) }
@@ -646,9 +663,9 @@ class Nspack < Roda
           farm_repo = MasterfilesApp::FarmRepo.new
           pucs = farm_repo.selected_farm_pucs(where: { farm_id: params[:changed_value] })
           orchards = if !params[:cultivar_id].nil_or_empty?
-                       farm_repo.find_orchards_by_farm_and_cultivar(params[:changed_value], params[:cultivar_id])
+                       farm_repo.for_select_orchards_by_farm_and_cultivar(params[:changed_value].to_i, params[:production_run_cultivar_id].to_i)
                      else
-                       farm_repo.find_orchards_by_farm_and_cultivar_group(params[:changed_value], params[:cultivar_group_id])
+                       farm_repo.for_select_orchards_by_farm_and_cultivar_group(params[:changed_value].to_i, params[:production_run_cultivar_group_id].to_i)
                      end
           json_actions([OpenStruct.new(type: :replace_select_options,
                                        dom_id: 'production_run_puc_id',
@@ -669,7 +686,7 @@ class Nspack < Roda
       r.on 'cultivar_group_combo_changed' do
         if !params[:changed_value].nil_or_empty?
           cultivars = MasterfilesApp::CultivarRepo.new.for_select_cultivars(where: { cultivar_group_id: params[:changed_value] })
-          seasons = MasterfilesApp::CalendarRepo.new.for_select_seasons_for_cultivar_group(params[:changed_value])
+          seasons = MasterfilesApp::CalendarRepo.new.for_select_seasons(where: { cultivar_group_id: params[:changed_value] })
           json_actions([OpenStruct.new(type: :replace_select_options,
                                        dom_id: 'production_run_cultivar_id',
                                        options_array: cultivars),
@@ -688,9 +705,9 @@ class Nspack < Roda
 
       r.on 'cultivar_combo_changed' do
         seasons = if !params[:changed_value].nil_or_empty?
-                    MasterfilesApp::CalendarRepo.new.for_select_seasons_for_cultivar(params[:changed_value])
+                    MasterfilesApp::CalendarRepo.new.for_select_seasons(where: { Sequel[:cultivars][:id] => params[:changed_value] })
                   else
-                    MasterfilesApp::CalendarRepo.new.for_select_seasons_for_cultivar_group(params[:cultivar_group_id])
+                    MasterfilesApp::CalendarRepo.new.for_select_seasons(where: { cultivar_group_id: params[:production_run_cultivar_group_id] })
                   end
         json_replace_select_options('production_run_season_id', seasons)
       end
@@ -808,6 +825,7 @@ class Nspack < Roda
               closed
               running
               setup_complete
+              template_name
               completed
               allocation_required
             ]

@@ -70,3 +70,4 @@ pdf_documentation/*.png
 /edi_filedrop/
 /.env.local*
 script_test.rb
+/edi_receive/

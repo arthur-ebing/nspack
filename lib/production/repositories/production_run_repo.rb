@@ -190,52 +190,40 @@ module ProductionApp
     end
 
     def find_production_run_flat(id)
-      hash = find_with_association(:production_runs,
-                                   id,
-                                   parent_tables: [{ parent_table: :product_setup_templates,
-                                                     columns: [:template_name],
-                                                     flatten_columns: { template_name: :template_name } },
-                                                   { parent_table: :cultivar_groups,
-                                                     columns: [:cultivar_group_code],
-                                                     flatten_columns: { cultivar_group_code: :cultivar_group_code } },
-                                                   { parent_table: :cultivars,
-                                                     columns: [:cultivar_name],
-                                                     flatten_columns: { cultivar_name: :cultivar_name } },
-                                                   { parent_table: :farms,
-                                                     columns: [:farm_code],
-                                                     flatten_columns: { farm_code: :farm_code } },
-                                                   { parent_table: :pucs,
-                                                     columns: [:puc_code],
-                                                     flatten_columns: { puc_code: :puc_code } },
-                                                   { parent_table: :orchards,
-                                                     columns: [:orchard_code],
-                                                     flatten_columns: { orchard_code: :orchard_code } },
-                                                   { parent_table: :seasons,
-                                                     columns: [:season_code],
-                                                     flatten_columns: { season_code: :season_code } },
-                                                   { parent_table: :plant_resources,
-                                                     foreign_key: :packhouse_resource_id,
-                                                     columns: [:plant_resource_code],
-                                                     flatten_columns: { plant_resource_code: :packhouse_code } },
-                                                   { parent_table: :plant_resources,
-                                                     foreign_key: :production_line_id,
-                                                     columns: [:plant_resource_code],
-                                                     flatten_columns: { plant_resource_code: :line_code } }],
-                                   lookup_functions: [{ function: :fn_production_run_code,
-                                                        args: [:id],
-                                                        col_name: :production_run_code },
-                                                      { function: :fn_current_status,
-                                                        args: ['production_runs', :id],
-                                                        col_name: :status },
-                                                      { function: :fn_production_run_code,
-                                                        args: [:cloned_from_run_id],
-                                                        col_name: :cloned_from_run_code }])
+      hash = find_with_association(
+        :production_runs, id,
+        parent_tables: [{ parent_table: :product_setup_templates,
+                          flatten_columns: { template_name: :template_name } },
+                        { parent_table: :cultivar_groups,
+                          flatten_columns: { cultivar_group_code: :cultivar_group_code, commodity_id: :commodity_id } },
+                        { parent_table: :cultivars,
+                          flatten_columns: { cultivar_name: :cultivar_name } },
+                        { parent_table: :commodities, foreign_key: :commodity_id,
+                          flatten_columns: { code: :commodity_code } },
+                        { parent_table: :farms,
+                          flatten_columns: { farm_code: :farm_code } },
+                        { parent_table: :pucs,
+                          flatten_columns: { puc_code: :puc_code } },
+                        { parent_table: :orchards,
+                          flatten_columns: { orchard_code: :orchard_code } },
+                        { parent_table: :seasons,
+                          flatten_columns: { season_code: :season_code } },
+                        { parent_table: :plant_resources, foreign_key: :packhouse_resource_id,
+                          flatten_columns: { plant_resource_code: :packhouse_code } },
+                        { parent_table: :plant_resources, foreign_key: :production_line_id,
+                          flatten_columns: { plant_resource_code: :line_code } }],
+        lookup_functions: [{ function: :fn_production_run_code,
+                             args: [:id],
+                             col_name: :production_run_code },
+                           { function: :fn_current_status,
+                             args: ['production_runs', :id],
+                             col_name: :status },
+                           { function: :fn_production_run_code,
+                             args: [:cloned_from_run_id],
+                             col_name: :cloned_from_run_code }]
+      )
       return nil if hash.nil?
 
-      hash[:commodity_code] = DB[:cultivars]
-                              .join(:commodities, id: :commodity_id)
-                              .where(Sequel[:cultivars][:id] => hash[:cultivar_id])
-                              .get(:code)
       ProductionRunFlat.new(hash)
     end
 

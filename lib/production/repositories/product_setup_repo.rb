@@ -93,8 +93,8 @@ module ProductionApp
     def for_select_template_cultivar_commodities(cultivar_group_id, cultivar_id) # rubocop:disable Metrics/AbcSize
       DB[:product_setup_templates]
         .join(:cultivar_groups, id: :cultivar_group_id)
-        .join(:cultivars, cultivar_group_id: :id)
-        .join(:commodities, id: :commodity_id)
+        .join(:commodities, id: Sequel[:cultivar_groups][:commodity_id])
+        .left_join(:cultivars, id: Sequel[:product_setup_templates][:cultivar_id])
         .where(Sequel[:product_setup_templates][:cultivar_group_id] => cultivar_group_id)
         .where(Sequel[:product_setup_templates][:cultivar_id] => cultivar_id)
         .distinct(Sequel[:commodities][:code])
@@ -109,8 +109,8 @@ module ProductionApp
     def get_commodity_id(cultivar_group_id, cultivar_id) # rubocop:disable Metrics/AbcSize
       DB[:product_setup_templates]
         .join(:cultivar_groups, id: :cultivar_group_id)
-        .join(:cultivars, cultivar_group_id: :id)
-        .join(:commodities, id: :commodity_id)
+        .join(:commodities, id: Sequel[:cultivar_groups][:commodity_id])
+        .left_join(:cultivars, id: Sequel[:product_setup_templates][:cultivar_id])
         .where(Sequel[:product_setup_templates][:cultivar_group_id] => cultivar_group_id)
         .where(Sequel[:product_setup_templates][:cultivar_id] => cultivar_id)
         .distinct(Sequel[:commodities][:code])
@@ -129,7 +129,7 @@ module ProductionApp
            .join(:cultivar_groups, id: :cultivar_group_id)
            .join(:product_setup_templates, cultivar_group_id: :id)
            .where(Sequel[:product_setup_templates][:id] => product_setup_template_id)
-           .where(Sequel[:cultivars][:commodity_id] => commodity_id)
+           .where(Sequel[:cultivar_groups][:commodity_id] => commodity_id)
       ds = ds.where(Sequel[:cultivars][:id] => cultivar_id) unless cultivar_id.nil_or_empty?
       ds.distinct(Sequel[:marketing_varieties][:id])
         .select(

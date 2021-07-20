@@ -148,7 +148,7 @@ class Nspack < Roda
     # CULTIVAR GROUPS
     # --------------------------------------------------------------------------
     r.on 'cultivar_groups', Integer do |id|
-      interactor = MasterfilesApp::CultivarInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      interactor = MasterfilesApp::CultivarGroupInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:cultivar_groups, id) do
@@ -178,14 +178,19 @@ class Nspack < Roda
         end
         r.delete do    # DELETE
           check_auth!('fruit', 'delete')
+          # interactor.assert_permission!(:delete, id)
           res = interactor.delete_cultivar_group(id)
-          delete_grid_row(id, notice: res.message)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
         end
       end
     end
 
     r.on 'cultivar_groups' do
-      interactor = MasterfilesApp::CultivarInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      interactor = MasterfilesApp::CultivarGroupInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('fruit', 'new')
         show_partial_or_page(r) { Masterfiles::Fruit::CultivarGroup::New.call(remote: fetch?(r)) }
@@ -274,28 +279,29 @@ class Nspack < Roda
           show_partial { Masterfiles::Fruit::Cultivar::Show.call(id) }
         end
         r.patch do     # UPDATE
-          res = interactor.update_cultivar(id, params[:cultivar]) # Use Interactor - returned instance is "larger" entity (incl. commod code)
+          res = interactor.update_cultivar(id, params[:cultivar])
           if res.success
-            hash = res.instance.to_h
-            hash[:code] = MasterfilesApp::CommodityRepo.new.find_commodity(res.instance[:commodity_id])&.code
             row_keys = %i[
-              commodity_id
               cultivar_group_id
               cultivar_group_code
               cultivar_name
-              code
               cultivar_code
               description
             ]
-            update_grid_row(id, changes: select_attributes(hash, row_keys), notice: res.message)
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::Fruit::Cultivar::Edit.call(id, params[:cultivar], res.errors) }
           end
         end
         r.delete do    # DELETE
           check_auth!('fruit', 'delete')
+          # interactor.assert_permission!(:delete, id)
           res = interactor.delete_cultivar(id)
-          delete_grid_row(id, notice: res.message)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
         end
       end
     end
@@ -352,6 +358,7 @@ class Nspack < Roda
 
         r.delete do    # DELETE
           check_auth!('fruit', 'delete')
+          # interactor.assert_permission!(:delete, id)
           res = interactor.delete_marketing_variety(id)
           if res.success
             delete_grid_row(id, notice: res.message)
@@ -751,8 +758,13 @@ class Nspack < Roda
         end
         r.delete do    # DELETE
           check_auth!('fruit', 'delete')
+          # interactor.assert_permission!(:delete, id)
           res = interactor.delete_std_fruit_size_count(id)
-          delete_grid_row(id, notice: res.message)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
         end
       end
     end
@@ -828,8 +840,13 @@ class Nspack < Roda
         end
         r.delete do    # DELETE
           check_auth!('fruit', 'delete')
+          # interactor.assert_permission!(:delete, id)
           res = interactor.delete_fruit_actual_counts_for_pack(id)
-          delete_grid_row(id, notice: res.message)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
         end
       end
     end

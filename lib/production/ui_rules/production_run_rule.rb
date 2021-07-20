@@ -108,16 +108,22 @@ module UiRules
                                      hide_on_load: @rules[:hide_on_new_second_form],
                                      prompt: true }
       fields[:cultivar_id] = { renderer: :select,
-                               options: MasterfilesApp::CultivarRepo.new.for_select_cultivars(where: { cultivar_group_id: @form_object.cultivar_group_id }),
+                               options: MasterfilesApp::CultivarRepo.new.for_select_cultivars(
+                                 where: { cultivar_group_id: @form_object.cultivar_group_id }
+                               ),
                                disabled_options: MasterfilesApp::CultivarRepo.new.for_select_inactive_cultivars,
                                prompt: true,
                                hide_on_load: @rules[:hide_on_new_second_form],
                                caption: 'Cultivar' }
 
       seasons = if !@form_object.cultivar_id.nil_or_empty?
-                  MasterfilesApp::CalendarRepo.new.for_select_seasons_for_cultivar(@form_object.cultivar_id)
+                  MasterfilesApp::CalendarRepo.new.for_select_seasons(
+                    where: { Sequel[:cultivars][:id] => @form_object.cultivar_id }
+                  )
                 else
-                  MasterfilesApp::CalendarRepo.new.for_select_seasons_for_cultivar_group(@form_object.cultivar_group_id)
+                  MasterfilesApp::CalendarRepo.new.for_select_seasons(
+                    where: { cultivar_group_id: @form_object.cultivar_group_id }
+                  )
                 end
       fields[:season_id] = { renderer: :select,
                              options: seasons,
@@ -128,9 +134,9 @@ module UiRules
                              required: true }
 
       farms = if !@form_object.cultivar_id.nil_or_empty?
-                @farm_repo.find_farms_by_cultivar(@form_object.cultivar_id)
+                @farm_repo.for_select_farms_by_cultivar(@form_object.cultivar_id)
               else
-                @farm_repo.find_farms_by_cultivar_group(@form_object.cultivar_group_id)
+                @farm_repo.for_select_farms_by_cultivar_group(@form_object.cultivar_group_id)
               end
       fields[:farm_id] = { renderer: :select,
                            options: farms,
@@ -150,9 +156,9 @@ module UiRules
                           required: true }
 
       orchards = if !@form_object.cultivar_id.nil_or_empty?
-                   @farm_repo.find_orchards_by_farm_and_cultivar(@form_object.farm_id, @form_object.cultivar_id)
+                   @farm_repo.for_select_orchards_by_farm_and_cultivar(@form_object.farm_id, @form_object.cultivar_id)
                  else
-                   @farm_repo.find_orchards_by_farm_and_cultivar_group(@form_object.farm_id, @form_object.cultivar_group_id)
+                   @farm_repo.for_select_orchards_by_farm_and_cultivar_group(@form_object.farm_id, @form_object.cultivar_group_id)
                  end
       fields[:orchard_id] = { renderer: :select,
                               options: orchards,
@@ -228,7 +234,7 @@ module UiRules
       seasons = if @form_object.cultivar_group_id.nil_or_empty?
                   []
                 else
-                  MasterfilesApp::CalendarRepo.new.for_select_seasons_for_cultivar_group(@form_object.cultivar_group_id)
+                  MasterfilesApp::CalendarRepo.new.for_select_seasons(where: { cultivar_group_id: @form_object.cultivar_group_id })
                 end
 
       {
@@ -392,14 +398,12 @@ module UiRules
                                   notify: [{ url: '/production/runs/production_runs/changed/packhouse' }]
         behaviour.dropdown_change :farm_id,
                                   notify: [{ url: '/production/runs/production_runs/farm_combo_changed',
-                                             param_keys: %i[cultivar_id cultivar_group_id],
-                                             param_values: { cultivar_id: @options[:form_values] ? @options[:form_values][:cultivar_id] : nil,
-                                                             cultivar_group_id: @options[:form_values] ? @options[:form_values][:cultivar_group_id] : nil } }]
+                                             param_keys: %i[production_run_cultivar_id production_run_cultivar_group_id] }]
         behaviour.dropdown_change :cultivar_group_id,
                                   notify: [{ url: '/production/runs/production_runs/cultivar_group_combo_changed' }]
         behaviour.dropdown_change :cultivar_id,
                                   notify: [{ url: '/production/runs/production_runs/cultivar_combo_changed',
-                                             param_keys: %i[cultivar_group_id] }]
+                                             param_keys: %i[production_run_cultivar_group_id] }]
       end
     end
 

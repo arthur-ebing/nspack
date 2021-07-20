@@ -47,7 +47,6 @@ module FinishedGoods
                     col.add_field :customer_order_number
                     col.add_field :customer_reference
                     col.add_field :depot_id
-                    col.add_field :rmt_load
                     col.add_field :location_of_issue
                   end
                   row.column do |col|
@@ -56,6 +55,7 @@ module FinishedGoods
                     col.add_field :edi_file_name
                     col.add_field :shipped_at
                     col.add_field :requires_temp_tail
+                    col.add_field :rmt_load
                   end
                 end
               end

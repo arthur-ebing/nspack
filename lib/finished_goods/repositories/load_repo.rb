@@ -62,7 +62,10 @@ module FinishedGoodsApp
       # Orders
       order_ids = select_values(:orders_loads, :order_id, load_id: id)
       hash[:order_id] = order_ids.one? ? order_ids.first : nil
-      hash[:packed_tm_group_id], hash[:marketing_org_party_role_id], hash[:target_customer_party_role_id] = get(:orders, hash[:order_id], %i[packed_tm_group_id marketing_org_party_role_id target_customer_party_role_id])
+      order_hash = find_hash(:orders, hash[:order_id]) || {}
+      hash[:packed_tm_group_id] = order_hash[:packed_tm_group_id]
+      hash[:marketing_org_party_role_id] = order_hash[:marketing_org_party_role_id]
+      hash[:target_customer_party_role_id] = order_hash[:target_customer_party_role_id]
 
       # load_voyages
       hash[:load_voyage_id] = get_id(:load_voyages, load_id: id)
@@ -168,7 +171,7 @@ module FinishedGoodsApp
 
       allocated_count = select_values(:pallets, :id, load_id: load_id).length
       max_count = get(:loads, load_id, :rmt_load) ? AppConst::CR_FG.max_bin_count_for_load? : AppConst::CR_FG.max_pallet_count_for_load?
-      raise Crossbeams::InfoError, "Allocation exceeded max count of  #{max_count} pallets on load" if allocated_count > max_count
+      raise Crossbeams::InfoError, "Allocation exceeded max count of #{max_count} pallets on load" if allocated_count > max_count
 
       # updates load status allocated
       update(:loads, load_id, allocated: true, allocated_at: Time.now)
@@ -211,9 +214,10 @@ module FinishedGoodsApp
       }
 
       pallet_ids = DB[:pallet_sequences]
-                   .join(:cultivars, id: :cultivar_id)
-                   .join(:commodities, id: :commodity_id)
-                   .join(:grades, id: Sequel[:pallet_sequences][:grade_id])
+                   .join(:cultivar_groups, id: :cultivar_group_id)
+                   .join(:commodities, id: Sequel[:cultivar_groups][:commodity_id])
+                   .left_join(:cultivars, id: Sequel[:pallet_sequences][:cultivar_id])
+                   .left_join(:grades, id: Sequel[:pallet_sequences][:grade_id])
                    .where(params.compact)
                    .select_map(:pallet_id)
 

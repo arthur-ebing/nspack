@@ -13,16 +13,16 @@ module MasterfilesApp
     end
 
     def test_cultivar_group
-      MasterfilesApp::CultivarRepo.any_instance.stubs(:find_cultivar_group_flat).returns(fake_cultivar_group)
+      MasterfilesApp::CultivarRepo.any_instance.stubs(:find_cultivar_group).returns(fake_cultivar_group)
       entity = interactor.send(:cultivar_group, 1)
-      assert entity.is_a?(CultivarGroupFlat)
+      assert entity.is_a?(CultivarGroup)
     end
 
     def test_create_cultivar_group
       attrs = fake_cultivar_group.to_h.reject { |k, _| k == :id }
       res = interactor.create_cultivar_group(attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(CultivarGroupFlat, res.instance)
+      assert_instance_of(CultivarGroup, res.instance)
       assert res.instance.id.nonzero?
     end
 
@@ -40,7 +40,7 @@ module MasterfilesApp
       attrs[:cultivar_group_code] = 'a_change'
       res = interactor.update_cultivar_group(id, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(CultivarGroupFlat, res.instance)
+      assert_instance_of(CultivarGroup, res.instance)
       assert_equal 'a_change', res.instance.cultivar_group_code
       refute_equal value, res.instance.cultivar_group_code
     end
@@ -76,17 +76,18 @@ module MasterfilesApp
         commodity_code: 'dummy',
         cultivar_group_code: Faker::Lorem.unique.word,
         description: 'ABC',
-        cultivar_ids: [1],
+        cultivar_ids: [1, 2, 3],
+        cultivars: %w[A B C],
         active: true
       }
     end
 
     def fake_cultivar_group(overrides = {})
-      CultivarGroupFlat.new(cultivar_group_attrs.merge(overrides))
+      CultivarGroup.new(cultivar_group_attrs.merge(overrides))
     end
 
     def interactor
-      @interactor ||= CultivarInteractor.new(current_user, {}, {}, {})
+      @interactor ||= CultivarGroupInteractor.new(current_user, {}, {}, {})
     end
   end
 end

@@ -673,7 +673,7 @@ module ProductionApp
            .join(:marketing_varieties_for_cultivars, marketing_variety_id: :id)
            .join(:cultivars, id: :cultivar_id)
            .join(:cultivar_groups, id: :cultivar_group_id)
-           .where(Sequel[:cultivars][:commodity_id] => commodity_id)
+           .where(Sequel[:cultivar_groups][:commodity_id] => commodity_id)
       ds = ds.where(Sequel[:cultivars][:id] => cultivar_id) unless cultivar_id.nil_or_empty?
       ds.distinct(Sequel[:marketing_varieties][:id])
         .select(
@@ -1080,7 +1080,8 @@ module ProductionApp
              FROM cartons
              JOIN carton_labels ON carton_labels.id = cartons.carton_label_id
              LEFT JOIN cultivars ON cultivars.id = carton_labels.cultivar_id
-                 LEFT JOIN commodities ON commodities.id = cultivars.commodity_id
+             LEFT JOIN cultivar_groups ON cultivar_groups.id = cultivars.cultivar_group_id
+             LEFT JOIN commodities ON commodities.id = cultivar_groups.commodity_id
              LEFT OUTER JOIN standard_product_weights ON standard_product_weights.commodity_id = commodities.id
                AND standard_product_weights.standard_pack_id = carton_labels.standard_pack_code_id
              WHERE production_run_id = production_runs.id

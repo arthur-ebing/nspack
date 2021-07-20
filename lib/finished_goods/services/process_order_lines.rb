@@ -84,7 +84,7 @@ module FinishedGoodsApp
             orders_loads.order_id,
             orders_loads.load_id,
             ARRAY_AGG(pallet_sequences.id) AS pallet_sequence_ids,
-            cultivars.commodity_id,
+            cultivar_groups.commodity_id,
             pallet_sequences.basic_pack_code_id AS basic_pack_id,
             pallet_sequences.standard_pack_code_id AS standard_pack_id,
             pallet_sequences.fruit_actual_counts_for_pack_id AS actual_count_id,
@@ -107,12 +107,13 @@ module FinishedGoodsApp
         JOIN pallets ON pallets.load_id = loads.id
         LEFT JOIN pallet_sequences ON pallet_sequences.pallet_id = pallets.id
         LEFT JOIN cultivars ON pallet_sequences.cultivar_id = cultivars.id
+        LEFT JOIN cultivar_groups ON cultivar_groups.id = cultivars.cultivar_group_id
 
         WHERE orders.id = ?
         GROUP BY
             orders_loads.order_id,
             orders_loads.load_id,
-            cultivars.commodity_id,
+            cultivar_groups.commodity_id,
             pallet_sequences.basic_pack_code_id,
             pallet_sequences.standard_pack_code_id,
             pallet_sequences.fruit_actual_counts_for_pack_id,

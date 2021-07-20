@@ -20,17 +20,6 @@ module MasterfilesApp
                           value: :id,
                           order_by: :cultivar_name
 
-    build_for_select :cultivars,
-                     alias: :cultivar_codes,
-                     label: %i[cultivar_name cultivar_code],
-                     value: :id,
-                     order_by: :cultivar_code
-    build_inactive_select :cultivars,
-                          alias: :cultivar_codes,
-                          label: %i[cultivar_name cultivar_code],
-                          value: :id,
-                          order_by: :cultivar_code
-
     build_for_select :marketing_varieties,
                      label: :marketing_variety_code,
                      value: :id,
@@ -45,37 +34,32 @@ module MasterfilesApp
     crud_calls_for :marketing_varieties, name: :marketing_variety, wrapper: MarketingVariety, exclude: %i[create delete]
 
     def find_cultivar_group(id)
-      hash = find_hash(:cultivar_groups, id)
+      hash = find_with_association(
+        :cultivar_groups, id,
+        parent_tables: [{ parent_table: :commodities,
+                          flatten_columns: { code: :commodity_code } }]
+      )
       return nil if hash.nil?
 
-      cultivar_ids = DB[:cultivars].where(cultivar_group_id: id).select_map(:id)
-      hash[:cultivar_ids] = cultivar_ids
+      hash[:cultivar_ids] = DB[:cultivars].where(cultivar_group_id: id).select_map(:id)
+      hash[:cultivars] = DB[:cultivars].where(cultivar_group_id: id).select_map(:cultivar_name)
       CultivarGroup.new(hash)
     end
 
-    def find_cultivar_group_flat(id)
-      hash = find_with_association(:cultivar_groups,
-                                   id,
-                                   parent_tables: [{
-                                     parent_table: :commodities,
-                                     columns: [:code],
-                                     flatten_columns: { code: :commodity_code }
-                                   }])
-      return nil if hash.nil?
-
-      cultivar_ids = DB[:cultivars].where(cultivar_group_id: id).select_map(:id)
-      hash[:cultivar_ids] = cultivar_ids
-      CultivarGroupFlat.new(hash)
-    end
-
     def find_cultivar(id)
-      hash = find_with_association(:cultivars,
-                                   id,
-                                   parent_tables: [{ parent_table: :cultivar_groups,
-                                                     columns: [:cultivar_group_code],
-                                                     flatten_columns: { cultivar_group_code: :cultivar_group_code } }])
+      hash = find_with_association(
+        :cultivars, id,
+        parent_tables: [{ parent_table: :cultivar_groups,
+                          flatten_columns: { cultivar_group_code: :cultivar_group_code, commodity_id: :commodity_id } },
+                        { parent_table: :commodities,
+                          flatten_columns: { code: :commodity_code } }]
+      )
       return nil if hash.nil?
 
+      hash[:marketing_varieties] = DB[:marketing_varieties]
+                                   .join(:marketing_varieties_for_cultivars, marketing_variety_id: :id)
+                                   .where(cultivar_id: id)
+                                   .select_map(:marketing_variety_code)
       Cultivar.new(hash)
     end
 
@@ -83,7 +67,8 @@ module MasterfilesApp
       hash = DB["SELECT cultivars.id
          FROM masterfile_variants v
          join cultivars on cultivars.id=v.masterfile_id
-         join commodities on commodities.id=cultivars.commodity_id
+         JOIN cultivar_groups ON cultivar_groups.id = cultivars.cultivar_group_id
+         JOIN commodities ON commodities.id = cultivar_groups.commodity_id
          JOIN orchards ON cultivars.id = ANY (orchards.cultivar_ids)
          WHERE variant_code = ? and commodities.code= ? and orchards.id = ?", variant_code, commodity_code, orchard_id].first
 
@@ -93,7 +78,8 @@ module MasterfilesApp
     def find_cultivar_by_cultivar_name_and_commodity_and_orchard(cultivar_name, commodity_code, orchard_id)
       hash = DB["SELECT cultivars.id
          FROM cultivars
-         join commodities on commodities.id=cultivars.commodity_id
+         JOIN cultivar_groups ON cultivar_groups.id = cultivars.cultivar_group_id
+         JOIN commodities ON commodities.id = cultivar_groups.commodity_id
          JOIN orchards ON cultivars.id = ANY (orchards.cultivar_ids)
          WHERE cultivar_name = ? and commodities.code= ? and orchards.id = ?", cultivar_name, commodity_code, orchard_id].first
 
@@ -144,22 +130,6 @@ module MasterfilesApp
       DB[:marketing_varieties].where(id: id).delete
     end
 
-    def find_cultivar_season(cultivar_id)
-      commodity_id = DB[:cultivars].where(id: cultivar_id).get(:commodity_id)
-      return nil if hash.nil?
-
-      season_id = DB[:seasons].where(commodity_id: commodity_id).reverse(:id).get(:id)
-      MasterfilesApp::CalendarRepo.new.find_season(season_id)
-    end
-
-    def find_cultivar_marketing_varieties(id)
-      DB[:marketing_varieties]
-        .join(:marketing_varieties_for_cultivars, marketing_variety_id: :id)
-        .where(cultivar_id: id)
-        .order(:marketing_variety_code)
-        .select_map(:marketing_variety_code)
-    end
-
     def for_select_cultivar_marketing_varieties(id)
       DB[:marketing_varieties]
         .join(:marketing_varieties_for_cultivars, marketing_variety_id: :id)
@@ -195,6 +165,15 @@ module MasterfilesApp
         .join(:production_runs, cultivar_id: :id)
         .where(Sequel[:production_runs][:id] => production_run_id)
         .get(:cultivar_name)
+    end
+
+    def for_select_cultivar_codes(where: {}, exclude: {})
+      dataset = DB[:cultivars]
+                .join(:cultivar_groups, id: :cultivar_group_id)
+                .where(convert_empty_values(where))
+                .exclude(convert_empty_values(exclude))
+      label_name = %i[cultivar_name cultivar_code]
+      dataset.select(*label_name, Sequel[:cultivars][:id]).map { |rec| [label_name.map { |nm| rec[nm] }.join(' - '), rec[:id]] }
     end
   end
 end

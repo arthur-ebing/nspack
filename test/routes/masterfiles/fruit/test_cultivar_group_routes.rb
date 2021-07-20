@@ -4,7 +4,7 @@ require File.join(File.expand_path('./../../../', __dir__), 'test_helper_for_rou
 
 class TestCultivarGroupRoutes < RouteTester
 
-  INTERACTOR = MasterfilesApp::CultivarInteractor
+  INTERACTOR = MasterfilesApp::CultivarGroupInteractor
 
   def test_edit
     authorise_pass!

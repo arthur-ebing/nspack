@@ -15,29 +15,25 @@ module UiRules
     end
 
     def set_show_fields
-      commodity_id_label = MasterfilesApp::CommodityRepo.new.find_commodity(@form_object.commodity_id)&.code
-      fields[:commodity_id] = { renderer: :label, with_value: commodity_id_label }
-      fields[:cultivar_group_id] = { renderer: :label, with_value: @form_object.cultivar_group_code }
+      fields[:commodity_code] = { renderer: :label }
+      fields[:cultivar_group_code] = { renderer: :label }
       fields[:cultivar_name] = { renderer: :label }
+      fields[:cultivar_code] = { renderer: :label }
       fields[:description] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
-      fields[:marketing_varieties] = { renderer: :list, items: cultivar_marketing_varieties }
-      fields[:cultivar_code] = { renderer: :label }
+      fields[:marketing_varieties] = { renderer: :list, items: @form_object.marketing_varieties }
     end
 
     def common_fields
       {
-        commodity_id: { renderer: :select,
-                        options: MasterfilesApp::CommodityRepo.new.for_select_commodities,
-                        required: true,
-                        prompt: 'Select Commodity' },
         cultivar_group_id: { renderer: :select,
                              options: @repo.for_select_cultivar_groups,
                              disabled_options: @repo.for_select_inactive_cultivar_groups,
                              required: true,
                              prompt: 'Select Cultivar Group' },
         cultivar_name: { required: true },
-        cultivar_code: {},
+        cultivar_code: { hint: 'Formal code registered with external systems. <br>
+                                This code must be correct in order to communicate with external systems such as phytclean.' },
         description: {}
       }
     end
@@ -49,15 +45,10 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(commodity_id: nil,
-                                    cultivar_group_id: nil,
+      @form_object = OpenStruct.new(cultivar_group_id: nil,
+                                    cultivar_code: nil,
                                     cultivar_name: nil,
-                                    description: nil,
-                                    cultivar_code: nil)
-    end
-
-    def cultivar_marketing_varieties
-      @repo.find_cultivar_marketing_varieties(@options[:id])
+                                    description: nil)
     end
   end
 end

@@ -150,10 +150,10 @@
   seq_count:
     :name: seq_count
     :sequence_no: 6
-    :caption: Seq count
+    :caption: "#Seq"
     :namespaced_name: aggregated.count
-    :data_type: :string
-    :width: 50
+    :data_type: :integer
+    :width: 70
     :format: 
     :hide: false
     :pinned: 
@@ -217,7 +217,7 @@
     :caption: Cultivars
     :namespaced_name: aggregated.cultivar_names
     :data_type: :string
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -230,10 +230,10 @@
   carton_quantity:
     :name: carton_quantity
     :sequence_no: 11
-    :caption: Carton quantity
+    :caption: Carton qty
     :namespaced_name: vw_pallets.carton_quantity
-    :data_type: :string
-    :width: 
+    :data_type: :integer
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -278,9 +278,9 @@
   cartons_per_pallets:
     :name: cartons_per_pallets
     :sequence_no: 14
-    :caption: Cartons per pallet
+    :caption: CPP
     :namespaced_name: aggregated.cartons_per_pallets
-    :data_type: :string
+    :data_type: :integer
     :width: 100
     :format: 
     :hide: false

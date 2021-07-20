@@ -15,7 +15,6 @@ module Masterfiles
             page.form do |form|
               form.action '/masterfiles/fruit/cultivars'
               form.remote! if remote
-              form.add_field :commodity_id
               form.add_field :cultivar_group_id
               form.add_field :cultivar_name
               form.add_field :cultivar_code

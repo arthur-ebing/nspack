@@ -1,23 +1,25 @@
 ---
 :caption: Product Setup Templates
-:sql: SELECT product_setup_templates.id, product_setup_templates.template_name, product_setup_templates.description,
-  product_setup_templates.cultivar_group_id, product_setup_templates.cultivar_id,
-  product_setup_templates.packhouse_resource_id, product_setup_templates.production_line_id,
-  product_setup_templates.season_group_id, product_setup_templates.season_id, product_setup_templates.active,
-  product_setup_templates.created_at, product_setup_templates.updated_at, cultivar_groups.cultivar_group_code,
-  cultivars.cultivar_name, plant_resources.plant_resource_code AS packhouse_resource_code,
-  plant_resources2.plant_resource_code AS production_line_code, season_groups.season_group_code,
-  seasons.season_code, fn_current_status('product_setup_templates', product_setup_templates.id)
-  AS status, fn_product_setup_template_in_production(product_setup_templates.id) AS
-  in_production, CASE WHEN fn_product_setup_template_in_production(product_setup_templates.id)
-  THEN 'warning' WHEN NOT product_setup_templates.active THEN 'inactive' ELSE NULL
-  END AS colour_rule FROM product_setup_templates JOIN cultivar_groups ON cultivar_groups.id
-  = product_setup_templates.cultivar_group_id LEFT JOIN cultivars ON cultivars.id
-  = product_setup_templates.cultivar_id LEFT JOIN plant_resources ON plant_resources.id
-  = product_setup_templates.packhouse_resource_id LEFT JOIN plant_resources plant_resources2
-  ON plant_resources2.id = product_setup_templates.production_line_id LEFT JOIN season_groups
-  ON season_groups.id = product_setup_templates.season_group_id LEFT JOIN seasons
-  ON seasons.id = product_setup_templates.season_id
+:sql: "SELECT \r\n   product_setup_templates.id,\r\n   product_setup_templates.template_name,\r\n
+  \  product_setup_templates.description,\r\n   product_setup_templates.cultivar_group_id,\r\n
+  \  product_setup_templates.cultivar_id,\r\n   product_setup_templates.packhouse_resource_id,\r\n
+  \  product_setup_templates.production_line_id,\r\n   product_setup_templates.season_group_id,\r\n
+  \  product_setup_templates.season_id,\r\n   product_setup_templates.active,\r\n
+  \  product_setup_templates.created_at,\r\n   product_setup_templates.updated_at,\r\n
+  \  cultivar_groups.cultivar_group_code,\r\n   cultivars.cultivar_name,\r\n   plant_resources.plant_resource_code
+  AS packhouse_resource_code,\r\n   plant_resources2.plant_resource_code AS production_line_code,\r\n
+  \  season_groups.season_group_code,\r\n   seasons.season_code,\r\n   fn_current_status('product_setup_templates',product_setup_templates.id)
+  AS status,\r\n   fn_product_setup_template_in_production(product_setup_templates.id)
+  AS in_production,\r\n   CASE \r\n       WHEN fn_product_setup_template_in_production(product_setup_templates.id)
+  THEN 'warning' \r\n       WHEN NOT product_setup_templates.active THEN 'inactive'
+  \r\n   END AS colour_rule \r\nFROM product_setup_templates \r\nJOIN cultivar_groups
+  ON cultivar_groups.id = product_setup_templates.cultivar_group_id \r\nLEFT JOIN
+  cultivars ON cultivars.id = product_setup_templates.cultivar_id \r\nLEFT JOIN plant_resources
+  ON plant_resources.id = product_setup_templates.packhouse_resource_id \r\nLEFT JOIN
+  plant_resources plant_resources2 ON plant_resources2.id = product_setup_templates.production_line_id\r\nLEFT
+  JOIN season_groups ON season_groups.id = product_setup_templates.season_group_id\r\nLEFT
+  JOIN seasons ON seasons.id = product_setup_templates.season_id\r\nORDER BY product_setup_templates.id
+  DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -27,7 +29,7 @@
 :columns:
   id:
     :name: id
-    :sequence_no: 12
+    :sequence_no: 1
     :caption: Id
     :namespaced_name: product_setup_templates.id
     :data_type: :integer
@@ -43,7 +45,7 @@
     :group_max: false
   template_name:
     :name: template_name
-    :sequence_no: 1
+    :sequence_no: 2
     :caption: Template name
     :namespaced_name: product_setup_templates.template_name
     :data_type: :string
@@ -59,7 +61,7 @@
     :group_max: false
   description:
     :name: description
-    :sequence_no: 2
+    :sequence_no: 3
     :caption: Description
     :namespaced_name: product_setup_templates.description
     :data_type: :string
@@ -75,7 +77,7 @@
     :group_max: false
   cultivar_group_id:
     :name: cultivar_group_id
-    :sequence_no: 13
+    :sequence_no: 4
     :caption: Cultivar group
     :namespaced_name: product_setup_templates.cultivar_group_id
     :data_type: :integer
@@ -91,7 +93,7 @@
     :group_max: false
   cultivar_id:
     :name: cultivar_id
-    :sequence_no: 14
+    :sequence_no: 5
     :caption: Cultivar
     :namespaced_name: product_setup_templates.cultivar_id
     :data_type: :integer
@@ -107,7 +109,7 @@
     :group_max: false
   packhouse_resource_id:
     :name: packhouse_resource_id
-    :sequence_no: 15
+    :sequence_no: 6
     :caption: Packhouse resource
     :namespaced_name: product_setup_templates.packhouse_resource_id
     :data_type: :integer
@@ -123,7 +125,7 @@
     :group_max: false
   production_line_id:
     :name: production_line_id
-    :sequence_no: 16
+    :sequence_no: 7
     :caption: Production line resource
     :namespaced_name: product_setup_templates.production_line_id
     :data_type: :integer
@@ -139,7 +141,7 @@
     :group_max: false
   season_group_id:
     :name: season_group_id
-    :sequence_no: 17
+    :sequence_no: 8
     :caption: Season group
     :namespaced_name: product_setup_templates.season_group_id
     :data_type: :integer
@@ -155,7 +157,7 @@
     :group_max: false
   season_id:
     :name: season_id
-    :sequence_no: 18
+    :sequence_no: 9
     :caption: Season
     :namespaced_name: product_setup_templates.season_id
     :data_type: :integer
@@ -171,7 +173,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Active
     :namespaced_name: product_setup_templates.active
     :data_type: :boolean
@@ -187,7 +189,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 19
+    :sequence_no: 11
     :caption: Created at
     :namespaced_name: product_setup_templates.created_at
     :data_type: :datetime
@@ -203,7 +205,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 20
+    :sequence_no: 12
     :caption: Updated at
     :namespaced_name: product_setup_templates.updated_at
     :data_type: :datetime
@@ -219,7 +221,7 @@
     :group_max: false
   cultivar_group_code:
     :name: cultivar_group_code
-    :sequence_no: 3
+    :sequence_no: 13
     :caption: Cultivar group code
     :namespaced_name: cultivar_groups.cultivar_group_code
     :data_type: :string
@@ -235,7 +237,7 @@
     :group_max: false
   cultivar_name:
     :name: cultivar_name
-    :sequence_no: 4
+    :sequence_no: 14
     :caption: Cultivar name
     :namespaced_name: cultivars.cultivar_name
     :data_type: :string
@@ -251,7 +253,7 @@
     :group_max: false
   packhouse_resource_code:
     :name: packhouse_resource_code
-    :sequence_no: 5
+    :sequence_no: 15
     :caption: Packhouse
     :namespaced_name: plant_resources.plant_resource_code
     :data_type: :string
@@ -267,7 +269,7 @@
     :group_max: false
   production_line_code:
     :name: production_line_code
-    :sequence_no: 6
+    :sequence_no: 16
     :caption: Line
     :namespaced_name: plant_resources2.plant_resource_code
     :data_type: :string
@@ -283,7 +285,7 @@
     :group_max: false
   season_group_code:
     :name: season_group_code
-    :sequence_no: 7
+    :sequence_no: 17
     :caption: Season group code
     :namespaced_name: season_groups.season_group_code
     :data_type: :string
@@ -299,7 +301,7 @@
     :group_max: false
   season_code:
     :name: season_code
-    :sequence_no: 8
+    :sequence_no: 18
     :caption: Season code
     :namespaced_name: seasons.season_code
     :data_type: :string
@@ -315,7 +317,7 @@
     :group_max: false
   status:
     :name: status
-    :sequence_no: 11
+    :sequence_no: 19
     :caption: Status
     :namespaced_name: 
     :data_type: :string
@@ -331,7 +333,7 @@
     :group_max: false
   in_production:
     :name: in_production
-    :sequence_no: 10
+    :sequence_no: 20
     :caption: In production
     :namespaced_name: 
     :data_type: :boolean

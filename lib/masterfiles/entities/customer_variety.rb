@@ -8,6 +8,7 @@ module MasterfilesApp
     attribute? :active, Types::Bool
     attribute :variety_as_customer_variety, Types::String
     attribute :packed_tm_group, Types::String
+    attribute :marketing_varieties, Types::Array
     attribute :customer_variety_varieties, Types::Array.default([].freeze) do
       attribute :marketing_variety_id, Types::Integer
     end

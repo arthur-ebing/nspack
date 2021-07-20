@@ -74,15 +74,6 @@ module EdiApp
       DB[:cultivars].where(id: cultivar_id).get(:cultivar_group_id)
     end
 
-    def find_season_id(date, cultivar_id)
-      id = DB[:cultivars].where(id: cultivar_id).get(:commodity_id)
-      DB[:seasons]
-        .where(commodity_id: id)
-        .where(Sequel.lit('start_date <= ?', date))
-        .where(Sequel.lit('end_date >= ?', date))
-        .get(:id)
-    end
-
     def find_fruit_size_reference_id(code)
       id = DB[:fruit_size_references].where(size_reference: code).or(edi_out_code: code).get(:id)
       return id unless id.nil?

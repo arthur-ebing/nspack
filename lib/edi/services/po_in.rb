@@ -239,7 +239,7 @@ module EdiApp
       cultivar_group_id = po_repo.find_cultivar_group_id(cultivar_id)
       rec[:lookup_data][:cultivar_group_id] = cultivar_group_id
       rec[:missing_mf][:cultivar_group_id] = { mode: :indirect, keys: { cultivar_id: cultivar_id } } if cultivar_group_id.nil?
-      season_id = po_repo.find_season_id(inspec_date || tran_date, cultivar_id)
+      season_id = MasterfilesApp::CalendarRepo.new.get_season_id(cultivar_id, inspec_date || tran_date)
       rec[:lookup_data][:season_id] = season_id
       rec[:missing_mf][:season_id] = { mode: :direct, raise: true, keys: { date: inspec_date || tran_date, cultivar_id: cultivar_id } } if season_id.nil?
       marketing_org_party_role_id = MasterfilesApp::PartyRepo.new.find_party_role_from_org_code_for_role(seq[:orgzn], AppConst::ROLE_MARKETER)

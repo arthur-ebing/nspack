@@ -188,8 +188,9 @@ module FinishedGoodsApp
       load_id = params.delete(:load_id)
 
       pallet_ids = DB[:pallet_sequences]
-                   .join(:cultivars, id: :cultivar_id)
-                   .join(:commodities, id: :commodity_id)
+                   .join(:cultivar_groups, id: :cultivar_group_id)
+                   .join(:commodities, id: Sequel[:cultivar_groups][:commodity_id])
+                   .left_join(:cultivars, Sequel[:pallet_sequences][:cultivar_id])
                    .where(params.compact)
                    .select_map(:pallet_id)
 

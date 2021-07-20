@@ -24,30 +24,30 @@ module MasterfilesApp
     crud_calls_for :customer_varieties, name: :customer_variety, wrapper: CustomerVariety
 
     def find_customer_variety(id)
-      hash = find_with_association(:customer_varieties,
-                                   id,
-                                   parent_tables: [{ parent_table: :marketing_varieties,
-                                                     columns: [:marketing_variety_code],
-                                                     foreign_key: :variety_as_customer_variety_id,
-                                                     flatten_columns: { marketing_variety_code: :variety_as_customer_variety } },
-                                                   { parent_table: :target_market_groups,
-                                                     columns: [:target_market_group_name],
-                                                     foreign_key: :packed_tm_group_id,
-                                                     flatten_columns: { target_market_group_name: :packed_tm_group } }],
-                                   sub_tables: [{ sub_table: :customer_variety_varieties,
-                                                  columns: [:marketing_variety_id] }])
+      hash = find_with_association(
+        :customer_varieties,  id,
+        parent_tables: [{ parent_table: :marketing_varieties, foreign_key: :variety_as_customer_variety_id,
+                          flatten_columns: { marketing_variety_code: :variety_as_customer_variety } },
+                        { parent_table: :target_market_groups, foreign_key: :packed_tm_group_id,
+                          flatten_columns: { target_market_group_name: :packed_tm_group } }],
+        sub_tables: [{ sub_table: :customer_variety_varieties,
+                       columns: [:marketing_variety_id] }]
+      )
       return nil if hash.nil?
 
+      hash[:marketing_varieties] = DB[:marketing_varieties]
+                                   .join(:customer_variety_varieties, marketing_variety_id: :id)
+                                   .where(customer_variety_id: id)
+                                   .select_map(:marketing_variety_code)
       CustomerVariety.new(hash)
     end
 
     def find_customer_variety_variety(id)
-      hash = find_with_association(:customer_variety_varieties,
-                                   id,
-                                   parent_tables: [{ parent_table: :marketing_varieties,
-                                                     columns: [:marketing_variety_code],
-                                                     foreign_key: :marketing_variety_id,
-                                                     flatten_columns: { marketing_variety_code: :marketing_variety_code } }])
+      hash = find_with_association(
+        :customer_variety_varieties, id,
+        parent_tables: [{ parent_table: :marketing_varieties, foreign_key: :marketing_variety_id,
+                          flatten_columns: { marketing_variety_code: :marketing_variety_code } }]
+      )
       return nil if hash.nil?
 
       OpenStruct.new(hash)
@@ -102,14 +102,6 @@ module MasterfilesApp
       { success: true }
     end
 
-    def find_customer_variety_marketing_varieties(id)
-      DB[:marketing_varieties]
-        .join(:customer_variety_varieties, marketing_variety_id: :id)
-        .where(customer_variety_id: id)
-        .order(:marketing_variety_code)
-        .select_map(:marketing_variety_code)
-    end
-
     def find_customer_variety_marketing_variety(customer_variety_variety_id)
       DB[:marketing_varieties]
         .join(:customer_variety_varieties, marketing_variety_id: :id)
@@ -141,6 +133,7 @@ module MasterfilesApp
       DB[:marketing_varieties]
         .join(:marketing_varieties_for_cultivars, marketing_variety_id: :id)
         .join(:cultivars, id: :cultivar_id)
+        .join(:cultivar_groups, id: :cultivar_group_id)
         .where(marketing_variety_id: variety_as_customer_variety_id)
         .get(:commodity_id)
     end

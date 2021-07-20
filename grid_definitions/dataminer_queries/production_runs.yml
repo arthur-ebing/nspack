@@ -4,10 +4,10 @@
   AS production_run_code,\r\n    fn_current_status ('production_runs', production_runs.id)
   AS status,\r\n    production_runs.running,\r\n    production_runs.reconfiguring,\r\n
   \   plant_resources2.plant_resource_code AS line_code,\r\n    cultivars.cultivar_name,\r\n
-  \   production_runs.active_run_stage,\r\n    cultivar_groups.cultivar_group_code,\r\n
-  \   farms.farm_code,\r\n    orchards.orchard_code,\r\n    plant_resources.plant_resource_code
-  AS packhouse_code,\r\n    product_setup_templates.template_name,\r\n    pucs.puc_code,\r\n
-  \   seasons.season_code,\r\n    fn_production_run_code (production_runs.cloned_from_run_id)
+  \   production_runs.active_run_stage,\r\n    commodities.code AS commodity_code,\r\n
+  \   cultivar_groups.cultivar_group_code,\r\n    farms.farm_code,\r\n    orchards.orchard_code,\r\n
+  \   plant_resources.plant_resource_code AS packhouse_code,\r\n    product_setup_templates.template_name,\r\n
+  \   pucs.puc_code,\r\n    seasons.season_code,\r\n    fn_production_run_code (production_runs.cloned_from_run_id)
   AS cloned_from_run_code,\r\n    production_runs.started_at,\r\n    production_runs.closed_at,\r\n
   \   production_runs.re_executed_at,\r\n    production_runs.completed_at,\r\n    production_runs.allow_cultivar_group_mixing,\r\n
   \   production_runs.allow_cultivar_mixing,\r\n    production_runs.allow_orchard_mixing,\r\n
@@ -33,7 +33,8 @@
   = production_runs.id) AS has_cartons,\r\n    CASE\r\n        WHEN production_runs.reconfiguring
   THEN 'inprogress'\r\n        WHEN production_runs.running THEN 'ok'\r\n        END
   AS colour_rule\r\n\r\nFROM production_runs\r\nLEFT JOIN cultivar_groups ON cultivar_groups.id
-  = production_runs.cultivar_group_id\r\nLEFT JOIN cultivars ON cultivars.id = production_runs.cultivar_id\r\nJOIN
+  = production_runs.cultivar_group_id\r\nLEFT JOIN commodities ON commodities.id =
+  cultivar_groups.commodity_id\r\nLEFT JOIN cultivars ON cultivars.id = production_runs.cultivar_id\r\nJOIN
   farms ON farms.id = production_runs.farm_id\r\nLEFT JOIN orchards ON orchards.id
   = production_runs.orchard_id\r\nJOIN plant_resources ON plant_resources.id = production_runs.packhouse_resource_id\r\nLEFT
   JOIN product_setup_templates ON product_setup_templates.id = production_runs.product_setup_template_id\r\nJOIN
@@ -175,9 +176,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  commodity_code:
+    :name: commodity_code
+    :sequence_no: 9
+    :caption: Commodity code
+    :namespaced_name: commodities.code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   cultivar_group_code:
     :name: cultivar_group_code
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Cultivar group code
     :namespaced_name: cultivar_groups.cultivar_group_code
     :data_type: :string
@@ -193,7 +210,7 @@
     :group_max: false
   farm_code:
     :name: farm_code
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Farm
     :namespaced_name: farms.farm_code
     :data_type: :string
@@ -209,7 +226,7 @@
     :group_max: false
   orchard_code:
     :name: orchard_code
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Orchard
     :namespaced_name: orchards.orchard_code
     :data_type: :string
@@ -225,7 +242,7 @@
     :group_max: false
   packhouse_code:
     :name: packhouse_code
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Packhouse code
     :namespaced_name: plant_resources.plant_resource_code
     :data_type: :string
@@ -241,7 +258,7 @@
     :group_max: false
   template_name:
     :name: template_name
-    :sequence_no: 13
+    :sequence_no: 14
     :caption: Template name
     :namespaced_name: product_setup_templates.template_name
     :data_type: :string
@@ -257,7 +274,7 @@
     :group_max: false
   puc_code:
     :name: puc_code
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: PUC
     :namespaced_name: pucs.puc_code
     :data_type: :string
@@ -273,7 +290,7 @@
     :group_max: false
   season_code:
     :name: season_code
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Season code
     :namespaced_name: seasons.season_code
     :data_type: :string
@@ -289,7 +306,7 @@
     :group_max: false
   cloned_from_run_code:
     :name: cloned_from_run_code
-    :sequence_no: 16
+    :sequence_no: 17
     :caption: Cloned from run
     :namespaced_name: 
     :data_type: :string
@@ -305,7 +322,7 @@
     :group_max: false
   started_at:
     :name: started_at
-    :sequence_no: 17
+    :sequence_no: 18
     :caption: Started at
     :namespaced_name: production_runs.started_at
     :data_type: :datetime
@@ -321,7 +338,7 @@
     :group_max: false
   closed_at:
     :name: closed_at
-    :sequence_no: 18
+    :sequence_no: 19
     :caption: Closed at
     :namespaced_name: production_runs.closed_at
     :data_type: :datetime
@@ -337,7 +354,7 @@
     :group_max: false
   re_executed_at:
     :name: re_executed_at
-    :sequence_no: 19
+    :sequence_no: 20
     :caption: Re executed at
     :namespaced_name: production_runs.re_executed_at
     :data_type: :datetime
@@ -353,7 +370,7 @@
     :group_max: false
   completed_at:
     :name: completed_at
-    :sequence_no: 20
+    :sequence_no: 21
     :caption: Completed at
     :namespaced_name: production_runs.completed_at
     :data_type: :datetime
@@ -369,7 +386,7 @@
     :group_max: false
   allow_cultivar_group_mixing:
     :name: allow_cultivar_group_mixing
-    :sequence_no: 21
+    :sequence_no: 22
     :caption: Mix cultivar groups?
     :namespaced_name: production_runs.allow_cultivar_group_mixing
     :data_type: :boolean
@@ -385,7 +402,7 @@
     :group_max: false
   allow_cultivar_mixing:
     :name: allow_cultivar_mixing
-    :sequence_no: 22
+    :sequence_no: 23
     :caption: Mix cultivars?
     :namespaced_name: production_runs.allow_cultivar_mixing
     :data_type: :boolean
@@ -401,7 +418,7 @@
     :group_max: false
   allow_orchard_mixing:
     :name: allow_orchard_mixing
-    :sequence_no: 23
+    :sequence_no: 24
     :caption: Mix orchards?
     :namespaced_name: production_runs.allow_orchard_mixing
     :data_type: :boolean
@@ -417,7 +434,7 @@
     :group_max: false
   tipping:
     :name: tipping
-    :sequence_no: 24
+    :sequence_no: 25
     :caption: Tipping
     :namespaced_name: production_runs.tipping
     :data_type: :boolean
@@ -433,7 +450,7 @@
     :group_max: false
   labeling:
     :name: labeling
-    :sequence_no: 25
+    :sequence_no: 26
     :caption: Labeling
     :namespaced_name: production_runs.labeling
     :data_type: :boolean
@@ -449,7 +466,7 @@
     :group_max: false
   closed:
     :name: closed
-    :sequence_no: 26
+    :sequence_no: 27
     :caption: Closed
     :namespaced_name: production_runs.closed
     :data_type: :boolean
@@ -465,7 +482,7 @@
     :group_max: false
   setup_complete:
     :name: setup_complete
-    :sequence_no: 27
+    :sequence_no: 28
     :caption: Setup complete
     :namespaced_name: production_runs.setup_complete
     :data_type: :boolean
@@ -481,7 +498,7 @@
     :group_max: false
   completed:
     :name: completed
-    :sequence_no: 28
+    :sequence_no: 29
     :caption: Completed
     :namespaced_name: production_runs.completed
     :data_type: :boolean
@@ -497,7 +514,7 @@
     :group_max: false
   farm_id:
     :name: farm_id
-    :sequence_no: 29
+    :sequence_no: 30
     :caption: Farm
     :namespaced_name: production_runs.farm_id
     :data_type: :integer
@@ -513,7 +530,7 @@
     :group_max: false
   puc_id:
     :name: puc_id
-    :sequence_no: 30
+    :sequence_no: 31
     :caption: PUC
     :namespaced_name: production_runs.puc_id
     :data_type: :integer
@@ -529,7 +546,7 @@
     :group_max: false
   packhouse_resource_id:
     :name: packhouse_resource_id
-    :sequence_no: 31
+    :sequence_no: 32
     :caption: Packhouse resource
     :namespaced_name: production_runs.packhouse_resource_id
     :data_type: :integer
@@ -545,7 +562,7 @@
     :group_max: false
   production_line_id:
     :name: production_line_id
-    :sequence_no: 32
+    :sequence_no: 33
     :caption: Production line
     :namespaced_name: production_runs.production_line_id
     :data_type: :integer
@@ -561,7 +578,7 @@
     :group_max: false
   season_id:
     :name: season_id
-    :sequence_no: 33
+    :sequence_no: 34
     :caption: Season
     :namespaced_name: production_runs.season_id
     :data_type: :integer
@@ -577,7 +594,7 @@
     :group_max: false
   orchard_id:
     :name: orchard_id
-    :sequence_no: 34
+    :sequence_no: 35
     :caption: Orchard
     :namespaced_name: production_runs.orchard_id
     :data_type: :integer
@@ -593,7 +610,7 @@
     :group_max: false
   cultivar_group_id:
     :name: cultivar_group_id
-    :sequence_no: 35
+    :sequence_no: 36
     :caption: Cultivar group
     :namespaced_name: production_runs.cultivar_group_id
     :data_type: :integer
@@ -609,7 +626,7 @@
     :group_max: false
   cultivar_id:
     :name: cultivar_id
-    :sequence_no: 36
+    :sequence_no: 37
     :caption: Cultivar
     :namespaced_name: production_runs.cultivar_id
     :data_type: :integer
@@ -625,7 +642,7 @@
     :group_max: false
   product_setup_template_id:
     :name: product_setup_template_id
-    :sequence_no: 37
+    :sequence_no: 38
     :caption: Product setup template
     :namespaced_name: production_runs.product_setup_template_id
     :data_type: :integer
@@ -641,7 +658,7 @@
     :group_max: false
   cloned_from_run_id:
     :name: cloned_from_run_id
-    :sequence_no: 38
+    :sequence_no: 39
     :caption: Cloned from run
     :namespaced_name: production_runs.cloned_from_run_id
     :data_type: :integer
@@ -657,7 +674,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 39
+    :sequence_no: 40
     :caption: Active
     :namespaced_name: production_runs.active
     :data_type: :boolean
@@ -673,7 +690,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 40
+    :sequence_no: 41
     :caption: Created at
     :namespaced_name: production_runs.created_at
     :data_type: :datetime
@@ -689,7 +706,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 41
+    :sequence_no: 42
     :caption: Updated at
     :namespaced_name: production_runs.updated_at
     :data_type: :datetime
@@ -705,7 +722,7 @@
     :group_max: false
   allocation_required:
     :name: allocation_required
-    :sequence_no: 42
+    :sequence_no: 43
     :caption: Allocation required
     :namespaced_name: production_runs.allocation_required
     :data_type: :boolean
@@ -721,7 +738,7 @@
     :group_max: false
   view_allocs:
     :name: view_allocs
-    :sequence_no: 43
+    :sequence_no: 44
     :caption: View allocs
     :namespaced_name: 
     :data_type: :boolean
@@ -737,7 +754,7 @@
     :group_max: false
   pallet_ids:
     :name: pallet_ids
-    :sequence_no: 44
+    :sequence_no: 45
     :caption: Pallet ids
     :namespaced_name: 
     :data_type: :string
@@ -753,7 +770,7 @@
     :group_max: false
   has_pallets:
     :name: has_pallets
-    :sequence_no: 45
+    :sequence_no: 46
     :caption: Has pallets
     :namespaced_name: 
     :data_type: :boolean
@@ -769,7 +786,7 @@
     :group_max: false
   delivery_ids:
     :name: delivery_ids
-    :sequence_no: 46
+    :sequence_no: 47
     :caption: Delivery ids
     :namespaced_name: 
     :data_type: :string
@@ -785,7 +802,7 @@
     :group_max: false
   has_deliveries:
     :name: has_deliveries
-    :sequence_no: 47
+    :sequence_no: 48
     :caption: Has deliveries
     :namespaced_name: 
     :data_type: :boolean
@@ -801,7 +818,7 @@
     :group_max: false
   has_bins:
     :name: has_bins
-    :sequence_no: 48
+    :sequence_no: 49
     :caption: Has bins
     :namespaced_name: 
     :data_type: :boolean
@@ -817,7 +834,7 @@
     :group_max: false
   has_rebins:
     :name: has_rebins
-    :sequence_no: 49
+    :sequence_no: 50
     :caption: Has rebins
     :namespaced_name: 
     :data_type: :boolean
@@ -833,7 +850,7 @@
     :group_max: false
   has_cartons:
     :name: has_cartons
-    :sequence_no: 50
+    :sequence_no: 51
     :caption: Has cartons
     :namespaced_name: 
     :data_type: :boolean
@@ -849,7 +866,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 51
+    :sequence_no: 52
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

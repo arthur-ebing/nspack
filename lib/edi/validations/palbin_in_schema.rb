@@ -9,7 +9,7 @@ module EdiApp
     required(:puc).filled(Types::StrippedString)
     required(:orchard).filled(Types::StrippedString)
     required(:cultivar).filled(Types::StrippedString)
-    required(:commodity).filled(Types::StrippedString)
+    required(:cultivar_group).filled(Types::StrippedString)
     required(:grade).filled(Types::StrippedString)
     required(:pack).filled(Types::StrippedString)
     required(:size_reference).filled(Types::StrippedString)

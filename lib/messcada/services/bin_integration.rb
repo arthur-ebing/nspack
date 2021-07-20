@@ -72,7 +72,7 @@ module MesscadaApp
       res = repo.fetch_bin_from_external_system(bin_number)
       return res unless res.success
 
-      run_legacy_data = run.legacy_data.merge!({ 'farm_code' => run.farm_id, 'commodity_code' => repo.get_value(:cultivars, :commodity_id, id: run.cultivar_id),
+      run_legacy_data = run.legacy_data.merge!({ 'farm_code' => run.farm_id, 'commodity_code' => repo.get_value(:cultivar_groups, :commodity_id, id: run.cultivar_group_id),
                                                  'rmt_variety_code' => run.cultivar_id, 'season_code' => run.season_id })
 
       bin_mfs_res = lookup_masterfiles({ farm_code: res.instance['farm_code'], orchard_code: res.instance['orchard_code'], product_class_code: res.instance['product_class_code'],

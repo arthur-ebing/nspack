@@ -1,75 +1,69 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class CultivarInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
-    def create_cultivar_group(params)
-      res = validate_cultivar_group_params(params)
-      return validation_failed_response(res) if res.failure?
-
-      id = repo.create_cultivar_group(res)
-      instance = cultivar_group(id)
-      success_response("Created cultivar group #{instance.cultivar_group_code}", instance)
-    rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { cultivar_group_code: ['This cultivar group already exists'] }))
-    end
-
-    def update_cultivar_group(id, params)
-      res = validate_cultivar_group_params(params)
-      return validation_failed_response(res) if res.failure?
-
-      repo.update_cultivar_group(id, res)
-      instance = cultivar_group(id)
-      success_response("Updated cultivar group #{instance.cultivar_group_code}", instance)
-    end
-
-    def delete_cultivar_group(id)
-      name = cultivar_group(id).cultivar_group_code
-
-      repo.transaction do
-        cultivar_group = repo.find_cultivar_group(id)
-        cultivar_group.cultivar_ids.each do |cultivar_id|
-          repo.delete_cultivar(cultivar_id)
-        end
-        repo.delete_cultivar_group(id)
-      end
-      success_response("Deleted cultivar group #{name}")
-    end
-
+  class CultivarInteractor < BaseInteractor
     def create_cultivar(params)
       res = validate_cultivar_params(params)
       return validation_failed_response(res) if res.failure?
 
-      id = repo.create_cultivar(res)
+      id = nil
+      repo.transaction do
+        id = repo.create_cultivar(res)
+        log_status(:cultivars, id, 'CREATED')
+        log_transaction
+      end
       instance = cultivar(id)
       success_response("Created cultivar #{instance.cultivar_name}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { cultivar_name: ['This cultivar already exists'] }))
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def update_cultivar(id, params)
       res = validate_cultivar_params(params)
       return validation_failed_response(res) if res.failure?
 
-      repo.update_cultivar(id, res)
+      repo.transaction do
+        repo.update_cultivar(id, res)
+        log_transaction
+      end
       instance = cultivar(id)
       success_response("Updated cultivar #{instance.cultivar_name}", instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def delete_cultivar(id)
       name = cultivar(id).cultivar_name
-      repo.delete_cultivar(id)
+      repo.transaction do
+        repo.delete_cultivar(id)
+        log_status(:cultivars, id, 'DELETED')
+        log_transaction
+      end
       success_response("Deleted cultivar #{name}")
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue Sequel::ForeignKeyConstraintViolation => e
+      failed_response("Unable to delete cultivar. It is still referenced#{e.message.partition('referenced').last}")
     end
 
     def create_marketing_variety(cultivar_id, params)
       res = validate_marketing_variety_params(params)
       return validation_failed_response(res) if res.failure?
 
-      id = repo.create_marketing_variety(cultivar_id, res)
+      id = nil
+      repo.transaction do
+        id = repo.create_marketing_variety(cultivar_id, res)
+        log_status(:marketing_varieties, id, 'CREATED')
+        log_transaction
+      end
       instance = marketing_variety(id)
       success_response("Created marketing variety #{instance.marketing_variety_code}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { marketing_variety_code: ['This marketing variety already exists'] }))
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def update_marketing_variety(id, params)
@@ -104,14 +98,6 @@ module MasterfilesApp
 
     def repo
       @repo ||= CultivarRepo.new
-    end
-
-    def cultivar_group(id)
-      repo.find_cultivar_group_flat(id)
-    end
-
-    def validate_cultivar_group_params(params)
-      CultivarGroupSchema.call(params)
     end
 
     def cultivar(id)

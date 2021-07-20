@@ -21,12 +21,17 @@ module UiRules
 
     def set_show_fields
       plant_resource_type_id_label = @repo.find_plant_resource_type(@form_object.plant_resource_type_id)&.plant_resource_type_code
-      fields[:plant_resource_type_id] = { renderer: :label, with_value: plant_resource_type_id_label, caption: 'Plant Resource Type' }
+      fields[:plant_resource_type_id] = { renderer: :label,
+                                          with_value: plant_resource_type_id_label,
+                                          caption: 'Plant Resource Type' }
       fields[:plant_resource_code] = { renderer: :label }
       fields[:system_resource_code] = { renderer: :label }
       fields[:description] = { renderer: :label }
-      fields[:represents_plant_resource_code] = { renderer: :label, invisible: @form_object.represents_plant_resource_id.nil?, caption: 'Represents Resource' }
-      fields[:active] = { renderer: :label, as_boolean: true }
+      fields[:represents_plant_resource_code] = { renderer: :label,
+                                                  invisible: @form_object.represents_plant_resource_id.nil?,
+                                                  caption: 'Represents Resource' }
+      fields[:active] = { renderer: :label,
+                          as_boolean: true }
     end
 
     def set_edit_fields # rubocop:disable Metrics/AbcSize
@@ -48,8 +53,10 @@ module UiRules
                        options: AppConst::GLN_OR_LINE_NUMBERS,
                        prompt: true,
                        parent_field: :resource_properties,
+                       caption: 'GLN',
                        invisible: !at_gln_level }
       fields[:phc] = { parent_field: :resource_properties,
+                       caption: 'PHC',
                        invisible: !at_phc_level }
       fields[:packhouse_no] = { renderer: :integer,
                                 required: true,
@@ -69,11 +76,11 @@ module UiRules
                                                 caption: 'Represents Resource' }
       fields[:carton_equals_pallet] = { renderer: :checkbox,
                                         parent_field: :resource_properties,
-                                        invisible: !at_module_level? }
+                                        invisible: !at_button_level? }
       fields[:rmd_mode] = { renderer: :checkbox,
                             parent_field: :resource_properties,
                             invisible: !at_module_level?,
-                            hint: "Set this to true if the robot's functions are to be handled by a Registerd Mobile Device." }
+                            hint: "Set this to true if the robot's functions are to be handled by a Registered Mobile Device." }
       fields[:reporting_industry] = { renderer: :select,
                                       options: [['Default', ''], %w[Citrus citrus], %w[Melons melons]],
                                       parent_field: :resource_properties,
@@ -94,10 +101,13 @@ module UiRules
                           options: @repo.for_select_plant_resource_types(parent_type),
                           disabled_options: @repo.for_select_inactive_plant_resource_types,
                           min_charwidth: 40,
-                          caption: 'plant resource type', required: true }
+                          caption: 'Plant Resource Type',
+                          required: true }
                       else
                         plant_resource_type_id_label = @repo.find_plant_resource_type(@form_object.plant_resource_type_id)&.plant_resource_type_code
-                        { renderer: :label, with_value: plant_resource_type_id_label, caption: 'Plant Resource Type' }
+                        { renderer: :label,
+                          with_value: plant_resource_type_id_label,
+                          caption: 'Plant Resource Type' }
                       end
       {
         plant_resource_type_id: type_renderer,
@@ -134,6 +144,12 @@ module UiRules
       return false if @form_object.system_resource_id.nil?
 
       @repo.system_resource_type_from_resource(@form_object.system_resource_id) == Crossbeams::Config::ResourceDefinitions::MODULE
+    end
+
+    def at_button_level?
+      return false if @form_object.system_resource_id.nil?
+
+      @repo.system_resource_type_from_resource(@form_object.system_resource_id) == Crossbeams::Config::ResourceDefinitions::MODULE_BUTTON
     end
 
     def representative_resources(code)

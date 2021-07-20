@@ -146,7 +146,8 @@ module ProductionApp
         LEFT OUTER JOIN cartons_per_pallet ON cartons_per_pallet.id = ps.cartons_per_pallet_id
         LEFT OUTER JOIN contract_workers ON contract_workers.id = ps.contract_worker_id
         LEFT OUTER JOIN cultivars ON cultivars.id = ps.cultivar_id
-        LEFT OUTER JOIN commodities ON commodities.id = cultivars.commodity_id
+        LEFT OUTER JOIN cultivar_groups ON cultivar_groups.id = cultivars.cultivar_group_id
+        LEFT OUTER JOIN commodities ON commodities.id = cultivar_groups.commodity_id
         LEFT OUTER JOIN marketing_varieties ON marketing_varieties.id = ps.marketing_variety_id
         LEFT OUTER JOIN fruit_size_references ON fruit_size_references.id = ps.fruit_size_reference_id
         LEFT OUTER JOIN fruit_actual_counts_for_packs ON fruit_actual_counts_for_packs.id = ps.fruit_actual_counts_for_pack_id
@@ -187,7 +188,8 @@ module ProductionApp
              FROM cartons
              JOIN carton_labels ON carton_labels.id = cartons.carton_label_id
              LEFT JOIN cultivars ON cultivars.id = carton_labels.cultivar_id
-                 LEFT JOIN commodities ON commodities.id = cultivars.commodity_id
+             LEFT JOIN cultivar_groups ON cultivar_groups.id = cultivars.cultivar_group_id
+             LEFT JOIN commodities ON commodities.id = cultivar_groups.commodity_id
              LEFT OUTER JOIN standard_product_weights ON standard_product_weights.commodity_id = commodities.id
                AND standard_product_weights.standard_pack_id = carton_labels.standard_pack_code_id
              WHERE production_run_id = production_runs.id
@@ -364,7 +366,8 @@ module ProductionApp
         JOIN target_market_groups ON target_market_groups.id = pallet_sequences.packed_tm_group_id
         JOIN standard_pack_codes ON standard_pack_codes.id = pallet_sequences.standard_pack_code_id
         JOIN cultivars ON cultivars.id = pallet_sequences.cultivar_id
-        LEFT JOIN commodities ON commodities.id = cultivars.commodity_id
+        LEFT JOIN cultivar_groups ON cultivar_groups.id = cultivars.cultivar_group_id
+        LEFT JOIN commodities ON commodities.id = cultivar_groups.commodity_id
         LEFT JOIN std_fruit_size_counts ON std_fruit_size_counts.id = pallet_sequences.std_fruit_size_count_id
         LEFT JOIN fruit_size_references ON fruit_size_references.id = pallet_sequences.fruit_size_reference_id
         LEFT JOIN fruit_actual_counts_for_packs ON fruit_actual_counts_for_packs.id = pallet_sequences.fruit_actual_counts_for_pack_id

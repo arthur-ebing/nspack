@@ -114,8 +114,8 @@ module UiRules
     def puc_change # rubocop:disable Metrics/AbcSize
       if @params[:changed_value].nil_or_empty?
         for_select_orchards = []
-        for_select_cultivars = cultivar_repo.for_select_cultivar_groups
-        for_select_cultivar_groups = cultivar_repo.for_select_cultivars
+        for_select_cultivars = cultivar_repo.for_select_cultivars
+        for_select_cultivar_groups = cultivar_repo.for_select_cultivar_groups
       else
         orchards = cultivar_repo.all_hash(:orchards,  puc_id: @params[:changed_value])
         for_select_orchards = orchards.map { |i| [i[:orchard_code], i[:id]] }

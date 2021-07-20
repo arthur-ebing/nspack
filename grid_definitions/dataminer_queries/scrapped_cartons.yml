@@ -55,7 +55,7 @@
   farms ON farms.id = carton_labels.farm_id\r\nJOIN pucs ON pucs.id = carton_labels.puc_id\r\nJOIN
   orchards ON orchards.id = carton_labels.orchard_id\r\nJOIN cultivar_groups ON cultivar_groups.id
   = carton_labels.cultivar_group_id\r\nLEFT JOIN cultivars ON cultivars.id = carton_labels.cultivar_id\r\nLEFT
-  JOIN commodities ON commodities.id = cultivars.commodity_id\r\nJOIN marketing_varieties
+  JOIN commodities ON commodities.id = cultivar_groups.commodity_id\r\nJOIN marketing_varieties
   ON marketing_varieties.id = carton_labels.marketing_variety_id\r\nLEFT JOIN customer_varieties
   ON customer_varieties.id = carton_labels.customer_variety_id\r\nLEFT JOIN marketing_varieties
   cvv ON cvv.id = customer_varieties.variety_as_customer_variety_id\r\nLEFT JOIN std_fruit_size_counts

@@ -69,17 +69,17 @@ module MasterfilesApp
     private
 
     def cultivar_attrs
-      commodity_id = create_commodity
       cultivar_group_id = create_cultivar_group
 
       {
         id: 1,
-        commodity_id: commodity_id,
         cultivar_group_id: cultivar_group_id,
         cultivar_name: Faker::Lorem.unique.word,
         description: 'ABC',
         cultivar_code: 'ABC',
         cultivar_group_code: Faker::Lorem.unique.word,
+        commodity_code: 'ABC',
+        marketing_varieties: %w[A B C],
         active: true
       }
     end
