@@ -18,61 +18,42 @@ module MesscadaApp
     #   success_response('pallet found', oldest_pallet_sequence_id: pallet_sequences.first[:id])
     # end
 
-    def pallet_to_be_verified(params) # rubocop:disable Metrics/AbcSize
-      params = repo.parse_pallet_or_carton_number(params)
-      if params[:carton_number]
-        pallet = repo.find_pallet_by_carton_number(params[:carton_number])
-        return failed_response("Carton: #{params[:carton_number]} not found.") if pallet.nil?
-      else
-        pallet = repo.find_pallet_by_pallet_number(params[:pallet_number])
-        return failed_response("Pallet: #{params[:pallet_number]} not found.") if pallet.nil?
-      end
+    def pallet_to_be_verified(params)
+      res = MesscadaApp::ScanCartonLabelOrPallet.call(params)
+      return res unless res.success
 
-      check_pallet!(:not_scrapped, pallet.pallet_number)
-      check_pallet!(:not_inspected, pallet.pallet_number)
-      success_response('Pallet found', pallet.pallet_sequence_ids.first)
+      scanned = res.instance
+      check_pallet!(:not_scrapped, scanned.pallet_number)
+      check_pallet!(:not_inspected, scanned.pallet_number)
+
+      success_response('Pallet found', scanned.pallet_sequence_id)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
-    def carton_to_be_verified(params) # rubocop:disable Metrics/AbcSize
-      # scanned_carton_number = MesscadaApp::ScannedCartonNumber.new(scanned_carton_number: params[:carton_number]).carton_number
-
-      # TODO: refactor - method name is confusing, not representative...
-      # ----------------------------------------------------------------
-      # Carton number is actually a pallet number...
-      # This should only be called when COMBINE_CARTON_AND_PALLET_VERIFICATION is true
-      scanned_carton_number = params[:carton_number]
-
-      res = carton_verification(carton_number: scanned_carton_number)
+    def combined_verification_scan(params)
+      res = carton_verification(params[:carton_number])
       return failed_response(res.message) unless res.success
 
-      args = repo.parse_pallet_or_carton_number({ scanned_number: scanned_carton_number })
-      pallet = if args[:carton_number]
-                 repo.find_pallet_by_carton_number(scanned_carton_number)
-               else
-                 repo.find_pallet_by_pallet_number(args[:pallet_number])
-               end
+      res = MesscadaApp::ScanCartonLabelOrPallet.call(params)
+      return res unless res.success
 
-      return failed_response('Carton verification failed to create pallet.') if pallet.nil?
+      scanned = res.instance
+      return failed_response('Carton verification failed to create pallet.') if scanned.pallet_id.nil?
 
-      success_response('Verified Carton', pallet.pallet_sequence_ids.first)
+      success_response('Verified Carton', scanned.pallet_sequence_id)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
-    def scan_pallet_or_carton_number(params) # rubocop:disable Metrics/AbcSize
-      params = repo.parse_pallet_or_carton_number(params)
-      if params[:carton_number]
-        pallet = repo.find_pallet_by_carton_number(params[:carton_number])
-        return failed_response("Carton: #{params[:carton_number]} not found.") if pallet.nil?
-      else
-        pallet = repo.find_pallet_by_pallet_number(params[:pallet_number])
-        return failed_response("Pallet: #{params[:pallet_number]} not found.") if pallet.nil?
-      end
+    def find_pallet_by_scanning_pallet_or_carton_number(params)
+      res = MesscadaApp::ScanCartonLabelOrPallet.call(params)
+      return res unless res.success
 
-      check_pallet!(:not_scrapped, pallet.pallet_number)
-      success_response("Found Pallet #{pallet.pallet_number}", pallet)
+      scanned = res.instance
+      check_pallet!(:not_scrapped, scanned.pallet_number)
+      pallet = repo.find_pallet_flat(scanned.pallet_id)
+      success_response("Found Pallet #{scanned.pallet_number}", pallet)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -272,13 +253,10 @@ module MesscadaApp
       failed_response(e.message)
     end
 
-    def carton_verification(params) # rubocop:disable Metrics/AbcSize
-      res = CartonAndPalletVerificationSchema.call(params)
-      return validation_failed_response(res) if res.failure?
-
+    def carton_verification(scanned_number)  # rubocop:disable Metrics/AbcSize
       cvl_res = nil
       repo.transaction do
-        cvl_res = MesscadaApp::CartonVerification.call(@user, res)
+        cvl_res = MesscadaApp::CartonVerification.call(@user, scanned_number)
         log_transaction
       end
       cvl_res
@@ -385,7 +363,7 @@ module MesscadaApp
 
     def pallet_weighing_for_labeling(user, params) # rubocop:disable Metrics/AbcSize
       res = if AppConst::COMBINE_CARTON_AND_PALLET_VERIFICATION
-              carton_to_be_verified(params)
+              combined_verification_scan(params)
             else
               pallet_to_be_verified(params)
             end
@@ -478,8 +456,6 @@ module MesscadaApp
         changeset[:in_stock] = true
         changeset[:stock_created_at] = Time.now
       end
-
-      changeset[:batch_number] = params[:batch_number] if AppConst::CR_PROD.capture_batch_number_for_pallets?
       changeset
     end
 
