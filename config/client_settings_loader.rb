@@ -370,16 +370,16 @@ class AppClientSettingsLoader # rubocop:disable Metrics/ClassLength
     [name, val]
   end
 
-  def self.new_env_var_line(name, rule)
+  def self.new_env_var_line(rule)
     evar = ENV[rule[:env_key]]
     comment = evar.nil? ? '# ' : ''
     val = evar || rule[:default]
     if rule[:required]
-      "#{name}=#{val} (REQUIRED) [#{rule[:desc]}]"
+      "#{rule[:env_key]}=#{val} (REQUIRED) [#{rule[:desc]}]"
     elsif rule[:default] && !comment.empty?
-      "#{comment}#{name}=#{val} (this is default, only change if not this value) [#{rule[:desc]}]"
+      "#{comment}#{rule[:env_key]}=#{val} (this is default, only change if not this value) [#{rule[:desc]}]"
     else
-      "#{comment}#{name}=#{val} (OPTIONAL) [#{rule[:desc]}]"
+      "#{comment}#{rule[:env_key]}=#{val} (OPTIONAL) [#{rule[:desc]}]"
     end
   end
 
@@ -437,10 +437,10 @@ class AppClientSettingsLoader # rubocop:disable Metrics/ClassLength
   end
 
   def self.add_rules(rules, out, required_values_only)
-    rules.sort.each do |name, rule|
+    rules.sort.each do |_, rule|
       next if required_values_only && !rule[:required]
 
-      out << new_env_var_line(name, rule)
+      out << new_env_var_line(rule)
     end
   end
 end
