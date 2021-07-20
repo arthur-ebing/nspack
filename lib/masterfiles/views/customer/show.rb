@@ -21,11 +21,6 @@ module Masterfiles
               form.add_field :active
             end
             page.section do |section|
-              section.add_control(control_type: :link,
-                                  text: 'New Payment Term Set',
-                                  url: "/masterfiles/finance/customer_payment_term_sets/new?customer_id=#{id}",
-                                  behaviour: :popup,
-                                  style: :button)
               section.add_grid('customer_payment_term_sets',
                                "/list/customer_payment_term_sets/grid?key=customer&id=#{id}",
                                caption: 'Payment Term Sets')
