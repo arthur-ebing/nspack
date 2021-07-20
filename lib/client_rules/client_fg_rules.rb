@@ -169,7 +169,7 @@ module Crossbeams
     end
 
     def use_continuous_govt_inspection_sheets?(explain: false)
-      return "Are inspection sheets open-ended?" if explain
+      return 'Are inspection sheets open-ended?' if explain
 
       setting(:use_continuous_govt_inspection_sheets)
     end
