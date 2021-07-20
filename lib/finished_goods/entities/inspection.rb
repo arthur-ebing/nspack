@@ -63,6 +63,7 @@ module FinishedGoodsApp
     attribute :pallet_percentage, Types::Decimal
     attribute :pallet_sequence_number, Types::String
     attribute :palletized_at, Types::DateTime
+    attribute :partially_palletized_at, Types::DateTime
     attribute :phyto_data, Types::String
     attribute :production_region, Types::String
     attribute :puc, Types::String
