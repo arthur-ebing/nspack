@@ -151,6 +151,8 @@ class Nspack < Roda
               tipping
               labeling
               colour_rule
+              commodity_code
+              allow_cultivar_group_mixing
             ]
             add_grid_row(attrs: select_attributes(res.instance.to_h.merge(status: "CLONED from run id #{id}"), row_keys),
                          notice: res.message)
@@ -607,7 +609,6 @@ class Nspack < Roda
                           allocation_required
                           template_name
                           production_run_code
-                          cloned_from_run_code
                           cultivar_group_code
                           cultivar_name
                           farm_code
@@ -825,9 +826,15 @@ class Nspack < Roda
               closed
               running
               setup_complete
-              template_name
               completed
               allocation_required
+              template_name
+              active
+              tipping
+              labeling
+              colour_rule
+              commodity_code
+              allow_cultivar_group_mixing
             ]
             add_grid_row(attrs: select_attributes(res.instance.to_h.merge(status: 'CREATED'), row_keys),
                          notice: res.message)
