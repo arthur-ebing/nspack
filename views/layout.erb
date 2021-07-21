@@ -99,7 +99,7 @@
     </div>
 
     <footer class="footness">
-      <p>NOSOFT 2017
+      <p>NoSoft
         <% if ENV['RACK_ENV'] == 'development' %>
           <% asset_type = assets_paths(:css).any? { |p| p.include?('scss') } ? :bug : :show %>
           <span class="ml4">ASSETS: <%= Crossbeams::Layout::Icon.new(asset_type).render %></span>

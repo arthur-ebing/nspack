@@ -161,7 +161,7 @@ module MasterfilesApp
 
     def create_dashboard(params)
       config = load_config('dashboards.yml')
-      key = params[:key]
+      key = params[:key].downcase
       config[key] = { 'description' => params[:description], 'boards' => [] }
       rewrite_config('dashboards.yml', config)
       success_response("Created new dashboard #{key}: #{params[:description]}")

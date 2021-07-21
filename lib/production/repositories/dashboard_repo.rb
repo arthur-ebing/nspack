@@ -444,6 +444,7 @@ module ProductionApp
         LEFT JOIN bin_load_products ON bin_load_products.id = rmt_bins.bin_load_product_id
         LEFT JOIN bin_loads ON bin_loads.id = bin_load_products.bin_load_id
         WHERE NOT rmt_bins.is_rebin
+          AND NOT rmt_bins.bin_received_date_time IS NULL
         GROUP BY to_char(rmt_bins.bin_received_date_time, 'YYYY'::text)::integer,
           to_char(rmt_bins.bin_received_date_time, 'IW'::text)::integer,
           farms.farm_code,
@@ -576,6 +577,7 @@ module ProductionApp
         LEFT JOIN bin_load_products ON bin_load_products.id = rmt_bins.bin_load_product_id
         LEFT JOIN bin_loads ON bin_loads.id = bin_load_products.bin_load_id
         WHERE NOT rmt_bins.is_rebin
+          AND NOT rmt_bins.bin_received_date_time IS NULL
         GROUP BY rmt_bins.bin_received_date_time::date,
           farms.farm_code,
           pucs.puc_code,
