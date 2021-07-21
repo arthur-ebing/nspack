@@ -62,7 +62,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     end
   end
 
-  def process_pallet(pallet_rows) # rubocop:disable Metrics/AbcSize
+  def process_pallet(pallet_rows) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
     @pallet_errors = []
     params = {}
     pallet_id = nil
@@ -85,6 +85,8 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
       res = create_pallet_sequence(params)
       params[:pallet_sequence_id] = res.instance
       raise Crossbeams::InfoError, "#{params[:pallet_number]}_#{params[:pallet_sequence_number]} #{res.message}" unless res.success
+
+      next if params[:depot_pallet]
 
       carton_numbers = params[:carton_numbers].split('|')
       carton_numbers.each do |carton_number|
