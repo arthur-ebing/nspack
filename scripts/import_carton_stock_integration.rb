@@ -377,6 +377,8 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
   end
 
   def get_id_or_error(table_name, args)
+    return nil if (args.length == 1) && args.values.first.nil_or_empty?
+
     comment = args.delete(:comment)
     id = get_variant_id(table_name, args)
 
