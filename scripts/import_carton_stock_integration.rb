@@ -375,11 +375,10 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
   end
 
   def get_id_or_error(table_name, args)
+    comment = args.delete(:comment)
     return nil if (args.length == 1) && args.values.first.nil_or_empty?
 
-    comment = args.delete(:comment)
     id = get_variant_id(table_name, args)
-
     unless id
       error_message = "masterfile on table #{table_name} not found, args:#{args}"
       error_message = "#{error_message}, comment: #{comment}" if comment
