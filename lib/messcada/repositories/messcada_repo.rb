@@ -408,6 +408,10 @@ module MesscadaApp
       DB[query, pallet_number]
     end
 
+    def find_first_sequence_id_for_pallet_number(pallet_number)
+      DB[:pallet_sequences].where(pallet_number: pallet_number).order(:id).get(:id)
+    end
+
     def find_pallet_sequences_from_same_pallet(id)
       DB["select sis.id
           from pallet_sequences s
