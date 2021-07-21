@@ -75,11 +75,13 @@ module MesscadaApp
     end
 
     def set_carton_params
-      params = { palletizing_bay_resource_id: palletizing_bay_resource_id }
+      params = { palletizing_bay_resource_id: palletizing_bay_resource_id,
+                 palletizer_identifier_id: nil,
+                 palletizer_contract_worker_id: nil }
       unless palletizer_identifier.nil?
         hr_repo = MesscadaApp::HrRepo.new
         params[:palletizer_identifier_id] = hr_repo.personnel_identifier_id_from_device_identifier(palletizer_identifier)
-        params[:palletizer_contract_worker_id] = hr_repo.contract_worker_id_from_personnel_id(palletizer_identifier_id)
+        params[:palletizer_contract_worker_id] = hr_repo.contract_worker_id_from_personnel_id(params[:palletizer_identifier_id])
       end
       params
     end
