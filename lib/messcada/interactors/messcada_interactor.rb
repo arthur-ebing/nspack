@@ -26,7 +26,13 @@ module MesscadaApp
       check_pallet!(:not_scrapped, scanned.pallet_number)
       check_pallet!(:not_inspected, scanned.pallet_number)
 
-      success_response('Pallet found', scanned.pallet_sequence_id)
+      # Get 1st seq...
+      sequence_id = if scanned.pallet_sequence_id.nil?
+                      repo.find_first_sequence_id_for_pallet_number(scanned.formatted_number)
+                    else
+                      scanned.pallet_sequence_id
+                    end
+      success_response('Pallet found', sequence_id)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
