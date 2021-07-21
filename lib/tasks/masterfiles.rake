@@ -85,6 +85,14 @@ namespace :app do
   namespace :jasper do
     desc 'Run a Jasper report'
     task :run_report, %i[rpt fname] => [:load_app] do |_, args|
+      # jasper_params = JasperParams.new('interwarehouse',
+      #                                  'rakeU',
+      #                                  vehicle_job_id: 2)
+      # jasper_params.mode = :print
+      # # jasper_params.printer = 'http-www-canon-com-pablodev'
+      # jasper_params.printer = 'MF420'
+      # res = CreateJasperReport.call(jasper_params)
+
       jasper_params = JasperParams.new(args.rpt,
                                        'rakeU',
                                        load_id: 278,
