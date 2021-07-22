@@ -18,7 +18,7 @@ module MesscadaApp
       legacy_carton_number: :resolve_legacy_carton_number
     }.freeze
 
-    def call
+    def call # rubocop:disable Metrics/AbcSize
       parse_params
       return failed_response('Nothing Scanned', build_entity) if scanned_number.empty?
 

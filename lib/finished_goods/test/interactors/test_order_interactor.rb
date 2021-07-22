@@ -68,6 +68,7 @@ module FinishedGoodsApp
     def order_attrs
       order_type_id = create_order_type
       customer_party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_CUSTOMER)
+      sales_person_party_role_id = create_party_role(party_type: 'P', name: AppConst::ROLE_SALES_PERSON)
       contact_party_role_id = create_party_role(party_type: 'P', name: AppConst::ROLE_CUSTOMER_CONTACT_PERSON)
       currency_id = create_currency
       deal_type_id = create_deal_type
@@ -86,6 +87,8 @@ module FinishedGoodsApp
         order_type: 'ABC',
         customer_party_role_id: customer_party_role_id,
         customer: 'ABC',
+        sales_person_party_role_id: sales_person_party_role_id,
+        sales_person: 'ABC',
         contact_party_role_id: contact_party_role_id,
         contact: 'ABC',
         currency_id: currency_id,

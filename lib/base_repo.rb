@@ -107,6 +107,19 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   end
 
   # Get a single value (or set of values) from a record given any WHERE clause.
+  # Reverse sorted by the order_by value or if not given the id
+  # Returns nil if no match is found.
+  #
+  # @param table_name [Symbol] the db table name.
+  # @param column [Symbol] the column (or array of columns) to return.
+  # @param args [Hash] the where-clause conditions.
+  # @return [any] the column value for the matching record or nil.
+  def get_last(table_name, column, args = {})
+    order_by = args.delete(:order_by) || :id
+    DB[table_name].where(args).exclude(column => nil).reverse(order_by).get(column)
+  end
+
+  # Get a single value (or set of values) from a record given any WHERE clause.
   # If an array of columns are given, an array of values will be returned.
   # An exception is raised if the query returns more than one record.
   #

@@ -38,6 +38,7 @@ module FinishedGoodsApp
             flatten_columns: { incoterm: :incoterm } }
         ],
         lookup_functions: [
+          { function: :fn_party_role_name, args: [:sales_person_party_role_id], col_name: :sales_person },
           { function: :fn_party_role_name, args: [:target_customer_party_role_id], col_name: :target_customer },
           { function: :fn_party_role_name, args: [:exporter_party_role_id], col_name: :exporter },
           { function: :fn_party_role_name, args: [:customer_party_role_id], col_name: :customer },
