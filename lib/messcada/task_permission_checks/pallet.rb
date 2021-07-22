@@ -174,6 +174,8 @@ module MesscadaApp
       end
 
       def verification_passed_check
+        return all_ok if AppConst::CR_FG.can_inspect_without_pallet_verification?
+
         failed_pallets = @repo.select_values(:pallet_sequences, :pallet_number, pallet_id: pallet_ids, verification_passed: false).uniq
         return failed_response "Pallet: #{failed_pallets.join(', ')}, verification not passed." unless failed_pallets.empty?
 
@@ -181,7 +183,7 @@ module MesscadaApp
       end
 
       def pallet_weight_check
-        return all_ok unless AppConst::PALLET_WEIGHT_REQUIRED_FOR_INSPECTION
+        return all_ok if AppConst::CR_FG.can_inspect_without_pallet_weight?
 
         errors = @repo.select_values(:pallets, :pallet_number, id: pallet_ids, gross_weight: nil).uniq
         return failed_response "Pallet: #{errors.join(', ')}, gross weight not filled." unless errors.empty?

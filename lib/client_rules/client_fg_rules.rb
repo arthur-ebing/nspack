@@ -16,6 +16,8 @@ module Crossbeams
             max_pallets_on_load: 96,
             use_inspection_destination_for_load_out: true,
             use_continuous_govt_inspection_sheets: false,
+            pallet_verification_required_for_inspection: true,
+            pallet_weight_required_for_inspection: true,
             valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } },
       hl: { place_of_issue_for_addendum: 'PLZ',
             vgm_required: false,
@@ -25,6 +27,8 @@ module Crossbeams
             max_pallets_on_load: 120,
             use_inspection_destination_for_load_out: false,
             use_continuous_govt_inspection_sheets: false,
+            pallet_verification_required_for_inspection: true,
+            pallet_weight_required_for_inspection: true,
             valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } },
       kr: { place_of_issue_for_addendum: 'CPT',
             vgm_required: true,
@@ -34,6 +38,8 @@ module Crossbeams
             max_pallets_on_load: 50,
             use_inspection_destination_for_load_out: false,
             use_continuous_govt_inspection_sheets: true,
+            pallet_verification_required_for_inspection: false,
+            pallet_weight_required_for_inspection: true,
             valid_pallet_destination: { failed: [/\AREWORKS$/], pending: [/\AREWORKS$/, /\ARA_10/, /\APACKHSE/], loaded: [/\APART_PALLETS/] } },
       um: { place_of_issue_for_addendum: nil,
             vgm_required: true,
@@ -43,6 +49,8 @@ module Crossbeams
             max_pallets_on_load: 40,
             use_inspection_destination_for_load_out: false,
             use_continuous_govt_inspection_sheets: false,
+            pallet_verification_required_for_inspection: true,
+            pallet_weight_required_for_inspection: true,
             valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } },
       ud: { place_of_issue_for_addendum: 'PLZ',
             vgm_required: true,
@@ -52,6 +60,8 @@ module Crossbeams
             max_pallets_on_load: 50,
             use_inspection_destination_for_load_out: false,
             use_continuous_govt_inspection_sheets: false,
+            pallet_verification_required_for_inspection: true,
+            pallet_weight_required_for_inspection: false,
             valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } },
       sr: { place_of_issue_for_addendum: 'PLZ',
             vgm_required: true,
@@ -61,6 +71,8 @@ module Crossbeams
             max_pallets_on_load: 80,
             use_inspection_destination_for_load_out: true,
             use_continuous_govt_inspection_sheets: false,
+            pallet_verification_required_for_inspection: true,
+            pallet_weight_required_for_inspection: true,
             valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } },
       sr2: { place_of_issue_for_addendum: 'PLZ',
              vgm_required: true,
@@ -70,6 +82,8 @@ module Crossbeams
              max_pallets_on_load: 80,
              use_inspection_destination_for_load_out: true,
              use_continuous_govt_inspection_sheets: false,
+             pallet_verification_required_for_inspection: true,
+             pallet_weight_required_for_inspection: true,
              valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } }
     }.freeze
     # ALLOW_EXPORT_PALLETS_TO_BYPASS_INSPECTION
@@ -82,7 +96,6 @@ module Crossbeams
     # GOVT_INSPECTION_SIGNEE_CAPTION
     # IN_TRANSIT_LOCATION
     # LOCATION_TYPES_COLD_BAY_DECK
-    # PALLET_WEIGHT_REQUIRED_FOR_INSPECTION
     # TEMP_TAIL_REQUIRED_TO_SHIP
 
     def initialize(client_code)
@@ -172,6 +185,18 @@ module Crossbeams
       return 'Are inspection sheets open-ended?' if explain
 
       setting(:use_continuous_govt_inspection_sheets)
+    end
+
+    def can_inspect_without_pallet_weight?(explain: false)
+      return 'Can inspections take place without first weighing the pallet?' if explain
+
+      !setting(:pallet_weight_required_for_inspection)
+    end
+
+    def can_inspect_without_pallet_verification?(explain: false)
+      return 'Can inspections take place without first verifying the pallet?' if explain
+
+      !setting(:pallet_verification_required_for_inspection)
     end
   end
 end
