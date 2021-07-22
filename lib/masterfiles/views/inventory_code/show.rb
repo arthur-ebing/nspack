@@ -19,6 +19,13 @@ module Masterfiles
               form.add_field :fruit_item_incentive_rate
               form.add_field :active
             end
+
+            page.section do |section|
+              section.add_grid('inventory_codes_packing_costs',
+                               "/list/inventory_codes_packing_costs_show/grid?key=inventory_code&inventory_code_id=#{id}",
+                               height: 16,
+                               caption: 'Inventory Packing Costs')
+            end
           end
 
           layout

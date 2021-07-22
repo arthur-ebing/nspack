@@ -1,0 +1,159 @@
+---
+:caption: Inventory Codes Packing Costs
+:sql: "SELECT \"inventory_codes_packing_costs\".\"id\", \"inventory_codes_packing_costs\".\"inventory_code_id\",
+  \"inventory_codes_packing_costs\".\"commodity_id\", \"inventory_codes\".\"inventory_code\",
+  \"inventory_codes\".\"description\" AS inventory_description,  \"commodities\".\"code\"
+  AS commodity_code,  \"commodities\".\"description\" AS commodity_description,  \"inventory_codes_packing_costs\".\"packing_cost\"\r\nFROM
+  \"inventory_codes_packing_costs\" \r\nJOIN \"commodities\" ON \"commodities\".\"id\"
+  = \"inventory_codes_packing_costs\".\"commodity_id\" \r\nJOIN \"inventory_codes\"
+  ON \"inventory_codes\".\"id\" = \"inventory_codes_packing_costs\".\"inventory_code_id\"\r\nORDER
+  BY \"inventory_codes\".\"inventory_code\" ASC,  \"commodities\".\"code\"  ASC"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: inventory_codes_packing_costs.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inventory_code_id:
+    :name: inventory_code_id
+    :sequence_no: 2
+    :caption: Inventory code
+    :namespaced_name: inventory_codes_packing_costs.inventory_code_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  commodity_id:
+    :name: commodity_id
+    :sequence_no: 3
+    :caption: Commodity
+    :namespaced_name: inventory_codes_packing_costs.commodity_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inventory_code:
+    :name: inventory_code
+    :sequence_no: 4
+    :caption: Inventory code
+    :namespaced_name: inventory_codes.inventory_code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inventory_description:
+    :name: inventory_description
+    :sequence_no: 5
+    :caption: Inventory description
+    :namespaced_name: inventory_codes.description
+    :data_type: :string
+    :width: 130
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  commodity_code:
+    :name: commodity_code
+    :sequence_no: 6
+    :caption: Commodity code
+    :namespaced_name: commodities.code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  commodity_description:
+    :name: commodity_description
+    :sequence_no: 7
+    :caption: Commodity description
+    :namespaced_name: commodities.description
+    :data_type: :string
+    :width: 130
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packing_cost:
+    :name: packing_cost
+    :sequence_no: 8
+    :caption: Packing cost
+    :namespaced_name: inventory_codes_packing_costs.packing_cost
+    :data_type: :number
+    :width: 100
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: inventory_code_id
+  :caption: Inventory code
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT inventory_code, id FROM inventory_codes ORDER BY inventory_code
+- :column: commodity_id
+  :caption: Commodity
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT code, id FROM commodities ORDER BY code

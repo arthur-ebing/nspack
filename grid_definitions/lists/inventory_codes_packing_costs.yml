@@ -1,0 +1,16 @@
+---
+:dataminer_definition: inventory_codes_packing_costs
+:conditions:
+  :inventory_code:
+    - :col: inventory_code_id
+      :op: "="
+      :val: "$:inventory_code_id$"
+  :commodity_code:
+    - :col: commodity_id
+      :op: "="
+      :val: "$:commodity_id$"
+:edit_rules:
+  :url: "/masterfiles/fruit/inventory_codes_packing_costs/$:id$/inline_edit_packing_cost"
+  :editable_fields:
+    packing_cost:
+      :editor: :numeric

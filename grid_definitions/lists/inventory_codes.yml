@@ -21,6 +21,12 @@
   :icon: list
   :title: Variants
   :popup: false
+- :separator: true
+- :url: "/list/inventory_codes_packing_costs_show/with_params?key=inventory_code&inventory_code_id=$:id$"
+  :text: packing costs
+  :icon: list
+  :title: Packing Costs
+  :popup: true
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/fruit/inventory_codes/new"

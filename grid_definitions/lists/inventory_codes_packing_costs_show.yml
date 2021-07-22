@@ -1,0 +1,11 @@
+---
+:dataminer_definition: inventory_codes_packing_costs
+:conditions:
+  :inventory_code:
+    - :col: inventory_code_id
+      :op: "="
+      :val: "$:inventory_code_id$"
+  :commodity_code:
+    - :col: commodity_id
+      :op: "="
+      :val: "$:commodity_id$"

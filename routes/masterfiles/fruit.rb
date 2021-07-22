@@ -1290,5 +1290,34 @@ class Nspack < Roda
         end
       end
     end
+
+    # INVENTORY CODES PACKING COSTS
+    # --------------------------------------------------------------------------
+    r.on 'inventory_codes_packing_costs', Integer do |id|
+      interactor = MasterfilesApp::InventoryCodeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'sync_inventory_packing_costs' do
+        check_auth!('fruit', 'new')
+        res = interactor.sync_inventory_packing_costs(id)
+        flash[:notice] = res.message
+        show_partial { Masterfiles::Fruit::InventoryCode::Edit.call(id) }
+      end
+
+      r.on 'inline_edit_packing_cost' do
+        res = interactor.inline_update_packing_cost(id, params)
+        if res.success
+          row_keys = %i[
+            commodity_code
+            commodity_description
+            inventory_code
+            inventory_description
+            packing_cost
+          ]
+          update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+        else
+          undo_grid_inline_edit(message: res.message, message_type: :error)
+        end
+      end
+    end
   end
 end

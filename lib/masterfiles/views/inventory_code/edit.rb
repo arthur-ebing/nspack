@@ -22,6 +22,20 @@ module Masterfiles
               form.add_field :edi_out_inventory_code
               form.add_field :fruit_item_incentive_rate
             end
+
+            page.section do |section|
+              section.show_border!
+              section.add_control(control_type: :link,
+                                  text: 'Create missing inventory packing costs',
+                                  url: "/masterfiles/fruit/inventory_codes_packing_costs/#{id}/sync_inventory_packing_costs",
+                                  behaviour: :replace_dialog,
+                                  style: :button)
+
+              section.add_grid('inventory_codes_packing_costs',
+                               "/list/inventory_codes_packing_costs/grid?key=inventory_code&inventory_code_id=#{id}",
+                               height: 16,
+                               caption: 'Inventory Packing Costs')
+            end
           end
 
           layout

@@ -53,6 +53,30 @@ module MasterfilesApp
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 
+    def sync_inventory_packing_costs(inventory_code_id)
+      repo.transaction do
+        repo.sync_inventory_packing_costs(inventory_code_id)
+      end
+      success_response('Inventory Packing Costs created successfully.')
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def inline_update_packing_cost(id, params)
+      res = validate_inline_update_packing_cost_params(params)
+      return validation_failed_response(res) if res.failure?
+
+      repo.transaction do
+        repo.update_inventory_codes_packing_cost(id, packing_cost: res[:column_value])
+        log_transaction
+      end
+
+      instance = inventory_codes_packing_cost(id)
+      success_response('Updated packing cost', instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     private
 
     def repo
@@ -63,8 +87,16 @@ module MasterfilesApp
       repo.find_inventory_code(id)
     end
 
+    def inventory_codes_packing_cost(id)
+      repo.find_inventory_codes_packing_cost(id)
+    end
+
     def validate_inventory_code_params(params)
       InventoryCodeSchema.call(params)
+    end
+
+    def validate_inline_update_packing_cost_params(params)
+      PackingCostInlineUpdateSchema.call(params)
     end
   end
 end

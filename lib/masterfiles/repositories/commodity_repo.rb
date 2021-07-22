@@ -25,6 +25,7 @@ module MasterfilesApp
       dependents = DB[:cultivar_groups].where(commodity_id: id).select_map(:id)
       return { error: 'This commodity is in use.' } unless dependents.empty?
 
+      DB[:inventory_codes_packing_costs].where(commodity_id: id).delete
       DB[:commodities].where(id: id).delete
       { success: true }
     end
