@@ -350,16 +350,20 @@ module FinishedGoodsApp
       array.map(&:capitalize).join('')
     end
 
-    def flatten_to_table(input, prefix: nil)
+    def flatten_to_table(input, prefix: nil) # rubocop:disable Metrics/AbcSize
       array_out = []
       is_an_array = input.is_a? Array
       input = [input] unless is_an_array
       Array(0...input.length).each do |i|
-        input[i].each do |k, v|
-          column = "#{prefix}#{humanize(k)}"
-          column = "#{humanize(k)}[#{i}]" if is_an_array
-          column = "#{prefix}[#{i}].#{humanize(k)}" if prefix && is_an_array
-          array_out << { column: column, value: Array(v).join(' ') }
+        if input[i].is_a?(String)
+          array_out << { column: 'Message', value: input[i] }
+        else
+          input[i].each do |k, v|
+            column = "#{prefix}#{humanize(k)}"
+            column = "#{humanize(k)}[#{i}]" if is_an_array
+            column = "#{prefix}[#{i}].#{humanize(k)}" if prefix && is_an_array
+            array_out << { column: column, value: Array(v).join(' ') }
+          end
         end
       end
       array_out
