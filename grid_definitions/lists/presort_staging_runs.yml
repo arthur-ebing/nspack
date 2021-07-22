@@ -1,0 +1,41 @@
+---
+:dataminer_definition: presort_staging_runs
+:actions:
+- :url: "/raw_materials/presorting/presort_staging_runs/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/raw_materials/presorting/presort_staging_runs/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+  :hide_if_true: completed
+- :url: "/raw_materials/presorting/presort_staging_runs/$:id$/complete_setup"
+  :text: complete setup
+  :icon: complete
+  :title: complete setup
+  :hide_if_false: editing
+  :popup: false
+- :separator: true
+- :url: "/raw_materials/presorting/presort_staging_runs/$:id$/uncomplete_setup"
+  :text: uncomplete setup
+  :icon: complete
+  :title: uncomplete setup
+  :hide_if_false: completed
+  :popup: false
+- :separator: true
+- :url: "/raw_materials/presorting/presort_staging_runs/$:id$/complete_staging"
+  :text: complete staging
+  :icon: complete
+  :title: complete staging
+  :hide_if_false: completed
+  :popup: false
+- :separator: true
+:page_controls:
+- :control_type: :link
+  :url: "/raw_materials/presorting/presort_staging_runs/new"
+  :text: New Presort Staging Run
+  :style: :button
+  :behaviour: :popup
