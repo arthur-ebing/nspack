@@ -53,6 +53,7 @@ module FinishedGoodsApp
 
     def parse_titan_inspection_result_doc(hash)
       result_doc = hash[:result_doc] ||= {}
+      result_doc = { 'message' => result_doc } if result_doc.is_a?(String)
       result_doc.delete('type')
       result_doc.delete('traceId')
       result_lines = result_doc.delete('errors') || []
