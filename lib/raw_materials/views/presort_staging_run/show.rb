@@ -10,41 +10,24 @@ module RawMaterials
 
           Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
-            page.section do |section|
-              section.form do |form|
-                form.caption 'Presort Staging Run'
-                form.view_only!
-                form.row do |row|
-                  row.column do |col|
-                    col.add_field :presort_unit_plant_resource_id
-                    col.add_field :supplier_id
-                    col.add_field :cultivar_id
-                    col.add_field :rmt_class_id
-                    col.add_field :rmt_size_id
-                    col.add_field :ripe_point_code if rules[:is_kr]
-                  end
-                  row.column do |col|
-                    col.add_field :track_indicator_code if rules[:is_kr]
-                    col.add_field :season_id
-                    col.add_field :editing
-                    col.add_field :staged
-                    col.add_field :active
-                    col.add_field :canceled
-                  end
-                  row.column do |col|
-                    col.add_field :canceled_at
-                    col.add_field :setup_uncompleted_at
-                    col.add_field :setup_completed
-                    col.add_field :setup_completed_at
-                  end
-                end
-              end
-            end
-
-            page.section do |section|
-              section.add_grid('presort_staging_run_children',
-                               "/list/presort_staging_run_children_view/grid?key=standard&staging_run_id=#{id}",
-                               caption: 'Run Children')
+            page.form do |form|
+              # form.caption 'Presort Staging Run'
+              form.view_only!
+              form.add_field :uncompleted_at
+              form.add_field :completed
+              form.add_field :presort_unit_plant_resource_id
+              form.add_field :supplier_id
+              form.add_field :completed_at
+              form.add_field :canceled
+              form.add_field :canceled_at
+              form.add_field :cultivar_id
+              form.add_field :rmt_class_id
+              form.add_field :rmt_size_id
+              form.add_field :season_id
+              form.add_field :editing
+              form.add_field :staged
+              form.add_field :active
+              form.add_field :legacy_data
             end
           end
         end

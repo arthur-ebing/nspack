@@ -1,14 +1,10 @@
 ---
 :caption: Presort Staging Runs
-:sql: SELECT "presort_staging_runs"."id", "presort_staging_runs"."created_at", "presort_staging_runs"."setup_uncompleted_at", fn_party_role_name(suppliers.supplier_party_role_id) as supplier,
-  "presort_staging_runs"."setup_completed", "presort_staging_runs"."presort_unit_plant_resource_id", "plant_resources"."plant_resource_code",
-  "presort_staging_runs"."supplier_id", "presort_staging_runs"."setup_completed_at", "presort_staging_runs"."canceled",
+:sql: SELECT "presort_staging_runs"."id", "presort_staging_runs"."created_at", "presort_staging_runs"."uncompleted_at", fn_party_role_name(suppliers.supplier_party_role_id) as supplier,
+  "presort_staging_runs"."completed", "presort_staging_runs"."presort_unit_plant_resource_id", "plant_resources"."plant_resource_code",
+  "presort_staging_runs"."supplier_id", "presort_staging_runs"."completed_at", "presort_staging_runs"."canceled",
   "presort_staging_runs"."canceled_at", "presort_staging_runs"."staged_at", "presort_staging_runs"."cultivar_id", "presort_staging_runs"."rmt_class_id",
   "presort_staging_runs"."rmt_size_id", "presort_staging_runs"."season_id", "presort_staging_runs"."editing",
-  CASE WHEN "presort_staging_runs"."editing" is false and "presort_staging_runs"."staged" is false and "presort_staging_runs"."active" is false THEN true ELSE false END as uncomplete_setup,
-  CASE WHEN "presort_staging_runs"."setup_completed" is true and "presort_staging_runs"."active" is false and "presort_staging_runs"."staged" is false THEN true ELSE false END as activate_run,
-  CASE WHEN "presort_staging_runs"."active" is true and "presort_staging_runs"."staged" is false THEN true ELSE false END as complete_staging,
-  CASE WHEN "presort_staging_runs"."setup_completed" is false and "presort_staging_runs"."active" is false  and "presort_staging_runs"."staged" is false THEN true ELSE false END as can_edit,
   "presort_staging_runs"."staged", "presort_staging_runs"."active", "presort_staging_runs"."legacy_data",
   "cultivars"."cultivar_name", "rmt_classes"."rmt_class_code", "rmt_sizes"."size_code",
   "seasons"."season_code", "suppliers"."id" AS suppliers_id, fn_current_status('presort_staging_runs',
@@ -230,11 +226,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  setup_uncompleted_at:
-    :name: setup_uncompleted_at
+  uncompleted_at:
+    :name: uncompleted_at
     :sequence_no: 14
     :caption: Uncompleted at
-    :namespaced_name: presort_staging_runs.setup_uncompleted_at
+    :namespaced_name: presort_staging_runs.uncompleted_at
     :data_type: :datetime
     :width:
     :format:
@@ -246,11 +242,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  setup_completed:
-    :name: setup_completed
+  completed:
+    :name: completed
     :sequence_no: 15
     :caption: Completed
-    :namespaced_name: presort_staging_runs.setup_completed
+    :namespaced_name: presort_staging_runs.completed
     :data_type: :boolean
     :width:
     :format:
@@ -262,11 +258,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  setup_completed_at:
-    :name: setup_completed_at
+  completed_at:
+    :name: completed_at
     :sequence_no: 16
     :caption: Completed at
-    :namespaced_name: presort_staging_runs.setup_completed_at
+    :namespaced_name: presort_staging_runs.completed_at
     :data_type: :datetime
     :width:
     :format:
@@ -438,70 +434,6 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  uncomplete_setup:
-    :name: uncomplete_setup
-    :sequence_no: 26
-    :caption: Uncomplete Setup?
-    :namespaced_name: uncomplete_setup
-    :data_type: :boolean
-    :width:
-    :format:
-    :hide: true
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  activate_run:
-    :name: activate_run
-    :sequence_no: 27
-    :caption: Activate Run?
-    :namespaced_name: activate_run
-    :data_type: :boolean
-    :width:
-    :format:
-    :hide: true
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  complete_staging:
-    :name: complete_staging
-    :sequence_no: 28
-    :caption: Complete Staging?
-    :namespaced_name: complete_staging
-    :data_type: :boolean
-    :width:
-    :format:
-    :hide: true
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  can_edit:
-    :name: can_edit
-    :sequence_no: 29
-    :caption: Can Edit?
-    :namespaced_name: can_edit
-    :data_type: :boolean
-    :width:
-    :format:
-    :hide: true
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
 :query_parameter_definitions:
 - :column: presort_staging_runs.created_at
   :caption: Date Created
@@ -519,7 +451,7 @@
   :ordered_list: false
   :ui_priority: 1
   :list_def:
-- :column: presort_staging_runs.setup_completed_at
+- :column: presort_staging_runs.completed_at
   :caption: Completed At
   :data_type: :datetime
   :control_type: :daterange

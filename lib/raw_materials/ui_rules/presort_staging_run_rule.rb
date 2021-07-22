@@ -2,7 +2,7 @@
 
 module UiRules
   class PresortStagingRunRule < Base # rubocop:disable Metrics/ClassLength
-    def generate_rules # rubocop:disable Metrics/AbcSize
+    def generate_rules
       @resource_repo = ProductionApp::ResourceRepo.new
       @supplier_repo = MasterfilesApp::SupplierRepo.new
       @cultivar_repo = MasterfilesApp::CultivarRepo.new
@@ -16,9 +16,8 @@ module UiRules
       apply_form_values
 
       common_values_for_fields common_fields
-      add_plant_resource_field
 
-      set_show_fields if (%i[show reopen].include? @mode) || repo.presort_staging_run_completed_or_staged?(@form_object[:id])
+      set_show_fields if %i[show reopen].include? @mode
 
       add_behaviours
 
@@ -29,31 +28,27 @@ module UiRules
       @rules[:is_kr] = (AppConst::CLIENT_CODE == 'kr')
     end
 
-    def add_plant_resource_field
-      if repo.exists?(:presort_staging_run_children, presort_staging_run_id: @form_object[:id])
-        supplier_id_label = @supplier_repo.find_supplier(@form_object[:supplier_id])&.supplier
-        fields[:supplier_id] = { renderer: :label, with_value: supplier_id_label, caption: 'Supplier' }
-      else
-        fields[:supplier_id] = { renderer: :select, options: @supplier_repo.for_select_suppliers,
-                                 disabled_options: @supplier_repo.for_select_inactive_suppliers,
-                                 caption: 'Supplier',
-                                 required: true,
-                                 prompt: true }
-      end
-    end
-
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      supplier_id_label = @supplier_repo.find_supplier(@form_object[:supplier_id])&.supplier
-      cultivar_id_label = repo.get(:cultivars, @form_object[:cultivar_id], :cultivar_name)
-      presort_unit_plant_resource_id_label = repo.get(:plant_resources, @form_object[:presort_unit_plant_resource_id], :plant_resource_code)
-      rmt_class_id_label = repo.get(:rmt_classes, @form_object[:rmt_class_id], :rmt_class_code)
-      rmt_size_id_label = repo.get(:rmt_sizes, @form_object[:rmt_size_id], :size_code)
-      season_id_label = repo.get(:seasons, @form_object[:season_id], :season_code)
-      fields[:setup_uncompleted_at] = { renderer: :label, format: :without_timezone_or_seconds }
-      fields[:setup_completed] = { renderer: :label, as_boolean: true }
-      fields[:presort_unit_plant_resource_id] = { renderer: :label, with_value: presort_unit_plant_resource_id_label, caption: 'Line Plant Resource' }
+      # supplier_id_label = RawMaterialsApp::SupplierRepo.new.find_supplier(@form_object.supplier_id)&.id
+      # supplier_id_label = repo.find(:suppliers, RawMaterialsApp::Supplier, @form_object.supplier_id)&.id
+      supplier_id_label = repo.get(:suppliers, @form_object.supplier_id, :id)
+      # cultivar_id_label = RawMaterialsApp::CultivarRepo.new.find_cultivar(@form_object.cultivar_id)&.cultivar_name
+      # cultivar_id_label = repo.find(:cultivars, RawMaterialsApp::Cultivar, @form_object.cultivar_id)&.cultivar_name
+      cultivar_id_label = repo.get(:cultivars, @form_object.cultivar_id, :cultivar_name)
+      # rmt_class_id_label = RawMaterialsApp::RmtClassRepo.new.find_rmt_class(@form_object.rmt_class_id)&.rmt_class_code
+      # rmt_class_id_label = repo.find(:rmt_classes, RawMaterialsApp::RmtClass, @form_object.rmt_class_id)&.rmt_class_code
+      rmt_class_id_label = repo.get(:rmt_classes, @form_object.rmt_class_id, :rmt_class_code)
+      # rmt_size_id_label = RawMaterialsApp::RmtSizeRepo.new.find_rmt_size(@form_object.rmt_size_id)&.size_code
+      # rmt_size_id_label = repo.find(:rmt_sizes, RawMaterialsApp::RmtSize, @form_object.rmt_size_id)&.size_code
+      rmt_size_id_label = repo.get(:rmt_sizes, @form_object.rmt_size_id, :size_code)
+      # season_id_label = RawMaterialsApp::SeasonRepo.new.find_season(@form_object.season_id)&.season_code
+      # season_id_label = repo.find(:seasons, RawMaterialsApp::Season, @form_object.season_id)&.season_code
+      season_id_label = repo.get(:seasons, @form_object.season_id, :season_code)
+      fields[:uncompleted_at] = { renderer: :label, format: :without_timezone_or_seconds }
+      fields[:completed] = { renderer: :label, as_boolean: true }
+      fields[:presort_unit_plant_resource_id] = { renderer: :label }
       fields[:supplier_id] = { renderer: :label, with_value: supplier_id_label, caption: 'Supplier' }
-      fields[:setup_completed_at] = { renderer: :label, format: :without_timezone_or_seconds }
+      fields[:completed_at] = { renderer: :label, format: :without_timezone_or_seconds }
       fields[:canceled] = { renderer: :label, as_boolean: true }
       fields[:canceled_at] = { renderer: :label, format: :without_timezone_or_seconds }
       fields[:cultivar_id] = { renderer: :label, with_value: cultivar_id_label, caption: 'Cultivar' }
@@ -63,33 +58,45 @@ module UiRules
       fields[:editing] = { renderer: :label, as_boolean: true }
       fields[:staged] = { renderer: :label, as_boolean: true }
       fields[:active] = { renderer: :label, as_boolean: true }
-      return fields unless kr?
-
-      fields[:ripe_point_code] = { renderer: :label, with_value: @form_object[:legacy_data].to_h['ripe_point_code'] }
-      fields[:track_indicator_code] = { renderer: :label, with_value: @form_object[:legacy_data].to_h['track_indicator_code'] }
+      fields[:legacy_data] = { renderer: :label }
     end
 
     def common_fields
-      season_id_label = repo.get(:seasons, @form_object[:season_id], :season_code)
-      fields = { presort_unit_plant_resource_id: { renderer: :select,
-                                                   options: @resource_repo.for_select_plant_resources_of_type(Crossbeams::Config::ResourceDefinitions::PRESORTING_UNIT),
-                                                   caption: 'Line Plant Resource',
-                                                   required: true,
-                                                   prompt: true },
-                 cultivar_id: { renderer: :select, options: @cultivar_repo.for_select_cultivars,
-                                disabled_options: @cultivar_repo.for_select_inactive_cultivars,
-                                caption: 'Cultivar', required: true,
-                                prompt: true },
-                 rmt_class_id: { renderer: :select, options: @fruit_repo.for_select_rmt_classes,
-                                 disabled_options: @fruit_repo.for_select_inactive_rmt_classes,
-                                 caption: 'Rmt Class',
-                                 required: true,
-                                 prompt: true },
-                 rmt_size_id: { renderer: :select, options: @size_repo.for_select_rmt_sizes,
-                                caption: 'Rmt Size',
-                                required: true,
-                                prompt: true },
-                 season_id: { renderer: :label, with_value: season_id_label, caption: 'Season' } }
+      fields = {
+        presort_unit_plant_resource_id: { renderer: :select,
+                                          # options: @resource_repo.for_select_plant_resources_of_type(Crossbeams::Config::ResourceDefinitions::PRESORTING_UNIT),
+                                          options: @resource_repo.for_select_plant_resources_of_type(Crossbeams::Config::ResourceDefinitions::LINE),
+                                          caption: 'Line Plant Resource',
+                                          required: true,
+                                          prompt: true },
+        supplier_id: { renderer: :select, options: @supplier_repo.for_select_suppliers,
+                       disabled_options: @supplier_repo.for_select_inactive_suppliers,
+                       caption: 'Supplier',
+                       required: true,
+                       prompt: true },
+        cultivar_id: { renderer: :select, options: @cultivar_repo.for_select_cultivars,
+                       disabled_options: @cultivar_repo.for_select_inactive_cultivars,
+                       caption: 'Cultivar', required: true,
+                       prompt: true },
+        rmt_class_id: { renderer: :select, options: @fruit_repo.for_select_rmt_classes,
+                        disabled_options: @fruit_repo.for_select_inactive_rmt_classes,
+                        caption: 'Rmt Class',
+                        required: true,
+                        prompt: true },
+        rmt_size_id: { renderer: :select, options: @size_repo.for_select_rmt_sizes,
+                       caption: 'Rmt Size',
+                       required: true,
+                       prompt: true },
+        season_id: { renderer: :label, with_value: nil, caption: 'Season' }
+        # uncompleted_at: {},
+        # completed: { renderer: :checkbox },
+        # completed_at: {},
+        # canceled: { renderer: :checkbox },
+        # canceled_at: {},
+        # editing: { renderer: :checkbox },
+        # staged: { renderer: :checkbox },
+        # legacy_data: {}
+      }
 
       return fields unless @rules[:is_kr]
 
@@ -105,7 +112,6 @@ module UiRules
       end
 
       @form_object = repo.find_presort_staging_run(@options[:id])
-      @form_object = repo.find_presort_staging_run(@options[:id]).to_h.merge(ripe_point_code: @form_object.legacy_data.to_h['ripe_point_code'], track_indicator_code: @form_object.legacy_data.to_h['track_indicator_code']) if kr?
     end
 
     def make_new_form_object

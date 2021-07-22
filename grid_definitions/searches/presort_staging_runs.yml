@@ -1,43 +1,37 @@
 ---
 :dataminer_definition: presort_staging_runs
 :actions:
-  - :url: "/raw_materials/presorting/presort_staging_runs/$:id$"
-    :text: view
-    :icon: view-show
-    :title: View
-    :popup: false
-  - :url: "/raw_materials/presorting/presort_staging_runs/$:id$/edit"
-    :text: edit
-    :icon: edit
-    :title: Edit
-    :popup: false
-    :hide_if_false: can_edit
-  - :url: "/raw_materials/presorting/presort_staging_runs/$:id$/complete_setup"
-    :text: complete setup
-    :icon: minus-outline
-    :title: complete setup
-    :hide_if_false: editing
-    :popup: false
-  - :url: "/raw_materials/presorting/presort_staging_runs/$:id$/uncomplete_setup"
-    :text: uncomplete setup
-    :icon: add-outline
-    :title: uncomplete setup
-    :hide_if_false: uncomplete_setup
-    :popup: false
-  - :separator: true
-  - :url: "/raw_materials/presorting/presort_staging_runs/$:id$/activate_run"
-    :text: activate run
-    :icon: check-square
-    :title: activate run
-    :hide_if_false: activate_run
-    :popup: false
-  - :url: "/raw_materials/presorting/presort_staging_runs/$:id$/complete_staging"
-    :text: complete staging
-    :icon: lock-closed
-    :title: complete staging
-    :hide_if_false: complete_staging
-    :popup: false
-  - :separator: true
+- :url: "/raw_materials/presorting/presort_staging_runs/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/raw_materials/presorting/presort_staging_runs/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :hide_if_true: completed
+  :popup: true
+- :url: "/raw_materials/presorting/presort_staging_runs/$:id$/complete_setup"
+  :text: complete setup
+  :icon: complete
+  :title: complete setup
+  :hide_if_false: editing
+  :popup: false
+- :url: "/raw_materials/presorting/presort_staging_runs/$:id$/uncomplete_setup"
+  :text: uncomplete setup
+  :icon: complete
+  :title: uncomplete setup
+  :hide_if_false: completed
+  :popup: false
+- :separator: true
+- :url: "/raw_materials/presorting/presort_staging_runs/$:id$/complete_staging"
+  :text: complete staging
+  :icon: complete
+  :title: complete staging
+  :hide_if_false: completed
+  :popup: false
+- :separator: true
 :page_controls:
 - :control_type: :link
   :url: "/raw_materials/presorting/presort_staging_runs/new"

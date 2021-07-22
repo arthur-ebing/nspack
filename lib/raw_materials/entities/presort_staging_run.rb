@@ -3,11 +3,11 @@
 module RawMaterialsApp
   class PresortStagingRun < Dry::Struct
     attribute :id, Types::Integer
-    attribute :setup_uncompleted_at, Types::DateTime
-    attribute :setup_completed, Types::Bool
+    attribute :uncompleted_at, Types::DateTime
+    attribute :completed, Types::Bool
     attribute :presort_unit_plant_resource_id, Types::Integer
     attribute :supplier_id, Types::Integer
-    attribute :setup_completed_at, Types::DateTime
+    attribute :completed_at, Types::DateTime
     attribute :canceled, Types::Bool
     attribute :created_at, Types::DateTime
     attribute :staged_at, Types::DateTime
@@ -24,13 +24,13 @@ module RawMaterialsApp
 
   class PresortStagingRunFlat < Dry::Struct
     attribute :id, Types::Integer
-    attribute :setup_uncompleted_at, Types::DateTime
-    attribute :setup_completed, Types::Bool
+    attribute :uncompleted_at, Types::DateTime
+    attribute :completed, Types::Bool
     attribute :presort_unit_plant_resource_id, Types::Integer
     attribute :supplier_id, Types::Integer
     attribute :created_at, Types::DateTime
     attribute :staged_at, Types::DateTime
-    attribute :setup_completed_at, Types::DateTime
+    attribute :completed_at, Types::DateTime
     attribute :canceled, Types::Bool
     attribute :canceled_at, Types::DateTime
     attribute :cultivar_id, Types::Integer
