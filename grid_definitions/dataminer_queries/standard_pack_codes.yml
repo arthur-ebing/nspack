@@ -6,17 +6,16 @@
   \   standard_pack_codes.material_mass,\r\n    standard_pack_codes.plant_resource_button_indicator,\r\n
   \   ARRAY_AGG(basic_pack_codes.basic_pack_code) AS basic_pack_codes,\r\n    standard_pack_codes.use_size_ref_for_edi,\r\n
   \   standard_pack_codes.palletizer_incentive_rate,\r\n    standard_pack_codes.bin,\r\n
-  \   standard_pack_codes.rmt_container_type_id,\r\n    rmt_container_types.container_type_code
-  AS container_type,\r\n    standard_pack_codes.rmt_container_material_type_id,\r\n
-  \   rmt_container_material_types.container_material_type_code AS material_type,\r\n
+  \   standard_pack_codes.rmt_container_material_owner_id,\r\n    CONCAT(container_material_type_code,
+  ' - ', fn_party_role_name(rmt_material_owner_party_role_id)) AS rmt_container_material_owner,\r\n
   \   standard_pack_codes.created_at,\r\n    standard_pack_codes.updated_at,\r\n    standard_pack_codes.active\r\nFROM
   standard_pack_codes\r\nLEFT JOIN basic_packs_standard_packs ON standard_pack_codes.id
   = basic_packs_standard_packs.standard_pack_id\r\nLEFT JOIN basic_pack_codes ON basic_pack_codes.id
-  = basic_packs_standard_packs.basic_pack_id\r\nLEFT JOIN rmt_container_material_types
-  ON rmt_container_material_types.id = standard_pack_codes.rmt_container_material_type_id\r\nLEFT
-  JOIN rmt_container_types ON rmt_container_types.id = standard_pack_codes.rmt_container_type_id\r\nGROUP
+  = basic_packs_standard_packs.basic_pack_id\r\nLEFT JOIN rmt_container_material_owners
+  ON rmt_container_material_owners.id = standard_pack_codes.rmt_container_material_owner_id\r\nLEFT
+  JOIN rmt_container_material_types ON rmt_container_material_types.id = rmt_container_material_owners.rmt_container_material_type_id\r\nGROUP
   BY\r\n    standard_pack_codes.id,\r\n    standard_pack_codes.standard_pack_code,\r\n
-  \   rmt_container_types.id,\r\n    rmt_container_material_types.id\r\n\r\nORDER
+  \   container_material_type_code,\r\n    rmt_material_owner_party_role_id\r\nORDER
   BY\r\n    standard_pack_codes.standard_pack_code"
 :limit: 
 :offset: 
@@ -199,12 +198,12 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  rmt_container_type_id:
-    :name: rmt_container_type_id
+  rmt_container_material_owner_id:
+    :name: rmt_container_material_owner_id
     :sequence_no: 12
-    :caption: RMT container type
-    :namespaced_name: standard_pack_codes.rmt_container_type_id
-    :data_type: :string
+    :caption: Rmt container material owner
+    :namespaced_name: standard_pack_codes.rmt_container_material_owner_id
+    :data_type: :integer
     :width: 
     :format: 
     :hide: true
@@ -215,45 +214,13 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  container_type:
-    :name: container_type
+  rmt_container_material_owner:
+    :name: rmt_container_material_owner
     :sequence_no: 13
-    :caption: Container type
-    :namespaced_name: rmt_container_types.container_type_code
+    :caption: Rmt container material owner
+    :namespaced_name: 
     :data_type: :string
-    :width: 120
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  rmt_container_material_type_id:
-    :name: rmt_container_material_type_id
-    :sequence_no: 14
-    :caption: RMT container material type
-    :namespaced_name: standard_pack_codes.rmt_container_material_type_id
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  material_type:
-    :name: material_type
-    :sequence_no: 15
-    :caption: Material type
-    :namespaced_name: rmt_container_material_types.container_material_type_code
-    :data_type: :string
-    :width: 120
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -265,7 +232,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 16
+    :sequence_no: 14
     :caption: Created at
     :namespaced_name: standard_pack_codes.created_at
     :data_type: :datetime
@@ -281,7 +248,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 17
+    :sequence_no: 15
     :caption: Updated at
     :namespaced_name: standard_pack_codes.updated_at
     :data_type: :datetime
@@ -297,7 +264,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 18
+    :sequence_no: 16
     :caption: Active
     :namespaced_name: standard_pack_codes.active
     :data_type: :boolean

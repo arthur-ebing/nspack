@@ -13,10 +13,8 @@ module MasterfilesApp
     attribute :use_size_ref_for_edi, Types::Bool
     attribute :palletizer_incentive_rate, Types::Decimal
     attribute :bin, Types::Bool
-    attribute :rmt_container_type_id, Types::Integer
-    attribute :container_type, Types::String
-    attribute :rmt_container_material_type_id, Types::Integer
-    attribute :material_type, Types::String
+    attribute :rmt_container_material_owner_id, Types::Integer
+    attribute :rmt_container_material_owner, Types::String
     attribute? :active, Types::Bool
   end
 end

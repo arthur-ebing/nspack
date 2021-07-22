@@ -122,17 +122,12 @@ module MasterfilesApp
     end
 
     def find_standard_pack(id)
-      hash = find_with_association(:standard_pack_codes, id,
-                                   parent_tables: [{ parent_table: :rmt_container_types,
-                                                     columns: %i[container_type_code],
-                                                     flatten_columns: { container_type_code: :container_type } },
-                                                   { parent_table: :rmt_container_material_types,
-                                                     columns: %i[container_material_type_code],
-                                                     flatten_columns: { container_material_type_code: :material_type } }])
+      hash = find_hash(:standard_pack_codes, id)
       return nil if hash.nil?
 
       hash[:basic_pack_ids] = select_values(:basic_packs_standard_packs, :basic_pack_id, standard_pack_id: id)
       hash[:basic_pack_codes] = select_values(:basic_pack_codes, :basic_pack_code, id: hash[:basic_pack_ids])
+      hash[:rmt_container_material_owner] = ProductionApp::ProductSetupRepo.new.rmt_container_material_owner_for(hash[:rmt_container_material_owner_id])
       StandardPack.new(hash)
     end
 

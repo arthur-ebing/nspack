@@ -45,24 +45,14 @@ module UiRules
                                  disabled_options: @packaging_repo.for_select_inactive_cartons_per_pallet,
                                  prompt: true,
                                  required: true,
-                                 caption: 'Cartons per Pallet' },
-        rmt_container_material_owner_id: { renderer: :select,
-                                           options: @setup_repo.for_select_rmt_container_material_owners,
-                                           caption: 'RMT Container Material Owner',
-                                           prompt: 'Select RMT Container Material Owner',
-                                           searchable: true,
-                                           remove_search_for_small_list: false,
-                                           hide_on_load: !@requires_material_owner }
+                                 caption: 'Cartons per Pallet' }
       }
     end
 
     def make_form_object
       @repo = ProductionApp::PackingSpecificationRepo.new
       @packaging_repo = MasterfilesApp::PackagingRepo.new
-      @setup_repo = ProductionApp::ProductSetupRepo.new
       apply_form_values
-
-      @requires_material_owner = @setup_repo.requires_material_owner?(@form_object.standard_pack_code_id, @form_object.grade_id)
     end
 
     def make_header_table

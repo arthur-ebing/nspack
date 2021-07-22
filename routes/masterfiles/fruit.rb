@@ -504,11 +504,8 @@ class Nspack < Roda
               use_size_ref_for_edi
               palletizer_incentive_rate
               bin
-              container_type
-              material_type
+              rmt_container_material_owner
               basic_pack_codes
-              container_type
-              material_type
               active
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
@@ -532,24 +529,7 @@ class Nspack < Roda
       interactor = MasterfilesApp::StandardPackInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       r.on 'bin_changed' do
-        actions = []
-        if params[:changed_value] == 't'
-          actions << OpenStruct.new(type: :show_element, dom_id: 'standard_pack_rmt_container_type_id_field_wrapper')
-        else
-          actions << OpenStruct.new(type: :hide_element, dom_id: 'standard_pack_rmt_container_type_id_field_wrapper')
-          actions << OpenStruct.new(type: :hide_element, dom_id: 'standard_pack_rmt_container_material_type_id_field_wrapper')
-          actions << OpenStruct.new(type: :change_select_value, dom_id: 'standard_pack_rmt_container_type_id', value: '')
-          actions << OpenStruct.new(type: :change_select_value, dom_id: 'standard_pack_rmt_container_material_type_id', value: '')
-        end
-        json_actions(actions)
-      end
-
-      r.on 'container_type_changed' do
-        actions = []
-        material_types = MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_rmt_container_material_types(where: { rmt_container_type_id: params[:changed_value] })
-        actions << OpenStruct.new(type: :replace_select_options, dom_id: 'standard_pack_rmt_container_material_type_id', options_array: material_types)
-        actions << OpenStruct.new(type: :show_element, dom_id: 'standard_pack_rmt_container_material_type_id_field_wrapper')
-        json_actions(actions)
+        handle_ui_change(:standard_pack, :bin, params)
       end
 
       r.on 'new' do    # NEW
@@ -570,11 +550,9 @@ class Nspack < Roda
             use_size_ref_for_edi
             bin
             palletizer_incentive_rate
-            rmt_container_type_id
-            rmt_container_material_type_id
+            rmt_container_material_owner_id
+            rmt_container_material_owner
             basic_pack_codes
-            container_type
-            material_type
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)

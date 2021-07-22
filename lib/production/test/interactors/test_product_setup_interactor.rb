@@ -126,7 +126,6 @@ module ProductionApp
       standard_pack_code_id = create_standard_pack
       basic_pack_code_id = create_basic_pack(standard_pack_id: standard_pack_code_id)
       target_customer_party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_TARGET_CUSTOMER)
-      rmt_container_material_owner_id = create_rmt_container_material_owner
 
       {
         id: 1,
@@ -165,8 +164,7 @@ module ProductionApp
         description: 'ABC',
         gtin_code: 'ABC',
         rmt_class_id: rmt_class_id,
-        target_customer_party_role_id: target_customer_party_role_id,
-        rmt_container_material_owner_id: rmt_container_material_owner_id
+        target_customer_party_role_id: target_customer_party_role_id
       }
     end
 

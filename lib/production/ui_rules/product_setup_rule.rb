@@ -2,7 +2,7 @@
 
 module UiRules
   class ProductSetupRule < Base # rubocop:disable Metrics/ClassLength
-    def generate_rules # rubocop:disable Metrics/AbcSize
+    def generate_rules
       @repo = ProductionApp::ProductSetupRepo.new
       @fruit_size_repo = MasterfilesApp::FruitSizeRepo.new
       @party_repo = MasterfilesApp::PartyRepo.new
@@ -12,7 +12,6 @@ module UiRules
 
       @rules[:gtins_required] = AppConst::CR_PROD.use_gtins?
       @rules[:basic_pack_equals_standard_pack] = AppConst::CR_MF.basic_pack_equals_standard_pack?
-      @rules[:requires_material_owner] = @repo.requires_material_owner?(@form_object.standard_pack_code_id, @form_object.grade_id)
 
       common_values_for_fields common_fields
 
@@ -48,7 +47,6 @@ module UiRules
       cultivar_group_id_label = product_setup_template&.cultivar_group_code
       cultivar_id_label = product_setup_template&.cultivar_name
       rmt_class_id_label = MasterfilesApp::FruitRepo.new.find_rmt_class(@form_object.rmt_class_id)&.rmt_class_code
-      rmt_container_material_owner = @repo.rmt_container_material_owner_for(@form_object.rmt_container_material_owner_id)
 
       fields[:product_setup_template_id] = { renderer: :label,
                                              with_value: product_setup_template_id_label,
@@ -137,10 +135,6 @@ module UiRules
       fields[:gtin_code] = { renderer: :label,
                              caption: 'GTIN Code',
                              hide_on_load: !@rules[:gtins_required] }
-      fields[:rmt_container_material_owner_id] = { renderer: :label,
-                                                   with_value: rmt_container_material_owner,
-                                                   caption: 'RMT Container Material Owner',
-                                                   hide_on_load: !@rules[:requires_material_owner] }
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize
@@ -350,14 +344,7 @@ module UiRules
                          caption: 'Treatments' },
         gtin_code: { renderer: :label,
                      caption: 'GTIN Code',
-                     hide_on_load: !@rules[:gtins_required] },
-        rmt_container_material_owner_id: { renderer: :select,
-                                           options: @repo.for_select_rmt_container_material_owners,
-                                           caption: 'RMT Container Material Owner',
-                                           prompt: 'Select RMT Container Material Owner',
-                                           searchable: true,
-                                           remove_search_for_small_list: false,
-                                           hide_on_load: !@rules[:requires_material_owner] }
+                     hide_on_load: !@rules[:gtins_required] }
 
       }
     end
@@ -398,29 +385,17 @@ module UiRules
                                     grade_id: nil,
                                     product_chars: nil,
                                     gtin_code: nil,
-                                    rmt_class_id: nil,
-                                    rmt_container_material_owner_id: nil)
+                                    rmt_class_id: nil)
     end
 
     def treatment_codes
       @repo.find_treatment_codes(@options[:id])
     end
 
-    def handle_behaviour
-      case @mode
-      when :standard_pack_code
-        standard_pack_code_change
-      when :grade
-        grade_change
-      else
-        unhandled_behaviour!
-      end
-    end
-
     private
 
     def add_behaviours
-      behaviours do |behaviour| # rubocop:disable Metrics/BlockLength
+      behaviours do |behaviour|
         behaviour.dropdown_change :commodity_id,
                                   notify: [{ url: '/production/product_setups/product_setups/commodity_changed',
                                              param_keys: %i[product_setup_product_setup_template_id] }]
@@ -446,27 +421,7 @@ module UiRules
         behaviour.dropdown_change :pallet_format_id,
                                   notify: [{ url: '/production/product_setups/product_setups/pallet_format_changed',
                                              param_keys: %i[product_setup_basic_pack_code_id] }]
-        behaviour.dropdown_change :standard_pack_code_id,
-                                  notify: [{ url: '/production/product_setups/product_setups/standard_pack_code_changed',
-                                             param_keys: %i[product_setup_grade_id] }]
-        behaviour.dropdown_change :grade_id,
-                                  notify: [{ url: '/production/product_setups/product_setups/grade_changed',
-                                             param_keys: %i[product_setup_standard_pack_code_id] }]
       end
-    end
-
-    def standard_pack_code_change
-      grade_id = params[:product_setup_grade_id]
-      requires_material_owner = ProductionApp::ProductSetupRepo.new.requires_material_owner?(params[:changed_value], grade_id)
-      json_actions([OpenStruct.new(type: requires_material_owner ? :show_element : :hide_element,
-                                   dom_id: 'product_setup_rmt_container_material_owner_id_field_wrapper')])
-    end
-
-    def grade_change
-      standard_pack_code_id = params[:product_setup_standard_pack_code_id]
-      requires_material_owner = ProductionApp::ProductSetupRepo.new.requires_material_owner?(standard_pack_code_id, params[:changed_value])
-      json_actions([OpenStruct.new(type: requires_material_owner ? :show_element : :hide_element,
-                                   dom_id: 'product_setup_rmt_container_material_owner_id_field_wrapper')])
     end
   end
 end

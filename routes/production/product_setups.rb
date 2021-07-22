@@ -331,14 +331,6 @@ class Nspack < Roda
                                      options_array: actual_counts)])
       end
 
-      r.on 'standard_pack_code_changed' do
-        handle_ui_change(:product_setup, :standard_pack_code, params)
-      end
-
-      r.on 'grade_changed' do
-        handle_ui_change(:product_setup, :grade, params)
-      end
-
       r.on 'std_fruit_size_count_changed' do
         commodity_id = params[:product_setup_commodity_id]
         basic_pack_code_id = params[:product_setup_basic_pack_code_id]
