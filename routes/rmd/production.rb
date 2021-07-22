@@ -1204,6 +1204,7 @@ class Nspack < Roda
   def fields_for_rmd_pallet_sequence_display(form, pallet_sequence, override = []) # rubocop:disable Metrics/AbcSize
     form.add_label(:pallet_number, 'Pallet Number', pallet_sequence[:pallet_number])
     form.add_label(:pallet_sequence_number, 'Pallet Sequence Number', pallet_sequence[:pallet_sequence_number])
+    form.add_label(:location, 'Location', pallet_sequence[:location])
     form.add_label(:build_status, 'Build Status', pallet_sequence[:build_status])
     form.add_label(:pallet_base, 'Pallet Base', pallet_sequence[:pallet_base])
     form.add_label(:stack_type, 'Stack Height', pallet_sequence[:stack_type])
