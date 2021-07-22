@@ -19,6 +19,7 @@ module UiRules
     def set_show_fields # rubocop:disable Metrics/AbcSize
       fields[:order_type] = { renderer: :label }
       fields[:customer] = { renderer: :label }
+      fields[:sales_person] = { renderer: :label }
       fields[:contact] = { renderer: :label }
       fields[:currency] = { renderer: :label }
       fields[:deal_type] = { renderer: :label }
@@ -69,6 +70,12 @@ module UiRules
                                   caption: 'Customer',
                                   prompt: true,
                                   required: true },
+        sales_person_party_role_id: { renderer: :select,
+                                      options: @party_repo.for_select_party_roles(AppConst::ROLE_SALES_PERSON),
+                                      disabled_options: @party_repo.for_select_inactive_party_roles(AppConst::ROLE_SALES_PERSON),
+                                      caption: 'Sales Person',
+                                      prompt: true,
+                                      required: true },
         contact_party_role_id: { renderer: :select,
                                  options: @party_repo.for_select_party_roles(
                                    AppConst::ROLE_CUSTOMER_CONTACT_PERSON,
@@ -156,6 +163,7 @@ module UiRules
     def make_new_form_object
       @form_object = OpenStruct.new(order_type_id: @repo.get_id(:order_types, order_type: 'SALES_ORDER'),
                                     customer_party_role_id: nil,
+                                    sales_person_party_role_id: nil,
                                     contact_party_role_id: nil,
                                     currency_id: nil,
                                     deal_type_id: nil,
@@ -270,12 +278,17 @@ module UiRules
 
     def customer_changed # rubocop:disable Metrics/AbcSize
       form_object_merge!(params)
-      @form_object[:customer_party_role_id] = params[:changed_value].to_i
+      customer_party_role_id = params[:changed_value].to_i
+      @form_object[:customer_party_role_id] = customer_party_role_id
       fields = common_fields
-      party_id = MasterfilesApp::PartyRepo.new.find_party_role(params[:changed_value].to_i)&.party_id
+      party_id = MasterfilesApp::PartyRepo.new.find_party_role(customer_party_role_id)&.party_id
       receiver_value = MasterfilesApp::PartyRepo.new.party_role_id_from_role_and_party_id(AppConst::ROLE_FINAL_RECEIVER, party_id)
+      sales_person_value = @repo.get_last(:orders, :sales_person_party_role_id, customer_party_role_id: customer_party_role_id)
 
-      json_actions([OpenStruct.new(type: :replace_select_options,
+      json_actions([OpenStruct.new(type: :change_select_value,
+                                   dom_id: 'order_sales_person_party_role_id',
+                                   value: sales_person_value),
+                    OpenStruct.new(type: :replace_select_options,
                                    dom_id: 'order_contact_party_role_id',
                                    options_array: fields[:contact_party_role_id][:options]),
                     OpenStruct.new(type: :replace_select_options,

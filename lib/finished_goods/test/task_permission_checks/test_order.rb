@@ -15,6 +15,8 @@ module FinishedGoodsApp
         order_type: 'ABC',
         customer_party_role_id: 1,
         customer: 'ABC',
+        sales_person_party_role_id: 1,
+        sales_person: 'ABC',
         contact_party_role_id: 1,
         contact: 'ABC',
         currency_id: 1,

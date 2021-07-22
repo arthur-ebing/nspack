@@ -20,6 +20,7 @@ module FinishedGoods
                 row.column do |col|
                   col.add_field :order_type_id
                   col.add_field :customer_party_role_id
+                  col.add_field :sales_person_party_role_id
                   col.add_field :contact_party_role_id
                   col.add_field :currency_id
                   col.add_field :deal_type_id

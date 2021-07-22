@@ -6,6 +6,8 @@ module FinishedGoodsApp
     attribute :order_id, Types::Integer
     attribute :order_type_id, Types::Integer
     attribute :order_type, Types::String
+    attribute :sales_person_party_role_id, Types::Integer
+    attribute :sales_person, Types::String
     attribute :customer_party_role_id, Types::Integer
     attribute :customer, Types::String
     attribute :contact_party_role_id, Types::Integer
