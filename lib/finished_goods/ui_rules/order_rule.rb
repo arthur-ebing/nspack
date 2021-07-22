@@ -119,7 +119,7 @@ module UiRules
                                   required: true },
         packed_tm_group_id: { renderer: :select,
                               options: MasterfilesApp::TargetMarketRepo.new.for_select_packed_tm_groups,
-                              disabled_options: MasterfilesApp::TargetMarketRepo.new.for_select_packed_tm_groups,
+                              disabled_options: MasterfilesApp::TargetMarketRepo.new.for_select_packed_tm_groups(active: false),
                               caption: 'Packed TM Group',
                               prompt: true,
                               required: false },
