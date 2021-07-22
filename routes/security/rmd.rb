@@ -64,6 +64,8 @@ class Nspack < Roda
             scan_with_camera
             hybrid_device
             start_page
+            act_as_reader_id
+            act_as_system_resource_code
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)

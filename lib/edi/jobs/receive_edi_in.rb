@@ -8,6 +8,9 @@ module EdiApp
       # No point in retrying
       self.maximum_retry_count = 0
 
+      # Force a short delay to ensure file move has completed.
+      self.run_at = -> { Time.now + 1 }
+
       def run(file_path) # rubocop:disable Metrics/AbcSize
         @file_path = File.expand_path(file_path)
         raise ArgumentError, "File \"#{@file_path}\" does not exist" unless File.exist?(@file_path)
