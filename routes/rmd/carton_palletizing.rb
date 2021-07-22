@@ -87,7 +87,7 @@ class Nspack < Roda
                                      # notes: notice,
                                      scan_with_camera: @rmd_scan_with_camera,
                                      caption: 'Carton Palletizing',
-                                     action: URI.decode_www_form_component(robot_feedback.confirm_url),
+                                     action: URI.decode_www_form_component(robot_feedback.confirm_url).sub('messcada/', 'rmd/'),
                                      button_caption: 'YES')
 
       form.add_label(:device, 'Device', robot_feedback.device)
@@ -103,7 +103,7 @@ class Nspack < Roda
       colour = :orange
       form.add_status_leds(colour)
       form.add_section_header(robot_feedback.confirm_text)
-      form.add_button('NO', URI.decode_www_form_component(robot_feedback.cancel_url)) unless robot_feedback.cancel_url == 'noop'
+      form.add_button('NO', URI.decode_www_form_component(robot_feedback.cancel_url).sub('messcada/', 'rmd/')) unless robot_feedback.cancel_url == 'noop'
       form.add_button('NO', '/rmd/carton_palletizing/cancel_op') if robot_feedback.cancel_url == 'noop'
       form.add_label(:reader_id, 'Reader', robot_feedback.reader_id, robot_feedback.reader_id, hide_on_load: true)
       form.add_label(:identifier, 'Identifier', identifier, identifier, hide_on_load: true)

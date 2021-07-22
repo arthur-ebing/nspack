@@ -1014,7 +1014,9 @@ module ProductionApp
     end
 
     def sequence_carton_id(pallet_sequence_id)
-      carton_id = get_value(:cartons, :id, pallet_sequence_id: pallet_sequence_id)
+      # Get any carton matching the sequence:
+      carton_id = DB[:cartons].where(pallet_sequence_id: pallet_sequence_id).get(:id)
+
       return carton_id unless carton_id.nil_or_empty?
 
       get(:pallet_sequences, pallet_sequence_id, :scanned_from_carton_id)
