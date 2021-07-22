@@ -25,6 +25,7 @@ module FinishedGoods
                   row.column do |col|
                     col.add_field :order_type
                     col.add_field :customer
+                    col.add_field :sales_person
                     col.add_field :contact
                     col.add_field :currency
                     col.add_field :deal_type

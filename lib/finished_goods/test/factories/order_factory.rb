@@ -8,6 +8,7 @@ module FinishedGoodsApp
 
       opts[:order_type_id] ||= create_order_type
       opts[:customer_party_role_id] ||= create_party_role(party_type: 'O', name: AppConst::ROLE_CUSTOMER)
+      opts[:sales_person_party_role_id] ||= create_party_role(party_type: 'P', name: AppConst::ROLE_SALES_PERSON)
       opts[:contact_party_role_id] ||= create_party_role(party_type: 'O', name: AppConst::ROLE_CUSTOMER_CONTACT_PERSON)
       opts[:currency_id] ||= create_currency
       opts[:deal_type_id] ||= create_deal_type
