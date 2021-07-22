@@ -48,10 +48,9 @@ module ProductionApp
     end
 
     def resolve_run_legacy_data(data)
-      {
-        'pc_code' => data['pc_code'],
-        'track_indicator_code' => data['track_indicator_code']
-      }
+      legacy_data = {}
+      AppConst::CR_PROD.run_cache_legacy_data_fields.each { |column| legacy_data[column.to_s] = data[column.to_s] }
+      legacy_data
     end
   end
 end
