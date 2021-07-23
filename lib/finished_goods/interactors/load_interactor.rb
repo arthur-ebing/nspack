@@ -262,8 +262,8 @@ module FinishedGoodsApp
       otmc_count = nil
       phyto_count = nil
       repo.transaction do
-        otmc_count = repo.update_load_otmc_results(id)
-        phyto_count = repo.update_load_phyto_data(id)
+        otmc_count = QualityApp::OrchardTestRepo.new.update_otmc_results(load_id: id)
+        phyto_count = QualityApp::OrchardTestRepo.new.update_phyto_data(load_id: id)
         log_transaction
       end
       success_response("Updated #{[otmc_count, phyto_count].max} pallet sequences on this load.")

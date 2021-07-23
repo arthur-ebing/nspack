@@ -167,6 +167,13 @@ class Nspack < Roda
         r.redirect '/list/govt_inspection_sheets'
       end
 
+      r.on 'update_otmc' do
+        check_auth!('inspection', 'edit')
+        res = interactor.update_otmc(id)
+        flash[res.success ? :notice : :error] = res.message
+        r.redirect "/finished_goods/inspection/govt_inspection_sheets/#{id}"
+      end
+
       r.on 'delete' do    # DELETE
         check_auth!('inspection', 'delete')
         interactor.assert_permission!(:delete, id)

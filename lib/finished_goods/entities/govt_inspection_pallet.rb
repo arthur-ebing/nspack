@@ -28,7 +28,7 @@ module FinishedGoodsApp
     attribute? :active, Types::Bool
   end
 
-  class PalletFlat < Dry::Struct
+  class PalletForGovtInspection < Dry::Struct
     attribute :pallet_number, Types::String
     attribute :gross_weight, Types::Float
     attribute :carton_quantity, Types::Integer

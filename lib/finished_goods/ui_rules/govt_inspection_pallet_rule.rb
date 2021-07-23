@@ -64,7 +64,7 @@ module UiRules
 
     def make_new_form_object
       @form_values = OpenStruct.new(@options[:form_values])
-      pallet_values = @repo.find_pallet_flat(@form_values.pallet_id)
+      pallet_values = @repo.find_pallet_for_govt_inspection(@form_values.pallet_id)
       @form_object = OpenStruct.new(govt_inspection_sheet_id: @form_values.govt_inspection_sheet_id,
                                     passed: true,
                                     inspected: true,

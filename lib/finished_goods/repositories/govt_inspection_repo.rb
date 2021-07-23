@@ -218,7 +218,7 @@ module FinishedGoodsApp
       GovtInspectionPallet.new(hash)
     end
 
-    def find_pallet_flat(id)
+    def find_pallet_for_govt_inspection(id)
       query = <<~SQL
         SELECT
           pallets.pallet_number,
@@ -242,7 +242,7 @@ module FinishedGoodsApp
       hash = DB[query, id].first
       return nil if hash.nil?
 
-      FinishedGoodsApp::PalletFlat.new(hash)
+      PalletForGovtInspection.new(hash)
     end
 
     def create_govt_inspection_pallet(res)

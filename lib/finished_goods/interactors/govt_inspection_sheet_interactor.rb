@@ -156,6 +156,19 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
+    def update_otmc(id)
+      otmc_count = nil
+      phyto_count = nil
+      repo.transaction do
+        otmc_count = QualityApp::OrchardTestRepo.new.update_otmc_results(govt_inspection_sheet_id: id)
+        phyto_count = QualityApp::OrchardTestRepo.new.update_phyto_data(govt_inspection_sheet_id: id)
+        log_transaction
+      end
+      success_response("Updated #{[otmc_count, phyto_count].max} pallet sequences on this inspection sheet.")
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def manually_create_pallet_tripsheet(planned_location_to_id) # rubocop:disable Metrics/AbcSize
       res = validate_manual_tripsheet_params(planned_location_to_id: planned_location_to_id, business_process_id: MesscadaApp::MesscadaRepo.new.find_business_process('MANUAL_TRIPSHEET')[:id],
                                              stock_type_id: MesscadaApp::MesscadaRepo.new.find_stock_type('PALLET')[:id])

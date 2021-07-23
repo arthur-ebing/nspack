@@ -148,5 +148,57 @@ module QualityApp
       end
       Hash[hash.sort]
     end
+
+    def update_otmc_results(load_id: nil, govt_inspection_sheet_id: nil)
+      pallet_ids = select_values(:pallets, :id, load_id: load_id) if load_id
+      pallet_ids = select_values(:govt_inspection_pallets, :pallet_id, govt_inspection_sheet_id: govt_inspection_sheet_id) if govt_inspection_sheet_id
+
+      query = <<~SQL
+        UPDATE pallet_sequences
+        SET failed_otmc_results = sq.new_failed_otmc_results
+        FROM (
+          SELECT
+            ps.id,
+            array_agg(vw.test_type_id order by vw.test_type_id) filter (where vw.test_type_id is not null) AS new_failed_otmc_results
+          FROM pallet_sequences ps
+          LEFT JOIN vw_orchard_test_results_flat vw
+            ON ps.puc_id = vw.puc_id
+           AND ps.orchard_id = vw.orchard_id
+           AND ps.cultivar_id = vw.cultivar_id
+           AND ps.packed_tm_group_id = ANY(vw.tm_group_ids)
+           AND NOT vw.passed
+           AND NOT vw.classification
+          WHERE ps.pallet_id IN (#{Array(pallet_ids).join(',')})
+          GROUP BY ps.id
+        ) sq
+        WHERE pallet_sequences.id = sq.id
+        AND pallet_sequences.failed_otmc_results IS DISTINCT FROM sq.new_failed_otmc_results
+      SQL
+      DB.execute(query)
+    end
+
+    def update_phyto_data(load_id: nil, govt_inspection_sheet_id: nil)
+      pallet_ids = select_values(:pallets, :id, load_id: load_id) if load_id
+      pallet_ids = select_values(:govt_inspection_pallets, :pallet_id, govt_inspection_sheet_id: govt_inspection_sheet_id) if govt_inspection_sheet_id
+
+      query = <<~SQL
+        UPDATE pallet_sequences
+        SET phyto_data = sq.api_result
+        FROM (
+          SELECT
+            ps.id,
+            otr.api_result
+          FROM pallet_sequences ps
+          JOIN orchard_test_results otr ON otr.puc_id = ps.puc_id
+           AND otr.orchard_id = ps.orchard_id
+           AND otr.cultivar_id = ps.cultivar_id
+           AND otr.orchard_test_type_id = (select id from orchard_test_types where api_attribute = 'phytoData')
+          WHERE ps.pallet_id IN (#{Array(pallet_ids).join(',')})
+        ) sq
+        WHERE pallet_sequences.id = sq.id
+          AND pallet_sequences.phyto_data IS DISTINCT FROM sq.api_result
+      SQL
+      DB.execute(query)
+    end
   end
 end

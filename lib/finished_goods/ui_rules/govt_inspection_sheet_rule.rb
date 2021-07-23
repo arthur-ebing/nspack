@@ -215,6 +215,13 @@ module UiRules
                  url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/reopen",
                  prompt: 'Are you sure you want to reopen this inspection?',
                  icon: :back }
+      update_otmc = { control_type: :link,
+                      style: :action_button,
+                      text: 'Update Phyto Data',
+                      url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/update_otmc",
+                      prompt: 'Are you sure, you want to update the OTMC Results for this inspection sheet?',
+                      icon: :plus }
+
       toggle = @form_object.use_inspection_destination_for_load_out
       toggle_use_inspection_destination = {
         control_type: :link,
@@ -231,10 +238,10 @@ module UiRules
         progress_controls = [complete]
       when 1
         instance_controls = [edit]
-        progress_controls = [uncomplete, preverify, titan_inspection, finish]
+        progress_controls = [uncomplete, update_otmc, preverify, titan_inspection, finish]
       when 2
         instance_controls = []
-        progress_controls = [reopen, preverify, titan_inspection, toggle_use_inspection_destination]
+        progress_controls = [reopen, preverify, update_otmc, titan_inspection, toggle_use_inspection_destination]
       else
         instance_controls = []
         progress_controls = [preverify]
