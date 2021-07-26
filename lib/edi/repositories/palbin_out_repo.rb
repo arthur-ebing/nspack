@@ -29,7 +29,13 @@ module EdiApp
         JOIN pucs ON pucs.id = pallet_sequences.puc_id
         JOIN orchards ON orchards.id = pallet_sequences.orchard_id
         JOIN cultivar_groups ON cultivar_groups.id = pallet_sequences.cultivar_group_id
-        LEFT JOIN cultivars ON cultivars.id = pallet_sequences.cultivar_id
+        LEFT JOIN cultivars ON cultivars.id = COALESCE(
+             pallet_sequences.cultivar_id,
+             (SELECT cultivar_id
+              FROM marketing_varieties_for_cultivars
+              WHERE pallet_sequences.marketing_variety_id = marketing_varieties_for_cultivars.marketing_variety_id
+              LIMIT 1)
+             )
         JOIN grades ON grades.id = pallet_sequences.grade_id
         JOIN standard_pack_codes ON standard_pack_codes.id = pallet_sequences.standard_pack_code_id
         JOIN fruit_size_references ON fruit_size_references.id = pallet_sequences.fruit_size_reference_id
