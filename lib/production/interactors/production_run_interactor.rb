@@ -181,18 +181,16 @@ module ProductionApp
 
       pallet_sequence = find_pallet_sequence(pallet_sequence_id)
 
-      res = nil
       repo.transaction do
-        res = MesscadaApp::UpdatePalletSequence.new(pallet_sequence[:pallet_id], pallet_sequence_id, carton_quantity).call
-
-        upd = {}
+        upd = { carton_quantity: carton_quantity }
         upd[:pallet_format_id] = new_pallet_format if new_pallet_format
         upd[:cartons_per_pallet_id] = new_cartons_per_pallet_id if new_cartons_per_pallet_id
-        MesscadaApp::MesscadaRepo.new.update_pallet_sequence(pallet_sequence_id, upd) unless upd.empty?
 
+        messcada_repo.update_pallet_sequence(pallet_sequence_id, upd)
+        log_status(:pallets, pallet_sequence[:pallet_id], AppConst::PALLETIZED_SEQUENCE_UPDATED)
         log_transaction
       end
-      res
+      ok_response
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue StandardError => e
