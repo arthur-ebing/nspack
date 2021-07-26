@@ -10,7 +10,7 @@
 #            `-- Pallet sequence -> OP
 #    Batch Trailer               -> BT
 module EdiApp
-  class PoOut < BaseEdiOutService
+  class PoOut < BaseEdiOutService # rubocop:disable Metrics/ClassLength
     attr_reader :org_code, :po_repo
 
     def initialize(edi_out_transaction_id, logger)
@@ -67,6 +67,7 @@ module EdiApp
 
     def prepare_oh
       hash = build_hash_from_data(@header_rec, 'OH')
+      hash[:location_code] = AppConst::FROM_DEPOT
       add_record('OH', hash)
       @oh_count += 1
     end
