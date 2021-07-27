@@ -15,6 +15,7 @@ module MasterfilesApp
         assert_equal scanned_number[-9, 9], res.instance.formatted_number
         assert_equal 1, res.instance.pallet_id
         assert_nil res.instance.carton_label_id
+        refute res.instance.failed_scan
       end
 
       valid_18_digit_pallet_numbers.each do |scanned_number|
@@ -30,6 +31,10 @@ module MasterfilesApp
     def test_scan_pallet_empty_number_fail
       res = MesscadaApp::ScanCartonLabelOrPallet.call('')
       refute res.success, 'should fail validation'
+      assert res.instance.failed_scan
+      %i[carton_label? pallet? carton_label_id carton_id pallet_id].each do |meth|
+        assert_raises(Crossbeams::FrameworkError) { res.instance.send(meth) }
+      end
     end
 
     def test_scan_pallet_fail
