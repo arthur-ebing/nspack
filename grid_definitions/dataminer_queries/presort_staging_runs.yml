@@ -1,10 +1,13 @@
 ---
 :caption: Presort Staging Runs
-:sql: SELECT "presort_staging_runs"."id", "presort_staging_runs"."created_at", "presort_staging_runs"."uncompleted_at", fn_party_role_name(suppliers.supplier_party_role_id) as supplier,
-  "presort_staging_runs"."completed", "presort_staging_runs"."presort_unit_plant_resource_id", "plant_resources"."plant_resource_code",
-  "presort_staging_runs"."supplier_id", "presort_staging_runs"."completed_at", "presort_staging_runs"."canceled",
+:sql: SELECT "presort_staging_runs"."id", "presort_staging_runs"."created_at", "presort_staging_runs"."setup_uncompleted_at", fn_party_role_name(suppliers.supplier_party_role_id) as supplier,
+  "presort_staging_runs"."setup_completed", "presort_staging_runs"."presort_unit_plant_resource_id", "plant_resources"."plant_resource_code",
+  "presort_staging_runs"."supplier_id", "presort_staging_runs"."setup_completed_at", "presort_staging_runs"."canceled",
   "presort_staging_runs"."canceled_at", "presort_staging_runs"."staged_at", "presort_staging_runs"."cultivar_id", "presort_staging_runs"."rmt_class_id",
   "presort_staging_runs"."rmt_size_id", "presort_staging_runs"."season_id", "presort_staging_runs"."editing",
+  CASE WHEN "presort_staging_runs"."editing" is false and "presort_staging_runs"."staged" is false and "presort_staging_runs"."active" is false THEN true ELSE false END as uncomplete_setup,
+  CASE WHEN "presort_staging_runs"."setup_completed" is true and "presort_staging_runs"."active" is false and "presort_staging_runs"."staged" is false THEN true ELSE false END as activate_run,
+  CASE WHEN "presort_staging_runs"."active" is true and "presort_staging_runs"."staged" is false THEN true ELSE false END as complete_staging,
   "presort_staging_runs"."staged", "presort_staging_runs"."active", "presort_staging_runs"."legacy_data",
   "cultivars"."cultivar_name", "rmt_classes"."rmt_class_code", "rmt_sizes"."size_code",
   "seasons"."season_code", "suppliers"."id" AS suppliers_id, fn_current_status('presort_staging_runs',
@@ -226,11 +229,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  uncompleted_at:
-    :name: uncompleted_at
+  setup_uncompleted_at:
+    :name: setup_uncompleted_at
     :sequence_no: 14
     :caption: Uncompleted at
-    :namespaced_name: presort_staging_runs.uncompleted_at
+    :namespaced_name: presort_staging_runs.setup_uncompleted_at
     :data_type: :datetime
     :width:
     :format:
@@ -242,11 +245,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  completed:
-    :name: completed
+  setup_completed:
+    :name: setup_completed
     :sequence_no: 15
     :caption: Completed
-    :namespaced_name: presort_staging_runs.completed
+    :namespaced_name: presort_staging_runs.setup_completed
     :data_type: :boolean
     :width:
     :format:
@@ -258,11 +261,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  completed_at:
-    :name: completed_at
+  setup_completed_at:
+    :name: setup_completed_at
     :sequence_no: 16
     :caption: Completed at
-    :namespaced_name: presort_staging_runs.completed_at
+    :namespaced_name: presort_staging_runs.setup_completed_at
     :data_type: :datetime
     :width:
     :format:
@@ -451,7 +454,7 @@
   :ordered_list: false
   :ui_priority: 1
   :list_def:
-- :column: presort_staging_runs.completed_at
+- :column: presort_staging_runs.setup_completed_at
   :caption: Completed At
   :data_type: :datetime
   :control_type: :daterange

@@ -6,13 +6,14 @@ Sequel.migration do
       primary_key :id
       foreign_key :presort_staging_run_id, :presort_staging_runs, type: :integer, null: true
       DateTime :created_at
-      DateTime :completed_at
+      DateTime :activated_at
       DateTime :staged_at
       TrueClass :canceled, default: false
       foreign_key :farm_id, :farms, type: :integer, null: false
       TrueClass :editing, default: false
       TrueClass :staged, default: false
-      TrueClass :active, default: true
+      TrueClass :active, default: false
+      index [:farm_id, :presort_staging_run_id], name: :presort_staging_run_child_farm_id_unique, unique: true
     end
 
     pgt_created_at(:presort_staging_run_children,
