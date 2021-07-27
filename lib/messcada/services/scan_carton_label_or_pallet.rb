@@ -20,13 +20,13 @@ module MesscadaApp
 
     def call # rubocop:disable Metrics/AbcSize
       parse_params
-      return failed_response('Nothing Scanned', build_entity) if scanned_number.empty?
+      return failed_response('Nothing Scanned', build_entity(failed: true)) if scanned_number.empty?
 
       scan_mode = SCAN[mode]
       raise ArgumentError, "Scan mode \"#{mode}\" is unknown for #{self.class}." if scan_mode.nil?
 
       send(scan_mode)
-      return failed_response("Failed to find #{@mode} number: #{@scanned_number}", build_entity) unless @id
+      return failed_response("Failed to find #{@mode} number: #{@scanned_number}", build_entity(failed: true)) unless @id
 
       success_response("Successfully scanned #{@mode} number", build_entity)
     rescue Crossbeams::InfoError => e
@@ -35,9 +35,11 @@ module MesscadaApp
 
     private
 
-    def build_entity
-      ScanCartonLabelOrPalletEntity.new(
+    def build_entity(failed: false)
+      # ScanCartonLabelOrPalletEntity.new(
+      ScannedCartonOrPalletResolver.new(
         id: @id,
+        failed_scan: failed,
         pallet_was_scanned: @pallet_was_scanned,
         scanned_number: @scanned_number,
         formatted_number: @formatted_number,
