@@ -76,5 +76,19 @@ module MasterfilesApp
         .select(Sequel[:suppliers][:id], Sequel[:organizations][:medium_description])
         .map { |r| [r[:medium_description], r[:id]] }
     end
+
+    def for_presort_staging_run_supplier_farms(staging_run__id)
+      query = <<~SQL
+        SELECT
+            farms.id, farms.farm_code
+        FROM presort_staging_runs
+        JOIN suppliers ON suppliers.id=presort_staging_runs.supplier_id
+        LEFT JOIN farms ON farms.id = ANY (suppliers.farm_ids)
+        WHERE presort_staging_runs.id = ?
+      SQL
+
+      DB[query, staging_run__id]
+        .map(%i[farm_code id])
+    end
   end
 end

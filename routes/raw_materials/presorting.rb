@@ -24,6 +24,12 @@ class Nspack < Roda
         r.redirect '/list/presort_staging_runs'
       end
 
+      r.on 'activate_run' do
+        res = interactor.activate_run(id)
+        flash[res.success ? :notice : :error] = res.message
+        r.redirect '/list/presort_staging_runs'
+      end
+
       r.on 'complete_staging' do
         res = interactor.complete_staging(id)
         flash[res.success ? :notice : :error] = res.message
@@ -33,24 +39,57 @@ class Nspack < Roda
       r.on 'edit' do   # EDIT
         check_auth!('presorting', 'edit')
         interactor.assert_permission!(:edit, id)
-        show_partial { RawMaterials::Presorting::PresortStagingRun::Edit.call(id) }
+        show_partial_or_page(r) { RawMaterials::Presorting::PresortStagingRun::Edit.call(id) }
+      end
+
+      r.on 'staging_run_child' do
+        r.get do
+          show_partial_or_page(r) { RawMaterials::Presorting::PresortStagingRunChild::New.call(id, remote: fetch?(r)) }
+        end
+
+        r.post do
+          res = interactor.create_presort_staging_run_child(id, params[:presort_staging_run_child])
+          if res.success
+            row_keys = %i[
+              id
+              farm_code
+              presort_staging_run_id
+              staged_at
+              canceled
+              farm_id
+              editing
+              staged
+              status
+              active
+            ]
+            add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                         notice: res.message)
+          else
+            re_show_form(r, res, url: "/raw_materials/presorting/presort_staging_runs/#{id}/staging_run_child") do
+              RawMaterials::Presorting::PresortStagingRunChild::New.call(id,
+                                                                         form_values: params[:presort_staging_run_child],
+                                                                         form_errors: res.errors,
+                                                                         remote: fetch?(r))
+            end
+          end
+        end
       end
 
       r.is do
         r.get do       # SHOW
           check_auth!('presorting', 'read')
-          show_partial { RawMaterials::Presorting::PresortStagingRun::Show.call(id) }
+          show_partial_or_page(r) { RawMaterials::Presorting::PresortStagingRun::Show.call(id) }
         end
         r.patch do     # UPDATE
           res = interactor.update_presort_staging_run(id, params[:presort_staging_run])
           if res.success
             row_keys = %i[
               id
-              uncompleted_at
-              completed
+              setup_uncompleted_at
+              setup_completed
               presort_unit_plant_resource_id
               supplier_id
-              completed_at
+              setup_completed_at
               canceled
               canceled_at
               cultivar_id
@@ -104,11 +143,11 @@ class Nspack < Roda
         if res.success
           row_keys = %i[
             id
-            uncompleted_at
-            completed
+            setup_uncompleted_at
+            setup_completed
             presort_unit_plant_resource_id
             supplier_id
-            completed_at
+            setup_completed_at
             canceled
             canceled_at
             cultivar_id
@@ -136,6 +175,23 @@ class Nspack < Roda
                                                                   remote: fetch?(r))
           end
         end
+      end
+    end
+
+    r.on 'presort_staging_run_children', Integer do |id|
+      interactor = RawMaterialsApp::PresortStagingRunInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'activate_child_run' do
+        res = interactor.activate_child_run(id)
+        flash[res.success ? :notice : :error] = res.message
+        # show_partial_or_page(r) { RawMaterials::Presorting::PresortStagingRun::Edit.call(res.instance) }
+        r.redirect "/raw_materials/presorting/presort_staging_runs/#{res.instance}/edit"
+      end
+
+      r.on 'complete_staging' do
+        res = interactor.complete_child_staging(id)
+        flash[res.success ? :notice : :error] = res.message
+        show_partial_or_page(r) { RawMaterials::Presorting::PresortStagingRun::Edit.call(res.instance) }
       end
     end
   end

@@ -5,12 +5,13 @@ Sequel.migration do
     create_table(:presort_staging_runs, ignore_index_errors: true) do
       primary_key :id
       DateTime :created_at
-      DateTime :uncompleted_at
+      DateTime :activated_at
+      DateTime :setup_uncompleted_at
       DateTime :staged_at
-      TrueClass :completed, default: false
+      TrueClass :setup_completed, default: false
       Integer :presort_unit_plant_resource_id
       foreign_key :supplier_id, :suppliers, type: :integer, null: true
-      DateTime :completed_at
+      DateTime :setup_completed_at
       TrueClass :canceled, default: false
       DateTime :canceled_at
       foreign_key :cultivar_id, :cultivars, type: :integer, null: false
@@ -19,7 +20,7 @@ Sequel.migration do
       foreign_key :season_id, :seasons, type: :integer, null: false
       TrueClass :editing, default: false
       TrueClass :staged, default: false
-      TrueClass :active, default: true
+      TrueClass :active, default: false
       Jsonb :legacy_data
     end
 
