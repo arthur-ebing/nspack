@@ -12,7 +12,7 @@ module UiRules
       @rules[:cancel_delivery_tripheet] = @form_object.tripsheet_created && !@form_object.tripsheet_offloaded
       @rules[:print_delivery_tripheet] = @rules[:cancel_delivery_tripheet]
       @rules[:vehicle_loaded] = @form_object.tripsheet_loaded
-      @rules[:vehicle_job_id] = @repo.get_value(:vehicle_jobs, :id, rmt_delivery_id: @form_object.id)
+      @rules[:vehicle_job_id] = @repo.get_value(:vehicle_jobs, :id, rmt_delivery_id: @form_object.id) unless @form_object.id.nil?
       @rules[:refresh_tripsheet] = @form_object.tripsheet_created && !@form_object.tripsheet_offloaded && !@repo.delivery_tripsheet_discreps(@form_object.id).empty?
       @rules[:list_tripsheets] = !@form_object.tripsheet_offloaded && !@repo.delivery_tripsheets(@form_object.id).empty?
 
