@@ -62,15 +62,10 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     end
   end
 
-  def process_pallet(pallet_rows) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+  def process_pallet(pallet_rows) # rubocop:disable Metrics/AbcSize
     @pallet_errors = []
     params = {}
     pallet_id = nil
-
-    @pallet_nett_weight = 0
-    pallet_rows.each do |sequence|
-      @pallet_nett_weight += sequence.to_h['nett_weight'].to_f
-    end
 
     pallet_rows.each_with_index do |sequence, index|
       params = get_mf_ids_for_pallet(sequence.to_h)
@@ -85,8 +80,6 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
       res = create_pallet_sequence(params)
       params[:pallet_sequence_id] = res.instance
       raise Crossbeams::InfoError, "#{params[:pallet_number]}_#{params[:pallet_sequence_number]} #{res.message}" unless res.success
-
-      next if params[:depot_pallet]
 
       carton_numbers = params[:carton_numbers].split('|')
       carton_numbers.each do |carton_number|
@@ -366,7 +359,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
 
   def create_pallet(params) # rubocop:disable Metrics/AbcSize
     args = params.clone
-    args[:nett_weight] = @pallet_nett_weight.round(2)
+    args.delete(:nett_weight)
 
     res = MesscadaApp::PalletContract.new.call(args)
     return failed_response("can't create_pallet #{validation_failed_response(res).errors}") if res.failure?
