@@ -22,9 +22,9 @@ module FinishedGoodsApp
 
       return nil if hash.nil?
 
-      hash[:pallet_number] = get(:pallets, hash[:pallet_id], :pallet_number)
-      hash[:process_result] = hash[:process_result].uniq.join(' ')
-      hash[:rejection_reasons] = hash[:rejection_reasons].uniq.join(' ')
+      hash[:pallet_number]      = get(:pallets, hash[:pallet_id], :pallet_number)
+      hash[:process_result]     = Array(hash[:process_result]).uniq.join(' ')
+      hash[:rejection_reasons]  = Array(hash[:rejection_reasons]).uniq.join(' ')
       EcertTrackingUnit.new(hash)
     end
 
