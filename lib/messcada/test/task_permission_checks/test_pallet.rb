@@ -5,7 +5,7 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 module MesscadaApp
   class TestPalletPermission < MiniTestWithHooks
     include Crossbeams::Responses
-    include PalletFactory
+    include MesscadaApp::PalletFactory
     include MasterfilesApp::PackagingFactory
     include ProductionApp::ResourceFactory
     include MasterfilesApp::LocationFactory
