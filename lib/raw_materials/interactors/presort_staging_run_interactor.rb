@@ -3,7 +3,7 @@
 module RawMaterialsApp
   class PresortStagingRunInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_presort_staging_run(params) # rubocop:disable Metrics/AbcSize
-      params[:season_id] = MasterfilesApp::CalendarRepo.new.get_season_id(params[:cultivar_id], Time.now)
+      params[:season_id] = MasterfilesApp::CalendarRepo.new.get_season_id(params[:cultivar_id], Time.now) unless params[:cultivar_id].nil_or_empty?
       params[:editing] = true
       params[:legacy_data] = { ripe_point_code: params[:ripe_point_code], track_indicator_code: params[:track_indicator_code] } if AppConst::CLIENT_CODE == 'kr'
       res = validate_presort_staging_run_params(params)
@@ -24,8 +24,7 @@ module RawMaterialsApp
     end
 
     def update_presort_staging_run(id, params) # rubocop:disable Metrics/AbcSize
-      params[:season_id] = MasterfilesApp::CalendarRepo.new.get_season_id(params[:cultivar_id], Time.now)
-      # params[:editing] = true
+      params[:season_id] = MasterfilesApp::CalendarRepo.new.get_season_id(params[:cultivar_id], Time.now) unless params[:cultivar_id].nil_or_empty?
       params[:legacy_data] = { ripe_point_code: params[:ripe_point_code], track_indicator_code: params[:track_indicator_code] } if AppConst::CLIENT_CODE == 'kr'
       res = validate_presort_staging_run_params(params)
       return validation_failed_response(res) if res.failure?

@@ -11,7 +11,7 @@
     :icon: edit
     :title: Edit
     :popup: false
-    :hide_if_true: completed
+    :hide_if_false: can_edit
   - :url: "/raw_materials/presorting/presort_staging_runs/$:id$/complete_setup"
     :text: complete setup
     :icon: minus-outline
