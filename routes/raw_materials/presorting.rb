@@ -50,20 +50,8 @@ class Nspack < Roda
         r.post do
           res = interactor.create_presort_staging_run_child(id, params[:presort_staging_run_child])
           if res.success
-            row_keys = %i[
-              id
-              farm_code
-              presort_staging_run_id
-              staged_at
-              canceled
-              farm_id
-              editing
-              staged
-              status
-              active
-            ]
-            add_grid_row(attrs: select_attributes(res.instance, row_keys),
-                         notice: res.message)
+            flash[:notice] = res.message
+            redirect_via_json "/raw_materials/presorting/presort_staging_runs/#{id}/edit"
           else
             re_show_form(r, res, url: "/raw_materials/presorting/presort_staging_runs/#{id}/staging_run_child") do
               RawMaterials::Presorting::PresortStagingRunChild::New.call(id,
@@ -83,34 +71,12 @@ class Nspack < Roda
         r.patch do     # UPDATE
           res = interactor.update_presort_staging_run(id, params[:presort_staging_run])
           if res.success
-            row_keys = %i[
-              id
-              setup_uncompleted_at
-              setup_completed
-              presort_unit_plant_resource_id
-              supplier_id
-              setup_completed_at
-              canceled
-              canceled_at
-              cultivar_id
-              rmt_class_id
-              rmt_size_id
-              season_id
-              editing
-              staged
-              active
-              legacy_data
-              status
-              plant_resource_code
-              cultivar_name
-              rmt_class_code
-              size_code
-              season_code
-              supplier
-            ]
-            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+            flash[:notice] = res.message
+            r.redirect "/raw_materials/presorting/presort_staging_runs/#{id}/edit"
           else
-            re_show_form(r, res) { RawMaterials::Presorting::PresortStagingRun::Edit.call(id, form_values: params[:presort_staging_run], form_errors: res.errors) }
+            re_show_form(r, res, url: "/raw_materials/presorting/presort_staging_runs/#{id}/edit") do
+              RawMaterials::Presorting::PresortStagingRun::Edit.call(id, form_values: params[:presort_staging_run], form_errors: res.errors)
+            end
           end
         end
         r.delete do    # DELETE
@@ -141,33 +107,7 @@ class Nspack < Roda
       r.post do        # CREATE
         res = interactor.create_presort_staging_run(params[:presort_staging_run])
         if res.success
-          row_keys = %i[
-            id
-            setup_uncompleted_at
-            setup_completed
-            presort_unit_plant_resource_id
-            supplier_id
-            setup_completed_at
-            canceled
-            canceled_at
-            cultivar_id
-            rmt_class_id
-            rmt_size_id
-            season_id
-            editing
-            staged
-            active
-            legacy_data
-            status
-            plant_resource_code
-            cultivar_name
-            rmt_class_code
-            size_code
-            season_code
-            supplier
-          ]
-          add_grid_row(attrs: select_attributes(res.instance, row_keys),
-                       notice: res.message)
+          redirect_via_json '/list/presort_staging_runs'
         else
           re_show_form(r, res, url: '/raw_materials/presorting/presort_staging_runs/new') do
             RawMaterials::Presorting::PresortStagingRun::New.call(form_values: params[:presort_staging_run],
@@ -184,7 +124,6 @@ class Nspack < Roda
       r.on 'activate_child_run' do
         res = interactor.activate_child_run(id)
         flash[res.success ? :notice : :error] = res.message
-        # show_partial_or_page(r) { RawMaterials::Presorting::PresortStagingRun::Edit.call(res.instance) }
         r.redirect "/raw_materials/presorting/presort_staging_runs/#{res.instance}/edit"
       end
 
