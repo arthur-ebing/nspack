@@ -7,8 +7,7 @@ module UiRules
       make_form_object
       apply_form_values
 
-      common_values_for_fields common_fields unless %i[show].include? @mode
-
+      common_values_for_fields common_fields
       set_show_fields if %i[show].include? @mode
       add_behaviours
       form_name 'order_item'
@@ -16,7 +15,7 @@ module UiRules
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
       fields[:order_id] = { renderer: :label }
-      fields[:load_id] = { renderer: :label }
+      fields[:loads] = { renderer: :label }
       fields[:commodity] = { renderer: :label }
       fields[:basic_pack] = { renderer: :label }
       fields[:standard_pack] = { renderer: :label }
@@ -27,8 +26,10 @@ module UiRules
       fields[:marketing_variety] = { renderer: :label }
       fields[:inventory] = { renderer: :label }
       fields[:carton_quantity] = { renderer: :label }
-      fields[:price_per_carton] = { renderer: :label }
-      fields[:price_per_kg] = { renderer: :label }
+      fields[:price_per_carton] = { renderer: :label,
+                                    hide_on_load: @form_object.pricing_per_kg }
+      fields[:price_per_kg] = { renderer: :label,
+                                hide_on_load: !@form_object.pricing_per_kg }
       fields[:sell_by_code] = { renderer: :label }
       fields[:pallet_format] = { renderer: :label }
       fields[:pkg_mark] = { renderer: :label,
@@ -51,8 +52,7 @@ module UiRules
                     required: true },
         load_id: { renderer: :select,
                    options: FinishedGoodsApp::LoadRepo.new.for_select_loads(
-                     where: { order_id: @form_object.order_id },
-                     active: true
+                     where: { order_id: @form_object.order_id }
                    ),
                    disabled_options: FinishedGoodsApp::LoadRepo.new.for_select_loads(active: false),
                    caption: 'Load',
@@ -114,8 +114,8 @@ module UiRules
                         caption: 'Inventory Code',
                         prompt: true },
         carton_quantity: { required: true },
-        price_per_carton: {},
-        price_per_kg: {},
+        price_per_carton: { hide_on_load: @form_object.pricing_per_kg },
+        price_per_kg: { hide_on_load: !@form_object.pricing_per_kg },
         sell_by_code: {},
         pallet_format_id: { renderer: :select,
                             options: MasterfilesApp::PackagingRepo.new.for_select_pallet_formats,
@@ -136,12 +136,6 @@ module UiRules
                         options: MasterfilesApp::FruitRepo.new.for_select_rmt_classes,
                         disabled_options: MasterfilesApp::FruitRepo.new.for_select_inactive_rmt_classes,
                         caption: 'RMT Class',
-                        prompt: true },
-        treatment_id: { renderer: :select,
-                        options: MasterfilesApp::FruitRepo.new.for_select_treatments,
-                        disabled_options: MasterfilesApp::FruitRepo.new.for_select_inactive_treatments,
-                        caption: 'Treatment',
-                        hide_on_load: true,
                         prompt: true }
       }
     end
@@ -157,6 +151,7 @@ module UiRules
 
     def make_new_form_object
       @form_object = OpenStruct.new(order_id: nil,
+                                    load_id: nil,
                                     commodity_id: nil,
                                     basic_pack_id: nil,
                                     standard_pack_id: nil,
@@ -173,8 +168,7 @@ module UiRules
                                     pallet_format_id: nil,
                                     pm_mark_id: nil,
                                     pm_bom_id: nil,
-                                    rmt_class_id: nil,
-                                    treatment_id: nil)
+                                    rmt_class_id: nil)
     end
 
     def handle_behaviour

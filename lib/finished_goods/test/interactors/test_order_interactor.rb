@@ -110,6 +110,7 @@ module FinishedGoodsApp
         marketing_org_party_role_id: marketing_org_party_role_id,
         marketing_org: 'ABC',
         allocated: false,
+        shipping: false,
         shipped: false,
         completed: false,
         completed_at: '2010-01-01 12:00',

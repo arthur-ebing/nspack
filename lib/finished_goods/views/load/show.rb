@@ -39,7 +39,6 @@ module FinishedGoods
                   row.column do |col|
                     col.add_field :id
                     col.add_field :load_id
-                    col.add_field :order_id
                     col.add_field :order_number
                     col.add_field :customer_order_number
                     col.add_field :customer_reference
