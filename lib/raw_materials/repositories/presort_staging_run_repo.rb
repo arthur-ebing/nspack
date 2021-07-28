@@ -66,5 +66,14 @@ module RawMaterialsApp
 
       PresortStagingRunChildFlat.new(hash)
     end
+
+    def presort_staging_run_completed_or_staged?(presort_staging_run_id)
+      !DB[:presort_staging_run_children]
+        .where(staged: true)
+        .or(active: true)
+        .where(presort_staging_run_id: presort_staging_run_id)
+        .all
+        .empty?
+    end
   end
 end

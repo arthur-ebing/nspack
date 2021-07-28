@@ -36,7 +36,6 @@ module RawMaterials
                     col.add_field :setup_uncompleted_at
                     col.add_field :setup_completed
                     col.add_field :setup_completed_at
-                    # col.add_field :legacy_data
                   end
                 end
               end
@@ -44,7 +43,7 @@ module RawMaterials
 
             page.section do |section|
               section.add_grid('presort_staging_run_children',
-                               "/list/presort_staging_run_children/grid?key=standard&staging_run_id=#{id}",
+                               "/list/presort_staging_run_children_view/grid?key=standard&staging_run_id=#{id}",
                                caption: 'Run Children')
             end
           end

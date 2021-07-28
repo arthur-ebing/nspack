@@ -16,7 +16,7 @@ module RawMaterials
               section.form do |form|
                 form.caption 'Edit Presort Staging Run'
                 form.action "/raw_materials/presorting/presort_staging_runs/#{id}"
-                form.remote!
+                # form.remote!
                 form.method :update
                 form.add_field :presort_unit_plant_resource_id
                 form.add_field :supplier_id
