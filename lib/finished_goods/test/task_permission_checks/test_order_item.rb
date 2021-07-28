@@ -13,7 +13,7 @@ module FinishedGoodsApp
         order_id: 1,
         order: 1,
         load_id: 1,
-        load: 1,
+        loads: [1],
         packed_tm_group_id: 1,
         marketing_org_party_role_id: 1,
         target_customer_party_role_id: 1,
@@ -47,8 +47,7 @@ module FinishedGoodsApp
         pkg_bom: 'ABC',
         rmt_class_id: 1,
         rmt_class: 'ABC',
-        treatment_id: 1,
-        treatment: 'ABC',
+        pricing_per_kg: true,
         active: true
       }
       FinishedGoodsApp::OrderItem.new(base_attrs.merge(attrs))

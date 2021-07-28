@@ -27,6 +27,7 @@ module FinishedGoods
                   col.add_field :deal_type_id
                   col.add_field :incoterm_id
                   col.add_field :customer_payment_term_set_id
+                  col.add_field :commit
                 end
                 row.column do |col|
                   col.add_field :target_customer_party_role_id

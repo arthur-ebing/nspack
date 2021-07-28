@@ -63,6 +63,7 @@ module UiRules
                          disabled_options: @finance_repo.for_select_inactive_order_types,
                          caption: 'Order Type',
                          prompt: true,
+                         min_charwidth: 35,
                          required: true },
         customer_party_role_id: { renderer: :select,
                                   options: @party_repo.for_select_party_roles(AppConst::ROLE_CUSTOMER),
@@ -117,6 +118,7 @@ module UiRules
                                          options: @party_repo.for_select_party_roles(AppConst::ROLE_TARGET_CUSTOMER),
                                          disabled_options: @party_repo.for_select_inactive_party_roles(AppConst::ROLE_TARGET_CUSTOMER),
                                          prompt: true,
+                                         min_charwidth: 35,
                                          caption: 'Target Customer' },
         exporter_party_role_id: { renderer: :select,
                                   options: @party_repo.for_select_party_roles(AppConst::ROLE_EXPORTER),
@@ -146,7 +148,11 @@ module UiRules
         internal_order_number: {},
         remarks: {},
         load_id: { hide_on_load: true },
-        pricing_per_kg: { renderer: :checkbox }
+        pricing_per_kg: { renderer: :checkbox },
+        commit: { renderer: :checkbox,
+                  caption: 'Confirm action!',
+                  hide_on_load: @form_object.to_h[:commit].nil?,
+                  as_boolean: true }
       }
     end
 
@@ -199,9 +205,9 @@ module UiRules
     private
 
     def add_progress_step
-      steps = ['Allocate Loads', 'Finished Allocating', 'Shipped', 'Finished']
+      steps = ['Allocate Loads', 'Started Shipping', 'Shipped', 'Finished']
       step = 0
-      step = 1 if @form_object.allocated
+      step = 1 if @form_object.shipping
       step = 2 if @form_object.shipped
       step = 3 if @form_object.completed
 
@@ -219,6 +225,7 @@ module UiRules
                text: 'Edit',
                url: "/finished_goods/orders/orders/#{id}/edit",
                prompt: 'Are you sure, you want to edit this order?',
+               behaviour: :popup,
                icon: :edit }
       delete = { control_type: :link,
                  style: :action_button,
@@ -226,15 +233,11 @@ module UiRules
                  url: "/finished_goods/orders/orders/#{id}/delete",
                  prompt: 'Are you sure, you want to delete this order?',
                  icon: :checkoff }
-      create_load = { control_type: :link,
-                      style: :action_button,
-                      text: 'New Load',
-                      url: "/finished_goods/orders/orders/#{id}/create_load" }
-      close = { control_type: :link,
-                style: :action_button,
-                text: 'Close Order',
-                url: "/finished_goods/orders/orders/#{id}/close",
-                icon: :checkon }
+      complete = { control_type: :link,
+                   style: :action_button,
+                   text: 'Close Order',
+                   url: "/finished_goods/orders/orders/#{id}/close",
+                   icon: :checkon }
       reopen = { control_type: :link,
                  style: :action_button,
                  text: 'Reopen Order',
@@ -249,16 +252,16 @@ module UiRules
       case @form_object.step
       when 0
         instance_controls = [back, edit, delete]
-        progress_controls = [create_load, refresh_order_lines, close]
+        progress_controls = [refresh_order_lines]
       when 1
         instance_controls = [back]
-        progress_controls = [reopen]
+        progress_controls = [refresh_order_lines]
       when 2
         instance_controls = [back]
-        progress_controls = []
+        progress_controls = [complete]
       when 3
         instance_controls = [back]
-        progress_controls = []
+        progress_controls = [reopen]
       else
         instance_controls = [back]
         progress_controls = []

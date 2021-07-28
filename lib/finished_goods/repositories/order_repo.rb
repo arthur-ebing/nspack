@@ -20,9 +20,10 @@ module FinishedGoodsApp
                           value: :id,
                           order_by: :sell_by_code
 
+    crud_calls_for :orders, name: :order, exclude: %i[create update]
     crud_calls_for :order_items, name: :order_item, exclude: [:delete]
 
-    def find_order(id)
+    def find_order(id) # rubocop:disable Metrics/AbcSize
       hash = find_with_association(
         :orders, id,
         parent_tables: [
@@ -49,6 +50,7 @@ module FinishedGoodsApp
       )
       return nil if hash.nil?
 
+      hash[:shipping] = DB[:orders_loads].join(:loads, id: :load_id).select_map(:shipped).any?
       hash[:order_id] = id
       hash[:order_number] = hash[:internal_order_number]
       hash[:contact_person_ids] = get_value(:customers, :contact_person_ids, customer_party_role_id: hash[:customer_party_role_id])
@@ -91,9 +93,7 @@ module FinishedGoodsApp
           { parent_table: :pm_marks, foreign_key: :pm_mark_id,
             flatten_columns: { description: :pkg_mark } },
           { parent_table: :rmt_classes, foreign_key: :rmt_class_id,
-            flatten_columns: { rmt_class_code: :rmt_class } },
-          { parent_table: :treatments, foreign_key: :treatment_id,
-            flatten_columns: { treatment_code: :treatment } }
+            flatten_columns: { rmt_class_code: :rmt_class } }
         ],
         lookup_functions: [
           { function: :fn_current_status, args: ['order_items', :id], col_name: :status }
@@ -101,6 +101,10 @@ module FinishedGoodsApp
       )
       return nil if hash.nil?
 
+      pallet_ids = select_values(:pallet_sequences, :pallet_id, order_item_id: id)
+      hash[:loads] = select_values(:pallets, :load_id, id: pallet_ids).uniq
+      hash[:load_id] = hash[:loads].first
+      hash[:pricing_per_kg] = get(:orders, hash[:order_id], :pricing_per_kg)
       OrderItem.new(hash)
     end
 
@@ -114,16 +118,14 @@ module FinishedGoodsApp
 
     def update_order(id, res)
       attrs = res.to_h
-      load_ids = select_values(:orders_loads, :load_id, order_id: id)
+      load_ids = select_values(:orders_loads, :load_id, order_id: id).uniq
       load_attrs = { customer_party_role_id: attrs[:customer_party_role_id],
                      exporter_party_role_id: attrs[:exporter_party_role_id],
                      final_receiver_party_role_id: attrs[:final_receiver_party_role_id],
                      customer_order_number: attrs[:customer_order_number],
-                     order_number: attrs[:internal_order_number] }
+                     order_number: attrs[:internal_order_number] }.compact
 
-      load_ids.each do |load_id|
-        LoadRepo.new.update_load(load_id, load_attrs)
-      end
+      LoadRepo.new.update_load(load_ids, load_attrs) unless load_attrs.empty?
 
       update(:orders, id, attrs)
     end
@@ -134,7 +136,7 @@ module FinishedGoodsApp
     end
 
     def delete_order_item(id)
-      DB[:order_items_pallet_sequences].where(order_item_id: id).delete
+      DB[:pallet_sequences].where(order_item_id: id).update(order_item_id: nil)
       delete(:order_items, id)
     end
 
@@ -144,7 +146,7 @@ module FinishedGoodsApp
       case params[:column_name]
       when *inline_columns
         column = params[:column_name]
-        value = params[:column_value]
+        value = params[:column_value].empty? ? nil : params[:column_value]
       else
         raise Crossbeams::InfoError, "There is no handler for changed column #{params[:column_name]}"
       end
@@ -152,10 +154,9 @@ module FinishedGoodsApp
       update(:order_items, id, { column => value })
     end
 
-    def allocate_to_order_item(id, allocate_pallet_ids, user)
-      load_id = get(:order_items, id, :load_id)
-      pallet_sequence_ids = select_values(:order_items_pallet_sequences, :pallet_sequence_id, order_item_id: id)
-      current_allocation = select_values(:pallet_sequences, :pallet_number, id: pallet_sequence_ids)
+    def allocate_to_order_item(id, load_id, allocate_pallet_ids, user)
+      current_order_item_pallets = select_values(:pallet_sequences, :pallet_id, order_item_id: id).uniq
+      current_allocation = select_values(:pallets, :pallet_number, id: current_order_item_pallets, load_id: load_id)
       new_allocation = select_values(:pallets, :pallet_number, id: allocate_pallet_ids)
 
       LoadRepo.new.unallocate_pallets(current_allocation - new_allocation, user)
@@ -163,10 +164,17 @@ module FinishedGoodsApp
       FinishedGoodsApp::ProcessOrderLines.call(user, load_id: load_id)
     end
 
-    def find_pallets_for_order_item(id) # rubocop:disable Metrics/AbcSize
-      order_item = find_order_item(id)
+    def find_pallets_for_order_items(order_item_ids, load_id)
+      pallet_ids = []
+      Array(order_item_ids).each { |order_item_id| pallet_ids += find_pallets_for_order_item(order_item_id, load_id) }
+      pallet_ids.uniq
+    end
+
+    def find_pallets_for_order_item(order_item_id, load_id) # rubocop:disable Metrics/AbcSize
+      order_item = find_order_item(order_item_id)
+      return nil unless order_item
+
       params = {
-        load_id: order_item.load_id,
         packed_tm_group_id: order_item.packed_tm_group_id,
         marketing_org_party_role_id: order_item.marketing_org_party_role_id,
         target_customer_party_role_id: order_item.target_customer_party_role_id,
@@ -186,20 +194,18 @@ module FinishedGoodsApp
         rmt_class_id: order_item.rmt_class_id
       }
 
-      load_id = params.delete(:load_id)
-
       pallet_ids = DB[:pallet_sequences]
                    .join(:cultivar_groups, id: :cultivar_group_id)
                    .join(:commodities, id: Sequel[:cultivar_groups][:commodity_id])
                    .left_join(:cultivars, id: Sequel[:pallet_sequences][:cultivar_id])
                    .where(params.compact)
+                   .where(Sequel.lit("(order_item_id is null OR order_item_id = #{order_item_id})"))
                    .select_map(:pallet_id)
 
-      ids = DB[:pallets]
-            .where(in_stock: true, id: pallet_ids)
-            .where(Sequel.lit("load_id is null OR load_id = #{load_id}"))
-            .distinct.select_map(:id) + [0]
-      [load_id, ids]
+      DB[:pallets]
+        .where(in_stock: true, id: pallet_ids)
+        .where(Sequel.lit("(load_id is null OR load_id = #{load_id})"))
+        .distinct.select_map(:id) + [0]
     end
   end
 end
