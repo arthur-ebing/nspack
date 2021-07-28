@@ -13,6 +13,7 @@ module FinishedGoodsApp
     include MasterfilesApp::VesselFactory
     include MasterfilesApp::PortFactory
     include FinishedGoodsApp::VoyageFactory
+    include FinishedGoodsApp::PalletHoldoverFactory
 
     include MesscadaApp::PalletFactory
     include MasterfilesApp::PackagingFactory
@@ -51,7 +52,7 @@ module FinishedGoodsApp
       create_pallet_sequence(pallet_id: pallet_id, order_item_id: order_item_id, carton_quantity: 10)
 
       res = ShipLoad.call(load_id, current_user)
-      assert res.success, 'Should ship load'
+      assert res.success, res.message
       assert repo.get(:loads, load_id, :shipped), 'Should Ship Load'
       assert repo.get(:orders, order_id, :shipped), 'Should Ship Order'
     end
@@ -69,7 +70,7 @@ module FinishedGoodsApp
       create_pallet_sequence(pallet_id: pallet_id, order_item_id: order_item_id, carton_quantity: 10)
 
       res = ShipLoad.call(load_id, current_user)
-      assert res.success, 'Should ship Load'
+      assert res.success, res.message
       assert repo.get(:loads, load_id, :shipped), 'Should ship Load'
       refute repo.get(:orders, order_id, :shipped), 'Should not ship Order'
     end
@@ -82,8 +83,35 @@ module FinishedGoodsApp
       create_pallet_sequence(pallet_id: pallet_id)
 
       res = ShipLoad.call(load_id, current_user)
-      refute res.success, 'Should not ship Load'
+      refute res.success, res.message
       assert !repo.get(:loads, load_id, :shipped), 'Load should not be shipped'
+    end
+
+    def test_ship_load_with_holdover_fail
+      load_id = create_load(allocated: true)
+
+      location_id = create_location(force_create: true)
+      pallet_id = create_pallet(load_id: load_id, location_id: location_id)
+      create_pallet_sequence(pallet_id: pallet_id)
+      create_pallet_holdover(pallet_id: pallet_id)
+
+      res = ShipLoad.call(load_id, current_user)
+      refute res.success, res.message
+      assert !repo.get(:loads, load_id, :shipped), 'Load should not be shipped'
+    end
+
+    def test_ship_load_with_holdover_pass
+      load_id = create_load(allocated: true, loaded: true)
+      create_load_vehicle(load_id: load_id)
+
+      location_id = create_location(force_create: true)
+      pallet_id = create_pallet(load_id: load_id, location_id: location_id)
+      create_pallet_sequence(pallet_id: pallet_id)
+      create_pallet_holdover(pallet_id: pallet_id, completed: true)
+
+      res = ShipLoad.call(load_id, current_user)
+      assert res.success, res.message
+      assert repo.get(:loads, load_id, :shipped), 'Load should be shipped'
     end
   end
 end

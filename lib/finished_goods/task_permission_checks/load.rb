@@ -119,6 +119,7 @@ module FinishedGoodsApp
         return failed_response("Load: #{id} requires a temp tail to be set") unless temp_tail?
         return failed_response("Load: #{id} associated order not completed") unless order_completed?
         return failed_response "Pallet: #{rmt_palbin_doesnt_have_cultivar.join(', ')}, do not have Cultivars, Only applicable for RMT loads." unless rmt_palbin_doesnt_have_cultivar.empty?
+        return failed_response "Pallet: #{pallets_with_uncompleted_hold_over.join(', ')}, has uncompleted holdovers." unless pallets_with_uncompleted_hold_over.empty?
 
         all_ok
       end
@@ -153,6 +154,10 @@ module FinishedGoodsApp
       def rmt_palbin_doesnt_have_cultivar
         pallet_ids = repo.select_values(:pallets, :id, load_id: id)
         DB[:pallet_sequences].where(pallet_id: pallet_ids, cultivar_id: nil).select_map(:pallet_number).uniq
+      end
+
+      def pallets_with_uncompleted_hold_over
+        DB[:pallet_holdovers].join(:pallets, id: :pallet_id).where(load_id: id, completed: false).select_map(:pallet_number)
       end
 
       def order_completed?

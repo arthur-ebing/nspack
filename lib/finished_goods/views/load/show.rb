@@ -185,8 +185,9 @@ module FinishedGoods
               form.submit_captions 'Close'
             end
             page.section do |section|
-              section.add_grid('stock_pallets',
-                               "/list/stock_pallets/grid?key=on_load&load_id=#{id}",
+              section.add_grid('stock_pallets_for_loads',
+                               "/list/stock_pallets_for_loads/grid?key=on_load&load_id=#{id}",
+                               colour_key: UtilityFunctions.colour_key_for_list('stock_pallets_for_loads'),
                                caption: 'Load Pallets',
                                height: 40)
             end
