@@ -64,8 +64,36 @@ class Nspack < Roda
         end
       end
 
+      r.on 'load', Integer do |load_id|
+        r.on 'grid' do
+          order_item_interactor = FinishedGoodsApp::OrderItemInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+          order_item_interactor.stock_pallets_grid(params[:order_item_ids].split(','), load_id)
+        rescue StandardError => e
+          show_json_exception(e)
+        end
+
+        r.on 'order_items' do
+          r.get do  # SHOW
+            check_auth!('dispatch', 'edit')
+            interactor.assert_permission!(:edit, id)
+            show_partial_or_page(r) { FinishedGoods::Orders::Order::OrderItems.call(order_id: id, load_id: load_id) }
+          end
+          r.post do
+            show_partial_or_page(r) { FinishedGoods::Orders::Order::Allocate.call(id, load_id: load_id, order_item_ids: multiselect_grid_choices(params)) }
+          end
+        end
+
+        r.on 'allocate' do
+          interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+          pallet_numbers = BaseRepo.new.select_values(:pallets, :pallet_number, id: multiselect_grid_choices(params)).uniq
+          res = interactor.allocate_multiselect(load_id, pallet_numbers)
+          flash[res.success ? :notice : :error] = res.message
+          r.redirect request.referer
+        end
+      end
+
       r.on 'order_items_grid' do
-        interactor.order_items_grid(id)
+        interactor.order_items_grid(id, params)
       rescue StandardError => e
         show_json_exception(e)
       end
@@ -80,7 +108,11 @@ class Nspack < Roda
           if res.success
             redirect_via_json "/finished_goods/orders/orders/#{id}"
           else
-            re_show_form(r, res) { FinishedGoods::Orders::Order::Edit.call(id, form_values: params[:order], form_errors: res.errors) }
+            re_show_form(r, res) do
+              FinishedGoods::Orders::Order::Edit.call(id,
+                                                      form_values: params[:order].to_h.merge(res.instance.slice(:commit)),
+                                                      form_errors: res.errors)
+            end
           end
         end
       end
@@ -101,6 +133,7 @@ class Nspack < Roda
       r.post do        # CREATE
         res = interactor.create_order(params[:order])
         if res.success
+          flash[:notice] = res.message
           redirect_via_json "/finished_goods/orders/orders/#{res.instance.id}"
         else
           re_show_form(r, res, url: '/finished_goods/orders/orders/new') do
@@ -135,6 +168,7 @@ class Nspack < Roda
             carton_quantity
             price_per_carton
             price_per_kg
+            colour_rule
           ]
           update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
         else
@@ -142,9 +176,9 @@ class Nspack < Roda
         end
       end
 
-      r.on 'allocate' do
+      r.on 'allocate', Integer do |load_id|
         r.on 'grid' do
-          interactor.allocate_grid(id)
+          interactor.stock_pallets_grid(id, load_id)
         rescue StandardError => e
           show_json_exception(e)
         end
@@ -152,17 +186,28 @@ class Nspack < Roda
         r.get do  # SHOW
           check_auth!('dispatch', 'edit')
           interactor.assert_permission!(:edit, id)
-          show_partial_or_page(r) { FinishedGoods::Orders::OrderItem::Allocate.call(id) }
+          show_partial_or_page(r) { FinishedGoods::Orders::OrderItem::Allocate.call(id, load_id) }
         end
 
         r.post do # UPDATE
-          res = interactor.allocate_to_order_item(id, multiselect_grid_choices(params))
+          res = interactor.allocate_to_order_item(id, load_id, multiselect_grid_choices(params))
           if res.success
             flash[:notice] = res.message
             r.redirect "/finished_goods/orders/orders/#{res.instance.order_id}"
           else
-            re_show_form(r, res, url: request.fullpath) { FinishedGoods::Orders::OrderItem::Allocate.call(id) }
+            re_show_form(r, res, url: request.fullpath) { FinishedGoods::Orders::OrderItem::Allocate.call(id, load_id) }
           end
+        end
+      end
+
+      r.on 'allocate' do
+        r.get do  # SHOW
+          check_auth!('dispatch', 'edit')
+          interactor.assert_permission!(:edit, id)
+          show_partial_or_page(r) { FinishedGoods::Orders::OrderItem::Load.call(id) }
+        end
+        r.post do
+          r.redirect "/finished_goods/orders/order_items/#{id}/allocate/#{params[:order_item][:load_id]}"
         end
       end
 
@@ -206,12 +251,14 @@ class Nspack < Roda
               pkg_bom
               rmt_class_id
               rmt_class
-              treatment_id
-              treatment
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
-            re_show_form(r, res) { FinishedGoods::Orders::OrderItem::Edit.call(id, form_values: params[:order_item], form_errors: res.errors) }
+            re_show_form(r, res) do
+              FinishedGoods::Orders::OrderItem::Edit.call(id,
+                                                          form_values: params[:order_item],
+                                                          form_errors: res.errors)
+            end
           end
         end
         r.delete do    # DELETE

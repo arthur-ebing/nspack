@@ -51,10 +51,10 @@ module FinishedGoods
               section.add_control(control_type: :link,
                                   text: 'New Load',
                                   url: "/finished_goods/orders/orders/#{id}/create_load",
-                                  visible: !ui_rule.form_object.allocated,
+                                  visible: !ui_rule.form_object.completed,
                                   style: :button)
-              section.add_grid('loads',
-                               "/list/loads/grid?key=order&order_id=#{id}",
+              section.add_grid('loads_orders',
+                               "/list/loads_orders/grid?key=order&order_id=#{id}",
                                caption: 'Loads',
                                height: 10)
             end
@@ -73,7 +73,7 @@ module FinishedGoods
               section.add_control(control_type: :link,
                                   text: 'New Order Item',
                                   url: "/finished_goods/orders/order_items/new?order_id=#{id}",
-                                  visible: !ui_rule.form_object.allocated,
+                                  visible: !ui_rule.form_object.shipped,
                                   behaviour: :popup,
                                   style: :button)
               section.add_grid('order_items',

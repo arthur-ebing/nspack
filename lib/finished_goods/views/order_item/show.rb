@@ -16,7 +16,6 @@ module FinishedGoods
               form.row do |row|
                 row.column do |col|
                   col.add_field :order_id
-                  col.add_field :load_id
                   col.add_field :commodity
                   col.add_field :basic_pack
                   col.add_field :standard_pack
@@ -24,19 +23,18 @@ module FinishedGoods
                   col.add_field :size_reference
                   col.add_field :grade
                   col.add_field :mark
-                  col.add_field :marketing_variety
-                end
-                row.column do |col|
-                  col.add_field :inventory
                   col.add_field :carton_quantity
                   col.add_field :price_per_carton
                   col.add_field :price_per_kg
+                end
+                row.column do |col|
+                  col.add_field :marketing_variety
+                  col.add_field :inventory
                   col.add_field :sell_by_code
                   col.add_field :pallet_format
                   col.add_field :pkg_mark
                   col.add_field :pkg_bom
                   col.add_field :rmt_class
-                  col.add_field :treatment
                   col.add_field :active
                 end
               end

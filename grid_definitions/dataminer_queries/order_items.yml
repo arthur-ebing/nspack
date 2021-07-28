@@ -1,46 +1,50 @@
 ---
-:caption: Orders Items
+:caption: Order Items
 :sql: "WITH allocated_sequences AS (\r\n    SELECT\r\n        order_item_id,\r\n        load_id,\r\n
   \       ARRAY_AGG(DISTINCT pallet_sequences.pallet_id) AS pallet_ids,\r\n        ARRAY_AGG(DISTINCT
   pallet_sequences.pallet_number) AS pallet_numbers,\r\n        SUM(pallet_sequences.carton_quantity)
-  AS allocated_carton_quantity\r\n    FROM order_items_pallet_sequences\r\n    JOIN
-  pallet_sequences ON pallet_sequences.id = order_items_pallet_sequences.pallet_sequence_id\r\n
-  \   JOIN pallets ON pallets.id = pallet_sequences.pallet_id\r\n\r\n    GROUP BY
-  order_item_id,\r\n             load_id\r\n)\r\nSELECT\r\n    order_items.id,\r\n
-  \   order_items.order_id,\r\n    orders.packed_tm_group_id,\r\n    orders.marketing_org_party_role_id,\r\n
-  \   orders.target_customer_party_role_id,\r\n    order_items.carton_quantity,\r\n
-  \   allocated_sequences.allocated_carton_quantity,\r\n    order_items.price_per_carton,\r\n
-  \   order_items.price_per_kg,\r\n    allocated_sequences.pallet_ids,\r\n    allocated_sequences.pallet_numbers,\r\n
-  \   order_items.load_id,\r\n    order_items.commodity_id,\r\n    order_items.basic_pack_id,\r\n
-  \   order_items.standard_pack_id,\r\n    order_items.actual_count_id,\r\n    order_items.size_reference_id,\r\n
-  \   order_items.inventory_id,\r\n    order_items.grade_id,\r\n    order_items.mark_id,\r\n
-  \   order_items.marketing_variety_id,\r\n    order_items.sell_by_code,\r\n    order_items.pallet_format_id,\r\n
-  \   order_items.pm_mark_id,\r\n    order_items.pm_bom_id,\r\n    order_items.rmt_class_id,\r\n
-  \   fruit_actual_counts_for_packs.actual_count_for_pack AS actual_count,\r\n    basic_pack_codes.basic_pack_code
-  AS basic_pack,\r\n    standard_pack_codes.standard_pack_code AS standard_pack,\r\n
-  \   commodities.code AS commodity,\r\n    grades.grade_code AS grade,\r\n    inventory_codes.inventory_code
-  AS inventory,\r\n    marks.mark_code AS mark,\r\n    marketing_varieties.marketing_variety_code
-  AS marketing_variety,\r\n    pallet_formats.description AS pallet_format,\r\n    pm_boms.bom_code
-  AS pkg_bom,\r\n    pm_marks.description AS pkg_mark,\r\n    rmt_classes.rmt_class_code
-  AS rmt_class,\r\n    fruit_size_references.size_reference,\r\n    fn_current_status('order_items',
-  order_items.id) AS status,\r\n    order_items.active,\r\n    order_items.created_at,\r\n
-  \   order_items.updated_at,\r\n    CASE\r\n        WHEN order_items.carton_quantity
-  = allocated_sequences.allocated_carton_quantity THEN 'green'\r\n    END AS colour_rule\r\n\r\nFROM
-  order_items\r\nJOIN orders ON orders.id = order_items.order_id\r\nJOIN orders_loads
-  ON orders_loads.order_id = order_items.order_id\r\nLEFT JOIN allocated_sequences
-  ON allocated_sequences.order_item_id = order_items.id\r\n                             AND
-  orders_loads.load_id = allocated_sequences.load_id\r\nLEFT JOIN fruit_actual_counts_for_packs
-  \ ON fruit_actual_counts_for_packs.id = order_items.actual_count_id\r\nLEFT JOIN
-  basic_pack_codes  ON basic_pack_codes.id = order_items.basic_pack_id\r\nLEFT JOIN
-  standard_pack_codes  ON standard_pack_codes.id = order_items.standard_pack_id\r\nLEFT
-  JOIN commodities  ON commodities.id = order_items.commodity_id\r\nLEFT JOIN grades
-  \ ON grades.id = order_items.grade_id\r\nLEFT JOIN inventory_codes  ON inventory_codes.id
-  = order_items.inventory_id\r\nLEFT JOIN marks  ON marks.id = order_items.mark_id\r\nLEFT
-  JOIN marketing_varieties  ON marketing_varieties.id = order_items.marketing_variety_id\r\nLEFT
-  JOIN fruit_size_references  ON fruit_size_references.id = order_items.size_reference_id\r\nLEFT
-  JOIN pallet_formats  ON pallet_formats.id = order_items.pallet_format_id\r\nLEFT
-  JOIN pm_boms  ON pm_boms.id = order_items.pm_bom_id\r\nLEFT JOIN pm_marks  ON pm_marks.id
-  = order_items.pm_mark_id\r\nLEFT JOIN rmt_classes  ON rmt_classes.id = order_items.rmt_class_id\r\n\r\n\r\n"
+  AS allocated_carton_quantity\r\n    FROM pallet_sequences\r\n    JOIN pallets ON
+  pallets.id = pallet_sequences.pallet_id\r\n\r\n    GROUP BY\r\n        order_item_id,\r\n
+  \       load_id\r\n)\r\nSELECT\r\n    order_items.id,\r\n    order_items.order_id,\r\n
+  \   ARRAY_AGG(DISTINCT allocated_sequences.load_id) AS loads,\r\n    allocated_sequences.order_item_id
+  IS NOT NULL AS pallets_allocated,\r\n    orders.packed_tm_group_id,\r\n    orders.marketing_org_party_role_id,\r\n
+  \   orders.target_customer_party_role_id,\r\n    SUM(order_items.carton_quantity)
+  AS carton_quantity,\r\n    SUM(allocated_sequences.allocated_carton_quantity) AS
+  allocated_carton_quantity,\r\n    order_items.price_per_carton,\r\n    order_items.price_per_kg,\r\n
+  \   array_merge_agg(DISTINCT allocated_sequences.pallet_ids) AS pallet_ids,\r\n
+  \   array_merge_agg(DISTINCT allocated_sequences.pallet_numbers) AS pallet_numbers,\r\n\r\n
+  \   order_items.commodity_id,\r\n    commodities.code AS commodity,\r\n    order_items.basic_pack_id,\r\n
+  \   basic_pack_codes.basic_pack_code AS basic_pack,\r\n    order_items.standard_pack_id,\r\n
+  \   standard_pack_codes.standard_pack_code AS standard_pack,\r\n    order_items.actual_count_id,\r\n
+  \   fruit_actual_counts_for_packs.actual_count_for_pack AS actual_count,\r\n    order_items.size_reference_id,\r\n
+  \   fruit_size_references.size_reference,\r\n    order_items.inventory_id,\r\n    inventory_codes.inventory_code
+  AS inventory,\r\n    order_items.grade_id,\r\n    grades.grade_code AS grade,\r\n
+  \   order_items.mark_id,\r\n    marks.mark_code AS mark,\r\n    order_items.marketing_variety_id,\r\n
+  \   marketing_varieties.marketing_variety_code AS marketing_variety,\r\n    order_items.sell_by_code,\r\n
+  \   order_items.pallet_format_id,\r\n    pallet_formats.description AS pallet_format,\r\n
+  \   order_items.pm_mark_id,\r\n    pm_marks.description AS pkg_mark,\r\n    order_items.pm_bom_id,\r\n
+  \   pm_boms.bom_code AS pkg_bom,\r\n    order_items.rmt_class_id,\r\n    rmt_classes.rmt_class_code
+  AS rmt_class,\r\n\r\n--     fn_current_status('order_items', order_items.id) AS
+  status,\r\n--     order_items.active,\r\n--     order_items.created_at,\r\n--     order_items.updated_at,\r\n
+  \   CASE\r\n        WHEN SUM(order_items.carton_quantity) = SUM(allocated_sequences.allocated_carton_quantity)
+  THEN 'green'\r\n        END AS colour_rule\r\n\r\nFROM order_items\r\nJOIN orders
+  ON orders.id = order_items.order_id\r\nLEFT JOIN allocated_sequences ON allocated_sequences.order_item_id
+  = order_items.id\r\nLEFT JOIN fruit_actual_counts_for_packs ON fruit_actual_counts_for_packs.id
+  = order_items.actual_count_id\r\nLEFT JOIN basic_pack_codes ON basic_pack_codes.id
+  = order_items.basic_pack_id\r\nLEFT JOIN standard_pack_codes ON standard_pack_codes.id
+  = order_items.standard_pack_id\r\nLEFT JOIN commodities ON commodities.id = order_items.commodity_id\r\nLEFT
+  JOIN grades ON grades.id = order_items.grade_id\r\nLEFT JOIN inventory_codes ON
+  inventory_codes.id = order_items.inventory_id\r\nLEFT JOIN marks ON marks.id = order_items.mark_id\r\nLEFT
+  JOIN marketing_varieties ON marketing_varieties.id = order_items.marketing_variety_id\r\nLEFT
+  JOIN fruit_size_references ON fruit_size_references.id = order_items.size_reference_id\r\nLEFT
+  JOIN pallet_formats ON pallet_formats.id = order_items.pallet_format_id\r\nLEFT
+  JOIN pm_boms ON pm_boms.id = order_items.pm_bom_id\r\nLEFT JOIN pm_marks ON pm_marks.id
+  = order_items.pm_mark_id\r\nLEFT JOIN rmt_classes ON rmt_classes.id = order_items.rmt_class_id\r\n\r\n\r\nGROUP
+  BY\r\n    order_items.id,\r\n    orders.id,\r\n    allocated_sequences.order_item_id,\r\n
+  \   fruit_actual_counts_for_packs.id,\r\n    basic_pack_codes.id,\r\n    standard_pack_codes.id,\r\n
+  \   commodities.id,\r\n    grades.id,\r\n    inventory_codes.id,\r\n    marks.id,\r\n
+  \   marketing_varieties.id,\r\n    fruit_size_references.id,\r\n    pallet_formats.id,\r\n
+  \   pm_boms.id,\r\n    pm_marks.id,\r\n    rmt_classes.id"
 :limit: 
 :offset: 
 :external_settings:
@@ -53,12 +57,12 @@
     :sequence_no: 1
     :caption: Id
     :namespaced_name: order_items.id
-    :data_type: :integer
+    :data_type: :string
     :width: 
     :format: 
     :hide: true
     :pinned: 
-    :groupable: true
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -80,9 +84,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  loads:
+    :name: loads
+    :sequence_no: 3
+    :caption: Loads
+    :namespaced_name: 
+    :data_type: :string
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallets_allocated:
+    :name: pallets_allocated
+    :sequence_no: 4
+    :caption: Pallets allocated
+    :namespaced_name: 
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   packed_tm_group_id:
     :name: packed_tm_group_id
-    :sequence_no: 3
+    :sequence_no: 5
     :caption: Packed tm group
     :namespaced_name: orders.packed_tm_group_id
     :data_type: :integer
@@ -98,7 +134,7 @@
     :group_max: false
   marketing_org_party_role_id:
     :name: marketing_org_party_role_id
-    :sequence_no: 4
+    :sequence_no: 6
     :caption: Marketing org party role
     :namespaced_name: orders.marketing_org_party_role_id
     :data_type: :integer
@@ -114,7 +150,7 @@
     :group_max: false
   target_customer_party_role_id:
     :name: target_customer_party_role_id
-    :sequence_no: 5
+    :sequence_no: 7
     :caption: Target customer party role
     :namespaced_name: orders.target_customer_party_role_id
     :data_type: :integer
@@ -130,11 +166,11 @@
     :group_max: false
   carton_quantity:
     :name: carton_quantity
-    :sequence_no: 6
+    :sequence_no: 8
     :caption: Required Carton qty
-    :namespaced_name: order_items.carton_quantity
+    :namespaced_name: 
     :data_type: :integer
-    :width: 100
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -146,11 +182,11 @@
     :group_max: false
   allocated_carton_quantity:
     :name: allocated_carton_quantity
-    :sequence_no: 7
+    :sequence_no: 9
     :caption: Allocated carton qty
-    :namespaced_name: allocated_sequences.allocated_carton_quantity
+    :namespaced_name: 
     :data_type: :integer
-    :width: 105
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -162,7 +198,7 @@
     :group_max: false
   price_per_carton:
     :name: price_per_carton
-    :sequence_no: 8
+    :sequence_no: 10
     :caption: Price per carton
     :namespaced_name: order_items.price_per_carton
     :data_type: :number
@@ -178,7 +214,7 @@
     :group_max: false
   price_per_kg:
     :name: price_per_kg
-    :sequence_no: 9
+    :sequence_no: 11
     :caption: Price per kg
     :namespaced_name: order_items.price_per_kg
     :data_type: :number
@@ -194,9 +230,9 @@
     :group_max: false
   pallet_ids:
     :name: pallet_ids
-    :sequence_no: 10
+    :sequence_no: 12
     :caption: Pallet ids
-    :namespaced_name: allocated_sequences.pallet_ids
+    :namespaced_name: 
     :data_type: :string
     :width: 
     :format: 
@@ -210,9 +246,9 @@
     :group_max: false
   pallet_numbers:
     :name: pallet_numbers
-    :sequence_no: 11
+    :sequence_no: 13
     :caption: Pallet numbers
-    :namespaced_name: allocated_sequences.pallet_numbers
+    :namespaced_name: 
     :data_type: :string
     :width: 200
     :format: 
@@ -224,25 +260,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  load_id:
-    :name: load_id
-    :sequence_no: 12
-    :caption: Load
-    :namespaced_name: order_items.load_id
-    :data_type: :integer
-    :width: 80
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   commodity_id:
     :name: commodity_id
-    :sequence_no: 13
+    :sequence_no: 14
     :caption: Commodity
     :namespaced_name: order_items.commodity_id
     :data_type: :integer
@@ -256,265 +276,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  basic_pack_id:
-    :name: basic_pack_id
-    :sequence_no: 14
-    :caption: Basic pack
-    :namespaced_name: order_items.basic_pack_id
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  standard_pack_id:
-    :name: standard_pack_id
-    :sequence_no: 15
-    :caption: Standard pack
-    :namespaced_name: order_items.standard_pack_id
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  actual_count_id:
-    :name: actual_count_id
-    :sequence_no: 16
-    :caption: Actual count
-    :namespaced_name: order_items.actual_count_id
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  size_reference_id:
-    :name: size_reference_id
-    :sequence_no: 17
-    :caption: Size reference
-    :namespaced_name: order_items.size_reference_id
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  inventory_id:
-    :name: inventory_id
-    :sequence_no: 18
-    :caption: Inventory
-    :namespaced_name: order_items.inventory_id
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  grade_id:
-    :name: grade_id
-    :sequence_no: 19
-    :caption: Grade
-    :namespaced_name: order_items.grade_id
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  mark_id:
-    :name: mark_id
-    :sequence_no: 20
-    :caption: Mark
-    :namespaced_name: order_items.mark_id
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  marketing_variety_id:
-    :name: marketing_variety_id
-    :sequence_no: 21
-    :caption: Marketing variety
-    :namespaced_name: order_items.marketing_variety_id
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  sell_by_code:
-    :name: sell_by_code
-    :sequence_no: 22
-    :caption: Sell by code
-    :namespaced_name: order_items.sell_by_code
-    :data_type: :string
-    :width: 110
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  pallet_format_id:
-    :name: pallet_format_id
-    :sequence_no: 23
-    :caption: Pallet format
-    :namespaced_name: order_items.pallet_format_id
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  pm_mark_id:
-    :name: pm_mark_id
-    :sequence_no: 24
-    :caption: Pm mark
-    :namespaced_name: order_items.pm_mark_id
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  pm_bom_id:
-    :name: pm_bom_id
-    :sequence_no: 25
-    :caption: Pm bom
-    :namespaced_name: order_items.pm_bom_id
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  rmt_class_id:
-    :name: rmt_class_id
-    :sequence_no: 26
-    :caption: rmt class
-    :namespaced_name: order_items.rmt_class_id
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  actual_count:
-    :name: actual_count
-    :sequence_no: 27
-    :caption: Actual count
-    :namespaced_name: fruit_actual_counts_for_packs.actual_count_for_pack
-    :data_type: :string
-    :width: 110
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  basic_pack:
-    :name: basic_pack
-    :sequence_no: 28
-    :caption: Basic pack
-    :namespaced_name: basic_pack_codes.basic_pack_code
-    :data_type: :string
-    :width: 110
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  standard_pack:
-    :name: standard_pack
-    :sequence_no: 29
-    :caption: Standard pack
-    :namespaced_name: standard_pack_codes.standard_pack_code
-    :data_type: :string
-    :width: 120
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   commodity:
     :name: commodity
-    :sequence_no: 30
+    :sequence_no: 15
     :caption: Commodity
     :namespaced_name: commodities.code
     :data_type: :string
@@ -528,11 +292,27 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  grade:
-    :name: grade
-    :sequence_no: 31
-    :caption: Grade
-    :namespaced_name: grades.grade_code
+  basic_pack_id:
+    :name: basic_pack_id
+    :sequence_no: 16
+    :caption: Basic pack
+    :namespaced_name: order_items.basic_pack_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  basic_pack:
+    :name: basic_pack
+    :sequence_no: 17
+    :caption: Basic pack
+    :namespaced_name: basic_pack_codes.basic_pack_code
     :data_type: :string
     :width: 110
     :format: 
@@ -544,11 +324,59 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  inventory:
-    :name: inventory
-    :sequence_no: 32
-    :caption: Inventory
-    :namespaced_name: inventory_codes.inventory_code
+  standard_pack_id:
+    :name: standard_pack_id
+    :sequence_no: 18
+    :caption: Standard pack
+    :namespaced_name: order_items.standard_pack_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  standard_pack:
+    :name: standard_pack
+    :sequence_no: 19
+    :caption: Standard pack
+    :namespaced_name: standard_pack_codes.standard_pack_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  actual_count_id:
+    :name: actual_count_id
+    :sequence_no: 20
+    :caption: Actual count
+    :namespaced_name: order_items.actual_count_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  actual_count:
+    :name: actual_count
+    :sequence_no: 21
+    :caption: Actual count
+    :namespaced_name: fruit_actual_counts_for_packs.actual_count_for_pack
     :data_type: :string
     :width: 110
     :format: 
@@ -560,95 +388,15 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  mark:
-    :name: mark
-    :sequence_no: 33
-    :caption: Mark
-    :namespaced_name: marks.mark_code
-    :data_type: :string
-    :width: 110
+  size_reference_id:
+    :name: size_reference_id
+    :sequence_no: 22
+    :caption: Size reference
+    :namespaced_name: order_items.size_reference_id
+    :data_type: :integer
+    :width: 
     :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  marketing_variety:
-    :name: marketing_variety
-    :sequence_no: 34
-    :caption: Marketing variety
-    :namespaced_name: marketing_varieties.marketing_variety_code
-    :data_type: :string
-    :width: 110
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  pallet_format:
-    :name: pallet_format
-    :sequence_no: 35
-    :caption: Pallet format
-    :namespaced_name: pallet_formats.description
-    :data_type: :string
-    :width: 110
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  pkg_bom:
-    :name: pkg_bom
-    :sequence_no: 36
-    :caption: PKG BOM
-    :namespaced_name: pm_boms.bom_code
-    :data_type: :string
-    :width: 110
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  pkg_mark:
-    :name: pkg_mark
-    :sequence_no: 37
-    :caption: PKG Mark
-    :namespaced_name: pm_marks.description
-    :data_type: :string
-    :width: 110
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  rmt_class:
-    :name: rmt_class
-    :sequence_no: 38
-    :caption: RMT Class
-    :namespaced_name: rmt_classes.rmt_class_code
-    :data_type: :string
-    :width: 110
-    :format: 
-    :hide: false
+    :hide: true
     :pinned: 
     :groupable: false
     :group_by_seq: 
@@ -658,7 +406,7 @@
     :group_max: false
   size_reference:
     :name: size_reference
-    :sequence_no: 39
+    :sequence_no: 23
     :caption: Size reference
     :namespaced_name: fruit_size_references.size_reference
     :data_type: :string
@@ -672,11 +420,59 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  status:
-    :name: status
-    :sequence_no: 40
-    :caption: Status
-    :namespaced_name: 
+  inventory_id:
+    :name: inventory_id
+    :sequence_no: 24
+    :caption: Inventory
+    :namespaced_name: order_items.inventory_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inventory:
+    :name: inventory
+    :sequence_no: 25
+    :caption: Inventory
+    :namespaced_name: inventory_codes.inventory_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  grade_id:
+    :name: grade_id
+    :sequence_no: 26
+    :caption: Grade
+    :namespaced_name: order_items.grade_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  grade:
+    :name: grade
+    :sequence_no: 27
+    :caption: Grade
+    :namespaced_name: grades.grade_code
     :data_type: :string
     :width: 110
     :format: 
@@ -688,29 +484,13 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  active:
-    :name: active
-    :sequence_no: 41
-    :caption: Active
-    :namespaced_name: order_items.active
-    :data_type: :boolean
-    :width: 110
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  created_at:
-    :name: created_at
-    :sequence_no: 42
-    :caption: Created at
-    :namespaced_name: order_items.created_at
-    :data_type: :datetime
-    :width: 110
+  mark_id:
+    :name: mark_id
+    :sequence_no: 28
+    :caption: Mark
+    :namespaced_name: order_items.mark_id
+    :data_type: :integer
+    :width: 
     :format: 
     :hide: true
     :pinned: 
@@ -720,15 +500,191 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  updated_at:
-    :name: updated_at
-    :sequence_no: 43
-    :caption: Updated at
-    :namespaced_name: order_items.updated_at
-    :data_type: :datetime
+  mark:
+    :name: mark
+    :sequence_no: 29
+    :caption: Mark
+    :namespaced_name: marks.mark_code
+    :data_type: :string
     :width: 110
     :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marketing_variety_id:
+    :name: marketing_variety_id
+    :sequence_no: 30
+    :caption: Marketing variety
+    :namespaced_name: order_items.marketing_variety_id
+    :data_type: :integer
+    :width: 
+    :format: 
     :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marketing_variety:
+    :name: marketing_variety
+    :sequence_no: 31
+    :caption: Marketing variety
+    :namespaced_name: marketing_varieties.marketing_variety_code
+    :data_type: :string
+    :width: 110
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  sell_by_code:
+    :name: sell_by_code
+    :sequence_no: 32
+    :caption: Sell by code
+    :namespaced_name: order_items.sell_by_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_format_id:
+    :name: pallet_format_id
+    :sequence_no: 33
+    :caption: Pallet format
+    :namespaced_name: order_items.pallet_format_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_format:
+    :name: pallet_format
+    :sequence_no: 34
+    :caption: Pallet format
+    :namespaced_name: pallet_formats.description
+    :data_type: :string
+    :width: 110
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pm_mark_id:
+    :name: pm_mark_id
+    :sequence_no: 35
+    :caption: Pm mark
+    :namespaced_name: order_items.pm_mark_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pkg_mark:
+    :name: pkg_mark
+    :sequence_no: 36
+    :caption: PKG Mark
+    :namespaced_name: pm_marks.description
+    :data_type: :string
+    :width: 110
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pm_bom_id:
+    :name: pm_bom_id
+    :sequence_no: 37
+    :caption: Pm bom
+    :namespaced_name: order_items.pm_bom_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pkg_bom:
+    :name: pkg_bom
+    :sequence_no: 38
+    :caption: PKG BOM
+    :namespaced_name: pm_boms.bom_code
+    :data_type: :string
+    :width: 110
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_class_id:
+    :name: rmt_class_id
+    :sequence_no: 39
+    :caption: Rmt class
+    :namespaced_name: order_items.rmt_class_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_class:
+    :name: rmt_class
+    :sequence_no: 40
+    :caption: RMT Class
+    :namespaced_name: rmt_classes.rmt_class_code
+    :data_type: :string
+    :width: 110
+    :format: 
+    :hide: false
     :pinned: 
     :groupable: false
     :group_by_seq: 
@@ -738,7 +694,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 44
+    :sequence_no: 41
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
