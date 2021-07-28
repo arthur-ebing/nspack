@@ -19,6 +19,7 @@ module FinishedGoodsApp
       return res unless res.success
 
       res = create_load
+      link_order
       return res unless res.success
 
       res = create_load_voyage
@@ -30,7 +31,14 @@ module FinishedGoodsApp
 
     private
 
-    def create_load # rubocop:disable Metrics/AbcSize
+    def link_order
+      return if params[:order_id].nil?
+
+      repo.create(:orders_loads, load_id: @load_id, order_id: params[:order_id])
+      DB[:orders].where(id: params[:order_id], shipped: true).update(shipped: false)
+    end
+
+    def create_load
       res = LoadSchema.call(params)
       return validation_failed_response(res) if res.failure?
 
@@ -40,8 +48,6 @@ module FinishedGoodsApp
       @load_id = repo.create(:loads, attrs)
       @params[:load_id] = load_id
       repo.log_status(:loads, load_id, 'CREATED', user_name: @user.user_name, comment: comment)
-
-      repo.create(:orders_loads, load_id: @load_id, order_id: params[:order_id]) unless params[:order_id].nil?
 
       ok_response
     end

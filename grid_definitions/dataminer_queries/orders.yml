@@ -21,16 +21,16 @@
   AS pod,\r\n    ARRAY_AGG(DISTINCT vw_loads.pol) AS pol,\r\n    ARRAY_AGG(DISTINCT
   vw_loads.consignee) AS consignee,\r\n    ARRAY_AGG(DISTINCT vw_loads.billing_client)
   AS billing_client,\r\n    ARRAY_AGG(DISTINCT vw_loads.shipper) AS shipper,\r\n    ARRAY_AGG(DISTINCT
-  vw_loads.shipping_line) AS shipping_line,\r\n\r\n    orders.active\r\n\r\n\r\nFROM
-  orders\r\n         JOIN currencies ON currencies.id = orders.currency_id\r\n         JOIN
-  customer_payment_term_sets ON customer_payment_term_sets.id = orders.customer_payment_term_set_id\r\n
-  \        JOIN order_types ON order_types.id = orders.order_type_id\r\n         LEFT
-  JOIN target_market_groups ON target_market_groups.id = orders.packed_tm_group_id\r\n
-  \        JOIN deal_types ON deal_types.id = orders.deal_type_id\r\n         JOIN
-  incoterms  ON incoterms.id = orders.incoterm_id\r\n         LEFT JOIN order_items
-  ON orders.id = order_items.order_id\r\n         LEFT JOIN vw_loads ON order_items.load_id
-  = vw_loads.id\r\n\r\nGROUP BY\r\n    orders.id,\r\n    order_types.id,\r\n    deal_types.id,\r\n
-  \   incoterms.id,\r\n    currencies.id,\r\n    target_market_groups.id"
+  vw_loads.shipping_line) AS shipping_line,\r\n\r\n    orders.active\r\n\r\nFROM orders\r\nJOIN
+  currencies ON currencies.id = orders.currency_id\r\nJOIN customer_payment_term_sets
+  ON customer_payment_term_sets.id = orders.customer_payment_term_set_id\r\nJOIN order_types
+  ON order_types.id = orders.order_type_id\r\nLEFT JOIN target_market_groups ON target_market_groups.id
+  = orders.packed_tm_group_id\r\nJOIN deal_types ON deal_types.id = orders.deal_type_id\r\nJOIN
+  incoterms  ON incoterms.id = orders.incoterm_id\r\nLEFT JOIN order_items ON orders.id
+  = order_items.order_id\r\nLEFT JOIN orders_loads ON orders_loads.order_id = orders.id\r\nLEFT
+  JOIN vw_loads ON orders_loads.load_id = vw_loads.id\r\n\r\nGROUP BY\r\n    orders.id,\r\n
+  \   order_types.id,\r\n    deal_types.id,\r\n    incoterms.id,\r\n    currencies.id,\r\n
+  \   target_market_groups.id"
 :limit: 
 :offset: 
 :external_settings: {}

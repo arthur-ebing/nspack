@@ -30,6 +30,7 @@ module FinishedGoods
                   col.add_field :voyage_code
                   col.add_field :pol_port_id
                   col.add_field :pod_port_id
+                  col.add_field :pallet_count
                 end
                 row.column do |col|
                   col.add_field :pallet_list

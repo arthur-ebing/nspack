@@ -14,23 +14,28 @@ module FinishedGoodsApp
 
     def call
       res = TaskPermissionCheck::Load.call(:ship, load_id)
-      raise Crossbeams::InfoError, res.message unless res.success
+      return res unless res.success
 
       ship_pallets
       ship_load
       ship_order
 
       success_response("Shipped Load: #{load_id}")
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     private
 
     def ship_order
-      order_id = DB[:orders_loads].where(load_id: load_id).get(:order_id)
-      return unless order_id
+      order_ids = repo.select_values(:orders_loads, :order_id, load_id: load_id)
+      return if order_ids.empty?
 
-      shipped = DB[:orders_loads].join(:loads, id: :load_id).where(order_id: order_id).select_map(:shipped).all?
-      repo.update(:orders, order_id, shipped: shipped)
+      order_ids.each do |order_id|
+        next unless TaskPermissionCheck::Order.call(:ship, order_id).success
+
+        repo.update(:orders, order_id, shipped: true)
+      end
     end
 
     def ship_load # rubocop:disable Metrics/AbcSize

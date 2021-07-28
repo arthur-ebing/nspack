@@ -31,6 +31,7 @@ module FinishedGoodsApp
     attribute :marketing_org_party_role_id, Types::Integer
     attribute :marketing_org, Types::String
     attribute :allocated, Types::Bool
+    attribute :shipping, Types::Bool
     attribute :shipped, Types::Bool
     attribute :completed, Types::Bool
     attribute :completed_at, Types::DateTime
@@ -47,6 +48,7 @@ module FinishedGoodsApp
     attribute :id, Types::Integer
     attribute :order_id, Types::Integer
     attribute :load_id, Types::Integer
+    attribute :loads, Types::IntArray
     attribute :packed_tm_group_id, Types::Integer
     attribute :marketing_org_party_role_id, Types::Integer
     attribute :target_customer_party_role_id, Types::Integer
@@ -80,8 +82,7 @@ module FinishedGoodsApp
     attribute :pkg_bom, Types::String
     attribute :rmt_class_id, Types::Integer
     attribute :rmt_class, Types::String
-    attribute :treatment_id, Types::Integer
-    attribute :treatment, Types::String
+    attribute :pricing_per_kg, Types::Bool
     attribute? :status, Types::String
     attribute? :active, Types::Bool
   end

@@ -86,14 +86,13 @@ module FinishedGoodsApp
       pm_mark_id = create_pm_mark
       pm_bom_id = create_pm_bom
       rmt_class_id = create_rmt_class
-      treatment_id = create_treatment
 
       {
         id: 1,
         order_id: order_id,
         order: order_id,
         load_id: nil,
-        load: nil,
+        loads: nil,
         packed_tm_group_id: nil,
         marketing_org_party_role_id: nil,
         target_customer_party_role_id: nil,
@@ -127,8 +126,7 @@ module FinishedGoodsApp
         pkg_bom: 'ABC',
         rmt_class_id: rmt_class_id,
         rmt_class: 'ABC',
-        treatment_id: treatment_id,
-        treatment: 'ABC',
+        pricing_per_kg: true,
         active: true
       }
     end

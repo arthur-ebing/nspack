@@ -2,6 +2,22 @@
 
 module FinishedGoodsApp
   module OrderFactory
+    def create_orders_loads(opts = {})
+      id = get_available_factory_record(:orders_loads, opts)
+      return id unless id.nil?
+
+      opts[:load_id] ||= create_load
+      opts[:order_id] ||= create_order
+
+      default = {
+        active: true,
+        created_at: '2010-01-01 12:00',
+        updated_at: '2010-01-01 12:00'
+      }
+      DB[:orders_loads].insert(default.merge(opts))
+      [opts[:order_id], opts[:load_id]]
+    end
+
     def create_order(opts = {})
       id = get_available_factory_record(:orders, opts)
       return id unless id.nil?
@@ -56,7 +72,6 @@ module FinishedGoodsApp
       opts[:treatment_id] ||= create_treatment
 
       default = {
-        load_id: nil,
         carton_quantity: Faker::Number.number(digits: 4),
         price_per_carton: Faker::Number.decimal,
         price_per_kg: Faker::Number.decimal,
