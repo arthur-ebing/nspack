@@ -622,7 +622,7 @@ module ProductionApp
         ps.fruit_sticker_ids, ps.rmt_class_id, ps.target_customer_party_role_id
         FROM pallet_sequences ps
         JOIN cultivar_groups ON cultivar_groups.id = ps.cultivar_group_id
-        JOIN cultivars ON cultivars.id = ps.cultivar_id
+        LEFT JOIN cultivars ON cultivars.id = ps.cultivar_id
         JOIN farms ON farms.id = ps.farm_id
         JOIN pucs ON pucs.id = ps.puc_id
         JOIN orchards ON orchards.id = ps.orchard_id
@@ -913,7 +913,7 @@ module ProductionApp
         SELECT DISTINCT orchard_id, cultivar_id, cultivars.cultivar_name, farms.farm_code || '_' || orchards.orchard_code AS farm_orchard_code
         FROM #{objects_table_name} t
         JOIN orchards on orchards.id = t.orchard_id
-        JOIN cultivars on cultivars.id = t.cultivar_id
+        LEFT JOIN cultivars on cultivars.id = t.cultivar_id
         JOIN farms on farms.id = t.farm_id
         WHERE t.id IN (#{objects_ids})
       SQL
