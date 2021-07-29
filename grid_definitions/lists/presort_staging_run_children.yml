@@ -13,6 +13,12 @@
     :title: Complete Staging
     :popup: false
     :hide_if_false: complete_staging
+  - :url: "/raw_materials/presorting/presort_staging_run_children/$:id$"
+    :text: delete
+    :icon: delete
+    :is_delete: true
+    :popup: true
+    :hide_if_false: editing
 :conditions:
   :standard:
     - :col: presort_staging_run_children.presort_staging_run_id

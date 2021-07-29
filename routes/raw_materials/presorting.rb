@@ -132,6 +132,18 @@ class Nspack < Roda
         flash[res.success ? :notice : :error] = res.message
         show_partial_or_page(r) { RawMaterials::Presorting::PresortStagingRun::Edit.call(res.instance) }
       end
+
+      r.is do
+        r.delete do    # DELETE
+          check_auth!('presorting', 'delete')
+          res = interactor.delete_presort_staging_run_child(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
     end
   end
 end
