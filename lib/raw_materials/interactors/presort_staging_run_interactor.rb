@@ -39,7 +39,9 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def complete_setup(id)
+    def complete_setup(id) # rubocop:disable Metrics/AbcSize
+      return failed_response('Cannot complete setup. Run must have children') unless repo.select_values(:presort_staging_run_children, :id, presort_staging_run_id: id).count.nonzero?
+
       repo.transaction do
         repo.update_presort_staging_run(id, setup_completed: true, editing: false, setup_completed_at: Time.now)
         log_status(:presort_staging_runs, id, 'COMPLETED')
@@ -84,7 +86,9 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def complete_staging(id)
+    def complete_staging(id) # rubocop:disable Metrics/AbcSize
+      return failed_response('Cannot complete staging. Run has editing children') if repo.exists?(:presort_staging_run_children, presort_staging_run_id: id, editing: true)
+
       repo.transaction do
         repo.update_presort_staging_run(id, active: false, staged: true, staged_at: Time.now)
         log_status(:presort_staging_runs, id, 'STAGED')
@@ -99,6 +103,8 @@ module RawMaterialsApp
     end
 
     def delete_presort_staging_run(id) # rubocop:disable Metrics/AbcSize
+      return failed_response('Cannot delete. Run has children') unless repo.select_values(:presort_staging_run_children, :id, presort_staging_run_id: id).count.zero?
+
       name = presort_staging_run(id).id
       repo.transaction do
         repo.delete_presort_staging_run(id)
@@ -159,6 +165,21 @@ module RawMaterialsApp
       failed_response(e.message, parent_id)
     rescue StandardError => e
       failed_response(e.message, parent_id)
+    end
+
+    def delete_presort_staging_run_child(id) # rubocop:disable Metrics/AbcSize
+      name = presort_staging_run_child(id).id
+      repo.transaction do
+        repo.delete_presort_staging_run_child(id)
+        log_status(:presort_staging_run_children, id, 'DELETED')
+        log_transaction
+      end
+      success_response("Deleted presort staging run child #{name}")
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue Sequel::ForeignKeyConstraintViolation => e
+      puts e.message
+      failed_response("Unable to delete presort staging run child. It is still referenced#{e.message.partition('referenced').last}")
     end
 
     def assert_permission!(task, id = nil)
