@@ -139,7 +139,7 @@ module RawMaterialsApp
 
     def activate_child_run(id) # rubocop:disable Metrics/AbcSize
       parent_id = repo.get(:presort_staging_run_children, id, :presort_staging_run_id)
-      return failed_response("Cannot activate child_run: #{id}. There already exists an active child_run", parent_id) if repo.exists?(:presort_staging_run_children, presort_staging_run_id: parent_id, active: true)
+      return failed_response("Cannot activate child_run: #{id}. There's already exists an active child_run", parent_id) if repo.exists?(:presort_staging_run_children, presort_staging_run_id: parent_id, active: true)
 
       repo.transaction do
         repo.update_presort_staging_run_child(id, active: true, editing: false, activated_at: Time.now)
