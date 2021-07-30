@@ -18,7 +18,6 @@ module FinishedGoods
                           caption: 'Order Items',
                           is_multiselect: true,
                           multiselect_url: "/finished_goods/orders/orders/#{order_id}/load/#{load_id}/order_items")
-            page.form(&:no_submit!)
           end
         end
       end

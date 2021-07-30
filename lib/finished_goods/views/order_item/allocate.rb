@@ -13,7 +13,6 @@ module FinishedGoods
                           can_be_cleared: true,
                           multiselect_url: "/finished_goods/orders/order_items/#{id}/allocate/#{load_id}",
                           caption: 'Choose pallets')
-            page.form(&:no_submit!)
           end
         end
       end

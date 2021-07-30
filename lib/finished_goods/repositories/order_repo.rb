@@ -172,7 +172,7 @@ module FinishedGoodsApp
 
     def find_pallets_for_order_item(order_item_id, load_id) # rubocop:disable Metrics/AbcSize
       order_item = find_order_item(order_item_id)
-      return nil unless order_item
+      return [] unless order_item
 
       params = {
         packed_tm_group_id: order_item.packed_tm_group_id,
@@ -200,12 +200,26 @@ module FinishedGoodsApp
                    .left_join(:cultivars, id: Sequel[:pallet_sequences][:cultivar_id])
                    .where(params.compact)
                    .where(Sequel.lit("(order_item_id is null OR order_item_id = #{order_item_id})"))
-                   .select_map(:pallet_id)
+                   .distinct
+                   .select_map(:pallet_id).uniq
 
       DB[:pallets]
         .where(in_stock: true, id: pallet_ids)
         .where(Sequel.lit("(load_id is null OR load_id = #{load_id})"))
-        .distinct.select_map(:id) + [0]
+        .distinct
+        .select_map(:id)
+    end
+
+    def all_order_loads_shipped?(order_id)
+      DB[:orders_loads].join(:loads, id: :load_id).where(order_id: order_id).select_map(:shipped).all?
+    end
+
+    def order_quantity_fulfilled?(order_id)
+      order_item_ids = select_values(:order_items, :id, order_id: order_id)
+      sequences_quantity = DB[:pallet_sequences].where(order_item_id: order_item_ids).sum(:carton_quantity).to_i
+      order_items_quantity = DB[:order_items].where(id: order_item_ids).sum(:carton_quantity).to_i
+
+      order_items_quantity == sequences_quantity
     end
   end
 end

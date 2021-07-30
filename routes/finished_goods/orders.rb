@@ -85,7 +85,7 @@ class Nspack < Roda
 
         r.on 'allocate' do
           interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-          pallet_numbers = BaseRepo.new.select_values(:pallets, :pallet_number, id: multiselect_grid_choices(params)).uniq
+          pallet_numbers = interactor.pallet_numbers_from_pallet_ids(multiselect_grid_choices(params))
           res = interactor.allocate_multiselect(load_id, pallet_numbers)
           flash[res.success ? :notice : :error] = res.message
           r.redirect request.referer

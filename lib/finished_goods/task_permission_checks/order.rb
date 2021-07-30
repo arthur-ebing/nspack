@@ -3,7 +3,7 @@
 module FinishedGoodsApp
   module TaskPermissionCheck
     class Order < BaseService
-      attr_reader :task, :entity, :order_id
+      attr_reader :task, :entity, :order_id, :repo
       def initialize(task, order_id = nil)
         @task = task
         @repo = OrderRepo.new
@@ -34,7 +34,7 @@ module FinishedGoodsApp
       end
 
       def edit_check
-        return failed_response 'Unable to edit, some loads on this Orders has already been shipped.' if @entity.shipping
+        return failed_response 'Unable to edit, some loads on this Orders have already been shipped.' if entity.shipping
 
         all_ok
       end
@@ -44,22 +44,18 @@ module FinishedGoodsApp
       end
 
       def ship_check
-        return failed_response 'Not all Loads on this order has been Shipped.' unless all_order_loads_shipped?
+        return failed_response 'Not all Loads on this order have been Shipped.' unless all_order_loads_shipped?
         return failed_response 'Required order carton quantities not fulfilled.' unless order_quantity_fulfilled?
 
         all_ok
       end
 
       def all_order_loads_shipped?
-        DB[:orders_loads].join(:loads, id: :load_id).where(order_id: order_id).select_map(:shipped).all?
+        repo.all_order_loads_shipped?(order_id)
       end
 
       def order_quantity_fulfilled?
-        order_item_ids = @repo.select_values(:order_items, :id, order_id: order_id)
-        sequences_quantity = DB[:pallet_sequences].where(order_item_id: order_item_ids).sum(:carton_quantity).to_i
-        order_items_quantity = DB[:order_items].where(id: order_item_ids).sum(:carton_quantity).to_i
-
-        order_items_quantity == sequences_quantity
+        repo.order_quantity_fulfilled?(order_id)
       end
     end
   end
