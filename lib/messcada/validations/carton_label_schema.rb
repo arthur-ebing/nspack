@@ -65,6 +65,7 @@ module MesscadaApp
       optional(:target_customer_party_role_id).maybe(:integer)
       optional(:rmt_container_material_owner_id).maybe(:integer)
       optional(:legacy_data).maybe(:hash)
+      optional(:color_percentage_id).maybe(:integer)
     end
 
     rule(:fruit_size_reference_id, :fruit_actual_counts_for_pack_id) do

@@ -588,7 +588,7 @@ const crossbeamsGridEvents = {
       body: form,
     }).then((response) => {
       if (response.status === 404) {
-        crossbeamsGridEvents.updateGridInPlace(event.data.id, errChanges);
+        crossbeamsGridEvents.updateGridInPlace(event.data.id, errChanges, gridId);
         crossbeamsUtils.showError('The requested resource was not found');
         return {};
       }
@@ -598,7 +598,7 @@ const crossbeamsGridEvents = {
         if (data.redirect) {
           window.location = data.redirect;
         } else if (data.undoEdit) {
-          crossbeamsGridEvents.updateGridInPlace(event.data.id, errChanges);
+          crossbeamsGridEvents.updateGridInPlace(event.data.id, errChanges, gridId);
         } else if (data.actions) {
           crossbeamsUtils.processActions(data.actions);
         } else {
@@ -616,7 +616,9 @@ const crossbeamsGridEvents = {
             crossbeamsUtils.showWarning(data.flash.warning);
           }
           if (data.flash.error) {
-            crossbeamsGridEvents.updateGridInPlace(event.data.id, errChanges);
+            if (!data.undoEdit) {
+              crossbeamsGridEvents.updateGridInPlace(event.data.id, errChanges, gridId);
+            }
             if (data.exception) {
               crossbeamsUtils.showError(data.flash.error);
               if (data.backtrace) {
@@ -632,7 +634,7 @@ const crossbeamsGridEvents = {
         }
       }).catch((data) => {
         // revert value
-        crossbeamsGridEvents.updateGridInPlace(event.data.id, errChanges);
+        crossbeamsGridEvents.updateGridInPlace(event.data.id, errChanges, gridId);
         crossbeamsUtils.fetchErrorHandler(data);
       });
   },

@@ -78,7 +78,8 @@ module MasterfilesApp
         requires_standard_counts: false,
         active: true,
         commodity_group_code: 'ABC',
-        use_size_ref_for_edi: false
+        use_size_ref_for_edi: false,
+        color_applies: false
       }
     end
 

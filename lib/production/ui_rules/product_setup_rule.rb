@@ -2,16 +2,18 @@
 
 module UiRules
   class ProductSetupRule < Base # rubocop:disable Metrics/ClassLength
-    def generate_rules
+    def generate_rules # rubocop:disable Metrics/AbcSize
       @repo = ProductionApp::ProductSetupRepo.new
       @fruit_size_repo = MasterfilesApp::FruitSizeRepo.new
       @party_repo = MasterfilesApp::PartyRepo.new
       @tm_repo = MasterfilesApp::TargetMarketRepo.new
+      @commodity_repo = MasterfilesApp::CommodityRepo.new
       make_form_object
       apply_form_values
 
       @rules[:gtins_required] = AppConst::CR_PROD.use_gtins?
       @rules[:basic_pack_equals_standard_pack] = AppConst::CR_MF.basic_pack_equals_standard_pack?
+      @rules[:color_applies] ||= @repo.get(:commodities, @form_object.commodity_id, :color_applies) || false
 
       common_values_for_fields common_fields
 
@@ -39,7 +41,7 @@ module UiRules
       inventory_code_id_label = MasterfilesApp::FruitRepo.new.find_inventory_code(@form_object.inventory_code_id)&.inventory_code
       pallet_format_id_label = @repo.get(:pallet_formats, @form_object.pallet_format_id, :description)
       cartons_per_pallet_id_label = @repo.get(:cartons_per_pallet, @form_object.cartons_per_pallet_id, :cartons_per_pallet)
-      commodity_id_label = MasterfilesApp::CommodityRepo.new.find_commodity(@form_object.commodity_id)&.code
+      commodity_id_label = @commodity_repo.find_commodity(@form_object.commodity_id)&.code
       grade_id_label = MasterfilesApp::FruitRepo.new.find_grade(@form_object.grade_id)&.grade_code
       pallet_base_id_label = MasterfilesApp::PackagingRepo.new.find_pallet_base(@form_object.pallet_base_id)&.pallet_base_code
       pallet_stack_type_id_label = MasterfilesApp::PackagingRepo.new.find_pallet_stack_type(@form_object.pallet_stack_type_id)&.stack_type_code
@@ -47,6 +49,7 @@ module UiRules
       cultivar_group_id_label = product_setup_template&.cultivar_group_code
       cultivar_id_label = product_setup_template&.cultivar_name
       rmt_class_id_label = MasterfilesApp::FruitRepo.new.find_rmt_class(@form_object.rmt_class_id)&.rmt_class_code
+      color_percentage_id_label = @repo.get(:color_percentages, @form_object.color_percentage_id, :description)
 
       fields[:product_setup_template_id] = { renderer: :label,
                                              with_value: product_setup_template_id_label,
@@ -135,6 +138,10 @@ module UiRules
       fields[:gtin_code] = { renderer: :label,
                              caption: 'GTIN Code',
                              hide_on_load: !@rules[:gtins_required] }
+      fields[:color_percentage_id] = { renderer: :label,
+                                       with_value: color_percentage_id_label,
+                                       hide_on_load: !@rules[:color_applies],
+                                       caption: 'Color Percentage' }
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize
@@ -147,6 +154,7 @@ module UiRules
       cultivar_id_label = product_setup_template&.cultivar_name
       # commodity_id = @form_object[:commodity_id].nil_or_empty? ? @repo.get_commodity_id(cultivar_group_id, cultivar_id) : @form_object.commodity_id
       commodity_id = @form_object[:commodity_id].nil_or_empty? ? @repo.get(:cultivar_groups, cultivar_group_id, :commodity_id) : @form_object.commodity_id
+      color_applies = @repo.get(:commodities, commodity_id, :color_applies)
       default_mkting_org_id = @form_object[:marketing_org_party_role_id].nil_or_empty? ? @party_repo.find_party_role_from_party_name_for_role(AppConst::CR_PROD.default_marketing_org, AppConst::ROLE_MARKETER) : @form_object[:marketing_org_party_role_id]
       {
         product_setup_template: { renderer: :label,
@@ -165,7 +173,7 @@ module UiRules
                     readonly: true },
         commodity_id: { renderer: :select,
                         options: @repo.for_select_template_cultivar_commodities(cultivar_group_id, cultivar_id),
-                        disabled_options: MasterfilesApp::CommodityRepo.new.for_select_inactive_commodities,
+                        disabled_options: @commodity_repo.for_select_inactive_commodities,
                         caption: 'Commodity',
                         required: true,
                         searchable: true,
@@ -344,7 +352,17 @@ module UiRules
                          caption: 'Treatments' },
         gtin_code: { renderer: :label,
                      caption: 'GTIN Code',
-                     hide_on_load: !@rules[:gtins_required] }
+                     hide_on_load: !@rules[:gtins_required] },
+        color_percentage_id: { renderer: :select,
+                               options: @commodity_repo.for_select_color_percentages(
+                                 where: { commodity_id: commodity_id }
+                               ),
+                               disabled_options: @commodity_repo.for_select_inactive_color_percentages,
+                               caption: 'Color Percentage',
+                               prompt: 'Select Color Percentage',
+                               hide_on_load: !color_applies,
+                               searchable: true,
+                               remove_search_for_small_list: false }
 
       }
     end
@@ -385,7 +403,8 @@ module UiRules
                                     grade_id: nil,
                                     product_chars: nil,
                                     gtin_code: nil,
-                                    rmt_class_id: nil)
+                                    rmt_class_id: nil,
+                                    color_percentage_id: nil)
     end
 
     def treatment_codes

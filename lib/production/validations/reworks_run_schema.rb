@@ -125,6 +125,7 @@ module ProductionApp # rubocop:disable Metrics/ModuleLength
     optional(:fruit_sticker_ids).maybe(:array).maybe { each(:integer) }
     optional(:tu_sticker_ids).maybe(:array).maybe { each(:integer) }
     optional(:target_customer_party_role_id).maybe(:integer)
+    optional(:color_percentage_id).maybe(:integer)
   end
 
   ReworksRunUpdatePalletSchema = Dry::Schema.Params do

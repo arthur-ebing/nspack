@@ -29,6 +29,7 @@ module ProductionApp
       optional(:standard_pack_code_id).maybe(:integer)
       required(:basic_pack_code_id).filled(:integer)
       optional(:target_customer_party_role_id).maybe(:integer)
+      optional(:color_percentage_id).maybe(:integer)
     end
     rule(:standard_pack_code_id) do
       key.failure 'must be filled' if values[:standard_pack_code_id].nil_or_empty? && !AppConst::CR_MF.basic_pack_equals_standard_pack?
@@ -53,6 +54,7 @@ module ProductionApp
       required(:fruit_size_reference_id).maybe(:integer)
       required(:rmt_class_id).maybe(:integer)
       required(:grade_id).filled(:integer)
+      optional(:color_percentage_id).maybe(:integer)
     end
     rule(:standard_pack_code_id) do
       key.failure 'must be filled' if values[:standard_pack_code_id].nil_or_empty? && !AppConst::CR_MF.basic_pack_equals_standard_pack?

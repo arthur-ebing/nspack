@@ -6,6 +6,8 @@ module UiRules
       @repo = MasterfilesApp::CommodityRepo.new
       make_form_object
 
+      @rules[:color_applies] = @form_object.color_applies
+
       common_values_for_fields common_fields
 
       set_show_fields if @mode == :show
@@ -22,6 +24,7 @@ module UiRules
       fields[:requires_standard_counts] = { renderer: :label, as_boolean: true }
       fields[:use_size_ref_for_edi] = { renderer: :label, as_boolean: true }
       fields[:active] = { renderer: :label, as_boolean: true }
+      fields[:color_applies] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields
@@ -37,7 +40,8 @@ module UiRules
                           At the international level, the Harmonized System (HS) for classifying goods is a six-digit code system.' },
         requires_standard_counts: { renderer: :checkbox },
         use_size_ref_for_edi: { renderer: :checkbox },
-        active: { renderer: :checkbox }
+        active: { renderer: :checkbox },
+        color_applies: { renderer: :checkbox }
       }
     end
 
@@ -54,7 +58,8 @@ module UiRules
                                     hs_code: nil,
                                     requires_standard_counts: true,
                                     use_size_ref_for_edi: nil,
-                                    active: true)
+                                    active: true,
+                                    color_applies: nil)
     end
   end
 end

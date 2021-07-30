@@ -21,6 +21,7 @@ module Masterfiles
               form.add_field :hs_code
               form.add_field :requires_standard_counts
               form.add_field :use_size_ref_for_edi
+              form.add_field :color_applies
             end
           end
 
