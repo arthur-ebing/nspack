@@ -86,8 +86,8 @@ module FinishedGoodsApp
 
       res = ShipLoad.call(load_id, current_user)
       refute res.success, res.message
-      assert !repo.get(:pallets, pallet_id, :shipped), 'Pallet should not be shipped'
-      assert !repo.get(:loads, load_id, :shipped), 'Load should not be shipped'
+      refute repo.get(:pallets, pallet_id, :shipped), 'Pallet should not be shipped'
+      refute repo.get(:loads, load_id, :shipped), 'Load should not be shipped'
     end
 
     def test_ship_load_with_holdover_fail
@@ -100,7 +100,7 @@ module FinishedGoodsApp
 
       res = ShipLoad.call(load_id, current_user)
       refute res.success, res.message
-      assert !repo.get(:loads, load_id, :shipped), 'Load should not be shipped'
+      refute repo.get(:loads, load_id, :shipped), 'Load should not be shipped'
     end
 
     def test_ship_load_with_holdover_pass
