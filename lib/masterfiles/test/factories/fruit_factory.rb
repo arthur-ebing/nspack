@@ -10,7 +10,8 @@ module MasterfilesApp
         grade_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
         rmt_grade: false,
-        active: true
+        active: true,
+        qa_level: Faker::Number.number(digits: 4)
       }
       DB[:grades].insert(default.merge(opts))
     end
