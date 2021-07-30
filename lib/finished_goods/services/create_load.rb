@@ -37,7 +37,7 @@ module FinishedGoodsApp
       attrs[:requires_temp_tail] = AppConst::TEMP_TAIL_REQUIRED_TO_SHIP unless attrs[:requires_temp_tail]
 
       @params[:load_id] = create_with_status(:loads, attrs)
-      repo.link_order_to_load(params)
+      repo.link_order_to_load(params[:order_id], params[:load_id])
 
       ok_response
     end
