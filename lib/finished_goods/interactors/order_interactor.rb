@@ -47,8 +47,7 @@ module FinishedGoodsApp
     end
 
     def validate_order_pallets(order_id, params)
-      valid_fields = %i[packed_tm_group_id target_customer_party_role_id]
-      difference = changed_values(order_id, params.slice(*valid_fields)).compact
+      difference = changed_values(order_id, params)
       return ok_response if difference.empty?
 
       order_item_ids = repo.select_values(:order_items, :id, order_id: order_id)

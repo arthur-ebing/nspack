@@ -187,9 +187,7 @@ module FinishedGoodsApp
       exists?(:orders_loads, load_id: id)
     end
 
-    def link_order_to_load(params)
-      order_id = params[:order_id]
-      load_id = params[:load_id]
+    def link_order_to_load(order_id, load_id)
       return if order_id.nil? || load_id.nil?
 
       create(:orders_loads, load_id: load_id, order_id: order_id)
