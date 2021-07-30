@@ -306,8 +306,8 @@ module FinishedGoodsApp
           varietyCode: pallet.marketing_variety,
           protocolExceptionIndicator: 'X7', # Smartfresh, X7, X8, X9 where the first character denotes the destination and the second character denotes the applicable phytosanitary
           productClass: pallet.grade,
-          nettWeight: pallet.nett_weight,
-          grossWeight: pallet.gross_weight,
+          nettWeight: pallet.nett_weight_per_carton,
+          grossWeight: pallet.gross_weight_per_carton,
           cartonQuantity: pallet.pallet_carton_quantity,
           inspectionPoint: govt_inspection_sheet.inspection_point,
           inspectorCode: govt_inspection_sheet.inspector_code,
