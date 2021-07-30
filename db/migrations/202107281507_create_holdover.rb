@@ -6,9 +6,8 @@ Sequel.migration do
       primary_key :id
       foreign_key :pallet_id, :pallets, type: :integer, null: false
       Integer :holdover_quantity, null: false
-      String :buildup_remarks, size: 255
+      String :buildup_remarks, size: 255, null: false
 
-      TrueClass :completed, default: false
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
 

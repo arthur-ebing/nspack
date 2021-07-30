@@ -10,7 +10,6 @@ module FinishedGoodsApp
       default = {
         holdover_quantity: Faker::Number.number(digits: 4),
         buildup_remarks: Faker::Lorem.unique.word,
-        completed: false,
         created_at: '2010-01-01 12:00',
         updated_at: '2010-01-01 12:00'
       }

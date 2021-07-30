@@ -8,7 +8,6 @@ module UiRules
       apply_form_values
 
       common_values_for_fields common_fields
-
       set_show_fields if %i[show].include? @mode
 
       form_name 'pallet_holdover'
@@ -21,7 +20,6 @@ module UiRules
                              hide_on_load: @form_object.pallet_number.nil? }
       fields[:holdover_quantity] = { renderer: :label }
       fields[:buildup_remarks] = { renderer: :label }
-      fields[:completed] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields
@@ -34,8 +32,7 @@ module UiRules
                      hide_on_load: @form_object.pallet_number.nil? },
         holdover_quantity: { renderer: :number,
                              required: true },
-        buildup_remarks: { required: true },
-        completed: { renderer: :checkbox }
+        buildup_remarks: { required: true }
       }
     end
 

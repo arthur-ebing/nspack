@@ -9,7 +9,6 @@ module FinishedGoodsApp
       id = nil
       repo.transaction do
         id = repo.create_pallet_holdover(res)
-        log_status(:pallet_holdovers, id, 'CREATED')
         log_transaction
       end
       instance = pallet_holdover(id)
@@ -38,7 +37,6 @@ module FinishedGoodsApp
       name = pallet_holdover(id).buildup_remarks
       repo.transaction do
         repo.delete_pallet_holdover(id)
-        log_status(:pallet_holdovers, id, 'DELETED')
         log_transaction
       end
       success_response("Deleted pallet holdover #{name}")
@@ -46,15 +44,6 @@ module FinishedGoodsApp
       failed_response(e.message)
     rescue Sequel::ForeignKeyConstraintViolation => e
       failed_response("Unable to delete pallet holdover. It is still referenced#{e.message.partition('referenced').last}")
-    end
-
-    def complete_a_pallet_holdover(id, params)
-      res = complete_a_record(:pallet_holdovers, id, params)
-      if res.success
-        success_response(res.message, pallet_holdover(id))
-      else
-        failed_response(res.message, pallet_holdover(id))
-      end
     end
 
     def assert_permission!(task, id = nil)

@@ -19,7 +19,6 @@ module FinishedGoods
               form.add_field :pallet_id
               form.add_field :holdover_quantity
               form.add_field :buildup_remarks
-              form.add_field :completed
             end
           end
         end
