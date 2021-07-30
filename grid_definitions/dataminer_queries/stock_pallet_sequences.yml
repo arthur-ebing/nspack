@@ -878,7 +878,7 @@
   gross_weight:
     :name: gross_weight
     :sequence_no: 53
-    :caption: Gross weight
+    :caption: Plt Gross weight
     :namespaced_name: gross_weight
     :data_type: :number
     :width: 
@@ -894,7 +894,7 @@
   nett_weight:
     :name: nett_weight
     :sequence_no: 54
-    :caption: Nett weight
+    :caption: Plt Nett weight
     :namespaced_name: nett_weight
     :data_type: :number
     :width: 
