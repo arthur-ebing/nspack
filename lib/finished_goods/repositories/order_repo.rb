@@ -50,7 +50,7 @@ module FinishedGoodsApp
       )
       return nil if hash.nil?
 
-      hash[:shipping] = DB[:orders_loads].join(:loads, id: :load_id).select_map(:shipped).any?
+      hash[:shipping] = DB[:orders_loads].join(:loads, id: :load_id).where(order_id: id).select_map(:shipped).any?
       hash[:order_id] = id
       hash[:order_number] = hash[:internal_order_number]
       hash[:contact_person_ids] = get_value(:customers, :contact_person_ids, customer_party_role_id: hash[:customer_party_role_id])
