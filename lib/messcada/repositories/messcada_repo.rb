@@ -522,7 +522,7 @@ module MesscadaApp
 
       attrs = res.to_h
       %i[treatment_ids fruit_sticker_ids tu_sticker_ids].each { |col| attrs[col] = array_for_db_col(attrs[col]) }
-      get_id(:pallet_sequences, attrs)
+      DB[:pallet_sequences].where(attrs).get(:id)
     end
 
     def sequence_has_cartons?(id)
