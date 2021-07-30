@@ -126,7 +126,7 @@ module FinishedGoodsApp
       load_ids = repo.select_values(:orders_loads, :load_id, order_id: id)
 
       Crossbeams::DataGrid::ColumnDefiner.new(for_multiselect: for_multiselect).make_columns do |mk| # rubocop:disable Metrics/BlockLength
-        mk.action_column do |act|
+        mk.action_column do |act| # rubocop:disable Metrics/BlockLength
           act.popup_view_link '/finished_goods/orders/order_items/$col1$',
                               col1: 'id', icon: 'view-show', text: 'view', title: 'View'
           act.popup_edit_link '/finished_goods/orders/order_items/$col1$/edit',
@@ -140,6 +140,19 @@ module FinishedGoodsApp
             act.popup_view_link '/finished_goods/orders/order_items/$col1$/allocate',
                                 col1: 'id', icon: 'edit', text: 'allocate to load', title: 'Loads'
           end
+          act.separator
+          url = '/list/order_item_prices/with_params?key=standard'
+          options = { icon: 'edit', text: 'previous prices', title: 'Previous prices for Order Item' }
+          columns = %w[commodity_id basic_pack_id standard_pack_id actual_count_id size_reference_id
+                       inventory_id grade_id mark_id marketing_variety_id sell_by_code
+                       pallet_format_id pm_mark_id pm_bom_id rmt_class_id order_id]
+
+          columns.each_with_index do |val, index|
+            count = index + 1
+            options["col#{count}".to_sym] = val
+            url = "#{url}&#{val}=$col#{count}$"
+          end
+          act.popup_view_link(url, options)
           act.separator
           act.popup_view_link '/development/statuses/list/order_items/$col1$',
                               col1: 'id', icon: 'information-solid', text: 'status', title: 'Status'
