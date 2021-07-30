@@ -34,25 +34,15 @@ module FinishedGoodsApp
       end
 
       def edit_check
-        return failed_response 'PalletHoldover has been completed' if completed?
+        # return failed_response 'PalletHoldover has been completed' if completed?
 
         all_ok
       end
 
       def delete_check
-        return failed_response 'PalletHoldover has been completed' if completed?
+        # return failed_response 'PalletHoldover has been completed' if completed?
 
         all_ok
-      end
-
-      def complete_check
-        return failed_response 'PalletHoldover has already been completed' if completed?
-
-        all_ok
-      end
-
-      def completed?
-        @entity.completed
       end
     end
   end
