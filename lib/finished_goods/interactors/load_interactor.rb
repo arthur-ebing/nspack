@@ -336,6 +336,10 @@ module FinishedGoodsApp
       TaskPermissionCheck::Load.call(task, id, pallet_number)
     end
 
+    def pallet_numbers_from_pallet_ids(pallet_ids)
+      repo.select_values(:pallets, :pallet_number, id: pallet_ids).uniq
+    end
+
     def load_entity(id)
       repo.find_load(id)
     end

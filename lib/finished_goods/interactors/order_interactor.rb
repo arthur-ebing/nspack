@@ -24,13 +24,12 @@ module FinishedGoodsApp
       res = validate_order_params(params)
       return validation_failed_response(res) if res.failure?
 
-      args = res.to_h
-      res = update_order_pallets(id, args)
-      return res unless res.success
+      val = validate_order_pallets(id, params)
+      return val unless val.success
 
       repo.transaction do
-        update_order_pallets(id, args)
-        repo.update_order(id, args)
+        update_order_pallets(val) if params[:apply_changes_to_pallets] == 't'
+        repo.update_order(id, res)
 
         log_transaction
       end
@@ -38,6 +37,32 @@ module FinishedGoodsApp
       success_response("Updated order #{instance.internal_order_number}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    end
+
+    def changed_values(order_id, params)
+      valid_fields = %i[packed_tm_group_id target_customer_party_role_id]
+      new_values = params.to_h.slice(*valid_fields).transform_values { |v| v.nil_or_empty? ? nil : v.to_i }
+      current_values = repo.find_hash(:orders, order_id).to_h.slice(*valid_fields)
+      Hash[*(new_values.to_a - current_values.to_a).flatten].compact
+    end
+
+    def validate_order_pallets(order_id, params)
+      valid_fields = %i[packed_tm_group_id target_customer_party_role_id]
+      difference = changed_values(order_id, params.slice(*valid_fields)).compact
+      return ok_response if difference.empty?
+
+      order_item_ids = repo.select_values(:order_items, :id, order_id: order_id)
+      pallet_ids = repo.select_values(:pallet_sequences, :pallet_id, order_item_id: order_item_ids).uniq
+      return success_response('ok', OpenStruct.new(pallet_ids: pallet_ids, params: difference)) if params[:apply_changes_to_pallets] == 't'
+
+      # Raises validation response to get user consent of transaction
+      message = "Additionally #{pallet_ids.length} pallets will be updated! This cannot be undone."
+      validation_failed_response({ messages: { apply_changes_to_pallets: [message] }, apply_changes_to_pallets: false })
+    end
+
+    def update_order_pallets(res)
+      instance = res.instance
+      repo.update(:pallet_sequences, instance.pallet_ids, instance.params)
     end
 
     def delete_order(id)
@@ -87,25 +112,6 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def update_order_pallets(order_id, params) # rubocop:disable Metrics/AbcSize
-      commit = params.delete(:commit)
-      valid_fields = %i[packed_tm_group_id target_customer_party_role_id]
-
-      new_values = params.clone.slice(*valid_fields)
-      current_values = DB[:orders].where(id: order_id).select(*valid_fields).first
-      return ok_response if current_values == new_values
-
-      pallet_ids = DB[:pallet_sequences].join(:order_items, id: :order_item_id).where(order_id: order_id).distinct.select_map(:pallet_id)
-      return ok_response if pallet_ids.empty?
-
-      message = "Additionally #{pallet_ids.uniq.length} pallets will be updated! This cannot be undone."
-      return validation_failed_response({ messages: { commit: [message] }, commit: false }) unless commit
-
-      update_values = new_values.compact
-      DB[:pallet_sequences].where(pallet_id: pallet_ids).update(update_values) unless update_values.empty?
-      ok_response
-    end
-
     def order_items_grid(id, params)
       rpt = dataminer_report('order_items.yml', conditions: [{ col: 'order_items.order_id', op: '=', val: id }])
       row_defs = dataminer_report_rows(rpt)
@@ -118,7 +124,7 @@ module FinishedGoodsApp
 
     def col_defs(rpt, id, for_multiselect = false) # rubocop:disable Metrics/AbcSize
       pricing_per_kg = repo.get(:orders, id, :pricing_per_kg)
-      loads = repo.select_values(:orders_loads, :load_id, order_id: id)
+      load_ids = repo.select_values(:orders_loads, :load_id, order_id: id)
 
       Crossbeams::DataGrid::ColumnDefiner.new(for_multiselect: for_multiselect).make_columns do |mk| # rubocop:disable Metrics/BlockLength
         mk.action_column do |act|
@@ -128,8 +134,8 @@ module FinishedGoodsApp
                               col1: 'id', icon: 'edit', text: 'edit', title: 'Edit', hide_if_true: 'pallets_allocated'
           act.popup_delete_link '/finished_goods/orders/order_items/$col1$',
                                 col1: 'id', icon: 'delete', text: 'delete'
-          if loads.length == 1
-            act.popup_view_link "/finished_goods/orders/order_items/$col1$/allocate/#{loads.first}",
+          if load_ids.length == 1
+            act.popup_view_link "/finished_goods/orders/order_items/$col1$/allocate/#{load_ids.first}",
                                 col1: 'id', icon: 'edit', text: 'allocate pallets', title: 'Allocate Pallets'
           else
             act.popup_view_link '/finished_goods/orders/order_items/$col1$/allocate',
