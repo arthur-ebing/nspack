@@ -4,10 +4,37 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
 module FinishedGoodsApp
   class TestOrderInteractor < MiniTestWithHooks
-    include OrderFactory
+    include FinishedGoodsApp::OrderFactory
     include MasterfilesApp::FinanceFactory
     include MasterfilesApp::PartyFactory
     include MasterfilesApp::TargetMarketFactory
+
+    include FinishedGoodsApp::LoadFactory
+    include FinishedGoodsApp::VoyageFactory
+    include MasterfilesApp::PartyFactory
+    include MasterfilesApp::DepotFactory
+    include MasterfilesApp::VesselFactory
+    include MasterfilesApp::PortFactory
+    # this can be simplified by including the sub factories in the parent factory.
+    include MesscadaApp::PalletFactory
+    include MasterfilesApp::PackagingFactory
+    include ProductionApp::ResourceFactory
+    include MasterfilesApp::LocationFactory
+    include MasterfilesApp::FruitFactory
+    include ProductionApp::ProductionRunFactory
+    include MasterfilesApp::FarmFactory
+    include MasterfilesApp::PartyFactory
+    include MasterfilesApp::CalendarFactory
+    include MasterfilesApp::CommodityFactory
+    include MasterfilesApp::CultivarFactory
+    include ProductionApp::ProductSetupFactory
+    include MasterfilesApp::TargetMarketFactory
+    include MasterfilesApp::GeneralFactory
+    include MasterfilesApp::MarketingFactory
+    include RawMaterialsApp::RmtBinFactory
+    include MasterfilesApp::HRFactory
+    include RawMaterialsApp::RmtDeliveryFactory
+    include MasterfilesApp::RmtContainerFactory
 
     def test_repo
       repo = interactor.send(:repo)
@@ -53,6 +80,26 @@ module FinishedGoodsApp
       res = interactor.update_order(id, attrs)
       refute res.success, "#{res.message} : #{res.errors.inspect}"
       assert_equal ['is missing'], res.errors[:customer_order_number]
+    end
+
+    def test_update_order_pallets
+      order_id, load_id = create_orders_loads
+      pallet_id = create_pallet(load_id: load_id)
+      order_item_id = create_order_item(order_id: order_id)
+      pallet_sequence_id = create_pallet_sequence(pallet_id: pallet_id, order_item_id: order_item_id)
+      new_packed_tm_group_id = create_target_market_group(force_create: true)
+
+      attrs = interactor.send(:repo).find_hash(:orders, order_id).reject { |k, _| k == :id }
+      value = attrs[:packed_tm_group_id]
+      attrs[:apply_changes_to_pallets] = 't'
+      attrs[:packed_tm_group_id] = new_packed_tm_group_id
+
+      res = interactor.update_order(order_id, attrs)
+      assert res.success, "#{res.message} : #{res.errors.inspect}"
+      assert_instance_of(Order, res.instance)
+      assert_equal new_packed_tm_group_id, res.instance.packed_tm_group_id
+      assert_equal new_packed_tm_group_id, interactor.send(:repo).get(:pallet_sequences, pallet_sequence_id, :packed_tm_group_id)
+      refute_equal value, res.instance.packed_tm_group_id
     end
 
     def test_delete_order

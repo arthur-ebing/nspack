@@ -61,7 +61,8 @@ module FinishedGoodsApp
 
     def update_order_pallets(res)
       instance = res.instance
-      repo.update(:pallet_sequences, instance.pallet_ids, instance.params)
+      ids = repo.select_values(:pallet_sequences, :id, pallet_id: instance.pallet_ids).uniq
+      repo.update(:pallet_sequences, ids, instance.params)
     end
 
     def delete_order(id)
