@@ -83,7 +83,7 @@ module MesscadaApp
       return failed_response('Invalid identifier') if personnel_identifier_id.nil?
 
       contract_worker_id = repo.contract_worker_id_from_personnel_id(personnel_identifier_id)
-      return failed_response('This identifier is not assigned') if contract_worker_id.nil?
+      return failed_response("#{identifier} not assigned") if contract_worker_id.nil?
 
       success_response('ok', { personnel_identifier_id: personnel_identifier_id, contract_worker_id: contract_worker_id, identifier: identifier })
     end
