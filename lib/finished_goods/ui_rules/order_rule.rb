@@ -149,10 +149,10 @@ module UiRules
         remarks: {},
         load_id: { hide_on_load: true },
         pricing_per_kg: { renderer: :checkbox },
-        commit: { renderer: :checkbox,
-                  caption: 'Confirm action!',
-                  hide_on_load: @form_object.to_h[:commit].nil?,
-                  as_boolean: true }
+        apply_changes_to_pallets: { renderer: :checkbox,
+                                    caption: 'Confirm action!',
+                                    hide_on_load: @form_object.to_h[:apply_changes_to_pallets].nil?,
+                                    as_boolean: true }
       }
     end
 

@@ -3,7 +3,7 @@
 require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
 module FinishedGoodsApp
-  class TestShipLoad < MiniTestWithHooks
+  class TestUnshipLoad < MiniTestWithHooks
     include FinishedGoodsApp::OrderFactory
     include MasterfilesApp::FinanceFactory
 
@@ -55,6 +55,7 @@ module FinishedGoodsApp
 
       res = UnshipLoad.call(load_id, current_user)
       assert res.success, 'Should unship load'
+      assert !repo.get(:pallets, pallet_id, :shipped), 'Should unship Pallet'
       assert !repo.get(:loads, load_id, :shipped), 'Should unship Load'
       assert !repo.get(:orders, order_id, :shipped), 'Should unship Order'
     end

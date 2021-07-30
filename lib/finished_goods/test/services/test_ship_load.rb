@@ -53,6 +53,7 @@ module FinishedGoodsApp
 
       res = ShipLoad.call(load_id, current_user)
       assert res.success, res.message
+      assert repo.get(:pallets, pallet_id, :shipped), 'Should Ship Pallet'
       assert repo.get(:loads, load_id, :shipped), 'Should Ship Load'
       assert repo.get(:orders, order_id, :shipped), 'Should Ship Order'
     end
@@ -71,6 +72,7 @@ module FinishedGoodsApp
 
       res = ShipLoad.call(load_id, current_user)
       assert res.success, res.message
+      assert repo.get(:pallets, pallet_id, :shipped), 'Should Ship Pallet'
       assert repo.get(:loads, load_id, :shipped), 'Should ship Load'
       refute repo.get(:orders, order_id, :shipped), 'Should not ship Order'
     end
@@ -84,6 +86,7 @@ module FinishedGoodsApp
 
       res = ShipLoad.call(load_id, current_user)
       refute res.success, res.message
+      assert !repo.get(:pallets, pallet_id, :shipped), 'Pallet should not be shipped'
       assert !repo.get(:loads, load_id, :shipped), 'Load should not be shipped'
     end
 

@@ -20,7 +20,6 @@ module FinishedGoods
                           multiselect_url: "/finished_goods/orders/orders/#{id}/load/#{load_id}/allocate",
                           multiselect_params: { order_item_ids: order_item_ids.join(',') },
                           caption: 'Choose pallets')
-            page.form(&:no_submit!)
           end
         end
       end
