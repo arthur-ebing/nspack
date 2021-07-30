@@ -168,7 +168,6 @@ class Nspack < Roda
             carton_quantity
             price_per_carton
             price_per_kg
-            colour_rule
           ]
           update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
         else
