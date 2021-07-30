@@ -47,6 +47,7 @@ module Production
                     fold.add_field :fruit_size_reference_id
                     fold.add_field :rmt_class_id
                     fold.add_field :grade_id
+                    fold.add_field :color_percentage_id
                   end
                 end
                 row.column do |col|

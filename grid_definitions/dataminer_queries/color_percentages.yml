@@ -1,0 +1,166 @@
+---
+:caption: Color Percentages
+:sql: "SELECT \"color_percentages\".\"id\", \"color_percentages\".\"commodity_id\",
+  \"commodities\".\"code\" AS commodity_code, \"color_percentages\".\"description\",
+  \"color_percentages\".\"color_percentage\", \"color_percentages\".\"active\", \"color_percentages\".\"created_at\",
+  \"color_percentages\".\"updated_at\", fn_current_status('color_percentages', \"color_percentages\".\"id\")
+  AS status \r\nFROM \"color_percentages\" \r\nJOIN \"commodities\" ON \"commodities\".\"id\"
+  = \"color_percentages\".\"commodity_id\"\r\nORDER BY \"commodities\".\"code\" ASC,
+  \"color_percentages\".\"description\" ASC"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: color_percentages.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  commodity_id:
+    :name: commodity_id
+    :sequence_no: 2
+    :caption: Commodity
+    :namespaced_name: color_percentages.commodity_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  commodity_code:
+    :name: commodity_code
+    :sequence_no: 3
+    :caption: Commodity code
+    :namespaced_name: commodities.code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  description:
+    :name: description
+    :sequence_no: 4
+    :caption: Description
+    :namespaced_name: color_percentages.description
+    :data_type: :string
+    :width: 200
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  color_percentage:
+    :name: color_percentage
+    :sequence_no: 5
+    :caption: Color Percentage
+    :namespaced_name: color_percentages.color_percentage
+    :data_type: :integer
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 6
+    :caption: Active
+    :namespaced_name: color_percentages.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 7
+    :caption: Created at
+    :namespaced_name: color_percentages.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 8
+    :caption: Updated at
+    :namespaced_name: color_percentages.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 9
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: commodity_id
+  :caption: Commodity
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT code, id FROM commodities ORDER BY code

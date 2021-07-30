@@ -382,7 +382,7 @@ module ProductionApp
       data_ar = %i[marketing_variety customer_variety std_size basic_pack std_pack actual_count size_ref marketing_org
                    packed_tm_group target_market mark inventory_code pallet_base stack_type cpp client_size_ref
                    client_product_code treatments order_number sell_by_code grade product_chars
-                   tu_labour_product ru_labour_product fruit_stickers tu_stickers target_customer]
+                   tu_labour_product ru_labour_product fruit_stickers tu_stickers target_customer color_percentage]
       data_ar << :rmt_class_code if AppConst::CR_PROD.capture_product_setup_class?
       data_ar.push(:pm_mark, :pm_type, :pm_subtype, :bom) if AppConst::CR_PROD.require_packaging_bom?
       query = MesscadaApp::DatasetPalletSequence.call('WHERE pallet_sequences.id = ?')
@@ -421,7 +421,8 @@ module ProductionApp
                      ru_labour_product: get(:pm_products, attrs[:ru_labour_product_id], :product_code),
                      fruit_stickers: sticker_values(attrs[:fruit_sticker_ids]),
                      tu_stickers: sticker_values(attrs[:tu_sticker_ids]),
-                     target_customer: party_repo.fn_party_role_name(attrs[:target_customer_party_role_id]) }
+                     target_customer: party_repo.fn_party_role_name(attrs[:target_customer_party_role_id]),
+                     color_percentage: get(:color_percentages, attrs[:color_percentage_id], :color_percentage) }
       data_attrs = data_attrs.merge(rmt_class_code: get(:rmt_classes, attrs[:rmt_class_id], :rmt_class_code)) if AppConst::CR_PROD.capture_product_setup_class?
       data_attrs = data_attrs.merge(packaging_bom_attrs(attrs)) if AppConst::CR_PROD.require_packaging_bom?
       data_attrs
@@ -619,7 +620,7 @@ module ProductionApp
         packhouses.plant_resource_code AS packhouse, lines.plant_resource_code AS line, farms.farm_code AS farm,
         pucs.puc_code AS puc, orchards.orchard_code AS orchard, cultivar_groups.cultivar_group_code AS cultivar_group,
         cultivars.cultivar_name AS cultivar, ps.packing_specification_item_id, ps.tu_labour_product_id, ps.ru_labour_product_id,
-        ps.fruit_sticker_ids, ps.rmt_class_id, ps.target_customer_party_role_id
+        ps.fruit_sticker_ids, ps.rmt_class_id, ps.target_customer_party_role_id, ps.color_percentage_id
         FROM pallet_sequences ps
         JOIN cultivar_groups ON cultivar_groups.id = ps.cultivar_group_id
         LEFT JOIN cultivars ON cultivars.id = ps.cultivar_id

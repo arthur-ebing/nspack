@@ -90,6 +90,7 @@ module MesscadaApp
     attribute :product_chars, Types::String
     attribute :rmt_container_material_owner_id, Types::Integer
     attribute :legacy_data, Types::Hash.optional
+    attribute :color_percentage_id, Types::Integer
   end
 
   class ScannedCartonNumber < Dry::Struct

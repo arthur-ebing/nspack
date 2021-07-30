@@ -79,6 +79,48 @@ class Nspack < Roda
         check_auth!('fruit', 'edit')
         show_partial { Masterfiles::Fruit::Commodity::Edit.call(id) }
       end
+
+      r.on 'color_percentages' do
+        interactor = MasterfilesApp::ColorPercentageInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+        r.on 'new' do    # NEW
+          check_auth!('fruit', 'new')
+          show_partial_or_page(r) { Masterfiles::Fruit::ColorPercentage::New.call(id, remote: fetch?(r)) }
+        end
+        r.post do        # CREATE
+          res = interactor.create_color_percentage(params[:color_percentage])
+          if res.success
+            row_keys = %i[
+              id
+              commodity_id
+              commodity_code
+              color_percentage
+              description
+              active
+            ]
+            json_actions([OpenStruct.new(type: :replace_input_value,
+                                         dom_id: 'color_percentage_color_percentage',
+                                         value: ''),
+                          OpenStruct.new(type: :replace_input_value,
+                                         dom_id: 'color_percentage_description',
+                                         value: ''),
+                          OpenStruct.new(type: :clear_form_validation,
+                                         dom_id: 'color_percentage_form'),
+                          OpenStruct.new(type: :add_grid_row,
+                                         attrs: select_attributes(res.instance, row_keys))],
+                         res.message,
+                         keep_dialog_open: true)
+          else
+            re_show_form(r, res, url: "/masterfiles/fruit/commodities/#{id}/color_percentages/new") do
+              Masterfiles::Fruit::ColorPercentage::New.call(id,
+                                                            form_values: params[:color_percentage],
+                                                            form_errors: res.errors,
+                                                            remote: fetch?(r))
+            end
+          end
+        end
+      end
+
       r.is do
         r.get do       # SHOW
           check_auth!('fruit', 'read')
@@ -96,6 +138,7 @@ class Nspack < Roda
               requires_standard_counts
               use_size_ref_for_edi
               active
+              color_applies
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
@@ -132,6 +175,7 @@ class Nspack < Roda
             requires_standard_counts
             use_size_ref_for_edi
             active
+            color_applies
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)
@@ -1300,6 +1344,73 @@ class Nspack < Roda
           update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
         else
           undo_grid_inline_edit(message: res.message, message_type: :error)
+        end
+      end
+    end
+
+    # COLOR PERCENTAGES
+    # --------------------------------------------------------------------------
+    r.on 'color_percentages', Integer do |id|
+      interactor = MasterfilesApp::ColorPercentageInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:color_percentages, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'inline_edit_color_percentage' do
+        res = interactor.inline_update_color_percentage(id, params)
+        if res.success
+          row_keys = %i[
+            commodity_code
+            color_percentage
+            description
+          ]
+          update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+        else
+          undo_grid_inline_edit(message: unwrap_failed_response(res), message_type: :error)
+        end
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('fruit', 'edit')
+        interactor.assert_permission!(:edit, id)
+        show_partial { Masterfiles::Fruit::ColorPercentage::Edit.call(id) }
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('fruit', 'read')
+          show_partial { Masterfiles::Fruit::ColorPercentage::Show.call(id) }
+        end
+
+        r.patch do     # UPDATE
+          res = interactor.update_color_percentage(id, params[:color_percentage])
+          if res.success
+            row_keys = %i[
+              commodity_code
+              color_percentage
+              description
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+          else
+            re_show_form(r, res) do
+              Masterfiles::Fruit::ColorPercentage::Edit.call(id,
+                                                             form_values: params[:color_percentage],
+                                                             form_errors: res.errors)
+            end
+          end
+        end
+
+        r.delete do    # DELETE
+          check_auth!('fruit', 'delete')
+          interactor.assert_permission!(:delete, id)
+          res = interactor.delete_color_percentage(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
         end
       end
     end

@@ -1,0 +1,29 @@
+---
+:dataminer_definition: color_percentages
+:actions:
+- :url: "/masterfiles/fruit/color_percentages/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/masterfiles/fruit/color_percentages/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/fruit/color_percentages/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+  - :control_type: :link
+    :url: "/masterfiles/fruit/commodities/$:commodity_id$/color_percentages/new"
+    :text: New Color Percentage
+    :style: :button
+    :behaviour: :popup
+:conditions:
+  :commodity_code:
+    - :col: commodity_id
+      :op: "="
+      :val: "$:commodity_id$"

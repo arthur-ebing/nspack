@@ -21,6 +21,13 @@
   :icon: list
   :title: Variants
   :popup: false
+- :separator: true
+- :url: "/list/color_percentages_show/with_params?key=commodity_code&commodity_id=$:id$"
+  :text: color percentages
+  :title: Color Percentages for $:code$
+  :icon: list
+  :popup: true
+  :hide_if_false: color_applies
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/fruit/commodities/new"
