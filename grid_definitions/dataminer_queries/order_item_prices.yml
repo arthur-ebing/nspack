@@ -1,0 +1,456 @@
+---
+:caption: Order Item Prices
+:sql: "SELECT\r\n    order_items.id,\r\n    order_items.order_id,\r\n    order_items.price_per_carton,\r\n
+  \   order_items.price_per_kg,\r\n    order_items.created_at,\r\n    order_items.updated_at,\r\n\r\n
+  \   order_items.commodity_id,\r\n    order_items.basic_pack_id,\r\n    order_items.standard_pack_id,\r\n
+  \   order_items.actual_count_id,\r\n    order_items.size_reference_id,\r\n    order_items.inventory_id,\r\n
+  \   order_items.grade_id,\r\n    order_items.mark_id,\r\n    order_items.marketing_variety_id,\r\n
+  \   order_items.sell_by_code,\r\n    order_items.pallet_format_id,\r\n    order_items.pm_mark_id,\r\n
+  \   order_items.pm_bom_id,\r\n    order_items.rmt_class_id\r\n\r\nFROM order_items\r\nORDER
+  BY created_at DESC"
+:limit: 
+:offset: 
+:external_settings:
+  :render_url: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: order_items.id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  order_id:
+    :name: order_id
+    :sequence_no: 2
+    :caption: Order
+    :namespaced_name: order_items.order_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  price_per_carton:
+    :name: price_per_carton
+    :sequence_no: 3
+    :caption: Price per carton
+    :namespaced_name: order_items.price_per_carton
+    :data_type: :number
+    :width: 130
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  price_per_kg:
+    :name: price_per_kg
+    :sequence_no: 4
+    :caption: Price per kg
+    :namespaced_name: order_items.price_per_kg
+    :data_type: :number
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 5
+    :caption: Created at
+    :namespaced_name: order_items.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 6
+    :caption: Updated at
+    :namespaced_name: order_items.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  commodity_id:
+    :name: commodity_id
+    :sequence_no: 7
+    :caption: Commodity
+    :namespaced_name: order_items.commodity_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  basic_pack_id:
+    :name: basic_pack_id
+    :sequence_no: 8
+    :caption: Basic pack
+    :namespaced_name: order_items.basic_pack_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  standard_pack_id:
+    :name: standard_pack_id
+    :sequence_no: 9
+    :caption: Standard pack
+    :namespaced_name: order_items.standard_pack_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  actual_count_id:
+    :name: actual_count_id
+    :sequence_no: 10
+    :caption: Actual count
+    :namespaced_name: order_items.actual_count_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  size_reference_id:
+    :name: size_reference_id
+    :sequence_no: 11
+    :caption: Size reference
+    :namespaced_name: order_items.size_reference_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inventory_id:
+    :name: inventory_id
+    :sequence_no: 12
+    :caption: Inventory
+    :namespaced_name: order_items.inventory_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  grade_id:
+    :name: grade_id
+    :sequence_no: 13
+    :caption: Grade
+    :namespaced_name: order_items.grade_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mark_id:
+    :name: mark_id
+    :sequence_no: 14
+    :caption: Mark
+    :namespaced_name: order_items.mark_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marketing_variety_id:
+    :name: marketing_variety_id
+    :sequence_no: 15
+    :caption: Marketing variety
+    :namespaced_name: order_items.marketing_variety_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  sell_by_code:
+    :name: sell_by_code
+    :sequence_no: 16
+    :caption: Sell by code
+    :namespaced_name: order_items.sell_by_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_format_id:
+    :name: pallet_format_id
+    :sequence_no: 17
+    :caption: Pallet format
+    :namespaced_name: order_items.pallet_format_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pm_mark_id:
+    :name: pm_mark_id
+    :sequence_no: 18
+    :caption: Pm mark
+    :namespaced_name: order_items.pm_mark_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pm_bom_id:
+    :name: pm_bom_id
+    :sequence_no: 19
+    :caption: Pm bom
+    :namespaced_name: order_items.pm_bom_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_class_id:
+    :name: rmt_class_id
+    :sequence_no: 20
+    :caption: Rmt class
+    :namespaced_name: order_items.rmt_class_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: order_items.order_id
+  :caption: Order
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: order_items.commodity_id
+  :caption: commodity_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: order_items.basic_pack_id
+  :caption: basic_pack_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: order_items.standard_pack_id
+  :caption: standard_pack_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: order_items.actual_count_id
+  :caption: actual_count_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: order_items.size_reference_id
+  :caption: size_reference_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: order_items.inventory_id
+  :caption: inventory_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: order_items.grade_id
+  :caption: grade_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: order_items.mark_id
+  :caption: mark_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: order_items.marketing_variety_id
+  :caption: marketing_variety_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: order_items.sell_by_code
+  :caption: sell_by_code
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: order_items.pallet_format_id
+  :caption: pallet_format_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: order_items.pm_mark_id
+  :caption: pm_mark_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: order_items.pm_bom_id
+  :caption: pm_bom_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: order_items.rmt_class_id
+  :caption: rmt_class_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

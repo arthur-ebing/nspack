@@ -716,4 +716,133 @@
   :default_value: 
   :ordered_list: false
   :ui_priority: 1
-  :list_def: 
+  :list_def:
+- :column: orders.packed_tm_group_id
+  :caption: packed_tm_group_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+- :column: orders.marketing_org_party_role_id
+  :caption: marketing_org_party_role_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+- :column: orders.target_customer_party_role_id
+  :caption: target_customer_party_role_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+- :column: order_items.commodity_id
+  :caption: commodity_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+- :column: order_items.standard_pack_id
+  :caption: standard_pack_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+- :column: order_items.actual_count_id
+  :caption: actual_count_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+- :column: order_items.size_reference_id
+  :caption: size_reference_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+- :column: order_items.inventory_id
+  :caption: inventory_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+- :column: order_items.grade_id
+  :caption: grade_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+- :column: order_items.mark_id
+  :caption: mark_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+- :column: order_items.marketing_variety_id
+  :caption: marketing_variety_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+- :column: order_items.sell_by_code
+  :caption: sell_by_code
+  :data_type: :string
+  :control_type: :text
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+- :column: order_items.pallet_format_id
+  :caption: pallet_format_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+- :column: order_items.pm_mark_id
+  :caption: pm_mark_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+- :column: order_items.pm_bom_id
+  :caption: pm_bom_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+- :column: order_items.rmt_class_id
+  :caption: rmt_class_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+
