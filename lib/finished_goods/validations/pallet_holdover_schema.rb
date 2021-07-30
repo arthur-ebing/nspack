@@ -6,6 +6,5 @@ module FinishedGoodsApp
     required(:pallet_id).filled(:integer)
     required(:holdover_quantity).filled(:integer)
     required(:buildup_remarks).filled(Types::StrippedString)
-    required(:completed).maybe(:bool)
   end
 end

@@ -13,8 +13,7 @@ module FinishedGoodsApp
         pallet_id: 1,
         pallet_number: '1234567',
         holdover_quantity: 1,
-        buildup_remarks: Faker::Lorem.unique.word,
-        completed: false
+        buildup_remarks: Faker::Lorem.unique.word
       }
       FinishedGoodsApp::PalletHoldover.new(base_attrs.merge(attrs))
     end

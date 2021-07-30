@@ -96,7 +96,8 @@ module FinishedGoodsApp
       location_id = create_location(force_create: true)
       pallet_id = create_pallet(load_id: load_id, location_id: location_id)
       create_pallet_sequence(pallet_id: pallet_id)
-      create_pallet_holdover(pallet_id: pallet_id)
+      carton_quantity = repo.get(:pallets, pallet_id, :carton_quantity)
+      create_pallet_holdover(pallet_id: pallet_id, holdover_quantity: carton_quantity + 1)
 
       res = ShipLoad.call(load_id, current_user)
       refute res.success, res.message
@@ -110,7 +111,9 @@ module FinishedGoodsApp
       location_id = create_location(force_create: true)
       pallet_id = create_pallet(load_id: load_id, location_id: location_id)
       create_pallet_sequence(pallet_id: pallet_id)
-      create_pallet_holdover(pallet_id: pallet_id, completed: true)
+
+      carton_quantity = repo.get(:pallets, pallet_id, :carton_quantity)
+      create_pallet_holdover(pallet_id: pallet_id, holdover_quantity: carton_quantity)
 
       res = ShipLoad.call(load_id, current_user)
       assert res.success, res.message
