@@ -166,7 +166,7 @@ module UiRules
       @form_object[:step] = step
     end
 
-    def add_controls # rubocop:disable Metrics/AbcSize
+    def add_controls # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       id = @options[:id]
       edit = { control_type: :link,
                style: :action_button,
@@ -202,8 +202,12 @@ module UiRules
                            style: :action_button,
                            text: 'Titan Inspection',
                            url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/titan_inspection",
-                           visible: @form_object.allow_titan_inspection & AppConst::CR_FG.do_titan_inspections?,
+                           visible: AppConst::CR_FG.do_titan_inspections?,
                            icon: :edit }
+      unless @form_object.allow_titan_inspection
+        titan_inspection[:prompt] = 'Please preverify inspected pallets first.'
+        titan_inspection[:url] = "/finished_goods/inspection/govt_inspection_sheets/#{id}/preverify"
+      end
       finish = { control_type: :link,
                  style: :action_button,
                  text: 'Finish Inspection',
