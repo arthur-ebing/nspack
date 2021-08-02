@@ -264,7 +264,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
                                             pallet_stack_type_id: args.pallet_stack_type_id)
     args.depot_pallet = args.is_depot_pallet == 't'
     unless args.depot_pallet
-      args.plt_packhouse_resource_id = get_id_or_error(:plant_resources, plant_resource_code: args.packhouse_code)
+      args.plt_packhouse_resource_id = get_id_or_error(:plant_resources, plant_resource_code: PH_CODES[args.packhouse_code])
       args.plt_line_resource_id = get_id_or_error(:plant_resources, plant_resource_code: args.production_line_code)
     end
     args.in_stock = args.inspection_result.to_s.upcase == 'PASSED'
