@@ -10,6 +10,8 @@ require_relative '../app_loader'
 # DEBUG=y RACK_ENV=production ruby scripts/base_script.rb ImportCartonStockIntegration 'file_name.csv' production_run_id
 
 class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassLength
+  PH_CODES = { 'KROMCO' => 'KROMCO_PACKHOUSE' }.freeze
+
   def run # rubocop:disable Metrics/AbcSize
     @filename = args[0]
     @production_run_id = args[1]
@@ -196,7 +198,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     args.rmt_class_id = get_id_or_error(:rmt_classes, rmt_class_code: args.product_class_code)
 
     unless args.depot_pallet
-      args.packhouse_resource_id = get_id_or_error(:plant_resources, plant_resource_code: args.packhouse_code)
+      args.packhouse_resource_id = get_id_or_error(:plant_resources, plant_resource_code: PH_CODES[args.packhouse_code])
       args.production_line_id = get_id_or_error(:plant_resources, plant_resource_code: args.production_line_code)
     end
 
