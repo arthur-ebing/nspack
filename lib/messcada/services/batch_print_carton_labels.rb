@@ -46,7 +46,10 @@ module MesscadaApp
     # sell_by_code grade_id product_chars
     def prepare_carton_label_record # rubocop:disable Metrics/AbcSize
       attrs = repo.find_hash(:product_setups, product_setup_id).reject { |k, _| EXCLUDE_PROD_SET_COLS.include?(k) }
+      attrs[:rmt_container_material_owner_id] = repo.get_value(:standard_pack_codes, :rmt_container_material_owner_id, id: attrs[:standard_pack_code_id])
       pr = repo.find_hash(:production_runs, production_run_id).select { |k, _| INCLUDE_PROD_RUN_COLS.include?(k) }
+      pr[:cultivar_id] = pr[:cultivar_id].nil_or_empty? ? production_repo.resolve_setup_cultivar_id(product_setup_id) : pr[:cultivar_id]
+
       phc = repo.find_resource_phc(pr[:production_line_id]) || repo.find_resource_phc(pr[:packhouse_resource_id])
       default_packing_method_id = MasterfilesApp::PackagingRepo.new.find_packing_method_by_code(AppConst::DEFAULT_PACKING_METHOD)&.id
       raise Crossbeams::FrameworkError, "Default Packing Method: #{AppConst::DEFAULT_PACKING_METHOD} does not exist." if default_packing_method_id.nil_or_empty?
