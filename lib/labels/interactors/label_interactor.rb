@@ -386,7 +386,8 @@ module LabelApp
 
     def variable_xml_from_params(params)
       # p params.keys
-      label_def = UtilityFunctions.symbolize_keys(JSON.parse(params[:label]))
+      label_def = JSON.parse(params[:label], symbolize_names: true)
+      # label_def = UtilityFunctions.symbolize_keys(JSON.parse(params[:label]))
       # p label_def
       formatted_name = params[:labelName].downcase.gsub(/[^a-zA-Z0-9 \\-]/, '').gsub(' ', '_')
       var_xml = Crossbeams::LabelDesigner::VariableXML.new(formatted_name, params[:pixelPerMM], label_def)
