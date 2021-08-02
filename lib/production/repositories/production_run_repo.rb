@@ -453,6 +453,17 @@ module ProductionApp
       rec
     end
 
+    def resolve_setup_cultivar_id(product_setup_id)
+      args = DB[:product_setups].where(id: product_setup_id).select(:product_setup_template_id, :marketing_variety_id).first
+      cultivar_id = DB[:product_setup_templates].where(id: args[:product_setup_template_id]).get(:cultivar_id)
+      return cultivar_id unless cultivar_id.nil?
+
+      cultivar_ids = DB[:marketing_varieties_for_cultivars].where(marketing_variety_id: args[:marketing_variety_id]).select_map(:cultivar_id).uniq
+      return nil unless cultivar_ids.count == 1
+
+      cultivar_ids.first
+    end
+
     # Does the run have at least one resource allocation with a setup and label?
     def any_allocated_setup?(id)
       exists?(:product_resource_allocations, Sequel.lit("production_run_id = #{id} AND product_setup_id IS NOT NULL AND label_template_id IS NOT NULL"))
