@@ -19,8 +19,9 @@ The following special environment variables are available when running the app:
 Handy Rake prep tasks
 
 * Run `bundle exec rake developers:setup` to setup a new developer install and to add missing environment variables to `.env.local`.
-* Run `bundle exec rake developers:listenv` to get a list of environment variables and their descriptions.
-* Run `bundle exec rake developers:validateenv` to list which environment variables are missing from `.env.local`.
+* Run `bundle exec rake developers:client_settings` to get a list of all possible environment variables and their descriptions.
+* Run `bundle exec rake developers:client_settings_required` to get the same list as above, but only including **required** variables.
+* Run `bundle exec rake developers:log:clear` to truncate the sql log file.
 
 == General
 
