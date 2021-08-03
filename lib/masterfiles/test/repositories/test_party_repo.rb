@@ -14,6 +14,7 @@ module MasterfilesApp
 
       assert_respond_to repo, :for_select_contact_method_types
       assert_respond_to repo, :for_select_address_types
+      assert_respond_to repo, :for_select_fruit_industry_levies
     end
 
     def test_crud_calls
@@ -22,6 +23,7 @@ module MasterfilesApp
       test_crud_calls_for :addresses, name: :address, wrapper: Address
       test_crud_calls_for :contact_methods, name: :contact_method, wrapper: ContactMethod
       test_crud_calls_for :registrations, name: :registration, wrapper: Registration
+      test_crud_calls_for :fruit_industry_levies, name: :fruit_industry_levy, wrapper: FruitIndustryLevy
     end
 
     def test_create_organization

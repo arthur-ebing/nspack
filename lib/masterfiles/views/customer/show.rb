@@ -15,6 +15,7 @@ module Masterfiles
               form.view_only!
               form.add_field :customer
               form.add_field :financial_account_code
+              form.add_field :fruit_industry_levy
               form.add_field :default_currency
               form.add_field :currencies
               form.add_field :contact_people
