@@ -16,7 +16,7 @@ module UiRules
       add_progress_step
       add_controls
 
-      @rules[:can_edit?] = !@form_object[:setup_completed] && !@form_object[:active] && !@form_object[:staged] && !repo.active_or_staged_children?(@form_object[:id])
+      @rules[:can_edit?] = !@form_object.setup_completed && !@form_object.active && !@form_object.staged && !repo.active_or_staged_children?(@form_object.id)
 
       common_values_for_fields common_fields
       add_plant_resource_field
@@ -33,8 +33,8 @@ module UiRules
     end
 
     def add_plant_resource_field
-      if repo.exists?(:presort_staging_run_children, presort_staging_run_id: @form_object[:id])
-        supplier_id_label = @supplier_repo.find_supplier(@form_object[:supplier_id])&.supplier
+      if repo.exists?(:presort_staging_run_children, presort_staging_run_id: @form_object.id)
+        supplier_id_label = @supplier_repo.find_supplier(@form_object.supplier_id)&.supplier
         fields[:supplier_id] = { renderer: :label, with_value: supplier_id_label, caption: 'Supplier' }
       else
         fields[:supplier_id] = { renderer: :select, options: @supplier_repo.for_select_suppliers,
@@ -46,12 +46,12 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      supplier_id_label = @supplier_repo.find_supplier(@form_object[:supplier_id])&.supplier
-      cultivar_id_label = repo.get(:cultivars, @form_object[:cultivar_id], :cultivar_name)
-      presort_unit_plant_resource_id_label = repo.get(:plant_resources, @form_object[:presort_unit_plant_resource_id], :plant_resource_code)
-      rmt_class_id_label = repo.get(:rmt_classes, @form_object[:rmt_class_id], :rmt_class_code)
-      rmt_size_id_label = repo.get(:rmt_sizes, @form_object[:rmt_size_id], :size_code)
-      season_id_label = repo.get(:seasons, @form_object[:season_id], :season_code)
+      supplier_id_label = @supplier_repo.find_supplier(@form_object.supplier_id)&.supplier
+      cultivar_id_label = repo.get(:cultivars, @form_object.cultivar_id, :cultivar_name)
+      presort_unit_plant_resource_id_label = repo.get(:plant_resources, @form_object.presort_unit_plant_resource_id, :plant_resource_code)
+      rmt_class_id_label = repo.get(:rmt_classes, @form_object.rmt_class_id, :rmt_class_code)
+      rmt_size_id_label = repo.get(:rmt_sizes, @form_object.rmt_size_id, :size_code)
+      season_id_label = repo.get(:seasons, @form_object.season_id, :season_code)
       fields[:setup_uncompleted_at] = { renderer: :label, format: :without_timezone_or_seconds }
       fields[:setup_completed] = { renderer: :label, as_boolean: true }
       fields[:presort_unit_plant_resource_id] = { renderer: :label, with_value: presort_unit_plant_resource_id_label, caption: 'Line Plant Resource' }
@@ -68,12 +68,12 @@ module UiRules
       fields[:active] = { renderer: :label, as_boolean: true }
       return fields unless kr?
 
-      fields[:ripe_point_code] = { renderer: :label, with_value: @form_object[:legacy_data].to_h['ripe_point_code'] }
-      fields[:track_indicator_code] = { renderer: :label, with_value: @form_object[:legacy_data].to_h['track_indicator_code'] }
+      fields[:ripe_point_code] = { renderer: :label, with_value: @form_object.legacy_data.to_h['ripe_point_code'] }
+      fields[:track_indicator_code] = { renderer: :label, with_value: @form_object.legacy_data.to_h['track_indicator_code'] }
     end
 
-    def common_fields
-      season_id_label = repo.get(:seasons, @form_object[:season_id], :season_code)
+    def common_fields # rubocop:disable Metrics/AbcSize
+      season_id_label = repo.get(:seasons, @form_object.season_id, :season_code)
       fields = { presort_unit_plant_resource_id: { renderer: :select,
                                                    options: @resource_repo.for_select_plant_resources_of_type(Crossbeams::Config::ResourceDefinitions::PRESORTING_UNIT),
                                                    caption: 'Line Plant Resource',
@@ -96,8 +96,10 @@ module UiRules
 
       return fields unless @rules[:is_kr]
 
+      cultivar_name = repo.get(:cultivars, @form_object.cultivar_id, :cultivar_name)
+      track_indicator_codes = messcada_repo.track_indicator_codes(cultivar_name).uniq if cultivar_name
       fields[:ripe_point_code] = { renderer: :select, options: messcada_repo.ripe_point_codes.map { |s| s[0] }.uniq, required: true, prompt: true }
-      fields[:track_indicator_code] = { renderer: :select, options: [], required: true, prompt: true }
+      fields[:track_indicator_code] = { renderer: :select, options: track_indicator_codes, required: true, prompt: true }
       fields
     end
 
@@ -108,7 +110,7 @@ module UiRules
       end
 
       @form_object = repo.find_presort_staging_run(@options[:id])
-      @form_object = repo.find_presort_staging_run(@options[:id]).to_h.merge(ripe_point_code: @form_object.legacy_data.to_h['ripe_point_code'], track_indicator_code: @form_object.legacy_data.to_h['track_indicator_code']) if kr?
+      @form_object = OpenStruct.new(@form_object.to_h.merge(ripe_point_code: @form_object.legacy_data.to_h['ripe_point_code'], track_indicator_code: @form_object.legacy_data.to_h['track_indicator_code'])) if kr?
     end
 
     def make_new_form_object
@@ -151,7 +153,7 @@ module UiRules
     end
 
     def add_controls
-      id = @form_object[:id]
+      id = @form_object.id
       complete_setup = { control_type: :link,
                          style: :action_button,
                          text: 'Complete Setup',
