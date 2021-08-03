@@ -1114,7 +1114,9 @@ module DevelopmentApp
               end
 
               def make_new_form_object
-                @form_object = OpenStruct.new(#{struct_fields.join(UtilityFunctions.comma_newline_and_spaces(36))})
+                @form_object = new_form_object_from_struct(#{opts.classnames[:module]}::#{opts.classnames[:class]})
+                # @form_object = new_form_object_from_struct(#{opts.classnames[:module]}::#{opts.classnames[:class]}, merge_hash: { some_column: 'some value' })
+                # @form_object = OpenStruct.new(#{struct_fields.join(UtilityFunctions.comma_newline_and_spaces_commented(36, 6))})
               end
 
               # def handle_behaviour

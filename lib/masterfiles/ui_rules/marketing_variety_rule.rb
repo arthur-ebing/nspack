@@ -34,8 +34,9 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(marketing_variety_code: nil,
-                                    description: nil)
+      @form_object = new_form_object_from_struct(MasterfilesApp::MarketingVariety)
+      # @form_object = OpenStruct.new(marketing_variety_code: nil,
+      #                               description: nil)
     end
   end
 end
