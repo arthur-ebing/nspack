@@ -63,6 +63,18 @@ module UiRules
       inflector.humanize(value.to_s).gsub(/\s\D/, &:upcase)
     end
 
+    # Get an OpenStruct with keys for every attribute of an entity.
+    # Optionally include values for some attributes in the merge_hash.
+    #
+    # @param struct [DryStruct] the entity to base the struct on.
+    # @param merge_hash [hash] optional hash to merge with non-nil values.
+    # @return [OpenStruct]
+    def new_form_object_from_struct(struct, merge_hash: {})
+      cols = struct.attribute_names.reject { |c| %i[id created_at updated_at].include?(c) }
+      hash = Hash[cols.zip([nil] * cols.length)]
+      OpenStruct.new(hash.merge(merge_hash))
+    end
+
     def extended_columns(repo, table, edit_mode: true)
       config = Crossbeams::Config::ExtendedColumnDefinitions.config_for(table)
       return if config.nil?

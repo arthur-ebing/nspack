@@ -96,18 +96,27 @@ module UiRules
       types = @repo.for_select_location_types(where: { hierarchical: true })
       raise CrossbeamsInfoError, 'There are no hierarchical location types defined' if types.empty?
 
-      @form_object = OpenStruct.new(primary_storage_type_id: initial_storage_type(parent),
-                                    location_type_id: types.first.last,
-                                    primary_assignment_id: initial_assignment(parent),
-                                    location_storage_definition_id: nil,
-                                    location_long_code: initial_code(parent),
-                                    location_description: nil,
-                                    location_short_code: initial_short_code(parent),
-                                    print_code: nil,
-                                    has_single_container: nil,
-                                    virtual_location: nil,
-                                    consumption_area: nil,
-                                    can_store_stock: false)
+      @form_object = new_form_object_from_struct(MasterfilesApp::Location,
+                                                 merge_hash: {
+                                                   primary_storage_type_id: initial_storage_type(parent),
+                                                   location_type_id: types.first.last,
+                                                   primary_assignment_id: initial_assignment(parent),
+                                                   location_long_code: initial_code(parent),
+                                                   location_short_code: initial_short_code(parent),
+                                                   can_store_stock: false
+                                                 })
+      # @form_object = OpenStruct.new(primary_storage_type_id: initial_storage_type(parent),
+      #                               location_type_id: types.first.last,
+      #                               primary_assignment_id: initial_assignment(parent),
+      #                               location_storage_definition_id: nil,
+      #                               location_long_code: initial_code(parent),
+      #                               location_description: nil,
+      #                               location_short_code: initial_short_code(parent),
+      #                               print_code: nil,
+      #                               has_single_container: nil,
+      #                               virtual_location: nil,
+      #                               consumption_area: nil,
+      #                               can_store_stock: false)
       @form_object[:location_type_id] = location_type_id_from(@options[:location_type_code]) if @mode == :new_flat
     end
 

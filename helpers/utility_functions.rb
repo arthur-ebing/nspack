@@ -63,6 +63,10 @@ module UtilityFunctions # rubocop:disable Metrics/ModuleLength
     ",\n#{' ' * count}"
   end
 
+  def comma_newline_and_spaces_commented(count, pos)
+    ",\n#{' ' * pos}# #{' ' * (count - pos)}"
+  end
+
   def spaces_from_string_lengths(initial_spaces, *strings)
     ' ' * ((initial_spaces || 0) + strings.sum(&:length))
   end
