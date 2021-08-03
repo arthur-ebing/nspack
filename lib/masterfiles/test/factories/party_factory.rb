@@ -170,5 +170,19 @@ module MasterfilesApp
       }
       DB[:registrations].insert(default.merge(opts))
     end
+
+    def create_fruit_industry_levy(opts = {})
+      id = get_available_factory_record(:fruit_industry_levies, opts)
+      return id unless id.nil?
+
+      default = {
+        levy_code: Faker::Lorem.unique.word,
+        description: Faker::Lorem.word,
+        active: true,
+        created_at: '2010-01-01 12:00',
+        updated_at: '2010-01-01 12:00'
+      }
+      DB[:fruit_industry_levies].insert(default.merge(opts))
+    end
   end
 end

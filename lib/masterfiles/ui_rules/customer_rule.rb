@@ -25,6 +25,7 @@ module UiRules
       fields[:financial_account_code] = { renderer: :label }
       fields[:active] = { renderer: :label,
                           as_boolean: true }
+      fields[:fruit_industry_levy] = { renderer: :label }
     end
 
     def common_fields
@@ -64,7 +65,12 @@ module UiRules
         short_description: { hide_on_load: hide_org_renderers },
         long_description: { hide_on_load: hide_org_renderers },
         company_reg_no: { hide_on_load: hide_org_renderers },
-        vat_number: { hide_on_load: hide_org_renderers }
+        vat_number: { hide_on_load: hide_org_renderers },
+        fruit_industry_levy_id: { renderer: :select,
+                                  options: @party_repo.for_select_fruit_industry_levies,
+                                  disabled_options: @party_repo.for_select_inactive_fruit_industry_levies,
+                                  prompt: true,
+                                  caption: 'Fruit Industry Levy' }
       }
     end
 
@@ -84,7 +90,8 @@ module UiRules
     def make_new_form_object
       @form_object = OpenStruct.new(default_currency_id: @repo.get_id(:currencies, currency: 'ZAR'),
                                     customer_party_role_id: nil,
-                                    financial_account_code: nil)
+                                    financial_account_code: nil,
+                                    fruit_industry_levy_id: nil)
     end
 
     private

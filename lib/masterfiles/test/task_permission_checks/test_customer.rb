@@ -19,7 +19,9 @@ module MasterfilesApp
         customer_party_role_id: 1,
         customer: 'ABC',
         financial_account_code: Faker::Lorem.word,
-        active: true
+        active: true,
+        fruit_industry_levy_id: 1,
+        fruit_industry_levy: 'ABC'
       }
       MasterfilesApp::Customer.new(base_attrs.merge(attrs))
     end

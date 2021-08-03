@@ -72,6 +72,8 @@ module MasterfilesApp
 
       currency_id = create_currency
       party_role_id = create_party_role
+      fruit_industry_levy_id = create_fruit_industry_levy
+
       default = {
         default_currency_id: currency_id,
         currency_ids: BaseRepo.new.array_for_db_col([currency_id]),
@@ -80,7 +82,8 @@ module MasterfilesApp
         contact_person_ids: BaseRepo.new.array_for_db_col([party_role_id]),
         active: true,
         created_at: '2010-01-01 12:00',
-        updated_at: '2010-01-01 12:00'
+        updated_at: '2010-01-01 12:00',
+        fruit_industry_levy_id: fruit_industry_levy_id
       }
       DB[:customers].insert(default.merge(opts))
     end
