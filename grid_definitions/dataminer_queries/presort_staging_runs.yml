@@ -5,10 +5,6 @@
   "presort_staging_runs"."supplier_id", "presort_staging_runs"."setup_completed_at", "presort_staging_runs"."canceled",
   "presort_staging_runs"."canceled_at", "presort_staging_runs"."staged_at", "presort_staging_runs"."cultivar_id", "presort_staging_runs"."rmt_class_id",
   "presort_staging_runs"."rmt_size_id", "presort_staging_runs"."season_id", "presort_staging_runs"."editing",
-  CASE WHEN "presort_staging_runs"."editing" is false and "presort_staging_runs"."staged" is false and "presort_staging_runs"."active" is false THEN true ELSE false END as uncomplete_setup,
-  CASE WHEN "presort_staging_runs"."setup_completed" is true and "presort_staging_runs"."active" is false and "presort_staging_runs"."staged" is false THEN true ELSE false END as activate_run,
-  CASE WHEN "presort_staging_runs"."active" is true and "presort_staging_runs"."staged" is false THEN true ELSE false END as complete_staging,
-  CASE WHEN "presort_staging_runs"."setup_completed" is false and "presort_staging_runs"."active" is false  and "presort_staging_runs"."staged" is false THEN true ELSE false END as can_edit,
   "presort_staging_runs"."staged", "presort_staging_runs"."active", "presort_staging_runs"."legacy_data",
   "cultivars"."cultivar_name", "rmt_classes"."rmt_class_code", "rmt_sizes"."size_code",
   "seasons"."season_code", "suppliers"."id" AS suppliers_id, fn_current_status('presort_staging_runs',
@@ -433,70 +429,6 @@
     :hide: false
     :pinned:
     :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  uncomplete_setup:
-    :name: uncomplete_setup
-    :sequence_no: 26
-    :caption: Uncomplete Setup?
-    :namespaced_name: uncomplete_setup
-    :data_type: :boolean
-    :width:
-    :format:
-    :hide: true
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  activate_run:
-    :name: activate_run
-    :sequence_no: 27
-    :caption: Activate Run?
-    :namespaced_name: activate_run
-    :data_type: :boolean
-    :width:
-    :format:
-    :hide: true
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  complete_staging:
-    :name: complete_staging
-    :sequence_no: 28
-    :caption: Complete Staging?
-    :namespaced_name: complete_staging
-    :data_type: :boolean
-    :width:
-    :format:
-    :hide: true
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  can_edit:
-    :name: can_edit
-    :sequence_no: 29
-    :caption: Can Edit?
-    :namespaced_name: can_edit
-    :data_type: :boolean
-    :width:
-    :format:
-    :hide: true
-    :pinned:
-    :groupable: true
     :group_by_seq:
     :group_sum: false
     :group_avg: false

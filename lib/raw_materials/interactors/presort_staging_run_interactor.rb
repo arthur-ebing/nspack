@@ -3,7 +3,7 @@
 module RawMaterialsApp
   class PresortStagingRunInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_presort_staging_run(params) # rubocop:disable Metrics/AbcSize
-      params[:season_id] = MasterfilesApp::CalendarRepo.new.get_season_id(params[:cultivar_id], Time.now) unless params[:cultivar_id].nil_or_empty?
+      params[:season_id] = calendar_repo.get_season_id(params[:cultivar_id], Time.now) unless params[:cultivar_id].nil_or_empty?
       params[:editing] = true
       params[:legacy_data] = { ripe_point_code: params[:ripe_point_code], track_indicator_code: params[:track_indicator_code] } if AppConst::CLIENT_CODE == 'kr'
       res = validate_presort_staging_run_params(params)
@@ -24,7 +24,8 @@ module RawMaterialsApp
     end
 
     def update_presort_staging_run(id, params) # rubocop:disable Metrics/AbcSize
-      params[:season_id] = MasterfilesApp::CalendarRepo.new.get_season_id(params[:cultivar_id], Time.now) unless params[:cultivar_id].nil_or_empty?
+      params[:supplier_id] = repo.get(:presort_staging_runs, id, :supplier_id) unless params.key?(:supplier_id)
+      params[:season_id] = calendar_repo.get_season_id(params[:cultivar_id], Time.now) unless params[:cultivar_id].nil_or_empty?
       params[:legacy_data] = { ripe_point_code: params[:ripe_point_code], track_indicator_code: params[:track_indicator_code] } if AppConst::CLIENT_CODE == 'kr'
       res = validate_presort_staging_run_params(params)
       return validation_failed_response(res) if res.failure?
@@ -71,7 +72,7 @@ module RawMaterialsApp
 
     def activate_run(id) # rubocop:disable Metrics/AbcSize
       resource_id = repo.get(:presort_staging_runs, id, :presort_unit_plant_resource_id)
-      return failed_response("Cannot activate presort_run: #{id}. There already exists an active run for this plant") if repo.exists?(:presort_staging_runs, presort_unit_plant_resource_id: resource_id, active: true)
+      return failed_response("Cannot activate presort_run: #{id}. There already exists an active run for this plant unit") if repo.exists?(:presort_staging_runs, presort_unit_plant_resource_id: resource_id, active: true)
 
       repo.transaction do
         repo.update_presort_staging_run(id, active: true, activated_at: Time.now)
@@ -138,8 +139,9 @@ module RawMaterialsApp
     end
 
     def activate_child_run(id) # rubocop:disable Metrics/AbcSize
-      parent_id = repo.get(:presort_staging_run_children, id, :presort_staging_run_id)
-      return failed_response("Cannot activate child_run: #{id}. There's already exists an active child_run", parent_id) if repo.exists?(:presort_staging_run_children, presort_staging_run_id: parent_id, active: true)
+      parent_id, plant_resource_id = repo.child_run_parent_id_and_plant_resource_id(id)
+      return failed_response("Cannot activate run: #{id}. There's already exists an active child on this run", parent_id) if repo.exists?(:presort_staging_run_children, presort_staging_run_id: parent_id, active: true)
+      return failed_response("Cannot activate run: #{id}. There already exists an active child run for this plant unit", parent_id) if repo.active_child_run_for_plant_resource_id?(plant_resource_id)
 
       repo.transaction do
         repo.update_presort_staging_run_child(id, active: true, editing: false, activated_at: Time.now)
@@ -168,13 +170,14 @@ module RawMaterialsApp
     end
 
     def delete_presort_staging_run_child(id) # rubocop:disable Metrics/AbcSize
+      parent_id = repo.get(:presort_staging_run_children, id, :presort_staging_run_id)
       name = presort_staging_run_child(id).id
       repo.transaction do
         repo.delete_presort_staging_run_child(id)
         log_status(:presort_staging_run_children, id, 'DELETED')
         log_transaction
       end
-      success_response("Deleted presort staging run child #{name}")
+      success_response("Deleted presort staging run child #{name}", parent_id)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue Sequel::ForeignKeyConstraintViolation => e
@@ -191,6 +194,10 @@ module RawMaterialsApp
 
     def repo
       @repo ||= PresortStagingRunRepo.new
+    end
+
+    def calendar_repo
+      MasterfilesApp::CalendarRepo.new
     end
 
     def presort_staging_run(id)
