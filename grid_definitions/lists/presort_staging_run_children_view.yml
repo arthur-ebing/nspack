@@ -1,7 +1,0 @@
----
-:dataminer_definition: presort_staging_run_children
-:conditions:
-  :standard:
-    - :col: presort_staging_run_children.presort_staging_run_id
-      :op: =
-      :val: $:staging_run_id$

@@ -11,14 +11,17 @@ module UiRules
       @calender_repo = MasterfilesApp::CalendarRepo.new
 
       kr?
-
       make_form_object
       apply_form_values
+      add_progress_step
+      add_controls
+
+      @rules[:can_edit?] = !@form_object[:setup_completed] && !@form_object[:active] && !@form_object[:staged] && !repo.active_or_staged_children?(@form_object[:id])
 
       common_values_for_fields common_fields
       add_plant_resource_field
 
-      set_show_fields if (%i[show reopen].include? @mode) || repo.presort_staging_run_completed_or_staged?(@form_object[:id])
+      set_show_fields unless @rules[:can_edit?] || @mode == :new
 
       add_behaviours
 
@@ -136,6 +139,56 @@ module UiRules
     end
 
     private
+
+    def add_progress_step
+      steps = ['Editing', 'Setup Completed', 'Activated', 'Staged']
+      step = 0
+      step = 1 if @form_object.setup_completed
+      step = 2 if @form_object.active
+      step = 3 if @form_object.staged
+
+      @form_object = OpenStruct.new(@form_object.to_h.merge(steps: steps, step: step))
+    end
+
+    def add_controls
+      id = @form_object[:id]
+      complete_setup = { control_type: :link,
+                         style: :action_button,
+                         text: 'Complete Setup',
+                         url: "/raw_materials/presorting/presort_staging_runs/#{id}/complete_setup",
+                         icon: :checkon }
+
+      uncomplete_setup = { control_type: :link,
+                           style: :action_button,
+                           text: 'Uncomplete Setup',
+                           url: "/raw_materials/presorting/presort_staging_runs/#{id}/uncomplete_setup",
+                           icon: :back }
+
+      activate = { control_type: :link,
+                   style: :action_button,
+                   text: 'Activate Run',
+                   url: "/raw_materials/presorting/presort_staging_runs/#{id}/activate_run",
+                   icon: :checkon }
+
+      complete_staging = { control_type: :link,
+                           style: :action_button,
+                           text: 'Complete Staging',
+                           url: "/raw_materials/presorting/presort_staging_runs/#{id}/complete_staging",
+                           icon: :checkon }
+
+      controls = case @form_object.step
+                 when 0
+                   [complete_setup]
+                 when 1
+                   [uncomplete_setup, activate]
+                 when 2
+                   [complete_staging]
+                 else
+                   []
+                 end
+
+      @form_object = OpenStruct.new(@form_object.to_h.merge(controls: controls))
+    end
 
     def repo
       RawMaterialsApp::PresortStagingRunRepo.new

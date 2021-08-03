@@ -15,31 +15,31 @@ class Nspack < Roda
       r.on 'complete_setup' do
         res = interactor.complete_setup(id)
         flash[res.success ? :notice : :error] = res.message
-        r.redirect '/list/presort_staging_runs'
+        r.redirect "/raw_materials/presorting/presort_staging_runs/#{id}/manage"
       end
 
       r.on 'uncomplete_setup' do
         res = interactor.uncomplete_setup(id)
         flash[res.success ? :notice : :error] = res.message
-        r.redirect '/list/presort_staging_runs'
+        r.redirect "/raw_materials/presorting/presort_staging_runs/#{id}/manage"
       end
 
       r.on 'activate_run' do
         res = interactor.activate_run(id)
         flash[res.success ? :notice : :error] = res.message
-        r.redirect '/list/presort_staging_runs'
+        r.redirect "/raw_materials/presorting/presort_staging_runs/#{id}/manage"
       end
 
       r.on 'complete_staging' do
         res = interactor.complete_staging(id)
         flash[res.success ? :notice : :error] = res.message
-        r.redirect '/list/presort_staging_runs'
+        r.redirect "/raw_materials/presorting/presort_staging_runs/#{id}/manage"
       end
 
-      r.on 'edit' do   # EDIT
+      r.on 'manage' do   # EDIT
         check_auth!('presorting', 'edit')
         interactor.assert_permission!(:edit, id)
-        show_partial_or_page(r) { RawMaterials::Presorting::PresortStagingRun::Edit.call(id) }
+        show_partial_or_page(r) { RawMaterials::Presorting::PresortStagingRun::Manage.call(id) }
       end
 
       r.on 'staging_run_child' do
@@ -51,7 +51,7 @@ class Nspack < Roda
           res = interactor.create_presort_staging_run_child(id, params[:presort_staging_run_child])
           if res.success
             flash[:notice] = res.message
-            redirect_via_json "/raw_materials/presorting/presort_staging_runs/#{id}/edit"
+            redirect_via_json "/raw_materials/presorting/presort_staging_runs/#{id}/manage"
           else
             re_show_form(r, res, url: "/raw_materials/presorting/presort_staging_runs/#{id}/staging_run_child") do
               RawMaterials::Presorting::PresortStagingRunChild::New.call(id,
@@ -64,18 +64,14 @@ class Nspack < Roda
       end
 
       r.is do
-        r.get do       # SHOW
-          check_auth!('presorting', 'read')
-          show_partial_or_page(r) { RawMaterials::Presorting::PresortStagingRun::Show.call(id) }
-        end
         r.patch do     # UPDATE
           res = interactor.update_presort_staging_run(id, params[:presort_staging_run])
           if res.success
             flash[:notice] = res.message
-            r.redirect "/raw_materials/presorting/presort_staging_runs/#{id}/edit"
+            r.redirect "/raw_materials/presorting/presort_staging_runs/#{id}/manage"
           else
-            re_show_form(r, res, url: "/raw_materials/presorting/presort_staging_runs/#{id}/edit") do
-              RawMaterials::Presorting::PresortStagingRun::Edit.call(id, form_values: params[:presort_staging_run], form_errors: res.errors)
+            re_show_form(r, res, url: "/raw_materials/presorting/presort_staging_runs/#{id}/manage") do
+              RawMaterials::Presorting::PresortStagingRun::Manage.call(id, form_values: params[:presort_staging_run], form_errors: res.errors)
             end
           end
         end
@@ -124,13 +120,13 @@ class Nspack < Roda
       r.on 'activate_child_run' do
         res = interactor.activate_child_run(id)
         flash[res.success ? :notice : :error] = res.message
-        r.redirect "/raw_materials/presorting/presort_staging_runs/#{res.instance}/edit"
+        r.redirect "/raw_materials/presorting/presort_staging_runs/#{res.instance}/manage"
       end
 
       r.on 'complete_staging' do
         res = interactor.complete_child_staging(id)
         flash[res.success ? :notice : :error] = res.message
-        show_partial_or_page(r) { RawMaterials::Presorting::PresortStagingRun::Edit.call(res.instance) }
+        show_partial_or_page(r) { RawMaterials::Presorting::PresortStagingRun::Manage.call(res.instance) }
       end
 
       r.is do
@@ -138,7 +134,10 @@ class Nspack < Roda
           check_auth!('presorting', 'delete')
           res = interactor.delete_presort_staging_run_child(id)
           if res.success
-            delete_grid_row(id, notice: res.message)
+            # delete_grid_row(id, notice: res.message)
+            flash[:notice] = res.message
+            # r.redirect "/raw_materials/presorting/presort_staging_runs/#{res.instance}/manage"
+            redirect_via_json "/raw_materials/presorting/presort_staging_runs/#{res.instance}/manage"
           else
             show_json_error(res.message, status: 200)
           end
