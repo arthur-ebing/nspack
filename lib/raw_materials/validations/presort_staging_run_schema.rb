@@ -16,7 +16,7 @@ module RawMaterialsApp
     required(:season_id).filled(:integer)
     optional(:editing).maybe(:bool)
     optional(:staged).maybe(:bool)
-    optional(:active).maybe(:bool)
+    optional(:running).maybe(:bool)
     optional(:legacy_data).maybe(:hash)
   end
 end

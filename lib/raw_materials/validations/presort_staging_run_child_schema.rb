@@ -10,5 +10,6 @@ module RawMaterialsApp
     required(:farm_id).filled(:integer)
     optional(:editing).maybe(:bool)
     optional(:staged).maybe(:bool)
+    optional(:running).maybe(:bool)
   end
 end

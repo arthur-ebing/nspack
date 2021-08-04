@@ -22,7 +22,7 @@ module RawMaterials
               form.add_field :rmt_class_id
               form.add_field :rmt_size_id
               form.add_field :season_id
-              if rules[:is_kr]
+              if rules[:implements_presort_legacy_data_fields]
                 form.add_field :ripe_point_code
                 form.add_field :track_indicator_code
               end

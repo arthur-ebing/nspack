@@ -1,11 +1,11 @@
 ---
 :caption: Presort Staging Runs
-:sql: SELECT "presort_staging_runs"."id", "presort_staging_runs"."created_at", "presort_staging_runs"."setup_uncompleted_at", fn_party_role_name(suppliers.supplier_party_role_id) as supplier,
+:sql: SELECT "presort_staging_runs"."id", "presort_staging_runs"."created_at", "presort_staging_runs"."updated_at", "presort_staging_runs"."setup_uncompleted_at", fn_party_role_name(suppliers.supplier_party_role_id) as supplier,
   "presort_staging_runs"."setup_completed", "presort_staging_runs"."presort_unit_plant_resource_id", "plant_resources"."plant_resource_code",
   "presort_staging_runs"."supplier_id", "presort_staging_runs"."setup_completed_at", "presort_staging_runs"."canceled",
   "presort_staging_runs"."canceled_at", "presort_staging_runs"."staged_at", "presort_staging_runs"."cultivar_id", "presort_staging_runs"."rmt_class_id",
   "presort_staging_runs"."rmt_size_id", "presort_staging_runs"."season_id", "presort_staging_runs"."editing",
-  "presort_staging_runs"."staged", "presort_staging_runs"."active", "presort_staging_runs"."legacy_data",
+  "presort_staging_runs"."staged", "presort_staging_runs"."running", "presort_staging_runs"."legacy_data",
   "cultivars"."cultivar_name", "rmt_classes"."rmt_class_code", "rmt_sizes"."size_code",
   "seasons"."season_code", "suppliers"."id" AS suppliers_id, fn_current_status('presort_staging_runs',
   "presort_staging_runs"."id") AS status FROM "presort_staging_runs" JOIN "cultivars"
@@ -14,6 +14,7 @@
   = "presort_staging_runs"."rmt_size_id" JOIN "seasons" ON "seasons"."id" = "presort_staging_runs"."season_id"
   JOIN "plant_resources" ON "plant_resources"."id" = "presort_staging_runs"."presort_unit_plant_resource_id"
   JOIN "suppliers" ON "suppliers"."id" = "presort_staging_runs"."supplier_id"
+  order by updated_at desc
 :limit:
 :offset: 
 :external_settings: {}
@@ -338,15 +339,15 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  active:
-    :name: active
+  running:
+    :name: running
     :sequence_no: 21
-    :caption: Active
-    :namespaced_name: presort_staging_runs.active
+    :caption: Running
+    :namespaced_name: presort_staging_runs.running
     :data_type: :boolean
     :width:
     :format:
-    :hide: true
+    :hide: false
     :pinned:
     :groupable: true
     :group_by_seq:
@@ -418,9 +419,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 26
+    :caption: Update At
+    :namespaced_name: presort_staging_runs.updated_at
+    :data_type: :datetime
+    :width:
+    :format:
+    :hide: true
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   staged_at:
     :name: staged_at
-    :sequence_no: 25
+    :sequence_no: 27
     :caption: Staged At
     :namespaced_name: presort_staging_runs.staged_at
     :data_type: :datetime

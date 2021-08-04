@@ -19,7 +19,7 @@ module RawMaterialsApp
     attribute :editing, Types::Bool
     attribute :staged, Types::Bool
     attribute :legacy_data, Types::Hash
-    attribute? :active, Types::Bool
+    attribute? :running, Types::Bool
   end
 
   class PresortStagingRunFlat < Dry::Struct
@@ -40,7 +40,7 @@ module RawMaterialsApp
     attribute :editing, Types::Bool
     attribute :staged, Types::Bool
     attribute :legacy_data, Types::Hash
-    attribute? :active, Types::Bool
+    attribute? :running, Types::Bool
 
     attribute :status, Types::String
     attribute :plant_resource_code, Types::String

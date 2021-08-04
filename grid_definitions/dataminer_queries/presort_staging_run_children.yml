@@ -1,21 +1,20 @@
 ---
 :caption: Presort Staging Run Children
-:sql: SELECT "presort_staging_run_children"."id", "presort_staging_run_children"."presort_staging_run_id",
-  "presort_staging_run_children"."created_at",
-  CASE WHEN "presort_staging_run_children"."active" IS true AND "presort_staging_run_children"."staged" IS false THEN true ELSE false END AS complete_staging,
+:sql: SELECT "presort_staging_run_children"."id", "presort_staging_run_children"."presort_staging_run_id", "presort_staging_run_children"."created_at", "presort_staging_run_children"."updated_at",
+  CASE WHEN "presort_staging_run_children"."running" IS true AND "presort_staging_run_children"."staged" IS false THEN true ELSE false END AS complete_staging,
   CASE
-  WHEN (select count(inn) < 1 from presort_staging_run_children inn where inn.presort_staging_run_id=presort_staging_run_children.presort_staging_run_id and inn.active is true) and "presort_staging_run_children"."staged" IS false
+  WHEN (select count(inn) < 1 from presort_staging_run_children inn where inn.presort_staging_run_id=presort_staging_run_children.presort_staging_run_id and inn.running is true) and "presort_staging_run_children"."staged" IS false
   THEN true
   ELSE false
   END as activate_run,
   "presort_staging_run_children"."staged_at", "presort_staging_run_children"."canceled",
   "presort_staging_run_children"."farm_id", "presort_staging_run_children"."editing",
-  "presort_staging_run_children"."staged", "presort_staging_run_children"."active",
+  "presort_staging_run_children"."staged", "presort_staging_run_children"."running",
   "farms"."farm_code", "presort_staging_runs"."id" AS presort_staging_runs_id, fn_current_status('presort_staging_run_children',
   "presort_staging_run_children"."id") AS status FROM "presort_staging_run_children"
   JOIN "farms" ON "farms"."id" = "presort_staging_run_children"."farm_id" LEFT JOIN
   "presort_staging_runs" ON "presort_staging_runs"."id" = "presort_staging_run_children"."presort_staging_run_id"
-  order by active desc
+  order by updated_at desc
 :limit: 
 :offset: 
 :external_settings: {}
@@ -196,11 +195,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  active:
-    :name: active
+  running:
+    :name: running
     :sequence_no: 10
-    :caption: Active
-    :namespaced_name: presort_staging_run_children.active
+    :caption: Running
+    :namespaced_name: presort_staging_run_children.running
     :data_type: :boolean
     :width: 
     :format: 
@@ -240,6 +239,22 @@
     :pinned: 
     :groupable: false
     :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 14
+    :caption: Update at
+    :namespaced_name: presort_staging_run_children.updated_at
+    :data_type: :datetime
+    :width:
+    :format:
+    :hide: true
+    :pinned:
+    :groupable: false
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false

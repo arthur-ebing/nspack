@@ -67,10 +67,10 @@ module RawMaterialsApp
       PresortStagingRunChildFlat.new(hash)
     end
 
-    def active_or_staged_children?(presort_staging_run_id)
+    def running_or_staged_children?(presort_staging_run_id)
       !DB[:presort_staging_run_children]
         .where(staged: true)
-        .or(active: true)
+        .or(running: true)
         .where(presort_staging_run_id: presort_staging_run_id)
         .all
         .empty?
@@ -84,10 +84,10 @@ module RawMaterialsApp
         .get(%i[presort_staging_run_id presort_unit_plant_resource_id])
     end
 
-    def active_child_run_for_plant_resource_id?(plant_resource_id)
+    def running_child_run_for_plant_resource_id?(plant_resource_id)
       !DB[:presort_staging_run_children]
         .join(:presort_staging_runs, id: :presort_staging_run_id)
-        .where(Sequel[:presort_staging_run_children][:active] => true, presort_unit_plant_resource_id: plant_resource_id)
+        .where(Sequel[:presort_staging_run_children][:running] => true, presort_unit_plant_resource_id: plant_resource_id)
         .first
         .nil?
     end

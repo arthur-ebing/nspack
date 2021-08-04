@@ -9,7 +9,7 @@ module RawMaterialsApp
     attribute :farm_id, Types::Integer
     attribute :editing, Types::Bool
     attribute :staged, Types::Bool
-    attribute? :active, Types::Bool
+    attribute? :running, Types::Bool
   end
 
   class PresortStagingRunChildFlat < Dry::Struct
@@ -22,6 +22,6 @@ module RawMaterialsApp
     attribute :staged, Types::Bool
     attribute :farm_code, Types::String
     attribute :status, Types::String
-    attribute? :active, Types::Bool
+    attribute? :running, Types::Bool
   end
 end
