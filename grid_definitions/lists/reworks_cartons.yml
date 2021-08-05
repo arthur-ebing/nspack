@@ -1,0 +1,22 @@
+---
+:dataminer_definition: reworks_cartons
+:conditions:
+  :scrap_reworks_cartons:
+    - :col: cartons.scrapped
+      :op: "="
+      :val: false
+  :unscrap_reworks_cartons:
+    - :col: cartons.scrapped
+      :op: "="
+      :val: true
+:multiselect:
+  :scrap_reworks_cartons:
+    :url: "/production/reworks/reworks_run_types/$:id$/reworks_runs/multiselect_reworks_run_cartons"
+    :section_caption: "SELECT 'Select Cartons for reworks run type: ' || run_type FROM reworks_run_types WHERE id = $:id$"
+    :multiselect_save_method: remote
+    :conditions: scrap_reworks_cartons
+  :unscrap_reworks_cartons:
+    :url: "/production/reworks/reworks_run_types/$:id$/reworks_runs/multiselect_reworks_run_cartons"
+    :section_caption: "SELECT 'Select Cartons for reworks run type: ' || run_type FROM reworks_run_types WHERE id = $:id$"
+    :multiselect_save_method: remote
+    :conditions: unscrap_reworks_cartons

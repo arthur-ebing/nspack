@@ -1146,5 +1146,19 @@ module ProductionApp
 
       ProductionApp::ProductSetupRepo.new.requires_material_owner?(oldest_sequence[:standard_pack_code_id], oldest_sequence[:grade_id])
     end
+
+    def carton_labels_on_pallet_sequence(carton_labels)
+      DB[:cartons]
+        .where(carton_label_id: carton_labels)
+        .exclude(pallet_sequence_id: nil, scrapped_sequence_id: nil)
+        .select_map(:carton_label_id)
+    end
+
+    def scrapped_carton_labels(carton_labels)
+      DB[:cartons]
+        .where(carton_label_id: carton_labels)
+        .where(scrapped: true)
+        .select_map(:carton_label_id)
+    end
   end
 end

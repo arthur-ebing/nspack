@@ -13,7 +13,8 @@ module MasterfilesApp
         description: 'ABC',
         active: true,
         applies_to_pallets: true,
-        applies_to_bins: true
+        applies_to_bins: true,
+        applies_to_cartons: false
       }
       MasterfilesApp::ScrapReason.new(base_attrs.merge(attrs))
     end

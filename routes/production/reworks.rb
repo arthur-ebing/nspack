@@ -583,6 +583,23 @@ class Nspack < Roda
           end
         end
 
+        r.on 'multiselect_reworks_run_cartons' do
+          check_auth!('reworks', 'new')
+          res = interactor.resolve_cartons_from_multiselect(id, multiselect_grid_choices(params))
+          if res.success
+            pallet_numbers = res.instance[:pallets_selected]
+            json_actions([OpenStruct.new(type: :replace_input_value,
+                                         dom_id: 'reworks_run_pallets_selected',
+                                         value: pallet_numbers)])
+          else
+            re_show_form(r, res) do
+              Production::Reworks::ReworksRun::New.call(id,
+                                                        form_values: params[:reworks_run_pallet],
+                                                        form_errors: res.errors)
+            end
+          end
+        end
+
         r.on 'multiselect_reworks_run_bulk_production_run_update' do
           attrs = retrieve_from_local_store(:reworks_run_params)
           res = interactor.bulk_production_run_update(id, multiselect_grid_choices(params), attrs)

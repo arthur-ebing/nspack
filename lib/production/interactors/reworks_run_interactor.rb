@@ -535,6 +535,17 @@ module ProductionApp
       failed_response(e.message)
     end
 
+    def resolve_cartons_from_multiselect(reworks_run_type_id, multiselect_list)
+      return failed_response('Carton selection cannot be empty') if multiselect_list.nil_or_empty?
+
+      carton_labels = repo.carton_carton_label(multiselect_list)
+      instance = { reworks_run_type_id: reworks_run_type_id,
+                   pallets_selected: carton_labels.join("\n") }
+      success_response('', instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def bulk_production_run_update(reworks_run_type_id, multiselect_list, attrs) # rubocop:disable Metrics/AbcSize
       return failed_response('Pallet sequence selection cannot be empty') if multiselect_list.nil_or_empty?
 
@@ -693,6 +704,9 @@ module ProductionApp
       when AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE,
           AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE
         validate_production_runs(reworks_run_type, params)
+      when AppConst::RUN_TYPE_SCRAP_CARTON,
+        AppConst::RUN_TYPE_UNSCRAP_CARTON
+        validate_carton_labels(reworks_run_type, params[:pallets_selected])
       else
         validate_pallet_numbers(reworks_run_type, params[:pallets_selected])
       end
@@ -717,8 +731,11 @@ module ProductionApp
       res = validate_reworks_run_params(attrs)
       return validation_failed_response(res) if res.failure?
 
-      return create_scrap_bin_reworks_run(res) if repo.find_reworks_run_type(attrs[:reworks_run_type_id])[:run_type] == AppConst::RUN_TYPE_SCRAP_BIN
-      return create_unscrap_bin_reworks_run(res) if repo.find_reworks_run_type(attrs[:reworks_run_type_id])[:run_type] == AppConst::RUN_TYPE_UNSCRAP_BIN
+      reworks_run_type = repo.find_reworks_run_type(attrs[:reworks_run_type_id])[:run_type]
+      return create_scrap_bin_reworks_run(res) if reworks_run_type == AppConst::RUN_TYPE_SCRAP_BIN
+      return create_unscrap_bin_reworks_run(res) if reworks_run_type == AppConst::RUN_TYPE_UNSCRAP_BIN
+      return create_scrap_carton_reworks_run(res) if reworks_run_type == AppConst::RUN_TYPE_SCRAP_CARTON
+      return create_unscrap_carton_reworks_run(res) if reworks_run_type == AppConst::RUN_TYPE_UNSCRAP_CARTON
 
       rw_res = ProductionApp::CreateReworksRun.call(res, reworks_action, changes)
       return failed_response(unwrap_failed_response(rw_res), attrs) unless rw_res.success
@@ -728,36 +745,55 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def create_scrap_bin_reworks_run(params) # rubocop:disable Metrics/AbcSize
+    def create_scrap_bin_reworks_run(params)
       repo.scrapped_bin_bulk_update(params)
-      id = repo.create_reworks_run(user: params[:user],
-                                   reworks_run_type_id: params[:reworks_run_type_id],
-                                   scrap_reason_id: params[:scrap_reason_id],
-                                   remarks: params[:remarks],
-                                   pallets_selected: "{ #{params[:pallets_selected].join(',')} }",
-                                   pallets_affected: "{ #{params[:pallets_selected].join(',')} }",
-                                   changes_made: nil,
-                                   bins_scrapped: "{ #{params[:pallets_selected].join(',')} }",
-                                   pallets_unscrapped: nil)
-      params[:pallets_selected].each do |bin| # LOG MULTIPLE!!!!!!!!!!!!!!
-        log_status(:rmt_bins, bin, 'SCRAPPED')
-      end
-      success_response('Bins Scrapped successfully', reworks_run_id: id)
+      reworks_run_attrs = resolve_reworks_run_attrs(params)
+      reworks_run_attrs[:bins_scrapped] = repo.array_for_db_col(params[:pallets_selected])
+      id = repo.create_reworks_run(reworks_run_attrs)
+      log_multiple_statuses(:rmt_bins, params[:pallets_selected], AppConst::REWORKS_SCRAPPED_STATUS)
+      success_response('Bins scrapped successfully', reworks_run_id: id)
     end
 
     def create_unscrap_bin_reworks_run(params)
       repo.unscrapped_bin_bulk_update(params)
-      id = repo.create_reworks_run(user: params[:user],
-                                   reworks_run_type_id: params[:reworks_run_type_id],
-                                   pallets_selected: "{ #{params[:pallets_selected].join(',')} }",
-                                   pallets_affected: "{ #{params[:pallets_selected].join(',')} }",
-                                   changes_made: nil,
-                                   bins_unscrapped: "{ #{params[:pallets_selected].join(',')} }",
-                                   pallets_unscrapped: nil)
-      params[:pallets_selected].each do |bin|
-        log_status(:rmt_bins, bin, AppConst::BIN_EXIT_REF_UNSCRAPPED)
-      end
-      success_response('Bins Unscrapped successfully', reworks_run_id: id)
+      reworks_run_attrs = resolve_reworks_run_attrs(params)
+      reworks_run_attrs[:bins_unscrapped] = repo.array_for_db_col(params[:pallets_selected])
+      id = repo.create_reworks_run(reworks_run_attrs)
+      log_multiple_statuses(:rmt_bins, params[:pallets_selected], AppConst::BIN_EXIT_REF_UNSCRAPPED)
+      success_response('Bins unscrapped successfully', reworks_run_id: id)
+    end
+
+    def create_scrap_carton_reworks_run(res)
+      carton_ids = repo.select_values(:cartons, :id, carton_label_id: res[:pallets_selected])
+      mesc_repo.update_carton(carton_ids, { scrapped: true, scrapped_at: Time.now, scrapped_reason: res[:remarks] })
+      reworks_run_attrs = resolve_reworks_run_attrs(res)
+      reworks_run_attrs[:cartons_scrapped] = repo.array_for_db_col(carton_ids)
+      id = repo.create_reworks_run(reworks_run_attrs)
+      log_multiple_statuses(:cartons, carton_ids, AppConst::REWORKS_SCRAPPED_STATUS)
+      success_response('Cartons scrapped successfully', reworks_run_id: id)
+    end
+
+    def create_unscrap_carton_reworks_run(res)
+      carton_ids = repo.select_values(:cartons, :id, carton_label_id: res[:pallets_selected])
+      mesc_repo.update_carton(carton_ids, { scrapped: false, scrapped_at: nil, scrapped_reason: nil })
+      reworks_run_attrs = resolve_reworks_run_attrs(res)
+      reworks_run_attrs[:cartons_unscrapped] = repo.array_for_db_col(carton_ids)
+      id = repo.create_reworks_run(reworks_run_attrs)
+      log_multiple_statuses(:cartons, carton_ids, 'UNSCRAPPED')
+      success_response('Cartons unscrapped successfully', reworks_run_id: id)
+    end
+
+    def resolve_reworks_run_attrs(params)
+      {
+        user: params[:user],
+        reworks_run_type_id: params[:reworks_run_type_id],
+        scrap_reason_id: params[:scrap_reason_id],
+        remarks: params[:remarks],
+        pallets_selected: params[:pallets_selected],
+        pallets_affected: params[:pallets_selected],
+        changes_made: nil,
+        pallets_unscrapped: nil
+      }
     end
 
     def print_reworks_pallet_label(pallet_number, params)
@@ -1865,7 +1901,9 @@ module ProductionApp
            AppConst::RUN_TYPE_BULK_WEIGH_BINS,
            AppConst::RUN_TYPE_BULK_UPDATE_PALLET_DATES,
            AppConst::RUN_TYPE_TIP_MIXED_ORCHARDS,
-           AppConst::RUN_TYPE_RESTORE_REPACKED_PALLET
+           AppConst::RUN_TYPE_RESTORE_REPACKED_PALLET,
+           AppConst::RUN_TYPE_SCRAP_CARTON,
+           AppConst::RUN_TYPE_UNSCRAP_CARTON
         false
       else
         true
@@ -2026,9 +2064,31 @@ module ProductionApp
       OpenStruct.new(success: true, instance:  attrs)
     end
 
+    def validate_carton_labels(reworks_run_type, cartons_string) # rubocop:disable Metrics/AbcSize
+      carton_labels = cartons_string.split(/\n|,/).map(&:strip).reject(&:empty?)
+      carton_labels.map! { |x| x.gsub(/['"]/, '') }
+
+      invalid_carton_labels = carton_labels.reject { |x| x.match(/\A\d+\Z/) }
+      return OpenStruct.new(success: false, messages: { pallets_selected: ["#{invalid_carton_labels.join(', ')} must be numeric"] }, pallets_selected: carton_labels) unless invalid_carton_labels.nil_or_empty?
+
+      referenced_carton_labels = repo.carton_labels_on_pallet_sequence(carton_labels)
+      return OpenStruct.new(success: false, messages: { pallets_selected: ["#{referenced_carton_labels.join(', ')} doesn't exist"] }, pallets_selected: carton_labels) unless referenced_carton_labels.nil_or_empty?
+
+      scrapped_carton_labels = repo.scrapped_carton_labels(carton_labels)
+      if AppConst::RUN_TYPE_UNSCRAP_CARTON == reworks_run_type
+        unscrapped_carton_labels = (carton_labels - scrapped_carton_labels.map(&:to_s))
+        return OpenStruct.new(success: false, messages: { pallets_selected: ["#{unscrapped_carton_labels.join(', ')} already unscrapped"] }, pallets_selected: carton_labels) unless unscrapped_carton_labels.nil_or_empty?
+      else
+        return OpenStruct.new(success: false, messages: { pallets_selected: ["#{scrapped_carton_labels.join(', ')} already scrapped"] }, pallets_selected: carton_labels) unless scrapped_carton_labels.nil_or_empty?
+      end
+
+      OpenStruct.new(success: true, instance: { pallet_numbers: carton_labels })
+    end
+
     def validate_reworks_run_new_params(reworks_run_type, params)
       case reworks_run_type
       when AppConst::RUN_TYPE_SCRAP_PALLET,
+           AppConst::RUN_TYPE_SCRAP_CARTON,
            AppConst::RUN_TYPE_SCRAP_BIN # WHY NOT ReworksRunScrapBinSchema ????
         ReworksRunScrapPalletsSchema.call(params)
       when AppConst::RUN_TYPE_TIP_BINS,

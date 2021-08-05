@@ -7,5 +7,6 @@ module MasterfilesApp
     required(:description).maybe(Types::StrippedString)
     optional(:applies_to_pallets).maybe(:bool)
     optional(:applies_to_bins).maybe(:bool)
+    optional(:applies_to_cartons).maybe(:bool)
   end
 end

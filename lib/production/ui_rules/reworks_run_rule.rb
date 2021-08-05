@@ -4,6 +4,7 @@ module UiRules
   class ReworksRunRule < Base # rubocop:disable Metrics/ClassLength
     def generate_rules # rubocop:disable Metrics/AbcSize
       @repo = ProductionApp::ReworksRepo.new
+      @quality_repo = MasterfilesApp::QualityRepo.new
       make_form_object
       apply_form_values
 
@@ -28,7 +29,7 @@ module UiRules
       if @form_object[:has_children]
         @rules[:change_run_details] ? make_compact_header_table(%i[tipped_bins carton_labels pallet_sequences], 3) : make_compact_header_table
       end
-      scrap_reason_id_label = MasterfilesApp::QualityRepo.new.find_scrap_reason(@form_object.scrap_reason_id)&.scrap_reason
+      scrap_reason_id_label = @quality_repo.find_scrap_reason(@form_object.scrap_reason_id)&.scrap_reason
       @rules[:scrap_pallet] = AppConst::RUN_TYPE_SCRAP_PALLET == reworks_run_type_id_label
       @rules[:tip_bins] = AppConst::RUN_TYPE_TIP_BINS == reworks_run_type_id_label
       @rules[:weigh_rmt_bins] = AppConst::RUN_TYPE_WEIGH_RMT_BINS == reworks_run_type_id_label
@@ -44,10 +45,11 @@ module UiRules
       @rules[:tip_mixed_orchards] = AppConst::RUN_TYPE_TIP_MIXED_ORCHARDS == reworks_run_type_id_label
       @rules[:restore_repacked_pallet] = AppConst::RUN_TYPE_RESTORE_REPACKED_PALLET == reworks_run_type_id_label
       @rules[:change_bin_delivery] = AppConst::RUN_TYPE_CHANGE_BIN_DELIVERY == reworks_run_type_id_label
+      @rules[:scrap_carton] = AppConst::RUN_TYPE_SCRAP_CARTON == reworks_run_type_id_label
+      @rules[:unscrap_carton] = AppConst::RUN_TYPE_UNSCRAP_CARTON == reworks_run_type_id_label
       @rules[:bin_run_type] = bin_run_type?
+      @rules[:carton_run_type] = carton_run_type?
       @rules[:bulk_update_pallet_dates] = AppConst::RUN_TYPE_BULK_UPDATE_PALLET_DATES == reworks_run_type_id_label
-
-      text_area_caption = @rules[:bin_run_type] ? 'Bins' : 'Pallets'
 
       fields[:created_at] = { renderer: :label,
                               format: :without_timezone_or_seconds }
@@ -57,7 +59,7 @@ module UiRules
       fields[:scrap_reason_id] = { renderer: :label,
                                    with_value: scrap_reason_id_label,
                                    caption: 'Scrap Reason',
-                                   hide_on_load: @rules[:scrap_pallet] || @rules[:scrap_bin] ? false : true }
+                                   hide_on_load: scrapping? ? false : true }
       fields[:remarks] = { renderer: :label,
                            hide_on_load: !@form_object.remarks.nil_or_empty? ? false : true }
       fields[:reworks_action] = { renderer: :label,
@@ -142,7 +144,10 @@ module UiRules
       @rules[:tip_mixed_orchards] = AppConst::RUN_TYPE_TIP_MIXED_ORCHARDS == reworks_run_type_id_label
       @rules[:restore_repacked_pallet] = AppConst::RUN_TYPE_RESTORE_REPACKED_PALLET == reworks_run_type_id_label
       @rules[:change_bin_delivery] = AppConst::RUN_TYPE_CHANGE_BIN_DELIVERY == reworks_run_type_id_label
+      @rules[:scrap_carton] = AppConst::RUN_TYPE_SCRAP_CARTON == reworks_run_type_id_label
+      @rules[:unscrap_carton] = AppConst::RUN_TYPE_UNSCRAP_CARTON == reworks_run_type_id_label
       @rules[:bin_run_type] = bin_run_type?
+      @rules[:carton_run_type] = carton_run_type?
       @rules[:show_allow_cultivar_group_mixing] = @rules[:allow_cultivar_group_mixing] && @rules[:bulk_production_run_update]
       @rules[:bulk_update_pallet_dates] = AppConst::RUN_TYPE_BULK_UPDATE_PALLET_DATES == reworks_run_type_id_label
 
@@ -151,23 +156,29 @@ module UiRules
                      else
                        'Bin' # @rules[:scan_rmt_bin_asset_numbers] ? 'Bin asset number' : 'Bin id'
                      end
-      text_area_caption = @rules[:bin_run_type] ? 'Bins' : 'Pallets'
-      scrap_reason = @rules[:scrap_bin] ? MasterfilesApp::QualityRepo.new.for_select_scrap_reasons(where: { applies_to_bins: true }) : MasterfilesApp::QualityRepo.new.for_select_scrap_reasons(where: { applies_to_pallets: true })
+
+      where = if @rules[:scrap_bin]
+                { applies_to_bins: true }
+              elsif @rules[:scrap_carton]
+                { applies_to_cartons: true }
+              else
+                { applies_to_pallets: true }
+              end
       {
         reworks_run_type_id: { renderer: :hidden },
         reworks_run_type: { renderer: :label,
                             with_value: reworks_run_type_id_label,
                             caption: 'Reworks Run Type' },
         scrap_reason_id: { renderer: :select,
-                           options: scrap_reason,
-                           disabled_options: MasterfilesApp::QualityRepo.new.for_select_inactive_scrap_reasons,
+                           options: @quality_repo.for_select_scrap_reasons(where: where),
+                           disabled_options: @quality_repo.for_select_inactive_scrap_reasons,
                            caption: 'Scrap Reason',
-                           hide_on_load: @rules[:scrap_pallet] || @rules[:scrap_bin] ? false : true },
+                           hide_on_load: scrapping? ? false : true },
         remarks: { renderer: :textarea,
                    rows: 5,
                    placeholder: 'Scrap remarks',
                    caption: 'Scrap Remarks',
-                   hide_on_load: @rules[:scrap_pallet] || @rules[:scrap_bin] ? false : true },
+                   hide_on_load: scrapping? ? false : true },
         pallets_selected: if @rules[:single_edit]
                             { caption: text_caption }
                           else
@@ -231,6 +242,24 @@ module UiRules
 
     def bin_run_type? # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       @rules[:tip_bins] || @rules[:weigh_rmt_bins] || @rules[:scrap_bin] || @rules[:unscrap_bin] || @rules[:bulk_bin_run_update] || @rules[:bulk_weigh_bins] || @rules[:untip_bins] || @rules[:tip_mixed_orchards] || @rules[:change_bin_delivery]
+    end
+
+    def carton_run_type?
+      @rules[:scrap_carton] || @rules[:unscrap_carton]
+    end
+
+    def scrapping?
+      @rules[:scrap_pallet] || @rules[:scrap_bin] || @rules[:scrap_carton]
+    end
+
+    def text_area_caption
+      if @rules[:bin_run_type]
+        'Bins'
+      elsif @rules[:carton_run_type]
+        'Cartons'
+      else
+        'Pallets'
+      end
     end
 
     def make_compact_details(reworks_run_type_id, affected_ids)

@@ -1,8 +1,8 @@
 ---
 :caption: Scrap Reasons
 :sql: SELECT "scrap_reasons"."id", "scrap_reasons"."scrap_reason", "scrap_reasons"."description",
-  "scrap_reasons"."active","scrap_reasons"."applies_to_pallets", "scrap_reasons"."created_at", "scrap_reasons"."updated_at"
-  FROM "scrap_reasons"
+  "scrap_reasons"."active","scrap_reasons"."applies_to_pallets","scrap_reasons"."applies_to_bins","scrap_reasons"."applies_to_cartons","scrap_reasons"."created_at",
+  "scrap_reasons"."updated_at" FROM "scrap_reasons"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -29,7 +29,7 @@
     :caption: Scrap reason
     :namespaced_name: scrap_reasons.scrap_reason
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -45,7 +45,7 @@
     :caption: Description
     :namespaced_name: scrap_reasons.description
     :data_type: :string
-    :width: 
+    :width: 200
     :format: 
     :hide: false
     :pinned: 
@@ -61,7 +61,7 @@
     :caption: Active
     :namespaced_name: scrap_reasons.active
     :data_type: :boolean
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -77,7 +77,39 @@
     :caption: Applies to pallets
     :namespaced_name: scrap_reasons.applies_to_pallets
     :data_type: :boolean
-    :width: 
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  applies_to_bins:
+    :name: applies_to_bins
+    :sequence_no: 6
+    :caption: Applies to bins
+    :namespaced_name: scrap_reasons.applies_to_bins
+    :data_type: :boolean
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  applies_to_cartons:
+    :name: applies_to_cartons
+    :sequence_no: 7
+    :caption: Applies to cartons
+    :namespaced_name: scrap_reasons.applies_to_cartons
+    :data_type: :boolean
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -89,7 +121,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 6
+    :sequence_no: 8
     :caption: Created at
     :namespaced_name: scrap_reasons.created_at
     :data_type: :datetime
@@ -105,7 +137,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 7
+    :sequence_no: 9
     :caption: Updated at
     :namespaced_name: scrap_reasons.updated_at
     :data_type: :datetime
