@@ -163,6 +163,7 @@ module Crossbeams
       PACKHOUSE = 'PACKHOUSE'
       ROOM = 'ROOM' # (AREA?)
       LINE = 'LINE'
+      PRESORTING_UNIT = 'PRESORTING_UNIT'
       DROP = 'DROP'
       PACK_POINT = 'PACK_POINT'
       DROP_TABLE = 'DROP_TABLE'

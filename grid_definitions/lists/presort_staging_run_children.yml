@@ -1,0 +1,32 @@
+---
+:dataminer_definition: presort_staging_run_children
+:actions:
+- :url: "/raw_materials/presorting/presort_staging_run_children/$:id$/activate_child_run"
+  :text: activate run
+  :icon: check-square
+  :title: Activate Run
+  :popup: false
+  :hide_if_false: activate_run
+- :url: "/raw_materials/presorting/presort_staging_run_children/$:id$/complete_staging"
+  :text: complete staging
+  :icon: lock-closed
+  :title: Complete Staging
+  :popup: false
+  :hide_if_false: complete_staging
+- :url: "/raw_materials/presorting/presort_staging_run_children/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+  :hide_if_false: editing
+- :separator: true
+- :url: "/development/statuses/list/presort_staging_run_children/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:conditions:
+  :standard:
+    - :col: presort_staging_run_children.presort_staging_run_id
+      :op: =
+      :val: $:staging_run_id$

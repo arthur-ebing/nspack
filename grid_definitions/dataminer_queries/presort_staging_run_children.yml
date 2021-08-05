@@ -1,0 +1,286 @@
+---
+:caption: Presort Staging Run Children
+:sql: SELECT "presort_staging_run_children"."id", "presort_staging_run_children"."presort_staging_run_id", "presort_staging_run_children"."created_at", "presort_staging_run_children"."updated_at",
+  CASE WHEN "presort_staging_run_children"."running" IS true AND "presort_staging_run_children"."staged" IS false THEN true ELSE false END AS complete_staging,
+  CASE
+  WHEN (select count(inn) < 1 from presort_staging_run_children inn where inn.presort_staging_run_id=presort_staging_run_children.presort_staging_run_id and inn.running is true) and "presort_staging_run_children"."staged" IS false
+  THEN true
+  ELSE false
+  END as activate_run,
+  "presort_staging_run_children"."staged_at", "presort_staging_run_children"."canceled",
+  "presort_staging_run_children"."farm_id", "presort_staging_run_children"."editing",
+  "presort_staging_run_children"."staged", "presort_staging_run_children"."running",
+  "farms"."farm_code", "presort_staging_runs"."id" AS presort_staging_runs_id, fn_current_status('presort_staging_run_children',
+  "presort_staging_run_children"."id") AS status FROM "presort_staging_run_children"
+  JOIN "farms" ON "farms"."id" = "presort_staging_run_children"."farm_id" LEFT JOIN
+  "presort_staging_runs" ON "presort_staging_runs"."id" = "presort_staging_run_children"."presort_staging_run_id"
+  order by updated_at desc
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: presort_staging_run_children.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  presort_staging_run_id:
+    :name: presort_staging_run_id
+    :sequence_no: 2
+    :caption: Presort staging run
+    :namespaced_name: presort_staging_run_children.presort_staging_run_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  farm_code:
+    :name: farm_code
+    :sequence_no: 3
+    :caption: Farm code
+    :namespaced_name: farms.farm_code
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 4
+    :caption: Created at
+    :namespaced_name: presort_staging_run_children.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  staged_at:
+    :name: staged_at
+    :sequence_no: 5
+    :caption: Staged at
+    :namespaced_name: presort_staging_run_children.staged_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  canceled:
+    :name: canceled
+    :sequence_no: 6
+    :caption: Canceled
+    :namespaced_name: presort_staging_run_children.canceled
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  farm_id:
+    :name: farm_id
+    :sequence_no: 7
+    :caption: Farm
+    :namespaced_name: presort_staging_run_children.farm_id
+    :data_type: :integer
+    :width:
+    :format:
+    :hide: true
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  editing:
+    :name: editing
+    :sequence_no: 8
+    :caption: Editing
+    :namespaced_name: presort_staging_run_children.editing
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  staged:
+    :name: staged
+    :sequence_no: 9
+    :caption: Staged
+    :namespaced_name: presort_staging_run_children.staged
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  activate_run:
+    :name: activate_run
+    :sequence_no: 9
+    :caption: Activate Run
+    :namespaced_name: activate_run
+    :data_type: :boolean
+    :width:
+    :format:
+    :hide: true
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  complete_staging:
+    :name: complete_staging
+    :sequence_no: 9
+    :caption: Complete Staging
+    :namespaced_name: complete_staging
+    :data_type: :boolean
+    :width:
+    :format:
+    :hide: true
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  running:
+    :name: running
+    :sequence_no: 10
+    :caption: Running
+    :namespaced_name: presort_staging_run_children.running
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  presort_staging_runs_id:
+    :name: presort_staging_runs_id
+    :sequence_no: 12
+    :caption: Presort staging runs
+    :namespaced_name: presort_staging_runs.id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 13
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 14
+    :caption: Update at
+    :namespaced_name: presort_staging_run_children.updated_at
+    :data_type: :datetime
+    :width:
+    :format:
+    :hide: true
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: presort_staging_run_children.presort_staging_run_id
+  :caption: Presort staging run
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT id, id FROM presort_staging_runs ORDER BY id
+- :column: presort_staging_run_children.farm_id
+  :caption: Farm
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT farm_code, id FROM farms ORDER BY farm_code
+- :column: presort_staging_runs.id
+  :caption: Presort staging runs
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

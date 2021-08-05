@@ -1,0 +1,502 @@
+---
+:caption: Presort Staging Runs
+:sql: SELECT "presort_staging_runs"."id", "presort_staging_runs"."created_at", "presort_staging_runs"."updated_at", "presort_staging_runs"."setup_uncompleted_at", fn_party_role_name(suppliers.supplier_party_role_id) as supplier,
+  "presort_staging_runs"."setup_completed", "presort_staging_runs"."presort_unit_plant_resource_id", "plant_resources"."plant_resource_code",
+  "presort_staging_runs"."supplier_id", "presort_staging_runs"."setup_completed_at", "presort_staging_runs"."canceled",
+  "presort_staging_runs"."canceled_at", "presort_staging_runs"."staged_at", "presort_staging_runs"."cultivar_id", "presort_staging_runs"."rmt_class_id",
+  "presort_staging_runs"."rmt_size_id", "presort_staging_runs"."season_id", "presort_staging_runs"."editing",
+  "presort_staging_runs"."staged", "presort_staging_runs"."running", "presort_staging_runs"."legacy_data",
+  "cultivars"."cultivar_name", "rmt_classes"."rmt_class_code", "rmt_sizes"."size_code",
+  "seasons"."season_code", "suppliers"."id" AS suppliers_id, fn_current_status('presort_staging_runs',
+  "presort_staging_runs"."id") AS status FROM "presort_staging_runs" JOIN "cultivars"
+  ON "cultivars"."id" = "presort_staging_runs"."cultivar_id" JOIN "rmt_classes" ON
+  "rmt_classes"."id" = "presort_staging_runs"."rmt_class_id" JOIN "rmt_sizes" ON "rmt_sizes"."id"
+  = "presort_staging_runs"."rmt_size_id" JOIN "seasons" ON "seasons"."id" = "presort_staging_runs"."season_id"
+  JOIN "plant_resources" ON "plant_resources"."id" = "presort_staging_runs"."presort_unit_plant_resource_id"
+  JOIN "suppliers" ON "suppliers"."id" = "presort_staging_runs"."supplier_id"
+  order by updated_at desc
+:limit:
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: presort_staging_runs.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 2
+    :caption: Status
+    :namespaced_name:
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  plant_resource_code:
+    :name: plant_resource_code
+    :sequence_no: 3
+    :caption: Presort Resource
+    :namespaced_name: plant_resources.plant_resource_code
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  supplier_id:
+    :name: supplier_id
+    :sequence_no: 4
+    :caption: Supplier
+    :namespaced_name: presort_staging_runs.supplier_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_id:
+    :name: cultivar_id
+    :sequence_no: 5
+    :caption: Cultivar
+    :namespaced_name: presort_staging_runs.cultivar_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_class_id:
+    :name: rmt_class_id
+    :sequence_no: 6
+    :caption: Rmt class
+    :namespaced_name: presort_staging_runs.rmt_class_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_size_id:
+    :name: rmt_size_id
+    :sequence_no: 7
+    :caption: Rmt size
+    :namespaced_name: presort_staging_runs.rmt_size_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  season_id:
+    :name: season_id
+    :sequence_no: 8
+    :caption: Season
+    :namespaced_name: presort_staging_runs.season_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_name:
+    :name: cultivar_name
+    :sequence_no: 9
+    :caption: Cultivar name
+    :namespaced_name: cultivars.cultivar_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_class_code:
+    :name: rmt_class_code
+    :sequence_no: 10
+    :caption: Rmt class code
+    :namespaced_name: rmt_classes.rmt_class_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  size_code:
+    :name: size_code
+    :sequence_no: 11
+    :caption: Size code
+    :namespaced_name: rmt_sizes.size_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  season_code:
+    :name: season_code
+    :sequence_no: 12
+    :caption: Season code
+    :namespaced_name: seasons.season_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  supplier:
+    :name: supplier
+    :sequence_no: 13
+    :caption: Supplier
+    :namespaced_name: supplier
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  setup_uncompleted_at:
+    :name: setup_uncompleted_at
+    :sequence_no: 14
+    :caption: Uncompleted at
+    :namespaced_name: presort_staging_runs.setup_uncompleted_at
+    :data_type: :datetime
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  setup_completed:
+    :name: setup_completed
+    :sequence_no: 15
+    :caption: Completed
+    :namespaced_name: presort_staging_runs.setup_completed
+    :data_type: :boolean
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  setup_completed_at:
+    :name: setup_completed_at
+    :sequence_no: 16
+    :caption: Completed at
+    :namespaced_name: presort_staging_runs.setup_completed_at
+    :data_type: :datetime
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  canceled:
+    :name: canceled
+    :sequence_no: 17
+    :caption: Canceled
+    :namespaced_name: presort_staging_runs.canceled
+    :data_type: :boolean
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  canceled_at:
+    :name: canceled_at
+    :sequence_no: 18
+    :caption: Canceled at
+    :namespaced_name: presort_staging_runs.canceled_at
+    :data_type: :datetime
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  editing:
+    :name: editing
+    :sequence_no: 19
+    :caption: Editing
+    :namespaced_name: presort_staging_runs.editing
+    :data_type: :boolean
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  staged:
+    :name: staged
+    :sequence_no: 20
+    :caption: Staged
+    :namespaced_name: presort_staging_runs.staged
+    :data_type: :boolean
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  running:
+    :name: running
+    :sequence_no: 21
+    :caption: Running
+    :namespaced_name: presort_staging_runs.running
+    :data_type: :boolean
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  legacy_data:
+    :name: legacy_data
+    :sequence_no: 22
+    :caption: Legacy data
+    :namespaced_name: presort_staging_runs.legacy_data
+    :data_type: :jsonb
+    :width:
+    :format:
+    :hide: true
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  presort_unit_plant_resource_id:
+    :name: presort_unit_plant_resource_id
+    :sequence_no: 23
+    :caption: Presort unit plant resource
+    :namespaced_name: presort_staging_runs.presort_unit_plant_resource_id
+    :data_type: :integer
+    :width:
+    :format:
+    :hide: true
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  suppliers_id:
+    :name: suppliers_id
+    :sequence_no: 24
+    :caption: Suppliers
+    :namespaced_name: suppliers.id
+    :data_type: :string
+    :width:
+    :format:
+    :hide: true
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 25
+    :caption: Created At
+    :namespaced_name: presort_staging_runs.created_at
+    :data_type: :datetime
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 26
+    :caption: Update At
+    :namespaced_name: presort_staging_runs.updated_at
+    :data_type: :datetime
+    :width:
+    :format:
+    :hide: true
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  staged_at:
+    :name: staged_at
+    :sequence_no: 27
+    :caption: Staged At
+    :namespaced_name: presort_staging_runs.staged_at
+    :data_type: :datetime
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: presort_staging_runs.created_at
+  :caption: Date Created
+  :data_type: :datetime
+  :control_type: :daterange
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+- :column: presort_staging_runs.staged_at
+  :caption: Date Staged
+  :data_type: :datetime
+  :control_type: :daterange
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+- :column: presort_staging_runs.setup_completed_at
+  :caption: Completed At
+  :data_type: :datetime
+  :control_type: :daterange
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+- :column: presort_staging_runs.presort_unit_plant_resource_id
+  :caption: Presort unit plant resource
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT plant_resource_code, plant_resources.id FROM plant_resources JOIN plant_resource_types t on t.id=plant_resources.plant_resource_type_id WHERE plant_resource_type_code='PRESORTING_UNIT' ORDER BY id
+- :column: presort_staging_runs.supplier_id
+  :caption: Supplier
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT fn_party_role_name(suppliers.supplier_party_role_id) as supplier, id FROM suppliers ORDER BY id
+- :column: presort_staging_runs.cultivar_id
+  :caption: Cultivar
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT cultivar_name, id FROM cultivars ORDER BY cultivar_name
