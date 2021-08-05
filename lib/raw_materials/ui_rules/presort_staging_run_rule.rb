@@ -10,14 +10,15 @@ module UiRules
       @size_repo = MasterfilesApp::RmtSizeRepo.new
       @calender_repo = MasterfilesApp::CalendarRepo.new
 
-      implements_presort_legacy_data_fields?
+      @rules[:implements_presort_legacy_data_fields] = AppConst::CR_RMT.implements_presort_legacy_data_fields?
+
       make_form_object
-      apply_form_values
-      add_progress_step
-      add_controls
 
       @rules[:can_edit?] = !@form_object.setup_completed && !@form_object.running && !@form_object.staged && !repo.running_or_staged_children?(@form_object.id)
 
+      apply_form_values
+      add_progress_step
+      add_controls
       common_values_for_fields common_fields
       add_plant_resource_field
 
@@ -62,7 +63,7 @@ module UiRules
       fields[:editing] = { renderer: :label, as_boolean: true }
       fields[:staged] = { renderer: :label, as_boolean: true }
       fields[:running] = { renderer: :label, as_boolean: true }
-      return fields unless implements_presort_legacy_data_fields?
+      return fields unless rules[:implements_presort_legacy_data_fields]
 
       fields[:ripe_point_code] = { renderer: :label, with_value: @form_object.legacy_data.to_h['ripe_point_code'] }
       fields[:track_indicator_code] = { renderer: :label, with_value: @form_object.legacy_data.to_h['track_indicator_code'] }
@@ -90,7 +91,7 @@ module UiRules
                                 prompt: true },
                  season_id: { renderer: :label, with_value: season_id_label, caption: 'Season' } }
 
-      return fields unless @rules[:implements_presort_legacy_data_fields]
+      return fields unless rules[:implements_presort_legacy_data_fields]
 
       cultivar_name = repo.get(:cultivars, @form_object.cultivar_id, :cultivar_name)
       track_indicator_codes = messcada_repo.track_indicator_codes(cultivar_name).uniq if cultivar_name
@@ -106,7 +107,7 @@ module UiRules
       end
 
       @form_object = repo.find_presort_staging_run(@options[:id])
-      return @form_object unless @rules[:implements_presort_legacy_data_fields]
+      return @form_object unless rules[:implements_presort_legacy_data_fields]
 
       legacy = AppConst::CR_RMT.presort_legacy_data_fields.map { |f| [f, @form_object.legacy_data.to_h[f.to_s]] }
       @form_object = OpenStruct.new(@form_object.to_h.merge(Hash[legacy]))
@@ -140,10 +141,6 @@ module UiRules
     end
 
     private
-
-    def implements_presort_legacy_data_fields?
-      @rules[:implements_presort_legacy_data_fields] = !AppConst::CR_RMT.presort_legacy_data_fields.empty?
-    end
 
     def add_progress_step
       steps = ['Editing', 'Setup Completed', 'Running', 'Staged']
@@ -216,7 +213,7 @@ module UiRules
         season_id = MasterfilesApp::CalendarRepo.new.get_season_id(params[:changed_value], Time.now)
         season_code = repo.get_value(:seasons, :season_code, id: season_id) if season_id
 
-        if implements_presort_legacy_data_fields?
+        if AppConst::CR_RMT.implements_presort_legacy_data_fields?
           cultivar_name = repo.get(:cultivars, params[:changed_value], :cultivar_name)
           track_indicator_codes = messcada_repo.track_indicator_codes(cultivar_name).uniq if cultivar_name
           actions << OpenStruct.new(type: :replace_select_options, dom_id: 'presort_staging_run_track_indicator_code', options_array: track_indicator_codes.to_a)

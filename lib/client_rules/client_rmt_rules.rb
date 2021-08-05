@@ -97,6 +97,12 @@ module Crossbeams
       @settings = CLIENT_SETTINGS.fetch(client_code.to_sym)
     end
 
+    def implements_presort_legacy_data_fields?(explain: false)
+      return 'Should presorting store legacy data' if explain
+
+      !setting(:presort_legacy_data_fields).empty?
+    end
+
     def convert_carton_to_rebins?(explain: false)
       return 'Should bin_tipping convert carton to rebin and then tip it' if explain
 
