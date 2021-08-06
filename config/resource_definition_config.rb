@@ -246,7 +246,7 @@ module Crossbeams
 
       PLANT_RESOURCE_RULES = {
         SITE => { description: 'Site',
-                  allowed_children: [PACKHOUSE, ROOM, MES_SERVER, CMS_SERVER],
+                  allowed_children: [PACKHOUSE, ROOM, MES_SERVER, CMS_SERVER, PRESORTING_UNIT],
                   icon: { file: 'globe', colour: CLR_H } },
         MES_SERVER => { description: 'MES Server',
                         allowed_children: [],
@@ -276,6 +276,9 @@ module Crossbeams
                                           BIN_VERIFICATION_STATION,
                                           WEIGHING_STATION],
                        icon: { file: 'factory', colour: CLR_N } },
+        PRESORTING_UNIT => { description: 'Presorting Unit',
+                             allowed_children: [],
+                             icon: { file: 'shuffle', colour: CLR_W } },
         ROOM => { description: 'Room',
                   allowed_children: [QC_ROBOT, BIN_SCALE_ROBOT, CARTON_SCALE_ROBOT, PALLET_SCALE_ROBOT, SCALE, PRINTER, WEIGHING_STATION],
                   icon: { file: 'home', colour: CLR_K } },
