@@ -82,6 +82,10 @@ module FinishedGoodsApp
       EdiApp::SendEdiOut.call(flow_type, load_entity.customer_party_role_id, @user.user_name, load_id)
     end
 
+    def send_hcs_edi(load_id)
+      EdiApp::SendEdiOut.call(AppConst::EDI_FLOW_HCS, nil, @user.user_name, load_id)
+    end
+
     def allocate_multiselect(load_id, pallet_numbers, initial_pallet_numbers = nil) # rubocop:disable Metrics/AbcSize
       check_pallets!(:allocate, pallet_numbers, load_id) unless pallet_numbers.empty?
       new_allocation = pallet_numbers
@@ -227,6 +231,7 @@ module FinishedGoodsApp
       repo.transaction do
         res = ShipLoad.call(id, @user)
         send_edi(id)
+        send_hcs_edi(id) if repo.load_is_on_order?(id)
 
         log_transaction
       end

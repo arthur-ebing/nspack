@@ -180,5 +180,9 @@ module FinishedGoodsApp
         .where(Sequel.lit("load_id is null OR load_id = #{id}"))
         .distinct.select_map(:id) + [0]
     end
+
+    def load_is_on_order?(id)
+      exists?(:orders_loads, load_id: id)
+    end
   end
 end

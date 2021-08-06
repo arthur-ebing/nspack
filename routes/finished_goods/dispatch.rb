@@ -358,6 +358,12 @@ class Nspack < Roda
         update_dialog_content(content: wrap_content_in_style(res.message, res.success ? :success : :error, caption: ''))
       end
 
+      r.on 're_send_hcs_edi' do
+        check_auth!('dispatch', 'edit')
+        res = interactor.send_hcs_edi(id)
+        update_dialog_content(content: wrap_content_in_style(res.message, res.success ? :success : :error, caption: ''))
+      end
+
       r.on 'titan_addendum', String do |mode|
         interactor.assert_permission!(:titan_addendum, id)
         res = interactor.titan_addendum(id, mode)
