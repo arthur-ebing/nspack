@@ -20,6 +20,26 @@ make_caption(:quality_control)
 # => 'Quality Control'
 ----
 
+==== new_form_object_from_struct
+
+Use this when creating a form object for a new form (where there is no existing record).
+
+Allows you to create a struct for a form_object based on an entity. All attribute values are set to `nil`.
+[source, ruby]
+----
+@form_object = new_form_object_from_struct(SomeApp::SomeEntity)
+----
+If you need to supply non-nil default values for some attributes, use the `merge_hash` argument:
+[source, ruby]
+----
+val = repo.get_some_val(id)
+@form_object = new_form_object_from_struct(SomeApp::SomeEntity,
+                                           merge_hash: {
+                                             key: val,
+                                             another_key: 'another val'
+                                           })
+----
+
 ==== compact_header
 
 Typically used to display header information in a form.
