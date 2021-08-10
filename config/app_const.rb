@@ -486,7 +486,8 @@ class AppConst # rubocop:disable Metrics/ClassLength
     Seasons: { table_name: 'seasons', column_name: 'season_code' },
     Standard_Packs: { table_name: 'standard_pack_codes', column_name: 'standard_pack_code' },
     Target_Markets: { table_name: 'target_markets', column_name: 'target_market_name' },
-    Vessels: { table_name: 'vessels', column_name: 'vessel_code' }
+    Vessels: { table_name: 'vessels', column_name: 'vessel_code' },
+    RMT_Container_Material_Types: { table_name: 'rmt_container_material_types', column_name: 'container_material_type_code' }
   }.freeze
 
   MF_TRANSFORMATION_SYSTEMS = ['Kromco MES'].freeze

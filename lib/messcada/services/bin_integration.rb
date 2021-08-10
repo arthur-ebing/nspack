@@ -52,7 +52,8 @@ module MesscadaApp
 
       mf_res = lookup_masterfiles({ farm_code: res.instance['farm_code'], orchard_code: res.instance['orchard_code'], product_class_code: res.instance['product_class_code'],
                                     size_code: res.instance['size_code'], rmt_variety_code: res.instance['rmt_variety_code'], season_code: res.instance['season_code'],
-                                    location_code: res.instance['location_code'], commodity_code: res.instance['commodity_code'], puc_code: res.instance['puc_code'] })
+                                    location_code: res.instance['location_code'], commodity_code: res.instance['commodity_code'], puc_code: res.instance['puc_code'],
+                                    container_material_type_code: res.instance['pack_material_product_code'] })
       return mf_res unless mf_res.success
 
       bin_attrs.merge!(mf_res.instance)
@@ -133,6 +134,7 @@ module MesscadaApp
       return failed_response("Missing MF. Season: #{record[:season_code]} Commodity: #{record[:commodity_code]}") unless !record.keys.include?(:season_code) || ((season_id = MasterfilesApp::CalendarRepo.new.find_cultivar_by_season_code_and_commodity_code(record[:season_code], record[:commodity_code])) || (season_id = MasterfilesApp::CalendarRepo.new.find_season_by_variant(record[:season_code], record[:commodity_code])))
       return failed_response("Missing MF. Size: #{record[:size_code]}") unless !record.keys.include?(:size_code) || ((size_id = repo.get_value(:rmt_sizes, :id, size_code: record[:size_code])) || (size_id = edi_repo.get_variant_id(:rmt_sizes, record[:size_code])))
       return failed_response("Missing MF. Location: #{record[:location_code]}") unless !record.keys.include?(:location_code) || ((location_id = repo.get_value(:locations, :id, location_short_code: record[:location_code])) || (location_id = edi_repo.get_variant_id(:locations, record[:location_code])))
+      return failed_response("Missing MF. Container Material Type: #{record[:container_material_type_code]}") unless !record.keys.include?(:container_material_type_code) || ((rmt_container_material_type_id = repo.get_value(:rmt_container_material_types, :id, container_material_type_code: record[:container_material_type_code])) || (rmt_container_material_type_id = edi_repo.get_variant_id(:rmt_container_material_types, record[:container_material_type_code])))
       return failed_response("Missing MF. Delivery Destination: #{record[:delivery_destination_code]}") unless !record.keys.include?(:delivery_destination_code) || !AppConst::DELIVERY_USE_DELIVERY_DESTINATION || ((rmt_delivery_destination_id = repo.get_value(:rmt_delivery_destinations, :id, delivery_destination_code: record[:delivery_destination_code])) || (rmt_delivery_destination_id = edi_repo.get_variant_id(:rmt_delivery_destinations, record[:delivery_destination_code])))
 
       cultivar_group_id = repo.get_value(:cultivars, :cultivar_group_id, id: cultivar_id)
@@ -146,6 +148,7 @@ module MesscadaApp
       season_id ? (mf[:season_id] = season_id) : nil
       size_id ? (mf[:rmt_size_id] = size_id) : nil
       location_id ? (mf[:location_id] = location_id) : nil
+      rmt_container_material_type_id ? (mf[:rmt_container_material_type_id] = rmt_container_material_type_id) : nil
       puc_id ? (mf[:puc_id] = puc_id) : nil
       rmt_delivery_destination_id ? (mf[:rmt_delivery_destination_id] = rmt_delivery_destination_id) : nil
       success_response('ok', mf)
