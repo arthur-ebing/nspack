@@ -49,7 +49,6 @@ module UiRules
       @rules[:bin_run_type] = bin_run_type?(reworks_run_type_id_label)
       @rules[:scrap_carton] = AppConst::RUN_TYPE_SCRAP_CARTON == reworks_run_type_id_label
       @rules[:unscrap_carton] = AppConst::RUN_TYPE_UNSCRAP_CARTON == reworks_run_type_id_label
-      @rules[:bin_run_type] = bin_run_type?
       @rules[:carton_run_type] = carton_run_type?
       @rules[:bulk_update_pallet_dates] = AppConst::RUN_TYPE_BULK_UPDATE_PALLET_DATES == reworks_run_type_id_label
 
@@ -150,7 +149,6 @@ module UiRules
       @rules[:bin_run_type] = bin_run_type?(reworks_run_type_id_label)
       @rules[:scrap_carton] = AppConst::RUN_TYPE_SCRAP_CARTON == reworks_run_type_id_label
       @rules[:unscrap_carton] = AppConst::RUN_TYPE_UNSCRAP_CARTON == reworks_run_type_id_label
-      @rules[:bin_run_type] = bin_run_type?
       @rules[:carton_run_type] = carton_run_type?
       @rules[:show_allow_cultivar_group_mixing] = @rules[:allow_cultivar_group_mixing] && @rules[:bulk_production_run_update]
       @rules[:bulk_update_pallet_dates] = AppConst::RUN_TYPE_BULK_UPDATE_PALLET_DATES == reworks_run_type_id_label
