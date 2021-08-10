@@ -608,6 +608,10 @@ class Nspack < Roda
             r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{id}"
           end
         end
+
+        r.on 'rmt_container_material_type_changed' do
+          handle_ui_change(:reworks_run_rmt_bin, :rmt_container_material_type, params)
+        end
       end
 
       r.on 'pallets', String do |pallet_number|
@@ -648,6 +652,32 @@ class Nspack < Roda
                                                                             back_url: "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{id}",
                                                                             form_values: params[:reworks_run_rmt_bin],
                                                                             form_errors: res.errors)
+              end
+            end
+          end
+        end
+
+        r.on 'edit_rmt_bin' do
+          bin_number = pallet_number.split(',').first
+          r.get do
+            show_partial_or_page(r)  do
+              Production::Reworks::ReworksRun::EditRmtBin.call(id,
+                                                               bin_number,
+                                                               back_url: "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{id}")
+            end
+          end
+          r.post do
+            res = interactor.update_rmt_bin_record(params[:reworks_run_rmt_bin])
+            if res.success
+              flash[:notice] = res.message
+              r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{id}"
+            else
+              re_show_form(r, res, url: "/production/reworks/reworks_run_types/#{id}/pallets/#{bin_number}/edit_rmt_bin") do
+                Production::Reworks::ReworksRun::EditRmtBin.call(id,
+                                                                 bin_number,
+                                                                 back_url: "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{id}",
+                                                                 form_values: res.instance,
+                                                                 form_errors: res.errors)
               end
             end
           end

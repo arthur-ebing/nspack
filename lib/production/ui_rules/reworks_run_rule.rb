@@ -45,6 +45,8 @@ module UiRules
       @rules[:tip_mixed_orchards] = AppConst::RUN_TYPE_TIP_MIXED_ORCHARDS == reworks_run_type_id_label
       @rules[:restore_repacked_pallet] = AppConst::RUN_TYPE_RESTORE_REPACKED_PALLET == reworks_run_type_id_label
       @rules[:change_bin_delivery] = AppConst::RUN_TYPE_CHANGE_BIN_DELIVERY == reworks_run_type_id_label
+      @rules[:single_bin_edit] = AppConst::RUN_TYPE_SINGLE_BIN_EDIT == reworks_run_type_id_label
+      @rules[:bin_run_type] = bin_run_type?(reworks_run_type_id_label)
       @rules[:scrap_carton] = AppConst::RUN_TYPE_SCRAP_CARTON == reworks_run_type_id_label
       @rules[:unscrap_carton] = AppConst::RUN_TYPE_UNSCRAP_CARTON == reworks_run_type_id_label
       @rules[:bin_run_type] = bin_run_type?
@@ -132,11 +134,12 @@ module UiRules
       @rules[:scrap_bin] = AppConst::RUN_TYPE_SCRAP_BIN == reworks_run_type_id_label
       @rules[:unscrap_bin] = AppConst::RUN_TYPE_UNSCRAP_BIN == reworks_run_type_id_label
       @rules[:single_pallet_edit] = AppConst::RUN_TYPE_SINGLE_PALLET_EDIT == reworks_run_type_id_label
+      @rules[:single_bin_edit] = AppConst::RUN_TYPE_SINGLE_BIN_EDIT == reworks_run_type_id_label
       @rules[:unscrap_pallet] = AppConst::RUN_TYPE_UNSCRAP_PALLET == reworks_run_type_id_label
       @rules[:tip_bins] = AppConst::RUN_TYPE_TIP_BINS == reworks_run_type_id_label
       @rules[:weigh_rmt_bins] = AppConst::RUN_TYPE_WEIGH_RMT_BINS == reworks_run_type_id_label
       @rules[:bulk_pallet_run_update] = AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE == reworks_run_type_id_label
-      @rules[:single_edit] = @rules[:single_pallet_edit] || @rules[:weigh_rmt_bins]
+      @rules[:single_edit] = @rules[:single_pallet_edit] || @rules[:weigh_rmt_bins] || @rules[:single_bin_edit]
       @rules[:bulk_bin_run_update] = AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE == reworks_run_type_id_label
       @rules[:bulk_production_run_update] = @rules[:bulk_pallet_run_update] || @rules[:bulk_bin_run_update]
       @rules[:bulk_weigh_bins] = AppConst::RUN_TYPE_BULK_WEIGH_BINS == reworks_run_type_id_label
@@ -144,6 +147,7 @@ module UiRules
       @rules[:tip_mixed_orchards] = AppConst::RUN_TYPE_TIP_MIXED_ORCHARDS == reworks_run_type_id_label
       @rules[:restore_repacked_pallet] = AppConst::RUN_TYPE_RESTORE_REPACKED_PALLET == reworks_run_type_id_label
       @rules[:change_bin_delivery] = AppConst::RUN_TYPE_CHANGE_BIN_DELIVERY == reworks_run_type_id_label
+      @rules[:bin_run_type] = bin_run_type?(reworks_run_type_id_label)
       @rules[:scrap_carton] = AppConst::RUN_TYPE_SCRAP_CARTON == reworks_run_type_id_label
       @rules[:unscrap_carton] = AppConst::RUN_TYPE_UNSCRAP_CARTON == reworks_run_type_id_label
       @rules[:bin_run_type] = bin_run_type?
@@ -240,8 +244,8 @@ module UiRules
                                     allow_cultivar_mixing: true)
     end
 
-    def bin_run_type? # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
-      @rules[:tip_bins] || @rules[:weigh_rmt_bins] || @rules[:scrap_bin] || @rules[:unscrap_bin] || @rules[:bulk_bin_run_update] || @rules[:bulk_weigh_bins] || @rules[:untip_bins] || @rules[:tip_mixed_orchards] || @rules[:change_bin_delivery]
+    def bin_run_type?(reworks_run_type)
+      AppConst::REWORKS_RUN_NON_PALLET_RUNS[reworks_run_type] == :bin
     end
 
     def carton_run_type?

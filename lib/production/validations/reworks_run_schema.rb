@@ -243,4 +243,13 @@ module ProductionApp # rubocop:disable Metrics/ModuleLength
     required(:from_delivery_id).filled(:integer)
     required(:to_delivery_id).filled(:integer)
   end
+
+  EditRmtBinSchema = Dry::Schema.Params do
+    required(:reworks_run_type_id).filled(:integer)
+    required(:bin_number).filled(:integer)
+    required(:rmt_class_id).maybe(:integer)
+    required(:rmt_size_id).maybe(:integer)
+    required(:rmt_container_material_type_id).maybe(:integer)
+    required(:rmt_material_owner_party_role_id).maybe(:integer)
+  end
 end

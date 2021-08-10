@@ -692,17 +692,10 @@ module ProductionApp
     end
 
     def validate_pallets_selected_input(reworks_run_type, params)
-      case reworks_run_type
-      when AppConst::RUN_TYPE_TIP_BINS,
-           AppConst::RUN_TYPE_WEIGH_RMT_BINS,
-           AppConst::RUN_TYPE_SCRAP_BIN,
-          AppConst::RUN_TYPE_UNSCRAP_BIN,
-          AppConst::RUN_TYPE_BULK_WEIGH_BINS,
-          AppConst::RUN_TYPE_UNTIP_BINS,
-        AppConst::RUN_TYPE_TIP_MIXED_ORCHARDS
+      case AppConst::REWORKS_RUN_NON_PALLET_RUNS[reworks_run_type]
+      when :bin
         validate_rmt_bins(reworks_run_type, params[:pallets_selected])
-      when AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE,
-          AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE
+      when :prodrun
         validate_production_runs(reworks_run_type, params)
       when AppConst::RUN_TYPE_SCRAP_CARTON,
         AppConst::RUN_TYPE_UNSCRAP_CARTON
@@ -716,6 +709,8 @@ module ProductionApp
       case reworks_run_type
       when AppConst::RUN_TYPE_WEIGH_RMT_BINS
         'edit_rmt_bin_gross_weight'
+      when AppConst::RUN_TYPE_SINGLE_BIN_EDIT
+        'edit_rmt_bin'
       when AppConst::RUN_TYPE_SINGLE_PALLET_EDIT,
          AppConst::RUN_TYPE_BATCH_PALLET_EDIT
         'edit_pallet'
@@ -1472,6 +1467,42 @@ module ProductionApp
         avg_gross_weight: instance[:avg_gross_weight] }
     end
 
+    def update_rmt_bin_record(params) # rubocop:disable Metrics/AbcSize
+      res = validate_edit_rmt_bin_params(params)
+      return validation_failed_response(res) if res.failure?
+
+      arr = %i[rmt_class_id rmt_size_id rmt_container_material_type_id rmt_material_owner_party_role_id]
+      before_state = rmt_bin(res[:bin_number]).slice(*arr)
+      after_state = res.to_h.slice(*arr)
+      changed_attrs = after_state.reject { |k, v|  before_state.key?(k) && before_state[k] == v }
+      return failed_response('INVALID CHANGES: There are no changes made.', after_state) if changed_attrs.empty?
+
+      repo.transaction do
+        repo.update_rmt_bin(res[:bin_number], after_state)
+        reworks_run_id = repo.create_reworks_run({ user: @user.user_name,
+                                                   reworks_run_type_id: res[:reworks_run_type_id],
+                                                   pallets_selected: Array(res[:bin_number]),
+                                                   pallets_affected: Array(res[:bin_number]),
+                                                   changes_made: resolve_changes_made(before: before_state,
+                                                                                      after: after_state,
+                                                                                      change_descriptions: { before: rmt_bin_state(before_state), after: rmt_bin_state(after_state) }) })
+        log_reworks_rmt_bin_status_and_transaction(reworks_run_id, res[:bin_number], AppConst::REWORKS_ACTION_SINGLE_BIN_EDIT)
+      end
+      success_response('RMT Bin updated successfully', pallet_number: res[:bin_number])
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def rmt_bin_state(attrs)
+      owner_id = repo.get_value(:rmt_container_material_owners,
+                                :id,
+                                attrs.slice(:rmt_container_material_type_id, :rmt_material_owner_party_role_id))
+      { rmt_class: repo.get(:rmt_classes, attrs[:rmt_class_id], :rmt_class_code),
+        rmt_size: repo.get(:rmt_sizes, attrs[:rmt_size_id], :size_code),
+        rmt_container_material_type: repo.get(:rmt_container_material_types, attrs[:rmt_container_material_type_id], :container_material_type_code),
+        rmt_material_owner: prod_setup_repo.rmt_container_material_owner_for(owner_id) }
+    end
+
     def clone_carton(params)
       res = validate_clone_carton_params(params)
       return validation_failed_response(res) if res.failure?
@@ -1996,13 +2027,12 @@ module ProductionApp
         return OpenStruct.new(success: false, messages: { pallets_selected: ["#{untipped_bins.join(', ')} not tipped"] }, pallets_selected: rmt_bins) unless untipped_bins.nil_or_empty?
       end
 
-      res = validate_scrapped_rmt_bins(reworks_run_type, rmt_bins)
-      return OpenStruct.new(success: false,  messages: res.messages, pallets_selected: rmt_bins) unless res.success
-
+      scrapped_bins = repo.scrapped_bins?(rmt_bins)
       if AppConst::RUN_TYPE_UNSCRAP_BIN == reworks_run_type
-        scrapped_bins = repo.scrapped_bins?(rmt_bins)
         unscrapped_bins = (rmt_bins - scrapped_bins.map(&:to_s))
         return OpenStruct.new(success: false, messages: { pallets_selected: ["#{unscrapped_bins.join(', ')} not scrapped"] }, pallets_selected: rmt_bins) unless unscrapped_bins.nil_or_empty?
+      else
+        return OpenStruct.new(success: false, messages: { pallets_selected: ["#{scrapped_bins.join(', ')} already scrapped"] }, pallets_selected: rmt_bins) unless scrapped_bins.nil_or_empty?
       end
 
       if AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE == reworks_run_type
@@ -2011,24 +2041,14 @@ module ProductionApp
         return OpenStruct.new(success: false, messages: { pallets_selected: ["#{extra_bins.join(', ')} are not from production run #{production_run_id}"] }, pallets_selected: rmt_bins) unless extra_bins.nil_or_empty?
       end
 
+      # TO DO: The staging process sets an attribute on a rmt_bin to indicate on which presort staging run it is staged
+      # Reworks can check that field. Only allow bins in reworks if that field is null.
+      # if AppConst::RUN_TYPE_SINGLE_BIN_EDIT == reworks_run_type
+      #   staging_bins = repo.presort_staging_bins?(rmt_bins)
+      #   return OpenStruct.new(success: false, messages: { pallets_selected: ["#{staging_bins.join(', ')} on presort staging run"] }, pallets_selected: rmt_bins) unless staging_bins.nil_or_empty?
+      # end
+
       OpenStruct.new(success: true, instance: { pallet_numbers: rmt_bins })
-    end
-
-    def validate_scrapped_rmt_bins(reworks_run_type, rmt_bins)
-      case reworks_run_type
-      when AppConst::RUN_TYPE_SCRAP_BIN,
-          AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE,
-          AppConst::RUN_TYPE_TIP_BINS,
-          AppConst::RUN_TYPE_WEIGH_RMT_BINS,
-          AppConst::RUN_TYPE_BULK_WEIGH_BINS,
-          AppConst::RUN_TYPE_TIP_MIXED_ORCHARDS
-
-        scrapped_bins = repo.scrapped_bins?(rmt_bins)
-        return OpenStruct.new(success: false, messages: { pallets_selected: ["#{scrapped_bins.join(', ')} already scrapped"] }, pallets_selected: rmt_bins) unless scrapped_bins.nil_or_empty?
-
-      end
-
-      OpenStruct.new(success: true, instance: { pallets_selected: rmt_bins })
     end
 
     def validate_production_runs(reworks_run_type, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
@@ -2172,6 +2192,10 @@ module ProductionApp
 
     def validate_delivery_params(params)
       DeliveryChangeSchema.call(params)
+    end
+
+    def validate_edit_rmt_bin_params(params)
+      EditRmtBinSchema.call(params)
     end
   end
 end

@@ -102,6 +102,7 @@ INSERT INTO reworks_run_types (run_type, description) VALUES('TIP BINS AGAINST S
 INSERT INTO reworks_run_types (run_type, description) VALUES('RESTORE REPACKED PALLET', 'Restore repacked pallet') ON CONFLICT DO NOTHING;
 INSERT INTO reworks_run_types (run_type, description) VALUES('CHANGE BIN DELIVERY', 'Change bin delivery') ON CONFLICT DO NOTHING;
 INSERT INTO reworks_run_types (run_type, description) VALUES('CHANGE RUN CULTIVAR', 'Change production run cultivar') ON CONFLICT DO NOTHING;
+INSERT INTO reworks_run_types (run_type, description) VALUES('SINGLE BIN EDIT', 'Single bin edit') ON CONFLICT DO NOTHING;
 INSERT INTO reworks_run_types (run_type, description) VALUES('SCRAP CARTON', 'Scrap Carton') ON CONFLICT DO NOTHING;
 INSERT INTO reworks_run_types (run_type, description) VALUES('UNSCRAP CARTON', 'Unscrap Carton') ON CONFLICT DO NOTHING;
 
