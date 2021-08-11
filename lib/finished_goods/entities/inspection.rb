@@ -34,6 +34,7 @@ module FinishedGoodsApp
     attribute :commodity_description, Types::String
     attribute :consignment_note_number, Types::String
     attribute :container, Types::String
+    attribute :basic_pack, Types::String
     attribute :govt_inspection_pallet_id, Types::Integer
     attribute :govt_inspection_sheet_id, Types::Integer
     attribute :grade, Types::String
@@ -41,6 +42,8 @@ module FinishedGoodsApp
     attribute :gross_weight_per_carton, Types::Decimal
     attribute :nett_weight_per_carton, Types::Decimal
     attribute :pallet_carton_quantity, Types::Decimal
+    attribute :gross_weight, Types::Decimal
+    attribute :nett_weight, Types::Decimal
     attribute :pallet_id, Types::Integer
     attribute :pallet_number, Types::String
     attribute :phc, Types::String
@@ -56,6 +59,7 @@ module FinishedGoodsApp
     attribute :grade, Types::String
     attribute :marketing_variety, Types::String
     attribute :nett_weight, Types::Decimal
+    attribute :sequence_nett_weight, Types::Decimal
     attribute :orchard, Types::String
     attribute :pallet_carton_quantity, Types::Decimal
     attribute :pallet_id, Types::Integer

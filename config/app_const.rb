@@ -540,6 +540,10 @@ class AppConst # rubocop:disable Metrics/ClassLength
                      STAGING: 'https://stagingapigateway.ppecb.com',
                      PRODUCTION: 'https://apigateway.ppecb.com' }[TITAN_ENVIRONMENT.to_sym]
 
+  TITAN_ADDENDUM_REQUEST = 'Request Addendum'
+  TITAN_ADDENDUM_STATUS = 'Addendum Status'
+  TITAN_ADDENDUM_CANCEL = 'Cancel Addendum'
+
   # QUALITY APP result types
   PASS_FAIL = 'Pass/Fail'
   CLASSIFICATION = 'Classification'

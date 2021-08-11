@@ -40,6 +40,13 @@ module FinishedGoodsApp
         hash = parse_titan_addendum_request_doc(hash)
         hash = parse_titan_addendum_result_doc(hash)
       end
+      TitanRequestFlat.new(hash)
+    end
+
+    def last_titan_addendum_request(load_id)
+      hash = DB[:titan_requests].where(load_id: load_id).reverse(:id).first
+      return nil if hash.nil?
+
       TitanRequest.new(hash)
     end
 
@@ -173,27 +180,37 @@ module FinishedGoodsApp
       inspection_pallet_sequences
     end
 
-    def find_titan_addendum(load_id) # rubocop:disable Metrics/AbcSize
-      ds = DB[:titan_requests].where(load_id: load_id).reverse(:id).where(request_type: 'Addendum Status')
-      hash = find_hash(:titan_requests, ds.get(:id))
+    def find_titan_addendum(load_id, mode) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+      return nil if mode == :request
+
+      request_type = case mode
+                     when :status
+                       AppConst::TITAN_ADDENDUM_REQUEST
+                     when :cancel
+                       AppConst::TITAN_ADDENDUM_REQUEST
+                     when :load
+                       [AppConst::TITAN_ADDENDUM_STATUS, AppConst::TITAN_ADDENDUM_REQUEST]
+                     end
+      hash = DB[:titan_requests].where(load_id: load_id, request_type: request_type).reverse(:id).first
       return nil unless hash
 
-      status_hash = ds.where(request_type: 'Addendum Status').get(:result_doc) || {}
+      status_hash = hash[:result_doc] || {}
       hash[:addendum_status] = status_hash['addendumStatus']
-      hash[:best_regime_code] = status_hash['bestRegimeCode']
+      # hash[:best_regime_code] = status_hash['bestRegimeCode']
       hash[:verification_status] = status_hash['verificationStatus']
       hash[:addendum_validations] = status_hash['addendumValidations']
-      hash[:available_regime_code] = status_hash['availableRegimeCode']
+      # hash[:available_regime_code] = status_hash['availableRegimeCode']
       hash[:e_cert_response_message] = status_hash['eCertResponseMessage']
       hash[:e_cert_hub_tracking_number] = status_hash['eCertHubTrackingNumber']
       hash[:e_cert_hub_tracking_status] = status_hash['eCertHubTrackingStatus']
-      hash[:e_cert_application_status] = status_hash['ecertApplicationStatus']
-      hash[:phyt_clean_verification_key] = status_hash['phytCleanVerificationKey']
+      # hash[:e_cert_application_status] = status_hash['ecertApplicationStatus']
+      # hash[:phyt_clean_verification_key] = status_hash['phytCleanVerificationKey']
       hash[:export_certification_status] = status_hash['exportCertificationStatus']
 
-      cancel_hash = ds.where(request_type: 'Cancel Addendum').get(:result_doc) || {}
+      cancel = DB[:titan_requests].where(load_id: load_id, request_type: AppConst::TITAN_ADDENDUM_CANCEL).reverse(:id).first || {}
+      cancel_hash = cancel[:result_doc] || {}
       hash[:cancelled_status] = cancel_hash['message']
-      hash[:cancelled_at] = ds.where(request_type: 'cancel').get(:updated_at)
+      hash[:cancelled_at] = cancel[:updated_at]
       TitanAddendumFlat.new(hash)
     end
 
@@ -204,15 +221,15 @@ module FinishedGoodsApp
       pallet_ids = select_values(:pallets, :id, load_id: load_id)
       ecert_agreement_ids = select_values(:ecert_tracking_units, :ecert_agreement_id, pallet_id: pallet_ids)
       ecert_agreement_codes = select_values(:ecert_agreements, :code, id: ecert_agreement_ids).join('')
+      fbo_code = party_repo.find_registration_code_for_party_role('FBO', load.exporter_party_role_id).to_s
       {
         eCertRequired: false,
-        cbrid: 1, # central business register id
-        cbrBillingID: 1,
-        requestId: load_id,
+        cbrid: '',
+        cbrBillingID: '',
+        requestId: "#{fbo_code}#{Time.now.strftime('%Y%m%d')}#{load_id}",
         eCertAgreementCode: ecert_agreement_codes,
-        eCertDesiredIssueLocation: 1,
-        exporterCode: party_repo.find_registration_code_for_party_role('FBO', load.exporter_party_role_id).to_s,
-        consignorName: party_repo.find_organization_for_party_role(load.exporter_party_role_id).short_description,
+        exporterCode: fbo_code,
+        consignorName: party_repo.find_organization_for_party_role(load.exporter_party_role_id).medium_description,
         consignorAddressLine1: [consignor_address&.address_line_1, consignor_address&.address_line_2, consignor_address&.address_line_3].compact!.join(', '),
         consignorAddressLine2: consignor_address&.city,
         consignorAddressLine3: consignor_address&.postal_code,
@@ -236,52 +253,53 @@ module FinishedGoodsApp
         shippedTargetCountry: load.destination_country,
         shippedTargetRegion: load.destination_region,
         locationOfIssue: load.location_of_issue,
-        estimatedDepartureDate: load.etd,
+        eCertDesiredIssueLocation: '',
+        estimatedDepartureDate: load.etd&.strftime('%F'),
         supportingDocuments: [
           # {
           #   supportingDocumentCode: '',
           #   supportingDocumentName: ''
+          #   mimetype: '',
+          #   isPrintable: '',
           #   # supportingDocument: byte[]
           # }
         ],
-        consignmentItems: [compile_consignment_items(load_id)],
+        consignmentItems: [compile_consignment_items(load)],
         addendumDetails: compile_addendum_details(load_id),
         flexiFields: []
       }
     end
 
-    def compile_consignment_items(load_id)
-      load = LoadRepo.new.find_load(load_id)
-      pallet_id = select_values_in_order(:pallets, :id, where: { load_id: load_id }, order: :id).first
+    def compile_consignment_items(load)
+      pallet_id = select_values_in_order(:pallets, :id, where: { load_id: load.id }, order: :id).first
       pallet = find_pallet_for_titan(pallet_id)
       {
-        productDescription: pallet.commodity_description,
-        commonName: 'required', # Common name of product. Required if flag eCertRequired is set to true
-        scientificName: 'required',
+        productCommonName: pallet.commodity_description,
+        productScientificName: '',
         nettWeightMeasureCode: 'KG',
         nettWeightMeasure: load.nett_weight.to_f.round(2),
         grossWeightMeasureCode: 'KG',
         grossWeightMeasure: load.verified_gross_weight.to_f.round(2),
         customsHarmonizedSystemClass: '',
-        commodityVegetableClass: '',
+        commodityVegetableClass: pallet.commodity, # ???
         commodityConditionClass: '',
         commodityIntentOfUseClass: '',
-        appliedProcessTypeCode: '',
-        appliedProcessStartDate: '2019-09-07',
-        appliedProcessEndDate: '2019-09-07',
+        appliedProcessStartDate: '',
+        appliedProcessEndDate: '',
         durationMeasureCode: '',
-        durationMeasure: '2.5',
+        durationMeasure: '',
         appliedProcessTreatmentTypeLevel1: '',
         appliedProcessTreatmentTypeLevel2: '',
         appliedProcessChemicalCode: '',
+        fullTreatmentInfromation: '',
         appliedProcessTemperatureUnitCode: '',
         appliedProcessTemperature: 0.00,
         appliedProcessConcentrationUnitCode: '',
         appliedProcessConcentration: 0.00,
         appliedProcessAdditionalNotes: '',
         packageLevelCode: 0,
-        packageTypeCode: 'CT',
-        packageItemUnitCode: 'a',
+        packageTypeCode: pallet.basic_pack,
+        packageItemUnitCode: '',
         packageItemQuantity: load.pallet_count,
         packageShippingMarks: '',
         additionalConsignmentNotes: load.memo_pad
@@ -289,32 +307,34 @@ module FinishedGoodsApp
     end
 
     def compile_addendum_details(load_id) # rubocop:disable Metrics/AbcSize
+      gi_repo = GovtInspectionRepo.new
       details = []
       pallet_ids = select_values(:pallets, :id, load_id: load_id)
       pallet_ids.each do |pallet_id| # rubocop:disable Metrics/BlockLength
         pallet = find_pallet_for_titan(pallet_id)
-        govt_inspection_sheet = GovtInspectionRepo.new.find_govt_inspection_sheet(pallet.govt_inspection_sheet_id)
-        govt_inspection_pallet = GovtInspectionRepo.new.find_govt_inspection_pallet(pallet.govt_inspection_pallet_id)
+        govt_inspection_sheet = gi_repo.find_govt_inspection_sheet(pallet.govt_inspection_sheet_id)
+        govt_inspection_pallet = gi_repo.find_govt_inspection_pallet(pallet.govt_inspection_pallet_id)
         details << {
-          inspectedSSCC: pallet.pallet_number,
           stuffLoadDate: pallet.shipped_at.strftime('%F'),
           loadPointFboCode: govt_inspection_sheet.inspection_point,
           consignmentNumber: pallet.consignment_note_number,
           phc: pallet.phc,
-          clientRef: load_id,
-          commodityCode: pallet.commodity,
-          varietyCode: pallet.marketing_variety,
-          protocolExceptionIndicator: 'X7', # Smartfresh, X7, X8, X9 where the first character denotes the destination and the second character denotes the applicable phytosanitary
-          productClass: pallet.grade,
-          nettWeight: pallet.nett_weight_per_carton,
-          grossWeight: pallet.gross_weight_per_carton,
-          cartonQuantity: pallet.pallet_carton_quantity,
-          inspectionPoint: govt_inspection_sheet.inspection_point,
-          inspectorCode: govt_inspection_sheet.inspector_code,
-          inspectionDate: govt_inspection_pallet.inspected_at,
+          inspectedSSCC: pallet.pallet_number,
+          clientRef: pallet_id,
           upn: govt_inspection_sheet.upn,
           inspectedTargetRegion: govt_inspection_sheet.destination_region,
           inspectedTargetCountry: govt_inspection_sheet.destination_country,
+          commodityCode: pallet.commodity,
+          fleshColour: '', # ???
+          varietyCode: pallet.marketing_variety,
+          protocolExceptionIndicator: '', # SF - Smartfresh, X7, X8, X9 where the first character denotes the destination and the second character denotes the applicable phytosanitary
+          productClass: pallet.grade,
+          nettWeight: pallet.nett_weight.to_f.round(2),
+          grossWeight: pallet.gross_weight.to_f.round(2), # If derived weight, add this to nett? OR...?
+          cartonQuantity: pallet.pallet_carton_quantity,
+          inspectionPoint: govt_inspection_sheet.inspection_point,
+          inspectorCode: govt_inspection_sheet.inspector_code,
+          inspectionDate: govt_inspection_pallet.inspected_at.strftime('%F'),
           containerNumber: pallet.container,
           addendumDetailLines: compile_addendum_detail_sequences(pallet_id)
         }
@@ -335,7 +355,8 @@ module FinishedGoodsApp
           phytoData: pallet_sequence.phyto_data || '',
           sizeCountBerrySize: pallet_sequence.size_ref,
           packCode: pallet_sequence.std_pack,
-          palletQuantity: pallet_sequence.pallet_percentage.to_f.round(3)
+          palletQuantity: pallet_sequence.carton_quantity,
+          nettPalletWeight: pallet_sequence.sequence_nett_weight.to_f.round(2)
         }
       end
       sequences
@@ -362,7 +383,7 @@ module FinishedGoodsApp
             column = "#{prefix}#{humanize(k)}"
             column = "#{humanize(k)}[#{i}]" if is_an_array
             column = "#{prefix}[#{i}].#{humanize(k)}" if prefix && is_an_array
-            array_out << { column: column, value: Array(v).join(' ') }
+            array_out << { column: column, value: Array(v).map { |vv| UtilityFunctions.scientific_notation_to_s(vv) }.join(' ') }
           end
         end
       end

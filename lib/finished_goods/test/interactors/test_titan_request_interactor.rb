@@ -22,7 +22,7 @@ module FinishedGoodsApp
     def test_titan_request
       FinishedGoodsApp::TitanRepo.any_instance.stubs(:find_titan_request).returns(fake_titan_request)
       entity = interactor.send(:titan_request, 1)
-      assert entity.is_a?(TitanRequest)
+      assert entity.is_a?(TitanRequestFlat)
     end
 
     def test_delete_titan_request
@@ -56,7 +56,7 @@ module FinishedGoodsApp
     end
 
     def fake_titan_request(overrides = {})
-      TitanRequest.new(titan_request_attrs.merge(overrides))
+      TitanRequestFlat.new(titan_request_attrs.merge(overrides))
     end
 
     def interactor
