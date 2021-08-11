@@ -26,6 +26,7 @@ api_mocks/static_response_server/responses/*
 
 # Used by dotenv library to load environment variables.
 .env.local
+.env.*
 cartons.json
 
 ## Documentation cache and generated files:
