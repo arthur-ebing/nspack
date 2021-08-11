@@ -310,11 +310,11 @@ module RawMaterialsApp
 
     def get_available_bin_asset_numbers(count)
       query = <<~SQL
-        select a.id, a.bin_asset_number
-        from bin_asset_numbers a
+        SELECT a.id, a.bin_asset_number
+        FROM bin_asset_numbers a
         WHERE NOT EXISTS(SELECT id FROM rmt_bins WHERE bin_asset_number = a.bin_asset_number)
-        order by last_used_at asc
-        limit ?
+        ORDER BY last_used_at ASC NULLS FIRST, a.bin_asset_number
+        LIMIT ?
       SQL
       DB[query, count].select_map(%i[id bin_asset_number]).sort_by(&:last)
     end
