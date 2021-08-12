@@ -37,8 +37,8 @@ module FinishedGoodsApp # rubocop:disable Metrics/ModuleLength
     required(:supportingDocuments).maybe(:array)
 
     required(:consignmentItems).array(:hash) do # rubocop:disable Metrics/BlockLength
-      required(:productCommonName).filled(:string)
-      required(:productScientificName).filled(:string)
+      required(:CommonName).filled(:string)
+      required(:ScientificName).filled(:string)
       required(:nettWeightMeasureCode).filled(:string)
       required(:nettWeightMeasure).filled(:decimal)
       required(:grossWeightMeasureCode).filled(:string)

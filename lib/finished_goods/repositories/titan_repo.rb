@@ -278,8 +278,8 @@ module FinishedGoodsApp
       pallet_id = select_values_in_order(:pallets, :id, where: { load_id: load.id }, order: :id).first
       pallet = find_pallet_for_titan(pallet_id)
       {
-        productCommonName: pallet.commodity_description, # Cannot be blank - BUT: "CommonName" (use cultivar?)
-        productScientificName: pallet.commodity_description, # Cannot be blank - BUT: "ScientificName"
+        CommonName: pallet.commodity_description, # Cannot be blank - BUT: "CommonName" (use cultivar?)
+        ScientificName: pallet.commodity_description, # Cannot be blank - BUT: "ScientificName"
         nettWeightMeasureCode: 'KG',
         nettWeightMeasure: load.nett_weight.to_f.round(2),
         grossWeightMeasureCode: 'KG',
