@@ -27,7 +27,7 @@ module ProductionApp
       end
     end
 
-    def cache_run # rubocop:disable Metrics/AbcSize
+    def cache_run
       @cache_run ||= {
         production_run_id: production_run[:id],
         farm_id: production_run[:farm_id],

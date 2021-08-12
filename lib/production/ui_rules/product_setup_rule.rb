@@ -45,9 +45,6 @@ module UiRules
       grade_id_label = MasterfilesApp::FruitRepo.new.find_grade(@form_object.grade_id)&.grade_code
       pallet_base_id_label = MasterfilesApp::PackagingRepo.new.find_pallet_base(@form_object.pallet_base_id)&.pallet_base_code
       pallet_stack_type_id_label = MasterfilesApp::PackagingRepo.new.find_pallet_stack_type(@form_object.pallet_stack_type_id)&.stack_type_code
-      product_setup_template = @repo.find_product_setup_template(@form_object.product_setup_template_id)
-      cultivar_group_id_label = product_setup_template&.cultivar_group_code
-      cultivar_id_label = product_setup_template&.cultivar_name
       rmt_class_id_label = MasterfilesApp::FruitRepo.new.find_rmt_class(@form_object.rmt_class_id)&.rmt_class_code
       color_percentage_id_label = @repo.get(:color_percentages, @form_object.color_percentage_id, :description)
 
@@ -55,10 +52,8 @@ module UiRules
                                              with_value: product_setup_template_id_label,
                                              caption: 'Product Setup Template' }
       fields[:cultivar_group] = { renderer: :label,
-                                  with_value: cultivar_group_id_label,
                                   caption: 'Cultivar Group' }
       fields[:cultivar] = { renderer: :label,
-                            with_value: cultivar_id_label,
                             caption: 'Cultivar' }
       fields[:marketing_variety_id] = { renderer: :label,
                                         with_value: marketing_variety_id_label,
@@ -146,40 +141,31 @@ module UiRules
 
     def common_fields # rubocop:disable Metrics/AbcSize
       product_setup_template_id = @options[:product_setup_template_id].nil_or_empty? ? @repo.find_product_setup(@options[:id]).product_setup_template_id : @options[:product_setup_template_id]
-      product_setup_template = @repo.find_product_setup_template(product_setup_template_id)
-      product_setup_template_id_label = product_setup_template&.template_name
-      cultivar_group_id = product_setup_template&.cultivar_group_id
-      cultivar_group_id_label = product_setup_template&.cultivar_group_code
-      cultivar_id = product_setup_template&.cultivar_id
-      cultivar_id_label = product_setup_template&.cultivar_name
       # commodity_id = @form_object[:commodity_id].nil_or_empty? ? @repo.get_commodity_id(cultivar_group_id, cultivar_id) : @form_object.commodity_id
-      commodity_id = @form_object[:commodity_id].nil_or_empty? ? @repo.get(:cultivar_groups, cultivar_group_id, :commodity_id) : @form_object.commodity_id
+      commodity_id = @form_object[:commodity_id].nil_or_empty? ? @repo.get(:cultivar_groups, @form_object.cultivar_group_id, :commodity_id) : @form_object.commodity_id
       color_applies = @repo.get(:commodities, commodity_id, :color_applies)
       default_mkting_org_id = @form_object[:marketing_org_party_role_id].nil_or_empty? ? @party_repo.find_party_role_from_party_name_for_role(AppConst::CR_PROD.default_marketing_org, AppConst::ROLE_MARKETER) : @form_object[:marketing_org_party_role_id]
       {
         product_setup_template: { renderer: :label,
-                                  with_value: product_setup_template_id_label,
                                   caption: 'Product Setup Template',
                                   readonly: true },
         product_setup_template_id: { renderer: :hidden,
                                      value: product_setup_template_id },
         cultivar_group: { renderer: :label,
-                          with_value: cultivar_group_id_label,
                           caption: 'Cultivar Group',
                           readonly: true },
         cultivar: { renderer: :label,
-                    with_value: cultivar_id_label,
                     caption: 'Cultivar',
                     readonly: true },
         commodity_id: { renderer: :select,
-                        options: @repo.for_select_template_cultivar_commodities(cultivar_group_id, cultivar_id),
+                        options: @repo.for_select_template_cultivar_commodities(@form_object.cultivar_group_id, @form_object.cultivar_id),
                         disabled_options: @commodity_repo.for_select_inactive_commodities,
                         caption: 'Commodity',
                         required: true,
                         searchable: true,
                         remove_search_for_small_list: false },
         marketing_variety_id: { renderer: :select,
-                                options: @repo.for_select_template_commodity_marketing_varieties(product_setup_template_id, commodity_id, cultivar_id),
+                                options: @repo.for_select_template_commodity_marketing_varieties(product_setup_template_id, commodity_id, @form_object.cultivar_id),
                                 disabled_options: MasterfilesApp::CultivarRepo.new.for_select_inactive_marketing_varieties,
                                 caption: 'Marketing Variety',
                                 required: true,
@@ -377,34 +363,16 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(product_setup_template_id: @options[:product_setup_template_id],
-                                    marketing_variety_id: nil,
-                                    customer_variety_id: nil,
-                                    std_fruit_size_count_id: nil,
-                                    basic_pack_code_id: nil,
-                                    standard_pack_code_id: nil,
-                                    fruit_actual_counts_for_pack_id: nil,
-                                    fruit_size_reference_id: nil,
-                                    marketing_org_party_role_id: nil,
-                                    packed_tm_group_id: nil,
-                                    target_market_id: nil,
-                                    target_customer_party_role_id: nil,
-                                    mark_id: nil,
-                                    inventory_code_id: nil,
-                                    pallet_format_id: nil,
-                                    cartons_per_pallet_id: nil,
-                                    extended_columns: nil,
-                                    client_size_reference: nil,
-                                    client_product_code: nil,
-                                    treatment_ids: nil,
-                                    marketing_order_number: nil,
-                                    sell_by_code: nil,
-                                    pallet_label_name: nil,
-                                    grade_id: nil,
-                                    product_chars: nil,
-                                    gtin_code: nil,
-                                    rmt_class_id: nil,
-                                    color_percentage_id: nil)
+      product_setup_template = @repo.find_product_setup_template(@options[:product_setup_template_id])
+      @form_object = new_form_object_from_struct(ProductionApp::ProductSetup,
+                                                 merge_hash: {
+                                                   product_setup_template_id: @options[:product_setup_template_id],
+                                                   product_setup_template: product_setup_template[:template_name],
+                                                   cultivar_group_id: product_setup_template[:cultivar_group_id],
+                                                   cultivar_id: product_setup_template[:cultivar_id],
+                                                   cultivar_group: product_setup_template[:cultivar_group_code],
+                                                   cultivar: product_setup_template[:cultivar_name]
+                                                 })
     end
 
     def treatment_codes
