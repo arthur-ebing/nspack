@@ -372,7 +372,7 @@ class Nspack < Roda
       end
 
       r.on 'titan_addendum' do
-        show_partial_or_page(r) { FinishedGoods::Dispatch::Load::TitanAddendum.call(id) }
+        show_partial_or_page(r) { FinishedGoods::Dispatch::Load::TitanAddendum.call(id, flash || {}) }
       end
 
       r.on 'allocate_multiselect' do

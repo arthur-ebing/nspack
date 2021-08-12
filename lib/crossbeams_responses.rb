@@ -152,6 +152,7 @@ module Crossbeams
     # @return [string] the list of validation errors for the field.
     def unwrap_errors(errs)
       return errs.join(', ') if errs.is_a?(Array)
+      return errs.map { |_, v| unwrap_error_set(v) }.join(' ') if errs.keys.first.is_a?(Integer)
 
       errs.group_by { |_, v| v }.map { |k, v| ": #{v.length} item#{v.length == 1 ? '' : 's'} #{k.join(', ')}" }.join(', ')
     end

@@ -4,7 +4,7 @@ module FinishedGoods
   module Dispatch
     module Load
       class TitanAddendum
-        def self.call(load_id, form_values: nil, form_errors: nil)
+        def self.call(load_id, flash, form_values: nil, form_errors: nil)
           ui_rule = UiRules::Compiler.new(:titan_addendum, :new, load_id: load_id, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -34,6 +34,11 @@ module FinishedGoods
               section.show_border!
               ui_rule.form_object.progress_controls.each do |control|
                 section.add_control(control)
+              end
+              if flash[:error]&.include?('Invalid addendum request')
+                section.add_notice(flash[:error].delete_prefix('Invalid addendum request: '),
+                                   caption: 'Invalid addendum request',
+                                   notice_type: :error)
               end
             end
             page.section do |section|

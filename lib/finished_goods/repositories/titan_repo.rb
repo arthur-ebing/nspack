@@ -222,10 +222,10 @@ module FinishedGoodsApp
       ecert_agreement_ids = select_values(:ecert_tracking_units, :ecert_agreement_id, pallet_id: pallet_ids)
       ecert_agreement_codes = select_values(:ecert_agreements, :code, id: ecert_agreement_ids).join('')
       fbo_code = party_repo.find_registration_code_for_party_role('FBO', load.exporter_party_role_id).to_s
-      {
+      payload = {
         eCertRequired: false,
-        cbrid: '',
-        cbrBillingID: '',
+        cbrid: 0,
+        cbrBillingID: 0,
         requestId: "#{fbo_code}#{Time.now.strftime('%Y%m%d')}#{load_id}",
         eCertAgreementCode: ecert_agreement_codes,
         exporterCode: fbo_code,
@@ -252,9 +252,9 @@ module FinishedGoodsApp
         dischargePort: load.pod_port_code,
         shippedTargetCountry: load.destination_country,
         shippedTargetRegion: load.destination_region,
-        locationOfIssue: load.location_of_issue,
+        locationOfIssue: load.location_of_issue, # Cannot be blank
         eCertDesiredIssueLocation: '',
-        estimatedDepartureDate: load.etd&.strftime('%F'),
+        estimatedDepartureDate: load.etd&.strftime('%F'), # Cannot be blank
         supportingDocuments: [
           # {
           #   supportingDocumentCode: '',
@@ -268,14 +268,18 @@ module FinishedGoodsApp
         addendumDetails: compile_addendum_details(load_id),
         flexiFields: []
       }
+      res = validate_addendum_payload(payload)
+      raise Crossbeams::InfoError, "Invalid addendum request: #{unwrap_error_set(res.errors)}" if res.failure?
+
+      res.to_h
     end
 
     def compile_consignment_items(load)
       pallet_id = select_values_in_order(:pallets, :id, where: { load_id: load.id }, order: :id).first
       pallet = find_pallet_for_titan(pallet_id)
       {
-        productCommonName: pallet.commodity_description,
-        productScientificName: '',
+        productCommonName: pallet.commodity_description, # Cannot be blank - BUT: "CommonName" (use cultivar?)
+        productScientificName: pallet.commodity_description, # Cannot be blank - BUT: "ScientificName"
         nettWeightMeasureCode: 'KG',
         nettWeightMeasure: load.nett_weight.to_f.round(2),
         grossWeightMeasureCode: 'KG',
@@ -284,8 +288,8 @@ module FinishedGoodsApp
         commodityVegetableClass: pallet.commodity, # ???
         commodityConditionClass: '',
         commodityIntentOfUseClass: '',
-        appliedProcessStartDate: '',
-        appliedProcessEndDate: '',
+        appliedProcessStartDate: nil,
+        appliedProcessEndDate: nil,
         durationMeasureCode: '',
         durationMeasure: '',
         appliedProcessTreatmentTypeLevel1: '',
@@ -299,7 +303,7 @@ module FinishedGoodsApp
         appliedProcessAdditionalNotes: '',
         packageLevelCode: 0,
         packageTypeCode: pallet.basic_pack,
-        packageItemUnitCode: '',
+        packageItemUnitCode: 'EA',
         packageItemQuantity: load.pallet_count,
         packageShippingMarks: '',
         additionalConsignmentNotes: load.memo_pad
@@ -320,7 +324,7 @@ module FinishedGoodsApp
           consignmentNumber: pallet.consignment_note_number,
           phc: pallet.phc,
           inspectedSSCC: pallet.pallet_number,
-          clientRef: pallet_id,
+          clientRef: pallet_id.to_s,
           upn: govt_inspection_sheet.upn,
           inspectedTargetRegion: govt_inspection_sheet.destination_region,
           inspectedTargetCountry: govt_inspection_sheet.destination_country,
@@ -353,7 +357,7 @@ module FinishedGoodsApp
           orchard: pallet_sequence.orchard,
           productionArea: pallet_sequence.production_region,
           phytoData: pallet_sequence.phyto_data || '',
-          sizeCountBerrySize: pallet_sequence.size_ref,
+          sizeCountBerrySize: pallet_sequence.edi_size_count, # Cannot be blank
           packCode: pallet_sequence.std_pack,
           palletQuantity: pallet_sequence.carton_quantity,
           nettPalletWeight: pallet_sequence.sequence_nett_weight.to_f.round(2)
@@ -389,6 +393,13 @@ module FinishedGoodsApp
       end
       array_out
     end
+
+    private
+
+    def validate_addendum_payload(payload)
+      TitanAddendumPayloadSchema.call(payload)
+    end
+
     # def sort_like(left, right)
     #   raise ArgumentError, 'Hash input required for "sort_like" method' unless (left.is_a? Hash) || (right.is_a? Hash)
     #

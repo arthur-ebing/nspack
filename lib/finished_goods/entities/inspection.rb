@@ -56,10 +56,10 @@ module FinishedGoodsApp
     attribute :carton_quantity, Types::Decimal
     attribute :commodity, Types::String
     attribute :commodity_description, Types::String
+    attribute :edi_size_count, Types::String
     attribute :grade, Types::String
     attribute :marketing_variety, Types::String
     attribute :nett_weight, Types::Decimal
-    attribute :sequence_nett_weight, Types::Decimal
     attribute :orchard, Types::String
     attribute :pallet_carton_quantity, Types::Decimal
     attribute :pallet_id, Types::Integer
@@ -71,6 +71,7 @@ module FinishedGoodsApp
     attribute :phyto_data, Types::String
     attribute :production_region, Types::String
     attribute :puc, Types::String
+    attribute :sequence_nett_weight, Types::Decimal
     attribute :size_ref, Types::String
     attribute :std_pack, Types::String
     attribute :inventory_code, Types::String
