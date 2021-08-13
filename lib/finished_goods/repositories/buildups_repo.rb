@@ -63,15 +63,16 @@ module FinishedGoodsApp
     end
 
     def get_process_to_rejoin(dest, source, user)
+      has_dest = dest.nil_or_empty? ? nil : " AND destination_pallet_number = '#{dest}'"
       src = source.join(',')
       query = <<~SQL
         SELECT id
         FROM pallet_buildups
-        where created_by = ? AND completed = false AND destination_pallet_number = ? AND
+        where created_by = ? AND completed = false #{has_dest} AND
         (source_pallets <@ ARRAY[#{src}]::text[] AND
          source_pallets @> ARRAY[#{src}]::text[]);
       SQL
-      DB[query, user, dest].select_map(:id).first
+      DB[query, user].select_map(:id).first
     end
 
     def get_process_to_cancel(pallets, user)

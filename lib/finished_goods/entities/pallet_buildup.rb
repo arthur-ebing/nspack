@@ -11,5 +11,6 @@ module FinishedGoodsApp
     attribute :created_at, Types::DateTime
     attribute :cartons_moved, Types::Hash
     attribute :completed, Types::Bool
+    attribute :auto_create_destination_pallet, Types::Bool
   end
 end

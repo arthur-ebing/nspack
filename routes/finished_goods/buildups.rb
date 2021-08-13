@@ -23,7 +23,13 @@ class Nspack < Roda
                                        action: '/rmd/buildups/pallet_buildup',
                                        button_caption: 'Next')
 
-        form.add_field(:pallet_number, 'Destination Pallet', scan: 'key248_all', scan_type: :pallet_number, submit_form: false, data_type: :number, required: true)
+        form.behaviours do |behaviour|
+          behaviour.input_change :auto_create_destination_pallet,
+                                 notify: [{ url: '/rmd/buildups/auto_create_destination_pallet_clicked' }]
+        end
+
+        form.add_field(:pallet_number, 'Destination Pallet', scan: 'key248_all', scan_type: :pallet_number, submit_form: false, data_type: :number, required: false)
+        form.add_toggle(:auto_create_destination_pallet, 'Auto Create Destination Pallet')
         form.add_field(:qty_to_move, 'Qty Cartons To Move', data_type: :number, required: true)
         form.add_field(:p1, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: false, data_type: :number, required: true)
         form.add_field(:p2, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: false, data_type: :number, required: false)
@@ -219,6 +225,18 @@ class Nspack < Roda
 
     r.on 'rejoin', Integer do |id|
       r.redirect("/rmd/buildups/move_cartons/#{id}")
+    end
+
+    r.on 'auto_create_destination_pallet_clicked' do
+      hide =  case params[:changed_value]
+              when 't'
+                true
+              when 'f', ''
+                false
+              end
+
+      action = hide ? :hide_element : :show_element
+      json_actions([OpenStruct.new(type: action, dom_id: 'buildup_pallet_number_row')])
     end
   end
 
