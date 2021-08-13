@@ -17,58 +17,30 @@
 class HBBFixActualCount < BaseScript
   def run # rubocop:disable Metrics/AbcSize
     resolve_args
-    carton_label_ids = DB[:carton_labels]
-                       .where(production_run_id: @production_run_id)
-                       .where(packing_method_id: @packing_method_id)
-                       .where(fruit_actual_counts_for_pack_id: nil)
-                       .select_map(:id).uniq
-    p "carton_label_ids to update: #{carton_label_ids}"
+    resolve_run_objects
+    commodity_id = DB[:cultivar_groups]
+                   .where(id: DB[:production_runs]
+                                .where(id: @production_run_id)
+                                .get(:cultivar_group_id))
+                   .get(:commodity_id)
 
-    pallet_sequence_ids = DB[:pallet_sequences]
-                          .where(fruit_actual_counts_for_pack_id: nil)
-                          .where(scanned_from_carton_id: DB[:cartons]
-                                       .where(carton_label_id: carton_label_ids)
-                                       .select_map(:id).uniq)
-                          .select_map(:id).uniq
-    p "pallet_sequence_ids to update: #{pallet_sequence_ids}"
+    query = <<~SQL
+      SELECT f.basic_pack_code_id, f.id, f.std_fruit_size_count_id
+      FROM fruit_actual_counts_for_packs f
+      JOIN std_fruit_size_counts s ON s.id = f.std_fruit_size_count_id
+      WHERE f.actual_count_for_pack = #{@actual_count}
+        AND s.commodity_id = #{commodity_id}
+    SQL
+    sizes = DB[query].all
 
     if debug_mode
       p 'Updated Jumble cartons and pallet_sequences successfully'
     else
-      DB.transaction do # rubocop:disable Metrics/BlockLength
-        cl_upd = <<~SQL
-          UPDATE carton_labels
-          SET std_fruit_size_count_id = t.std_fruit_size_count_id,
-              fruit_actual_counts_for_pack_id = t.fruit_actual_counts_for_pack_id
-          FROM (
-            SELECT sc.id AS std_fruit_size_count_id, ac.id AS fruit_actual_counts_for_pack_id, cl.id AS carton_label_id
-            FROM std_fruit_size_counts sc
-            JOIN cultivar_groups ON sc.commodity_id = cultivar_groups.commodity_id
-            AND size_count_value = #{@actual_count}
-            JOIN fruit_actual_counts_for_packs ac ON ac.std_fruit_size_count_id = sc.id
-            JOIN carton_labels cl ON cl.basic_pack_code_id = ac.basic_pack_code_id
-            AND cl.id IN (#{carton_label_ids.join(',')})
-          ) t
-          WHERE carton_labels.id = t.carton_label_id;
-        SQL
-        DB.run(cl_upd) unless carton_label_ids.nil_or_empty?
-
-        ps_upd = <<~SQL
-          UPDATE pallet_sequences
-          SET std_fruit_size_count_id = t.std_fruit_size_count_id,
-              fruit_actual_counts_for_pack_id = t.fruit_actual_counts_for_pack_id
-          FROM (
-            SELECT sc.id AS std_fruit_size_count_id, ac.id AS fruit_actual_counts_for_pack_id, ps.id AS pallet_sequence_id
-            FROM std_fruit_size_counts sc
-            JOIN cultivar_groups ON sc.commodity_id = cultivar_groups.commodity_id
-            AND size_count_value = #{@actual_count}
-            JOIN fruit_actual_counts_for_packs ac ON ac.std_fruit_size_count_id = sc.id
-            JOIN pallet_sequences ps ON ps.basic_pack_code_id = ac.basic_pack_code_id
-            AND ps.id IN (#{pallet_sequence_ids.join(',')})
-          ) t
-          WHERE pallet_sequences.id = t.pallet_sequence_id;
-        SQL
-        DB.run(ps_upd) unless pallet_sequence_ids.nil_or_empty?
+      DB.transaction do
+        sizes.each do |size|
+          update_cartons_with_ids_matching_on_basic_pack(size) unless @carton_label_ids.nil_or_empty?
+          update_sequences_with_ids_matching_on_basic_pack(size) unless @pallet_sequence_ids.nil_or_empty?
+        end
       end
     end
 
@@ -87,9 +59,9 @@ class HBBFixActualCount < BaseScript
       --------
       Updated Jumble cartons and pallet_sequences' fruit_actual_counts_for_pack_id for production runs 46 and 47
 
-      carton_labels: #{carton_label_ids.join(', ')}
+      carton_labels: #{@carton_label_ids.join(', ')}
 
-      pallet_sequences: #{pallet_sequence_ids.join(', ')}
+      pallet_sequences: #{@pallet_sequence_ids.join(', ')}
     STR
 
     log_infodump(:data_fix,
@@ -115,5 +87,44 @@ class HBBFixActualCount < BaseScript
     p "@production_run_id: #{@production_run_id}"
     p "@packing_method_id: #{@packing_method_id}"
     p "@actual_count: #{@actual_count}"
+  end
+
+  def resolve_run_objects # rubocop:disable Metrics/AbcSize
+    @carton_label_ids = DB[:carton_labels]
+                        .where(production_run_id: @production_run_id)
+                        .where(packing_method_id: @packing_method_id)
+                        .where(fruit_actual_counts_for_pack_id: nil)
+                        .select_map(:id).uniq
+    p "@carton_label_ids to update: #{@carton_label_ids}"
+
+    @pallet_sequence_ids = DB[:pallet_sequences]
+                           .where(fruit_actual_counts_for_pack_id: nil)
+                           .where(scanned_from_carton_id: DB[:cartons]
+                                       .where(carton_label_id: @carton_label_ids)
+                                       .select_map(:id).uniq)
+                           .select_map(:id).uniq
+    p "@pallet_sequence_ids to update: #{@pallet_sequence_ids}"
+  end
+
+  def update_cartons_with_ids_matching_on_basic_pack(atrrs)
+    cl_upd = <<~SQL
+      UPDATE carton_labels
+      SET std_fruit_size_count_id = #{atrrs[:std_fruit_size_count_id]},
+          fruit_actual_counts_for_pack_id = #{atrrs[:id]}
+      WHERE carton_labels.id IN (#{@carton_label_ids.join(',')})
+      AND basic_pack_code_id = #{atrrs[:basic_pack_code_id]};
+    SQL
+    DB.run(cl_upd)
+  end
+
+  def update_sequences_with_ids_matching_on_basic_pack(atrrs)
+    ps_upd = <<~SQL
+      UPDATE pallet_sequences
+      SET std_fruit_size_count_id = #{atrrs[:std_fruit_size_count_id]},
+          fruit_actual_counts_for_pack_id = #{atrrs[:id]}
+      WHERE pallet_sequences.id IN (#{@pallet_sequence_ids.join(',')})
+      AND basic_pack_code_id = #{atrrs[:basic_pack_code_id]};
+    SQL
+    DB.run(ps_upd)
   end
 end
