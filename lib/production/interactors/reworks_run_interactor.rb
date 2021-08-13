@@ -650,7 +650,7 @@ module ProductionApp
       return validation_failed_response(res) unless res.success
 
       params[:pallets_selected] = res.instance[:pallet_numbers]
-      res = assert_reworks_in_stock_pallets_permissions(reworks_run_type, params[:pallets_selected])
+      res = validate_reworks_permissions(reworks_run_type, params[:pallets_selected])
       return validation_failed_response(res) unless res.success
 
       params[:allow_orchard_mixing] = true if AppConst::RUN_TYPE_TIP_MIXED_ORCHARDS == reworks_run_type
@@ -702,6 +702,16 @@ module ProductionApp
       else
         validate_pallet_numbers(reworks_run_type, params[:pallets_selected])
       end
+    end
+
+    def validate_reworks_permissions(reworks_run_type, pallets_selected)
+      res = assert_reworks_in_stock_pallets_permissions(reworks_run_type, pallets_selected)
+      return res unless res.success
+
+      res = assert_govt_inspected_pallets_reworks_permissions(reworks_run_type, pallets_selected)
+      return res unless res.success
+
+      ok_response
     end
 
     def display_page(reworks_run_type)
@@ -1956,6 +1966,20 @@ module ProductionApp
 
     def can_change_reworks_in_stock_pallets(pallet_numbers)
       includes_in_stock_pallets?(pallet_numbers) && Crossbeams::Config::UserPermissions.can_user?(@user, :reworks, :can_change_in_stock_pallets)  unless @user&.permission_tree.nil?
+    end
+
+    def assert_govt_inspected_pallets_reworks_permissions(reworks_run_type, pallet_numbers)
+      return ok_response unless [AppConst::RUN_TYPE_SCRAP_PALLET,
+                                 AppConst::RUN_TYPE_UNSCRAP_PALLET].include?(reworks_run_type)
+
+      govt_inspected_pallets = repo.govt_inspected_pallets(pallet_numbers)
+      unless govt_inspected_pallets.nil_or_empty?
+        can_change = Crossbeams::Config::UserPermissions.can_user?(@user, :reworks, :can_change_govt_inspected_pallets) unless @user&.permission_tree.nil?
+        message = "#{govt_inspected_pallets.join(', ')} have passed the govt_inspection and requires user with 'can_change_govt_inspected_pallets' permission"
+        return OpenStruct.new(success: false, messages: { pallets_selected: [message] }, pallets_selected: pallet_numbers) unless can_change
+      end
+
+      success_response('', { pallet_numbers: pallet_numbers })
     end
 
     def validate_pallet_numbers(reworks_run_type, pallet_numbers, production_run_id = nil) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity

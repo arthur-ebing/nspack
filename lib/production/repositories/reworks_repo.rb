@@ -1160,5 +1160,12 @@ module ProductionApp
         .where(scrapped: true)
         .select_map(:carton_label_id)
     end
+
+    def govt_inspected_pallets(pallet_numbers)
+      DB[:pallets]
+        .where(pallet_number: pallet_numbers)
+        .where(govt_inspection_passed: true)
+        .select_map(:pallet_number)
+    end
   end
 end
