@@ -275,7 +275,9 @@ class AppConst # rubocop:disable Metrics/ClassLength
     RUN_TYPE_SINGLE_BIN_EDIT => :bin,
     RUN_TYPE_CHANGE_BIN_DELIVERY => :bin,
     RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE => :prodrun,
-    RUN_TYPE_BULK_BIN_RUN_UPDATE => :prodrun
+    RUN_TYPE_BULK_BIN_RUN_UPDATE => :prodrun,
+    RUN_TYPE_SCRAP_CARTON => :carton,
+    RUN_TYPE_UNSCRAP_CARTON => :carton
   }.freeze
 
   # Routes that do not require login:

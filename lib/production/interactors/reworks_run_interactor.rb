@@ -697,8 +697,7 @@ module ProductionApp
         validate_rmt_bins(reworks_run_type, params[:pallets_selected])
       when :prodrun
         validate_production_runs(reworks_run_type, params)
-      when AppConst::RUN_TYPE_SCRAP_CARTON,
-        AppConst::RUN_TYPE_UNSCRAP_CARTON
+      when :carton
         validate_carton_labels(reworks_run_type, params[:pallets_selected])
       else
         validate_pallet_numbers(reworks_run_type, params[:pallets_selected])
