@@ -1,4 +1,12 @@
 /*
+
+To get a list of all tables that are being audited:
+
+SELECT DISTINCT event_object_table AS table_name
+FROM information_schema.triggers
+WHERE trigger_name = 'audit_trigger_row'
+ORDER BY table_name;
+
 =====================================================================================
 *** NOTES FROM https://wiki.postgresql.org/wiki/Audit_trigger_91plus about usage ***
 =====================================================================================
