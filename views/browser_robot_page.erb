@@ -1,0 +1,38 @@
+<% if @robot_page.success %>
+  <div class="robotBase flex vh-100">
+    <div class="robotLeft ba b--red pa1">LEFT
+      <div class="robotLoginWidget pa2 mb2 ba b--navy">
+        Login widget (Group or individual)
+        <div>Images/SVG letters
+<%#= initials_avatar('Jack', 'Johnson') %>
+<%#= initials_avatar('Miles', 'Davis') %>
+<%#= initials_avatar('Ar', 'Rr') %>
+<%= initials_avatar('A', 'A') %>
+<%= initials_avatar('B', 'A') %>
+<%= initials_avatar('C', 'A') %>
+<%= initials_avatar('D', 'A') %>
+<%= initials_avatar('E', 'A') %>
+<%= initials_avatar('F', 'A') %>
+<%= initials_avatar('G', 'A') %>
+<%= initials_avatar('H', 'A') %>
+<%= initials_avatar('I', 'A') %>
+<%= initials_avatar('J', 'A') %>
+<%= initials_avatar('K', 'A') %>
+<%#= initials_avatar('First only', nil) %>
+        </div>
+        <div>Name(s) and group name if applicable</div>
+      </div>
+      <div class="robotStatsWidget pa2 ba b--yellw">
+        Stats widget
+      </div>
+    </div>
+    <div class="robotRight ba b--green flex-auto pa1">RIGHT
+      <div class="pa2 mb2 ba b--orange">Optional scale widget</div>
+      <div class="pa2 mb2 ba b--pink">Buttons widget</div>
+      <div class="pa2 mb2 ba b--gray">Printlog widget</div>
+      <div class="pa2 ba b--purple">Websocket widget</div>
+    </div>
+  </div>
+<% else %>
+  <h2>Unable to initialise robot: <%= @robot_page.message %></h2>
+<% end %>

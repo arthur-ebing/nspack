@@ -639,4 +639,28 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
       "#{CGI.escapeHTML(res.message)} - #{res.errors.map { |fld, errs| p "#{fld} #{errs.map { |e| CGI.escapeHTML(e.to_s) }.join(', ')}" }.join('; ')}"
     end
   end
+
+  AVATAR_COLOURS = %w[#f2b736 #c5523f #499255 #1875e5 #E7040F #FF4136 #5E2CA5 #D5008F #001B44 #137752 #19A974].freeze
+
+  # Generate an SVG based on the initials of the name and surname passed in.
+  #
+  # @param first_name [string] the first letter (or a space) is used as the initial.
+  # @param surname [string] the first letter (or a space) is used as the initial.
+  # @param size [symbol] image size, can be :small, :medium or :large. Default is :small.
+  # @return [string] the SVG code.
+  def initials_avatar(first_name, surname, size: :medium)
+    init1 = (first_name || ' ')[0].upcase
+    init2 = (surname || ' ')[0].upcase
+    bg = AVATAR_COLOURS[(init1.ord + init2.ord) % AVATAR_COLOURS.length]
+    opts = { small: 50, medium: 100, large: 150 }
+    <<~SVG
+      <?xml version="1.0" encoding="UTF-8"?>
+      <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="#{opts[size]}" height="#{opts[size]}" viewBox="0 0 50 50">
+        <rect width="100%" height="100%" fill="#{bg}"/>
+        <text fill="#fff" font-family="Helvetica,Arial,sans-serif" font-size="26" font-weight="500" x="50%" y="55%" dominant-baseline="middle" text-anchor="middle">
+          #{init1}#{init2}
+        </text>
+      </svg>
+    SVG
+  end
 end
