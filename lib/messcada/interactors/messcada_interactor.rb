@@ -465,6 +465,10 @@ module MesscadaApp
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 
+    def build_robot
+      success_response('build', { some: 'thing' })
+    end
+
     private
 
     def pallet_changes_on_verify(params)
