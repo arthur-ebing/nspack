@@ -99,6 +99,11 @@ module Crossbeams
       HTML
     end
 
+    def image
+      @fields << '<input id="myFileInput" name="the_image" type="file" accept="image/*;capture=camera">'
+      @multipart = true
+    end
+
     # TODO: Add disabled_items to select
 
     # Add a select box to the form.
@@ -220,7 +225,7 @@ module Crossbeams
 
       <<~HTML
         <h2>#{caption}#{page_number_and_page_count}</h2>
-        <form action="#{action}" method="POST">
+        <form action="#{action}" method="POST" #{@multipart ? "enctype='multipart/form-data'" : ''}>
           #{error_section}
           #{notes_section}
           #{camera_section}
