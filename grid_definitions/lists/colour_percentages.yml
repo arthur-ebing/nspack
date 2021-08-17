@@ -1,12 +1,12 @@
 ---
-:dataminer_definition: color_percentages
+:dataminer_definition: colour_percentages
 :conditions:
   :commodity_code:
     - :col: commodity_id
       :op: "="
       :val: "$:commodity_id$"
 :edit_rules:
-  :url: "/masterfiles/fruit/color_percentages/$:id$/inline_edit_color_percentage"
+  :url: "/masterfiles/fruit/colour_percentages/$:id$/inline_edit_colour_percentage"
   :editable_fields:
-    color_percentage:
+    colour_percentage:
       :editor: :numeric

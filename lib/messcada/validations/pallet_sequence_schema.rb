@@ -72,7 +72,7 @@ module MesscadaApp
       optional(:marketing_orchard_id).maybe(:integer)
       optional(:created_at).maybe(:time)
       optional(:product_chars).maybe(Types::StrippedString)
-      optional(:color_percentage_id).maybe(:integer)
+      optional(:colour_percentage_id).maybe(:integer)
     end
 
     rule(:fruit_size_reference_id, :fruit_actual_counts_for_pack_id) do
@@ -148,6 +148,6 @@ module MesscadaApp
     optional(:tu_sticker_ids).maybe(:array).maybe { each(:integer) }
     optional(:target_customer_party_role_id).maybe(:integer)
     optional(:product_chars).maybe(Types::StrippedString)
-    optional(:color_percentage_id).maybe(:integer)
+    optional(:colour_percentage_id).maybe(:integer)
   end
 end

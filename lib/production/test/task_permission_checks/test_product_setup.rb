@@ -45,7 +45,7 @@ module ProductionApp
         gtin_code: 'ABC',
         rmt_class_id: 1,
         target_customer_party_role_id: 1,
-        color_percentage_id: 1
+        colour_percentage_id: 1
       }
       ProductionApp::ProductSetup.new(base_attrs.merge(attrs))
     end

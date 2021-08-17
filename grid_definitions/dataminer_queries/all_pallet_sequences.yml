@@ -36,7 +36,8 @@
   \   failed_otmc,\r\n    created_by,\r\n    verified_by,\r\n    edi_size_count,\r\n
   \   target_customer_party_role_id,\r\n    target_customer,\r\n    consignment_note_number,\r\n
   \   dispatch_note,\r\n    customer_order_number,\r\n    customer_reference, \r\n
-  \   depot,\r\n    po_file_name,\r\n    batch_number,\r\n    CASE WHEN fn_pallet_verification_failed
+  \   depot,\r\n    po_file_name,\r\n    batch_number,\r\n    colour_percentage_id,\r\n
+  \   colour_percentage,\r\n    colour_description,\r\n    CASE WHEN fn_pallet_verification_failed
   (pallet_id) THEN\r\n        'error'\r\n    ELSE\r\n        colour_rule\r\n    END
   AS colour_rule\r\nFROM\r\n    vw_pallet_sequence_flat"
 :limit: 
@@ -2483,9 +2484,57 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  colour_percentage_id:
+    :name: colour_percentage_id
+    :sequence_no: 153
+    :caption: Colour percentage
+    :namespaced_name: colour_percentage_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  colour_percentage:
+    :name: colour_percentage
+    :sequence_no: 154
+    :caption: Colour percentage
+    :namespaced_name: colour_percentage
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  colour_description:
+    :name: colour_description
+    :sequence_no: 155
+    :caption: Colour description
+    :namespaced_name: colour_description
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 153
+    :sequence_no: 156
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

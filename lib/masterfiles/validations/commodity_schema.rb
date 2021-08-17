@@ -9,7 +9,7 @@ module MasterfilesApp
     required(:hs_code).maybe(Types::StrippedString)
     required(:requires_standard_counts).maybe(:bool)
     required(:use_size_ref_for_edi).maybe(:bool)
-    required(:color_applies).maybe(:bool)
+    required(:colour_applies).maybe(:bool)
     # required(:active).filled(:bool)
   end
 end

@@ -378,16 +378,16 @@ module UiRules
                                    ),
                                    selected: @form_object.tu_sticker_ids,
                                    required: false }
-      fields[:color_percentage_id] =  { renderer: :select,
-                                        options: @commodity_repo.for_select_color_percentages(
-                                          where: { commodity_id: commodity_id }
-                                        ),
-                                        disabled_options: @commodity_repo.for_select_inactive_color_percentages,
-                                        caption: 'Color Percentage',
-                                        prompt: 'Select Color Percentage',
-                                        searchable: true,
-                                        hide_on_load: !commodity.color_applies,
-                                        remove_search_for_small_list: false }
+      fields[:colour_percentage_id] =  { renderer: :select,
+                                         options: @commodity_repo.for_select_colour_percentages(
+                                           where: { commodity_id: commodity_id }
+                                         ),
+                                         disabled_options: @commodity_repo.for_select_inactive_colour_percentages,
+                                         caption: 'Colour Percentage',
+                                         prompt: 'Select Colour Percentage',
+                                         searchable: true,
+                                         hide_on_load: !commodity.colour_applies,
+                                         remove_search_for_small_list: false }
     end
 
     def make_form_object # rubocop:disable Metrics/AbcSize

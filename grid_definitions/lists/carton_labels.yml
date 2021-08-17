@@ -6,21 +6,29 @@
   - marketing_orchard
   - dp_carton
   - gtin_code
+  - colour_percentage
+  - colour_description
   um:
   - marketing_puc
   - marketing_orchard
   - dp_carton
   - gtin_code
+  - colour_percentage
+  - colour_description
   ud:
   - marketing_puc
   - marketing_orchard
   - dp_carton
   - gtin_code
+  - colour_percentage
+  - colour_description
   sr:
   - marketing_puc
   - marketing_orchard
   - dp_carton
   - gtin_code
+  - colour_percentage
+  - colour_description
   srp:
   - marketing_puc
   - marketing_orchard
@@ -29,6 +37,10 @@
   hl:
   - marketing_puc
   - marketing_orchard
+  - colour_percentage
+  - colour_description
   sr2:
   - marketing_puc
   - marketing_orchard
+  - colour_percentage
+  - colour_description

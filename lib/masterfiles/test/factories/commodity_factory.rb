@@ -15,7 +15,7 @@ module MasterfilesApp
         active: true,
         requires_standard_counts: false,
         use_size_ref_for_edi: false,
-        color_applies: false
+        colour_applies: false
       }
       DB[:commodities].insert(default.merge(opts))
     end
@@ -32,21 +32,21 @@ module MasterfilesApp
       DB[:commodity_groups].insert(default.merge(opts))
     end
 
-    def create_color_percentage(opts = {})
-      id = get_available_factory_record(:color_percentages, opts)
+    def create_colour_percentage(opts = {})
+      id = get_available_factory_record(:colour_percentages, opts)
       return id unless id.nil?
 
       opts[:commodity_id] ||= create_commodity
 
       default = {
 
-        color_percentage: Faker::Number.number(digits: 2),
+        colour_percentage: Faker::Number.number(digits: 2),
         description: Faker::Lorem.unique.word,
         active: true,
         created_at: '2010-01-01 12:00',
         updated_at: '2010-01-01 12:00'
       }
-      DB[:color_percentages].insert(default.merge(opts))
+      DB[:colour_percentages].insert(default.merge(opts))
     end
   end
 end

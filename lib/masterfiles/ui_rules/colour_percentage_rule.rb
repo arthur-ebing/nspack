@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class ColorPercentageRule < Base
+  class ColourPercentageRule < Base
     def generate_rules
       @repo = MasterfilesApp::CommodityRepo.new
       make_form_object
@@ -10,7 +10,7 @@ module UiRules
       common_values_for_fields common_fields
 
       set_show_fields if %i[show].include? @mode
-      form_name 'color_percentage'
+      form_name 'colour_percentage'
     end
 
     def set_show_fields
@@ -18,13 +18,13 @@ module UiRules
       fields[:commodity_id] = { renderer: :label,
                                 with_value: commodity_id_label,
                                 caption: 'Commodity' }
-      fields[:color_percentage] = { renderer: :label }
+      fields[:colour_percentage] = { renderer: :label }
       fields[:description] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields
-      commodity_id = @options[:commodity_id] || @repo.get(:color_percentages, @options[:id], :commodity_id)
+      commodity_id = @options[:commodity_id] || @repo.get(:colour_percentages, @options[:id], :commodity_id)
       commodity_id_label = @repo.get(:commodities, commodity_id, :code)
       {
         commodity_code: { renderer: :label,
@@ -33,7 +33,7 @@ module UiRules
                           readonly: true },
         commodity_id: { renderer: :hidden,
                         value: commodity_id },
-        color_percentage: {},
+        colour_percentage: {},
         description: { required: true }
       }
     end
@@ -44,12 +44,12 @@ module UiRules
         return
       end
 
-      @form_object = @repo.find_color_percentage(@options[:id])
+      @form_object = @repo.find_colour_percentage(@options[:id])
     end
 
     def make_new_form_object
       @form_object = OpenStruct.new(commodity_id: @options[:commodity_id],
-                                    color_percentage: nil,
+                                    colour_percentage: nil,
                                     description: nil)
     end
   end

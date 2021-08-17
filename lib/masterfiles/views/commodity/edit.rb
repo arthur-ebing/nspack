@@ -22,15 +22,15 @@ module Masterfiles
               form.add_field :hs_code
               form.add_field :requires_standard_counts
               form.add_field :use_size_ref_for_edi
-              form.add_field :color_applies
+              form.add_field :colour_applies
             end
 
-            if rules[:color_applies]
+            if rules[:colour_applies]
               page.section do |section|
-                section.add_grid('color_percentages',
-                                 "/list/color_percentages/grid?key=commodity_code&commodity_id=#{id}",
+                section.add_grid('colour_percentages',
+                                 "/list/colour_percentages/grid?key=commodity_code&commodity_id=#{id}",
                                  height: 16,
-                                 caption: 'Color Percentages')
+                                 caption: 'Colour Percentages')
               end
             end
           end

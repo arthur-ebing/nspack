@@ -126,7 +126,7 @@ module ProductionApp
       standard_pack_code_id = create_standard_pack
       basic_pack_code_id = create_basic_pack(standard_pack_id: standard_pack_code_id)
       target_customer_party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_TARGET_CUSTOMER)
-      color_percentage_id = create_color_percentage
+      colour_percentage_id = create_colour_percentage
 
       {
         id: 1,
@@ -166,7 +166,7 @@ module ProductionApp
         gtin_code: 'ABC',
         rmt_class_id: rmt_class_id,
         target_customer_party_role_id: target_customer_party_role_id,
-        color_percentage_id: color_percentage_id,
+        colour_percentage_id: colour_percentage_id,
         product_setup_template: 'ABC',
         cultivar_group_id: 1,
         cultivar_id: 1,

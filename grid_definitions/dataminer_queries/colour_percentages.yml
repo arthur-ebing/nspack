@@ -1,12 +1,12 @@
 ---
-:caption: Color Percentages
-:sql: "SELECT \"color_percentages\".\"id\", \"color_percentages\".\"commodity_id\",
-  \"commodities\".\"code\" AS commodity_code, \"color_percentages\".\"description\",
-  \"color_percentages\".\"color_percentage\", \"color_percentages\".\"active\", \"color_percentages\".\"created_at\",
-  \"color_percentages\".\"updated_at\", fn_current_status('color_percentages', \"color_percentages\".\"id\")
-  AS status \r\nFROM \"color_percentages\" \r\nJOIN \"commodities\" ON \"commodities\".\"id\"
-  = \"color_percentages\".\"commodity_id\"\r\nORDER BY \"commodities\".\"code\" ASC,
-  \"color_percentages\".\"description\" ASC"
+:caption: Colour Percentages
+:sql: "SELECT \"colour_percentages\".\"id\", \"colour_percentages\".\"commodity_id\",
+  \"commodities\".\"code\" AS commodity_code, \"colour_percentages\".\"description\",
+  \"colour_percentages\".\"colour_percentage\", \"colour_percentages\".\"active\", \"colour_percentages\".\"created_at\",
+  \"colour_percentages\".\"updated_at\", fn_current_status('colour_percentages', \"colour_percentages\".\"id\")
+  AS status \r\nFROM \"colour_percentages\" \r\nJOIN \"commodities\" ON \"commodities\".\"id\"
+  = \"colour_percentages\".\"commodity_id\"\r\nORDER BY \"commodities\".\"code\" ASC,
+  \"colour_percentages\".\"description\" ASC"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -15,7 +15,7 @@
     :name: id
     :sequence_no: 1
     :caption: Id
-    :namespaced_name: color_percentages.id
+    :namespaced_name: colour_percentages.id
     :data_type: :integer
     :width: 
     :format: 
@@ -31,7 +31,7 @@
     :name: commodity_id
     :sequence_no: 2
     :caption: Commodity
-    :namespaced_name: color_percentages.commodity_id
+    :namespaced_name: colour_percentages.commodity_id
     :data_type: :integer
     :width: 
     :format: 
@@ -63,7 +63,7 @@
     :name: description
     :sequence_no: 4
     :caption: Description
-    :namespaced_name: color_percentages.description
+    :namespaced_name: colour_percentages.description
     :data_type: :string
     :width: 200
     :format: 
@@ -75,11 +75,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  color_percentage:
-    :name: color_percentage
+  colour_percentage:
+    :name: colour_percentage
     :sequence_no: 5
-    :caption: Color Percentage
-    :namespaced_name: color_percentages.color_percentage
+    :caption: Colour Percentage
+    :namespaced_name: colour_percentages.colour_percentage
     :data_type: :integer
     :width: 120
     :format: 
@@ -95,7 +95,7 @@
     :name: active
     :sequence_no: 6
     :caption: Active
-    :namespaced_name: color_percentages.active
+    :namespaced_name: colour_percentages.active
     :data_type: :boolean
     :width: 
     :format: 
@@ -111,7 +111,7 @@
     :name: created_at
     :sequence_no: 7
     :caption: Created at
-    :namespaced_name: color_percentages.created_at
+    :namespaced_name: colour_percentages.created_at
     :data_type: :datetime
     :width: 
     :format: 
@@ -127,7 +127,7 @@
     :name: updated_at
     :sequence_no: 8
     :caption: Updated at
-    :namespaced_name: color_percentages.updated_at
+    :namespaced_name: colour_percentages.updated_at
     :data_type: :datetime
     :width: 
     :format: 

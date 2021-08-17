@@ -1,21 +1,40 @@
 ---
 :dataminer_definition: pallet_sequences_view
 :actions:
-  - :url: "/list/pallets_audit/with_params?key=pallet&id=$:pallet_id$"
-    :text: Pallet Audit
-    :icon: list
-  - :url: "/list/pallet_sequences_audit/with_params?key=pallet_sequence&id=$:pallet_sequence_id$"
-    :text: Sequence Audit
-    :icon: list
+- :url: "/list/pallets_audit/with_params?key=pallet&id=$:pallet_id$"
+  :text: Pallet Audit
+  :icon: list
+- :url: "/list/pallet_sequences_audit/with_params?key=pallet_sequence&id=$:pallet_sequence_id$"
+  :text: Sequence Audit
+  :icon: list
 :captions:
   :conditions:
     :production_run_sequences: Pallet Sequences on Production Run
 :conditions:
   :standard:
-    - :col: vw_pallets.pallet_id
-      :op: =
-      :val: $:pallet_id$
+  - :col: vw_pallets.pallet_id
+    :op: "="
+    :val: "$:pallet_id$"
   :production_run_sequences:
-    - :col: vw_pallet_sequences.production_run_id
-      :op: =
-      :val: $:id$
+  - :col: vw_pallet_sequences.production_run_id
+    :op: "="
+    :val: "$:id$"
+:hide_for_client:
+  hb:
+  - colour_percentage
+  - colour_description
+  hl:
+  - colour_percentage
+  - colour_description
+  um:
+  - colour_percentage
+  - colour_description
+  ud:
+  - colour_percentage
+  - colour_description
+  sr:
+  - colour_percentage
+  - colour_description
+  sr2:
+  - colour_percentage
+  - colour_description

@@ -2,10 +2,10 @@
 
 module Masterfiles
   module Fruit
-    module ColorPercentage
+    module ColourPercentage
       class Edit
         def self.call(id, form_values: nil, form_errors: nil)
-          ui_rule = UiRules::Compiler.new(:color_percentage, :edit, id: id, form_values: form_values)
+          ui_rule = UiRules::Compiler.new(:colour_percentage, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
           Crossbeams::Layout::Page.build(rules) do |page|
@@ -13,13 +13,13 @@ module Masterfiles
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.caption 'Edit Color Percentage'
-              form.action "/masterfiles/fruit/color_percentages/#{id}"
+              form.caption 'Edit Colour Percentage'
+              form.action "/masterfiles/fruit/colour_percentages/#{id}"
               form.remote!
               form.method :update
               form.add_field :commodity_id
               form.add_field :description
-              form.add_field :color_percentage
+              form.add_field :colour_percentage
             end
           end
         end

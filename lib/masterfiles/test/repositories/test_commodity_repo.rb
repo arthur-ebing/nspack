@@ -12,7 +12,7 @@ module MasterfilesApp
     def test_crud_calls
       test_crud_calls_for :commodity_groups, name: :commodity_group, wrapper: CommodityGroup
       test_crud_calls_for :commodities, name: :commodity, wrapper: Commodity
-      test_crud_calls_for :color_percentages, name: :color_percentage, wrapper: ColorPercentage
+      test_crud_calls_for :colour_percentages, name: :colour_percentage, wrapper: ColourPercentage
     end
 
     private

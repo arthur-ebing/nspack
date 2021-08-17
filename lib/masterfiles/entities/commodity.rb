@@ -11,6 +11,6 @@ module MasterfilesApp
     attribute :commodity_group_code, Types::String
     attribute :requires_standard_counts, Types::Bool
     attribute :use_size_ref_for_edi, Types::Bool
-    attribute :color_applies, Types::Bool
+    attribute :colour_applies, Types::Bool
   end
 end

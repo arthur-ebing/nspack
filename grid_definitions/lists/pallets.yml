@@ -77,20 +77,28 @@
   - marketing_puc
   - marketing_orchard
   - shipped_date
+  - colour_percentage
+  - colour_description
   um:
   - marketing_puc
   - marketing_orchard
   - shipped_date
   - batch_number
+  - colour_percentage
+  - colour_description
   ud:
   - marketing_puc
   - marketing_orchard
   - batch_number
+  - colour_percentage
+  - colour_description
   sr:
   - marketing_puc
   - marketing_orchard
   - shipped_date
   - batch_number
+  - colour_percentage
+  - colour_description
   srp:
   - marketing_puc
   - marketing_orchard
@@ -99,11 +107,15 @@
   - marketing_orchard
   - shipped_date
   - batch_number
+  - colour_percentage
+  - colour_description
   sr2:
   - marketing_puc
   - marketing_orchard
   - shipped_date
   - batch_number
+  - colour_percentage
+  - colour_description
   kr:
   - shipped_date
   - batch_number

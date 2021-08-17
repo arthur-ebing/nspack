@@ -6,7 +6,7 @@ module UiRules
       @repo = MasterfilesApp::CommodityRepo.new
       make_form_object
 
-      @rules[:color_applies] = @form_object.color_applies
+      @rules[:colour_applies] = @form_object.colour_applies
 
       common_values_for_fields common_fields
 
@@ -24,7 +24,7 @@ module UiRules
       fields[:requires_standard_counts] = { renderer: :label, as_boolean: true }
       fields[:use_size_ref_for_edi] = { renderer: :label, as_boolean: true }
       fields[:active] = { renderer: :label, as_boolean: true }
-      fields[:color_applies] = { renderer: :label, as_boolean: true }
+      fields[:colour_applies] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields
@@ -41,7 +41,7 @@ module UiRules
         requires_standard_counts: { renderer: :checkbox },
         use_size_ref_for_edi: { renderer: :checkbox },
         active: { renderer: :checkbox },
-        color_applies: { renderer: :checkbox }
+        colour_applies: { renderer: :checkbox }
       }
     end
 
@@ -59,7 +59,7 @@ module UiRules
                                     requires_standard_counts: true,
                                     use_size_ref_for_edi: nil,
                                     active: true,
-                                    color_applies: nil)
+                                    colour_applies: nil)
     end
   end
 end

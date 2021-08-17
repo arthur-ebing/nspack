@@ -132,7 +132,7 @@ module ProductionApp
       hash[:fruit_size_reference] = get(:fruit_size_references, hash[:fruit_size_reference_id], :size_reference)
       hash[:grade] = get(:grades, hash[:grade_id], :grade_code)
       hash[:class] = get(:rmt_classes, hash[:rmt_class_id], :rmt_class_code)
-      hash[:color_percentage] = get(:color_percentages, hash[:color_percentage_id], :color_percentage)
+      hash[:colour_percentage] = get(:colour_percentages, hash[:colour_percentage_id], :colour_percentage)
       hash[:packing_specification_code] = product_setup_partial_code(hash)
       return hash if hash[:step] < 2
 

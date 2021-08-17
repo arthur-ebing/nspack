@@ -3,7 +3,7 @@
 :sql: "SELECT\r\n    commodities.id,\r\n    commodities.commodity_group_id,\r\n    commodity_groups.code
   AS commodity_group_code,\r\n    commodities.code,\r\n    commodities.description,\r\n
   \   commodities.hs_code,\r\n    commodities.requires_standard_counts,\r\n    commodities.use_size_ref_for_edi,\r\n
-  \   commodities.color_applies,\r\n    fn_masterfile_variants('commodities', commodities.id)
+  \   commodities.colour_applies,\r\n    fn_masterfile_variants('commodities', commodities.id)
   AS variant_codes,\r\n    commodities.active,\r\n    commodities.created_at,\r\n
   \   commodities.updated_at\r\nFROM  commodities\r\nJOIN commodity_groups ON commodity_groups.id
   = commodities.commodity_group_id"
@@ -139,11 +139,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  color_applies:
-    :name: color_applies
+  colour_applies:
+    :name: colour_applies
     :sequence_no: 9
-    :caption: Color applies
-    :namespaced_name: commodities.color_applies
+    :caption: Colour applies
+    :namespaced_name: commodities.colour_applies
     :data_type: :boolean
     :width: 100
     :format: 
