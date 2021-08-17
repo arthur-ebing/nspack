@@ -18,6 +18,7 @@ module FinishedGoodsApp
       request_inspection: :request_inspection_task,
       request_reinspection: :request_reinspection_task,
       validate: :validation_call,
+      validate_consignment: :validate_by_consignment_call,
       update_inspection: :update_inspection_task,
       update_reinspection: :update_reinspection_task,
       results: :request_results_task,
@@ -150,6 +151,16 @@ module FinishedGoodsApp
 
       res = http.json_post(url, payload, header)
       log_titan_request('Request Reinspection', res)
+    end
+
+    def validate_by_consignment_call
+      auth_token_call if header.nil?
+      url = "#{AppConst::TITAN_API_HOST}/pi/ProductInspection/InspectionMessages/ValidationResult?consignmentNumber=#{govt_inspection_sheet.consignment_note_number}"
+      @header.delete('api-version')
+
+      res = http.request_get(url, header)
+      res = failed_response(res.message, res.instance) unless res.instance['errors'].nil_or_empty?
+      log_titan_request('Validation', res)
     end
 
     def validation_call
