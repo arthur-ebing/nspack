@@ -63,10 +63,10 @@
   inventory_code:
     :name: inventory_code
     :sequence_no: 4
-    :caption: Inventory code
+    :caption: Inventory
     :namespaced_name: inventory_codes.inventory_code
     :data_type: :string
-    :width: 100
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -82,7 +82,7 @@
     :caption: Inventory description
     :namespaced_name: inventory_codes.description
     :data_type: :string
-    :width: 130
+    :width: 190
     :format: 
     :hide: false
     :pinned: 
@@ -95,10 +95,10 @@
   commodity_code:
     :name: commodity_code
     :sequence_no: 6
-    :caption: Commodity code
+    :caption: Commodity
     :namespaced_name: commodities.code
     :data_type: :string
-    :width: 100
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -130,7 +130,7 @@
     :caption: Packing cost
     :namespaced_name: inventory_codes_packing_costs.packing_cost
     :data_type: :number
-    :width: 100
+    :width: 90
     :format: :delimited_1000
     :hide: false
     :pinned: 
