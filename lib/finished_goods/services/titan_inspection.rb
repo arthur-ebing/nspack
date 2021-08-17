@@ -18,6 +18,7 @@ module FinishedGoodsApp
       request_inspection: :request_inspection_task,
       request_reinspection: :request_reinspection_task,
       validate: :validation_call,
+      validate_consignment: :validate_by_consignment_call,
       update_inspection: :update_inspection_task,
       update_reinspection: :update_reinspection_task,
       results: :request_results_task,
@@ -152,6 +153,16 @@ module FinishedGoodsApp
       log_titan_request('Request Reinspection', res)
     end
 
+    def validate_by_consignment_call
+      auth_token_call if header.nil?
+      url = "#{AppConst::TITAN_API_HOST}/pi/ProductInspection/InspectionMessages/ValidationResult?consignmentNumber=#{govt_inspection_sheet.consignment_note_number}"
+      @header.delete('api-version')
+
+      res = http.request_get(url, header)
+      res = failed_response(res.message, res.instance) unless res.instance['errors'].nil_or_empty?
+      log_titan_request('Validation', res)
+    end
+
     def validation_call
       auth_token_call if header.nil?
       url = "#{AppConst::TITAN_API_HOST}/pi/ProductInspection/InspectionMessages/ValidationResult?inspectionMessageId=#{inspection_message_id}"
@@ -203,7 +214,7 @@ module FinishedGoodsApp
     end
 
     def auth_token_call
-      @http = Crossbeams::HTTPCalls.new(responder: TitanHttpResponder.new)
+      @http = Crossbeams::HTTPCalls.new(call_logger: call_logger, responder: TitanHttpResponder.new)
       raise Crossbeams::InfoError, 'Service Unavailable: Failed to connect to remote server.' unless http.can_ping?('ppecb.com')
 
       url = "#{AppConst::TITAN_API_HOST}/oauth/ApiAuth"
@@ -213,6 +224,10 @@ module FinishedGoodsApp
       raise Crossbeams::InfoError, res.message unless res.success
 
       @header = { 'Authorization' => "Bearer #{res.instance['token']}" }
+    end
+
+    def call_logger
+      Crossbeams::HTTPTextCallLogger.new('TITAN-INSPECTION-API', log_path: 'log/titan_inspection_api_http_calls.log')
     end
 
     class TitanHttpResponder

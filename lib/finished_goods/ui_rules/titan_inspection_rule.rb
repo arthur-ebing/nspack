@@ -43,6 +43,10 @@ module UiRules
                    url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/titan_inspection/validate",
                    visible: @form_object&.inspection_message_id,
                    style: :action_button }
+      validate_cons = { control_type: :link, text: 'Validate by Consignment',
+                        url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/titan_inspection/validate_consignment",
+                        visible: !@form_object.validated && !@form_object&.inspection_message_id && !@form_object.request_type.nil?,
+                        style: :action_button }
       results = { control_type: :link, text: 'Get Results',
                   url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/titan_inspection/results",
                   visible: @form_object.validated,
@@ -59,8 +63,8 @@ module UiRules
                               url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/titan_inspection/update_reinspection",
                               visible: @form_object.validated,
                               style: :action_button }
-      progress_controls = [inspect, update, validate, results, delete]
-      progress_controls = [reinspect, update_reinspection, validate, results, delete] if @form_object.reinspection
+      progress_controls = [inspect, update, validate, validate_cons, results, delete]
+      progress_controls = [reinspect, update_reinspection, validate, validate_cons, results, delete] if @form_object.reinspection
       @form_object.progress_controls = progress_controls unless @repo.get(:govt_inspection_sheets, @options[:govt_inspection_sheet_id], :inspected)
     end
   end
