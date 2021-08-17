@@ -5,11 +5,11 @@
   marketing_varieties.id) AS variant_codes,\r\n    array_agg(distinct cultivars.cultivar_group_id)
   AS cultivar_group_ids,\r\n    array_agg(distinct cultivars.cultivar_code) AS cultivar_code,\r\n
   \   marketing_varieties.active,\r\n    marketing_varieties.created_at,\r\n    marketing_varieties.updated_at\r\nFROM
-  marketing_varieties\r\nJOIN marketing_varieties_for_cultivars ON marketing_varieties.id
-  = marketing_varieties_for_cultivars.marketing_variety_id\r\nJOIN cultivars ON cultivars.id
-  = marketing_varieties_for_cultivars.cultivar_id\r\nJOIN cultivar_groups ON cultivar_groups.id
-  = cultivars.cultivar_group_id\r\n\r\nGROUP BY marketing_varieties.id\r\nORDER BY
-  marketing_varieties.marketing_variety_code"
+  marketing_varieties\r\nLEFT JOIN marketing_varieties_for_cultivars ON marketing_varieties.id
+  = marketing_varieties_for_cultivars.marketing_variety_id\r\nLEFT JOIN cultivars
+  ON cultivars.id = marketing_varieties_for_cultivars.cultivar_id\r\nLEFT JOIN cultivar_groups
+  ON cultivar_groups.id = cultivars.cultivar_group_id\r\n\r\nGROUP BY marketing_varieties.id\r\nORDER
+  BY marketing_varieties.marketing_variety_code"
 :limit: 
 :offset: 
 :external_settings:

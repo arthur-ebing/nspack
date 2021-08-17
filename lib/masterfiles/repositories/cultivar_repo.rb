@@ -88,7 +88,7 @@ module MasterfilesApp
 
     def delete_cultivar(id)
       DB[:marketing_varieties_for_cultivars].where(cultivar_id: id).delete
-      delete_orphaned_marketing_varieties
+      deactivate_orphaned_marketing_varieties
       DB[:cultivars].where(id: id).delete
     end
 
@@ -104,23 +104,34 @@ module MasterfilesApp
       new_ids           = marketing_variety_ids - existing_ids
 
       DB[:marketing_varieties_for_cultivars].where(cultivar_id: cultivar_id).where(marketing_variety_id: old_ids).delete
-      delete_orphaned_marketing_varieties
+      deactivate_orphaned_marketing_varieties
 
       new_ids.each do |prog_id|
         DB[:marketing_varieties_for_cultivars].insert(cultivar_id: cultivar_id, marketing_variety_id: prog_id)
       end
+      reactivate_marketing_varieties(new_ids)
       { success: true }
     end
 
-    def delete_orphaned_marketing_varieties
+    def orphaned_marketing_varieties
       link_ids = DB[:marketing_varieties_for_cultivars].select_map(:marketing_variety_id).uniq
       marketing_variety_ids = DB[:marketing_varieties].select_map(:id)
-      orphan_ids = marketing_variety_ids - link_ids
+      marketing_variety_ids - link_ids
+    end
+
+    def reactivate_marketing_varieties(ids)
+      DB[:customer_variety_varieties].where(marketing_variety_id: ids, active: false).update(active: true)
+      DB[:customer_varieties].where(variety_as_customer_variety_id: ids, active: false).update(active: true)
+      DB[:marketing_varieties].where(id: ids, active: false).update(active: true)
+    end
+
+    def deactivate_orphaned_marketing_varieties
+      orphan_ids = orphaned_marketing_varieties
       return if orphan_ids.empty?
 
-      DB[:customer_variety_varieties].where(marketing_variety_id: orphan_ids).delete
-      DB[:customer_varieties].where(variety_as_customer_variety_id: orphan_ids).delete
-      DB[:marketing_varieties].where(id: orphan_ids).delete
+      DB[:customer_variety_varieties].where(marketing_variety_id: orphan_ids).update(active: false)
+      DB[:customer_varieties].where(variety_as_customer_variety_id: orphan_ids).update(active: false)
+      DB[:marketing_varieties].where(id: orphan_ids).update(active: false)
     end
 
     def cultivar_marketing_variety_ids(cultivar_id)
