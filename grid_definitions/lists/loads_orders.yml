@@ -21,7 +21,7 @@
 - :url: "/finished_goods/dispatch/loads/$:id$/create_order"
   :text: create order
   :icon: document-add
-  :hide_if_true: on_order, rmt_load
+  :hide_if_true: on_order,rmt_load
 - :separator: true
 - :url: "/development/statuses/list/loads/$:id$"
   :text: status
