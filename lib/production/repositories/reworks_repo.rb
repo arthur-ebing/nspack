@@ -1163,8 +1163,9 @@ module ProductionApp
 
     def govt_inspected_pallets(pallet_numbers)
       DB[:pallets]
+        .join(:govt_inspection_pallets, pallet_id: :id)
         .where(pallet_number: pallet_numbers)
-        .where(govt_inspection_passed: true)
+        .where(passed: true)
         .select_map(:pallet_number)
     end
   end
