@@ -11,7 +11,7 @@ module FinishedGoodsApp
     attribute :result_doc, Types::Hash
     attribute :inspection_message_id, Types::Integer
     attribute :transaction_id, Types::Integer
-    attribute :request_id, Types::Integer
+    attribute :request_id, Types::String
     attribute :created_at, Types::DateTime
   end
 
@@ -27,7 +27,7 @@ module FinishedGoodsApp
 
     attribute :transaction_id, Types::Integer
     attribute :inspection_message_id, Types::Integer
-    attribute :request_id, Types::Integer
+    attribute :request_id, Types::String
     attribute :created_at, Types::DateTime
   end
 
@@ -46,7 +46,7 @@ module FinishedGoodsApp
   class TitanAddendumFlat < Dry::Struct
     attribute :id, Types::Integer
     attribute :load_id, Types::Integer
-    attribute :request_id, Types::Integer
+    attribute :request_id, Types::String
     attribute :transaction_id, Types::Integer
     attribute :updated_at, Types::DateTime
 

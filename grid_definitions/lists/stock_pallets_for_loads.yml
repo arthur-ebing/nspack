@@ -18,7 +18,7 @@
   :icon: add-outline
   :title: New
   :popup: true
-  :hide_if_true: shipped, has_pallet_holdover
+  :hide_if_true: shipped,has_pallet_holdover
 - :url: "/finished_goods/dispatch/pallet_holdovers/$:pallet_holdover_id$"
   :text: view holdover
   :icon: view-show
