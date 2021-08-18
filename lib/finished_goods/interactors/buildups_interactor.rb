@@ -34,6 +34,9 @@ module FinishedGoodsApp
       error_msgs.merge!(!(err = validate_scrapped(pallets)).empty? ? error_messages(res.to_h, err, 'is scrapped') : {})
       return validation_failed_response(messages: error_msgs) unless error_msgs.empty?
 
+      error_msgs = !(err = validate_has_individual_cartons(pallets)).empty? ? error_messages(res.to_h, err, 'has no individuals ctns') : {}
+      return validation_failed_response(messages: error_msgs) unless error_msgs.empty?
+
       error_msgs = !(err = validate_zero_qty(pallets)).empty? ? error_messages(res.to_h, err, 'has 0 ctn_qty') : {}
       return validation_failed_response(messages: error_msgs) unless error_msgs.empty?
 
@@ -109,6 +112,7 @@ module FinishedGoodsApp
 
             prod_run_repo.decrement_sequence(orig_seq)
             dest_pallet_id = res.instance[:pallet_id]
+            repo.update(:pallets, dest_pallet_id, has_individual_cartons: true)
             updates.store(:destination_pallet_number, repo.get_value(:pallets, :pallet_number, id: dest_pallet_id))
           end
 
@@ -152,6 +156,10 @@ module FinishedGoodsApp
 
     def validate_scrapped(pallets)
       repo.get_scrapped(pallets)
+    end
+
+    def validate_has_individual_cartons(pallets)
+      repo.get_has_no_individual_cartons(pallets)
     end
 
     def validate_zero_qty(pallets)

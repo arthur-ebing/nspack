@@ -18,6 +18,10 @@ module FinishedGoodsApp
       DB[:pallets].where(pallet_number: pallets, scrapped: true).select_map(:pallet_number)
     end
 
+    def get_has_no_individual_cartons(pallets)
+      DB[:pallets].where(pallet_number: pallets, has_individual_cartons: false).select_map(:pallet_number)
+    end
+
     def get_zero_qty_pallets(pallets)
       DB[:pallets].where(pallet_number: pallets, carton_quantity: 0).select_map(:pallet_number)
     end
