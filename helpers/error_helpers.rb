@@ -1,4 +1,14 @@
 module ErrorHelpers # rubocop:disable Metrics/ModuleLength
+  # If the SendMailJob fails, this helper will show that there is a problem.
+  # @return [string] the mail-problem notification.
+  def display_email_sending_failure
+    file_name = DevelopmentApp::SendMailJob::MAIL_FAIL
+    return '' unless File.exist?(file_name)
+
+    msg = File.read(file_name)
+    %(<span class="red" title="#{msg}">#{Crossbeams::Layout::Icon.render(:envelope)}</span>)
+  end
+
   # For a JSON response, set the content-type header.
   # @return [void]
   def return_json_response
