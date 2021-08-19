@@ -1085,7 +1085,7 @@ class Nspack < Roda
       form = Crossbeams::RMDForm.new(form_state,
                                      form_name: :pallet,
                                      scan_with_camera: @rmd_scan_with_camera,
-                                     caption: 'Scan Tripeheet Pallet',
+                                     caption: 'Scan Tripsheet Pallet',
                                      action: "/rmd/finished_goods/create_pallet_vehicle_job_unit/#{id}",
                                      button_caption: 'Submit')
 

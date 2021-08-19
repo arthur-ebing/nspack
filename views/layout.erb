@@ -59,6 +59,7 @@
           <% if @user_has_rmd_menu_items %>
             <%= Crossbeams::Layout::Link.new(text: 'RMD', url: '/rmd/home', style: :button, css_class: 'bg-dark-blue').render %>
           <% end %>
+          <%= display_email_sending_failure %>
           <a href="/logout" id="logout" class="f6 fw6 hover-blue link black-70 ml3 mr2 mr3-m mr4-l dib" title="Logout">logout</a>
         <% end %>
       </div>

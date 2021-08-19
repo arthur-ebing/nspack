@@ -2,6 +2,8 @@
 
 module DevelopmentApp
   class SendMailJob < BaseQueJob
+    MAIL_FAIL = File.join(__dir__, '../../../tmp', 'mailfail')
+
     def run(options = {}) # rubocop:disable Metrics/AbcSize
       from_mail = resolve_sender(options[:from])
 
@@ -18,7 +20,16 @@ module DevelopmentApp
 
       mail.deliver!
       send_bus_message("Mail sent: '#{options[:subject]}'", target_user: options[:notify_user]) if options[:notify_user]
+      clear_mail_fail
       finish
+    rescue Net::SMTPAuthenticationError,
+           Net::SMTPServerBusy,
+           Net::SMTPSyntaxError,
+           Net::SMTPFatalError,
+           Net::SMTPUnknownError,
+           Errno::ECONNREFUSED => e
+      log_mail_fail(e)
+      raise
     end
 
     private
@@ -80,6 +91,27 @@ module DevelopmentApp
         raise ArgumentError, "Mail attachment has invalid option: #{key}" unless %i[filename content mime_type].include?(key)
       end
       raise ArgumentError, 'Mail attachment must have filename and content options' unless keys.include?(:filename) && keys.include?(:content)
+    end
+
+    # If the mail cannot be sent, log the exception status in a file.
+    # This file can be checked by other parts of the application to monitor email-sending status.
+    # Swallow any exceptions raised in this method.
+    def log_mail_fail(err)
+      return if File.exist?(MAIL_FAIL)
+
+      File.open(MAIL_FAIL, 'w') { |f| f.puts "#{err.class} => #{err.message}" }
+    rescue StandardError => e
+      puts "UNABLE TO HANDLE ERROR IN log_mail_fail: #{e.message}"
+      nil
+    end
+
+    # If mail-sending is OK, remove the exception status file.
+    # Swallow any exceptions raised in this method.
+    def clear_mail_fail
+      File.delete(MAIL_FAIL) if File.exist?(MAIL_FAIL)
+    rescue StandardError => e
+      puts "UNABLE TO HANDLE ERROR IN clear_mail_fail: #{e.message}"
+      nil
     end
   end
 end
