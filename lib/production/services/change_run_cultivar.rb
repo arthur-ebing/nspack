@@ -24,8 +24,9 @@ module ProductionApp
 
     def change_run_cultivar # rubocop:disable Metrics/AbcSize
       repo.transaction do
+        arr = %i[cultivar_id allow_cultivar_mixing reconfiguring setup_complete]
         repo.update_production_run(production_run_id,
-                                   { cultivar_id: params[:cultivar_id], allow_cultivar_mixing: false })
+                                   params.to_h.slice(*arr))
         parent_id = repo.create_reworks_run(resolve_reworks_run_attrs)
         repo.log_status(:production_runs, production_run_id, AppConst::REWORKS_ACTION_CHANGE_RUN_CULTIVAR)
 
@@ -39,6 +40,8 @@ module ProductionApp
                                repo.select_values(:pallet_sequences, :id, { production_run_id: production_run_id }),
                                change_attrs,
                                objects_reworks_run_attrs)
+
+        ReExecuteRun.call(production_run_id, user_name) if params[:labeling]
       end
 
       ok_response
@@ -50,13 +53,16 @@ module ProductionApp
       run = ProductionApp::ProductionRunRepo.new.find_production_run(production_run_id)
       {
         cultivar_id: run[:cultivar_id],
-        allow_cultivar_mixing: run[:allow_cultivar_mixing]
+        allow_cultivar_mixing: run[:allow_cultivar_mixing],
+        reconfiguring: run[:reconfiguring],
+        setup_complete: run[:setup_complete]
       }
     end
 
     def resolve_reworks_run_attrs(parent_id = nil) # rubocop:disable Metrics/AbcSize
-      extra_after_state = parent_id.nil? ? { allow_cultivar_mixing: false } : {}
-      extra_before_state = parent_id.nil? ? before_state.to_h.slice(:allow_cultivar_mixing) : {}
+      arr = %i[allow_cultivar_mixing reconfiguring setup_complete]
+      extra_after_state = parent_id.nil? ? params.to_h.slice(*arr) : {}
+      extra_before_state = parent_id.nil? ? before_state.to_h.slice(*arr) : {}
       {
         parent_id: parent_id,
         user: user_name,

@@ -32,6 +32,12 @@ module Production
                   col.add_field :production_run_id
                 end
               end
+
+              form.row do |row|
+                row.column do |col|
+                  col.add_notice('Run will be re-executed after this change.') if rules[:labeling]
+                end
+              end
             end
           end
 

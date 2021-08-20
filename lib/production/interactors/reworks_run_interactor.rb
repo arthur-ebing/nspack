@@ -176,14 +176,21 @@ module ProductionApp
                               allow_orchard_mixing: run[:allow_orchard_mixing],
                               allow_cultivar_mixing: run[:allow_cultivar_mixing],
                               allow_cultivar_group_mixing: run[:allow_cultivar_group_mixing] })
-
-      res = resolve_missing_tipped_orchards(params)
+      res = resolve_missing_tipped_orchards(add_run_labeling_attrs(params))
       return res unless res.success
 
       res = resolve_missing_tipped_cultivars(params)
       return res unless res.success
 
       success_response('ok', res.instance)
+    end
+
+    def add_run_labeling_attrs(attrs)
+      run = production_run(attrs[:production_run_id])
+      attrs[:labeling] = run[:labeling]
+      attrs[:reconfiguring] = run[:labeling] ? true : run[:reconfiguring]
+      attrs[:setup_complete] = run[:labeling] ? false : run[:setup_complete]
+      attrs
     end
 
     def resolve_missing_tipped_orchards(params) # rubocop:disable Metrics/AbcSize
@@ -254,7 +261,8 @@ module ProductionApp
     end
 
     def update_run_cultivar(params) # rubocop:disable Metrics/AbcSize
-      res = validate_reworks_change_run_cultivar_params(params)
+      params[:allow_cultivar_mixing] = false
+      res = validate_reworks_change_run_cultivar_params(add_run_labeling_attrs(params))
       return validation_failed_response(res) if res.failure?
 
       from_cutivar_id = repo.get(:production_runs, res[:production_run_id], :cultivar_id)
