@@ -46,7 +46,7 @@ module EdiApp
       validate_data({ 'OC' => %i[load_id], 'OK' => %i[load_id container], 'OP' => %i[load_id sscc seq_no] }, check_lengths: true)
       fname = create_flat_file
 
-      po_repo.store_edi_filename(fname, record_id)
+      po_repo.store_edi_filename(fname, record_id, target_depot?)
       log('Ending transform...')
       success_response('PoOut was successful', fname)
     end
@@ -56,6 +56,11 @@ module EdiApp
     end
 
     private
+
+    # Is this EDI for the load's depot?
+    def target_depot?
+      po_repo.target_depot?(edi_out_rule_id, record_id)
+    end
 
     def prepare_bh
       @header_rec = po_repo.po_header_row(record_id)

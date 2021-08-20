@@ -202,13 +202,21 @@ module EdiApp
       DB[query, load_id].all
     end
 
-    def store_edi_filename(file_name, record_id)
-      DB[:loads].where(id: record_id).update(edi_file_name: file_name)
+    def store_edi_filename(file_name, record_id, target_depot)
+      DB[:loads].where(id: record_id).update(edi_file_name: file_name) if target_depot
       log_status(:loads, record_id, 'PO SENT', user_name: 'System', comment: file_name)
     end
 
     def log_po_fail(record_id, message)
       log_status(:loads, record_id, 'PO SEND FAILURE', user_name: 'System', comment: message)
+    end
+
+    def target_depot?(edi_out_rule_id, load_id)
+      rule_depot_id = DB[:edi_out_rules].where(id: edi_out_rule_id).get(:depot_id)
+      return false if rule_depot_id.nil?
+
+      load_depot_id = DB[:loads].where(id: load_id).get(:depot_id)
+      load_depot_id == rule_depot_id
     end
   end
 end
