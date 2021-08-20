@@ -139,5 +139,14 @@ module EdiApp
       SQL
       DB[query, load_id].all
     end
+
+    def log_hcs_success(file_name, record_id)
+      # DB[:loads].where(id: record_id).update(edi_file_name: file_name)
+      log_status(:loads, record_id, 'HCS SENT', user_name: 'System', comment: file_name)
+    end
+
+    def log_hcs_fail(record_id, message)
+      log_status(:loads, record_id, 'HCS SEND FAILURE', user_name: 'System', comment: message)
+    end
   end
 end

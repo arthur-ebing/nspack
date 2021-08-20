@@ -15,8 +15,13 @@ module EdiApp
       return success_response('No data for HCS') if record_entries.length.zero?
 
       fname = create_csv_file
+      hcs_repo.log_hcs_success(fname, record_id)
       log('Ending transform...')
       success_response('HcsOut was successful', fname)
+    end
+
+    def on_fail(message)
+      hcs_repo.log_hcs_fail(record_id, message)
     end
 
     private
