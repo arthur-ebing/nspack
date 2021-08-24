@@ -197,6 +197,14 @@ These are the methods used in building a page layout.
 |None
 |Makes the section fit in available space. Required to make a grid within the section expand to use available space.
 
+|full_dialog_height!
+|None
+|Makes the section take up most of the available height in a dialog.
+
+|half_dialog_height!
+|None
+|Makes the section take up about half the available height in a dialog.
+
 |render
 |
 |Renders the section and all nodes within it.
