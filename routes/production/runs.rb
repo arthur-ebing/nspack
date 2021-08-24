@@ -371,6 +371,10 @@ class Nspack < Roda
         end
       end
 
+      r.on 'run_reports' do
+        show_partial { Production::Runs::ProductionRun::RunReports.call(id) }
+      end
+
       r.on 'packout_report_dispatched' do
         jasper_params = JasperParams.new('packout_runs',
                                          current_user.login_name,
@@ -390,7 +394,7 @@ class Nspack < Roda
       end
 
       r.on 'packout_report_derived_dispatched' do
-        jasper_params = JasperParams.new('packout_runs',
+        jasper_params = JasperParams.new('detailed_packout',
                                          current_user.login_name,
                                          production_run_id: [id],
                                          carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
@@ -427,6 +431,78 @@ class Nspack < Roda
 
       r.on 'packout_report_derived' do
         jasper_params = JasperParams.new('packout_runs',
+                                         current_user.login_name,
+                                         production_run_id: [id],
+                                         carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
+                                         use_packed_weight: false,
+                                         use_derived_weight: true,
+                                         dispatched_only: false,
+                                         client_code: AppConst::CLIENT_CODE)
+        res = CreateJasperReport.call(jasper_params)
+
+        if res.success
+          change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
+        else
+          show_error(res.message, fetch?(r))
+        end
+      end
+
+      r.on 'detailed_packout_report_dispatched' do
+        jasper_params = JasperParams.new('detailed_packout',
+                                         current_user.login_name,
+                                         production_run_id: [id],
+                                         carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
+                                         use_packed_weight: true,
+                                         use_derived_weight: false,
+                                         dispatched_only: true,
+                                         client_code: AppConst::CLIENT_CODE)
+        res = CreateJasperReport.call(jasper_params)
+
+        if res.success
+          change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
+        else
+          show_error(res.message, fetch?(r))
+        end
+      end
+
+      r.on 'detailed_packout_report_derived_dispatched' do
+        jasper_params = JasperParams.new('detailed_packout',
+                                         current_user.login_name,
+                                         production_run_id: [id],
+                                         carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
+                                         use_packed_weight: false,
+                                         use_derived_weight: true,
+                                         dispatched_only: true,
+                                         client_code: AppConst::CLIENT_CODE)
+        res = CreateJasperReport.call(jasper_params)
+
+        if res.success
+          change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
+        else
+          show_error(res.message, fetch?(r))
+        end
+      end
+
+      r.on 'detailed_packout_report' do
+        jasper_params = JasperParams.new('detailed_packout',
+                                         current_user.login_name,
+                                         production_run_id: [id],
+                                         carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
+                                         use_packed_weight: true,
+                                         use_derived_weight: false,
+                                         dispatched_only: false,
+                                         client_code: AppConst::CLIENT_CODE)
+        res = CreateJasperReport.call(jasper_params)
+
+        if res.success
+          change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
+        else
+          show_error(res.message, fetch?(r))
+        end
+      end
+
+      r.on 'detailed_packout_report_derived' do
+        jasper_params = JasperParams.new('detailed_packout',
                                          current_user.login_name,
                                          production_run_id: [id],
                                          carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
