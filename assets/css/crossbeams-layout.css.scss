@@ -252,6 +252,12 @@ section.crossbeams_layout-fit-height {
   flex-grow: 1;
   display:flex;
 }
+section.crossbeams_layout-full_dlg-height {
+  min-height: 20rem;
+}
+section.crossbeams_layout-half_dlg-height {
+  min-height: 10rem;
+}
 .grid-number-column {
   text-align: right;
 }
