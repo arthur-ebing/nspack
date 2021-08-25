@@ -320,7 +320,7 @@ module FinishedGoodsApp
         govt_inspection_pallet = gi_repo.find_govt_inspection_pallet(pallet.govt_inspection_pallet_id)
         details << {
           stuffLoadDate: pallet.shipped_at.strftime('%F'),
-          loadPointFboCode: govt_inspection_sheet.inspection_point,
+          loadPointFboCode: AppConst::CR_FG.titan_cold_store_fbo_code,
           consignmentNumber: pallet.consignment_note_number,
           phc: pallet.phc,
           inspectedSSCC: pallet.pallet_number,
