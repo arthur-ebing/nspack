@@ -53,154 +53,154 @@
     :op: "="
     :val: "$:id$"
   :active:
-  - :col: vw_pallets.active
+  - :col: pallets.active
     :op: "="
     :val: "$:active$"
   :daily_pack:
-  - :col: vw_pallets.in_stock
+  - :col: pallets.in_stock
     :op: "="
     :val: "$:in_stock$"
-  - :col: vw_pallets.shipped
+  - :col: pallets.shipped
     :op: "="
     :val: "$:shipped$"
   :local_pack:
-  - :col: vw_pallets.in_stock
+  - :col: pallets.in_stock
     :op: "="
     :val: false
-  - :col: vw_pallets.shipped
+  - :col: pallets.shipped
     :op: "="
     :val: false
-  - :col: vw_pallet_sequences.packed_tm_group
+  - :col: target_market_groups.target_market_group_name
     :op: "="
     :val: LO
   :export_pack:
-  - :col: vw_pallets.in_stock
+  - :col: pallets.in_stock
     :op: "="
     :val: false
-  - :col: vw_pallets.shipped
+  - :col: pallets.shipped
     :op: "="
     :val: false
-  - :col: vw_pallet_sequences.packed_tm_group
+  - :col: target_market_groups.target_market_group_name
     :op: "<>"
     :val: LO
   :in_stock:
-  - :col: vw_pallets.in_stock
+  - :col: pallets.in_stock
     :op: "="
     :val: "$:in_stock$"
-  - :col: vw_pallets.shipped
+  - :col: pallets.shipped
     :op: "="
     :val: false
   :in_stock_depot_pallet:
-  - :col: vw_pallets.in_stock
+  - :col: pallets.in_stock
     :op: "="
     :val: true
-  - :col: vw_pallets.depot_pallet
+  - :col: pallets.depot_pallet
     :op: "="
     :val: true
   :unallocated_stock:
-  - :col: vw_pallets.in_stock
+  - :col: pallets.in_stock
     :op: "="
     :val: "$:in_stock$"
-  - :col: vw_pallets.allocated
+  - :col: pallets.allocated
     :op: "="
     :val: "$:allocated$"
   :scrapped:
-  - :col: vw_pallets.scrapped
+  - :col: pallets.scrapped
     :op: "="
     :val: "$:scrapped$"
   :failed_inspections:
-  - :col: vw_pallets.inspected
+  - :col: pallets.inspected
     :op: "="
     :val: "$:inspected$"
-  - :col: vw_pallets.govt_inspection_passed
+  - :col: pallets.govt_inspection_passed
     :op: "="
     :val: "$:govt_inspection_passed$"
-  :failed_verifications:
-  - :col: vw_pallets.pallet_verification_failed
-    :op: "="
-    :val: "$:pallet_verification_failed$"
+  # :failed_verifications:
+  # - :col: vw_pallets.pallet_verification_failed
+  #   :op: "="
+  #   :val: "$:pallet_verification_failed$"
   :unallocated_pallet_stock:
-  - :col: vw_pallets.in_stock
+  - :col: pallets.in_stock
     :op: "="
     :val: true
-  - :col: vw_pallets.zero_load_id
-    :op: IN
-    :val: "$:id$,0"
-  - :col: aggregated.rmt_grades
+  - :col: pallets.load_id
+    :op: match_or_null
+    :val: "$:id$"
+  - :col: grades.rmt_grade
     :op: "="
     :val: false
   :unallocated_pallet_stock_for_order:
-  - :col: vw_pallets.in_stock
+  - :col: pallets.in_stock
     :op: "="
     :val: true
-  - :col: vw_pallets.zero_load_id
-    :op: IN
-    :val: "$:load_id$,0"
-  - :col: aggregated.rmt_grades
+  - :col: pallets.load_id
+    :op: match_or_null
+    :val: "$:load_id$"
+  - :col: grades.rmt_grade
     :op: "="
     :val: false
-  - :col: vw_pallet_sequences.packed_tm_group_id
+  - :col: ps.packed_tm_group_id
     :op: "="
     :val: "$:packed_tm_group_id$"
-  - :col: vw_pallet_sequences.marketing_org_party_role_id
+  - :col: ps.marketing_org_party_role_id
     :op: "="
     :val: "$:marketing_org_party_role_id$"
-  - :col: vw_pallet_sequences.target_customer_party_role_id
+  - :col: ps.target_customer_party_role_id
     :op: "="
     :val: "$:target_customer_party_role_id$"
     :optional: true
-  :unallocated_bin_stock:
-  - :col: vw_pallets.in_stock
-    :op: "="
-    :val: true
-  - :col: vw_pallets.zero_load_id
-    :op: IN
-    :val: "$:id$,0"
-  - :col: aggregated.count
-    :op: "="
-    :val: 1
-  - :col: aggregated.rmt_grades
-    :op: "="
-    :val: true
+  # :unallocated_bin_stock:
+  # - :col: vw_pallets.in_stock
+  #   :op: "="
+  #   :val: true
+  # - :col: vw_pallets.zero_load_id
+  #   :op: IN
+  #   :val: "$:id$,0"
+  # - :col: aggregated.count
+  #   :op: "="
+  #   :val: 1
+  # - :col: aggregated.rmt_grades
+  #   :op: "="
+  #   :val: true
   :on_load:
-  - :col: vw_pallets.load_id
+  - :col: pallets.load_id
     :op: "="
     :val: "$:load_id$"
   :shipped:
-  - :col: vw_pallets.shipped
+  - :col: pallets.shipped
     :op: "="
     :val: "$:shipped$"
-  :failed_otmc:
-  - :col: aggregated.failed_otmc
-    :op: "="
-    :val: "$:failed_otmc$"
+  # :failed_otmc:
+  # - :col: aggregated.failed_otmc
+  #   :op: "="
+  #   :val: "$:failed_otmc$"
   :pallets_available_to_reworks:
-  - :col: vw_pallets.in_stock
+  - :col: pallets.in_stock
     :op: "="
     :val: true
   :pallets_available_for_bulk_update:
-  - :col: vw_pallet_sequences.production_run_id
+  - :col: ps.production_run_id
     :op: "="
     :val: "$:production_run_id$"
   :failed_and_not_repacked:
-  - :col: vw_pallets.inspected
+  - :col: pallets.inspected
     :op: "="
     :val: true
-  - :col: vw_pallets.govt_inspection_passed
+  - :col: pallets.govt_inspection_passed
     :op: "="
     :val: false
-  - :col: vw_pallets.allocated
+  - :col: pallets.allocated
     :op: "="
     :val: false
   :target_customer_pallets:
-  - :col: vw_pallets.in_stock
+  - :col: pallets.in_stock
     :op: "="
     :val: true
   :pallets_available_to_scrap:
-  - :col: vw_pallets.in_stock
+  - :col: pallets.in_stock
     :op: "="
     :val: true
-  - :col: vw_pallets.allocated
+  - :col: pallets.allocated
     :op: "="
     :val: false
 :multiselect:
