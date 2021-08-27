@@ -2018,6 +2018,11 @@ module ProductionApp
         return OpenStruct.new(success: false, messages: { pallets_selected: ["#{allocated_pallets.join(', ')} have been allocated."] }, pallets_selected: pallet_numbers) unless allocated_pallets.nil_or_empty?
       end
 
+      if AppConst::RUN_TYPE_SCRAP_PALLET == reworks_run_type
+        inspection_pallets = repo.open_govt_inspection_sheet_pallets(pallet_numbers)
+        return OpenStruct.new(success: false, messages: { pallets_selected: ["#{inspection_pallets.join(', ')} are on an open govt inspection sheet."] }, pallets_selected: pallet_numbers) unless inspection_pallets.nil_or_empty?
+      end
+
       scrapped_pallets = repo.scrapped_pallets?(pallet_numbers)
       if AppConst::RUN_TYPE_UNSCRAP_PALLET == reworks_run_type
         unscrapped_pallets = (pallet_numbers - scrapped_pallets)
