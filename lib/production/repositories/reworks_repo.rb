@@ -1163,9 +1163,17 @@ module ProductionApp
 
     def govt_inspected_pallets(pallet_numbers)
       DB[:pallets]
-        .join(:govt_inspection_pallets, pallet_id: :id)
         .where(pallet_number: pallet_numbers)
-        .where(passed: true)
+        .where(govt_inspection_passed: true)
+        .select_map(:pallet_number)
+    end
+
+    def open_govt_inspection_sheet_pallets(pallet_numbers)
+      DB[:pallets]
+        .join(:govt_inspection_pallets, pallet_id: :id)
+        .join(:govt_inspection_sheets, id: :govt_inspection_sheet_id)
+        .where(pallet_number: pallet_numbers)
+        .where(Sequel[:govt_inspection_sheets][:inspected] => false)
         .select_map(:pallet_number)
     end
   end
