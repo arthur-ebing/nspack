@@ -115,10 +115,13 @@
   - :col: pallets.govt_inspection_passed
     :op: "="
     :val: "$:govt_inspection_passed$"
-  # :failed_verifications:
-  # - :col: vw_pallets.pallet_verification_failed
-  #   :op: "="
-  #   :val: "$:pallet_verification_failed$"
+  :failed_verifications:
+  - :col: pallets.verified
+    :op: "="
+    :val: true
+  - :col: ps.verification_passed
+    :op: "="
+    :val: false
   :unallocated_pallet_stock:
   - :col: pallets.in_stock
     :op: "="
@@ -149,19 +152,19 @@
     :op: "="
     :val: "$:target_customer_party_role_id$"
     :optional: true
-  # :unallocated_bin_stock:
-  # - :col: vw_pallets.in_stock
-  #   :op: "="
-  #   :val: true
-  # - :col: vw_pallets.zero_load_id
-  #   :op: IN
-  #   :val: "$:id$,0"
+  :unallocated_bin_stock:
+  - :col: pallets.in_stock
+    :op: "="
+    :val: true
+  - :col: pallets.load_id
+    :op: match_or_null
+    :val: "$:id$"
   # - :col: aggregated.count
   #   :op: "="
   #   :val: 1
-  # - :col: aggregated.rmt_grades
-  #   :op: "="
-  #   :val: true
+  - :col: grades.rmt_grade
+    :op: "="
+    :val: true
   :on_load:
   - :col: pallets.load_id
     :op: "="
@@ -170,10 +173,10 @@
   - :col: pallets.shipped
     :op: "="
     :val: "$:shipped$"
-  # :failed_otmc:
-  # - :col: aggregated.failed_otmc
-  #   :op: "="
-  #   :val: "$:failed_otmc$"
+  :failed_otmc:
+  - :col: ps.failed_otmc_results
+    :op: "not_null"
+    :val: "1"
   :pallets_available_to_reworks:
   - :col: pallets.in_stock
     :op: "="
