@@ -49,7 +49,7 @@
     :failed_and_not_repacked: Failed and not repacked Pallets
 :conditions:
   :standard:
-  - :col: ps.id
+  - :col: pallets.id
     :op: "="
     :val: "$:id$"
   :active:
