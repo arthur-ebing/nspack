@@ -2134,3 +2134,27 @@
   :ordered_list: false
   :ui_priority: 1
   :list_def: 
+- :column: ps.failed_otmc_results
+  :caption: Failed OTMC results
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: pallets.verified
+  :caption: Pallet verified
+  :data_type: :boolean
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: ps.verification_passed
+  :caption: Sequence verification passed
+  :data_type: :boolean
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
