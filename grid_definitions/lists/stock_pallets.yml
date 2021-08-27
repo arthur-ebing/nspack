@@ -49,7 +49,7 @@
     :failed_and_not_repacked: Failed and not repacked Pallets
 :conditions:
   :standard:
-  - :col: vw_pallet_sequences.id
+  - :col: ps.id
     :op: "="
     :val: "$:id$"
   :active:
