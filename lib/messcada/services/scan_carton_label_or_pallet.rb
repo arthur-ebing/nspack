@@ -2,12 +2,14 @@
 
 module MesscadaApp
   class ScanCartonLabelOrPallet < BaseService
-    attr_reader :repo, :params, :mode, :scanned_number, :formatted_number
+    attr_reader :repo, :params, :mode, :scanned_number, :formatted_number, :expect
 
     def initialize(params)
       @repo = MesscadaApp::MesscadaRepo.new
       @pallet_was_scanned = false
+      @carton_with_pallet_label = false
       @scanned_number = ''
+      @expect = params.delete(:expect) if params.respond_to?(:to_h)
       @params = params
       @params = { scanned_number: params.to_s } unless @params.respond_to?(:to_h)
     end
@@ -36,14 +38,16 @@ module MesscadaApp
     private
 
     def build_entity(failed: false)
-      # ScanCartonLabelOrPalletEntity.new(
       ScannedCartonOrPalletResolver.new(
         id: @id,
         failed_scan: failed,
         pallet_was_scanned: @pallet_was_scanned,
         scanned_number: @scanned_number,
         formatted_number: @formatted_number,
-        scanned_type: @mode.to_s
+        scanned_type: @mode.to_s,
+        carton_with_pallet_label: @carton_with_pallet_label,
+        carton_equals_pallet_id: @carton_equals_pallet_id,
+        carton_id: @carton_id
       )
     end
 
@@ -80,18 +84,31 @@ module MesscadaApp
 
     def resolve_pallet
       @formatted_number = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: scanned_number).pallet_number
+      return pallet_scanned_for_carton if expect == :carton_label
+
       @pallet_was_scanned = true
       @id = repo.get_id(:pallets, pallet_number: formatted_number)
+    end
+
+    # A pallet number was scanned on a carton (carton=pallet)
+    def pallet_scanned_for_carton
+      @pallet_was_scanned = false
+      @carton_with_pallet_label = true
+      @id = repo.get_id(:carton_labels, pallet_number: formatted_number)
+      @carton_id = repo.get_id(:cartons, carton_label_id: @id)
+      @carton_equals_pallet_id = repo.get_id(:pallets, pallet_number: formatted_number)
     end
 
     def resolve_carton_label
       @formatted_number = MesscadaApp::ScannedCartonNumber.new(scanned_carton_number: scanned_number).carton_number
       @id = repo.get_id(:carton_labels, id: formatted_number)
+      @carton_id = repo.get_id(:cartons, carton_label_id: @id)
     end
 
     def resolve_legacy_carton_number
       @formatted_number = MesscadaApp::ScannedCartonNumber.new(scanned_carton_number: scanned_number).legacy_carton_number
       @id = repo.get_value(:legacy_barcodes, :carton_label_id, legacy_carton_number: formatted_number)
+      @carton_id = repo.get_id(:cartons, carton_label_id: @id)
     end
   end
 end

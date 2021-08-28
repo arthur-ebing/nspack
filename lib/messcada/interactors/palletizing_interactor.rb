@@ -22,6 +22,7 @@ module MesscadaApp
       check_res = validate_params_input(params)
       return check_res unless check_res.success
 
+      # FIXME: This does not allow for palletizing a legacy carton
       check_res = check_carton_number_length(params[:carton_number])
       return check_res unless check_res.success
 

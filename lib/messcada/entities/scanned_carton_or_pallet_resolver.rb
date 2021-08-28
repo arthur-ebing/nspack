@@ -8,7 +8,7 @@ module MesscadaApp
   class ScannedCartonOrPalletResolver
     include Crossbeams::Responses
 
-    VALUE_FIELDS = %i[id failed_scan pallet_was_scanned formatted_number scanned_number scanned_type].freeze
+    VALUE_FIELDS = %i[id failed_scan pallet_was_scanned formatted_number scanned_number scanned_type carton_id].freeze
 
     def initialize(hash)
       @entity = validation_result(hash)
@@ -30,11 +30,18 @@ module MesscadaApp
       pallet_was_scanned
     end
 
-    # Was a carton label id scanned?
+    # Was a carton label id scanned or pallet label of a carton=pallet carton?
     def carton_label?
       assert_ok_scan(__method__)
 
       !pallet_was_scanned
+    end
+
+    # Was a pallet label scanned that represents a carton (carton=pallet carton)?
+    def carton_with_pallet_label?
+      assert_ok_scan(__method__)
+
+      @entity[:carton_with_pallet_label]
     end
 
     def carton_label_id
@@ -43,11 +50,10 @@ module MesscadaApp
       pallet_was_scanned ? nil : id
     end
 
-    # could this have been a ctn == plt? in which case we can return the id
     def carton_id
       assert_ok_scan(__method__)
 
-      pallet_was_scanned ? nil : repo.get_id(:cartons, carton_label_id: id)
+      pallet_was_scanned ? nil : repo.get_id(:cartons, carton_label_id: carton_label_id)
     end
 
     def pallet_sequence_id
@@ -65,11 +71,15 @@ module MesscadaApp
     def pallet_id
       assert_ok_scan(__method__)
 
+      return @entity[:carton_equals_pallet_id] if carton_with_pallet_label?
+
       pallet_was_scanned ? id : repo.get(:pallet_sequences, pallet_sequence_id, :pallet_id)
     end
 
     def pallet_number
       assert_ok_scan(__method__)
+
+      return formatted_number if carton_with_pallet_label?
 
       pallet_was_scanned ? formatted_number : repo.get(:pallets, pallet_id, :pallet_number)
     end
@@ -88,14 +98,16 @@ module MesscadaApp
       end
     end
 
-    def validation_result(hash)
+    def validation_result(hash) # rubocop:disable Metrics/AbcSize
       Dry::Schema.Params do
         required(:id).maybe(:integer)
         required(:failed_scan).filled(:bool)
         required(:pallet_was_scanned).filled(:bool)
+        required(:carton_with_pallet_label).filled(:bool)
         required(:formatted_number).maybe(:string)
         required(:scanned_number).maybe(:string)
         required(:scanned_type).filled(:string)
+        required(:carton_equals_pallet_id).maybe(:integer)
       end.call(hash)
     end
 

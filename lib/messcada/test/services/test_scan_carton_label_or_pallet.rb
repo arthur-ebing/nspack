@@ -95,6 +95,12 @@ module MasterfilesApp
       refute res.success, 'should fail validation'
     end
 
+    def test_scan_pallet_for_carton_label
+      skip 'Scan pallet no & end up with a carton'
+      # scan pallet no
+      # for carton lbl
+    end
+
     private
 
     def valid_9_digit_pallet_numbers

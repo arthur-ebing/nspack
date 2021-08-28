@@ -26,18 +26,17 @@ module MesscadaApp
     private
 
     def resolve_scanned_number_params
-      res = ScanCartonLabelOrPallet.call(scanned_number)
+      scan_params = { scanned_number: scanned_number.to_s, expect: :carton_label }
+      res = ScanCartonLabelOrPallet.call(scan_params)
       return res unless res.success
 
       scanned = res.instance
       @scanned = scanned.to_h
-      if scanned.pallet?
+      if scanned.carton_with_pallet_label?
         @pallet_number = scanned.pallet_number
         @pallet_id = scanned.pallet_id
-        @carton_label_id = repo.get_id(:carton_labels, pallet_number: pallet_number)
-      else
-        @carton_label_id = scanned.carton_label_id
       end
+      @carton_label_id = scanned.carton_label_id
       ok_response
     end
 
