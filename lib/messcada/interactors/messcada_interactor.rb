@@ -41,13 +41,13 @@ module MesscadaApp
       res = carton_verification(params[:carton_number])
       return failed_response(res.message) unless res.success
 
-      res = MesscadaApp::ScanCartonLabelOrPallet.call(params)
+      res = MesscadaApp::ScanCartonLabelOrPallet.call(scanned_number: params[:carton_number], expect: :carton_label)
       return res unless res.success
 
       scanned = res.instance
       return failed_response('Carton verification failed to create pallet.') if scanned.pallet_id.nil?
 
-      success_response('Verified Carton', scanned.pallet_sequence_id)
+      success_response('Verified Carton', scanned.first_sequence_id)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
