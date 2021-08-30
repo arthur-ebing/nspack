@@ -32,7 +32,7 @@ module MasterfilesApp
       res = MesscadaApp::ScanCartonLabelOrPallet.call('')
       refute res.success, 'should fail validation'
       assert res.instance.failed_scan
-      %i[carton_label? pallet? carton_label_id carton_id pallet_id].each do |meth|
+      %i[carton_label? pallet? carton_label_id pallet_id].each do |meth|
         assert_raises(Crossbeams::FrameworkError) { res.instance.send(meth) }
       end
     end
