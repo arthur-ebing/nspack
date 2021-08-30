@@ -116,6 +116,10 @@ module MesserverApp
       request_uri(bulk_registration_mode_uri(mes_module, start: start))
     end
 
+    def gossamer_data_for(code)
+      request_uri(gossamer_data_uri(code))
+    end
+
     private
 
     def publish_part_of_body(printer_type, targets)
@@ -361,6 +365,10 @@ module MesserverApp
 
     def bulk_registration_mode_uri(mes_module, start: true)
       URI.parse("#{AppConst::LABEL_SERVER_URI}?Type=SetCardRegistrationState&Name=#{mes_module}&Status=#{start}")
+    end
+
+    def gossamer_data_uri(code)
+      URI.parse("#{AppConst::LABEL_SERVER_URI}?Type=GetGossamerData&ListType=yaml&Name=#{code}")
     end
 
     def log_request(request)
