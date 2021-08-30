@@ -466,7 +466,14 @@ module MesscadaApp
     end
 
     def build_robot
-      success_response('build', { some: 'thing' })
+      success_response('build', { device: 'CLM-06',
+                                  name: 'DRB-11-12',
+                                  buttons: [
+                                    { plant_resource_id: 88, plant: 'DRN-11-12-B1', system: 'CLM-06-B1', url: '/messcada/production/carton_labeling?', params: %w[device card_reader identifier] },
+                                    { plant_resource_id: 89, plant: 'DRN-11-12-B2', system: 'CLM-06-B2', url: '/messcada/production/carton_labeling?', params: %w[device card_reader identifier] },
+                                    { plant_resource_id: 90, plant: 'DRN-11-12-B3', system: 'CLM-06-B3', url: '/messcada/production/carton_labeling?', params: %w[device card_reader identifier] },
+                                    { plant_resource_id: 91, plant: 'DRN-11-12-B4', system: 'CLM-06-B4', url: '/messcada/production/carton_labeling?', params: %w[device card_reader identifier] }
+                                  ] })
     end
 
     private

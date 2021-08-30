@@ -1,23 +1,78 @@
 <% if @robot_page.success %>
   <div class="robotBase flex vh-100">
-    <div class="robotLeft ba b--red pa1">LEFT
+    <div class="robotLeft ba b--red pa1 w-20">CLM-06 (LEFT)
       <div class="robotLoginWidget pa2 mb2 ba b--navy">
         Login widget (Group or individual)
-        <div>Images/SVG letters
+        <div class="flex flex-wrap">
 <%#= initials_avatar('Jack', 'Johnson') %>
 <%#= initials_avatar('Miles', 'Davis') %>
 <%#= initials_avatar('Ar', 'Rr') %>
-<%= initials_avatar('A', 'A') %>
-<%= initials_avatar('B', 'A') %>
-<%= initials_avatar('C', 'A') %>
-<%= initials_avatar('D', 'A') %>
-<%= initials_avatar('E', 'A') %>
-<%= initials_avatar('F', 'A') %>
-<%= initials_avatar('G', 'A') %>
-<%= initials_avatar('H', 'A') %>
-<%= initials_avatar('I', 'A') %>
-<%= initials_avatar('J', 'A') %>
-<%= initials_avatar('K', 'A') %>
+<div>
+  <%= initials_avatar('A', 'A') %>
+  <div>
+    Arthur Andersen
+  </div>
+</div>
+<div>
+  <%= initials_avatar('B', 'A') %>
+  <div>
+    Brian Andersen
+  </div>
+</div>
+<div>
+  <%= initials_avatar('C', 'A') %>
+  <div>
+    Carl Andersen
+  </div>
+</div>
+<div>
+  <%= initials_avatar('D', 'A') %>
+  <div>
+    Don Andersen
+  </div>
+</div>
+<div>
+  <%= initials_avatar('E', 'A') %>
+  <div>
+    Eric Andersen
+  </div>
+</div>
+<div>
+  <%= initials_avatar('F', 'A') %>
+  <div>
+    Fred Andersen
+  </div>
+</div>
+<div>
+  <%= initials_avatar('G', 'A') %>
+  <div>
+    Garth Andersen
+  </div>
+</div>
+<div>
+  <%= initials_avatar('H', 'A') %>
+  <div>
+    Harry Andersen
+  </div>
+</div>
+<div>
+  <%= initials_avatar('I', 'A') %>
+  <div>
+    Ian Andersen
+  </div>
+</div>
+<div>
+  <%= initials_avatar('J', 'A') %>
+  <div>
+    John Andersen
+  </div>
+</div>
+<div>
+  <%= initials_avatar('K', 'A') %>
+  <div>
+    Kevin Andersen
+  </div>
+</div>
 <%#= initials_avatar('First only', nil) %>
         </div>
         <div>Name(s) and group name if applicable</div>
@@ -28,7 +83,11 @@
     </div>
     <div class="robotRight ba b--green flex-auto pa1">RIGHT
       <div class="pa2 mb2 ba b--orange">Optional scale widget</div>
-      <div class="pa2 mb2 ba b--pink">Buttons widget</div>
+      <div class="pa2 mb2 ba b--pink">
+        <% @robot_page.instance[:buttons].each do |btn| %>
+          <div id="button_<%= btn[:plant_resource_id] %>"><%= btn[:plant] %></div>
+        <% end %>
+      </div>
       <div class="pa2 mb2 ba b--gray">Printlog widget</div>
       <div class="pa2 ba b--purple">Websocket widget</div>
     </div>
