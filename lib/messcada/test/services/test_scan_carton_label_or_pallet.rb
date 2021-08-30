@@ -97,8 +97,11 @@ module MasterfilesApp
 
     def test_scan_pallet_for_carton_label
       skip 'Scan pallet no & end up with a carton'
-      # scan pallet no
-      # for carton lbl
+      # Create carton_lbl with pallet number
+      # Scan pallet
+      # Check outputs
+      # Create carton & check outputs
+      # Create pallet & check outputs
     end
 
     private
