@@ -50,12 +50,6 @@ module MesscadaApp
       pallet_was_scanned ? nil : id
     end
 
-    def carton_id
-      assert_ok_scan(__method__)
-
-      pallet_was_scanned ? nil : repo.get_id(:cartons, carton_label_id: carton_label_id)
-    end
-
     def pallet_sequence_id
       assert_ok_scan(__method__)
 
@@ -108,6 +102,7 @@ module MesscadaApp
         required(:scanned_number).maybe(:string)
         required(:scanned_type).filled(:string)
         required(:carton_equals_pallet_id).maybe(:integer)
+        required(:carton_id).maybe(:integer)
       end.call(hash)
     end
 
