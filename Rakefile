@@ -45,7 +45,11 @@ end
 # This task ensures Local .env is considered if present:
 task :dotenv_with_override do
   require 'dotenv'
-  Dotenv.load('.env.local', '.env')
+  if ENV['RUN_AS']
+    Dotenv.load(".env.#{ENV['RUN_AS']}", '.env')
+  else
+    Dotenv.load('.env.local', '.env')
+  end
 end
 
 # This task ensures the app is loaded.
