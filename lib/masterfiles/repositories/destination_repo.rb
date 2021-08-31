@@ -91,6 +91,7 @@ module MasterfilesApp
       if country_hash
         region_hash = where_hash(:destination_regions, id: country_hash[:destination_region_id])
         hash[:country_name] = country_hash[:country_name] if country_hash
+        hash[:iso_country_code] = country_hash[:iso_country_code] if country_hash
         hash[:region_name] = region_hash[:destination_region_name] if region_hash
       end
 

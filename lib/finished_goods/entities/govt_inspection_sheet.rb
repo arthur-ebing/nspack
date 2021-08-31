@@ -32,6 +32,7 @@ module FinishedGoodsApp
     attribute :destination_region, Types::String
     attribute :destination_country_id, Types::Integer
     attribute :destination_country, Types::String
+    attribute :iso_country_code, Types::String
     attribute :reinspection, Types::Bool
     attribute :created_by, Types::String
     attribute :tripsheet_created, Types::Bool

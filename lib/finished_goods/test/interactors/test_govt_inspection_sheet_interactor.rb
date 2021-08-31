@@ -99,6 +99,7 @@ module FinishedGoodsApp
         destination_region: Faker::Lorem.unique.word,
         destination_country_id: destination_country_id,
         destination_country: Faker::Lorem.unique.word,
+        iso_country_code: Faker::Lorem.unique.word,
         reinspection: false,
         allow_titan_inspection: false,
         created_by: 'ABC',
