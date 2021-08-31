@@ -24,6 +24,7 @@ module FinishedGoodsApp
         final_destination_id: 1,
         destination_city: 'ABC',
         destination_country: 'ABC',
+        iso_country_code: 'ZA',
         destination_region: 'ABC',
         depot_id: 1,
         depot_code: 'ABC',

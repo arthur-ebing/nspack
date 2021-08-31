@@ -18,6 +18,7 @@ module FinishedGoodsApp
     attribute :final_destination_id, Types::Integer
     attribute :destination_city, Types::String
     attribute :destination_country, Types::String
+    attribute :iso_country_code, Types::String
     attribute :destination_region, Types::String
     attribute :depot_id, Types::Integer
     attribute :depot_code, Types::String
