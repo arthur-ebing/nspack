@@ -4,6 +4,8 @@ require 'message_bus'
 
 if ENV.fetch('RACK_ENV') == 'test'
   Dotenv.load('.env.test', '.env.local', '.env')
+elsif ENV['RUN_AS']
+  Dotenv.load(".env.#{ENV['RUN_AS']}", '.env')
 else
   Dotenv.load('.env.local', '.env')
 end

@@ -26,7 +26,7 @@ module UiRules
       fields[:valid] = { renderer: :label, as_boolean: true }
       fields[:has_discrepancies] = { renderer: :label, as_boolean: true }
       fields[:reprocessed] = { renderer: :label, as_boolean: true }
-      fields[:notes] = { renderer: :label, invisible: @form_object.notes.nil? }
+      fields[:notes] = { renderer: :label, format: :preformat, invisible: @form_object.notes.nil? }
       fields[:match_data] = { renderer: :label }
     end
 

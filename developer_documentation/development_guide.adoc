@@ -36,12 +36,14 @@ A11Y Modal Dialog:: Popup dialog (special version that blocks "close with ESC") 
 
 Tachyons:: functional css - link:https://tachyons.io/[Tachyons]
 
-Most classes in code should be tachyons classes (e.g. `class="b blue br3"` (read: bold, blue, border-radius 3) means `font-weight: bold`, `color: blue` `border-radius: .5rem`).
+Most classes in code should be tachyons classes (e.g. `class="b blue br3"` (read: bold, blue, border-radius 3) translates to this css: `font-weight: bold`, `color: blue` `border-radius: .5rem`).
 Custom css should only be written if tachyons does not cover the desired outcome.
 
 ==== Other
 
 Jasper Reports:: Reporting environment written in Java - https://community.jaspersoft.com/project/jasperreports-library
+Jruby Jasper:: Reporting engine to run Jasper reports - https://github.com/NoSoft-SA/jruby_jasper (Uses `drb` to send report requests)
+Shared Config:: Distributed ruby app that provides shared configuration - https://github.com/NoSoft-SA/shared_config (provides variable definitions for label designing)
 
 === Ruby code
 
@@ -131,12 +133,15 @@ The rules in use are based on the link:https://github.com/airbnb/javascript[Airb
 
 === Source Code Management
 
+Code is versioned using link:https://git-scm.com/[git] and stored centrally via link:https://github.com/NoSoft-SA/[github].
+
 All Crossbeams framework code follows the link:https://nvie.com/posts/a-successful-git-branching-model/[git flow] branching model where no work is done on the master branch directly.
 
-Developers work on the `develop` branch, the `develop` branch is merged into `master` and `master` is deployed via `capistrano`.
+Developers work on feature branches based on the `develop` branch, the `develop` branch is merged into `master` and `master` is deployed via `capistrano`.
 
-Any sizable chunk of work should be developed in a feature branch that is merged into the `develop` branch when complete.
+All work should be developed in feature branches and pull requests generated in github. Pull requests are evaluated, tested and merged into the `develop` branch when complete.
 
+There are times when a developer might need to work on a hotfix branch based off `master` to make a small urgent fix.
 A good tool to use on the commandline for this is link:https://github.com/petervanderdoes/gitflow-avh/wiki[git-flow].
 
 Other useful git tools:

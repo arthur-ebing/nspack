@@ -14,7 +14,8 @@ module Crossbeams
             create_farm_location: false,
             pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
             default_delivery_location: 'FRUIT_RECEPTION_1',
-            use_bin_asset_control: false  },
+            use_bin_asset_control: false,
+            presort_legacy_data_fields: [] },
       hl: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             delivery_capture_container_material: false,
@@ -24,7 +25,8 @@ module Crossbeams
             create_farm_location: false,
             pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
             default_delivery_location: 'FRUIT_RECEPTION_1',
-            use_bin_asset_control: false  },
+            use_bin_asset_control: false,
+            presort_legacy_data_fields: []  },
       kr: { bin_pallet_conversion_defaults: { pallet_format: { stack_type: 'BIN', pallet_base: 'S' },
                                               basic_pack: 'BX750',
                                               grade: 'SA',
@@ -42,7 +44,8 @@ module Crossbeams
             create_farm_location: false,
             pending_delivery_location: nil,
             default_delivery_location: nil,
-            use_bin_asset_control: false  },
+            use_bin_asset_control: false,
+            presort_legacy_data_fields: %i[ripe_point_code track_indicator_code]  },
       um: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             delivery_capture_container_material: false,
@@ -52,7 +55,8 @@ module Crossbeams
             create_farm_location: false,
             pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
             default_delivery_location: 'FRUIT RECEPTION',
-            use_bin_asset_control: false  },
+            use_bin_asset_control: false,
+            presort_legacy_data_fields: []  },
       ud: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             delivery_capture_container_material: true,
@@ -62,7 +66,8 @@ module Crossbeams
             create_farm_location: true,
             pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
             default_delivery_location: 'FRUIT_RECEPTION_1',
-            use_bin_asset_control: false  },
+            use_bin_asset_control: false,
+            presort_legacy_data_fields: []  },
       sr: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             delivery_capture_container_material: true,
@@ -72,7 +77,8 @@ module Crossbeams
             create_farm_location: false,
             pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
             default_delivery_location: 'FRUIT_RECEPTION_1',
-            use_bin_asset_control: false  },
+            use_bin_asset_control: false,
+            presort_legacy_data_fields: []  },
       sr2: { bin_pallet_conversion_defaults: {},
              delivery_capture_inner_bins: false,
              delivery_capture_container_material: true,
@@ -82,12 +88,19 @@ module Crossbeams
              create_farm_location: true,
              pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
              default_delivery_location: 'FRUIT_RECEPTION_1',
-             use_bin_asset_control: false  }
+             use_bin_asset_control: false,
+             presort_legacy_data_fields: []  }
     }.freeze
 
     def initialize(client_code)
       super
       @settings = CLIENT_SETTINGS.fetch(client_code.to_sym)
+    end
+
+    def implements_presort_legacy_data_fields?(explain: false)
+      return 'Should presorting store legacy data' if explain
+
+      !setting(:presort_legacy_data_fields).empty?
     end
 
     def convert_carton_to_rebins?(explain: false)

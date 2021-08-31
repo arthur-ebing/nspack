@@ -3,9 +3,10 @@
 :sql: "SELECT\r\n    commodities.id,\r\n    commodities.commodity_group_id,\r\n    commodity_groups.code
   AS commodity_group_code,\r\n    commodities.code,\r\n    commodities.description,\r\n
   \   commodities.hs_code,\r\n    commodities.requires_standard_counts,\r\n    commodities.use_size_ref_for_edi,\r\n
-  \   fn_masterfile_variants('commodities', commodities.id) AS variant_codes,\r\n
-  \   commodities.active,\r\n    commodities.created_at,\r\n    commodities.updated_at\r\nFROM
-  \ commodities\r\nJOIN commodity_groups ON commodity_groups.id = commodities.commodity_group_id"
+  \   commodities.colour_applies,\r\n    fn_masterfile_variants('commodities', commodities.id)
+  AS variant_codes,\r\n    commodities.active,\r\n    commodities.created_at,\r\n
+  \   commodities.updated_at\r\nFROM  commodities\r\nJOIN commodity_groups ON commodity_groups.id
+  = commodities.commodity_group_id"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -138,9 +139,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  colour_applies:
+    :name: colour_applies
+    :sequence_no: 9
+    :caption: Colour applies
+    :namespaced_name: commodities.colour_applies
+    :data_type: :boolean
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   variant_codes:
     :name: variant_codes
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Variant Codes
     :namespaced_name: 
     :data_type: :string
@@ -156,7 +173,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Active
     :namespaced_name: commodities.active
     :data_type: :boolean
@@ -172,7 +189,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Created at
     :namespaced_name: commodities.created_at
     :data_type: :datetime
@@ -188,7 +205,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Updated at
     :namespaced_name: commodities.updated_at
     :data_type: :datetime

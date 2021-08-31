@@ -19,6 +19,8 @@ module MasterfilesApp
     attribute :customer_party_role_id, Types::Integer
     attribute :customer, Types::String
     attribute :financial_account_code, Types::String
+    attribute :fruit_industry_levy_id, Types::Integer
+    attribute :fruit_industry_levy, Types::String
     attribute? :active, Types::Bool
   end
 

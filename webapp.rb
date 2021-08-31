@@ -399,7 +399,7 @@ class Nspack < Roda
                         variable_xml: xml,
                         png_image: img }
 
-          p params[:label]
+          # p params[:label]
           DB.transaction do
             repo.update_label(id, interactor.include_updated_by_in_changeset(changeset))
             repo.log_action(user_name: current_user.user_name, context: 'update label', route_url: request.path, request_ip: request.ip)

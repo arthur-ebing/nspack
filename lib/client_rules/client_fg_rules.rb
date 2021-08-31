@@ -18,6 +18,8 @@ module Crossbeams
             use_continuous_govt_inspection_sheets: false,
             pallet_verification_required_for_inspection: true,
             pallet_weight_required_for_inspection: true,
+            extra_barcode_scan_rules: [],
+            titan_cold_store_fbo_code: nil,
             valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } },
       hl: { place_of_issue_for_addendum: 'PLZ',
             vgm_required: false,
@@ -29,6 +31,8 @@ module Crossbeams
             use_continuous_govt_inspection_sheets: false,
             pallet_verification_required_for_inspection: true,
             pallet_weight_required_for_inspection: true,
+            extra_barcode_scan_rules: [],
+            titan_cold_store_fbo_code: nil,
             valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } },
       kr: { place_of_issue_for_addendum: 'CPT',
             vgm_required: true,
@@ -40,6 +44,8 @@ module Crossbeams
             use_continuous_govt_inspection_sheets: true,
             pallet_verification_required_for_inspection: false,
             pallet_weight_required_for_inspection: true,
+            extra_barcode_scan_rules: [{ regex: '^(\\D\\D\\D)$', type: 'location', field: 'location_short_code' }],
+            titan_cold_store_fbo_code: 'E2064',
             valid_pallet_destination: { failed: [/\AREWORKS$/], pending: [/\AREWORKS$/, /\ARA_10/, /\APACKHSE/], loaded: [/\APART_PALLETS/] } },
       um: { place_of_issue_for_addendum: nil,
             vgm_required: true,
@@ -51,6 +57,8 @@ module Crossbeams
             use_continuous_govt_inspection_sheets: false,
             pallet_verification_required_for_inspection: true,
             pallet_weight_required_for_inspection: true,
+            extra_barcode_scan_rules: [],
+            titan_cold_store_fbo_code: nil,
             valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } },
       ud: { place_of_issue_for_addendum: 'PLZ',
             vgm_required: true,
@@ -62,6 +70,8 @@ module Crossbeams
             use_continuous_govt_inspection_sheets: false,
             pallet_verification_required_for_inspection: true,
             pallet_weight_required_for_inspection: false,
+            extra_barcode_scan_rules: [],
+            titan_cold_store_fbo_code: nil,
             valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } },
       sr: { place_of_issue_for_addendum: 'PLZ',
             vgm_required: true,
@@ -73,6 +83,8 @@ module Crossbeams
             use_continuous_govt_inspection_sheets: false,
             pallet_verification_required_for_inspection: true,
             pallet_weight_required_for_inspection: true,
+            extra_barcode_scan_rules: [],
+            titan_cold_store_fbo_code: nil,
             valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } },
       sr2: { place_of_issue_for_addendum: 'PLZ',
              vgm_required: true,
@@ -84,6 +96,8 @@ module Crossbeams
              use_continuous_govt_inspection_sheets: false,
              pallet_verification_required_for_inspection: true,
              pallet_weight_required_for_inspection: true,
+             extra_barcode_scan_rules: [],
+             titan_cold_store_fbo_code: nil,
              valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } }
     }.freeze
     # ALLOW_EXPORT_PALLETS_TO_BYPASS_INSPECTION
@@ -197,6 +211,12 @@ module Crossbeams
       return 'Can inspections take place without first verifying the pallet?' if explain
 
       !setting(:pallet_verification_required_for_inspection)
+    end
+
+    def barcode_scan_rules(explain: false)
+      return 'Regular expression rules for capturing and identifying values from scanned input.' if explain
+
+      AppConst::BARCODE_SCAN_RULES + setting(:extra_barcode_scan_rules)
     end
   end
 end

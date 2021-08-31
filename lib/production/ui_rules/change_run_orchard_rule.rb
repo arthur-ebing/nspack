@@ -6,6 +6,9 @@ module UiRules
       @repo = ProductionApp::ReworksRepo.new
       @farm_repo = MasterfilesApp::FarmRepo.new
       make_form_object
+
+      @rules[:labeling] = @repo.get(:production_runs, @form_object.id, :labeling)
+
       apply_form_values
 
       common_values_for_fields common_fields

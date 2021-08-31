@@ -713,5 +713,130 @@ module ProductionApp
       SQL
       DB[query, run_id, plant_resource_id].all
     end
+
+    def fetch_gossamer_data(repo, code)
+      res = repo.gossamer_data_for(code)
+      return {} unless res.success
+
+      YAML.safe_load(res.instance)
+    end
+
+    def gossamer_data
+      gossamer_modules = DB[:system_resources].where(module_function: 'gossamer-ap').select(:system_resource_code).order(:description).all
+      return [] if gossamer_modules.empty?
+
+      recs = []
+      repo = MesserverApp::MesserverRepo.new
+      gossamer_modules.each do |code|
+        hash = fetch_gossamer_data(repo, code)
+        # If empty, return 'CLM-99 no data retrieved' or something...
+        hash['RegisterData'].each do |side|
+          recs << flatten_side(hash, side)
+        end
+      end
+      recs
+
+      # Get list of gossamer modules & loop to make calls.
+      # Flatten into combination of module + side...
+      # [{ 'Gossamer' =>
+      #   { 'Name' => 'CLM-26',
+      #     'NoSides' => 1,
+      #     'Model' => 'PP-300-130',
+      #     'Type' => 'gossamer-ap',
+      #     'Function' => 'carton-labelling',
+      #     'NetworkInterface' => '192.168.23.39',
+      #     'Port' => 502,
+      #     'Alias' => 'Gossamer AutoPacker 2',
+      #     'Time' => 49_694,
+      #     'RegisterData' =>
+      #     [{ 'Side' => 1,
+      #        'MachineID' => 0,
+      #        'PackCount' => 0,
+      #        'LabelPrintQty' => 2,
+      #        'PrintCommand' => 0,
+      #        'Accumulator-70%' => 0,
+      #        'Accumulator%' => 0,
+      #        'Alarm-Active' => 0,
+      #        'Alarm-Code' => 0,
+      #        'TotalCount' => 48_437,
+      #        'Producing' => 25_850,
+      #        'NoProduct' => 809,
+      #        'NoCartons' => 1605,
+      #        'BuildBack' => 331,
+      #        'Stopped' => 193_098,
+      #        'Fault' => 63_624,
+      #        'Total-Spare-1' => 0,
+      #        'Total-Spare-2' => 0,
+      #        'Total-Spare-3' => 0,
+      #        'ActiveCounter' => 61_437,
+      #        'SpeedPerHour' => 150 }] } }]
+
+      # [{ 'Name' => 'CLM-26',
+      #    'NoSides' => 1,
+      #    'Model' => 'PP-300-130',
+      #    'Type' => 'gossamer-ap',
+      #    'Function' => 'carton-labelling',
+      #    'NetworkInterface' => '192.168.23.39',
+      #    'Port' => 502,
+      #    'Alias' => 'Gossamer AutoPacker 2',
+      #    'Time' => 49_694,
+      #    'Side' => 1,
+      #    'MachineID' => 0,
+      #    'PackCount' => 0,
+      #    'LabelPrintQty' => 2,
+      #    'PrintCommand' => 0,
+      #    'Accumulator-70%' => 0,
+      #    'Accumulator%' => 0,
+      #    'Alarm-Active' => 0,
+      #    'Alarm-Code' => 0,
+      #    'TotalCount' => 48_437,
+      #    'Producing' => 25_850,
+      #    'NoProduct' => 809,
+      #    'NoCartons' => 1605,
+      #    'BuildBack' => 331,
+      #    'Stopped' => 193_098,
+      #    'Fault' => 63_624,
+      #    'Total-Spare-1' => 0,
+      #    'Total-Spare-2' => 0,
+      #    'Total-Spare-3' => 0,
+      #    'ActiveCounter' => 61_437,
+      #    'SpeedPerHour' => 150 },
+      #  { 'Name' => 'CLM-26',
+      #    'NoSides' => 1,
+      #    'Model' => 'PP-300-130',
+      #    'Type' => 'gossamer-ap',
+      #    'Function' => 'carton-labelling',
+      #    'NetworkInterface' => '192.168.23.39',
+      #    'Port' => 502,
+      #    'Alias' => 'Gossamer AutoPacker 2',
+      #    'Time' => 49_694,
+      #    'Side' => 2,
+      #    'MachineID' => 0,
+      #    'PackCount' => 0,
+      #    'LabelPrintQty' => 2,
+      #    'PrintCommand' => 0,
+      #    'Accumulator-70%' => 0,
+      #    'Accumulator%' => 0,
+      #    'Alarm-Active' => 0,
+      #    'Alarm-Code' => 0,
+      #    'TotalCount' => 48_437,
+      #    'Producing' => 25_850,
+      #    'NoProduct' => 809,
+      #    'NoCartons' => 1605,
+      #    'BuildBack' => 331,
+      #    'Stopped' => 193_098,
+      #    'Fault' => 63_624,
+      #    'Total-Spare-1' => 0,
+      #    'Total-Spare-2' => 0,
+      #    'Total-Spare-3' => 0,
+      #    'ActiveCounter' => 61_437,
+      #    'SpeedPerHour' => 150 }]
+    end
+
+    def flatten_side(hash, side)
+      head = hash.dup
+      head.delete('RegisterData')
+      hash.merge(side)
+    end
   end
 end

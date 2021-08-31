@@ -48,6 +48,7 @@ INSERT INTO roles (name, specialised) VALUES ('INSPECTOR', true) ON CONFLICT DO 
 INSERT INTO roles (name, specialised) VALUES ('SUPPLIER', true) ON CONFLICT DO NOTHING;
 INSERT INTO roles (name, specialised) VALUES ('CUSTOMER', true) ON CONFLICT DO NOTHING;
 INSERT INTO roles (name) VALUES ('CUSTOMER_CONTACT_PERSON') ON CONFLICT DO NOTHING;
+INSERT INTO roles (name) VALUES ('SALES_PERSON') ON CONFLICT DO NOTHING;
 
 -- TARGET MARKET GROUP TYPES
 INSERT INTO target_market_group_types (target_market_group_type_code) VALUES('PACKED') ON CONFLICT DO NOTHING;
@@ -102,6 +103,9 @@ INSERT INTO reworks_run_types (run_type, description) VALUES('TIP BINS AGAINST S
 INSERT INTO reworks_run_types (run_type, description) VALUES('RESTORE REPACKED PALLET', 'Restore repacked pallet') ON CONFLICT DO NOTHING;
 INSERT INTO reworks_run_types (run_type, description) VALUES('CHANGE BIN DELIVERY', 'Change bin delivery') ON CONFLICT DO NOTHING;
 INSERT INTO reworks_run_types (run_type, description) VALUES('CHANGE RUN CULTIVAR', 'Change production run cultivar') ON CONFLICT DO NOTHING;
+INSERT INTO reworks_run_types (run_type, description) VALUES('SINGLE BIN EDIT', 'Single bin edit') ON CONFLICT DO NOTHING;
+INSERT INTO reworks_run_types (run_type, description) VALUES('SCRAP CARTON', 'Scrap Carton') ON CONFLICT DO NOTHING;
+INSERT INTO reworks_run_types (run_type, description) VALUES('UNSCRAP CARTON', 'Unscrap Carton') ON CONFLICT DO NOTHING;
 
 -- LOCATION TYPES
 INSERT INTO location_types (location_type_code, short_code, hierarchical) VALUES('BIN_ASSET', 'BIN_ASSET', 'f') ON CONFLICT DO NOTHING;

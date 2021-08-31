@@ -4,6 +4,9 @@
 :send_edi:
   :po: false
   :ps: false
+  :uistk: false
+  :palbin: false
+  :hcs: false
 :out_dirs:
   :paltrack: "$ROOT/edi_out/paltrack"
   :head_office: "$ROOT/edi_out/head_office"

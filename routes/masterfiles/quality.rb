@@ -95,8 +95,14 @@ class Nspack < Roda
         r.patch do     # UPDATE
           res = interactor.update_scrap_reason(id, params[:scrap_reason])
           if res.success
-            update_grid_row(id, changes: { scrap_reason: res.instance[:scrap_reason], description: res.instance[:description], applies_to_pallets: res.instance[:applies_to_pallets] },
-                                notice: res.message)
+            row_keys = %i[
+              scrap_reason
+              description
+              applies_to_pallets
+              applies_to_bins
+              applies_to_cartons
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::Quality::ScrapReason::Edit.call(id, form_values: params[:scrap_reason], form_errors: res.errors) }
           end
@@ -129,6 +135,8 @@ class Nspack < Roda
             description
             active
             applies_to_pallets
+            applies_to_bins
+            applies_to_cartons
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)

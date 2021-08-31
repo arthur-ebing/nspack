@@ -9,7 +9,7 @@ module FinishedGoodsApp
       @load_id = load_id
       @task = task.to_sym
       @user = user
-      @api_request = repo.find_titan_addendum(load_id)
+      @api_request = repo.find_titan_addendum(load_id, @task)
     end
 
     MODES = {
@@ -53,7 +53,7 @@ module FinishedGoodsApp
 
       @payload = repo.compile_addendum(load_id)
       res = http.json_post(url, payload, header)
-      log_titan_request('Request Addendum', res)
+      log_titan_request(AppConst::TITAN_ADDENDUM_REQUEST, res)
     end
 
     def cancel_addendum_call
@@ -61,18 +61,18 @@ module FinishedGoodsApp
 
       @payload = { transactionId: api_request.transaction_id, requestId: api_request.request_id.to_s }
       res = http.json_post(url, payload, header)
-      log_titan_request('Cancel Addendum', res)
+      log_titan_request(AppConst::TITAN_ADDENDUM_CANCEL, res)
     end
 
     def addendum_status_call
       url = "#{AppConst::TITAN_API_HOST}/ec/ExportCertification/Addendum/AddendumStatus?transactionId=#{api_request.transaction_id}"
       @payload = { url: url }
       res = http.request_get(url, header)
-      log_titan_request('Addendum Status', res)
+      log_titan_request(AppConst::TITAN_ADDENDUM_STATUS, res)
     end
 
     def auth_token_call
-      @http = Crossbeams::HTTPCalls.new(responder: TitanHttpResponder.new)
+      @http = Crossbeams::HTTPCalls.new(call_logger: call_logger, responder: TitanHttpResponder.new)
       raise Crossbeams::InfoError, 'Service Unavailable: Failed to connect to remote server.' unless http.can_ping?('ppecb.com')
 
       url = "#{AppConst::TITAN_API_HOST}/oauth/ApiAuth"
@@ -84,10 +84,18 @@ module FinishedGoodsApp
       @header = { 'Authorization' => "Bearer #{res.instance['token']}" }
     end
 
+    def call_logger
+      Crossbeams::HTTPTextCallLogger.new('TITAN-ADDENDUM-API', log_path: 'log/titan_addendum_api_http_calls.log')
+    end
+
     class TitanHttpResponder
       include Crossbeams::Responses
       def format_response(response, _context)
-        instance = JSON.parse(response.body)
+        instance = if response.body.empty?
+                     ''
+                   else
+                     JSON.parse(response.body)
+                   end
         case response.code
         when '200'
           success_response(instance['message'], instance)

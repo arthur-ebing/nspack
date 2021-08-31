@@ -1,6 +1,6 @@
 ---
 :caption: RMT Container Material Types
-:sql: SELECT "rmt_container_material_types"."id", "rmt_container_material_types"."rmt_container_type_id",
+:sql: SELECT "rmt_container_material_types"."id", "rmt_container_material_types"."rmt_container_type_id", fn_masterfile_variants('rmt_container_material_types', rmt_container_material_types.id) AS variant_codes,
   "rmt_container_material_types"."container_material_type_code", "rmt_container_material_types"."description",
   "rmt_container_material_types"."active", "rmt_container_material_types"."created_at",
   "rmt_container_material_types"."updated_at", "rmt_container_types"."container_type_code","rmt_container_material_types"."tare_weight",
@@ -151,6 +151,22 @@
     :pinned: 
     :groupable: false
     :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  variant_codes:
+    :name: variant_codes
+    :sequence_no: 10
+    :caption: Variant Codes
+    :namespaced_name:
+    :data_type: :string
+    :width: 200
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false

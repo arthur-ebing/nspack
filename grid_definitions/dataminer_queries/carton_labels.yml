@@ -33,11 +33,13 @@
   AS palletizer_personnel_number,\r\n  cartons.is_virtual,\r\n  marketing_pucs.puc_code
   AS marketing_puc,\r\n  registered_orchards.orchard_code AS marketing_orchard,\r\n
   \ carton_labels.rmt_bin_id,\r\n  carton_labels.dp_carton,\r\n  carton_labels.gtin_code,\r\n
-  \ fn_party_role_name (carton_labels.target_customer_party_role_id) AS target_customer\r\nFROM\r\n
-  \ carton_labels\r\n  LEFT JOIN cartons ON carton_labels.id = cartons.carton_label_id\r\n
-  \ JOIN production_runs ON production_runs.id = carton_labels.production_run_id\r\n
-  \ JOIN product_setup_templates ON product_setup_templates.id = production_runs.product_setup_template_id\r\n
-  \ JOIN plant_resources packhouses ON packhouses.id = carton_labels.packhouse_resource_id\r\n
+  \ fn_party_role_name (carton_labels.target_customer_party_role_id) AS target_customer,\r\n
+  \ carton_labels.colour_percentage_id,\r\n  colour_percentages.colour_percentage,\r\n
+  \ colour_percentages.description AS colour_description \r\nFROM\r\n  carton_labels\r\n
+  \ LEFT JOIN cartons ON carton_labels.id = cartons.carton_label_id\r\n  JOIN production_runs
+  ON production_runs.id = carton_labels.production_run_id\r\n  JOIN product_setup_templates
+  ON product_setup_templates.id = production_runs.product_setup_template_id\r\n  JOIN
+  plant_resources packhouses ON packhouses.id = carton_labels.packhouse_resource_id\r\n
   \ JOIN plant_resources lines ON lines.id = carton_labels.production_line_id\r\n
   \ LEFT JOIN plant_resources packpoints ON packpoints.id = carton_labels.resource_id\r\n
   \ LEFT JOIN plant_resources palletizing_bays ON palletizing_bays.id = cartons.palletizing_bay_resource_id\r\n
@@ -73,7 +75,8 @@
   cartons.palletizer_contract_worker_id\r\n  LEFT JOIN pucs marketing_pucs ON marketing_pucs.id
   = carton_labels.marketing_puc_id\r\n  LEFT JOIN registered_orchards ON registered_orchards.id
   = carton_labels.marketing_orchard_id\r\n  LEFT JOIN pallet_sequences ON pallet_sequences.id
-  = cartons.pallet_sequence_id\r\nORDER BY\r\n  carton_labels.id DESC"
+  = cartons.pallet_sequence_id\r\n  LEFT JOIN colour_percentages ON colour_percentages.id
+  = carton_labels.colour_percentage_id\r\nORDER BY\r\n  carton_labels.id DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -1110,6 +1113,54 @@
     :namespaced_name: 
     :data_type: :string
     :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  colour_percentage_id:
+    :name: colour_percentage_id
+    :sequence_no: 66
+    :caption: Colour percentage
+    :namespaced_name: carton_labels.colour_percentage_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  colour_percentage:
+    :name: colour_percentage
+    :sequence_no: 67
+    :caption: Colour percentage
+    :namespaced_name: colour_percentages.colour_percentage
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  colour_description:
+    :name: colour_description
+    :sequence_no: 68
+    :caption: Colour description
+    :namespaced_name: colour_percentages.description
+    :data_type: :string
+    :width: 150
     :format: 
     :hide: false
     :pinned: 

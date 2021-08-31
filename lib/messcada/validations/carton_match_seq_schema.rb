@@ -47,5 +47,6 @@ module MesscadaApp
     required(:fruit_sticker_ids).maybe(:array).maybe { each(:integer) }
     required(:tu_sticker_ids).maybe(:array).maybe { each(:integer) }
     required(:treatment_ids).maybe(:array).maybe { each(:integer) }
+    required(:colour_percentage_id).maybe(:integer)
   end
 end

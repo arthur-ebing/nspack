@@ -125,6 +125,7 @@ module ProductionApp # rubocop:disable Metrics/ModuleLength
     optional(:fruit_sticker_ids).maybe(:array).maybe { each(:integer) }
     optional(:tu_sticker_ids).maybe(:array).maybe { each(:integer) }
     optional(:target_customer_party_role_id).maybe(:integer)
+    optional(:colour_percentage_id).maybe(:integer)
   end
 
   ReworksRunUpdatePalletSchema = Dry::Schema.Params do
@@ -229,17 +230,33 @@ module ProductionApp # rubocop:disable Metrics/ModuleLength
     optional(:allow_orchard_mixing).maybe(:bool)
     optional(:allow_cultivar_mixing).maybe(:bool)
     optional(:allow_cultivar_group_mixing).maybe(:bool)
+    required(:labeling).maybe(:bool)
+    required(:reconfiguring).maybe(:bool)
+    required(:setup_complete).maybe(:bool)
   end
 
   ReworksRunChangeRunCultivarSchema = Dry::Schema.Params do
     required(:reworks_run_type_id).filled(:integer)
     required(:production_run_id).filled(:integer)
     required(:cultivar_id).filled(:integer)
+    required(:allow_cultivar_mixing).maybe(:bool)
+    required(:labeling).maybe(:bool)
+    required(:reconfiguring).maybe(:bool)
+    required(:setup_complete).maybe(:bool)
   end
 
   DeliveryChangeSchema = Dry::Schema.Params do
     required(:reworks_run_type_id).filled(:integer)
     required(:from_delivery_id).filled(:integer)
     required(:to_delivery_id).filled(:integer)
+  end
+
+  EditRmtBinSchema = Dry::Schema.Params do
+    required(:reworks_run_type_id).filled(:integer)
+    required(:bin_number).filled(:integer)
+    required(:rmt_class_id).maybe(:integer)
+    required(:rmt_size_id).maybe(:integer)
+    required(:rmt_container_material_type_id).maybe(:integer)
+    required(:rmt_material_owner_party_role_id).maybe(:integer)
   end
 end

@@ -51,6 +51,7 @@ module Production
                   col.add_field :fruit_size_reference_id
                   col.add_field :rmt_class_id
                   col.add_field :grade_id
+                  col.add_field :colour_percentage_id
                 end
               end
             end

@@ -86,7 +86,17 @@ module UiRules
                     disabled_options: @fruit_repo.for_select_inactive_grades,
                     prompt: true,
                     required: true,
-                    caption: 'Grade' }
+                    caption: 'Grade' },
+        colour_percentage_id: { renderer: :select,
+                                options: @commodity_repo.for_select_colour_percentages(
+                                  where: { commodity_id: @form_object.commodity_id }
+                                ),
+                                disabled_options: @commodity_repo.for_select_inactive_colour_percentages,
+                                caption: 'Colour Percentage',
+                                prompt: 'Select Colour Percentage',
+                                hide_on_load: !@colour_applies,
+                                searchable: true,
+                                remove_search_for_small_list: false }
       }
     end
 
@@ -101,6 +111,7 @@ module UiRules
       form_object_merge!(@repo.extend_packing_specification(@form_object))
 
       @requires_standard_counts ||= @repo.get(:commodities, @form_object.commodity_id, :requires_standard_counts) || true
+      @colour_applies ||= @repo.get(:commodities, @form_object.commodity_id, :colour_applies) || false
       @basic_equals_standard_pack = AppConst::CR_MF.basic_pack_equals_standard_pack?
     end
 
@@ -146,6 +157,7 @@ module UiRules
       @form_object[:commodity_id] = params[:changed_value].to_i
       fields = common_fields
 
+      colour_applies = @repo.get(:commodities, @form_object.commodity_id, :colour_applies)
       json_actions([OpenStruct.new(type: :replace_select_options,
                                    dom_id: 'packing_specification_wizard_marketing_variety_id',
                                    options_array: fields[:marketing_variety_id][:options]),
@@ -155,7 +167,12 @@ module UiRules
                     OpenStruct.new(type: fields[:std_fruit_size_count_id][:hide_on_load] ? :hide_element : :show_element,
                                    dom_id: 'packing_specification_wizard_std_fruit_size_count_id_field_wrapper'),
                     OpenStruct.new(type: fields[:fruit_actual_counts_for_pack_id][:hide_on_load] ? :hide_element : :show_element,
-                                   dom_id: 'packing_specification_wizard_fruit_actual_counts_for_pack_id_field_wrapper')])
+                                   dom_id: 'packing_specification_wizard_fruit_actual_counts_for_pack_id_field_wrapper'),
+                    OpenStruct.new(type: colour_applies ? :show_element : :hide_element,
+                                   dom_id: 'packing_specification_wizard_colour_percentage_id_field_wrapper'),
+                    OpenStruct.new(type: :replace_select_options,
+                                   dom_id: 'packing_specification_wizard_colour_percentage_id',
+                                   options_array: fields[:colour_percentage_id][:options])])
     end
 
     def basic_pack_changed

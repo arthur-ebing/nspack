@@ -259,7 +259,7 @@
         const prev = afi && afi.parentNode && afi.parentNode.previousElementSibling;
         if (prev instanceof HTMLTableCellElement) { prev.classList.add('focusLabel'); }
 
-        crossbeamsRmdScan.init(<%= AppConst::BARCODE_SCAN_RULES.to_json %>, <%= @bypass_rules ? true : false %>);
+        crossbeamsRmdScan.init(<%= AppConst::CR_FG.barcode_scan_rules.to_json %>, <%= @bypass_rules ? true : false %>);
       });
     </script>
     <%= content_for :late_javascript %>

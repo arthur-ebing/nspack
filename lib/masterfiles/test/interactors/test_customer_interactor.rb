@@ -69,6 +69,7 @@ module MasterfilesApp
     def customer_attrs
       currency_id = create_currency
       party_role_id = create_party_role
+      fruit_industry_levy_id = create_fruit_industry_levy
 
       {
         id: 1,
@@ -87,7 +88,9 @@ module MasterfilesApp
         medium_description: Faker::Lorem.unique.word,
         long_description: 'ABC',
         vat_number: 'ABC',
-        company_reg_no: 'ABC'
+        company_reg_no: 'ABC',
+        fruit_industry_levy_id: fruit_industry_levy_id,
+        fruit_industry_levy: 'ABC'
       }
     end
 

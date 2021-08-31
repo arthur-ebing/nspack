@@ -13,6 +13,16 @@ module MasterfilesApp
                      label: :surname,
                      value: :id,
                      order_by: :surname
+
+    build_for_select :fruit_industry_levies,
+                     label: :levy_code,
+                     value: :id,
+                     order_by: :levy_code
+    build_inactive_select :fruit_industry_levies,
+                          label: :levy_code,
+                          value: :id,
+                          order_by: :levy_code
+
     def for_select_roles(where: {}, active: true)
       DB[:roles]
         .where(active: active, specialised: false)
@@ -28,6 +38,7 @@ module MasterfilesApp
     crud_calls_for :party_roles, name: :party_role
     crud_calls_for :parties, name: :party
     crud_calls_for :registrations, name: :registration, exclude: %i[create update]
+    crud_calls_for :fruit_industry_levies, name: :fruit_industry_levy, wrapper: FruitIndustryLevy
 
     def for_select_contact_method_types
       DevelopmentApp::ContactMethodTypeRepo.new.for_select_contact_method_types

@@ -13,11 +13,41 @@
   :has_permission:
   - load
   - can_unship
+- :url: "/finished_goods/dispatch/pallet_holdovers/new?pallet_id=$:id$"
+  :text: new holdover
+  :icon: add-outline
+  :title: New
+  :popup: true
+  :hide_if_true: shipped,has_pallet_holdover
+- :url: "/finished_goods/dispatch/pallet_holdovers/$:pallet_holdover_id$"
+  :text: view holdover
+  :icon: view-show
+  :title: View
+  :popup: true
+  :hide_if_false: has_pallet_holdover
+- :url: "/finished_goods/dispatch/pallet_holdovers/$:pallet_holdover_id$/edit"
+  :text: edit holdover
+  :icon: edit
+  :title: Edit
+  :popup: true
+  :hide_if_true: pallet_holdover_completed
+  :hide_if_false: has_pallet_holdover
+- :url: "/finished_goods/dispatch/pallet_holdovers/$:pallet_holdover_id$"
+  :text: delete holdover
+  :icon: delete
+  :is_delete: true
+  :popup: true
+  :hide_if_true: pallet_holdover_completed
+  :hide_if_false: has_pallet_holdover
 :conditions:
   :unallocated_pallets:
     - :col: vw_pallets.pallet_id
       :op: IN
       :val: "$:pallet_ids$"
+  :on_load:
+    - :col: vw_pallets.load_id
+      :op: "="
+      :val: "$:load_id$"
 :multiselect:
   :allocate_pallets:
     :url: "/finished_goods/dispatch/loads/$:id$/allocate"

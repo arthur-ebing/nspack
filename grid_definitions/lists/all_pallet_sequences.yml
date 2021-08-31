@@ -22,11 +22,15 @@
   - fruit_sticker
   - fruit_sticker_2
   - batch_number
+  - colour_percentage
+  - colour_description
   sr:
   - fruit_sticker
   - fruit_sticker_2
   - shipped_date
   - batch_number
+  - colour_percentage
+  - colour_description
   srp:
   - fruit_sticker
   - fruit_sticker_2
@@ -35,20 +39,28 @@
   - fruit_sticker_2
   - shipped_date
   - batch_number
+  - colour_percentage
+  - colour_description
   hb:
   - fruit_sticker
   - fruit_sticker_2
   - shipped_date
+  - colour_percentage
+  - colour_description
   hl:
   - fruit_sticker
   - fruit_sticker_2
   - shipped_date
   - batch_number
+  - colour_percentage
+  - colour_description
   um:
   - fruit_sticker
   - fruit_sticker_2
   - shipped_date
   - batch_number
+  - colour_percentage
+  - colour_description
   kr:
   - shipped_date
   - batch_number

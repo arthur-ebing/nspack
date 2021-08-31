@@ -38,6 +38,7 @@ module UiRules
       rules = @repo.plant_resource_definition(@form_object.plant_resource_type_id)
       fields[:plant_resource_code][:readonly] = true if rules[:non_editable_code]
 
+      at_ph_presort_level = [Crossbeams::Config::ResourceDefinitions::PACKHOUSE, Crossbeams::Config::ResourceDefinitions::PRESORTING_UNIT].include?(@form_object.plant_resource_type_code)
       at_ph_level = @form_object.plant_resource_type_code == Crossbeams::Config::ResourceDefinitions::PACKHOUSE
       at_gln_level = @form_object.plant_resource_type_code == Crossbeams::Config::ResourceDefinitions::LINE
       at_phc_level = @form_object.plant_resource_type_code == AppConst::PHC_LEVEL
@@ -48,7 +49,7 @@ module UiRules
                                hidden_fields: %i[location_id],
                                show_field: :location_long_code,
                                caption: 'Select Location',
-                               invisible: !at_ph_level }
+                               invisible: !at_ph_presort_level }
       fields[:gln] = { renderer: :select,
                        options: AppConst::GLN_OR_LINE_NUMBERS,
                        prompt: true,

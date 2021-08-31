@@ -98,7 +98,12 @@ module MenuHelpers
 
   # Is a constant in AppConst defined and true?
   def app_const_true?(const)
-    AppConst.const_defined?(const) && AppConst.const_get(const) == true
+    if const.start_with?('CR_')
+      konst, meth = const.split('.')
+      AppConst.const_defined?(konst) && AppConst.const_get(konst).send(meth.to_sym) == true
+    else
+      AppConst.const_defined?(const) && AppConst.const_get(const) == true
+    end
   end
 
   def progfunc_url(row)

@@ -9,6 +9,7 @@ module UiRules
       @fruit_size_repo = MasterfilesApp::FruitSizeRepo.new
       @fruit_repo = MasterfilesApp::FruitRepo.new
       @bom_repo = MasterfilesApp::BomRepo.new
+      @commodity_repo = MasterfilesApp::CommodityRepo.new
 
       make_form_object
       apply_form_values
@@ -116,7 +117,7 @@ module UiRules
     def edit_sequence_fields # rubocop:disable Metrics/AbcSize
       # commodity_id = @form_object[:commodity_id].nil_or_empty? ? ProductionApp::ProductSetupRepo.new.get_commodity_id(@form_object.cultivar_group_id, @form_object.cultivar_id) : @form_object[:commodity_id]
       commodity_id = @form_object[:commodity_id].nil_or_empty? ? @repo.get(:cultivar_groups, @form_object.cultivar_group_id, :commodity_id) : @form_object[:commodity_id]
-      commodity = MasterfilesApp::CommodityRepo.new.find_commodity(commodity_id)
+      commodity = @commodity_repo.find_commodity(commodity_id)
       raise Crossbeams::FrameworkError, 'No commodity for cultivar group or sequence' if commodity.nil?
 
       requires_standard_counts = commodity.requires_standard_counts
@@ -377,6 +378,16 @@ module UiRules
                                    ),
                                    selected: @form_object.tu_sticker_ids,
                                    required: false }
+      fields[:colour_percentage_id] =  { renderer: :select,
+                                         options: @commodity_repo.for_select_colour_percentages(
+                                           where: { commodity_id: commodity_id }
+                                         ),
+                                         disabled_options: @commodity_repo.for_select_inactive_colour_percentages,
+                                         caption: 'Colour Percentage',
+                                         prompt: 'Select Colour Percentage',
+                                         searchable: true,
+                                         hide_on_load: !commodity.colour_applies,
+                                         remove_search_for_small_list: false }
     end
 
     def make_form_object # rubocop:disable Metrics/AbcSize

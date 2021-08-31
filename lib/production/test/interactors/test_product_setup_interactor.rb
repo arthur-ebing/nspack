@@ -25,7 +25,7 @@ module ProductionApp
     def test_product_setup
       ProductionApp::ProductSetupRepo.any_instance.stubs(:find_product_setup).returns(fake_product_setup)
       entity = interactor.send(:product_setup, 1)
-      assert entity.is_a?(ProductSetup)
+      assert entity.is_a?(ProductSetupFlat)
     end
 
     def test_create_product_setup
@@ -33,14 +33,14 @@ module ProductionApp
       attrs = fake_product_setup.to_h.reject { |k, _| k == :id }
       res = interactor.create_product_setup(attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(ProductSetup, res.instance)
+      assert_instance_of(ProductSetupFlat, res.instance)
       assert res.instance.id.nonzero?
 
       AppConst::TEST_SETTINGS.client_code = 'um'
       attrs = fake_product_setup.to_h.reject { |k, _| k == :id }
       res = interactor.create_product_setup(attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(ProductSetup, res.instance)
+      assert_instance_of(ProductSetupFlat, res.instance)
       assert res.instance.id.nonzero?
     ensure
       AppConst::TEST_SETTINGS.client_code = AppConst::TEST_SETTINGS.boot_client_code
@@ -62,7 +62,7 @@ module ProductionApp
       attrs[:client_size_reference] = 'a_change'
       res = interactor.update_product_setup(id, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(ProductSetup, res.instance)
+      assert_instance_of(ProductSetupFlat, res.instance)
       assert_equal 'a_change', res.instance.client_size_reference
       refute_equal value, res.instance.client_size_reference
 
@@ -74,7 +74,7 @@ module ProductionApp
       attrs[:client_size_reference] = 'changed'
       res = interactor.update_product_setup(id, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(ProductSetup, res.instance)
+      assert_instance_of(ProductSetupFlat, res.instance)
       assert_equal 'changed', res.instance.client_size_reference
       refute_equal value, res.instance.client_size_reference
     ensure
@@ -126,6 +126,7 @@ module ProductionApp
       standard_pack_code_id = create_standard_pack
       basic_pack_code_id = create_basic_pack(standard_pack_id: standard_pack_code_id)
       target_customer_party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_TARGET_CUSTOMER)
+      colour_percentage_id = create_colour_percentage
 
       {
         id: 1,
@@ -164,14 +165,20 @@ module ProductionApp
         description: 'ABC',
         gtin_code: 'ABC',
         rmt_class_id: rmt_class_id,
-        target_customer_party_role_id: target_customer_party_role_id
+        target_customer_party_role_id: target_customer_party_role_id,
+        colour_percentage_id: colour_percentage_id,
+        product_setup_template: 'ABC',
+        cultivar_group_id: 1,
+        cultivar_id: 1,
+        cultivar_group: 'ABC',
+        cultivar: 'ABC'
       }
     end
 
     def fake_product_setup(overrides = {})
       hash = product_setup_attrs.merge(overrides)
       create_gtin(hash)
-      ProductSetup.new(hash)
+      ProductSetupFlat.new(hash)
     end
 
     def interactor

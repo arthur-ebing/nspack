@@ -41,6 +41,12 @@ module Production
                                css_classes: 'orange b'
                 end
               end
+
+              form.row do |row|
+                row.column do |col|
+                  col.add_notice('Run will be re-executed after this change.') if rules[:labeling]
+                end
+              end
             end
             page.section do |section|
               section.row do |row|

@@ -16,7 +16,8 @@ module MasterfilesApp
         description: Faker::Lorem.word,
         active: true,
         applies_to_pallets: false,
-        applies_to_bins: false
+        applies_to_bins: false,
+        applies_to_cartons: false
       }
       DB[:scrap_reasons].insert(default.merge(opts))
     end

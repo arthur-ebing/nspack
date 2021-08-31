@@ -39,7 +39,6 @@ module FinishedGoods
                   row.column do |col|
                     col.add_field :id
                     col.add_field :load_id
-                    col.add_field :order_id
                     col.add_field :order_number
                     col.add_field :customer_order_number
                     col.add_field :customer_reference
@@ -156,18 +155,18 @@ module FinishedGoods
                 fold.row do |row|
                   row.column do |col|
                     col.add_field :addendum_status
-                    col.add_field :best_regime_code
+                    # col.add_field :best_regime_code
                     col.add_field :verification_status
                     col.add_field :addendum_validations
-                    col.add_field :available_regime_code
+                    # col.add_field :available_regime_code
                     col.add_field :export_certification_status
                   end
                   row.column do |col|
                     col.add_field :e_cert_response_message
                     col.add_field :e_cert_hub_tracking_number
                     col.add_field :e_cert_hub_tracking_status
-                    col.add_field :e_cert_application_status
-                    col.add_field :phyt_clean_verification_key
+                    # col.add_field :e_cert_application_status
+                    # col.add_field :phyt_clean_verification_key
                     col.add_field :cancelled_at
                     col.add_field :cancelled_status
                   end
@@ -186,8 +185,9 @@ module FinishedGoods
               form.submit_captions 'Close'
             end
             page.section do |section|
-              section.add_grid('stock_pallets',
-                               "/list/stock_pallets/grid?key=on_load&load_id=#{id}",
+              section.add_grid('stock_pallets_for_loads',
+                               "/list/stock_pallets_for_loads/grid?key=on_load&load_id=#{id}",
+                               colour_key: UtilityFunctions.colour_key_for_list('stock_pallets_for_loads'),
                                caption: 'Load Pallets',
                                height: 40)
             end

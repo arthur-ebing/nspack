@@ -264,7 +264,9 @@ module MesscadaApp
          fn_party_role_name(pallet_sequences.target_customer_party_role_id) AS target_customer,
          pallets.batch_number,
          pallets.rmt_container_material_owner_id,
-         CONCAT(container_material_type_code, ' - ', fn_party_role_name(rmt_material_owner_party_role_id)) AS rmt_container_material_owner
+         CONCAT(container_material_type_code, ' - ', fn_party_role_name(rmt_material_owner_party_role_id)) AS rmt_container_material_owner,
+         pallet_sequences.colour_percentage_id,
+         colour_percentages.colour_percentage
 
         FROM pallet_sequences
         JOIN pallets ON pallets.id = pallet_sequences.pallet_id
@@ -340,6 +342,7 @@ module MesscadaApp
         LEFT JOIN pm_products ru_pm_products ON ru_pm_products.id = pallet_sequences.ru_labour_product_id
         LEFT JOIN rmt_container_material_owners ON rmt_container_material_owners.id = pallets.rmt_container_material_owner_id
         LEFT JOIN rmt_container_material_types ON rmt_container_material_types.id = rmt_container_material_owners.rmt_container_material_type_id
+        LEFT JOIN colour_percentages ON colour_percentages.id = pallet_sequences.colour_percentage_id
 
       SQL
     end

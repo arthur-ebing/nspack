@@ -133,8 +133,16 @@ module Crossbeams
       if res.errors.empty?
         res.message
       else
-        "#{res.message} - #{res.errors.map { |fld, errs| "#{fld} #{unwrap_errors(errs)}" }.join('; ')}"
+        "#{res.message} - #{unwrap_error_set(res.errors)}"
       end
+    end
+
+    # Unwrap a hash of errors.
+    #
+    # @param error_set [hash,Dry::Schema::MessageSet] the hash or validation error set.
+    # @return [string] the errors in readable form.
+    def unwrap_error_set(error_set)
+      error_set.to_h.map { |fld, errs| "#{fld} #{unwrap_errors(errs)}" }.join('; ')
     end
 
     # Take validation errors and unwrap Array or Hash.
@@ -144,6 +152,7 @@ module Crossbeams
     # @return [string] the list of validation errors for the field.
     def unwrap_errors(errs)
       return errs.join(', ') if errs.is_a?(Array)
+      return errs.map { |_, v| unwrap_error_set(v) }.join(' ') if errs.keys.first.is_a?(Integer)
 
       errs.group_by { |_, v| v }.map { |k, v| ": #{v.length} item#{v.length == 1 ? '' : 's'} #{k.join(', ')}" }.join(', ')
     end

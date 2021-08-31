@@ -19,7 +19,8 @@ module FinishedGoodsApp
         request_type: Faker::Lorem.unique.word,
         inspection_message_id: 1,
         transaction_id: 1,
-        request_id: 1,
+        request_id: '1',
+        success: true,
         created_at: Time.now
       }
       FinishedGoodsApp::TitanRequest.new(base_attrs.merge(attrs))

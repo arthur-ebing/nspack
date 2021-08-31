@@ -5,6 +5,7 @@ module ProductionApp
     def create_carton_label_cache # rubocop:disable Metrics/AbcSize
       cache = {}
       repo.allocated_setup_keys(production_run.id).each do |rec|
+        cultivar_id = production_run[:cultivar_id].nil_or_empty? ? repo.resolve_setup_cultivar_id(rec[:product_setup_id]) : production_run[:cultivar_id]
         cache[rec[:device_or_packpoint]] = {
           print_command: print_command_for(rec[:product_resource_allocation_id], rec[:label_template_name]),
           setup_data: rec[:setup_data],
@@ -13,6 +14,7 @@ module ProductionApp
                                                packing_method_id: rec[:packing_method_id],
                                                label_name: rec[:label_template_name],
                                                target_customer_party_role_id: rec[:target_customer_party_role_id],
+                                               cultivar_id: cultivar_id,
                                                legacy_data: resolve_run_legacy_data(production_run.legacy_data.to_h))
         }
       end
@@ -25,14 +27,13 @@ module ProductionApp
       end
     end
 
-    def cache_run # rubocop:disable Metrics/AbcSize
+    def cache_run
       @cache_run ||= {
         production_run_id: production_run[:id],
         farm_id: production_run[:farm_id],
         puc_id: production_run[:puc_id],
         orchard_id: production_run[:orchard_id],
         cultivar_group_id: production_run[:cultivar_group_id],
-        cultivar_id: production_run[:cultivar_id],
         packhouse_resource_id: production_run[:packhouse_resource_id],
         production_line_id: production_run[:production_line_id],
         season_id: production_run[:season_id]

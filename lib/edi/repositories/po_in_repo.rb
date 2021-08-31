@@ -4,7 +4,7 @@ module EdiApp
   class PoInRepo < BaseRepo
     def create_pallet(attrs)
       id = DB[:pallets].insert(attrs)
-      log_status('pallets', id, 'DEPOT PALLET CREATED FROM PO', user_name: 'System')
+      log_status(:pallets, id, 'DEPOT PALLET CREATED FROM PO', user_name: 'System')
       id
     end
 

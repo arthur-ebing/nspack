@@ -64,5 +64,31 @@ module MasterfilesApp
 
       delete(:supplier_groups, id)
     end
+
+    def for_select_suppliers(where: {}, exclude: {}, active: true) # rubocop:disable Metrics/AbcSize
+      DB[:suppliers]
+        .join(:party_roles, id: :supplier_party_role_id)
+        .join(:organizations, id: :organization_id)
+        .where(Sequel[:suppliers][:active] => active)
+        .where(convert_empty_values(where))
+        .exclude(convert_empty_values(exclude))
+        .distinct
+        .select(Sequel[:suppliers][:id], Sequel[:organizations][:medium_description])
+        .map { |r| [r[:medium_description], r[:id]] }
+    end
+
+    def for_presort_staging_run_supplier_farms(staging_run__id)
+      query = <<~SQL
+        SELECT
+            farms.id, farms.farm_code
+        FROM presort_staging_runs
+        JOIN suppliers ON suppliers.id=presort_staging_runs.supplier_id
+        LEFT JOIN farms ON farms.id = ANY (suppliers.farm_ids)
+        WHERE presort_staging_runs.id = ?
+      SQL
+
+      DB[query, staging_run__id]
+        .map(%i[farm_code id])
+    end
   end
 end

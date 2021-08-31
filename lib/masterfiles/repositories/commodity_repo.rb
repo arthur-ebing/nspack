@@ -18,14 +18,24 @@ module MasterfilesApp
                           label: :code,
                           value: :id
 
+    build_for_select :colour_percentages,
+                     label: :description,
+                     value: :id,
+                     order_by: :description
+    build_inactive_select :colour_percentages,
+                          label: :description,
+                          value: :id
+
     crud_calls_for :commodity_groups, name: :commodity_group, wrapper: CommodityGroup, exclude: %i[delete]
     crud_calls_for :commodities, name: :commodity, exclude: %i[delete]
+    crud_calls_for :colour_percentages, name: :colour_percentage, wrapper: ColourPercentage
 
     def delete_commodity(id)
       dependents = DB[:cultivar_groups].where(commodity_id: id).select_map(:id)
       return { error: 'This commodity is in use.' } unless dependents.empty?
 
       DB[:inventory_codes_packing_costs].where(commodity_id: id).delete
+      DB[:colour_percentages].where(commodity_id: id).delete
       DB[:commodities].where(id: id).delete
       { success: true }
     end
@@ -51,6 +61,21 @@ module MasterfilesApp
       return nil if hash.nil?
 
       Commodity.new(hash)
+    end
+
+    def find_colour_percentage(id)
+      hash = find_with_association(:colour_percentages,
+                                   id,
+                                   parent_tables: [{ parent_table: :commodities,
+                                                     columns: [:code],
+                                                     flatten_columns: { code: :commodity_code } }])
+      return nil if hash.nil?
+
+      ColourPercentageFlat.new(hash)
+    end
+
+    def update_colour_percentage(id, attrs)
+      update(:colour_percentages, id, attrs)
     end
   end
 end

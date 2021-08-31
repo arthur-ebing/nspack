@@ -583,6 +583,23 @@ class Nspack < Roda
           end
         end
 
+        r.on 'multiselect_reworks_run_cartons' do
+          check_auth!('reworks', 'new')
+          res = interactor.resolve_cartons_from_multiselect(id, multiselect_grid_choices(params))
+          if res.success
+            pallet_numbers = res.instance[:pallets_selected]
+            json_actions([OpenStruct.new(type: :replace_input_value,
+                                         dom_id: 'reworks_run_pallets_selected',
+                                         value: pallet_numbers)])
+          else
+            re_show_form(r, res) do
+              Production::Reworks::ReworksRun::New.call(id,
+                                                        form_values: params[:reworks_run_pallet],
+                                                        form_errors: res.errors)
+            end
+          end
+        end
+
         r.on 'multiselect_reworks_run_bulk_production_run_update' do
           attrs = retrieve_from_local_store(:reworks_run_params)
           res = interactor.bulk_production_run_update(id, multiselect_grid_choices(params), attrs)
@@ -590,6 +607,10 @@ class Nspack < Roda
             flash[:notice] = res.message
             r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{id}"
           end
+        end
+
+        r.on 'rmt_container_material_type_changed' do
+          handle_ui_change(:reworks_run_rmt_bin, :rmt_container_material_type, params)
         end
       end
 
@@ -631,6 +652,32 @@ class Nspack < Roda
                                                                             back_url: "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{id}",
                                                                             form_values: params[:reworks_run_rmt_bin],
                                                                             form_errors: res.errors)
+              end
+            end
+          end
+        end
+
+        r.on 'edit_rmt_bin' do
+          bin_number = pallet_number.split(',').first
+          r.get do
+            show_partial_or_page(r)  do
+              Production::Reworks::ReworksRun::EditRmtBin.call(id,
+                                                               bin_number,
+                                                               back_url: "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{id}")
+            end
+          end
+          r.post do
+            res = interactor.update_rmt_bin_record(params[:reworks_run_rmt_bin])
+            if res.success
+              flash[:notice] = res.message
+              r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{id}"
+            else
+              re_show_form(r, res, url: "/production/reworks/reworks_run_types/#{id}/pallets/#{bin_number}/edit_rmt_bin") do
+                Production::Reworks::ReworksRun::EditRmtBin.call(id,
+                                                                 bin_number,
+                                                                 back_url: "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{id}",
+                                                                 form_values: res.instance,
+                                                                 form_errors: res.errors)
               end
             end
           end

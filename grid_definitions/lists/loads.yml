@@ -16,13 +16,19 @@
 - :url: "/finished_goods/dispatch/loads/$:id$/create_order"
   :text: create order
   :icon: document-add
-  :hide_if_true: on_order, rmt_load
+  :hide_if_true: on_order,rmt_load
 - :url: "/finished_goods/dispatch/loads/$:id$/re_send_edi"
   :text: re-send EDI
   :icon: play
   :title: Re-send EDI
   :popup: true
   :hide_if_false: shipped
+- :url: "/finished_goods/dispatch/loads/$:id$/re_send_hcs_edi"
+  :text: re-send HCS EDI
+  :icon: play
+  :title: Re-send HCS EDI
+  :popup: true
+  :hide_if_false: shipped,on_order
 - :separator: true
 - :url: "/development/statuses/list/loads/$:id$"
   :text: status
@@ -43,3 +49,6 @@
     - :col: orders_loads.order_id
       :op: =
       :val: $:order_id$
+:multiselect:
+  :order:
+    :conditions: order

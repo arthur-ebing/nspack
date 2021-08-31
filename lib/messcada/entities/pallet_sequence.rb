@@ -76,6 +76,7 @@ module MesscadaApp
     attribute :fruit_sticker_ids, Types::Array
     attribute :tu_sticker_ids, Types::Array
     attribute :target_customer_party_role_id, Types::Integer
+    attribute :colour_percentage_id, Types::Integer
     attribute? :legacy_data, Types::Hash.optional
     attribute? :active, Types::Bool
   end

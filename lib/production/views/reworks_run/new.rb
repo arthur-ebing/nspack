@@ -32,12 +32,24 @@ module Production
           elsif rules[:restore_repacked_pallet]
             grid = 'repacked_pallets'
             grid_key = 'restore_repacked_pallets'
+          elsif rules[:scrap_carton]
+            grid = 'reworks_cartons'
+            grid_key = 'scrap_reworks_cartons'
+          elsif rules[:unscrap_carton]
+            grid = 'reworks_cartons'
+            grid_key = 'unscrap_reworks_cartons'
           else
             grid = 'stock_pallets'
             grid_key = 'reworks_pallets'
           end
 
-          multi_select_caption = rules[:bin_run_type] ? 'Bins' : 'Pallets'
+          multi_select_caption = if rules[:bin_run_type]
+                                   'Bins'
+                                 elsif rules[:carton_run_type]
+                                   'Cartons'
+                                 else
+                                   'Pallets'
+                                 end
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form_values form_values

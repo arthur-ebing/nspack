@@ -90,6 +90,7 @@ module MesscadaApp
     attribute :product_chars, Types::String
     attribute :rmt_container_material_owner_id, Types::Integer
     attribute :legacy_data, Types::Hash.optional
+    attribute :colour_percentage_id, Types::Integer
   end
 
   class ScannedCartonNumber < Dry::Struct
@@ -99,6 +100,14 @@ module MesscadaApp
       raise Crossbeams::InfoError, 'Scan field empty.' if scanned_carton_number.nil_or_empty?
 
       raise Crossbeams::InfoError, "#{scanned_carton_number} is not a recognised carton number length." unless scanned_carton_number.length < 8
+
+      scanned_carton_number
+    end
+
+    def legacy_carton_number
+      raise Crossbeams::InfoError, 'Scan field empty.' if scanned_carton_number.nil_or_empty?
+
+      raise Crossbeams::InfoError, "#{scanned_carton_number} is not a recognised legacy carton number length." unless scanned_carton_number.length == 12
 
       scanned_carton_number
     end

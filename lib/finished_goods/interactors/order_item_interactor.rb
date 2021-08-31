@@ -34,10 +34,10 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def allocate_to_order_item(id, params)
+    def allocate_to_order_item(id, load_id, params)
       repo.transaction do
         check!(:edit, id)
-        repo.allocate_to_order_item(id, params, @user)
+        repo.allocate_to_order_item(id, load_id, params, @user)
 
         log_transaction
       end
@@ -76,8 +76,8 @@ module FinishedGoodsApp
       failed_response("Unable to delete order item. It is still referenced#{e.message.partition('referenced').last}")
     end
 
-    def allocate_grid(id)
-      load_id, pallet_ids = repo.find_pallets_for_order_item(id)
+    def stock_pallets_grid(ids, load_id)
+      pallet_ids = repo.find_pallets_for_order_items(ids, load_id)
       rpt = dataminer_report('stock_pallets_for_loads.yml', conditions: [{ col: 'vw_pallets.pallet_id', op: 'IN', val: pallet_ids }])
 
       row_defs = dataminer_report_rows(rpt)

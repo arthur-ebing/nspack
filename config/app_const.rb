@@ -165,6 +165,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   ROLE_IMPLEMENTATION_OWNER = 'IMPLEMENTATION_OWNER'
   ROLE_CUSTOMER = 'CUSTOMER'
   ROLE_CUSTOMER_CONTACT_PERSON = 'CUSTOMER_CONTACT_PERSON'
+  ROLE_SALES_PERSON = 'SALES_PERSON'
   ROLE_SUPPLIER = 'SUPPLIER'
   ROLE_MARKETER = 'MARKETER'
   ROLE_FARM_OWNER = 'FARM_OWNER'
@@ -226,6 +227,9 @@ class AppConst # rubocop:disable Metrics/ClassLength
   RUN_TYPE_RESTORE_REPACKED_PALLET = 'RESTORE REPACKED PALLET'
   RUN_TYPE_CHANGE_BIN_DELIVERY = 'CHANGE BIN DELIVERY'
   RUN_TYPE_CHANGE_RUN_CULTIVAR = 'CHANGE RUN CULTIVAR'
+  RUN_TYPE_SINGLE_BIN_EDIT = 'SINGLE BIN EDIT'
+  RUN_TYPE_SCRAP_CARTON = 'SCRAP CARTON'
+  RUN_TYPE_UNSCRAP_CARTON = 'UNSCRAP CARTON'
 
   # Constants for Reworks run actions:
   REWORKS_ACTION_SINGLE_EDIT = 'SINGLE EDIT'
@@ -244,6 +248,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   REWORKS_ACTION_CHANGE_RUN_ORCHARD = 'CHANGE RUN ORCHARD'
   REWORKS_ACTION_CHANGE_BIN_DELIVERY = 'CHANGE BIN DELIVERY'
   REWORKS_ACTION_CHANGE_RUN_CULTIVAR = 'CHANGE RUN CULTIVAR'
+  REWORKS_ACTION_SINGLE_BIN_EDIT = 'SINGLE BIN EDIT'
 
   REWORKS_REPACK_PALLET_STATUS = 'REPACK SCRAP'
   REWORKS_REPACK_PALLET_NEW_STATUS = 'REPACKED'
@@ -259,6 +264,22 @@ class AppConst # rubocop:disable Metrics/ClassLength
   DELIVERY_TRIPSHEET_BUSINESS_PROCESS = 'DELIVERY_TRIPSHEET'
   BINS_TRIPSHEET_BUSINESS_PROCESS = 'BINS_TRIPSHEET'
   REWORKS_BULK_UPDATE_PALLET_DATES = 'REWORKS BULK UPDATE PALLET DATES'
+
+  REWORKS_RUN_NON_PALLET_RUNS = {
+    RUN_TYPE_TIP_BINS => :bin,
+    RUN_TYPE_WEIGH_RMT_BINS => :bin,
+    RUN_TYPE_SCRAP_BIN => :bin,
+    RUN_TYPE_UNSCRAP_BIN => :bin,
+    RUN_TYPE_BULK_WEIGH_BINS => :bin,
+    RUN_TYPE_UNTIP_BINS => :bin,
+    RUN_TYPE_TIP_MIXED_ORCHARDS => :bin,
+    RUN_TYPE_SINGLE_BIN_EDIT => :bin,
+    RUN_TYPE_CHANGE_BIN_DELIVERY => :bin,
+    RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE => :prodrun,
+    RUN_TYPE_BULK_BIN_RUN_UPDATE => :prodrun,
+    RUN_TYPE_SCRAP_CARTON => :carton,
+    RUN_TYPE_UNSCRAP_CARTON => :carton
+  }.freeze
 
   # Routes that do not require login:
   BYPASS_LOGIN_ROUTES = [
@@ -431,6 +452,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   EDI_FLOW_PO = 'PO'
   EDI_FLOW_UISTK = 'UISTK'
   EDI_FLOW_PALBIN = 'PALBIN'
+  EDI_FLOW_HCS = 'HCS'
   DEPOT_DESTINATION_TYPE = 'DEPOT'
   PARTY_ROLE_DESTINATION_TYPE = 'PARTY_ROLE'
   DESTINATION_TYPES = [DEPOT_DESTINATION_TYPE, PARTY_ROLE_DESTINATION_TYPE].freeze
@@ -442,6 +464,10 @@ class AppConst # rubocop:disable Metrics/ClassLength
     EDI_FLOW_PO => {
       depot: true,
       roles: [ROLE_CUSTOMER, ROLE_SHIPPER, ROLE_EXPORTER]
+    },
+    EDI_FLOW_HCS => {
+      depot: false,
+      roles: [ROLE_EXPORTER]
     },
     EDI_FLOW_UISTK => {
       depot: false,
@@ -479,7 +505,8 @@ class AppConst # rubocop:disable Metrics/ClassLength
     Seasons: { table_name: 'seasons', column_name: 'season_code' },
     Standard_Packs: { table_name: 'standard_pack_codes', column_name: 'standard_pack_code' },
     Target_Markets: { table_name: 'target_markets', column_name: 'target_market_name' },
-    Vessels: { table_name: 'vessels', column_name: 'vessel_code' }
+    Vessels: { table_name: 'vessels', column_name: 'vessel_code' },
+    RMT_Container_Material_Types: { table_name: 'rmt_container_material_types', column_name: 'container_material_type_code' }
   }.freeze
 
   MF_TRANSFORMATION_SYSTEMS = ['Kromco MES'].freeze
@@ -515,6 +542,10 @@ class AppConst # rubocop:disable Metrics/ClassLength
   TITAN_API_HOST = { UAT: 'https://uatapigateway.ppecb.com',
                      STAGING: 'https://stagingapigateway.ppecb.com',
                      PRODUCTION: 'https://apigateway.ppecb.com' }[TITAN_ENVIRONMENT.to_sym]
+
+  TITAN_ADDENDUM_REQUEST = 'Request Addendum'
+  TITAN_ADDENDUM_STATUS = 'Addendum Status'
+  TITAN_ADDENDUM_CANCEL = 'Cancel Addendum'
 
   # QUALITY APP result types
   PASS_FAIL = 'Pass/Fail'

@@ -26,5 +26,7 @@ UISTK:
   CSV: true
 PALBIN:
   CSV: true
+HCS:
+  CSV: true
 MFGT:
   masterfile: 700

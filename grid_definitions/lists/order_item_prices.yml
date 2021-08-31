@@ -1,0 +1,50 @@
+---
+:dataminer_definition: order_item_prices
+:conditions:
+  :standard:
+    - :col: order_items.order_id
+      :op: <>
+      :val: "$:order_id$"
+    - :col: order_items.actual_count_id
+      :op: =
+      :val: "$:actual_count_id$"
+    - :col: order_items.basic_pack_id
+      :op: =
+      :val: "$:basic_pack_id$"
+    - :col: order_items.commodity_id
+      :op: =
+      :val: "$:commodity_id$"
+    - :col: order_items.grade_id
+      :op: =
+      :val: "$:grade_id$"
+    - :col: order_items.inventory_id
+      :op: =
+      :val: "$:inventory_id$"
+    - :col: order_items.mark_id
+      :op: =
+      :val: "$:mark_id$"
+    - :col: order_items.marketing_variety_id
+      :op: =
+      :val: "$:marketing_variety_id$"
+    - :col: order_items.pallet_format_id
+      :op: =
+      :val: "$:pallet_format_id$"
+    - :col: order_items.pm_bom_id
+      :op: =
+      :val: "$:pm_bom_id$"
+    - :col: order_items.pm_mark_id
+      :op: =
+      :val: "$:pm_mark_id$"
+    - :col: order_items.rmt_class_id
+      :op: =
+      :val: "$:rmt_class_id$"
+# grid does not filter on NULL string values   url = "&sell_by_code=&pallet_format_id"
+#    - :col: order_items.sell_by_code
+#      :op: =
+#      :val: "$:sell_by_code$"
+    - :col: order_items.size_reference_id
+      :op: =
+      :val: "$:size_reference_id$"
+    - :col: order_items.standard_pack_id
+      :op: =
+      :val: "$:standard_pack_id$"

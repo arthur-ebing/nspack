@@ -3,14 +3,16 @@
 :sql: "SELECT\r\n    customers.id,\r\n    customers.customer_party_role_id,\r\n    fn_party_role_name
   (customers.customer_party_role_id) AS customer,\r\n    financial_account_code,\r\n
   \   customers.default_currency_id,\r\n    currencies.currency AS default_currency,\r\n
-  \   customers.currency_ids,\r\n    (\r\n        SELECT array_agg(currency ORDER
-  BY currency)\r\n        FROM currencies\r\n        WHERE id = ANY(customers.currency_ids)\r\n
+  \   customers.fruit_industry_levy_id,\r\n    fruit_industry_levies.levy_code AS
+  fruit_industry_levy,\r\n    customers.currency_ids,\r\n    (\r\n        SELECT array_agg(currency
+  ORDER BY currency)\r\n        FROM currencies\r\n        WHERE id = ANY(customers.currency_ids)\r\n
   \   ) AS currencies,\r\n    (\r\n        SELECT array_agg(fn_party_role_name (c.contact_person_id))\r\n
   \       FROM ( SELECT unnest(c.contact_person_ids) contact_person_id\r\n               FROM
   customers c\r\n               WHERE c.id = customers.id) c\r\n    ) AS contact_people,\r\n
   \   fn_current_status ('customers', customers.id) AS status,\r\n    customers.active,\r\n
   \   customers.created_at,\r\n    customers.updated_at\r\nFROM customers\r\n         LEFT
-  JOIN currencies ON currencies.id = customers.default_currency_id\r\n"
+  JOIN currencies ON currencies.id = customers.default_currency_id\r\n         LEFT
+  JOIN fruit_industry_levies ON fruit_industry_levies.id = customers.fruit_industry_levy_id\r\n"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -111,9 +113,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  fruit_industry_levy_id:
+    :name: fruit_industry_levy_id
+    :sequence_no: 7
+    :caption: Fruit industry levy
+    :namespaced_name: customers.fruit_industry_levy_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  fruit_industry_levy:
+    :name: fruit_industry_levy
+    :sequence_no: 8
+    :caption: Fruit industry levy
+    :namespaced_name: fruit_industry_levies.levy_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   currency_ids:
     :name: currency_ids
-    :sequence_no: 7
+    :sequence_no: 9
     :caption: Currency ids
     :namespaced_name: customers.currency_ids
     :data_type: :string
@@ -129,7 +163,7 @@
     :group_max: false
   currencies:
     :name: currencies
-    :sequence_no: 8
+    :sequence_no: 10
     :caption: Currencies
     :namespaced_name: 
     :data_type: :string
@@ -145,7 +179,7 @@
     :group_max: false
   contact_people:
     :name: contact_people
-    :sequence_no: 9
+    :sequence_no: 11
     :caption: Contact people
     :namespaced_name: 
     :data_type: :string
@@ -161,7 +195,7 @@
     :group_max: false
   status:
     :name: status
-    :sequence_no: 10
+    :sequence_no: 12
     :caption: Status
     :namespaced_name: 
     :data_type: :string
@@ -177,7 +211,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 11
+    :sequence_no: 13
     :caption: Active
     :namespaced_name: customers.active
     :data_type: :boolean
@@ -193,7 +227,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 12
+    :sequence_no: 14
     :caption: Created at
     :namespaced_name: customers.created_at
     :data_type: :datetime
@@ -209,7 +243,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 13
+    :sequence_no: 15
     :caption: Updated at
     :namespaced_name: customers.updated_at
     :data_type: :datetime

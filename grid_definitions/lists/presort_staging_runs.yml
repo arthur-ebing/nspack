@@ -1,0 +1,26 @@
+---
+:dataminer_definition: presort_staging_runs
+:actions:
+- :url: "/raw_materials/presorting/presort_staging_runs/$:id$/manage"
+  :text: manage
+  :icon: manage
+  :title: Manage
+  :popup: false
+- :url: "/raw_materials/presorting/presort_staging_runs/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+  :hide_if_false: editing
+- :separator: true
+- :url: "/development/statuses/list/presort_staging_runs/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/raw_materials/presorting/presort_staging_runs/new"
+  :text: New Presort Staging Run
+  :style: :button
+  :behaviour: :popup

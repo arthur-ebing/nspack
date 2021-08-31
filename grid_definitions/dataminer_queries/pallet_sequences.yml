@@ -35,6 +35,7 @@
   \   verified_by,\r\n    edi_size_count,\r\n    target_customer_party_role_id,\r\n
   \   target_customer,\r\n    consignment_note_number,\r\n    dispatch_note,\r\n    customer_order_number,\r\n
   \   customer_reference, \r\n    depot,\r\n    po_file_name,\r\n    batch_number,\r\n
+  \   colour_percentage_id,\r\n    colour_percentage,\r\n    colour_description,\r\n
   \   colour_rule\r\nFROM\r\n    vw_pallet_sequence_flat"
 :limit: 
 :offset: 
@@ -835,7 +836,7 @@
   gross_weight:
     :name: gross_weight
     :sequence_no: 50
-    :caption: Gross weight
+    :caption: Plt Gross weight
     :namespaced_name: gross_weight
     :data_type: :number
     :width: 
@@ -851,7 +852,7 @@
   nett_weight:
     :name: nett_weight
     :sequence_no: 51
-    :caption: Nett weight
+    :caption: Plt Nett weight
     :namespaced_name: nett_weight
     :data_type: :number
     :width: 
@@ -2320,9 +2321,57 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  colour_percentage_id:
+    :name: colour_percentage_id
+    :sequence_no: 143
+    :caption: Colour percentage
+    :namespaced_name: colour_percentage_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  colour_percentage:
+    :name: colour_percentage
+    :sequence_no: 144
+    :caption: Colour percentage
+    :namespaced_name: colour_percentage
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  colour_description:
+    :name: colour_description
+    :sequence_no: 145
+    :caption: Colour description
+    :namespaced_name: colour_description
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 143
+    :sequence_no: 146
     :caption: Colour rule
     :namespaced_name: colour_rule
     :data_type: :string

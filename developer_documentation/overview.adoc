@@ -9,7 +9,7 @@ link:/developer_documentation/start.adoc[Back to documentation home]
 
 The system is designed as an application that is loaded inside a web application which uses the `Roda` routing tree gem to handle request endpoints which call into the application.
 
-The application can also be loaded without the routing tree which allows it to be called from the commandline (e.g. a Rake task), the {abbr-repl} `bin/console`, or have other servers (like a TCP server) load it.
+The application can also be loaded without the routing tree which allows it to be called from the commandline (e.g. a Rake task), the {abbr-repl} `bin/console`, the job queue, or have other servers (like a TCP server) load it.
 
 .How the code is organised and loaded
 image::High-level components.png[High-level components]
@@ -32,7 +32,7 @@ Applets do not have to define all units -- just what is required.
 
 Lists of data are displayed in pages using data grids. These can be any of:
 
-list:: Runs a query and returns all rows.
+list:: Runs a query (which can be filtered in various ways) and returns all rows.
 lookup:: Runs a query which might be filtered and returns rows -- one of which can be selected.
 search:: Presents a page where the user can fill in parameters before the query is run, returning the filtered rows.
 

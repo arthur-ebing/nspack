@@ -35,7 +35,8 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(security_group_name: nil)
+      @form_object = new_form_object_from_struct(SecurityApp::SecurityGroup)
+      # @form_object = OpenStruct.new(security_group_name: nil)
     end
 
     def make_permission_form_object

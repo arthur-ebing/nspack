@@ -65,6 +65,7 @@ module UiRules
       fields[:shipper_party_role_id] = { renderer: :label, with_value: @form_object.shipper, caption: 'Shipper' }
       fields[:booking_reference] = { renderer: :label }
       fields[:memo_pad] = { renderer: :label }
+      fields[:pallet_count] = { renderer: :label }
 
       # Load Vehicles
       load_vehicle_id = @repo.get_id(:load_vehicles, load_id: @form_object.id)
@@ -99,19 +100,19 @@ module UiRules
       fields.merge!(container_fields.each { |_, v| v[:invisible] = container.nil? })
 
       # Titan Addendum
-      addendum = FinishedGoodsApp::TitanRepo.new.find_titan_addendum(@form_object.id)
+      addendum = FinishedGoodsApp::TitanRepo.new.find_titan_addendum(@form_object.id, :load)
       addendum_fields = {}
       fields[:location_of_issue] = { renderer: :label }
       addendum_fields[:addendum_status] = { renderer: :label, with_value: addendum&.addendum_status }
-      addendum_fields[:best_regime_code] = { renderer: :label, with_value: addendum&.best_regime_code }
+      # addendum_fields[:best_regime_code] = { renderer: :label, with_value: addendum&.best_regime_code }
       addendum_fields[:verification_status] = { renderer: :label, with_value: addendum&.verification_status }
       addendum_fields[:addendum_validations] = { renderer: :label, with_value: addendum&.addendum_validations }
-      addendum_fields[:available_regime_code] = { renderer: :label, with_value: addendum&.available_regime_code }
+      # addendum_fields[:available_regime_code] = { renderer: :label, with_value: addendum&.available_regime_code }
       addendum_fields[:e_cert_response_message] = { renderer: :label, with_value: addendum&.e_cert_response_message }
       addendum_fields[:e_cert_hub_tracking_number] = { renderer: :label, with_value: addendum&.e_cert_hub_tracking_number }
       addendum_fields[:e_cert_hub_tracking_status] = { renderer: :label, with_value: addendum&.e_cert_hub_tracking_status }
-      addendum_fields[:e_cert_application_status] = { renderer: :label, with_value: addendum&.e_cert_application_status }
-      addendum_fields[:phyt_clean_verification_key] = { renderer: :label, with_value: addendum&.phyt_clean_verification_key }
+      # addendum_fields[:e_cert_application_status] = { renderer: :label, with_value: addendum&.e_cert_application_status }
+      # addendum_fields[:phyt_clean_verification_key] = { renderer: :label, with_value: addendum&.phyt_clean_verification_key }
       addendum_fields[:export_certification_status] = { renderer: :label, with_value: addendum&.export_certification_status }
       addendum_fields[:cancelled_status] = { renderer: :label, with_value: addendum&.cancelled_status }
       addendum_fields[:cancelled_at] = { renderer: :label, with_value: addendum&.cancelled_at }

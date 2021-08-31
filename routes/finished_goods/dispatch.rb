@@ -358,6 +358,12 @@ class Nspack < Roda
         update_dialog_content(content: wrap_content_in_style(res.message, res.success ? :success : :error, caption: ''))
       end
 
+      r.on 're_send_hcs_edi' do
+        check_auth!('dispatch', 'edit')
+        res = interactor.send_hcs_edi(id)
+        update_dialog_content(content: wrap_content_in_style(res.message, res.success ? :success : :error, caption: ''))
+      end
+
       r.on 'titan_addendum', String do |mode|
         interactor.assert_permission!(:titan_addendum, id)
         res = interactor.titan_addendum(id, mode)
@@ -366,13 +372,13 @@ class Nspack < Roda
       end
 
       r.on 'titan_addendum' do
-        show_partial_or_page(r) { FinishedGoods::Dispatch::Load::TitanAddendum.call(id) }
+        show_partial_or_page(r) { FinishedGoods::Dispatch::Load::TitanAddendum.call(id, flash || {}) }
       end
 
       r.on 'allocate_multiselect' do
         check_auth!('dispatch', 'edit')
         interactor.assert_permission!(:edit, id)
-        pallet_numbers = BaseRepo.new.select_values(:pallets, :pallet_number, id: multiselect_grid_choices(params)).uniq
+        pallet_numbers = interactor.pallet_numbers_from_pallet_ids(multiselect_grid_choices(params))
         res = interactor.allocate_multiselect(id, pallet_numbers)
         flash[res.success ? :notice : :error] = res.message
         r.redirect request.referer
@@ -570,6 +576,72 @@ class Nspack < Roda
         else
           re_show_form(r, res, url: '/finished_goods/dispatch/loads/new') do
             FinishedGoods::Dispatch::Load::New.call(form_values: params[:load], form_errors: res.errors, back_url: request.referer)
+          end
+        end
+      end
+    end
+
+    # PALLET HOLDOVERS
+    # --------------------------------------------------------------------------
+    r.on 'pallet_holdovers', Integer do |id|
+      interactor = FinishedGoodsApp::PalletHoldoverInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:pallet_holdovers, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('dispatch', 'edit')
+        interactor.assert_permission!(:edit, id)
+        show_partial { FinishedGoods::Dispatch::PalletHoldover::Edit.call(id) }
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('dispatch', 'read')
+          show_partial { FinishedGoods::Dispatch::PalletHoldover::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_pallet_holdover(id, params[:pallet_holdover])
+          if res.success
+            flash[:notice] = res.message
+            redirect_via_json(request.referer)
+          else
+            re_show_form(r, res) { FinishedGoods::Dispatch::PalletHoldover::Edit.call(id, form_values: params[:pallet_holdover], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('dispatch', 'delete')
+          interactor.assert_permission!(:delete, id)
+          res = interactor.delete_pallet_holdover(id)
+          if res.success
+            flash[:notice] = res.message
+            redirect_via_json(request.referer)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+
+    r.on 'pallet_holdovers' do
+      interactor = FinishedGoodsApp::PalletHoldoverInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'new' do    # NEW
+        check_auth!('dispatch', 'new')
+        show_partial_or_page(r) { FinishedGoods::Dispatch::PalletHoldover::New.call(form_values: params, remote: fetch?(r)) }
+      end
+      r.post do        # CREATE
+        res = interactor.create_pallet_holdover(params[:pallet_holdover])
+        if res.success
+          flash[:notice] = res.message
+          redirect_via_json(request.referer)
+        else
+          re_show_form(r, res, url: '/finished_goods/dispatch/pallet_holdovers/new') do
+            FinishedGoods::Dispatch::PalletHoldover::New.call(form_values: params[:pallet_holdover],
+                                                              form_errors: res.errors,
+                                                              remote: fetch?(r))
           end
         end
       end

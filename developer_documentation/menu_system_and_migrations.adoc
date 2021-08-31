@@ -98,7 +98,7 @@ Crossbeams::MenuMigrations::Migrator.migration('Nspack') do
                             url: '/another/path/here',
                             group: 'Together',
                             rename: 'Commodity Groups',
-                            hide_if_const_true: 'PALLET_IS_IN_STOCK_WHEN_VERIFIED,PRINT_PALLET_LABEL_AT_PALLET_VERIFICATION'
+                            hide_if_const_true: 'CR_PROD.incentives?,PRINT_PALLET_LABEL_AT_PALLET_VERIFICATION'
   end
 
   down do
@@ -236,8 +236,10 @@ add_program_function(key, functional_area:, program:, seq: 1, group: nil, url:, 
 * `:url` - the URL to callfrom this menu item
 * `:restricted` - if true, specific users need to be linked to the item to see it
 * `:show_in_iframe` - if true, render the URL inside an iframe
-* `:hide_if_const_true` - (String of comma-separated AppConst constants) If any of the AppConsts evaluate to true, the menu will be hidden
-* `:hide_if_const_false` - (String of comma-separated AppConst constants) If any of the AppConsts evaluate to false, the menu will be hidden
+* `:hide_if_const_true` - (String of comma-separated AppConst constants or client rules) If any of the rules evaluate to true, the menu will be hidden
+* `:hide_if_const_false` - (String of comma-separated AppConst constants or client rules) If any of the rules evaluate to false, the menu will be hidden
+
+Each client rule is specified as `<AppConst varname>.<client_rule>` e.g. `CR_PROD.check_something?`
 
 === drop_program_function
 
@@ -269,8 +271,10 @@ change_program_function(key, options = {})
 ** `:restricted` - if true, specific users need to be linked to the item to see it
 ** `:show_in_iframe` - if true, render the URL inside an iframe
 ** `:rename` (string) the new name for the program function
-** `:hide_if_const_true` - (String of comma-separated AppConst constants) If any of the AppConsts evaluate to true, the menu will be hidden. Set to nil to clear
-** `:hide_if_const_false` - (String of comma-separated AppConst constants) If any of the AppConsts evaluate to false, the menu will be hidden. Set to nil to clear
+** `:hide_if_const_true` - (String of comma-separated AppConst constants or client rules) If any of the rules evaluate to true, the menu will be hidden. Set to nil to clear
+** `:hide_if_const_false` - (String of comma-separated AppConst constants or client rules) If any of the rules evaluate to false, the menu will be hidden. Set to nil to clear
+
+Each client rule is specified as `<AppConst varname>.<client_rule>` e.g. `CR_PROD.check_something?`
 
 === move_program_function
 

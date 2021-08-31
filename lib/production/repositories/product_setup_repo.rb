@@ -54,17 +54,21 @@ module ProductionApp
 
     def find_product_setup(id)
       hash = DB["SELECT product_setups.* ,cultivar_groups.commodity_id, pallet_formats.pallet_base_id, pallet_formats.pallet_stack_type_id,
-                 fn_product_setup_code(product_setups.id) AS product_setup_code, fn_product_setup_in_production(product_setups.id) AS in_production
+                 fn_product_setup_code(product_setups.id) AS product_setup_code, fn_product_setup_in_production(product_setups.id) AS in_production,
+                 product_setup_templates.template_name AS product_setup_template, product_setup_templates.cultivar_group_id,
+                 product_setup_templates.cultivar_id, cultivar_groups.cultivar_group_code AS cultivar_group,
+                 cultivars.cultivar_name AS cultivar
                  FROM product_setups
                  JOIN product_setup_templates ON product_setup_templates.id = product_setups.product_setup_template_id
                  JOIN cultivar_groups ON cultivar_groups.id = product_setup_templates.cultivar_group_id
+                 LEFT JOIN cultivars ON cultivars.id = product_setup_templates.cultivar_id
                  LEFT JOIN std_fruit_size_counts ON std_fruit_size_counts.id = product_setups.std_fruit_size_count_id
                  JOIN pallet_formats ON pallet_formats.id = product_setups.pallet_format_id
                  LEFT JOIN treatments ON treatments.id = ANY (product_setups.treatment_ids)
                  WHERE product_setups.id = ?", id].first
       return nil if hash.nil?
 
-      ProductSetup.new(hash)
+      ProductSetupFlat.new(hash)
     end
 
     def for_select_plant_resources(plant_resource_type_code)

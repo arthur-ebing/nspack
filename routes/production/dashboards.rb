@@ -101,5 +101,19 @@ class Nspack < Roda
         { updateMessage: { content: content, continuePolling: true } }.to_json
       end
     end
+
+    # GOSSAMER DATA
+    # --------------------------------------------------------------------------
+    r.on 'gossamer_data' do
+      r.is do
+        show_page_in_layout(layout_to_use) { Production::Dashboards::Dashboard::GossamerData.call }
+      end
+
+      r.on 'detail' do
+        content = render_partial { Production::Dashboards::Dashboard::GossamerDataDetail.call }
+        # { updateMessage: { content: content, continuePolling: true } }.to_json
+        { updateMessage: { content: content, continuePolling: false } }.to_json
+      end
+    end
   end
 end
