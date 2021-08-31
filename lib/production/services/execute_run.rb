@@ -36,7 +36,11 @@ module ProductionApp
         work = [{ reload_page: { message: 'You might need to reload this page - a new run has been executed.' } }]
         send_bus_message_to_page(work, 'product_setups_on_runs/with_params')
       end
-      success_response('Run is executing', this_run: changeset.to_h.merge(status: 'RUNNING', id: production_run.id, colour_rule: 'ok'))
+      success_response('Run is executing', this_run: changeset.to_h.merge(status: 'RUNNING',
+                                                                          id: production_run.id,
+                                                                          colour_rule: 'ok',
+                                                                          allocation_required: false,
+                                                                          view_allocs: true))
     end
 
     private

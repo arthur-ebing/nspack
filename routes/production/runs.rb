@@ -245,6 +245,8 @@ class Nspack < Roda
             started_at
             status
             colour_rule
+            allocation_required
+            view_allocs
           ]
           # MessageBus to activerun page to refresh
           acts = [OpenStruct.new(type: :update_grid_row,  ids: id, changes: select_attributes(res.instance[:this_run], row_keys))]
@@ -277,6 +279,8 @@ class Nspack < Roda
             status
             re_executed_at
             colour_rule
+            allocation_required
+            view_allocs
           ]
           update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
         end
@@ -286,6 +290,7 @@ class Nspack < Roda
         check_auth!('runs', 'execute')
         res = interactor.re_configure_run(id)
         if res.success
+
           row_keys = %i[
             running
             tipping
@@ -295,6 +300,8 @@ class Nspack < Roda
             active_run_stage
             status
             colour_rule
+            allocation_required
+            view_allocs
           ]
           acts = [OpenStruct.new(type: :update_grid_row,  ids: id, changes: select_attributes(res.instance, row_keys))]
           content = render_partial { Production::Runs::ProductionRun::Edit.call(id) }
