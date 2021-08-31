@@ -71,7 +71,7 @@ module Crossbeams
             pallet_verification_required_for_inspection: true,
             pallet_weight_required_for_inspection: false,
             extra_barcode_scan_rules: [],
-            titan_cold_store_fbo_code: nil,
+            titan_cold_store_fbo_code: 'L6875',
             valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } },
       sr: { place_of_issue_for_addendum: 'PLZ',
             vgm_required: true,
