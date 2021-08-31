@@ -94,7 +94,7 @@ module MesscadaApp
   end
 
   class ScannedCartonNumber < Dry::Struct
-    attribute :scanned_carton_number, Types::String
+    attribute :scanned_carton_number, Types::StrippedString
 
     def carton_number
       raise Crossbeams::InfoError, 'Scan field empty.' if scanned_carton_number.nil_or_empty?
