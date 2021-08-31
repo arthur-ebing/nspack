@@ -36,6 +36,7 @@ module FinishedGoodsApp
         destination_region: Faker::Lorem.unique.word,
         destination_country_id: 1,
         destination_country: Faker::Lorem.unique.word,
+        iso_country_code: Faker::Lorem.unique.word,
         reinspection: false,
         allow_titan_inspection: false,
         upn: '123',

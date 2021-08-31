@@ -39,6 +39,7 @@ module MasterfilesApp
       opts[:destination_region_id] ||= create_destination_region
       default = {
         country_name: Faker::Lorem.unique.word,
+        iso_country_code: Faker::Lorem.unique.word,
         active: true,
         created_at: '2010-01-01 12:00',
         updated_at: '2010-01-01 12:00'

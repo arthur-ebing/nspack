@@ -92,6 +92,7 @@ module FinishedGoodsApp
       final_destination = MasterfilesApp::DestinationRepo.new.find_city(hash[:final_destination_id])
       hash[:destination_city] = final_destination.city_name
       hash[:destination_country] = final_destination.country_name
+      hash[:iso_country_code] = final_destination.iso_country_code
       hash[:destination_region] = final_destination.region_name
 
       # Pallets

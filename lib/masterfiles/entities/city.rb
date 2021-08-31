@@ -6,6 +6,7 @@ module MasterfilesApp
     attribute :destination_country_id, Types::Integer
     attribute :city_name, Types::String
     attribute :country_name, Types::String
+    attribute :iso_country_code, Types::String
     attribute :region_name, Types::String
   end
 end

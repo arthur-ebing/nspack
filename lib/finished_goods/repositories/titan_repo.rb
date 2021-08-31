@@ -147,7 +147,7 @@ module FinishedGoodsApp
                                 carton: pallet.bin ? 'B' : 'C',
                                 cartonQty: pallet.pallet_carton_quantity,
                                 targetRegion: govt_inspection_sheet.destination_region,
-                                targetCountry: govt_inspection_sheet.destination_country,
+                                targetCountry: govt_inspection_sheet.iso_country_code,
                                 protocolExceptionIndicator: 'NA',
                                 agreementCode: ecert_agreement_code,
                                 consignmentLinePallets: compile_inspection_pallet_sequences(pallet_id) }
@@ -238,8 +238,8 @@ module FinishedGoodsApp
         consigneeAddressLine1: [consignee_address&.address_line_1, consignee_address&.address_line_2, consignee_address&.address_line_3].compact!.join(', '),
         consigneeAddressLine2: consignee_address&.city,
         consigneeAddressLine3: consignee_address&.postal_code,
-        consigneeCountryId: load.destination_country,
-        importCountryId: load.destination_country,
+        consigneeCountryId: load.iso_country_code,
+        importCountryId: load.iso_country_code,
         cfCode: party_repo.find_registration_code_for_party_role('CF', load.shipper_party_role_id).to_s,
         lspCode: party_repo.find_registration_code_for_party_role('LSP', load.shipper_party_role_id).to_s,
         transportType: get(:voyage_types, load.voyage_type_id, :industry_description),
@@ -250,7 +250,7 @@ module FinishedGoodsApp
         shippingBookingReference: load.booking_reference,
         loadPort: load.pol_port_code,
         dischargePort: load.pod_port_code,
-        shippedTargetCountry: load.destination_country,
+        shippedTargetCountry: load.iso_country_code,
         shippedTargetRegion: load.destination_region,
         locationOfIssue: load.location_of_issue, # Cannot be blank
         eCertDesiredIssueLocation: '',
@@ -327,7 +327,7 @@ module FinishedGoodsApp
           clientRef: pallet_id.to_s,
           upn: govt_inspection_sheet.upn,
           inspectedTargetRegion: govt_inspection_sheet.destination_region,
-          inspectedTargetCountry: govt_inspection_sheet.destination_country,
+          inspectedTargetCountry: govt_inspection_sheet.iso_country_code,
           commodityCode: pallet.commodity,
           fleshColour: '', # ???
           varietyCode: pallet.marketing_variety,
