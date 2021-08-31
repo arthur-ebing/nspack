@@ -718,11 +718,13 @@ module ProductionApp
       res = repo.gossamer_data_for(code)
       return {} unless res.success
 
-      YAML.safe_load(res.instance)
+      (YAML.safe_load(res.instance) || {})['Gossamer']
     end
 
     def gossamer_data
-      gossamer_modules = DB[:system_resources].where(module_function: 'gossamer-ap').select(:system_resource_code).order(:description).all
+      # gossamer_modules = DB[:system_resources].where(module_function: 'gossamer-ap').order(:description).select_map(:system_resource_code)
+      # FIXME: Hard-coded for SR2 modules for now...
+      gossamer_modules = DB[:system_resources].where(system_resource_code: %w[CLM-25 CLM-26 CLM-27 CLM-28]).order(:description).select_map(:system_resource_code)
       return [] if gossamer_modules.empty?
 
       recs = []
@@ -730,7 +732,7 @@ module ProductionApp
       gossamer_modules.each do |code|
         hash = fetch_gossamer_data(repo, code)
         # If empty, return 'CLM-99 no data retrieved' or something...
-        hash['RegisterData'].each do |side|
+        hash['RegisterData']&.each do |side|
           recs << flatten_side(hash, side)
         end
       end
