@@ -116,7 +116,7 @@ module UiRules
     end
 
     def apply_form_rules
-      @rules[:require_extended_packaging] = AppConst::REQUIRE_EXTENDED_PACKAGING
+      @rules[:require_extended_packaging] = AppConst::CR_PROD.require_extended_packaging?
       @rules[:minimum_composition_level] = @form_object.minimum_composition_level
       @rules[:fruit_composition_level] = @form_object.fruit_composition_level
       @rules[:show_extra_fields] = !(@rules[:minimum_composition_level] || @rules[:fruit_composition_level])

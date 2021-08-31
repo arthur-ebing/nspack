@@ -25,6 +25,7 @@ module Crossbeams
             require_packaging_bom: false,
             capture_batch_number_for_pallets: true,
             derive_nett_weight: false,
+            require_extended_packaging: false,
             run_cache_legacy_data_fields: [] },
       hl: { run_allocations: true,
             pallet_label_seqs_sql: nil,
@@ -46,6 +47,7 @@ module Crossbeams
             require_packaging_bom: false,
             capture_batch_number_for_pallets: false,
             derive_nett_weight: false,
+            require_extended_packaging: false,
             run_cache_legacy_data_fields: [] },
       kr: { run_allocations: true,
             pallet_label_seqs_sql: 'SELECT p.puc_code, p.gap_code, ps.gtin_code, ps.carton_quantity FROM pallet_sequences ps JOIN pucs p ON p.id = ps.puc_id WHERE ps.pallet_id = ? ORDER BY ps.pallet_sequence_number',
@@ -67,6 +69,7 @@ module Crossbeams
             require_packaging_bom: true,
             capture_batch_number_for_pallets: false,
             derive_nett_weight: true,
+            require_extended_packaging: true,
             run_cache_legacy_data_fields: %i[pc_code track_indicator_code] },
       um: { run_allocations: true,
             pallet_label_seqs_sql: 'SELECT o.orchard_code, m.marketing_variety_code, s.size_reference, ps.carton_quantity FROM pallet_sequences ps JOIN orchards o ON o.id = ps.orchard_id JOIN marketing_varieties m ON m.id = ps.marketing_variety_id JOIN fruit_size_references s ON s.id = ps.fruit_size_reference_id WHERE ps.pallet_id = ? ORDER BY ps.pallet_sequence_number',
@@ -88,6 +91,7 @@ module Crossbeams
             require_packaging_bom: false,
             capture_batch_number_for_pallets: false,
             derive_nett_weight: false,
+            require_extended_packaging: false,
             run_cache_legacy_data_fields: [] },
       ud: { run_allocations: true,
             pallet_label_seqs_sql: nil,
@@ -109,6 +113,7 @@ module Crossbeams
             require_packaging_bom: false,
             capture_batch_number_for_pallets: false,
             derive_nett_weight: false,
+            require_extended_packaging: false,
             run_cache_legacy_data_fields: [] },
       sr: { run_allocations: true,
             pallet_label_seqs_sql: nil,
@@ -130,6 +135,7 @@ module Crossbeams
             require_packaging_bom: false,
             capture_batch_number_for_pallets: false,
             derive_nett_weight: false,
+            require_extended_packaging: false,
             run_cache_legacy_data_fields: [] },
       sr2: { run_allocations: true,
              pallet_label_seqs_sql: nil,
@@ -151,6 +157,7 @@ module Crossbeams
              require_packaging_bom: false,
              capture_batch_number_for_pallets: false,
              derive_nett_weight: false,
+             require_extended_packaging: false,
              run_cache_legacy_data_fields: [] }
     }.freeze
     # ALLOW_OVERFULL_REWORKS_PALLETIZING
@@ -167,7 +174,6 @@ module Crossbeams
     # PALLET_IS_IN_STOCK_WHEN_VERIFIED
     # PALLET_MIX_RULES_SCOPE
     # PRINT_PALLET_LABEL_AT_PALLET_VERIFICATION
-    # REQUIRE_EXTENDED_PACKAGING
     # REQUIRE_FRUIT_STICKER_AT_PALLET_VERIFICATION
     # REQUIRE_PACKAGING_BOM
     # ROBOT_DISPLAY_LINES
@@ -331,6 +337,12 @@ module Crossbeams
       return 'Set derived_weight on pallets.' if explain
 
       setting(:derive_nett_weight)
+    end
+
+    def require_extended_packaging?(explain: false)
+      return 'Should product setup be extended to include basic pack, dimensions and mass?' if explain
+
+      setting(:require_extended_packaging)
     end
   end
 end
