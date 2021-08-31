@@ -65,6 +65,7 @@ module UiRules
       fields[:shipper_party_role_id] = { renderer: :label, with_value: @form_object.shipper, caption: 'Shipper' }
       fields[:booking_reference] = { renderer: :label }
       fields[:memo_pad] = { renderer: :label }
+      fields[:pallet_count] = { renderer: :label }
 
       # Load Vehicles
       load_vehicle_id = @repo.get_id(:load_vehicles, load_id: @form_object.id)

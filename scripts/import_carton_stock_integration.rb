@@ -62,15 +62,10 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     end
   end
 
-  def process_pallet(pallet_rows) # rubocop:disable Metrics/AbcSize
+  def process_pallet(pallet_rows) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
     @pallet_errors = []
     params = {}
     pallet_id = nil
-
-    @pallet_nett_weight = 0
-    pallet_rows.each do |sequence|
-      @pallet_nett_weight += sequence.to_h['nett_weight'].to_f
-    end
 
     pallet_rows.each_with_index do |sequence, index|
       params = get_mf_ids_for_pallet(sequence.to_h)
@@ -85,6 +80,8 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
       res = create_pallet_sequence(params)
       params[:pallet_sequence_id] = res.instance
       raise Crossbeams::InfoError, "#{params[:pallet_number]}_#{params[:pallet_sequence_number]} #{res.message}" unless res.success
+
+      next if params[:depot_pallet]
 
       carton_numbers = params[:carton_numbers].split('|')
       carton_numbers.each do |carton_number|
@@ -127,13 +124,13 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     args.orchard_id = get_orchard_id(args)
 
     args.cultivar_code = args.rmt_variety
-    args.cultivar_id = get_id_or_error(:cultivars, cultivar_name: args.rmt_variety)
+    args.cultivar_id = get_id_or_error(:cultivars, cultivar_name: args.rmt_variety, comment: 'rmt_variety')
 
     args.cultivar_group_id = @repo.get(:cultivars, args.cultivar_id, :cultivar_group_id)
 
     args.product_resource_allocation_id = nil
 
-    args.organization_id = get_id_or_error(:organizations, short_description: args.marketing_org)
+    args.organization_id = get_id_or_error(:organizations, short_description: args.marketing_org, comment: 'marketing_org')
     role_id = get_id_or_error(:roles, name: AppConst::ROLE_MARKETER)
     args.marketing_org_party_role_id = get_id_or_error(:party_roles,
                                                        organization_id: args.organization_id,
@@ -142,10 +139,9 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
 
     args.marketing_orchard_id = find_or_create_marketing_orchard(args)
     args.marketing_puc_id = find_or_create_marketing_puc(args)
-    args.marketing_variety_id = get_id_or_error(:marketing_varieties,
-                                                marketing_variety_code: args.marketing_variety)
+    args.marketing_variety_id = get_id_or_error(:marketing_varieties, marketing_variety_code: args.marketing_variety)
 
-    args.destination_region_id = get_id_or_error(:destination_regions, destination_region_name: args.packed_tm_group)
+    args.destination_region_id = get_id_or_error(:destination_regions, destination_region_name: args.packed_tm_group, comment: 'packed_tm_group')
     args.packed_tm_group_id = DB[:destination_regions_tm_groups]
                               .where(destination_region_id: args.destination_region_id)
                               .get(:target_market_group_id)
@@ -154,7 +150,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     args.target_market_id = get_id_or_error(:target_markets, target_market_name: args.target_market)
 
     unless args.target_customer.nil_or_empty?
-      organization_id = get_id_or_error(:organizations, short_description: args.target_customer)
+      organization_id = get_id_or_error(:organizations, short_description: args.target_customer, comment: 'target_customer')
       role_id = get_id_or_error(:roles, name: AppConst::ROLE_TARGET_CUSTOMER)
       args.target_customer_party_role_id = get_id_or_error(:party_roles,
                                                            organization_id: organization_id,
@@ -212,7 +208,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
   end
 
   def get_orchard_id(args)
-    if  args.depot_pallet
+    if args.depot_pallet
       params = { orchard_code: 'DEPOT_UNKNOWN',
                  farm_id: @repo.get_id(:farms, farm_code: 'DEPOT_UNKNOWN'),
                  puc_id: @repo.get_id_or_create(:pucs, puc_code: 'DEPOT_UNKNOWN') }
@@ -268,7 +264,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
                                             pallet_stack_type_id: args.pallet_stack_type_id)
     args.depot_pallet = args.is_depot_pallet == 't'
     unless args.depot_pallet
-      args.plt_packhouse_resource_id = get_id_or_error(:plant_resources, plant_resource_code: args.packhouse_code)
+      args.plt_packhouse_resource_id = get_id_or_error(:plant_resources, plant_resource_code: PH_CODES[args.packhouse_code])
       args.plt_line_resource_id = get_id_or_error(:plant_resources, plant_resource_code: args.production_line_code)
     end
     args.in_stock = args.inspection_result.to_s.upcase == 'PASSED'
@@ -315,15 +311,17 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
     @repo.create(:registered_orchards, res.to_h)
   end
 
-  def find_or_create_marketing_puc(params)
-    attrs = params.to_h
-    marketing_puc_id = get_id_or_error(:pucs, puc_code: attrs[:marketing_puc])
+  def find_or_create_marketing_puc(args)
+    attrs = args.to_h
+    marketing_puc_id = get_id_or_error(:pucs, puc_code: attrs[:marketing_puc], comment: 'marketing_puc')
 
-    args = { organization_id: attrs[:organization_id], farm_id: attrs[:farm_id], puc_id: marketing_puc_id }
-    existing_id = @repo.get_value(:farm_puc_orgs, :puc_id, args)
+    params = { organization_id: attrs[:organization_id], farm_id: attrs[:farm_id], puc_id: marketing_puc_id }
+    existing_id = @repo.get_value(:farm_puc_orgs, :puc_id, params)
     return existing_id if existing_id
 
-    res = MasterfilesApp::FarmPucOrgSchema.call(args)
+    return nil if args.depot_pallet
+
+    res = MasterfilesApp::FarmPucOrgSchema.call(params)
     raise Crossbeams::InfoError, "can't create_farm_puc_orgs #{validation_failed_response(res).errors}" if res.failure?
 
     @repo.create(:farm_puc_orgs, res)
@@ -363,7 +361,7 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
 
   def create_pallet(params) # rubocop:disable Metrics/AbcSize
     args = params.clone
-    args[:nett_weight] = @pallet_nett_weight.round(2)
+    args.delete(:nett_weight)
 
     res = MesscadaApp::PalletContract.new.call(args)
     return failed_response("can't create_pallet #{validation_failed_response(res).errors}") if res.failure?
@@ -376,11 +374,15 @@ class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassL
   end
 
   def get_id_or_error(table_name, args)
+    comment = args.delete(:comment)
     return nil if (args.length == 1) && args.values.first.nil_or_empty?
 
     id = get_variant_id(table_name, args)
-    @pallet_errors << "#{table_name} masterfile not found, args:#{args}" unless id
-
+    unless id
+      error_message = "masterfile on table #{table_name} not found, args:#{args}"
+      error_message = "#{error_message}, comment: #{comment}" if comment
+      @pallet_errors <<  error_message
+    end
     id
   end
 

@@ -59,14 +59,18 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def validate_carton_number_for_palletizing(carton_number)
+    def validate_carton_number_for_palletizing(scanned_number)
+      res = MesscadaApp::ScanCartonLabelOrPallet.call(scanned_number)
+      return res unless res.success
+
+      carton_number = res.instance.carton_label_id
       res = UtilityFunctions.validate_integer_length(:carton_number, carton_number)
       return failed_response("Value #{carton_number} is too big to be a carton. Perhaps you scanned a pallet number?") if res.failure?
 
       carton_equals_pallet = messcada_repo.carton_label_carton_equals_pallet(carton_number)
       return failed_response("This Carton #{carton_number}, carton equals pallet and cannot be palletized") if carton_equals_pallet
 
-      ok_response
+      success_response('ok', carton_number)
     end
 
     def direct_edit_pallet_sequence(pallet_sequence_id, params) # rubocop:disable Metrics/AbcSize
@@ -87,8 +91,8 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def find_carton_by_carton_label_id(carton_label_id)
-      repo.find_carton_by_carton_label_id(carton_label_id)
+    def get_carton_id_from_carton_label_id(carton_label_id)
+      repo.get_id(:cartons, carton_label_id: carton_label_id)
     end
 
     def create_pallet_from_carton(carton_id) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
@@ -151,24 +155,24 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def replace_pallet_sequence(user_name, carton_number, pallet_sequence_id, carton_quantity) # rubocop:disable Metrics/AbcSize
+    def replace_pallet_sequence(carton_id, pallet_sequence_id, carton_quantity) # rubocop:disable Metrics/AbcSize
       return failed_response('Carton Qty cannot be set zero') if carton_quantity&.to_i&.zero?
-      return failed_response("Scanned Carton:#{carton_number} not found. #{AppConst::CARTON_VERIFICATION_REQUIRED ? ' Needs to be verified' : nil}") unless carton_number
+      return failed_response("Scanned Carton:#{carton_id} not found. #{AppConst::CARTON_VERIFICATION_REQUIRED ? ' Needs to be verified' : nil}") unless carton_id
 
-      carton = find_carton_with_run_info(carton_number)
+      carton = find_carton_with_run_info(carton_id)
       return failed_response('Scanned Carton Production Run is closed') if carton[:production_run_closed]
 
       pallet_sequence = find_pallet_sequence(pallet_sequence_id)
       res = nil
       repo.transaction do
-        res = MesscadaApp::ReplacePalletSequence.new(user_name, carton[:id], pallet_sequence[:pallet_id], pallet_sequence_id, carton_quantity).call
+        res = MesscadaApp::ReplacePalletSequence.new(@user.user_name, carton[:id], pallet_sequence[:pallet_id], pallet_sequence_id, carton_quantity).call
         log_transaction
       end
       res
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("#{__method__}. pallet_sequence_id:#{pallet_sequence_id}, carton_number:#{carton_number} "))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("#{__method__}. pallet_sequence_id:#{pallet_sequence_id}, carton_id:#{carton_id} "))
       failed_response(e.message)
     end
 

@@ -72,10 +72,10 @@ module UiRules
         if AppConst::CR_MF.kromco_calculate_basic_pack_code?
           behaviour.lose_focus :height_mm,
                                notify: [{ url: '/masterfiles/fruit/basic_pack_codes/height_changed',
-                                          param_keys: %i[basic_pack_code_basic_pack_code basic_pack_code_footprint_code] }]
+                                          param_keys: %i[basic_pack_basic_pack_code basic_pack_footprint_code] }]
           behaviour.lose_focus :footprint_code,
                                notify: [{ url: '/masterfiles/fruit/basic_pack_codes/footprint_code_changed',
-                                          param_keys: %i[basic_pack_code_basic_pack_code basic_pack_code_height_mm] }]
+                                          param_keys: %i[basic_pack_basic_pack_code basic_pack_height_mm] }]
         end
       end
     end

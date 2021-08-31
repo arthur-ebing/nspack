@@ -13,22 +13,30 @@ module FinishedGoodsApp
 
     def call
       res = TaskPermissionCheck::Load.call(:unship, load_id)
-      raise Crossbeams::InfoError, res.message unless res.success
+      return res unless res.success
+
+      unship_pallets
 
       if pallet_number.nil?
         unship_load
-        unship_pallets
-
+        unship_order
         success_response("Unshipped Load: #{load_id}")
       else
-        unship_pallets
         unallocate_pallet
-
         success_response("Unshipped and unallocated Pallet: #{pallet_number}")
       end
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     private
+
+    def unship_order
+      order_ids = DB[:orders_loads].join(:orders, id: :order_id).where(load_id: load_id, shipped: true).select_map(:order_id)
+      return if order_ids.empty?
+
+      repo.update(:orders, order_ids, shipped: false)
+    end
 
     def unship_load
       attrs = { shipped: false }

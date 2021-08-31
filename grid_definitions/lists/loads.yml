@@ -49,3 +49,6 @@
     - :col: orders_loads.order_id
       :op: =
       :val: $:order_id$
+:multiselect:
+  :order:
+    :conditions: order

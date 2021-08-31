@@ -29,52 +29,40 @@ module MesscadaApp
     end
 
     def find_pallet_sequence_flat(id)
-      hash = find_with_association(:pallet_sequences, id,
-                                   parent_tables: [{ parent_table: :farms,
-                                                     foreign_key: :farm_id,
-                                                     flatten_columns: { farm_code: :farm_code,
-                                                                        pdn_region_id: :production_region_id } },
-                                                   { parent_table: :production_regions,
-                                                     foreign_key: :production_region_id,
-                                                     flatten_columns: { production_region_code: :production_region_code } },
-                                                   { parent_table: :pucs,
-                                                     foreign_key: :puc_id,
-                                                     flatten_columns: { puc_code: :puc_code } },
-                                                   { parent_table: :orchards,
-                                                     foreign_key: :orchard_id,
-                                                     flatten_columns: { orchard_code: :orchard_code } },
-                                                   { parent_table: :cultivars,
-                                                     foreign_key: :cultivar_id,
-                                                     flatten_columns: { cultivar_code: :cultivar_code,
-                                                                        cultivar_name: :cultivar_name,
-                                                                        commodity_id: :commodity_id } },
-                                                   { parent_table: :cultivar_groups,
-                                                     foreign_key: :cultivar_group_id,
-                                                     flatten_columns: { cultivar_group_code: :cultivar_group_code } },
-                                                   { parent_table: :commodities,
-                                                     foreign_key: :commodity_id,
-                                                     flatten_columns: { code: :commodity_code,
-                                                                        description: :commodity_description } },
-                                                   { parent_table: :standard_pack_codes,
-                                                     foreign_key: :standard_pack_code_id,
-                                                     flatten_columns: { standard_pack_code: :standard_pack_code } },
-                                                   { parent_table: :marketing_varieties,
-                                                     foreign_key: :marketing_variety_id,
-                                                     flatten_columns: { marketing_variety_code: :marketing_variety_code } },
-                                                   { parent_table: :target_markets,
-                                                     flatten_columns: { target_market_name: :target_market_name } },
-                                                   { parent_table: :grades,
-                                                     foreign_key: :grade_id,
-                                                     flatten_columns: { grade_code: :grade_code } },
-                                                   { parent_table: :rmt_classes,
-                                                     foreign_key: :rmt_class_id,
-                                                     flatten_columns: { rmt_class_code: :rmt_class_code } }],
-                                   lookup_functions: [{ function: :fn_current_status,
-                                                        args: ['pallet_sequences', :id],
-                                                        col_name: :status },
-                                                      { function: :fn_party_role_name,
-                                                        args: [:target_customer_party_role_id],
-                                                        col_name: :target_customer }])
+      hash = find_with_association(
+        :pallet_sequences, id,
+        parent_tables: [{ parent_table: :farms,
+                          flatten_columns: { farm_code: :farm_code,
+                                             pdn_region_id: :production_region_id } },
+                        { parent_table: :production_regions, foreign_key: :production_region_id,
+                          flatten_columns: { production_region_code: :production_region_code } },
+                        { parent_table: :pucs,
+                          flatten_columns: { puc_code: :puc_code } },
+                        { parent_table: :orchards,
+                          flatten_columns: { orchard_code: :orchard_code } },
+                        { parent_table: :cultivars,
+                          flatten_columns: { cultivar_code: :cultivar_code,
+                                             cultivar_name: :cultivar_name } },
+                        { parent_table: :cultivar_groups,
+                          flatten_columns: { cultivar_group_code: :cultivar_group_code,
+                                             commodity_id: :commodity_id } },
+                        { parent_table: :commodities,
+                          foreign_key: :commodity_id,
+                          flatten_columns: { code: :commodity_code,
+                                             description: :commodity_description } },
+                        { parent_table: :standard_pack_codes,
+                          flatten_columns: { standard_pack_code: :standard_pack_code } },
+                        { parent_table: :marketing_varieties,
+                          flatten_columns: { marketing_variety_code: :marketing_variety_code } },
+                        { parent_table: :target_markets,
+                          flatten_columns: { target_market_name: :target_market_name } },
+                        { parent_table: :grades,
+                          flatten_columns: { grade_code: :grade_code } },
+                        { parent_table: :rmt_classes,
+                          flatten_columns: { rmt_class_code: :rmt_class_code } }],
+        lookup_functions: [{ function: :fn_current_status, args: ['pallet_sequences', :id], col_name: :status },
+                           { function: :fn_party_role_name, args: [:target_customer_party_role_id], col_name: :target_customer }]
+      )
       return nil if hash.nil?
 
       hash[:pallet_carton_quantity] = get(:pallets, hash[:pallet_id], :carton_quantity) || 0
@@ -420,6 +408,10 @@ module MesscadaApp
       DB[query, pallet_number]
     end
 
+    def find_first_sequence_id_for_pallet_number(pallet_number)
+      DB[:pallet_sequences].where(pallet_number: pallet_number).order(:id).get(:id)
+    end
+
     def find_pallet_sequences_from_same_pallet(id)
       DB["select sis.id
           from pallet_sequences s
@@ -572,22 +564,6 @@ module MesscadaApp
         .get(:id)
     end
 
-    def parse_pallet_or_carton_number(res = {}) # rubocop:disable Metrics/AbcSize
-      params = res.to_h
-      if params[:pallet_number]
-        params[:pallet_number] = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: params[:pallet_number]).pallet_number
-        return params
-      end
-      raise Crossbeams::InfoError, 'scanned number not given' if params[:scanned_number].nil_or_empty?
-
-      if params[:scanned_number].length > 8
-        params[:pallet_number] = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: params[:scanned_number]).pallet_number
-      else
-        params[:carton_number] = MesscadaApp::ScannedCartonNumber.new(scanned_carton_number: params[:scanned_number]).carton_number
-      end
-      params
-    end
-
     def find_rmt_bin_by_tipped_asset_number(bin_number)
       get_id(:rmt_bins, tipped_asset_number: bin_number)
     end
@@ -595,12 +571,6 @@ module MesscadaApp
     def rmt_bin_exists?(rmt_bin_id)
       exists?(:rmt_bins, id: rmt_bin_id)
     end
-
-    # def find_rmt_bin_farm(rmt_bin_id)
-    #   DB[:rmt_bins]
-    #     .where(id: rmt_bin_id)
-    #     .get(:farm_id)
-    # end
 
     def find_rmt_bin_farm_attrs(rmt_bin_id)
       DB[:rmt_bins]

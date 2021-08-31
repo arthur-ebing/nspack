@@ -34,20 +34,25 @@
   \   aggregated.repacked,\r\n    aggregated.repacked_at,\r\n    aggregated.repacked_from_pallet_ids,\r\n
   \   aggregated.failed_otmc_results,\r\n    aggregated.failed_otmc,\r\n    aggregated.created_by,\r\n
   \   aggregated.verified_by,\r\n    aggregated.edi_size_counts,\r\n    vw_pallets.consignment_note_number,\r\n
-  \   vw_pallets.created_at,\r\n    vw_pallets.active,\r\n    CASE\r\n        WHEN
-  vw_pallets.scrapped THEN 'warning'\r\n        WHEN vw_pallets.shipped THEN 'inactive'\r\n
-  \       WHEN vw_pallets.allocated THEN 'ready'\r\n        WHEN vw_pallets.in_stock
-  THEN 'ok'\r\n        WHEN vw_pallets.palletized OR vw_pallets.partially_palletized
-  THEN 'inprogress'\r\n        WHEN vw_pallets.inspected AND NOT vw_pallets.govt_inspection_passed
-  THEN 'error'\r\n        WHEN vw_pallets.pallet_verification_failed THEN 'error'\r\n
-  \       END AS colour_rule\r\n\r\nFROM vw_pallets\r\nLEFT JOIN vw_pallet_sequences_aggregated
-  aggregated ON aggregated.pallet_id = vw_pallets.pallet_id\r\n\r\nORDER BY load_id,
-  pallet_number DESC"
+  \   vw_pallets.created_at,\r\n    pallet_holdovers.id AS pallet_holdover_id,\r\n
+  \   pallet_holdovers.id IS NOT NULL AS has_pallet_holdover,\r\n    pallet_holdovers.holdover_quantity
+  = vw_pallets.carton_quantity AS pallet_holdover_completed,\r\n    vw_pallets.active,\r\n
+  \   CASE\r\n        WHEN pallet_holdovers.holdover_quantity != vw_pallets.carton_quantity
+  THEN 'yellow'\r\n        WHEN vw_pallets.scrapped THEN 'warning'\r\n        WHEN
+  vw_pallets.shipped THEN 'inactive'\r\n        WHEN vw_pallets.allocated THEN 'ready'\r\n
+  \       WHEN vw_pallets.in_stock THEN 'ok'\r\n        WHEN vw_pallets.palletized
+  OR vw_pallets.partially_palletized THEN 'inprogress'\r\n        WHEN vw_pallets.inspected
+  AND NOT vw_pallets.govt_inspection_passed THEN 'error'\r\n        WHEN vw_pallets.pallet_verification_failed
+  THEN 'error'\r\n        END AS colour_rule\r\n\r\nFROM vw_pallets\r\nLEFT JOIN vw_pallet_sequences_aggregated
+  aggregated ON aggregated.pallet_id = vw_pallets.pallet_id\r\nLEFT JOIN pallet_holdovers
+  ON pallet_holdovers.pallet_id = vw_pallets.pallet_id\r\n\r\nORDER BY load_id, pallet_number
+  DESC"
 :limit: 
 :offset: 
 :external_settings:
   :render_url: 
   :colour_key:
+    yellow: Holdover not completed
     warning: Scrapped
     inactive: Shipped
     ready: Allocated
@@ -1655,9 +1660,57 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  pallet_holdover_id:
+    :name: pallet_holdover_id
+    :sequence_no: 101
+    :caption: Pallet holdover
+    :namespaced_name: pallet_holdovers.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  has_pallet_holdover:
+    :name: has_pallet_holdover
+    :sequence_no: 102
+    :caption: Has pallet holdover
+    :namespaced_name: 
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_holdover_completed:
+    :name: pallet_holdover_completed
+    :sequence_no: 103
+    :caption: Pallet holdover completed
+    :namespaced_name: 
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   active:
     :name: active
-    :sequence_no: 101
+    :sequence_no: 104
     :caption: Active
     :namespaced_name: vw_pallets.active
     :data_type: :boolean
@@ -1673,7 +1726,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 102
+    :sequence_no: 105
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

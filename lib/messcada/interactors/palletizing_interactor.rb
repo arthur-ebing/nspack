@@ -22,6 +22,7 @@ module MesscadaApp
       check_res = validate_params_input(params)
       return check_res unless check_res.success
 
+      # FIXME: This does not allow for palletizing a legacy carton
       check_res = check_carton_number_length(params[:carton_number])
       return check_res unless check_res.success
 
@@ -580,7 +581,7 @@ module MesscadaApp
     end
 
     def get_palletizing_carton(carton_number, _bay_state, palletizer_identifier, palletizing_bay_resource_id)
-      MesscadaApp::CartonVerification.call(@user, { carton_number: carton_number }, palletizer_identifier, palletizing_bay_resource_id) unless verified_carton_number?(carton_number)
+      MesscadaApp::CartonVerification.call(@user, carton_number, palletizer_identifier, palletizing_bay_resource_id) unless verified_carton_number?(carton_number)
       carton_number_carton_id(carton_number)
     end
 

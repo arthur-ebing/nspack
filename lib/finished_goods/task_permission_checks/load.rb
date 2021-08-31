@@ -117,8 +117,8 @@ module FinishedGoodsApp
         return failed_response("Load: #{id} truck arrival not done") unless vehicle?
         return failed_response("Load: #{id} hasn't been loaded") unless loaded?
         return failed_response("Load: #{id} requires a temp tail to be set") unless temp_tail?
-        return failed_response("Load: #{id} associated order not completed") unless order_completed?
         return failed_response "Pallet: #{rmt_palbin_doesnt_have_cultivar.join(', ')}, do not have Cultivars, Only applicable for RMT loads." unless rmt_palbin_doesnt_have_cultivar.empty?
+        return failed_response "Pallet: #{pallets_with_uncompleted_holdover.join(', ')}, has uncompleted holdovers." unless pallets_with_uncompleted_holdover.empty?
 
         all_ok
       end
@@ -152,11 +152,24 @@ module FinishedGoodsApp
 
       def rmt_palbin_doesnt_have_cultivar
         pallet_ids = repo.select_values(:pallets, :id, load_id: id)
-        DB[:pallet_sequences].where(pallet_id: pallet_ids, cultivar_id: nil).select_map(:pallet_number).uniq
+        repo.select_values(:pallet_sequences, :pallet_number, pallet_id: pallet_ids, cultivar_id: nil).uniq
+      end
+
+      def pallets_with_uncompleted_holdover
+        uncompleted = []
+        pallet_ids = repo.select_values(:pallets, :id, load_id: id)
+        array = repo.select_values(:pallet_holdovers, %i[pallet_id holdover_quantity], pallet_id: pallet_ids)
+        array.each do |pallet_id, holdover_quantity|
+          next if holdover_quantity == repo.get(:pallets, pallet_id, :carton_quantity)
+
+          uncompleted << repo.get(:pallets, pallet_id, :pallet_number)
+        end
+        uncompleted
       end
 
       def order_completed?
-        DB[:orders_loads].join(:orders, id: :order_id).where(load_id: id).get(:completed) || true
+        order_ids = repo.select_values(:orders_loads, :order_id, load_id: id).uniq
+        repo.select_values(:orders, :completed, id: order_ids).all?
       end
 
       def shipped?

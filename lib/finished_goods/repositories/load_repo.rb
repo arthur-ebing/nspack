@@ -140,6 +140,8 @@ module FinishedGoodsApp
       update(:pallets, pallet_ids, load_id: nil, allocated: false, temp_tail: nil)
       log_multiple_statuses(:pallets, pallet_ids, 'UNALLOCATED', user_name: user.user_name)
 
+      DB[:pallet_sequences].where(pallet_id: pallet_ids).update(order_item_id: nil)
+
       # log status for loads where all pallets have been unallocated
       load_ids.each do |load_id|
         next if exists?(:pallets, load_id: load_id)
@@ -183,6 +185,13 @@ module FinishedGoodsApp
 
     def load_is_on_order?(id)
       exists?(:orders_loads, load_id: id)
+    end
+
+    def link_order_to_load(order_id, load_id)
+      return if order_id.nil? || load_id.nil?
+
+      create(:orders_loads, load_id: load_id, order_id: order_id)
+      DB[:orders].where(id: order_id, shipped: true).update(shipped: false)
     end
   end
 end

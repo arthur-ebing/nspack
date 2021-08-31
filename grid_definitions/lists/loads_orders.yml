@@ -1,0 +1,43 @@
+---
+:dataminer_definition: loads
+:actions:
+- :url: "/finished_goods/dispatch/loads/$:id$"
+  :text: view
+  :icon: view-show
+  :hide_if_false: shipped
+- :url: "/finished_goods/dispatch/loads/$:id$"
+  :text: manage
+  :icon: edit
+  :hide_if_true: shipped
+- :url: "/finished_goods/orders/orders/$:order_id$/load/$:id$/order_items"
+  :text: allocate from spec
+  :icon: edit
+  :popup: true
+  :hide_if_true: shipped
+- :separator: true
+- :url: "/finished_goods/dispatch/loads/$:id$/copy"
+  :text: copy
+  :icon: copy
+- :url: "/finished_goods/dispatch/loads/$:id$/create_order"
+  :text: create order
+  :icon: document-add
+  :hide_if_true: on_order,rmt_load
+- :separator: true
+- :url: "/development/statuses/list/loads/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/finished_goods/dispatch/loads/new"
+  :text: New Load
+  :style: :button
+:conditions:
+  :order:
+    - :col: orders_loads.order_id
+      :op: =
+      :val: $:order_id$
+:multiselect:
+  :order:
+    :conditions: order
