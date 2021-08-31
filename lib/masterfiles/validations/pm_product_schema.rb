@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class ExtendedPmProductContract < Dry::Validation::Contract
-    if AppConst::REQUIRE_EXTENDED_PACKAGING
+    if AppConst::CR_PROD.require_extended_packaging?
       params do
         optional(:id).filled(:integer)
         required(:pm_subtype_id).filled(:integer)

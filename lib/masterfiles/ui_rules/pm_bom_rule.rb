@@ -7,7 +7,7 @@ module UiRules
       make_form_object
       apply_form_values
 
-      @rules[:require_extended_packaging] = AppConst::REQUIRE_EXTENDED_PACKAGING
+      @rules[:require_extended_packaging] = AppConst::CR_PROD.require_extended_packaging?
 
       common_values_for_fields common_fields
 

@@ -18,7 +18,7 @@ module UiRules
       fields[:pm_composition_level_id] = { renderer: :label,
                                            with_value: @form_object.composition_level_description,
                                            caption: 'Composition Level',
-                                           hide_on_load: !AppConst::REQUIRE_EXTENDED_PACKAGING }
+                                           hide_on_load: !AppConst::CR_PROD.require_extended_packaging? }
       fields[:pm_type_code] = { renderer: :label,
                                 caption: 'PKG Type Code' }
       fields[:description] = { renderer: :label }
@@ -27,7 +27,7 @@ module UiRules
                                items: @repo.for_select_pm_subtypes(where: { pm_type_id: @options[:id] }),
                                caption: 'PKG Subtypes' }
       fields[:short_code] = { renderer: :label,
-                              hide_on_load: !AppConst::REQUIRE_EXTENDED_PACKAGING }
+                              hide_on_load: !AppConst::CR_PROD.require_extended_packaging? }
     end
 
     def common_fields
@@ -40,13 +40,13 @@ module UiRules
                                    searchable: true,
                                    remove_search_for_small_list: false,
                                    required: false,
-                                   hide_on_load: !AppConst::REQUIRE_EXTENDED_PACKAGING },
+                                   hide_on_load: !AppConst::CR_PROD.require_extended_packaging? },
         pm_type_code: { caption: 'PKG Type Code',
                         required: true,
                         force_uppercase: true },
         description: { required: true },
         short_code: { force_uppercase: true,
-                      hide_on_load: !AppConst::REQUIRE_EXTENDED_PACKAGING }
+                      hide_on_load: !AppConst::CR_PROD.require_extended_packaging? }
       }
     end
 
