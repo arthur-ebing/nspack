@@ -39,10 +39,11 @@ module Production
           %w[MachineID PackCount LabelPrintQty PrintCommand Accumulator-70% Accumulator%
              Alarm-Active Alarm-Code TotalCount Producing NoProduct NoCartons BuildBack
              Stopped Fault Total-Spare-1 Total-Spare-2 Total-Spare-3 ActiveCounter SpeedPerHour].map do |key|
+               val = rec[key] == -1 ? '' : UtilityFunctions.delimited_number(rec[key], no_decimals: 0, delimiter: ' ')
                <<~HTML
                  <div class="ml2 mb3 ba w5">
                    <div class="pa3" style="background-color:#e6f4f1">#{inflector.humanize(inflector.underscore(key))}</div>
-                   <div class="f2 tr pa2">#{UtilityFunctions.delimited_number(rec[key], no_decimals: 0, delimiter: ' ')}</div>
+                   <div class="f2 tr pa2">#{val}</div>
                  </div>
                HTML
              end.join
