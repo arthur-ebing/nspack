@@ -416,7 +416,7 @@ module MesscadaApp
       DB["select sis.id
           from pallet_sequences s
           join pallet_sequences sis on sis.pallet_id=s.pallet_id
-          where s.id = #{id}
+          where s.id = #{id} AND scrapped_at IS NULL
           order by sis.pallet_sequence_number asc"].map { |s| s[:id] }
     end
 
