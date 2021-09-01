@@ -149,7 +149,7 @@ module FinishedGoodsApp
                                 cartonQty: pallet.pallet_carton_quantity,
                                 targetRegion: govt_inspection_sheet.destination_region,
                                 targetCountry: govt_inspection_sheet.iso_country_code,
-                                protocolExceptionIndicator: 'NA',
+                                protocolExceptionIndicator: govt_inspection_sheet.exception_protocol_tm,
                                 agreementCode: ecert_agreement_code,
                                 consignmentLinePallets: compile_inspection_pallet_sequences(pallet_id) }
       end
@@ -332,7 +332,7 @@ module FinishedGoodsApp
           commodityCode: pallet.commodity,
           fleshColour: '', # ???
           varietyCode: pallet.marketing_variety,
-          protocolExceptionIndicator: '', # SF - Smartfresh, X7, X8, X9 where the first character denotes the destination and the second character denotes the applicable phytosanitary
+          protocolExceptionIndicator: govt_inspection_sheet.exception_protocol_tm,
           productClass: pallet.grade,
           nettWeight: pallet.nett_weight.to_f.round(2),
           grossWeight: pallet.gross_weight.to_f.round(2), # If derived weight, add this to nett? OR...?
