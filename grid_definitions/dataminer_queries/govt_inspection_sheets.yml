@@ -14,7 +14,8 @@
   \      govt_inspection_sheets.tripsheet_loaded,\r\n       govt_inspection_sheets.tripsheet_loaded_at,\r\n
   \      govt_inspection_sheets.tripsheet_offloaded,\r\n       govt_inspection_sheets.tripsheet_offloaded_at,\r\n
   \      govt_inspection_sheets.upn,\r\n\r\n       created_by,\r\n       string_agg(pallets.pallet_number::text,
-  ', '::text) AS pallet_numbers,\r\n\r\n       govt_inspection_sheets.active,\r\n
+  ', '::text) AS pallet_numbers,\r\n\r\n       govt_inspection_sheets.exception_protocol_tm_id,\r\n
+  \      target_markets.target_market_name AS exception_protocol_tm,\r\n       govt_inspection_sheets.active,\r\n
   \      govt_inspection_sheets.created_at,\r\n       govt_inspection_sheets.updated_at,\r\n\r\n
   \      CASE\r\n           WHEN tripsheet_offloaded THEN 'ready'      WHEN cancelled
   THEN 'warning'\r\n           WHEN govt_inspection_sheets.inspected AND NOT bool_and(govt_inspection_pallets.passed)
@@ -24,8 +25,10 @@
   destination_regions on govt_inspection_sheets.destination_region_id = destination_regions.id\r\nLEFT
   JOIN inspectors ON inspectors.id = inspector_id\r\nLEFT JOIN govt_inspection_pallets
   ON govt_inspection_sheets.id = govt_inspection_pallets.govt_inspection_sheet_id\r\nLEFT
-  JOIN pallets ON govt_inspection_pallets.pallet_id = pallets.id\r\n\r\nGROUP BY govt_inspection_sheets.id,\r\n
-  \        inspectors.id,\r\n         destination_regions.id\r\nORDER BY govt_inspection_sheets.id
+  JOIN pallets ON govt_inspection_pallets.pallet_id = pallets.id\r\nLEFT JOIN target_markets
+  ON target_markets.id = govt_inspection_sheets.exception_protocol_tm_id\r\n\r\nGROUP
+  BY govt_inspection_sheets.id,\r\n         inspectors.id,\r\n         destination_regions.id,\r\n
+  \        target_markets.target_market_name\r\nORDER BY govt_inspection_sheets.id
   DESC"
 :limit: 
 :offset: 
@@ -518,9 +521,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  exception_protocol_tm_id:
+    :name: exception_protocol_tm_id
+    :sequence_no: 31
+    :caption: Exception protocol tm
+    :namespaced_name: govt_inspection_sheets.exception_protocol_tm_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  exception_protocol_tm:
+    :name: exception_protocol_tm
+    :sequence_no: 32
+    :caption: Exception protocol tm
+    :namespaced_name: target_markets.target_market_name
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   active:
     :name: active
-    :sequence_no: 31
+    :sequence_no: 33
     :caption: Active
     :namespaced_name: govt_inspection_sheets.active
     :data_type: :boolean
@@ -536,7 +571,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 32
+    :sequence_no: 34
     :caption: Created at
     :namespaced_name: govt_inspection_sheets.created_at
     :data_type: :datetime
@@ -552,7 +587,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 33
+    :sequence_no: 35
     :caption: Updated at
     :namespaced_name: govt_inspection_sheets.updated_at
     :data_type: :datetime
@@ -568,7 +603,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 34
+    :sequence_no: 36
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

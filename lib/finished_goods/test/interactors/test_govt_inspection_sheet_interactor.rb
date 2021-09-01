@@ -72,6 +72,8 @@ module FinishedGoodsApp
       target_market_group_id = create_target_market_group
       destination_region_id = create_destination_region
       destination_country_id = create_destination_country
+      target_market_id = create_target_market
+
       {
         id: 1,
         inspector_id: inspector_id,
@@ -113,7 +115,9 @@ module FinishedGoodsApp
         tripsheet_offloaded: false,
         use_inspection_destination_for_load_out: false,
         upn: nil,
-        active: true
+        active: true,
+        exception_protocol_tm_id: target_market_id,
+        exception_protocol_tm: 'ABC'
       }
     end
 

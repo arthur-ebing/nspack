@@ -26,5 +26,6 @@ module FinishedGoodsApp
     optional(:tripsheet_offloaded).maybe(:bool)
     optional(:use_inspection_destination_for_load_out).maybe(:bool)
     optional(:created_by).maybe(Types::StrippedString)
+    required(:exception_protocol_tm_id).maybe(:integer)
   end
 end

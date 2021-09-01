@@ -26,6 +26,7 @@ module UiRules
                                        caption: 'Target Customers',
                                        invisible: !AppConst::CR_PROD.link_target_markets_to_target_customers?,
                                        items: @repo.target_customer_party_role_names_for(@options[:id]) }
+      fields[:protocol_exception] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields
@@ -39,7 +40,8 @@ module UiRules
                                options: @party_repo.for_select_party_roles(AppConst::ROLE_TARGET_CUSTOMER),
                                selected: @form_object.target_customer_ids,
                                invisible: !AppConst::CR_PROD.link_target_markets_to_target_customers?,
-                               caption: 'Target Customers' }
+                               caption: 'Target Customers' },
+        protocol_exception: { renderer: :checkbox }
       }
     end
 
@@ -50,12 +52,7 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(target_market_name: nil,
-                                    country_ids: [],
-                                    tm_group_ids: [],
-                                    description: nil,
-                                    inspection_tm: nil,
-                                    target_customer_ids: [])
+      @form_object = new_form_object_from_struct(MasterfilesApp::TargetMarket)
     end
   end
 end

@@ -178,10 +178,13 @@ class Nspack < Roda
         r.patch do     # UPDATE
           res = interactor.update_target_market(id, params[:target_market])
           if res.success
-            update_grid_row(id,
-                            changes: { target_market_name: res.instance[:target_market_name],
-                                       description: res.instance[:description], inspection_tm: res.instance[:inspection_tm] },
-                            notice: res.message)
+            row_keys = %i[
+              target_market_name
+              description
+              inspection_tm
+              protocol_exception
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::TargetMarkets::TargetMarket::Edit.call(id, params[:target_market], res.errors) }
           end

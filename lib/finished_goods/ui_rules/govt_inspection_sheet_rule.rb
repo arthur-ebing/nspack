@@ -5,13 +5,14 @@ module UiRules
     def generate_rules
       @repo = FinishedGoodsApp::GovtInspectionRepo.new
       @party_repo = MasterfilesApp::PartyRepo.new
+      @tm_repo = MasterfilesApp::TargetMarketRepo.new
       make_form_object
       apply_form_values
 
       common_values_for_fields common_fields
 
       set_show_fields if %i[show].include? @mode
-      add_behaviours if %i[new edit].include? @mode
+      add_behaviours if %i[new edit reinspection].include? @mode
 
       add_progress_step
       add_controls
@@ -48,6 +49,8 @@ module UiRules
       fields[:created_by] = { renderer: :label }
       fields[:consignment_note_number] = { renderer: :label }
       fields[:status] = { renderer: :label }
+      fields[:exception_protocol_tm] = { renderer: :label,
+                                         caption: 'Exception Protocol Target Market' }
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize
@@ -83,10 +86,10 @@ module UiRules
         inspection_point: {},
         awaiting_inspection_results: { renderer: :checkbox },
         packed_tm_group_id: { renderer: :select,
-                              options: MasterfilesApp::TargetMarketRepo.new.for_select_packed_tm_groups(
+                              options: @tm_repo.for_select_packed_tm_groups(
                                 where: { id: valid_tm_group_ids }
                               ),
-                              disabled_options: MasterfilesApp::TargetMarketRepo.new.for_select_inactive_tm_groups,
+                              disabled_options: @tm_repo.for_select_inactive_tm_groups,
                               caption: 'Packed TM Group',
                               required: true },
         destination_region_id: { renderer: :select,
@@ -116,7 +119,14 @@ module UiRules
                         disable: @mode != :reinspection },
         created_by: { disabled: true },
         consignment_note_number: { disabled: true },
-        status: { disabled: true }
+        status: { disabled: true },
+        exception_protocol_tm_id: { renderer: :select,
+                                    options: @tm_repo.for_select_packed_group_tms(
+                                      where: { protocol_exception: true, target_market_group_id: @form_object.packed_tm_group_id }
+                                    ),
+                                    disabled_options: @tm_repo.for_select_inactive_target_markets,
+                                    prompt: true,
+                                    caption: 'Exception Protocol Target Market' }
       }
     end
 
@@ -150,7 +160,8 @@ module UiRules
         destination_region_id: @repo.get_last(:govt_inspection_sheets, :destination_region_id),
         destination_country_id: @repo.get_last(:govt_inspection_sheets, :destination_country_id),
         reinspection: @mode == :reinspection,
-        scanned_number: nil
+        scanned_number: nil,
+        exception_protocol_tm_id: nil
       )
     end
 

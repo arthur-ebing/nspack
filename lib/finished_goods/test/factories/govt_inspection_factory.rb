@@ -23,6 +23,7 @@ module FinishedGoodsApp
       destination_region_id = create_destination_region
       inspection_billing_party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_INSPECTION_BILLING)
       exporter_party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_EXPORTER)
+      target_market_id = create_target_market
 
       default = {
         inspector_id: inspector_id,
@@ -41,7 +42,8 @@ module FinishedGoodsApp
         destination_region_id: destination_region_id,
         active: true,
         created_at: '2010-01-01 12:00',
-        updated_at: '2010-01-01 12:00'
+        updated_at: '2010-01-01 12:00',
+        exception_protocol_tm_id: target_market_id
       }
       DB[:govt_inspection_sheets].insert(default.merge(opts))
     end

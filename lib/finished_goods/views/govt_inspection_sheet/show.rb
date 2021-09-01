@@ -108,6 +108,7 @@ module FinishedGoods
                     # col.add_field :packed_tm_group
                     col.add_field :destination_region
                     col.add_field :destination_country
+                    col.add_field :exception_protocol_tm
                     col.add_field :use_inspection_destination_for_load_out
                     col.add_field :completed
                     col.add_field :inspected
