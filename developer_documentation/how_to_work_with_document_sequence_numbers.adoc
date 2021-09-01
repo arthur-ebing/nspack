@@ -92,3 +92,15 @@ end
 ----
 
 NOTE: The `update_with_document_number` method does not return the new document number -- you'll need to query the database to get it.
+
+==== Applying a sequence to many rows
+
+If you need one sequence to apply to several rows, get the number from the database and then update the reords:
+[source,ruby]
+----
+ids = some_set_of_table_ids
+repo.transaction do
+  seq_no = repo.next_document_sequence_number('invoice')
+  repo.update(:table_name, ids, sequence_column: seq_no)
+end
+----

@@ -62,7 +62,7 @@ module MasterfilesApp
       DB[:seasons].where(commodity_id: commodity_id).where(Sequel.lit('? between start_date and end_date', date)).get(:id)
     end
 
-    def for_select_seasons(where: {}, exclude: {})
+    def for_select_seasons(where: {}, exclude: {}) # rubocop:disable Metrics/AbcSize
       DB[:seasons]
         .join(:cultivar_groups, commodity_id: :commodity_id)
         .join(:cultivars, cultivar_group_id: :id)
@@ -70,6 +70,7 @@ module MasterfilesApp
         .exclude(convert_empty_values(exclude))
         .where(Sequel.lit('start_date').< Time.now)
         .where(Sequel.lit('end_date').> Time.now)
+        .distinct
         .select_map([:season_code, Sequel[:seasons][:id]])
     end
 
