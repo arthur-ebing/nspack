@@ -15,6 +15,8 @@ namespace :deploy do
       user = capture(:git, 'config --get user.name')
       email = capture(:git, 'config --get user.email')
 
+      version = File.read(File.join(File.expand_path('../../../', __dir__), 'VERSION'))
+
       hash = { app: fetch(:application),
                client: fetch(:stage),
                server: fetch(:this_server),
@@ -27,7 +29,8 @@ namespace :deploy do
                ruby_version: fetch(:chruby_ruby),
                deployed_by: user.strip,
                deployer_email: email.strip,
-               deployed_to: fetch(:deploy_to) }
+               deployed_to: fetch(:deploy_to),
+               app_version: version&.chomp }
 
       puts("\n------------------------------------------------------------------------------------------------")
       puts('Log the deployment event: (Copy this command and run it against the deployment log application.)')
