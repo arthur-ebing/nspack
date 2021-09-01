@@ -1,5 +1,5 @@
 module MesscadaApp
-  class BinIntegration < BaseService # rubocop:disable Metrics/ClassLength
+  class BinIntegration < BaseService
     attr_reader :repo, :bin_number, :run_id
 
     def initialize(bin_number, run_id)
@@ -9,7 +9,7 @@ module MesscadaApp
     end
 
     def call # rubocop:disable Metrics/AbcSize,  Metrics/CyclomaticComplexity
-      if AppConst::CLIENT_CODE == 'kr'
+      if AppConst::CR_RMT.check_external_bin_valid_for_integration?
         res = valid_bin_for_kromco_rmt_system?
         return res unless res.success
       end
@@ -50,10 +50,10 @@ module MesscadaApp
       bin_attrs = { bin_asset_number: res.instance['bin_number'], nett_weight: res.instance['weight'], bin_fullness: AppConst::BIN_FULL, qty_bins: 1,
                     bin_received_date_time: res.instance['bin_receive_date_time'], rmt_container_type_id: repo.get_value(:rmt_container_types, :id, container_type_code: 'BIN') }
 
-      mf_res = lookup_masterfiles({ farm_code: res.instance['farm_code'], orchard_code: res.instance['orchard_code'], product_class_code: res.instance['product_class_code'],
-                                    size_code: res.instance['size_code'], rmt_variety_code: res.instance['rmt_variety_code'], season_code: res.instance['season_code'],
-                                    location_code: res.instance['location_code'], commodity_code: res.instance['commodity_code'], puc_code: res.instance['puc_code'],
-                                    container_material_type_code: res.instance['pack_material_product_code'] })
+      fields = %i[farm_code orchard_code product_class_code size_code rmt_variety_code season_code location_code commodity_code puc_code]
+      hash = Hash[fields.zip(fields.map { |f| res.instance[f.to_s] })]
+      hash[:container_material_type_code] = res.instance['pack_material_product_code']
+      mf_res = MasterfilesApp::LookupMasterfileValues.call(hash)
       return mf_res unless mf_res.success
 
       bin_attrs.merge!(mf_res.instance)
@@ -76,9 +76,9 @@ module MesscadaApp
       run_legacy_data = run.legacy_data.merge!({ 'farm_code' => run.farm_id, 'commodity_code' => repo.get_value(:cultivar_groups, :commodity_id, id: run.cultivar_group_id),
                                                  'rmt_variety_code' => run.cultivar_id, 'season_code' => run.season_id })
 
-      bin_mfs_res = lookup_masterfiles({ farm_code: res.instance['farm_code'], orchard_code: res.instance['orchard_code'], product_class_code: res.instance['product_class_code'],
-                                         size_code: res.instance['size_code'], rmt_variety_code: res.instance['rmt_variety_code'], season_code: res.instance['season_code'],
-                                         location_code: res.instance['location_code'], commodity_code: res.instance['commodity_code'], puc_code: res.instance['puc_code'] })
+      fields = %i[farm_code orchard_code product_class_code size_code rmt_variety_code season_code location_code commodity_code puc_code]
+      hash = Hash[fields.zip(fields.map { |f| res.instance[f.to_s] })]
+      bin_mfs_res = MasterfilesApp::LookupMasterfileValues.call(hash)
       return bin_mfs_res unless bin_mfs_res.success
 
       bin_legacy_data = { 'rmt_size' => res.instance['size_code'], 'treatment_code' => res.instance['rmtp_treatment_code'], 'pc_code' => res.instance['pc_name'],
@@ -108,9 +108,10 @@ module MesscadaApp
       delivery_attrs = { date_delivered: delivery_res.instance['date_delivered'], date_picked: delivery_res.instance['date_time_picked'],
                          quantity_bins_with_fruit: delivery_res.instance['quantity_full_bins'], truck_registration_number: delivery_res.instance['truck_registration_number'] }
 
-      del_mf_res = lookup_masterfiles({ farm_code: delivery_res.instance['farm_code'], orchard_code: delivery_res.instance['orchard_code'], commodity_code: delivery_res.instance['commodity_code'],
-                                        rmt_variety_code: delivery_res.instance['rmt_variety_code'], season_code: delivery_res.instance['season_code'], puc_code: delivery_res.instance['puc_code'],
-                                        destination_complex: delivery_res.instance['destination_complex'], delivery_destination_code: delivery_res.instance['destination_complex'] })
+      fields = %i[farm_code orchard_code rmt_variety_code season_code commodity_code puc_code]
+      hash = Hash[fields.zip(fields.map { |f| delivery_res.instance[f.to_s] })]
+      hash[:delivery_destination_code] = delivery_res.instance['destination_complex']
+      del_mf_res = MasterfilesApp::LookupMasterfileValues.call(hash)
       return del_mf_res unless del_mf_res.success
 
       delivery_attrs.merge!(del_mf_res.instance)
@@ -119,39 +120,6 @@ module MesscadaApp
       del_columns = %w[date_delivered date_time_picked quantity_full_bins truck_registration_number farm_code rmt_variety_code destination_complex orchard_code season_code commodity_code puc_code]
       delivery_attrs[:legacy_data] = delivery_res.instance.delete_if { |k, _v| del_columns.include?(k) }.to_json
       success_response('ok', delivery_attrs)
-    end
-
-    def lookup_masterfiles(record) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity,  Metrics/PerceivedComplexity
-      edi_repo = EdiApp::EdiInRepo.new
-      return failed_response("Missing MF. Farm: #{record[:farm_code]}") unless !record.keys.include?(:farm_code) || ((farm_id = repo.get_value(:farms, :id, farm_code: record[:farm_code])) || (farm_id = edi_repo.get_variant_id(:farms, record[:farm_code])))
-      return failed_response("Missing MF. PUC: #{record[:puc_code]} Farm: #{record[:farm_code]}") unless !record.keys.include?(:puc_code) || ((puc_id = MasterfilesApp::FarmRepo.new.find_puc_by_puc_code_and_farm(record[:puc_code], farm_id)) || (puc_id = MasterfilesApp::FarmRepo.new.find_puc_by_variant_and_farm(record[:puc_code], farm_id)))
-      return failed_response("Missing MF. Orchard: #{record[:orchard_code]} PUC: #{record[:puc_code]} Farm: #{record[:farm_code]}") unless !record.keys.include?(:orchard_code) || ((orchard_id = repo.get_value(:orchards, :id, orchard_code: record[:orchard_code], farm_id: farm_id, puc_id: puc_id)) || (orchard_id = repo.find_orchard_by_variant_and_puc_and_farm(record[:orchard_code], puc_id, farm_id)))
-      return failed_response("Missing MF. RmtClass: #{record[:product_class_code]}") unless !record.keys.include?(:product_class_code) || ((rmt_class_id = repo.get_value(:rmt_classes, :id, rmt_class_code: record[:product_class_code])) || (rmt_class_id = edi_repo.get_variant_id(:rmt_classes, record[:product_class_code])))
-
-      return failed_response("Missing MF. Commodity: #{record[:commodity_code]}") unless !record.keys.include?(:commodity_code) || ((commodity_id = repo.get_value(:commodities, :id, code: record[:commodity_code])) || (commodity_id = edi_repo.get_variant_id(:commodities, record[:commodity_code])))
-
-      return failed_response("Missing MF. Cultivar: #{record[:rmt_variety_code]} Commodity: #{record[:commodity_code]} Farm: #{record[:farm_code]} Orchard: #{record[:orchard_code]}") unless !record.keys.include?(:rmt_variety_code) || ((cultivar_id = MasterfilesApp::CultivarRepo.new.find_cultivar_by_cultivar_name_and_commodity_and_orchard(record[:rmt_variety_code], record[:commodity_code], orchard_id)) || (cultivar_id = MasterfilesApp::CultivarRepo.new.find_cultivar_by_variant_and_commodity_and_orchard(record[:rmt_variety_code], record[:commodity_code], orchard_id)))
-      return failed_response("Missing MF. Season: #{record[:season_code]} Commodity: #{record[:commodity_code]}") unless !record.keys.include?(:season_code) || ((season_id = MasterfilesApp::CalendarRepo.new.find_cultivar_by_season_code_and_commodity_code(record[:season_code], record[:commodity_code])) || (season_id = MasterfilesApp::CalendarRepo.new.find_season_by_variant(record[:season_code], record[:commodity_code])))
-      return failed_response("Missing MF. Size: #{record[:size_code]}") unless !record.keys.include?(:size_code) || ((size_id = repo.get_value(:rmt_sizes, :id, size_code: record[:size_code])) || (size_id = edi_repo.get_variant_id(:rmt_sizes, record[:size_code])))
-      return failed_response("Missing MF. Location: #{record[:location_code]}") unless !record.keys.include?(:location_code) || ((location_id = repo.get_value(:locations, :id, location_short_code: record[:location_code])) || (location_id = edi_repo.get_variant_id(:locations, record[:location_code])))
-      return failed_response("Missing MF. Container Material Type: #{record[:container_material_type_code]}") unless !record.keys.include?(:container_material_type_code) || ((rmt_container_material_type_id = repo.get_value(:rmt_container_material_types, :id, container_material_type_code: record[:container_material_type_code])) || (rmt_container_material_type_id = edi_repo.get_variant_id(:rmt_container_material_types, record[:container_material_type_code])))
-      return failed_response("Missing MF. Delivery Destination: #{record[:delivery_destination_code]}") unless !record.keys.include?(:delivery_destination_code) || !AppConst::DELIVERY_USE_DELIVERY_DESTINATION || ((rmt_delivery_destination_id = repo.get_value(:rmt_delivery_destinations, :id, delivery_destination_code: record[:delivery_destination_code])) || (rmt_delivery_destination_id = edi_repo.get_variant_id(:rmt_delivery_destinations, record[:delivery_destination_code])))
-
-      cultivar_group_id = repo.get_value(:cultivars, :cultivar_group_id, id: cultivar_id)
-      mf = {}
-      farm_id ? (mf[:farm_id] = farm_id) : nil
-      orchard_id ? (mf[:orchard_id] = orchard_id) : nil
-      rmt_class_id ? (mf[:rmt_class_id] = rmt_class_id) : nil
-      commodity_id ? (mf[:commodity_id] = commodity_id) : nil
-      cultivar_id ? (mf[:cultivar_id] = cultivar_id) : nil
-      cultivar_group_id ? (mf[:cultivar_group_id] = cultivar_group_id) : nil
-      season_id ? (mf[:season_id] = season_id) : nil
-      size_id ? (mf[:rmt_size_id] = size_id) : nil
-      location_id ? (mf[:location_id] = location_id) : nil
-      rmt_container_material_type_id ? (mf[:rmt_container_material_type_id] = rmt_container_material_type_id) : nil
-      puc_id ? (mf[:puc_id] = puc_id) : nil
-      rmt_delivery_destination_id ? (mf[:rmt_delivery_destination_id] = rmt_delivery_destination_id) : nil
-      success_response('ok', mf)
     end
   end
 end

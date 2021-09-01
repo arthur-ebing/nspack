@@ -7,6 +7,8 @@ module Crossbeams
     CLIENT_SETTINGS = {
       hb: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
+            use_delivery_destination: false,
+            bin_valid_for_external_integration: false,
             delivery_capture_container_material: false,
             delivery_capture_container_material_owner: false,
             set_defaults_for_new_rmt_delivery: true,
@@ -18,6 +20,8 @@ module Crossbeams
             presort_legacy_data_fields: [] },
       hl: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
+            use_delivery_destination: false,
+            bin_valid_for_external_integration: false,
             delivery_capture_container_material: false,
             delivery_capture_container_material_owner: false,
             set_defaults_for_new_rmt_delivery: true,
@@ -37,6 +41,8 @@ module Crossbeams
                                               inventory_code: 'UL',
                                               sell_by_code: nil },
             delivery_capture_inner_bins: false,
+            use_delivery_destination: true,
+            bin_valid_for_external_integration: true,
             delivery_capture_container_material: true,
             delivery_capture_container_material_owner: true,
             set_defaults_for_new_rmt_delivery: true,
@@ -48,6 +54,8 @@ module Crossbeams
             presort_legacy_data_fields: %i[ripe_point_code track_indicator_code]  },
       um: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
+            use_delivery_destination: false,
+            bin_valid_for_external_integration: false,
             delivery_capture_container_material: false,
             delivery_capture_container_material_owner: false,
             set_defaults_for_new_rmt_delivery: true,
@@ -59,6 +67,8 @@ module Crossbeams
             presort_legacy_data_fields: []  },
       ud: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
+            use_delivery_destination: true,
+            bin_valid_for_external_integration: false,
             delivery_capture_container_material: true,
             delivery_capture_container_material_owner: true,
             set_defaults_for_new_rmt_delivery: false,
@@ -70,6 +80,8 @@ module Crossbeams
             presort_legacy_data_fields: []  },
       sr: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
+            use_delivery_destination: true,
+            bin_valid_for_external_integration: false,
             delivery_capture_container_material: true,
             delivery_capture_container_material_owner: true,
             set_defaults_for_new_rmt_delivery: true,
@@ -81,6 +93,8 @@ module Crossbeams
             presort_legacy_data_fields: []  },
       sr2: { bin_pallet_conversion_defaults: {},
              delivery_capture_inner_bins: false,
+             use_delivery_destination: true,
+             bin_valid_for_external_integration: false,
              delivery_capture_container_material: true,
              delivery_capture_container_material_owner: true,
              set_defaults_for_new_rmt_delivery: true,
@@ -125,6 +139,18 @@ module Crossbeams
       return 'Do delivered bins contain inner bins (e.g. lugs within larger containers).' if explain
 
       setting(:delivery_capture_inner_bins)
+    end
+
+    def include_destination_in_delivery?(explain: false)
+      return 'Should the destination be included in the rmt_delivery.' if explain
+
+      setting(:use_delivery_destination)
+    end
+
+    def check_external_bin_valid_for_integration?(explain: false)
+      return 'Is the external bin valid for integration.' if explain
+
+      setting(:bin_valid_for_external_integration)
     end
 
     def capture_container_material?(explain: false)

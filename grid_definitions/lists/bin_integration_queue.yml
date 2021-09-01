@@ -1,0 +1,5 @@
+---
+:dataminer_definition: bin_integration_queue
+:multiselect:
+  :standard:
+    :url: "/raw_materials/bin_integration/bin_integration_queue/reprocess"
