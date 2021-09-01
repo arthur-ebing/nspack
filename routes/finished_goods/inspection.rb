@@ -228,11 +228,14 @@ class Nspack < Roda
 
       r.on 'packed_tm_group_changed' do
         actions = []
-        region_list = if params[:changed_value].nil_or_empty?
-                        []
-                      else
-                        MasterfilesApp::DestinationRepo.new.for_select_destination_regions(where: { target_market_group_id: params[:changed_value] })
-                      end
+        if params[:changed_value].nil_or_empty?
+          region_list = []
+          target_markets = []
+        else
+          region_list = MasterfilesApp::DestinationRepo.new.for_select_destination_regions(where: { target_market_group_id: params[:changed_value] })
+          target_markets = MasterfilesApp::TargetMarketRepo.new.for_select_packed_group_tms(where: { protocol_exception: true, target_market_group_id: params[:changed_value] })
+        end
+        actions << OpenStruct.new(type: :replace_select_options, dom_id: 'govt_inspection_sheet_exception_protocol_tm_id', options_array: target_markets)
         actions << OpenStruct.new(type: :replace_select_options, dom_id: 'govt_inspection_sheet_destination_region_id', options_array: region_list)
         actions << OpenStruct.new(type: :change_select_value, dom_id: 'govt_inspection_sheet_destination_region_id', value: region_list.first.last) if region_list.length == 1
         json_actions(actions)

@@ -13,8 +13,9 @@
   '; ')\r\n    FROM (\r\n      SELECT\r\n        fn_party_role_name(target_customer_party_role_id)
   AS target_customer\r\n      FROM\r\n        target_markets_target_customers\r\n
   \     WHERE target_markets_target_customers.target_market_id = target_markets.id)
-  AS tab) AS target_customers,\r\n  \"target_markets\".\"inspection_tm\",\r\n  \"target_markets\".\"created_at\",\r\n
-  \ \"target_markets\".\"updated_at\"\r\nFROM\r\n  \"target_markets\""
+  AS tab) AS target_customers,\r\n  \"target_markets\".\"inspection_tm\",\r\n  \"target_markets\".\"protocol_exception\",\r\n
+  \ \"target_markets\".\"created_at\",\r\n  \"target_markets\".\"updated_at\"\r\nFROM\r\n
+  \ \"target_markets\""
 :limit: 
 :offset: 
 :external_settings: {}
@@ -121,7 +122,23 @@
     :caption: Inspection tm?
     :namespaced_name: target_markets.inspection_tm
     :data_type: :boolean
-    :width: 150
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  protocol_exception:
+    :name: protocol_exception
+    :sequence_no: 8
+    :caption: Protocol exception?
+    :namespaced_name: target_markets.protocol_exception
+    :data_type: :boolean
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -133,7 +150,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Created at
     :namespaced_name: target_markets.created_at
     :data_type: :datetime
@@ -149,7 +166,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Updated at
     :namespaced_name: target_markets.updated_at
     :data_type: :datetime

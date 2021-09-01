@@ -42,6 +42,8 @@ module FinishedGoodsApp
     attribute :tripsheet_offloaded, Types::Bool
     attribute :use_inspection_destination_for_load_out, Types::Bool
     attribute :upn, Types::String
+    attribute :exception_protocol_tm_id, Types::Integer
+    attribute :exception_protocol_tm, Types::String
     attribute? :status, Types::String
     attribute? :active, Types::Bool
   end

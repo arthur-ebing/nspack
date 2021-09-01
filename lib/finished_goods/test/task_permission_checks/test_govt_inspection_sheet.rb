@@ -48,7 +48,9 @@ module FinishedGoodsApp
         tripsheet_loaded_at: '2010-01-01 12:00',
         tripsheet_offloaded: false,
         use_inspection_destination_for_load_out: false,
-        active: true
+        active: true,
+        exception_protocol_tm_id: 1,
+        exception_protocol_tm: 'ABC'
       }
       FinishedGoodsApp::GovtInspectionSheet.new(base_attrs.merge(attrs))
     end
