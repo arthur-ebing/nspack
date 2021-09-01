@@ -35,3 +35,8 @@ dummy_invoice:
   digit_length: 7
   table: invoices
   column: invoice_ref
+bin_integration_queue:
+  db_sequence_name: doc_seqs_bin_integration_queue
+  data_type: :integer
+  table: bin_integration_queue
+  column: job_no

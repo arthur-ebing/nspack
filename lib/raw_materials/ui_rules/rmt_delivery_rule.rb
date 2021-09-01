@@ -40,7 +40,7 @@ module UiRules
       fields[:rmt_delivery_destination_id] = { renderer: :label,
                                                with_value: MasterfilesApp::RmtDeliveryDestinationRepo.new.find_rmt_delivery_destination(@form_object.rmt_delivery_destination_id)&.delivery_destination_code,
                                                caption: 'Destination',
-                                               hide_on_load: !AppConst::DELIVERY_USE_DELIVERY_DESTINATION }
+                                               hide_on_load: !AppConst::CR_RMT.include_destination_in_delivery? }
       fields[:season_id] = { renderer: :label,
                              with_value: MasterfilesApp::CalendarRepo.new.find_season(@form_object.season_id)&.season_code,
                              caption: 'Season' }
@@ -118,8 +118,8 @@ module UiRules
                                        options: MasterfilesApp::RmtDeliveryDestinationRepo.new.for_select_rmt_delivery_destinations,
                                        disabled_options: MasterfilesApp::RmtDeliveryDestinationRepo.new.for_select_inactive_rmt_delivery_destinations,
                                        caption: 'Destination',
-                                       required: AppConst::DELIVERY_USE_DELIVERY_DESTINATION,
-                                       hide_on_load: !AppConst::DELIVERY_USE_DELIVERY_DESTINATION,
+                                       required: AppConst::CR_RMT.include_destination_in_delivery?,
+                                       hide_on_load: !AppConst::CR_RMT.include_destination_in_delivery?,
                                        prompt: true },
         truck_registration_number: { pattern: :alphanumeric,
                                      hide_on_load: !AppConst::DELIVERY_CAPTURE_TRUCK_AT_FRUIT_RECEPTION },

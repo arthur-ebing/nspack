@@ -577,5 +577,25 @@ module RawMaterialsApp
 
       success_response 'continue'
     end
+
+    def bin_integration_queue_snapshot(job_no)
+      DB[:bin_integration_queue].where(job_no: job_no).all
+    end
+
+    def delete_bin_integration_queue_item(id)
+      DB[:bin_integration_queue].where(id: id).delete
+    end
+
+    def log_bin_integration_queue_error(id, message, bin_number, stacktrace = nil)
+      update(:bin_integration_queue, id, error: { err: message, stacktrace: stacktrace.to_s }.to_json)
+
+      mail = <<~STR
+        Bin:#{bin_number} could not be created
+
+        #{message}
+      STR
+
+      ErrorMailer.send_error_email(subject: 'LEGACY BIN INTEGRATION FAIL', message: mail, append_recipients: AppConst::LEGACY_SYSTEM_ERROR_RECIPIENTS)
+    end
   end
 end
