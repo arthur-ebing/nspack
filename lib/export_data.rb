@@ -125,13 +125,14 @@ module Crossbeams
       @current_column = nil
     end
 
-    def write_xls_file # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def write_xls_file # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       xls_possible_types = { string: :string, integer: :integer, date: :string,
                              datetime: :time, time: :time, boolean: :string, number: :float }
       heads = []
       fields = []
       xls_types = []
       x_styles = []
+      first_row = recs.first
       Axlsx::Package.new do |p| # rubocop:disable Metrics/BlockLength
         p.workbook do |wb| # rubocop:disable Metrics/BlockLength
           styles = wb.styles
@@ -144,7 +145,11 @@ module Crossbeams
           report.ordered_columns.each do |col|
             next if col.hide && !@export_hidden_fields
 
-            xls_types << xls_possible_types[col.data_type] || :string
+            if first_row[col.name.to_sym].is_a?(Sequel::Postgres::PGArray)
+              xls_types << :string
+            else
+              xls_types << xls_possible_types[col.data_type] || :string
+            end
             heads << col.caption
             fields << col.name
             x_styles << if col.format
@@ -167,6 +172,8 @@ module Crossbeams
                   'Y'
                 when FalseClass
                   'N'
+                when Sequel::Postgres::PGArray
+                  v.to_a.join(', ')
                 else
                   v
                 end
