@@ -246,7 +246,10 @@ const crossbeamsGridFormatters = {
     if (typeof params.value === 'string') {
       return params.value.replace(/ \+\d\d\d\d$/, '').replace(/\+\d+$/, '');
     }
-    return Array.from(params.value).map(a => a.replace(/ \+\d\d\d\d$/, '').replace(/\+\d+$/, '')).join(', ');
+    return Array.from(params.value).map(a => a.replace(/ \+\d\d\d\d$/, '')
+      .replace(/\+\d+$/, '')
+      .replace(/:\d\d\.\d+\+\d+$/, ''))
+      .join(', ');
   },
 
   // Remove the seconds and time zone portion of a datetime column.
@@ -257,7 +260,13 @@ const crossbeamsGridFormatters = {
     if (typeof params.value === 'string') {
       return params.value.replace(/:\d\d \+\d\d\d\d$/, '').replace(/:\d\d\+\d+$/, '');
     }
-    return Array.from(params.value).map(a => a.replace(/:\d\d \+\d\d\d\d$/, '').replace(/:\d\d\+\d+$/, '')).join(', ');
+    // 2021-07-22 20:49:44+00,
+    // 2021-07-22 20:49:44 +0000,
+    // 2021-07-22 20:49:44.81621+00,
+    return Array.from(params.value).map(a => a.replace(/:\d\d \+\d\d\d\d$/, '')
+      .replace(/:\d\d\+\d+$/, '')
+      .replace(/:\d\d\.\d+\+\d+$/, ''))
+      .join(', ');
   },
 
   // Format a column to display as an icon.
