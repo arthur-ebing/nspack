@@ -243,7 +243,10 @@ const crossbeamsGridFormatters = {
     if (!params.value) { return null; }
 
     if (params.value === '' || params.value === null) { return ''; }
-    return params.value.replace(/ \+\d\d\d\d$/, '');
+    if (typeof params.value === 'string') {
+      return params.value.replace(/ \+\d\d\d\d$/, '').replace(/\+\d+$/, '');
+    }
+    return Array.from(params.value).map(a => a.replace(/ \+\d\d\d\d$/, '').replace(/\+\d+$/, '')).join(', ');
   },
 
   // Remove the seconds and time zone portion of a datetime column.
@@ -251,7 +254,10 @@ const crossbeamsGridFormatters = {
     if (!params.data) { return null; }
 
     if (params.value === '' || params.value === null) { return ''; }
-    return params.value.replace(/:\d\d \+\d\d\d\d$/, '');
+    if (typeof params.value === 'string') {
+      return params.value.replace(/:\d\d \+\d\d\d\d$/, '').replace(/:\d\d\+\d+$/, '');
+    }
+    return Array.from(params.value).map(a => a.replace(/:\d\d \+\d\d\d\d$/, '').replace(/:\d\d\+\d+$/, '')).join(', ');
   },
 
   // Format a column to display as an icon.
