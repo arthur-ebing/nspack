@@ -4,9 +4,9 @@
   \    repacked_from_pallet_number,\r\n     pallet_id,\r\n     repacked_to_pallet_number,\r\n
   \    inspection_failure_reason,\r\n     govt_first_inspection_at,\r\n     govt_reinspection_at,\r\n
   \    pallet_sequence_number,\r\n     has_individual_cartons,\r\n     repacked,\r\n
-  \    repacked_at,\r\n     id,\r\n     location,\r\n     cultivar,\r\n     carton_quantity,\r\n
-  \    pallet_carton_quantity,\r\n     pallet_size,\r\n     pallet_age,\r\n     stock_age,\r\n
-  \    cold_age,\r\n     ambient_age,\r\n     created_at,\r\n     palletized_at,\r\n
+  \    repacked_at,\r\n     pallet_id AS id,\r\n     location,\r\n     cultivar,\r\n
+  \    carton_quantity,\r\n     pallet_carton_quantity,\r\n     pallet_size,\r\n     pallet_age,\r\n
+  \    stock_age,\r\n     cold_age,\r\n     ambient_age,\r\n     created_at,\r\n     palletized_at,\r\n
   \    govt_inspection_passed,\r\n     inspected_dest_country,\r\n     shipped_at,\r\n
   \    allocated_at,\r\n     verified_at,\r\n     allocated,\r\n     load_id,\r\n
   \    shipped,\r\n     in_stock,\r\n     inspected,\r\n     palletized,\r\n     production_run_id,\r\n
@@ -28,7 +28,7 @@
 :limit: 
 :offset: 
 :external_settings:
-  :render_url:
+  :render_url: 
   :colour_key:
     ok: In Stock Pallets
     ready: Allocated Pallets
@@ -1445,15 +1445,15 @@
   :default_value: 
   :ordered_list: false
   :ui_priority: 2
-  :list_def:
+  :list_def: 
 - :column: repacked_from_pallet_number
   :caption: From Pallet number
   :data_type: :string
   :control_type: :text
-  :default_value:
+  :default_value: 
   :ordered_list: false
   :ui_priority: 3
-  :list_def:
+  :list_def: 
 - :column: repacked_at
   :caption: Repacked at
   :data_type: :date
@@ -1466,15 +1466,19 @@
   :caption: Allocated?
   :data_type: :boolean
   :control_type: :list
-  :default_value:
+  :default_value: 
   :ordered_list: false
   :ui_priority: 4
-  :list_def: [true, false]
+  :list_def:
+  - true
+  - false
 - :column: scrapped
   :caption: Scrapped?
   :data_type: :boolean
   :control_type: :list
-  :default_value:
+  :default_value: 
   :ordered_list: false
   :ui_priority: 5
-  :list_def: [true, false]
+  :list_def:
+  - true
+  - false

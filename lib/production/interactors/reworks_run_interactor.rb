@@ -517,8 +517,7 @@ module ProductionApp
     def resolve_pallet_numbers_from_multiselect(reworks_run_type_id, multiselect_list)
       return failed_response('Pallet selection cannot be empty') if multiselect_list.nil_or_empty?
 
-      reworks_run_type = reworks_run_type(reworks_run_type_id)
-      pallet_numbers = selected_pallet_numbers(reworks_run_type, multiselect_list)
+      pallet_numbers = repo.select_values(:pallets, :pallet_number, id: multiselect_list).uniq
       instance = { reworks_run_type_id: reworks_run_type_id,
                    pallets_selected: pallet_numbers.join("\n") }
       success_response('', instance)

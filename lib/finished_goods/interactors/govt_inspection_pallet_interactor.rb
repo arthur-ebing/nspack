@@ -71,10 +71,9 @@ module FinishedGoodsApp
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 
-    def reject_to_repack(multiselect_list) # rubocop:disable Metrics/AbcSize
-      return failed_response('Pallet selection cannot be empty') if multiselect_list.nil_or_empty?
+    def reject_to_repack(pallet_ids) # rubocop:disable Metrics/AbcSize
+      return failed_response('Pallet selection cannot be empty') if pallet_ids.nil_or_empty?
 
-      pallet_ids = repo.select_values(:pallet_sequences, :pallet_id, id: multiselect_list).uniq
       new_pallet_ids = []
       repo.transaction do
         pallet_ids.each do |pallet_id|
