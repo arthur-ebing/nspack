@@ -15,7 +15,7 @@
   \      govt_inspection_sheets.tripsheet_offloaded,\r\n       govt_inspection_sheets.tripsheet_offloaded_at,\r\n
   \      govt_inspection_sheets.upn,\r\n\r\n       created_by,\r\n       string_agg(pallets.pallet_number::text,
   ', '::text) AS pallet_numbers,\r\n\r\n       govt_inspection_sheets.exception_protocol_tm_id,\r\n
-  \      target_markets.target_market_name AS exception_protocol_tm,\r\n       govt_inspection_sheets.active,\r\n
+  \      target_markets.target_market_name AS protocol_exception,\r\n       govt_inspection_sheets.active,\r\n
   \      govt_inspection_sheets.created_at,\r\n       govt_inspection_sheets.updated_at,\r\n\r\n
   \      CASE\r\n           WHEN tripsheet_offloaded THEN 'ready'      WHEN cancelled
   THEN 'warning'\r\n           WHEN govt_inspection_sheets.inspected AND NOT bool_and(govt_inspection_pallets.passed)
@@ -537,10 +537,10 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  exception_protocol_tm:
-    :name: exception_protocol_tm
+  protocol_exception:
+    :name: protocol_exception
     :sequence_no: 32
-    :caption: Exception protocol tm
+    :caption: Protocol exception
     :namespaced_name: target_markets.target_market_name
     :data_type: :string
     :width: 120

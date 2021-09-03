@@ -50,7 +50,7 @@ module UiRules
       fields[:consignment_note_number] = { renderer: :label }
       fields[:status] = { renderer: :label }
       fields[:exception_protocol_tm] = { renderer: :label,
-                                         caption: 'Exception Protocol Target Market' }
+                                         caption: 'Protocol Exception' }
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize
@@ -126,7 +126,7 @@ module UiRules
                                     ),
                                     disabled_options: @tm_repo.for_select_inactive_target_markets,
                                     prompt: true,
-                                    caption: 'Exception Protocol Target Market' }
+                                    caption: 'Protocol Exception' }
       }
     end
 
