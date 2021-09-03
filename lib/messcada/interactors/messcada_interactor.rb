@@ -449,15 +449,41 @@ module MesscadaApp
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 
-    def build_robot
-      success_response('build', { device: 'CLM-06',
-                                  name: 'DRB-11-12',
-                                  buttons: [
-                                    { plant_resource_id: 88, plant: 'DRN-11-12-B1', system: 'CLM-06-B1', url: '/messcada/production/carton_labeling?', params: %w[device card_reader identifier] },
-                                    { plant_resource_id: 89, plant: 'DRN-11-12-B2', system: 'CLM-06-B2', url: '/messcada/production/carton_labeling?', params: %w[device card_reader identifier] },
-                                    { plant_resource_id: 90, plant: 'DRN-11-12-B3', system: 'CLM-06-B3', url: '/messcada/production/carton_labeling?', params: %w[device card_reader identifier] },
-                                    { plant_resource_id: 91, plant: 'DRN-11-12-B4', system: 'CLM-06-B4', url: '/messcada/production/carton_labeling?', params: %w[device card_reader identifier] }
-                                  ] })
+    # build_robot called with ip address / device name?
+    def build_robot # rubocop:disable Metrics/AbcSize
+      # !------- code to be converted and moved to repo...
+      sysres_robot = DB[:system_resources].where(system_resource_code: 'CLM-06').first
+      plantres_robot = DB[:plant_resources].where(system_resource_id: sysres_robot[:id]).first
+      line = resource_repo.plant_resource_parent_of_system_resource(Crossbeams::Config::ResourceDefinitions::LINE, sysres_robot[:system_resource_code])
+      res = production_run_repo.find_production_runs_for_line_in_state(line.instance, running: true, labeling: true)
+      run_id = res.success ? res.instance.first : nil
+      buttons = resource_repo.robot_buttons(plantres_robot[:id]).map do |button_plant_id|
+        plnt = resource_repo.find_plant_resource_flat(button_plant_id)
+        sys = resource_repo.find_system_resource(plnt.system_resource_id)
+        # Lookup if btn alloc - enable or not & set button caption
+        # What line?
+        # What labeling run?
+        # What alloc prod + label?
+        if run_id.nil?
+          enabled = false
+        else
+          enabled = true # button has alloc...
+          button_caption = 'caption'
+        end
+        OpenStruct.new(plant_resource_id: plnt.id,
+                       button_name: plnt.plant_resource_code,
+                       enabled: enabled,
+                       button_caption: button_caption,
+                       system_name: sys[:system_resource_code],
+                       # URL might have to be proxied to handle fetch requests (/messcada/browser/carton_labeling)
+                       url: "/messcada/production/carton_labeling?device=#{sys[:system_resource_code]}&card_reader=$:card_reader$&identifier=$:identifier$",
+                       params: %w[device card_reader identifier]) # Might include scale weight / bin_number ...
+      end
+      # Read res & get login/out/group etc., robot buttons
+      success_response('build', { device: sysres_robot[:system_resource_code],
+                                  name: plantres_robot[:plant_resource_code],
+                                  run_id: run_id,
+                                  buttons: buttons })
     end
 
     private

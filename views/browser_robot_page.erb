@@ -82,14 +82,26 @@
       </div>
     </div>
     <div class="robotRight ba b--green flex-auto pa1">RIGHT
-      <div class="pa2 mb2 ba b--orange">Optional scale widget</div>
-      <div class="pa2 mb2 ba b--pink">
+      <div class="pa2 mb2 ba b--orange h-10"><p>Optional scale widget</p></div>
+      <!--
+        Adjust dimensions based on no of buttons. (2 :: h-90, w-40) (4 :: h-40, w-40) (6 :: h-30, w-40) (1 :: h-90, w-90)
+        Also change the relative text size...
+      -->
+      <div class="pa2 mb2 ba b--pink flex flex-wrap h-50">
         <% @robot_page.instance[:buttons].each do |btn| %>
-          <div id="button_<%= btn[:plant_resource_id] %>"><%= btn[:plant] %></div>
+          <button id="button_<%= btn[:plant_resource_id] %>" data-button-action-url="<%= btn[:url] %>" class="br3 pa3 f1 tc ml5 mt2 mb2 w-40 h-40"><span><%= btn[:system_name] %></span></button>
         <% end %>
       </div>
-      <div class="pa2 mb2 ba b--gray">Printlog widget</div>
-      <div class="pa2 ba b--purple">Websocket widget</div>
+      <div class="pa2 mb2 ba b--gray h-20">
+        Printlog widget
+        <p>
+        <%= @robot_page.instance.inspect %>
+        </p>
+        <p>
+        <%= @robot_page.instance[:buttons].map(&:to_h).inspect.gsub('},', '},<br>') %>
+        </p>
+      </div>
+      <div class="pa2 ba b--purple h20"><p>Websocket widget</p></div>
     </div>
   </div>
 <% else %>
