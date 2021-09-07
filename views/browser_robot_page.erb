@@ -1,83 +1,11 @@
 <% if @robot_page.success %>
   <div class="robotBase flex vh-100">
-    <div class="robotLeft ba b--red pa1 w-20">CLM-06 (LEFT)
-      <div class="robotLoginWidget pa2 mb2 ba b--navy">
-        Login widget (Group or individual)
-        <div class="flex flex-wrap">
-<%#= initials_avatar('Jack', 'Johnson') %>
-<%#= initials_avatar('Miles', 'Davis') %>
-<%#= initials_avatar('Ar', 'Rr') %>
-<div>
-  <%= initials_avatar('A', 'A') %>
-  <div>
-    Arthur Andersen
-  </div>
-</div>
-<div>
-  <%= initials_avatar('B', 'A') %>
-  <div>
-    Brian Andersen
-  </div>
-</div>
-<div>
-  <%= initials_avatar('C', 'A') %>
-  <div>
-    Carl Andersen
-  </div>
-</div>
-<div>
-  <%= initials_avatar('D', 'A') %>
-  <div>
-    Don Andersen
-  </div>
-</div>
-<div>
-  <%= initials_avatar('E', 'A') %>
-  <div>
-    Eric Andersen
-  </div>
-</div>
-<div>
-  <%= initials_avatar('F', 'A') %>
-  <div>
-    Fred Andersen
-  </div>
-</div>
-<div>
-  <%= initials_avatar('G', 'A') %>
-  <div>
-    Garth Andersen
-  </div>
-</div>
-<div>
-  <%= initials_avatar('H', 'A') %>
-  <div>
-    Harry Andersen
-  </div>
-</div>
-<div>
-  <%= initials_avatar('I', 'A') %>
-  <div>
-    Ian Andersen
-  </div>
-</div>
-<div>
-  <%= initials_avatar('J', 'A') %>
-  <div>
-    John Andersen
-  </div>
-</div>
-<div>
-  <%= initials_avatar('K', 'A') %>
-  <div>
-    Kevin Andersen
-  </div>
-</div>
-<%#= initials_avatar('First only', nil) %>
+    <div class="robotLeft ba b--red pa1 w-20"><%= @robot_page.instance[:device] %> (LEFT)
+      <div class="robotLoginWidget pa2 mb2 h-50 ba b--navy">
+        <div id="robotLoginWidget" class="flex flex-wrap">
         </div>
-        <div>Name(s) and group name if applicable</div>
       </div>
-      <div class="robotStatsWidget pa2 ba b--yellw">
+      <div class="robotStatsWidget pa2 h-25 ba b--yellw">
         Stats widget
       </div>
     </div>
@@ -88,8 +16,12 @@
         Also change the relative text size...
       -->
       <div class="pa2 mb2 ba b--pink flex flex-wrap h-50">
-        <% @robot_page.instance[:buttons].each do |btn| %>
-          <button id="button_<%= btn[:plant_resource_id] %>" data-button-action-url="<%= btn[:url] %>" class="br3 pa3 f1 tc ml5 mt2 mb2 w-40 h-40"><span><%= btn[:system_name] %></span></button>
+        <% button_colours = %w[#f2b736 #c5523f #499255 #1875e5 #E7040F #FF4136 #5E2CA5 #D5008F #001B44 #137752 #19A974] %>
+        <% @robot_page.instance[:buttons].each_with_index do |btn, index| %>
+          <% btn_class = btn[:enabled] ? 'br3 pa3 dim f2 tl ml5 mt2 mb2 w-40 h-40' : 'br3 pa3 f2 tl ml5 mt2 mb2 w-40 h-40' %>
+          <% btn_style = btn[:enabled] ? "style=\"background-color:#{button_colours[index]}\"" : '' %>
+          <% btn_enabled = btn[:enabled] ? '' : 'disabled="true"' %>
+          <button id="button_<%= btn[:plant_resource_id] %>" data-button-action-url="<%= btn[:url] %>" class="<%= btn_class%>" <%= btn_style %> <%= btn_enabled %>><span><%= (index + 65).chr %></span><br><%= btn[:button_caption] %></button>
         <% end %>
       </div>
       <div class="pa2 mb2 ba b--gray h-20">
@@ -101,7 +33,9 @@
         <%= @robot_page.instance[:buttons].map(&:to_h).inspect.gsub('},', '},<br>') %>
         </p>
       </div>
-      <div class="pa2 ba b--purple h20"><p>Websocket widget</p></div>
+      <div class="pa2 ba b--purple h20">
+        <div id="txtShow" class="navy bg-light-blue pa2"></div>
+      </div>
     </div>
   </div>
 <% else %>

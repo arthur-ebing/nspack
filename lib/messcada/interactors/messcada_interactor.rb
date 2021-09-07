@@ -259,6 +259,20 @@ module MesscadaApp
       failed_response(e.message)
     end
 
+    def send_label_to_printer(params)
+      res = carton_labeling(params)
+      # Robot page should refuse if no printer linked to robot...
+      printer = printer_for_robot(params[:system_resource].id)
+      p printer
+      p res.instance
+      # nil
+      # "<label><status>true</status><template>JS_TEST</template><quantity>1</quantity><fvalue>4265559</fvalue><fvalue>41</fvalue><fvalue>PEARS</fvalue><fvalue>PACKHAM'S TRIUMPH</fvalue><fvalue>1A</fvalue><fvalue>A1-2</fvalue><fvalue>E0351</fvalue><fvalue>6113</fvalue><fvalue>V1044</fvalue><fvalue>45</fvalue><fvalue>PR</fvalue><fvalue></fvalue><fvalue>GGN 4050373704834</fvalue><fvalue></fvalue><lcd1>Label JS_TEST</lcd1><lcd2>Label printed...</lcd2><lcd3></lcd3><lcd4></lcd4><lcd5></lcd5><lcd6></lcd6><msg>Carton Label printed successfully</msg></label>"
+
+      # MesserverRepo.new.print_published_label()
+      # call messerver to print
+      success_response('OK dummy print', printer: printer)
+    end
+
     def carton_verification(scanned_number)  # rubocop:disable Metrics/AbcSize
       cvl_res = nil
       repo.transaction do
@@ -449,14 +463,39 @@ module MesscadaApp
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 
+    # Get the device code from system resources that matches an ip address.
+    # Returns nil if not found/not a MODULE.
+    # When running in development mode, a passed-in device parameter will be used when present.
+    def device_code_from_ip_address(ip_address, params)
+      device = if params[:device] && AppConst.development?
+                 params[:device]
+               else
+                 resource_repo.device_code_from_ip_address(ip_address)
+               end
+
+      sysres_id = resource_repo.get_id(:system_resources, system_resource_code: device)
+      return nil if sysres_id.nil?
+      return nil unless resource_repo.system_resource_type_from_resource(sysres_id) == Crossbeams::Config::ResourceDefinitions::MODULE
+
+      device
+    end
+
     # build_robot called with ip address / device name?
-    def build_robot # rubocop:disable Metrics/AbcSize
+    def build_robot(device) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       # !------- code to be converted and moved to repo...
-      sysres_robot = DB[:system_resources].where(system_resource_code: 'CLM-06').first
+      sysres_robot = DB[:system_resources].where(system_resource_code: device).first
+      return failed_response("#{device} does not exist") if sysres_robot.nil?
+
       plantres_robot = DB[:plant_resources].where(system_resource_id: sysres_robot[:id]).first
+      users = if sysres_robot[:group_incentive]
+                ProductionApp::DashboardRepo.new.robot_group_incentive_details(sysres_robot[:id]).map { |r| "#{r[:first_name]} #{r[:surname]}" }
+              else
+                ProductionApp::DashboardRepo.new.robot_logon_details(sysres_robot[:id]).map { |r| "#{r[:first_name]} #{r[:surname]}" }
+              end
       line = resource_repo.plant_resource_parent_of_system_resource(Crossbeams::Config::ResourceDefinitions::LINE, sysres_robot[:system_resource_code])
       res = production_run_repo.find_production_runs_for_line_in_state(line.instance, running: true, labeling: true)
       run_id = res.success ? res.instance.first : nil
+      p run_id
       buttons = resource_repo.robot_buttons(plantres_robot[:id]).map do |button_plant_id|
         plnt = resource_repo.find_plant_resource_flat(button_plant_id)
         sys = resource_repo.find_system_resource(plnt.system_resource_id)
@@ -467,23 +506,46 @@ module MesscadaApp
         if run_id.nil?
           enabled = false
         else
-          enabled = true # button has alloc...
-          button_caption = 'caption'
+          lbl_modules = production_run_repo.button_allocations(run_id)
+          # lbl_modules.group_by { |r| [r[:module], r[:alias]] }
+          rec = lbl_modules.find { |a| a[:module] == sysres_robot[:system_resource_code] && a[:button] == sys.system_resource_code[/.\d+$/] } # .first
+          # p rec
+          ar = AppConst::CR_PROD.button_caption_spec.split('$')
+          button_caption = ar.map { |s| s.start_with?(':') ? rec[s.delete_prefix(':').to_sym] : s }.compact.join
+          # p button_caption
+          if button_caption.strip.empty?
+            enabled = false
+            button_caption = 'Not allocated'
+          else
+            enabled = true
+          end
         end
+        # NB. may need client setting to show button name? Or just A/B/C...
         OpenStruct.new(plant_resource_id: plnt.id,
                        button_name: plnt.plant_resource_code,
                        enabled: enabled,
                        button_caption: button_caption,
                        system_name: sys[:system_resource_code],
                        # URL might have to be proxied to handle fetch requests (/messcada/browser/carton_labeling)
-                       url: "/messcada/production/carton_labeling?device=#{sys[:system_resource_code]}&card_reader=$:card_reader$&identifier=$:identifier$",
+                       url: "/messcada/browser/carton_labeling?device=#{sys[:system_resource_code]}&card_reader=$:card_reader$&identifier=$:identifier$",
                        params: %w[device card_reader identifier]) # Might include scale weight / bin_number ...
       end
       # Read res & get login/out/group etc., robot buttons
       success_response('build', { device: sysres_robot[:system_resource_code],
                                   name: plantres_robot[:plant_resource_code],
                                   run_id: run_id,
+                                  users: users,
                                   buttons: buttons })
+    end
+
+    def login_state(device) # rubocop:disable Metrics/AbcSize
+      sysres_robot = DB[:system_resources].where(system_resource_code: device).first
+      users = if sysres_robot[:group_incentive]
+                ProductionApp::DashboardRepo.new.robot_group_incentive_details(sysres_robot[:id]).map { |r| "#{r[:first_name]} #{r[:surname]}" }
+              else
+                ProductionApp::DashboardRepo.new.robot_logon_details(sysres_robot[:id]).map { |r| "#{r[:first_name]} #{r[:surname]}" }
+              end
+      success_response('OK', users)
     end
 
     private

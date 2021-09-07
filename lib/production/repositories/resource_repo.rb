@@ -596,6 +596,10 @@ module ProductionApp
       DB[:registered_mobile_devices].where(act_as_system_resource_id: sysres_id).update(act_as_system_resource_id: nil, act_as_reader_id: nil)
     end
 
+    def device_code_from_ip_address(ip_address)
+      DB[:system_resources].where(ip_address: ip_address).get(:system_resource_code)
+    end
+
     def device_handled_by_rmd?(device)
       prop = DB[:plant_resources].where(system_resource_id: DB[:system_resources].where(system_resource_code: device).get(:id)).get(:resource_properties)
       prop && prop['rmd_mode'] == 't'
