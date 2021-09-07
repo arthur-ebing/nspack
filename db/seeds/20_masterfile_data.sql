@@ -130,11 +130,11 @@ INSERT INTO locations (primary_storage_type_id, location_type_id, primary_assign
 VALUES ((SELECT id FROM location_storage_types WHERE storage_type_code = 'PALLETS'), (SELECT id FROM location_types WHERE location_type_code = 'IN_TRANSIT'), (SELECT id FROM location_assignments WHERE assignment_code = 'TRANSIT'), 'IN_TRANSIT_EX_PACKHSE', 'IN_TRANSIT_EX_PACKHSE', 'IN_TRANSIT_EX_PACKHSE', true, true) ON CONFLICT DO NOTHING;
 
 -- SITE LOCATION
-INSERT INTO locations (primary_storage_type_id, location_type_id, primary_assignment_id, location_long_code, location_description, location_short_code, can_store_stock)
-VALUES ((SELECT id FROM location_storage_types WHERE storage_type_code = 'SITE'), (SELECT id FROM location_types WHERE location_type_code = 'SITE'),
-(SELECT id FROM location_assignments WHERE assignment_code = 'SITE'), 'SITE', 'SITE', 'SITE', true) ON CONFLICT DO NOTHING;
-INSERT INTO public.tree_locations(ancestor_location_id, descendant_location_id, path_length)
-VALUES ((SELECT id FROM locations where location_short_code = 'SITE'), (SELECT id FROM locations where location_short_code = 'SITE'), 0) ON CONFLICT DO NOTHING;
+-- INSERT INTO locations (primary_storage_type_id, location_type_id, primary_assignment_id, location_long_code, location_description, location_short_code, can_store_stock)
+-- VALUES ((SELECT id FROM location_storage_types WHERE storage_type_code = 'SITE'), (SELECT id FROM location_types WHERE location_type_code = 'SITE'),
+-- (SELECT id FROM location_assignments WHERE assignment_code = 'SITE'), 'SITE', 'SITE', 'SITE', true) ON CONFLICT DO NOTHING;
+-- INSERT INTO public.tree_locations(ancestor_location_id, descendant_location_id, path_length)
+-- VALUES ((SELECT id FROM locations where location_short_code = 'SITE'), (SELECT id FROM locations where location_short_code = 'SITE'), 0) ON CONFLICT DO NOTHING;
 
 -- PENDING LOCATION
 INSERT INTO location_assignments (assignment_code) VALUES('STORAGE_AT_UNKNOWN_LOCATION') ON CONFLICT DO NOTHING;
