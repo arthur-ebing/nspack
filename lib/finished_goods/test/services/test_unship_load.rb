@@ -50,8 +50,10 @@ module FinishedGoodsApp
       pallet_id = create_pallet(load_id: load_id, location_id: location_id, shipped: true)
       create_pallet_sequence(pallet_id: pallet_id, order_item_id: order_item_id, carton_quantity: 10)
 
-      location_type_id = create_location_type(location_type_code: 'SITE')
-      create_location(location_type_id: location_type_id)
+      location_type_id = repo.get_id(:location_types, location_type_code: 'SITE')
+      location_type_id ||= create_location_type(location_type_code: 'SITE')
+      loc_id = repo.get_id(:locations, location_type_id: location_type_id)
+      create_location(location_type_id: location_type_id) if loc_id.nil?
 
       res = UnshipLoad.call(load_id, current_user)
       assert res.success, 'Should unship load'
