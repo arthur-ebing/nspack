@@ -100,20 +100,21 @@ module FinishedGoodsApp
       success_response("There are #{pallet_count} pallets in this location: #{location_code}. Are you sure these pallets are no longer there?", location_id)
     end
 
-    def move_all_pallet_out_of_location(location_id)
+    def move_all_pallet_out_of_location(location_id) # rubocop:disable Metrics/AbcSize
+      pending_location_id = repo.get_value(:locations, :id, location_short_code: AppConst::PENDING_LOCATION)
+      pallets = repo.select_values(:pallets, :id, location_id: location_id)
+      location_code = repo.get_value(:locations, :location_short_code, id: location_id)
+
       repo.transaction do
-        pending_location_id = repo.get_value(:locations, :id, location_short_code: AppConst::PENDING_LOCATION)
-        pallets = repo.select_values(:pallets, :id, location_id: location_id)
         pallets.each do |id|
           res = FinishedGoodsApp::MoveStock.call(AppConst::PALLET_STOCK_TYPE, id, pending_location_id, 'MOVE_PALLET', nil)
           raise Crossbeams::InfoError, res.message unless res.success
         end
-
-        location_code = repo.get_value(:locations, :location_short_code, id: location_id)
-        success_response("#{pallets.size} pallets moved from #{location_code} to #{AppConst::PENDING_LOCATION}")
       end
+
+      success_response("#{pallets.size} pallets moved from #{location_code} to #{AppConst::PENDING_LOCATION}")
     rescue Crossbeams::InfoError => e
-      failed_response(e)
+      failed_response(e.message)
     end
 
     private
