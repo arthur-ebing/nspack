@@ -113,6 +113,7 @@ INSERT INTO location_types (location_type_code, short_code, hierarchical) VALUES
 INSERT INTO location_types (location_type_code, short_code, hierarchical) VALUES('FARM', 'FARM', 'f') ON CONFLICT DO NOTHING;
 INSERT INTO location_types (location_type_code, short_code, hierarchical) VALUES('PENDING_LOCATION', 'PENDING_LOCATION', 't') ON CONFLICT DO NOTHING;
 INSERT INTO location_types (location_type_code, short_code, hierarchical) VALUES('IN_TRANSIT', 'IN_TRANSIT', 'f') ON CONFLICT DO NOTHING;
+INSERT INTO location_types (location_type_code, short_code, hierarchical) VALUES('UNTIPPED_BIN', 'UNTIPPED_BIN', 'f') ON CONFLICT DO NOTHING;
 
 -- LOCATION STORAGE TYPES
 INSERT INTO location_storage_types (storage_type_code) VALUES('SITE') ON CONFLICT DO NOTHING;
@@ -120,24 +121,42 @@ INSERT INTO location_storage_types (storage_type_code) VALUES('PALLETS') ON CONF
 INSERT INTO location_storage_types (storage_type_code) VALUES('RMT_PALLETS') ON CONFLICT DO NOTHING;
 INSERT INTO location_storage_types (storage_type_code) VALUES('BIN_ASSET') ON CONFLICT DO NOTHING;
 INSERT INTO location_storage_types (storage_type_code) VALUES('PALLETS') ON CONFLICT DO NOTHING;
+INSERT INTO location_storage_types (storage_type_code) VALUES('UNTIPPED_BIN') ON CONFLICT DO NOTHING;
+INSERT INTO location_storage_types (storage_type_code) VALUES('EMPTY_BINS') ON CONFLICT DO NOTHING;
+INSERT INTO location_storage_types (storage_type_code) VALUES('FULL_BINS') ON CONFLICT DO NOTHING;
 
 -- LOCATION ASSIGNMENTS
 INSERT INTO location_assignments (assignment_code) VALUES('SITE') ON CONFLICT DO NOTHING;
 INSERT INTO location_assignments (assignment_code) VALUES('TRANSIT') ON CONFLICT DO NOTHING;
+INSERT INTO location_assignments (assignment_code) VALUES('STORAGE_AT_UNKNOWN_LOCATION') ON CONFLICT DO NOTHING;
+INSERT INTO location_assignments (assignment_code) VALUES('APPLICATION') ON CONFLICT DO NOTHING;
+INSERT INTO location_assignments (assignment_code) VALUES('UNTIPPED_BIN') ON CONFLICT DO NOTHING;
+INSERT INTO location_assignments (assignment_code) VALUES('EMPTY_BIN_STORAGE') ON CONFLICT DO NOTHING;
+INSERT INTO location_assignments (assignment_code) VALUES('FULL_BIN_STORAGE') ON CONFLICT DO NOTHING;
+INSERT INTO location_assignments (assignment_code) VALUES('WAREHOUSE_RECEIVING_AREA') ON CONFLICT DO NOTHING;
 
 -- IN-TRANSIT LOCATION (Not part of locations tree)
 INSERT INTO locations (primary_storage_type_id, location_type_id, primary_assignment_id, location_long_code, location_description, location_short_code, can_be_moved, can_store_stock)
 VALUES ((SELECT id FROM location_storage_types WHERE storage_type_code = 'PALLETS'), (SELECT id FROM location_types WHERE location_type_code = 'IN_TRANSIT'), (SELECT id FROM location_assignments WHERE assignment_code = 'TRANSIT'), 'IN_TRANSIT_EX_PACKHSE', 'IN_TRANSIT_EX_PACKHSE', 'IN_TRANSIT_EX_PACKHSE', true, true) ON CONFLICT DO NOTHING;
 
--- SITE LOCATION
--- INSERT INTO locations (primary_storage_type_id, location_type_id, primary_assignment_id, location_long_code, location_description, location_short_code, can_store_stock)
--- VALUES ((SELECT id FROM location_storage_types WHERE storage_type_code = 'SITE'), (SELECT id FROM location_types WHERE location_type_code = 'SITE'),
--- (SELECT id FROM location_assignments WHERE assignment_code = 'SITE'), 'SITE', 'SITE', 'SITE', true) ON CONFLICT DO NOTHING;
--- INSERT INTO public.tree_locations(ancestor_location_id, descendant_location_id, path_length)
--- VALUES ((SELECT id FROM locations where location_short_code = 'SITE'), (SELECT id FROM locations where location_short_code = 'SITE'), 0) ON CONFLICT DO NOTHING;
+
+-- SITE LOCATION: Only insert if there is no SITE type location already.
+INSERT INTO locations
+    (primary_storage_type_id, location_type_id, primary_assignment_id, location_long_code, location_description, location_short_code, can_store_stock)
+SELECT (SELECT id FROM location_storage_types WHERE storage_type_code = 'SITE'),
+       (SELECT id FROM location_types WHERE location_type_code = 'SITE'),
+       (SELECT id FROM location_assignments WHERE assignment_code = 'SITE'), 'SITE', 'SITE', 'SITE', true
+WHERE
+    NOT EXISTS (
+        SELECT id FROM locations WHERE location_type_id = (SELECT id FROM location_types WHERE location_type_code = 'SITE')
+    );
+
+-- Insert SITE location into the tree only if there is no SITE location in the tree...
+INSERT INTO public.tree_locations(ancestor_location_id, descendant_location_id, path_length)
+VALUES ((SELECT id FROM locations where location_type_id = (SELECT id FROM location_types WHERE location_type_code = 'SITE') LIMIT 1),
+        (SELECT id FROM locations where location_type_id = (SELECT id FROM location_types WHERE location_type_code = 'SITE') LIMIT 1), 0) ON CONFLICT DO NOTHING;
 
 -- PENDING LOCATION
-INSERT INTO location_assignments (assignment_code) VALUES('STORAGE_AT_UNKNOWN_LOCATION') ON CONFLICT DO NOTHING;
 INSERT INTO locations (primary_storage_type_id, location_type_id, primary_assignment_id, location_long_code, location_description, location_short_code, can_store_stock)
 VALUES ((SELECT id FROM location_storage_types WHERE storage_type_code = 'PALLETS'), (SELECT id FROM location_types WHERE location_type_code = 'PENDING_LOCATION'),
 (SELECT id FROM location_assignments WHERE assignment_code = 'STORAGE_AT_UNKNOWN_LOCATION'), 'PENDING_LOCATION', 'PENDING_LOCATION', 'PENDING_LOCATION', true) ON CONFLICT DO NOTHING;
@@ -147,7 +166,6 @@ INSERT INTO public.tree_locations(ancestor_location_id, descendant_location_id, 
 VALUES ((SELECT id FROM locations where location_short_code = 'PENDING_LOCATION'), (SELECT id FROM locations where location_short_code = 'PENDING_LOCATION'), 0) ON CONFLICT DO NOTHING;
 
 -- SCRAP LOCATION
-INSERT INTO location_assignments (assignment_code) VALUES('APPLICATION') ON CONFLICT DO NOTHING;
 INSERT INTO locations (primary_storage_type_id, location_type_id, primary_assignment_id, location_long_code, location_description, location_short_code, can_be_moved, can_store_stock)
 VALUES ((SELECT id FROM location_storage_types WHERE storage_type_code = 'PALLETS'), (SELECT id FROM location_types WHERE location_type_code = 'IN_TRANSIT'),
 (SELECT id FROM location_assignments WHERE assignment_code = 'APPLICATION'), 'SCRAP_PACKHSE', 'SCRAP_PACKHSE', 'SCRAP_PACKHSE', true, true) ON CONFLICT DO NOTHING;
@@ -158,26 +176,17 @@ VALUES ((SELECT id FROM location_storage_types WHERE storage_type_code = 'PALLET
 (SELECT id FROM location_assignments WHERE assignment_code = 'APPLICATION'), 'UNSCRAP_PACKHSE', 'UNSCRAP_PACKHSE', 'UNSCRAP_PACKHSE', true, true) ON CONFLICT DO NOTHING;
 
 -- UNTIP_BIN LOCATION (Not part of locations tree)
-INSERT INTO location_types (location_type_code, short_code, hierarchical) VALUES('UNTIPPED_BIN', 'UNTIPPED_BIN', 'f') ON CONFLICT DO NOTHING;
-INSERT INTO location_storage_types (storage_type_code) VALUES('UNTIPPED_BIN') ON CONFLICT DO NOTHING;
-INSERT INTO location_assignments (assignment_code) VALUES('UNTIPPED_BIN') ON CONFLICT DO NOTHING;
 INSERT INTO locations (primary_storage_type_id, location_type_id, primary_assignment_id, location_long_code, location_description, location_short_code, can_be_moved, can_store_stock, virtual_location)
 VALUES ((SELECT id FROM location_storage_types WHERE storage_type_code = 'UNTIPPED_BIN'), (SELECT id FROM location_types WHERE location_type_code = 'UNTIPPED_BIN'), (SELECT id FROM location_assignments WHERE assignment_code = 'UNTIPPED_BIN'), 'UNTIPPED_BIN', 'UNTIPPED_BIN', 'UNTIPPED_BIN', true, true, true) ON CONFLICT DO NOTHING;
 
 -- ONSITE EMPTY BIN LOCATION (Not part of locations tree)
-INSERT INTO location_storage_types (storage_type_code) VALUES('EMPTY_BINS') ON CONFLICT DO NOTHING;
-INSERT INTO location_assignments (assignment_code) VALUES('EMPTY_BIN_STORAGE') ON CONFLICT DO NOTHING;
 INSERT INTO locations (primary_storage_type_id, location_type_id, primary_assignment_id, location_long_code, location_description, location_short_code, can_be_moved, can_store_stock, virtual_location)
 VALUES ((SELECT id FROM location_storage_types WHERE storage_type_code = 'EMPTY_BINS'), (SELECT id FROM location_types WHERE location_type_code = 'BIN_ASSET'), (SELECT id FROM location_assignments WHERE assignment_code = 'EMPTY_BIN_STORAGE'), 'ONSITE_EMPTY_BIN', 'ONSITE_EMPTY_BIN', 'ONSITE_EMPTY_BIN', true, true, true) ON CONFLICT DO NOTHING;
 
 -- ONSITE FULL BIN LOCATION (Not part of locations tree)
-INSERT INTO location_storage_types (storage_type_code) VALUES('FULL_BINS') ON CONFLICT DO NOTHING;
-INSERT INTO location_assignments (assignment_code) VALUES('FULL_BIN_STORAGE') ON CONFLICT DO NOTHING;
 INSERT INTO locations (primary_storage_type_id, location_type_id, primary_assignment_id, location_long_code, location_description, location_short_code, can_be_moved, can_store_stock, virtual_location)
 VALUES ((SELECT id FROM location_storage_types WHERE storage_type_code = 'FULL_BINS'), (SELECT id FROM location_types WHERE location_type_code = 'BIN_ASSET'), (SELECT id FROM location_assignments WHERE assignment_code = 'FULL_BIN_STORAGE'), 'ONSITE_FULL_BIN', 'ONSITE_FULL_BIN', 'ONSITE_FULL_BIN', true, true, true) ON CONFLICT DO NOTHING;
 
--- LOCATION_ASSIGNMENT for offload vehicle
-INSERT INTO location_assignments (assignment_code) VALUES('WAREHOUSE_RECEIVING_AREA') ON CONFLICT DO NOTHING;
 
 -- BUSINESS PROCESSES
 INSERT INTO business_processes(process, description) VALUES('MOVE_PALLET', 'ADHOC individual FG Pallet movements') ON CONFLICT DO NOTHING;
