@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  class PalletMovementsInteractor < BaseInteractor
+  class PalletMovementsInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def move_pallet(pallet_number, location, location_scan_field) # rubocop:disable Metrics/AbcSize
       pallet = ProductionApp::ProductionRunRepo.new.find_pallet_by_pallet_number(pallet_number)
       return validation_failed_response(messages: { pallet_number: ['Pallet does not exist'] }) unless pallet
@@ -10,7 +10,7 @@ module FinishedGoodsApp
       return validation_failed_response(messages: { location: ['Location does not exist'] }) if location_id.nil_or_empty?
 
       repo.transaction do
-        FinishedGoodsApp::MoveStockService.new(AppConst::PALLET_STOCK_TYPE, pallet[:id], location_id, 'MOVE_PALLET', nil).call
+        FinishedGoodsApp::MoveStock.call(AppConst::PALLET_STOCK_TYPE, pallet[:id], location_id, 'MOVE_PALLET', nil)
       end
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
@@ -40,7 +40,7 @@ module FinishedGoodsApp
 
       repo.transaction do
         plts_to_move.each do |p|
-          res = FinishedGoodsApp::MoveStockService.new(AppConst::PALLET_STOCK_TYPE, p[:pallet_id], location_to_id, 'MOVE_PALLET', nil).call
+          res = FinishedGoodsApp::MoveStock.call(AppConst::PALLET_STOCK_TYPE, p[:pallet_id], location_to_id, 'MOVE_PALLET', nil)
           raise res.message unless res.success
         end
       end
@@ -87,6 +87,33 @@ module FinishedGoodsApp
       repo.set_pallets_target_customer(target_customer_id, pallet_ids)
 
       success_response("Selected pallets have been successfully allocated to target customer #{get_target_customer_name(target_customer_id)}")
+    end
+
+    def pallets_in_location_to_be_cleared(params)
+      location_id = locn_repo.resolve_location_id_from_scan(params[:location], params[:location_scan_field])
+      return failed_response('Location does not exist') if location_id.nil_or_empty?
+
+      location_code = repo.get_value(:locations, :location_short_code, id: location_id)
+      pallet_count = locn_repo.location_pallets_count(location_id)
+      return failed_response("Location: #{location_code} is empty") if pallet_count.zero?
+
+      success_response("There are #{pallet_count} pallets in this location: #{location_code}. Are you sure these pallets are no longer there?", location_id)
+    end
+
+    def move_all_pallet_out_of_location(location_id)
+      repo.transaction do
+        pending_location_id = repo.get_value(:locations, :id, location_short_code: AppConst::PENDING_LOCATION)
+        pallets = repo.select_values(:pallets, :id, location_id: location_id)
+        pallets.each do |id|
+          res = FinishedGoodsApp::MoveStock.call(AppConst::PALLET_STOCK_TYPE, id, pending_location_id, 'MOVE_PALLET', nil)
+          raise Crossbeams::InfoError, res.message unless res.success
+        end
+
+        location_code = repo.get_value(:locations, :location_short_code, id: location_id)
+        success_response("#{pallets.size} pallets moved from #{location_code} to #{AppConst::PENDING_LOCATION}")
+      end
+    rescue Crossbeams::InfoError => e
+      failed_response(e)
     end
 
     private

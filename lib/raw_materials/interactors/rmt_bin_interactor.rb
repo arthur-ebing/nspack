@@ -173,11 +173,11 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def complete_bins_offload_vehicle(vehicle_job_id, bin_ids) # rubocop:disable Metrics/AbcSize
+    def complete_bins_offload_vehicle(vehicle_job_id, bin_ids)
       repo.update(:vehicle_jobs, vehicle_job_id, offloaded_at: Time.now)
       location_to_id = repo.get(:vehicle_jobs, vehicle_job_id, :planned_location_to_id)
       bin_ids.each do |b|
-        res = FinishedGoodsApp::MoveStockService.new(AppConst::BIN_STOCK_TYPE, b, location_to_id, AppConst::BIN_OFFLOAD_VEHICLE_MOVE_BIN_BUSINESS_PROCESS, nil).call
+        res = FinishedGoodsApp::MoveStock.call(AppConst::BIN_STOCK_TYPE, b, location_to_id, AppConst::BIN_OFFLOAD_VEHICLE_MOVE_BIN_BUSINESS_PROCESS, nil)
         raise res.message unless res.success
       end
 
@@ -598,7 +598,7 @@ module RawMaterialsApp
       return failed_response('Bin is already at this location') unless bin[:location_id] != location_id
 
       repo.transaction do
-        FinishedGoodsApp::MoveStockService.new(AppConst::BIN_STOCK_TYPE, bin_number, location_id, 'MOVE_BIN', nil).call
+        FinishedGoodsApp::MoveStock.call(AppConst::BIN_STOCK_TYPE, bin_number, location_id, 'MOVE_BIN', nil)
       end
     rescue Crossbeams::InfoError => e
       failed_response(e.message)

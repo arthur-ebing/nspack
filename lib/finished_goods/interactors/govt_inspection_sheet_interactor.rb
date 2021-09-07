@@ -430,7 +430,7 @@ module FinishedGoodsApp
       location_to_id = repo.get(:vehicle_jobs, vehicle_job_id, :planned_location_to_id)
       tripsheet_pallets = repo.get_vehicle_job_units(vehicle_job_id)
       tripsheet_pallets.each do |p|
-        res = FinishedGoodsApp::MoveStockService.new(AppConst::PALLET_STOCK_TYPE, p[:stock_item_id], location_to_id, 'MOVE_PALLET', nil).call
+        res = FinishedGoodsApp::MoveStock.call(AppConst::PALLET_STOCK_TYPE, p[:stock_item_id], location_to_id, 'MOVE_PALLET', nil)
         raise res.message unless res.success
       end
       repo.update(:pallets, tripsheet_pallets.map { |p| p[:stock_item_id] }, in_stock: true, stock_created_at: Time.now) if AppConst::CREATE_STOCK_AT_FIRST_INTAKE

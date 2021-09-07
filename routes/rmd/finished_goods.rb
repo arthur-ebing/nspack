@@ -876,6 +876,58 @@ class Nspack < Roda
           r.redirect('/rmd/finished_goods/pallet_movements/move_pallet')
         end
       end
+
+      r.on 'empty_pallet_location' do
+        r.get do
+          form_state = {}
+          error = retrieve_from_local_store(:error)
+          form_state.merge!(error_message: error.message) unless error.nil?
+
+          form = Crossbeams::RMDForm.new(form_state,
+                                         form_name: :pallet,
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         caption: 'Scan Location',
+                                         action: '/rmd/finished_goods/pallet_movements/empty_pallet_location',
+                                         button_caption: 'Submit')
+          form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location, submit_form: true, required: true, lookup: false)
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+
+        r.post do
+          res = interactor.pallets_in_location_to_be_cleared(params[:pallet])
+          if res.success
+            form = Crossbeams::RMDForm.new(nil,
+                                           form_name: :pallet,
+                                           scan_with_camera: @rmd_scan_with_camera,
+                                           caption: 'Confirm Empty Location',
+                                           action: '/rmd/finished_goods/pallet_movements/empty_pallet_location_rejected',
+                                           reset_button: false,
+                                           button_caption: 'No')
+            form.add_section_header(res.message)
+            form.add_button('Yes', "/rmd/finished_goods/pallet_movements/empty_pallet_location_confirmed/#{res.instance}")
+            form.add_csrf_tag csrf_tag
+            view(inline: form.render, layout: :layout_rmd)
+          else
+            store_locally(:error, res)
+            r.redirect('/rmd/finished_goods/pallet_movements/empty_pallet_location')
+          end
+        end
+      end
+
+      r.on 'empty_pallet_location_rejected' do
+        r.redirect('/rmd/finished_goods/pallet_movements/empty_pallet_location')
+      end
+
+      r.on 'empty_pallet_location_confirmed', Integer do |location_id|
+        res = interactor.move_all_pallet_out_of_location(location_id)
+        if res.success
+          view(inline: rmd_success_message(res.message), layout: :layout_rmd)
+        else
+          store_locally(:error, res)
+          r.redirect('/rmd/finished_goods/pallet_movements/empty_pallet_location')
+        end
+      end
     end
 
     # --------------------------------------------------------------------------

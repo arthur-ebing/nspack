@@ -58,7 +58,7 @@ module FinishedGoodsApp
 
       pallet_ids = repo.select_values(:pallets, :id, load_id: load_id)
       pallet_ids.each do |pallet_id|
-        res = MoveStockService.call('PALLET', pallet_id, location_to, 'LOAD_SHIPPED', @load_id)
+        res = MoveStock.call('PALLET', pallet_id, location_to, 'LOAD_SHIPPED', @load_id)
         raise Crossbeams::InfoError, res.message unless res.success
 
         attrs = { shipped: true, shipped_at: shipped_at, exit_ref: 'SHIPPED', in_stock: false }
