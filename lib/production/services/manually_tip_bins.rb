@@ -75,7 +75,7 @@ module ProductionApp
       location_id = repo.find_run_location_id(production_run_id)
       return failed_response('Location does not exist') if location_id.nil_or_empty?
 
-      res = FinishedGoodsApp::MoveStockService.new(AppConst::BIN_STOCK_TYPE, bin_number, location_id, AppConst::REWORKS_MOVE_BIN_BUSINESS_PROCESS, nil).call
+      res = FinishedGoodsApp::MoveStock.call(AppConst::BIN_STOCK_TYPE, bin_number, location_id, AppConst::REWORKS_MOVE_BIN_BUSINESS_PROCESS, nil)
       return res unless res.success
 
       ok_response

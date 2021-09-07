@@ -174,7 +174,7 @@ module ProductionApp
 
       @pallet_ids = repo.find_pallet_ids_from_pallet_number(pallets_affected)
       pallet_ids.each  do |pallet_id|
-        res = FinishedGoodsApp::MoveStockService.call(AppConst::PALLET_STOCK_TYPE, pallet_id, location_to_id, AppConst::REWORKS_MOVE_PALLET_BUSINESS_PROCESS, nil)
+        res = FinishedGoodsApp::MoveStock.call(AppConst::PALLET_STOCK_TYPE, pallet_id, location_to_id, AppConst::REWORKS_MOVE_PALLET_BUSINESS_PROCESS, nil)
         return res unless res.success
       end
 

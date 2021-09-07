@@ -58,7 +58,7 @@ module FinishedGoodsApp
         location_to_id = opts[pallet_id]
         return failed_response('Location does not exist') if location_to_id.nil_or_empty?
 
-        res = FinishedGoodsApp::MoveStockService.call(AppConst::PALLET_STOCK_TYPE, pallet_id, location_to_id, AppConst::REWORKS_MOVE_PALLET_BUSINESS_PROCESS, nil)
+        res = FinishedGoodsApp::MoveStock.call(AppConst::PALLET_STOCK_TYPE, pallet_id, location_to_id, AppConst::REWORKS_MOVE_PALLET_BUSINESS_PROCESS, nil)
         return res unless res.success
       end
 

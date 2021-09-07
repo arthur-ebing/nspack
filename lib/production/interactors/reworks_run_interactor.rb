@@ -623,7 +623,7 @@ module ProductionApp
       return failed_response('Location does not exist') if location_id.nil_or_empty?
 
       children.each do |bin_number|
-        res = FinishedGoodsApp::MoveStockService.new(AppConst::BIN_STOCK_TYPE, bin_number, location_id, AppConst::REWORKS_MOVE_BIN_BUSINESS_PROCESS, nil).call
+        res = FinishedGoodsApp::MoveStock.call(AppConst::BIN_STOCK_TYPE, bin_number, location_id, AppConst::REWORKS_MOVE_BIN_BUSINESS_PROCESS, nil)
         return res unless res.success
       end
       ok_response
@@ -1347,7 +1347,7 @@ module ProductionApp
         return failed_response('Location does not exist') if location_to_id.nil_or_empty?
 
         attrs[:pallets_selected].each do |bin_number|
-          res = FinishedGoodsApp::MoveStockService.call(AppConst::BIN_STOCK_TYPE, bin_number, location_to_id, AppConst::REWORKS_MOVE_BIN_BUSINESS_PROCESS, nil)
+          res = FinishedGoodsApp::MoveStock.call(AppConst::BIN_STOCK_TYPE, bin_number, location_to_id, AppConst::REWORKS_MOVE_BIN_BUSINESS_PROCESS, nil)
           return res unless res.success
         end
 

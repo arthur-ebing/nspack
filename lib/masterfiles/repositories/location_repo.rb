@@ -414,6 +414,10 @@ module MasterfilesApp
         .map(%i[location_short_code id])
     end
 
+    def location_pallets_count(location_id)
+      DB[:pallets].where(location_id: location_id).count
+    end
+
     private
 
     def sql_for_missing_str_values(values, table, column)

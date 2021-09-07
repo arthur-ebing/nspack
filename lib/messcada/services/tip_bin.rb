@@ -28,7 +28,7 @@ module MesscadaApp
       return failed_response(errors) unless errors.nil?
 
       location_to_id = ProductionApp::ResourceRepo.new.find_plant_resource(@run_attrs[:packhouse_resource_id]).location_id
-      res = FinishedGoodsApp::MoveStockService.new(AppConst::BIN_STOCK_TYPE, rmt_bin_id, location_to_id, AppConst::BIN_TIP_MOVE_BIN_BUSINESS_PROCESS, nil).call
+      res = FinishedGoodsApp::MoveStock.call(AppConst::BIN_STOCK_TYPE, rmt_bin_id, location_to_id, AppConst::BIN_TIP_MOVE_BIN_BUSINESS_PROCESS, nil)
       return res unless res.success
 
       repo.complete_external_bin_tipping(bin_number, @run_id) if AppConst::CR_PROD.kromco_rmt_integration?

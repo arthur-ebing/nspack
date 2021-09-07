@@ -123,6 +123,17 @@ INSERT INTO location_assignments (assignment_code) VALUES('TRANSIT') ON CONFLICT
 INSERT INTO locations (primary_storage_type_id, location_type_id, primary_assignment_id, location_long_code, location_description, location_short_code, can_be_moved, can_store_stock)
 VALUES ((SELECT id FROM location_storage_types WHERE storage_type_code = 'PALLETS'), (SELECT id FROM location_types WHERE location_type_code = 'IN_TRANSIT'), (SELECT id FROM location_assignments WHERE assignment_code = 'TRANSIT'), 'IN_TRANSIT_EX_PACKHSE', 'IN_TRANSIT_EX_PACKHSE', 'IN_TRANSIT_EX_PACKHSE', true, true) ON CONFLICT DO NOTHING;
 
+-- PENDING LOCATION
+INSERT INTO location_types (location_type_code, short_code, hierarchical) VALUES('PENDING_LOCATION', 'PENDING_LOCATION', 't') ON CONFLICT DO NOTHING;
+INSERT INTO location_assignments (assignment_code) VALUES('STORAGE_AT_UNKNOWN_LOCATION') ON CONFLICT DO NOTHING;
+INSERT INTO locations (primary_storage_type_id, location_type_id, primary_assignment_id, location_long_code, location_description, location_short_code, can_store_stock)
+VALUES ((SELECT id FROM location_storage_types WHERE storage_type_code = 'PALLETS'), (SELECT id FROM location_types WHERE location_type_code = 'PENDING_LOCATION'),
+(SELECT id FROM location_assignments WHERE assignment_code = 'STORAGE_AT_UNKNOWN_LOCATION'), 'PENDING_LOCATION', 'PENDING_LOCATION', 'PENDING_LOCATION', true) ON CONFLICT DO NOTHING;
+INSERT INTO public.tree_locations(ancestor_location_id, descendant_location_id, path_length)
+VALUES ((SELECT id FROM locations where location_type_id = (SELECT id FROM location_types WHERE location_type_code='SITE')), (SELECT id FROM locations where location_short_code = 'PENDING_LOCATION'), 1)  ON CONFLICT DO NOTHING;
+INSERT INTO public.tree_locations(ancestor_location_id, descendant_location_id, path_length)
+VALUES ((SELECT id FROM locations where location_short_code = 'PENDING_LOCATION'), (SELECT id FROM locations where location_short_code = 'PENDING_LOCATION'), 0) ON CONFLICT DO NOTHING;
+
 -- SCRAP LOCATION
 INSERT INTO location_assignments (assignment_code) VALUES('APPLICATION') ON CONFLICT DO NOTHING;
 INSERT INTO locations (primary_storage_type_id, location_type_id, primary_assignment_id, location_long_code, location_description, location_short_code, can_be_moved, can_store_stock)
