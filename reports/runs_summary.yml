@@ -1,28 +1,35 @@
 ---
 :caption: Runs Summary
-:sql: "SELECT\r\n    r.id AS production_run_id,\r\n    r.allow_cultivar_mixing AS
-  cult_mix,\r\n    r.allow_orchard_mixing AS orc_mix,\r\n    r.started_at,\r\n    r.completed_at,\r\n
-  \   cultivar_group_code AS cultivar_group,\r\n    cultivars.description AS cultivar_description,\r\n
-  \   orchards.orchard_code,\r\n    pucs.puc_code,\r\n    seasons.season_code,\r\n
-  \   tipped_qty,\r\n    tipped_nett_weight,\r\n    packed_qty,\r\n    packed_nett_weight,\r\n
-  \   plant_resource_code AS line\r\nFROM\r\n    production_runs r\r\n        LEFT
-  JOIN (\r\n        SELECT\r\n            production_run_id,\r\n            sum(nett_weight)
-  packed_nett_weight,\r\n            count(*) packed_qty\r\n        FROM pallet_sequences\r\n
-  \       WHERE scrapped_at IS NULL\r\n        GROUP BY\r\n            production_run_id)
-  ps ON r.id = ps.production_run_id\r\n        LEFT JOIN (\r\n        SELECT\r\n            production_run_tipped_id,\r\n
-  \           sum(nett_weight) tipped_nett_weight,\r\n            count(*) tipped_qty\r\n
-  \       FROM rmt_bins rb\r\n        WHERE bin_tipped AND NOT scrapped\r\n\r\n        GROUP
-  BY\r\n            production_run_tipped_id) t ON r.id = t.production_run_tipped_id\r\n
-  \       JOIN cultivars ON r.cultivar_id = cultivars.id\r\n        LEFT JOIN cultivar_groups
-  ON cultivars.cultivar_group_id = cultivar_groups.id\r\n        JOIN orchards ON
-  r.orchard_id = orchards.id\r\n        LEFT JOIN seasons ON r.season_id = seasons.id\r\n
-  \       JOIN pucs ON r.puc_id = pucs.id\r\n        LEFT JOIN plant_resources pr
-  ON r.production_line_id = pr.id\r\nGROUP BY\r\n    r.id,\r\n    r.allow_cultivar_mixing,\r\n
-  \   r.allow_orchard_mixing,\r\n    cultivar_group_code,\r\n    r.started_at,\r\n
-  \   r.completed_at,\r\n    cultivars.description,\r\n    orchards.orchard_code,\r\n
-  \   pucs.puc_code,\r\n    seasons.season_code,\r\n    packed_nett_weight,\r\n    tipped_nett_weight,\r\n
-  \   tipped_qty,\r\n    packed_qty,\r\n    plant_resource_code\r\nORDER BY\r\n    r.started_at
-  DESC"
+:sql: "\r\nSELECT\r\n  r.id AS production_run_id,\r\n  r.allow_cultivar_mixing AS
+  cult_mix,\r\n  r.allow_orchard_mixing AS orc_mix,\r\n  r.started_at,\r\n  r.completed_at,\r\n
+  \ cultivar_group_code AS cultivar_group,\r\n  cultivars.description AS cultivar_description,\r\n
+  \ orchards.orchard_code,\r\n  pucs.puc_code,\r\n  seasons.season_code,\r\n  tipped_qty,\r\n
+  \ tipped_nett_weight,\r\n  packed_qty,\r\n  packed_nett_weight,\r\n  COALESCE(rebin_bin_wt,
+  0) + COALESCE(rebin_ctn_wt, 0) AS rebin_weight,\r\n  plant_resource_code AS line\r\nFROM\r\n
+  \ production_runs r\r\n  LEFT JOIN (\r\n    SELECT\r\n      production_run_id,\r\n
+  \     sum(nett_weight) packed_nett_weight,\r\n      count(*) packed_qty\r\n    FROM\r\n
+  \     pallet_sequences\r\n    WHERE\r\n      scrapped_at IS NULL\r\n    GROUP BY\r\n
+  \     production_run_id) ps ON r.id = ps.production_run_id\r\n  LEFT JOIN (\r\n
+  \   SELECT\r\n      production_run_tipped_id,\r\n      sum(nett_weight) tipped_nett_weight,\r\n
+  \     count(*) tipped_qty\r\n    FROM\r\n      rmt_bins rb\r\n    WHERE\r\n      bin_tipped\r\n
+  \     AND NOT scrapped\r\n    GROUP BY\r\n      production_run_tipped_id) t ON r.id
+  = t.production_run_tipped_id\r\n  LEFT JOIN (\r\n    SELECT\r\n      rmt_bins.production_run_rebin_id,\r\n
+  \     SUM(COALESCE(nett_weight, 0)) AS rebin_bin_wt\r\n    FROM\r\n      rmt_bins\r\n
+  \   WHERE\r\n      NOT scrapped\r\n    GROUP BY\r\n      rmt_bins.production_run_rebin_id)
+  rb ON rb.production_run_rebin_id = r.id\r\n  LEFT JOIN (\r\n    SELECT\r\n      carton_labels.production_run_id,\r\n
+  \     SUM(COALESCE(cartons.nett_weight, 0)) AS rebin_ctn_wt\r\n    FROM\r\n      carton_labels\r\n
+  \     JOIN cartons ON cartons.carton_label_id = carton_labels.id\r\n    WHERE\r\n
+  \     carton_labels.rmt_class_id IS NOT NULL\r\n      AND NOT cartons.scrapped\r\n
+  \   GROUP BY\r\n      carton_labels.production_run_id) rc ON rc.production_run_id
+  = r.id\r\n  JOIN cultivars ON r.cultivar_id = cultivars.id\r\n  LEFT JOIN cultivar_groups
+  ON cultivars.cultivar_group_id = cultivar_groups.id\r\n  JOIN orchards ON r.orchard_id
+  = orchards.id\r\n  LEFT JOIN seasons ON r.season_id = seasons.id\r\n  JOIN pucs
+  ON r.puc_id = pucs.id\r\n  LEFT JOIN plant_resources pr ON r.production_line_id
+  = pr.id\r\nGROUP BY\r\n  r.id,\r\n  r.allow_cultivar_mixing,\r\n  r.allow_orchard_mixing,\r\n
+  \ cultivar_group_code,\r\n  r.started_at,\r\n  r.completed_at,\r\n  cultivars.description,\r\n
+  \ orchards.orchard_code,\r\n  pucs.puc_code,\r\n  seasons.season_code,\r\n  packed_nett_weight,\r\n
+  \ tipped_nett_weight,\r\n  rebin_bin_wt,\r\n  rebin_ctn_wt,\r\n  tipped_qty,\r\n
+  \ packed_qty,\r\n  plant_resource_code\r\nORDER BY\r\n  r.started_at DESC\r\n"
 :limit: 
 :offset: 
 :external_settings:
@@ -252,9 +259,25 @@
     :group_avg: true
     :group_min: false
     :group_max: false
+  rebin_weight:
+    :name: rebin_weight
+    :sequence_no: 15
+    :caption: Rebin weight
+    :namespaced_name: 
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: true
+    :group_avg: true
+    :group_min: false
+    :group_max: false
   line:
     :name: line
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Line
     :namespaced_name: plant_resource_code
     :data_type: :string
