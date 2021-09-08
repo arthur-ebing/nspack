@@ -259,18 +259,22 @@ module MesscadaApp
       failed_response(e.message)
     end
 
-    def send_label_to_printer(params)
+    def send_label_to_printer(params) # rubocop:disable Metrics/AbcSize
       res = carton_labeling(params)
-      # Robot page should refuse if no printer linked to robot...
+      schema = Nokogiri::XML(res.instance)
+      label_name = schema.xpath('.//label/template').text
+      quantity = schema.xpath('.//label/quantity').text
       printer = printer_for_robot(params[:system_resource].id)
-      p printer
-      p res.instance
-      # nil
-      # "<label><status>true</status><template>JS_TEST</template><quantity>1</quantity><fvalue>4265559</fvalue><fvalue>41</fvalue><fvalue>PEARS</fvalue><fvalue>PACKHAM'S TRIUMPH</fvalue><fvalue>1A</fvalue><fvalue>A1-2</fvalue><fvalue>E0351</fvalue><fvalue>6113</fvalue><fvalue>V1044</fvalue><fvalue>45</fvalue><fvalue>PR</fvalue><fvalue></fvalue><fvalue>GGN 4050373704834</fvalue><fvalue></fvalue><lcd1>Label JS_TEST</lcd1><lcd2>Label printed...</lcd2><lcd3></lcd3><lcd4></lcd4><lcd5></lcd5><lcd6></lcd6><msg>Carton Label printed successfully</msg></label>"
+      vars = {}
+      schema.xpath('.//label/fvalue').each_with_index { |node, i| vars["F#{i + 1}".to_sym] = node.text }
 
-      # MesserverRepo.new.print_published_label()
       # call messerver to print
-      success_response('OK dummy print', printer: printer)
+      res = MesserverApp::MesserverRepo.new.print_published_label(label_name, vars, quantity, printer)
+      # PRN-01
+      # "<label><status>true</status><template>JS_TEST</template><quantity>1</quantity><fvalue>4265559</fvalue><fvalue>41</fvalue><fvalue>PEARS</fvalue><fvalue>PACKHAM'S TRIUMPH</fvalue><fvalue>1A</fvalue><fvalue>A1-2</fvalue><fvalue>E0351</fvalue><fvalue>6113</fvalue><fvalue>V1044</fvalue><fvalue>45</fvalue><fvalue>PR</fvalue><fvalue></fvalue><fvalue>GGN 4050373704834</fvalue><fvalue></fvalue><lcd1>Label JS_TEST</lcd1><lcd2>Label printed...</lcd2><lcd3></lcd3><lcd4></lcd4><lcd5></lcd5><lcd6></lcd6><msg>Carton Label printed successfully</msg></label>"
+      return res unless res.success
+
+      success_response(res.message, printer: printer)
     end
 
     def carton_verification(scanned_number)  # rubocop:disable Metrics/AbcSize
@@ -466,18 +470,25 @@ module MesscadaApp
     # Get the device code from system resources that matches an ip address.
     # Returns nil if not found/not a MODULE.
     # When running in development mode, a passed-in device parameter will be used when present.
-    def device_code_from_ip_address(ip_address, params)
+    def device_code_from_ip_address(ip_address, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       device = if params[:device] && AppConst.development?
                  params[:device]
                else
                  resource_repo.device_code_from_ip_address(ip_address)
                end
 
-      sysres_id = resource_repo.get_id(:system_resources, system_resource_code: device)
-      return nil if sysres_id.nil?
-      return nil unless resource_repo.system_resource_type_from_resource(sysres_id) == Crossbeams::Config::ResourceDefinitions::MODULE
+      return failed_response("There is no device configured for #{ip_address}") if device.nil?
 
-      device
+      sysres_id = resource_repo.get_id(:system_resources, system_resource_code: device)
+      return failed_response("#{device} does not exist") if sysres_id.nil?
+      return failed_response("#{device} is not a robot") unless resource_repo.system_resource_type_from_resource(sysres_id) == Crossbeams::Config::ResourceDefinitions::MODULE
+
+      # Check to see that device has a printer associated.
+      printer_list = resource_repo.linked_printer_for_device(device)
+      return failed_response("#{device} does not have a linked printer") if printer_list.empty?
+      return failed_response("#{device} has more than one linked printer") if printer_list.length > 1
+
+      success_response('ok', device)
     end
 
     # build_robot called with ip address / device name?

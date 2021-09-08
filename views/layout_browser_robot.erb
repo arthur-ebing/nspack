@@ -365,7 +365,7 @@
         }).join();
       };
 
-      const loginWidgetRefresh = () => {
+      const loginWidgetRefresh = (initialLogin) => {
         const url = `/messcada/browser/login_status/${device}`
               // fetch login state for device
         fetch(url, {
@@ -384,7 +384,7 @@
         .then((data) => {
           if (data.success) {
             // replace login widget & enable buttons
-            crossbeamsUtils.showSuccess(data.message);
+            if (!initialLogin) { crossbeamsUtils.showSuccess(data.message) };
             fillLoginWidget(data.payload);
             // Refresh login widget...
           } else {
@@ -481,7 +481,8 @@
         if (prev instanceof HTMLTableCellElement) { prev.classList.add('focusLabel'); }
 
         crossbeamsRmdScan.init(<%= AppConst::BARCODE_SCAN_RULES.to_json %>, <%= @bypass_rules ? true : false %>, loginHandler);
-        loginWidgetRefresh(<%= @robot_page.instance[:users] %>);
+        // loginWidgetRefresh(<%= @robot_page.instance[:users] %>);
+        loginWidgetRefresh(true);
       });
     </script>
     <%= content_for :late_javascript %>

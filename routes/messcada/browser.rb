@@ -7,19 +7,10 @@ class Nspack < Roda
     # --------------------------------------------------------------------------
     r.on 'robot' do
       interactor = MesscadaApp::MesscadaInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-      device = interactor.device_code_from_ip_address(request.ip, params)
-      raise Crossbeams::TaskNotPermittedError, 'This is not a valid robot' if device.nil?
+      res = interactor.device_code_from_ip_address(request.ip, params)
+      raise Crossbeams::TaskNotPermittedError, res.message unless res.success
 
-      # device = if params[:device] && AppConst.development?
-      #            params[:device]
-      #          else
-      #            # 'CLM-06' # Get from system_resource for this ip address...
-      #            ProductionApp::ResourceRepo.new.device_code_from_ip_address(request.ip)
-      #          end
-      # use ip address
-      # Get device from ip address
-      # robot_interactor to handle robot-building methods?
-      # get device from ip
+      device = res.instance # This could be more - include printer
 
       r.is do
         @robot_page = interactor.build_robot(device)
