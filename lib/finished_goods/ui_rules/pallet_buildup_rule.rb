@@ -38,10 +38,6 @@ module UiRules
         cartons_moved: {},
         completed: { renderer: :checkbox }
       }
-      @form_object[:cartons_moved].values.flatten.to_a.each do |c|
-        fields[c.to_sym] = { renderer: :label, caption: '' }
-        @form_object[c.to_sym] = c
-      end
 
       fields
     end
