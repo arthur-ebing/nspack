@@ -261,6 +261,8 @@ module MesscadaApp
 
     def send_label_to_printer(params) # rubocop:disable Metrics/AbcSize
       res = carton_labeling(params)
+      return res unless res.success
+
       schema = Nokogiri::XML(res.instance)
       label_name = schema.xpath('.//label/template').text
       quantity = schema.xpath('.//label/quantity').text
@@ -510,7 +512,7 @@ module MesscadaApp
       line = resource_repo.plant_resource_parent_of_system_resource(Crossbeams::Config::ResourceDefinitions::LINE, sysres_robot[:system_resource_code])
       res = production_run_repo.find_production_runs_for_line_in_state(line.instance, running: true, labeling: true)
       run_id = res.success ? res.instance.first : nil
-      p run_id
+
       buttons = resource_repo.robot_buttons(plantres_robot[:id]).map do |button_plant_id|
         plnt = resource_repo.find_plant_resource_flat(button_plant_id)
         sys = resource_repo.find_system_resource(plnt.system_resource_id)

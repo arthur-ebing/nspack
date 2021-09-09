@@ -30,7 +30,6 @@ module ProductionApp
                         comment: changeset[:active_run_stage],
                         user_name: user_name)
 
-        # MesscadaApp::Job::NotifyProductionRunResourceStates.enqueue(production_run.id) if AppConst::CLM_BUTTON_CAPTION_FORMAT || AppConst::PROVIDE_PACK_TYPE_AT_VERIFICATION
         MesscadaApp::Job::NotifyProductionRunResourceStates.enqueue(production_run.id, user_name) if AppConst::CR_PROD.run_provides_button_captions?
         # Notify active setups page that the page might need to be reloaded:
         work = [{ reload_page: { message: 'You might need to reload this page - a new run has been executed.' } }]

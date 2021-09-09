@@ -28,18 +28,10 @@ class Nspack < Roda
 
     r.on 'carton_labeling' do
       interactor = MesscadaApp::MesscadaInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-      # { device: device, packpoint: packpoint, card_reader: '', bin_number: bin_number, identifier: identifier, identifier_is_person: true }
-      # params = xml_interpreter.params_for_carton_labeling
-      # res = MesscadaApp::AddSystemResourceIncentiveToParams.call(params)
+
       res = MesscadaApp::AddSystemResourceIncentiveToParams.call(params, has_button: true)
-      # res = interactor.carton_labeling(res.instance) if res.success
       res = interactor.send_label_to_printer(res.instance) if res.success
-      # res = interactor.carton_labeling(res.instance) if res.success
-      # res = MesscadaApp::AddSystemResourceIncentiveToParams.call(params, has_button: true)
-      # res = interactor.carton_labeling(res.instance) if res.success
-      # res = interactor.browser_carton_label(params)
       if res.success
-        # append to printlog
         show_json_notice(res.message)
       else
         show_json_exception(res.message)

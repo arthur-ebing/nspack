@@ -277,6 +277,8 @@
     <script src="/js/crossbeams-layout.js?seq=23"></script>
     <script src="/js/crossbeams-rmd_scan.js?seq=25" type="text/javascript"></script>
     <script src="/js/sweetalert2.min.js" type="text/javascript"></script>
+    <script src="/js/message-bus.js?seq=1"></script>
+    <script src="/js/message-bus-ajax.js"></script>
     <script>
       const device = '<%= @robot_page.instance[:device] %>';
       const robotActivityLog = document.getElementById('robotActivityLog') || document.createElement('div');
@@ -302,6 +304,69 @@
       if (window.NodeList && !NodeList.prototype.forEach) {
         NodeList.prototype.forEach = Array.prototype.forEach;
       }
+
+      // MessageBus handling --- START
+      MessageBus.baseUrl = "/terminus/";
+
+      // @message_bus_client_id
+      MessageBus.subscribe("/terminus", function(msg){
+        console.log('MSG', msg);
+        if (!msg.targetDevice) {
+          return;
+        }
+        if (msg.targetDevice && msg.targetDevice !== device) {
+          return;
+        }
+        if (msg.actions) {
+          msg.actions.forEach((action) => {
+            if (action.toggle_classes) {
+              console.log('CLASS', action.toggle_classes.id);
+            } else if (action.set_inner_value) {
+              console.log('HTML', action.set_inner_value.id);
+            } else if (action.reload_page) {
+              console.log('RELOAD', action.reload_page);
+            } else {
+              console.log('UNKNOWN', action);
+            }
+          });
+        }
+        if (msg.payload) {
+          msg.payload.forEach((action) => {
+            const btn = document.getElementById(`button_${action.button_id}`);
+            const cap = document.getElementById(`button_${action.button_id}_caption`);
+            if (btn) {
+              if (action.enabled) {
+                 btn.classList.add('dim', 'near-black');
+                 btn.style.backgroundColor = btn.dataset.backColour;
+                 btn.disabled = false;
+                 cap.innerHTML = action.caption;
+               } else {
+                 btn.classList.remove('dim', 'near-black');
+                 btn.style.backgroundColor = null;
+                 btn.disabled = true;
+                 cap.innerHTML = 'Not allocated';
+               }
+            }
+          });
+        }
+
+        if (msg.message) {
+          switch (msg.messageType) {
+            case 'warning':
+              crossbeamsUtils.showWarning(msg.message);
+              return;
+            case 'success':
+              crossbeamsUtils.showSuccess(msg.message);
+              return;
+            case 'error':
+              crossbeamsUtils.showError(msg.message);
+              return;
+            default:
+              crossbeamsUtils.showInformation(msg.message);
+          }
+        }
+      });
+      // MessageBus handling --- END
 
       // Highlight label text for inputs that have focus.
       document.addEventListener('focus', function (event) {

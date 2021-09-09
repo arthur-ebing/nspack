@@ -534,7 +534,8 @@ module ProductionApp
            "fruit_size_references"."size_reference"::text
          ELSE
           "fruit_actual_counts_for_packs"."actual_count_for_pack"::text
-         END AS size_ref_or_count
+         END AS size_ref_or_count,
+         "p"."id"
         FROM "production_runs" r
         JOIN "tree_plant_resources" t ON "t"."ancestor_plant_resource_id" = "r"."production_line_id"
         JOIN "plant_resources" p ON "p"."id" = "t"."descendant_plant_resource_id" AND "p"."plant_resource_type_id" = (SELECT

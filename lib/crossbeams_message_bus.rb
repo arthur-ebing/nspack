@@ -32,5 +32,13 @@ module Crossbeams
                            actions: actions,
                            message: message)
     end
+
+    def send_bus_message_to_device(target_device, payload, message: nil, message_type: :information)
+      ::MessageBus.publish('/terminus',
+                           messageType: message_type,
+                           targetDevice: target_device,
+                           payload: payload,
+                           message: message)
+    end
   end
 end
