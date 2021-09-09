@@ -231,6 +231,14 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
     return res;
   };
 
+  const unpackScaleValue = (rawVal) => {
+    const val = rawVal.split(/\r\n|\r|\n/)[0]; // remove newlines
+    const res = { success: false };
+    res.success = true;
+    res.weight = val;
+    return res;
+  };
+
   /**
    * Apply scan rules to the scanned value
    * to dig out the actual value and type.
@@ -311,6 +319,18 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
           publicAPIs.logit('Login not enabled.');
         }
       }
+      if (event.data.includes('[SCALE]')) {
+        const scalePack = unpackScaleValue(event.data.split(',')[0].replace('[SCALE]', ''));
+        if (!scalePack.success) {
+          publicAPIs.logit(scalePack.error);
+          return;
+        }
+        if (publicAPIs.weightFunc) {
+          publicAPIs.weightFunc(scalePack.weight);
+        } else {
+          publicAPIs.logit('Scale weighing not enabled.');
+        }
+      }
       if (event.data.includes('[SCAN]')) {
         const scanPack = unpackScanValue(event.data.split(',')[0].replace('[SCAN]', ''));
         if (!scanPack.success) {
@@ -382,10 +402,11 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
    * @param {object} rules - the rules for identifying scan values.
    * @param {boolean} bypassRules - should the rules be ignored (scan any barcode).
    */
-  publicAPIs.init = (rules, bypassRules, loginFunc) => {
+  publicAPIs.init = (rules, bypassRules, loginFunc, weightFunc) => {
     publicAPIs.rules = rules;
     publicAPIs.bypassRules = bypassRules;
     publicAPIs.loginFunc = loginFunc;
+    publicAPIs.weightFunc = weightFunc;
     publicAPIs.expectedScanTypes = Array.from(document.querySelectorAll('[data-scan-rule]')).map(a => a.dataset.scanRule);
     publicAPIs.expectedScanTypes = publicAPIs.expectedScanTypes.filter((it, i, ar) => ar.indexOf(it) === i);
 

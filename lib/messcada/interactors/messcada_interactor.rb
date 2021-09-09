@@ -270,11 +270,15 @@ module MesscadaApp
 
       # call messerver to print
       res = MesserverApp::MesserverRepo.new.print_published_label(label_name, vars, quantity, printer)
+      # res = success_response('a dummy test')
+      # res = failed_response('Pretend fail print...')
       # PRN-01
       # "<label><status>true</status><template>JS_TEST</template><quantity>1</quantity><fvalue>4265559</fvalue><fvalue>41</fvalue><fvalue>PEARS</fvalue><fvalue>PACKHAM'S TRIUMPH</fvalue><fvalue>1A</fvalue><fvalue>A1-2</fvalue><fvalue>E0351</fvalue><fvalue>6113</fvalue><fvalue>V1044</fvalue><fvalue>45</fvalue><fvalue>PR</fvalue><fvalue></fvalue><fvalue>GGN 4050373704834</fvalue><fvalue></fvalue><lcd1>Label JS_TEST</lcd1><lcd2>Label printed...</lcd2><lcd3></lcd3><lcd4></lcd4><lcd5></lcd5><lcd6></lcd6><msg>Carton Label printed successfully</msg></label>"
       return res unless res.success
 
-      success_response(res.message, printer: printer)
+      log = "Printed (#{label_name}): #{vars.values.join(', ')}"
+      success_response(log)
+      # success_response(res.message, printer: printer, vars: vars.inspect) # change this to a string rep of lbl, prn & vars
     end
 
     def carton_verification(scanned_number)  # rubocop:disable Metrics/AbcSize

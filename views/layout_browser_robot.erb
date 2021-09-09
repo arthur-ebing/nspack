@@ -60,6 +60,13 @@
        /* grid-area: right; */
      }
 
+     [data-scale-reading="empty"] {
+       color: white;
+     }
+
+     [data-scale-reading="filled"] {
+       color: gray;
+     }
 
 
 
@@ -272,6 +279,23 @@
     <script src="/js/sweetalert2.min.js" type="text/javascript"></script>
     <script>
       const device = '<%= @robot_page.instance[:device] %>';
+      const robotActivityLog = document.getElementById('robotActivityLog') || document.createElement('div');
+      const scaleWeight = document.getElementById('scaleWeight') || document.createElement('div');
+
+      const logActivity = (text, logLevel) => {
+        const li = document.createElement("li");
+        li.append(document.createTextNode(text.toString().replace('An error occurred: ', '')));
+        if (logLevel && logLevel == 'warning' || logLevel == 'error') {
+          const cls = document.createAttribute('class');
+          if (logLevel == 'warning') {
+            cls.value = 'orange';
+          } else {
+            cls.value = 'red';
+          }
+          li.setAttributeNode(cls);
+        }
+        robotActivityLog.prepend(li);
+      };
 
       Jackbox.init();
       // Polyfill for old robot browsers...
@@ -291,9 +315,21 @@
 
       document.addEventListener('click', function (event) {
         if (!event.target.dataset || !event.target.dataset.buttonActionUrl) { return; }
+        // if scale required...
+        if (scaleWeight.textContent === '.') {
+          logActivity('Invalid weight. Transaction ignored.', 'warning');
+          crossbeamsUtils.showError('There is no weight from the scale.');
+          return;
+        }
+
         let url = event.target.dataset.buttonActionUrl;
         url = url.replace(/\$:card_reader\$/, '1');
-        url = url.replace(/\$:identifier\$/, '123');
+        url = url.replace(/\$:identifier\$/, '123'); // STORED id?
+        url = url.replace(/\$:weight\$/, scaleWeight.textcontent);
+        // SCALE...
+
+        scaleWeight.textContent = '.';
+        scaleWeight.dataset.scaleReading = 'empty';
 
         fetch(url, {
           method: 'GET',
@@ -314,12 +350,15 @@
           }
           if (data.flash) {
             if (data.flash.notice) {
+              logActivity(data.flash.notice);
               crossbeamsUtils.showSuccess(data.flash.notice);
             }
             if (data.flash.warning) {
+              logActivity(data.flash.warning, 'warning');
               crossbeamsUtils.showWarning(data.flash.warning);
             }
             if (data.flash.error) {
+              logActivity(data.flash.error, 'error');
               if (data.exception) {
                 crossbeamsUtils.showError(data.flash.error);
                 if (data.backtrace) {
@@ -334,6 +373,7 @@
             }
           }
         }).catch((data) => {
+          logActivity(data, 'error');
           crossbeamsUtils.fetchErrorHandler(data);
         });
       }, true);
@@ -359,7 +399,7 @@
             </text>
           </svg>
                   <div>
-         ${u}
+         ${splits[0]}
                   </div>
                 </div>`
         }).join();
@@ -416,12 +456,19 @@
             }
           }
         }).catch((data) => {
+          logActivity(data, 'error');
           crossbeamsUtils.fetchErrorHandler(data);
         });
       };
 
+      const scaleHandler = (weight) => {
+        console.log('Scale:', weight);
+        scaleWeight.textContent = weight;
+        scaleWeight.dataset.scaleReading = 'filled';
+      };
+
       const loginHandler = (cardReader, identifier) => {
-        console.log('Login:', cardReader, identifier);
+        // console.log('Login:', cardReader, identifier);
         const url = `/messcada/hr/logon?device=${device}&card_reader=${cardReader}&identifier=${identifier}`
         // Login via fetch & update
         fetch(url, {
@@ -470,6 +517,7 @@
             }
           }
         }).catch((data) => {
+          logActivity(data, 'error');
           crossbeamsUtils.fetchErrorHandler(data);
         });
       };
@@ -480,7 +528,7 @@
         const prev = afi && afi.parentNode && afi.parentNode.previousElementSibling;
         if (prev instanceof HTMLTableCellElement) { prev.classList.add('focusLabel'); }
 
-        crossbeamsRmdScan.init(<%= AppConst::BARCODE_SCAN_RULES.to_json %>, <%= @bypass_rules ? true : false %>, loginHandler);
+        crossbeamsRmdScan.init(<%= AppConst::BARCODE_SCAN_RULES.to_json %>, <%= @bypass_rules ? true : false %>, loginHandler, scaleHandler);
         // loginWidgetRefresh(<%= @robot_page.instance[:users] %>);
         loginWidgetRefresh(true);
       });
