@@ -562,6 +562,14 @@ module ProductionApp
       SystemResourceIncentiveSettings.new(hash.merge(packpoint: packpoint, cache_key: cache_key, card_reader: card_reader || '1'))
     end
 
+    def active_group_incentive_id_for(system_resource_id)
+      DB[:group_incentives].where(system_resource_id: system_resource_id, active: true).get(:id)
+    end
+
+    def active_individual_incentive_id_for(system_resource_id)
+      DB[:system_resource_logins].where(system_resource_id: system_resource_id, active: true).get(:id)
+    end
+
     def packpoint_for_button(system_resource_code)
       system_resource_id = get_id(:system_resources, system_resource_code: system_resource_code)
       return nil if system_resource_id.nil?

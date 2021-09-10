@@ -5,15 +5,15 @@
         <div id="robotLoginWidget" class="flex flex-wrap">
         </div>
       </div>
-      <div class="robotStatsWidget pa2 h-25">
+      <div class="pa2 f3 mb2 bb h-10 tc">
+        Scale: <div id="scaleWeight" data-scale-reading="empty" class="dib ba b b--mid-gray mid-gray w-two-thirds tr pa2">.</div>
+      </div>
+      <div id="robotStatsWidget" class="robotStatsWidget pa2 h-25 flex-auto">
         Stats widget
       </div>
     </div>
     <div class="robotRight flex-auto pa1">
       <!-- Only include the following if cartons must be weighed... -->
-      <div class="pa2 f3 mb2 h-10 tc">
-        Scale weight: <div id="scaleWeight" data-scale-reading="empty" class="dib ba b b--mid-gray mid-gray w4 tr pa2">.</div>
-      </div>
       <!--
         Adjust dimensions based on no of buttons. (2 :: h-90, w-40) (4 :: h-40, w-40) (6 :: h-30, w-40) (1 :: h-90, w-90)
         Also change the relative text size...
@@ -24,7 +24,7 @@
           <% btn_class = btn[:enabled] ? 'br3 pa3 dim f2 tl ml5 mt2 mb2 w-40 h-40 near-black' : 'br3 pa3 f2 tl ml5 mt2 mb2 w-40 h-40' %>
           <% btn_style = btn[:enabled] ? "style=\"background-color:#{button_colours[index]}\"" : '' %>
           <% btn_enabled = btn[:enabled] ? '' : 'disabled="true"' %>
-          <button id="button_<%= btn[:plant_resource_id] %>" data-back-colour="<%= button_colours[index] %>" data-button-action-url="<%= btn[:url] %>" class="<%= btn_class%>" <%= btn_style %> <%= btn_enabled %>><span class="mid-gray f1"><%= (index + 65).chr %></span><br><span id="button_<%= btn[:plant_resource_id] %>_caption"><%= btn[:button_caption] %></span></button>
+          <button id="button_<%= btn[:plant_resource_id] %>" data-button-index="<%= index %>" data-back-colour="<%= button_colours[index] %>" data-button-action-url="<%= btn[:url] %>" class="<%= btn_class%>" <%= btn_style %> <%= btn_enabled %>><span class="mid-gray f1"><%= (index + 65).chr %></span><br><span id="button_<%= btn[:plant_resource_id] %>_caption"><%= btn[:button_caption] %></span></button>
         <% end %>
       </div>
       <div class="pa1 mb2 bt b--gray h-20">

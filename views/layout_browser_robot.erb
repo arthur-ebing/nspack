@@ -273,6 +273,7 @@
     </div>
     <script src="/js/jackbox.min.js"></script>
     <script src="/js/crossbeams-error.js"></script>
+    <script src="/js/crossbeams-local-storage.js"></script>
     <script src="/js/crossbeams-utils.js?seq=32"></script>
     <script src="/js/crossbeams-layout.js?seq=23"></script>
     <script src="/js/crossbeams-rmd_scan.js?seq=25" type="text/javascript"></script>
@@ -281,8 +282,36 @@
     <script src="/js/message-bus-ajax.js"></script>
     <script>
       const device = '<%= @robot_page.instance[:device] %>';
+      const startLoginKey = '<%= @robot_page.instance[:login_key] %>';
+      const no_buttons = <%= @robot_page.instance[:buttons].length %>;
+      let deviceStore = crossbeamsLocalStorage.getItem(device);
+      if (!deviceStore || deviceStore.loginKey !== startLoginKey) {
+        deviceStore = {
+          button_stats: Array(no_buttons).fill(0),
+          no_packers: <%= @robot_page.instance[:users].length %>,
+          loginKey: startLoginKey,
+        };
+        crossbeamsLocalStorage.setItem(device, deviceStore);
+      }
       const robotActivityLog = document.getElementById('robotActivityLog') || document.createElement('div');
       const scaleWeight = document.getElementById('scaleWeight') || document.createElement('div');
+      const robotStatsWidget = document.getElementById('robotStatsWidget') || document.createElement('div');
+
+      const recalcStats = () => {
+        const tot = deviceStore.button_stats.reduce((a, b) => a + b, 0);
+        let ave;
+        if (deviceStore.no_packers === 0) {
+          ave = 0;
+        } else {
+          ave = (tot / deviceStore.no_packers).toLocaleString('en-US', { maximumFractionDigits: 2 });
+        }
+        robotStatsWidget.innerHTML = `${deviceStore.button_stats.map((u, i) => {
+          const letter = String.fromCharCode(i + 65);
+          return `<div class="dib ml3 mt2 pa3 br2 ba f4"><span class="mid-gray">${letter}:</span> ${u}</div>`;
+        }).join("\n")}
+        <div class="dib ml3 mt2 pa3 br2 ba f4"><span class="mid-gray">Total:</span> ${tot}</div>
+        <div class="dib ml3 mt2 pa3 br2 ba f4"><span class="mid-gray">Avg:</span> ${ave}</div>`
+      };
 
       const logActivity = (text, logLevel) => {
         const li = document.createElement("li");
@@ -386,6 +415,7 @@
           crossbeamsUtils.showError('There is no weight from the scale.');
           return;
         }
+        const buttonIndex = event.target.dataset.buttonIndex;
 
         let url = event.target.dataset.buttonActionUrl;
         url = url.replace(/\$:card_reader\$/, '1');
@@ -415,6 +445,9 @@
           }
           if (data.flash) {
             if (data.flash.notice) {
+              deviceStore.button_stats[buttonIndex] += 1;
+              crossbeamsLocalStorage.setItem(device, deviceStore);
+              recalcStats();
               logActivity(data.flash.notice);
               crossbeamsUtils.showSuccess(data.flash.notice);
             }
@@ -443,31 +476,40 @@
         });
       }, true);
 
-      const fillLoginWidget = (users) => {
+      const fillLoginWidget = (payload) => {
+        // if (payload.login_type === 'group' && deviceStore.loginKey == payload.login_key) {
+        //   // Nothing actually changed.  ---> but need to show on 1st load...
+        //   return;
+        // }
+        deviceStore.loginKey = payload.login_key;
+        deviceStore.button_stats = Array(no_buttons).fill(0);
+        deviceStore.no_packers = payload.users.length;
+        crossbeamsLocalStorage.setItem(device, deviceStore);
+
         const avatar_colours = ['#f2b736', '#c5523f', '#499255', '#1875e5', '#E7040F', '#FF4136', '#5E2CA5', '#D5008F', '#001B44', '#137752', '#19A974'];
         const loginWidget = document.getElementById('robotLoginWidget');
         let splits = [];
         let init1 = '';
         let init2 = '';
         let bg = '';
-        loginWidget.innerHTML = users.map(u => {
+        loginWidget.innerHTML = payload.users.map(u => {
           splits = u.split(' ');
           init1 = (splits[0][0] || '').toUpperCase();
           init2 = ((splits[1] && splits[1][0]) || '').toUpperCase();
           bg = avatar_colours[(init1.charCodeAt() + init2.charCodeAt()) % avatar_colours.length];
           return `<div>
-          <?xml version="1.0" encoding="UTF-8"?>
-          <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 50 50">
-            <rect width="100%" height="100%" fill="${bg}"/>
-            <text fill="#fff" font-family="Helvetica,Arial,sans-serif" font-size="26" font-weight="500" x="50%" y="55%" dominant-baseline="middle" text-anchor="middle">
-              ${init1}${init2}
-            </text>
-          </svg>
-                  <div>
-         ${splits[0]}
-                  </div>
-                </div>`
-        }).join();
+            <?xml version="1.0" encoding="UTF-8"?>
+            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 50 50">
+              <rect width="100%" height="100%" fill="${bg}"/>
+              <text fill="#fff" font-family="Helvetica,Arial,sans-serif" font-size="26" font-weight="500" x="50%" y="55%" dominant-baseline="middle" text-anchor="middle">
+                ${init1}${init2}
+              </text>
+            </svg>
+            <div>
+            ${splits[0]}
+            </div>
+          </div>`
+        }).join(' ');
       };
 
       const loginWidgetRefresh = (initialLogin) => {
@@ -596,6 +638,7 @@
         crossbeamsRmdScan.init(<%= AppConst::BARCODE_SCAN_RULES.to_json %>, <%= @bypass_rules ? true : false %>, loginHandler, scaleHandler);
         // loginWidgetRefresh(<%= @robot_page.instance[:users] %>);
         loginWidgetRefresh(true);
+        recalcStats();
       });
     </script>
     <%= content_for :late_javascript %>

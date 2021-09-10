@@ -504,11 +504,6 @@ module MesscadaApp
       return failed_response("#{device} does not exist") if sysres_robot.nil?
 
       plantres_robot = DB[:plant_resources].where(system_resource_id: sysres_robot[:id]).first
-      users = if sysres_robot[:group_incentive]
-                ProductionApp::DashboardRepo.new.robot_group_incentive_details(sysres_robot[:id]).map { |r| "#{r[:first_name]} #{r[:surname]}" }
-              else
-                ProductionApp::DashboardRepo.new.robot_logon_details(sysres_robot[:id]).map { |r| "#{r[:first_name]} #{r[:surname]}" }
-              end
       line = resource_repo.plant_resource_parent_of_system_resource(Crossbeams::Config::ResourceDefinitions::LINE, sysres_robot[:system_resource_code])
       res = production_run_repo.find_production_runs_for_line_in_state(line.instance, running: true, labeling: true)
       run_id = res.success ? res.instance.first : nil
@@ -547,22 +542,28 @@ module MesscadaApp
                        url: "/messcada/browser/carton_labeling?device=#{sys[:system_resource_code]}&card_reader=$:card_reader$&identifier=$:identifier$",
                        params: %w[device card_reader identifier]) # Might include scale weight / bin_number ...
       end
+      login_state = login_state(sysres_robot[:system_resource_code])
       # Read res & get login/out/group etc., robot buttons
       success_response('build', { device: sysres_robot[:system_resource_code],
                                   name: plantres_robot[:plant_resource_code],
                                   run_id: run_id,
-                                  users: users,
+                                  users: login_state.instance[:users],
+                                  login_key: login_state.instance[:login_key],
                                   buttons: buttons })
     end
 
     def login_state(device) # rubocop:disable Metrics/AbcSize
       sysres_robot = DB[:system_resources].where(system_resource_code: device).first
-      users = if sysres_robot[:group_incentive]
-                ProductionApp::DashboardRepo.new.robot_group_incentive_details(sysres_robot[:id]).map { |r| "#{r[:first_name]} #{r[:surname]}" }
-              else
-                ProductionApp::DashboardRepo.new.robot_logon_details(sysres_robot[:id]).map { |r| "#{r[:first_name]} #{r[:surname]}" }
-              end
-      success_response('OK', users)
+      if sysres_robot[:group_incentive]
+        users = ProductionApp::DashboardRepo.new.robot_group_incentive_details(sysres_robot[:id]).map { |r| "#{r[:first_name]} #{r[:surname]}" }
+        login_type = 'group'
+        login_key = "group_#{resource_repo.active_group_incentive_id_for(sysres_robot[:id])}"
+      else
+        users = ProductionApp::DashboardRepo.new.robot_logon_details(sysres_robot[:id]).map { |r| "#{r[:first_name]} #{r[:surname]}" }
+        login_type = 'individual'
+        login_key = "individual_#{resource_repo.active_individual_incentive_id_for(sysres_robot[:id])}"
+      end
+      success_response('OK', login_key: login_key, login_type: login_type, users: users)
     end
 
     private
