@@ -23,8 +23,11 @@ module EdiApp
 
       match_data_on(prepare_array_for_match(pallet_numbers))
 
-      check_missing_masterfiles
-      check_load_service_schema
+      mf_res = check_missing_masterfiles
+      return mf_res unless mf_res.success
+
+      mf_res = check_load_service_schema
+      return mf_res unless mf_res.success
 
       business_validation
 
@@ -58,17 +61,24 @@ module EdiApp
         col = k.to_s.gsub('_id', '')
         col.slice!('_party_role')
         val = v.first
-        missing_masterfiles << ["#{col}: #{val}"]
+        missing_masterfiles << "#{col}: #{val}"
       end
       check_missing_masterfiles
     end
 
     def check_missing_masterfiles
-      return if missing_masterfiles.empty?
+      return ok_response if missing_masterfiles.empty?
 
       notes = missing_masterfiles.join(", \n")
       missing_masterfiles_detected(notes)
-      raise Crossbeams::InfoError, 'Missing masterfiles'
+      # raise Crossbeams::InfoError, 'Missing masterfiles'
+      note = <<~STR
+        Please add the missing masterfiles or create variants for them if applicable.
+
+        Then go to #{AppConst::URL_BASE.chomp('/')}/edi/viewer/received/errors
+        Select the line for file #{file_name} and click on "re-process this file" to retry this process.
+      STR
+      failed_response('Missing masterfiles', "\n#{notes}\n\n#{note}")
     end
 
     def allocate_pallets # rubocop:disable Metrics/AbcSize
@@ -194,7 +204,7 @@ module EdiApp
       id = repo.get_id(:party_roles, role_id: role_id, organization_id: org_id)
       return id unless id.nil?
 
-      missing_masterfiles << ["Organization: #{role_name.capitalize} - #{party_role_name}"]
+      missing_masterfiles << "Organization: #{role_name.capitalize} - #{party_role_name}"
       id
     end
 
@@ -206,7 +216,7 @@ module EdiApp
       id = repo.get_variant_id(table_name, val)
       return id unless id.nil?
 
-      missing_masterfiles << ["#{table_name.capitalize}: #{col.capitalize} - #{val}"]
+      missing_masterfiles << "#{table_name.capitalize}: #{col.capitalize} - #{val}"
       id
     end
 
