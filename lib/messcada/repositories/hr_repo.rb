@@ -105,6 +105,9 @@ module MesscadaApp
                 from_external_system: false,
                 active: false)
 
+      # 3. Remove from group if applicable
+      remove_login_from_group(contract_worker_id)
+
       logout_from_messcada(system_resource_id, contract_worker_id) unless system_resource_id.nil?
 
       ok_response

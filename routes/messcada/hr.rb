@@ -30,7 +30,7 @@ class Nspack < Roda
 
       if fetch?(r)
         { success: res.success,
-          message: "#{res.instance[:contract_worker]} logged on" }.to_json
+          message: res.success ? "#{res.instance[:contract_worker]} logged on" : res.message }.to_json
       else
         feedback = if res.success
                      MesscadaApp::RobotFeedback.new(device: params[:device],
@@ -52,18 +52,23 @@ class Nspack < Roda
       res = MesscadaApp::AddSystemResourceIncentiveToParams.call(params, get_group_incentive: false)
       res = interactor.logout(res.instance) if res.success
 
-      feedback = if res.success
-                   MesscadaApp::RobotFeedback.new(device: params[:device],
-                                                  status: true,
-                                                  line1: res.instance[:contract_worker],
-                                                  line4: 'Logged off')
-                 else
-                   MesscadaApp::RobotFeedback.new(device: params[:device],
-                                                  status: false,
-                                                  line1: 'Cannot logout',
-                                                  line4: res.message)
-                 end
-      Crossbeams::RobotResponder.new(feedback).render
+      if fetch?(r)
+        { success: res.success,
+          message: res.success ? "#{res.instance[:contract_worker]} logged off" : res.message }.to_json
+      else
+        feedback = if res.success
+                     MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                    status: true,
+                                                    line1: res.instance[:contract_worker],
+                                                    line4: 'Logged off')
+                   else
+                     MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                    status: false,
+                                                    line1: 'Cannot logout',
+                                                    line4: res.message)
+                   end
+        Crossbeams::RobotResponder.new(feedback).render
+      end
     end
 
     r.on 'logon_with_no' do

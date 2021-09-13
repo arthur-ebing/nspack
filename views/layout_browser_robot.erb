@@ -296,6 +296,9 @@
       const robotActivityLog = document.getElementById('robotActivityLog') || document.createElement('div');
       const scaleWeight = document.getElementById('scaleWeight') || document.createElement('div');
       const robotStatsWidget = document.getElementById('robotStatsWidget') || document.createElement('div');
+      const toggleLogout = document.getElementById('toggleLogout');
+      const loginWidget = document.getElementById('robotLoginWidget');
+      const robotButtons = document.getElementById('robotButtons');
 
       const recalcStats = () => {
         const tot = deviceStore.button_stats.reduce((a, b) => a + b, 0);
@@ -397,6 +400,18 @@
       });
       // MessageBus handling --- END
 
+      const setLogoutMode = (logout) => {
+        if (logout) {
+          robotLoginWidget.classList.add('o-20');
+          robotButtons.classList.add('o-20');
+          robotButtons.querySelectorAll('[data-enabled="true"]').forEach((node) => { node.disabled = true; });
+        } else {
+          robotLoginWidget.classList.remove('o-20');
+          robotButtons.classList.remove('o-20');
+          robotButtons.querySelectorAll('[data-enabled="true"]').forEach((node) => { node.disabled = false; });
+        }
+      };
+
       // Highlight label text for inputs that have focus.
       document.addEventListener('focus', function (event) {
         const prev = event.target.parentNode && event.target.parentNode.previousElementSibling;
@@ -486,8 +501,12 @@
         deviceStore.no_packers = payload.users.length;
         crossbeamsLocalStorage.setItem(device, deviceStore);
 
+        if (toggleLogout.checked) {
+          toggleLogout.checked = false;
+          setLogoutMode(false);
+        }
+
         const avatar_colours = ['#f2b736', '#c5523f', '#499255', '#1875e5', '#E7040F', '#FF4136', '#5E2CA5', '#D5008F', '#001B44', '#137752', '#19A974'];
-        const loginWidget = document.getElementById('robotLoginWidget');
         let splits = [];
         let init1 = '';
         let init2 = '';
@@ -576,7 +595,7 @@
 
       const loginHandler = (cardReader, identifier) => {
         // console.log('Login:', cardReader, identifier);
-        const url = `/messcada/hr/logon?device=${device}&card_reader=${cardReader}&identifier=${identifier}`
+        const url = `/messcada/hr/${toggleLogout.checked ? 'logoff' : 'logon'}?device=${device}&card_reader=${cardReader}&identifier=${identifier}`
         // Login via fetch & update
         fetch(url, {
           method: 'GET',
@@ -634,6 +653,9 @@
         const afi = document.querySelector('input[autofocus]');
         const prev = afi && afi.parentNode && afi.parentNode.previousElementSibling;
         if (prev instanceof HTMLTableCellElement) { prev.classList.add('focusLabel'); }
+        toggleLogout.addEventListener('click', function (event) {
+          setLogoutMode(toggleLogout.checked);
+        });
 
         crossbeamsRmdScan.init(<%= AppConst::BARCODE_SCAN_RULES.to_json %>, <%= @bypass_rules ? true : false %>, loginHandler, scaleHandler);
         // loginWidgetRefresh(<%= @robot_page.instance[:users] %>);
