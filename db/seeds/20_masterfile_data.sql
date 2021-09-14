@@ -278,3 +278,6 @@ INSERT INTO incoterms (incoterm) VALUES ('Deliver at Store') ON CONFLICT DO NOTH
 INSERT INTO incoterms (incoterm) VALUES ('DDP') ON CONFLICT DO NOTHING;
 INSERT INTO incoterms (incoterm) VALUES ('DDU') ON CONFLICT DO NOTHING;
 INSERT INTO incoterms (incoterm) VALUES ('EX Coldstore') ON CONFLICT DO NOTHING;
+
+-- QA STANDARD TYPES
+INSERT INTO qa_standard_types (qa_standard_type_code, description) VALUES('MRL', 'Minimum Residue Level') ON CONFLICT DO NOTHING;
