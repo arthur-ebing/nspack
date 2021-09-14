@@ -409,15 +409,15 @@ module MesscadaApp
     end
 
     def find_first_sequence_id_for_pallet_number(pallet_number)
-      DB[:pallet_sequences].where(pallet_number: pallet_number, scrapped_at: nil).order(:id).get(:id)
+      DB[:pallet_sequences].where(pallet_number: pallet_number, scrapped_at: nil, removed_from_pallet: false).order(:id).get(:id)
     end
 
     def find_pallet_sequences_from_same_pallet(id)
-      DB["select sis.id
-          from pallet_sequences s
-          join pallet_sequences sis on sis.pallet_id=s.pallet_id
-          where s.id = #{id} AND sis.scrapped_at IS NULL
-          order by sis.pallet_sequence_number asc"].map { |s| s[:id] }
+      DB["SELECT sis.id
+          FROM pallet_sequences s
+          JOIN pallet_sequences sis ON sis.pallet_id=s.pallet_id
+          WHERE s.id = #{id} AND sis.pallet_id IS NOT NULL
+          ORDER BY sis.pallet_sequence_number ASC"].map { |s| s[:id] }
     end
 
     def find_pallet_sequence_attrs(id)
