@@ -654,6 +654,8 @@ class Nspack < Roda
               standard_carton_nett_weight
               ratio_to_standard_carton
               is_standard_carton
+              min_gross_weight
+              max_gross_weight
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
@@ -705,6 +707,8 @@ class Nspack < Roda
             standard_carton_nett_weight
             ratio_to_standard_carton
             is_standard_carton
+            min_gross_weight
+            max_gross_weight
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)

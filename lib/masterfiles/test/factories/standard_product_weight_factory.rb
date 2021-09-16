@@ -16,7 +16,9 @@ module MasterfilesApp
         updated_at: '2010-01-01 12:00',
         standard_carton_nett_weight: Faker::Number.decimal,
         ratio_to_standard_carton: Faker::Number.decimal,
-        is_standard_carton: false
+        is_standard_carton: false,
+        max_gross_weight: Faker::Number.decimal,
+        min_gross_weight: Faker::Number.decimal
       }
       DB[:standard_product_weights].insert(default.merge(opts))
     end

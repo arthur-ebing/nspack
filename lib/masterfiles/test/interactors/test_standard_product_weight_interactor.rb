@@ -76,7 +76,9 @@ module MasterfilesApp
         active: true,
         standard_carton_nett_weight: 1.0,
         ratio_to_standard_carton: 1.0,
-        is_standard_carton: false
+        is_standard_carton: false,
+        max_gross_weight: 1.0,
+        min_gross_weight: 1.0
       }
     end
 

@@ -21,7 +21,7 @@ module MasterfilesApp
       instance = standard_product_weight(id)
       success_response("Created standard product weight #{instance.id}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { id: ['This standard product weight already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { standard_pack_id: ['This standard product weight already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
