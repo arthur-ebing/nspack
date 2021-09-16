@@ -11,6 +11,8 @@ module MasterfilesApp
     attribute :standard_carton_nett_weight, Types::Decimal
     attribute :ratio_to_standard_carton, Types::Decimal
     attribute :is_standard_carton, Types::Bool
+    attribute :min_gross_weight, Types::Decimal
+    attribute :max_gross_weight, Types::Decimal
   end
 
   class StandardProductWeightFlat < Dry::Struct
@@ -25,5 +27,7 @@ module MasterfilesApp
     attribute :standard_carton_nett_weight, Types::Decimal
     attribute :ratio_to_standard_carton, Types::Decimal
     attribute :is_standard_carton, Types::Bool
+    attribute :min_gross_weight, Types::Decimal
+    attribute :max_gross_weight, Types::Decimal
   end
 end

@@ -26,6 +26,8 @@ module UiRules
                                                caption: 'Standard Carton Nett Weight (kg)' }
       fields[:ratio_to_standard_carton] = { renderer: :label }
       fields[:is_standard_carton] = { renderer: :label, as_boolean: true }
+      fields[:min_gross_weight] = { renderer: :label }
+      fields[:max_gross_weight] = { renderer: :label }
     end
 
     def common_fields
@@ -59,7 +61,9 @@ module UiRules
                   &divide; (<em>standard carton nett weight</em> of the <em>standard pack</em> of the pallet)
                 </blockquote>"
         },
-        ratio_to_standard_carton: { renderer: :numeric }
+        ratio_to_standard_carton: { renderer: :numeric },
+        min_gross_weight: { renderer: :numeric },
+        max_gross_weight: { renderer: :numeric }
       }
     end
 
@@ -73,13 +77,7 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(commodity_id: nil,
-                                    standard_pack_id: nil,
-                                    gross_weight: nil,
-                                    nett_weight: nil,
-                                    standard_carton_nett_weight: nil,
-                                    ratio_to_standard_carton: nil,
-                                    is_standard_carton: nil)
+      @form_object = new_form_object_from_struct(MasterfilesApp::StandardProductWeight)
     end
   end
 end

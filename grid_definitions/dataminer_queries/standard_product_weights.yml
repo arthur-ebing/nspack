@@ -5,6 +5,7 @@
   \   standard_pack_codes.standard_pack_code,\r\n    standard_product_weights.gross_weight,\r\n
   \   standard_product_weights.nett_weight,\r\n    standard_product_weights.standard_carton_nett_weight,\r\n
   \   standard_product_weights.ratio_to_standard_carton,\r\n    standard_product_weights.is_standard_carton,\r\n
+  \   standard_product_weights.min_gross_weight,\r\n    standard_product_weights.max_gross_weight,\r\n
   \   fn_current_status('standard_product_weights', standard_product_weights.id) AS
   status,\r\n    standard_product_weights.active,\r\n    standard_product_weights.created_at,\r\n
   \   standard_product_weights.updated_at\r\nFROM standard_product_weights \r\nJOIN
@@ -148,7 +149,7 @@
     :caption: Ratio to standard carton
     :namespaced_name: standard_product_weights.ratio_to_standard_carton
     :data_type: :number
-    :width: 
+    :width: 200
     :format: :delimited_1000
     :hide: false
     :pinned: 
@@ -164,8 +165,40 @@
     :caption: Std carton?
     :namespaced_name: standard_product_weights.is_standard_carton
     :data_type: :boolean
-    :width: 110
+    :width: 150
     :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  min_gross_weight:
+    :name: min_gross_weight
+    :sequence_no: 11
+    :caption: Min Gross
+    :namespaced_name: standard_product_weights.min_gross_weight
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  max_gross_weight:
+    :name: max_gross_weight
+    :sequence_no: 12
+    :caption: Max Gross
+    :namespaced_name: standard_product_weights.max_gross_weight
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
     :hide: false
     :pinned: 
     :groupable: false
@@ -176,7 +209,7 @@
     :group_max: false
   status:
     :name: status
-    :sequence_no: 11
+    :sequence_no: 13
     :caption: Status
     :namespaced_name: 
     :data_type: :string
@@ -192,7 +225,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 12
+    :sequence_no: 14
     :caption: Active
     :namespaced_name: standard_product_weights.active
     :data_type: :boolean
@@ -208,7 +241,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 13
+    :sequence_no: 15
     :caption: Created at
     :namespaced_name: standard_product_weights.created_at
     :data_type: :datetime
@@ -224,7 +257,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 14
+    :sequence_no: 16
     :caption: Updated at
     :namespaced_name: standard_product_weights.updated_at
     :data_type: :datetime
