@@ -18,7 +18,6 @@ module Masterfiles
               form.add_field :target_customer_ids
               form.add_field :description
               form.add_field :inspection_tm
-              form.add_field :protocol_exception
             end
           end
 

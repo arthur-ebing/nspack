@@ -182,7 +182,6 @@ class Nspack < Roda
               target_market_name
               description
               inspection_tm
-              protocol_exception
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else

@@ -40,9 +40,7 @@ module FinishedGoodsApp
                         { parent_table: :destination_regions,  foreign_key: :destination_region_id,
                           flatten_columns: { destination_region_name: :destination_region } },
                         { parent_table: :destination_countries, foreign_key: :destination_country_id,
-                          flatten_columns: { country_name: :destination_country, iso_country_code: :iso_country_code } },
-                        { parent_table: :target_markets, foreign_key: :exception_protocol_tm_id,
-                          flatten_columns: { target_market_name: :exception_protocol_tm } }]
+                          flatten_columns: { country_name: :destination_country, iso_country_code: :iso_country_code } }]
       )
       return nil unless hash
 

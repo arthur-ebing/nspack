@@ -48,8 +48,7 @@ module MasterfilesApp
         target_market_name: Faker::Lorem.unique.word,
         active: true,
         description: Faker::Lorem.word,
-        inspection_tm: false,
-        protocol_exception: false
+        inspection_tm: false
       }
       DB[:target_markets].insert(default.merge(opts))
     end
