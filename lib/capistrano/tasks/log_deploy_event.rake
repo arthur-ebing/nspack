@@ -35,7 +35,7 @@ namespace :deploy do
       puts("\n------------------------------------------------------------------------------------------------")
       puts('Log the deployment event: (Copy this command and run it against the deployment log application.)')
       puts("------------------------------------------------------------------------------------------------\n\n")
-      puts %(curl -d '#{hash.to_json}' -H 'Content-Type: application/json' http://localhost:9292/log_event)
+      puts %(curl -d '#{hash.to_json}' -H 'Content-Type: application/json' http://nspack.deploys/log_event)
       puts("------------------------------------------------------------------------------------------------\n\n")
     end
   end
