@@ -374,13 +374,15 @@ module ProductionApp
 
     def allocate_product_setup(product_resource_allocation_id, params)
       res = repo.allocate_product_setup(product_resource_allocation_id, params[:column_value])
-      res.instance = { changes: { product_setup_id: res.instance[:product_setup_id] } }
+      label_template_name = repo.resource_allocation_label_name(product_resource_allocation_id)
+      res.instance = { changes: { product_setup_id: res.instance[:product_setup_id], label_template_name: label_template_name } }
       res
     end
 
     def allocate_packing_specification(product_resource_allocation_id, params)
       res = repo.allocate_packing_specification(product_resource_allocation_id, params[:column_value])
-      res.instance = { changes: { packing_specification_item_code: res.instance[:packing_specification_item_code] } }
+      label_template_name = repo.resource_allocation_label_name(product_resource_allocation_id)
+      res.instance = { changes: { packing_specification_item_code: res.instance[:packing_specification_item_code], label_template_name: label_template_name } }
       res
     end
 

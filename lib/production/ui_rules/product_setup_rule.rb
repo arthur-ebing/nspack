@@ -47,6 +47,7 @@ module UiRules
       pallet_stack_type_id_label = MasterfilesApp::PackagingRepo.new.find_pallet_stack_type(@form_object.pallet_stack_type_id)&.stack_type_code
       rmt_class_id_label = MasterfilesApp::FruitRepo.new.find_rmt_class(@form_object.rmt_class_id)&.rmt_class_code
       colour_percentage_id_label = @repo.get(:colour_percentages, @form_object.colour_percentage_id, :description)
+      carton_label_template_id_label = @repo.get(:label_templates, @form_object.carton_label_template_id, :label_template_name)
 
       fields[:product_setup_template_id] = { renderer: :label,
                                              with_value: product_setup_template_id_label,
@@ -137,6 +138,9 @@ module UiRules
                                         with_value: colour_percentage_id_label,
                                         hide_on_load: !@rules[:colour_applies],
                                         caption: 'Colour Percentage' }
+      fields[:carton_label_template_id] = { renderer: :label,
+                                            with_value: carton_label_template_id_label,
+                                            caption: 'Carton Label Name' }
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize
@@ -162,7 +166,6 @@ module UiRules
                         disabled_options: @commodity_repo.for_select_inactive_commodities,
                         caption: 'Commodity',
                         required: true,
-                        searchable: true,
                         remove_search_for_small_list: false },
         marketing_variety_id: { renderer: :select,
                                 options: @repo.for_select_template_commodity_marketing_varieties(product_setup_template_id, commodity_id, @form_object.cultivar_id),
@@ -170,7 +173,6 @@ module UiRules
                                 caption: 'Marketing Variety',
                                 required: true,
                                 prompt: 'Select Marketing Variety',
-                                searchable: true,
                                 remove_search_for_small_list: false },
         std_fruit_size_count_id: { renderer: :select,
                                    options: @fruit_size_repo.for_select_std_fruit_size_counts(
@@ -179,7 +181,6 @@ module UiRules
                                    disabled_options: @fruit_size_repo.for_select_inactive_std_fruit_size_counts,
                                    caption: 'Std Size Count',
                                    prompt: 'Select Size Count',
-                                   searchable: true,
                                    remove_search_for_small_list: false },
         basic_pack_code_id: { renderer: :select,
                               options: @fruit_size_repo.for_select_basic_packs,
@@ -187,7 +188,6 @@ module UiRules
                               caption: 'Basic Pack',
                               required: true,
                               prompt: 'Select Basic Pack',
-                              searchable: true,
                               remove_search_for_small_list: false },
         standard_pack_code_id: { renderer: :select,
                                  options: @fruit_size_repo.for_select_standard_packs,
@@ -195,7 +195,6 @@ module UiRules
                                  caption: 'Standard Pack',
                                  required: !@rules[:basic_pack_equals_standard_pack],
                                  prompt: 'Select Standard Pack',
-                                 searchable: true,
                                  hide_on_load: @rules[:basic_pack_equals_standard_pack],
                                  remove_search_for_small_list: false },
         fruit_actual_counts_for_pack_id: { renderer: :select,
@@ -206,14 +205,12 @@ module UiRules
                                            disabled_options: @fruit_size_repo.for_select_inactive_fruit_actual_counts_for_packs,
                                            caption: 'Actual Count',
                                            prompt: 'Select Actual Count',
-                                           searchable: true,
                                            remove_search_for_small_list: false },
         fruit_size_reference_id: { renderer: :select,
                                    options: @fruit_size_repo.for_select_fruit_size_references,
                                    disabled_options: @fruit_size_repo.for_select_inactive_fruit_size_references,
                                    caption: 'Size Reference',
                                    prompt: 'Select Size Reference',
-                                   searchable: true,
                                    remove_search_for_small_list: false },
         rmt_class_id: { renderer: :select,
                         options: MasterfilesApp::FruitRepo.new.for_select_rmt_classes,
@@ -221,7 +218,6 @@ module UiRules
                         invisible: !AppConst::CR_PROD.capture_product_setup_class?,
                         caption: 'Class',
                         prompt: 'Select Class',
-                        searchable: true,
                         remove_search_for_small_list: false },
         grade_id: { renderer: :select,
                     options: MasterfilesApp::FruitRepo.new.for_select_grades,
@@ -229,7 +225,6 @@ module UiRules
                     caption: 'Grade',
                     required: true,
                     prompt: 'Select Grade',
-                    searchable: true,
                     remove_search_for_small_list: false },
         marketing_org_party_role_id: { renderer: :select,
                                        options: @party_repo.for_select_party_roles(AppConst::ROLE_MARKETER),
@@ -237,7 +232,6 @@ module UiRules
                                        caption: 'Marketing Org',
                                        required: true,
                                        prompt: 'Select Marketing Org',
-                                       searchable: true,
                                        remove_search_for_small_list: false },
         packed_tm_group_id: { renderer: :select,
                               options: @tm_repo.for_select_packed_tm_groups,
@@ -245,7 +239,6 @@ module UiRules
                               caption: 'Packed TM Group',
                               required: true,
                               prompt: 'Select Packed TM Group',
-                              searchable: true,
                               remove_search_for_small_list: false },
         target_market_id: { renderer: :select,
                             options: @tm_repo.for_select_packed_group_tms(
@@ -254,14 +247,12 @@ module UiRules
                             disabled_options: @tm_repo.for_select_inactive_target_markets,
                             caption: 'Target Market',
                             prompt: 'Select Target Market',
-                            searchable: true,
                             remove_search_for_small_list: false },
         target_customer_party_role_id: { renderer: :select,
                                          options: @party_repo.for_select_party_roles(AppConst::ROLE_TARGET_CUSTOMER),
                                          invisible: !AppConst::CR_PROD.link_target_markets_to_target_customers?,
                                          caption: 'Target Customer',
                                          prompt: 'Select Target Customer',
-                                         searchable: true,
                                          remove_search_for_small_list: false },
         sell_by_code: {},
         mark_id: { renderer: :select,
@@ -270,7 +261,6 @@ module UiRules
                    caption: 'Mark',
                    required: true,
                    prompt: 'Select Mark',
-                   searchable: true,
                    remove_search_for_small_list: false },
         product_chars: {},
         inventory_code_id: { renderer: :select,
@@ -278,7 +268,6 @@ module UiRules
                              disabled_options: MasterfilesApp::FruitRepo.new.for_select_inactive_inventory_codes,
                              caption: 'Inventory Code',
                              prompt: 'Select Inventory Code',
-                             searchable: true,
                              remove_search_for_small_list: false,
                              required: true },
         customer_variety_id: { renderer: :select,
@@ -289,7 +278,6 @@ module UiRules
                                disabled_options: MasterfilesApp::MarketingRepo.new.for_select_inactive_customer_varieties,
                                caption: 'Customer Variety',
                                prompt: 'Select Customer Variety',
-                               searchable: true,
                                remove_search_for_small_list: false },
         client_product_code: {},
         client_size_reference: {},
@@ -299,21 +287,18 @@ module UiRules
                           caption: 'Pallet Base',
                           required: true,
                           prompt: 'Select Pallet Base',
-                          searchable: true,
                           remove_search_for_small_list: false },
         pallet_stack_type_id: { renderer: :select, options: MasterfilesApp::PackagingRepo.new.for_select_pallet_stack_types,
                                 disabled_options: MasterfilesApp::PackagingRepo.new.for_select_inactive_pallet_stack_types,
                                 caption: 'Pallet Stack Type',
                                 required: true,
                                 prompt: 'Select Pallet Stack Type',
-                                searchable: true,
                                 remove_search_for_small_list: false },
         pallet_format_id: { renderer: :select, options: MasterfilesApp::PackagingRepo.new.for_select_pallet_formats,
                             disabled_options: MasterfilesApp::PackagingRepo.new.for_select_inactive_pallet_formats,
                             caption: 'Pallet Format',
                             required: true,
                             prompt: 'Select Pallet Format',
-                            searchable: true,
                             remove_search_for_small_list: false },
         pallet_label_name: { renderer: :select,
                              options: MasterfilesApp::LabelTemplateRepo.new.for_select_label_templates(
@@ -321,7 +306,6 @@ module UiRules
                              ),
                              caption: 'Pallet Label Name',
                              prompt: 'Select Pallet Label Name',
-                             searchable: true,
                              remove_search_for_small_list: false },
         cartons_per_pallet_id: { renderer: :select,
                                  options: MasterfilesApp::PackagingRepo.new.for_select_cartons_per_pallet,
@@ -329,7 +313,6 @@ module UiRules
                                  caption: 'Cartons per Pallet',
                                  required: true,
                                  prompt: 'Select Cartons per Pallet',
-                                 searchable: true,
                                  remove_search_for_small_list: false },
         active: { renderer: :checkbox },
         treatment_ids: { renderer: :multi,
@@ -347,8 +330,14 @@ module UiRules
                                 caption: 'Colour Percentage',
                                 prompt: 'Select Colour Percentage',
                                 hide_on_load: !colour_applies,
-                                searchable: true,
-                                remove_search_for_small_list: false }
+                                remove_search_for_small_list: false },
+        carton_label_template_id: { renderer: :select,
+                                    options: MasterfilesApp::LabelTemplateRepo.new.for_select_label_templates(
+                                      where: { application: AppConst::PRINT_APP_CARTON }
+                                    ),
+                                    caption: 'Carton Label Name',
+                                    prompt: 'Select Carton Label Name',
+                                    remove_search_for_small_list: false }
 
       }
     end

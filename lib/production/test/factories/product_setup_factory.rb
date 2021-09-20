@@ -42,6 +42,7 @@ module ProductionApp
       rmt_class_id = create_rmt_class
       standard_pack_code_id = create_standard_pack
       basic_pack_code_id = create_basic_pack(standard_pack_id: standard_pack_code_id)
+      carton_label_template_id = create_label_template
 
       default = {
         product_setup_template_id: product_setup_template_id,
@@ -69,7 +70,8 @@ module ProductionApp
         product_chars: Faker::Lorem.unique.word,
         active: true,
         gtin_code: Faker::Lorem.word,
-        rmt_class_id: rmt_class_id
+        rmt_class_id: rmt_class_id,
+        carton_label_template_id: carton_label_template_id
       }
       create_gtin(default.merge(opts))
       DB[:product_setups].insert(default.merge(opts))

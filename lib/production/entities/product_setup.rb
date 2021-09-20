@@ -36,6 +36,7 @@ module ProductionApp
     attribute :rmt_class_id, Types::Integer
     attribute :target_customer_party_role_id, Types::Integer
     attribute :colour_percentage_id, Types::Integer
+    attribute :carton_label_template_id, Types::Integer
   end
 
   class ProductSetupFlat < Dry::Struct
@@ -78,5 +79,7 @@ module ProductionApp
     attribute :cultivar_id, Types::Integer
     attribute :cultivar_group, Types::String
     attribute :cultivar, Types::String
+    attribute :carton_label_template_id, Types::Integer
+    attribute :carton_template_name, Types::String
   end
 end
