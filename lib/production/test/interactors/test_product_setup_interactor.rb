@@ -16,6 +16,7 @@ module ProductionApp
     include MasterfilesApp::TargetMarketFactory
     include RawMaterialsApp::RmtBinFactory
     include MasterfilesApp::RmtContainerFactory
+    include MesscadaApp::CartonFactory
 
     def test_repo
       repo = interactor.send(:repo)
@@ -171,7 +172,9 @@ module ProductionApp
         cultivar_group_id: 1,
         cultivar_id: 1,
         cultivar_group: 'ABC',
-        cultivar: 'ABC'
+        cultivar: 'ABC',
+        carton_label_template_id: nil,
+        carton_template_name: 'ABC'
       }
     end
 

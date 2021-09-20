@@ -302,12 +302,14 @@ module ProductionApp
     def allocate_product_setup(product_resource_allocation_id, product_setup_code)
       run_id = DB[:product_resource_allocations].where(id: product_resource_allocation_id).get(:production_run_id)
       qry = <<~SQL
-        SELECT id
+        SELECT id, carton_label_template_id
         FROM product_setups
         WHERE product_setup_template_id = (SELECT product_setup_template_id FROM production_runs WHERE id = #{run_id}) AND fn_product_setup_code(id) = '#{product_setup_code}'
       SQL
-      product_setup_id = DB[qry].get(:id)
-      update(:product_resource_allocations, product_resource_allocation_id, product_setup_id: product_setup_id)
+      product_setup_id, label_template_id = DB[qry].get(%i[id carton_label_template_id])
+      attrs = { product_setup_id: product_setup_id }
+      attrs[:label_template_id] = label_template_id unless label_template_id.nil?
+      update(:product_resource_allocations, product_resource_allocation_id, attrs)
 
       success_response("Allocated #{product_setup_code}", product_setup_id: product_setup_id)
     end
@@ -315,17 +317,25 @@ module ProductionApp
     def allocate_packing_specification(product_resource_allocation_id, packing_specification_item_code)
       run_id = DB[:product_resource_allocations].where(id: product_resource_allocation_id).get(:production_run_id)
       qry = <<~SQL
-        SELECT packing_specification_items.id, product_setup_id
+        SELECT packing_specification_items.id, product_setup_id, product_setups.carton_label_template_id
         FROM packing_specification_items
         JOIN product_setups ON product_setups.id = packing_specification_items.product_setup_id
         WHERE product_setup_template_id = (SELECT product_setup_template_id FROM production_runs WHERE id = #{run_id})
          AND fn_packing_specification_code(packing_specification_items.id) = '#{packing_specification_item_code}'
       SQL
-      spec_id, setup_id = DB[qry].get(%i[id product_setup_id])
+      spec_id, setup_id, label_template_id = DB[qry].get(%i[id product_setup_id carton_label_template_id])
       attrs = { packing_specification_item_id: spec_id, product_setup_id: setup_id }
+      attrs[:label_template_id] = label_template_id unless label_template_id.nil?
       update(:product_resource_allocations, product_resource_allocation_id, attrs)
 
       success_response("Allocated #{packing_specification_item_code}", packing_specification_item_code: packing_specification_item_code)
+    end
+
+    def resource_allocation_label_name(product_resource_allocation_id)
+      DB[:label_templates].where(id: DB[:product_resource_allocations]
+                                       .where(id: product_resource_allocation_id)
+                                       .get(:label_template_id))
+                          .get(:label_template_name)
     end
 
     def label_for_allocation(product_resource_allocation_id, label_template_name)

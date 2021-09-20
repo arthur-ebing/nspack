@@ -75,6 +75,7 @@ module Production
                     fold.add_field :pallet_format_id
                     fold.add_field :pallet_label_name
                     fold.add_field :cartons_per_pallet_id
+                    fold.add_field :carton_label_template_id
                   end
                 end
                 row.column do |col|

@@ -45,7 +45,14 @@ module UiRules
                                  disabled_options: @packaging_repo.for_select_inactive_cartons_per_pallet,
                                  prompt: true,
                                  required: true,
-                                 caption: 'Cartons per Pallet' }
+                                 caption: 'Cartons per Pallet' },
+        carton_label_template_id: { renderer: :select,
+                                    options: MasterfilesApp::LabelTemplateRepo.new.for_select_label_templates(
+                                      where: { application: AppConst::PRINT_APP_CARTON }
+                                    ),
+                                    caption: 'Carton Label Name',
+                                    prompt: 'Select Carton Label Name',
+                                    remove_search_for_small_list: false }
       }
     end
 

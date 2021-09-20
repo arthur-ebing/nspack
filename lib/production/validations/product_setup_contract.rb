@@ -30,6 +30,7 @@ module ProductionApp
       required(:basic_pack_code_id).filled(:integer)
       optional(:target_customer_party_role_id).maybe(:integer)
       optional(:colour_percentage_id).maybe(:integer)
+      required(:carton_label_template_id).maybe(:integer)
     end
     rule(:standard_pack_code_id) do
       key.failure 'must be filled' if values[:standard_pack_code_id].nil_or_empty? && !AppConst::CR_MF.basic_pack_equals_standard_pack?
@@ -86,6 +87,7 @@ module ProductionApp
       required(:pallet_format_id).filled(:integer)
       required(:pallet_label_name).maybe(Types::StrippedString)
       required(:cartons_per_pallet_id).filled(:integer)
+      required(:carton_label_template_id).maybe(:integer)
     end
   end
 
