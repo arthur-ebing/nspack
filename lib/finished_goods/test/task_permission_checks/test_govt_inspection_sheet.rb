@@ -49,8 +49,7 @@ module FinishedGoodsApp
         tripsheet_offloaded: false,
         use_inspection_destination_for_load_out: false,
         active: true,
-        exception_protocol_tm_id: 1,
-        exception_protocol_tm: 'ABC'
+        titan_protocol_exception: 'ABC'
       }
       FinishedGoodsApp::GovtInspectionSheet.new(base_attrs.merge(attrs))
     end

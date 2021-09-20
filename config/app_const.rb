@@ -549,6 +549,14 @@ class AppConst # rubocop:disable Metrics/ClassLength
   TITAN_ADDENDUM_STATUS = 'Addendum Status'
   TITAN_ADDENDUM_CANCEL = 'Cancel Addendum'
 
+  # Constants for titan_protocol_exception:
+  TITAN_PROTOCOL_EXCEPTION_OPTIONS = [
+    ['SF - Smartfresh', 'SF'],
+    ['7 - FCM', '7'],
+    ['8 - CBS', '8'],
+    ['9 - CFM & CBS', '9']
+  ].freeze
+
   # QUALITY APP result types
   PASS_FAIL = 'Pass/Fail'
   CLASSIFICATION = 'Classification'

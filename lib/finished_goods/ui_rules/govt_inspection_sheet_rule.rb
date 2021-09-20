@@ -49,8 +49,8 @@ module UiRules
       fields[:created_by] = { renderer: :label }
       fields[:consignment_note_number] = { renderer: :label }
       fields[:status] = { renderer: :label }
-      fields[:exception_protocol_tm] = { renderer: :label,
-                                         caption: 'Protocol Exception' }
+      fields[:titan_protocol_exception] = { renderer: :label,
+                                            caption: 'Titan Protocol Exception' }
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize
@@ -120,13 +120,10 @@ module UiRules
         created_by: { disabled: true },
         consignment_note_number: { disabled: true },
         status: { disabled: true },
-        exception_protocol_tm_id: { renderer: :select,
-                                    options: @tm_repo.for_select_packed_group_tms(
-                                      where: { protocol_exception: true, target_market_group_id: @form_object.packed_tm_group_id }
-                                    ),
-                                    disabled_options: @tm_repo.for_select_inactive_target_markets,
+        titan_protocol_exception: { renderer: :select,
+                                    options: AppConst::TITAN_PROTOCOL_EXCEPTION_OPTIONS,
                                     prompt: true,
-                                    caption: 'Protocol Exception' }
+                                    caption: 'Titan Protocol Exception' }
       }
     end
 
@@ -161,7 +158,7 @@ module UiRules
         destination_country_id: @repo.get_last(:govt_inspection_sheets, :destination_country_id),
         reinspection: @mode == :reinspection,
         scanned_number: nil,
-        exception_protocol_tm_id: nil
+        titan_protocol_exception: nil
       )
     end
 

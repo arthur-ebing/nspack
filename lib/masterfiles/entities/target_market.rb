@@ -9,6 +9,5 @@ module MasterfilesApp
     attribute :description, Types::String
     attribute :inspection_tm, Types::Bool
     attribute :target_customer_ids, Types::Array
-    attribute :protocol_exception, Types::Bool
   end
 end

@@ -9,6 +9,5 @@ module MasterfilesApp
     required(:description).maybe(Types::StrippedString)
     required(:inspection_tm).maybe(:bool)
     optional(:target_customer_ids).maybe(:array).each(:integer)
-    required(:protocol_exception).maybe(:bool)
   end
 end
