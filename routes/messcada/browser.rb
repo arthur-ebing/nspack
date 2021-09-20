@@ -30,6 +30,9 @@ class Nspack < Roda
       interactor = MesscadaApp::MesscadaInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       res = MesscadaApp::AddSystemResourceIncentiveToParams.call(params, has_button: true)
+
+      res = interactor.check_carton_label_weight(res.instance) if res.success && r.remaining_path == '/weighing'
+
       res = interactor.send_label_to_printer(res.instance) if res.success
       if res.success
         show_json_notice(res.message)

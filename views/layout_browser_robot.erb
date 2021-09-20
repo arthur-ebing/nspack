@@ -435,8 +435,7 @@
         let url = event.target.dataset.buttonActionUrl;
         url = url.replace(/\$:card_reader\$/, '1');
         url = url.replace(/\$:identifier\$/, '123'); // STORED id?
-        url = url.replace(/\$:weight\$/, scaleWeight.textcontent);
-        // SCALE...
+        url = url.replace(/\$:weight\$/, scaleWeight.textContent);
 
         scaleWeight.textContent = '.';
         scaleWeight.dataset.scaleReading = 'empty';

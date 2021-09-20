@@ -363,6 +363,21 @@ module ProductionApp
       success_response('ok', id)
     end
 
+    # Given a system resource code, return the id of its immediate
+    # parent plant resource.
+    # def system_resource_parent_plant_id(system_resource_code)
+    #   query = <<~SQL
+    #     SELECT p.id
+    #     FROM system_resources sys
+    #     JOIN plant_resources plant ON plant.system_resource_id = sys.id
+    #     JOIN tree_plant_resources t ON t.descendant_plant_resource_id = plant.id
+    #     JOIN plant_resources p ON p.id = t.ancestor_plant_resource_id
+    #     WHERE sys.system_resource_code = ?
+    #       AND t.path_length = 1
+    #   SQL
+    #   DB[query, system_resource_code].get(:id)
+    # end
+
     def system_servers
       query = <<~SQL
         SELECT s.system_resource_code as name,

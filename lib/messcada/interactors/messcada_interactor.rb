@@ -255,7 +255,38 @@ module MesscadaApp
       failed_response(e.message)
     end
 
+    def check_weights(params)
+      p params
+      alloc_hash = production_run_repo.allocation_for_button_code(params[:device])
+      raise Crossbeams::InfoError, "There is no allocation for #{params[:device]}" if alloc_hash.nil?
+
+      check_weights = product_setup_repo.check_weights_for_product_setup(alloc_hash[:product_setup_id])
+      raise Crossbeams::InfoError, 'No check weights set up for product' if check_weights.nil?
+
+      # Get fruitspec from button (running run)
+      # get line from resource
+      # labeling_run_for_line(line_id)
+      # get alloc for run & resource
+      # none: raise InfoError
+      # Get STD pack weights
+      # { pack_code: 'A123', min_gross_weight: 12, max_gross_weight: 20, commodity_code: 'AP' }
+      check_weights
+    end
+
+    def check_carton_label_weight(params)
+      check_weights = check_weights(params)
+      check_weights[:weight] = params[:weight]
+      contract = CartonLabelCheckWeightContract.new
+      res = contract.call(check_weights)
+      return failed_response(unwrap_error_set(res.errors)) if res.failure?
+
+      success_response('ok', params)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def send_label_to_printer(params) # rubocop:disable Metrics/AbcSize
+      # Change ctn labeling to handle a gross weight param
       res = carton_labeling(params)
       return res unless res.success
 
@@ -534,9 +565,10 @@ module MesscadaApp
                        enabled: enabled,
                        button_caption: button_caption,
                        system_name: sys[:system_resource_code],
-                       # URL might have to be proxied to handle fetch requests (/messcada/browser/carton_labeling)
-                       url: "/messcada/browser/carton_labeling?device=#{sys[:system_resource_code]}&card_reader=$:card_reader$&identifier=$:identifier$",
-                       params: %w[device card_reader identifier]) # Might include scale weight / bin_number ...
+                       # url: "/messcada/browser/carton_labeling?device=#{sys[:system_resource_code]}&card_reader=$:card_reader$&identifier=$:identifier$",
+                       url: "/messcada/browser/carton_labeling/weighing?device=#{sys[:system_resource_code]}&card_reader=$:card_reader$&identifier=$:identifier$&weight=$:weight$",
+                       # params: %w[device card_reader identifier]) # Might include scale weight / bin_number ...
+                       params: %w[device card_reader identifier weight])
       end
       login_state = login_state(sysres_robot[:system_resource_code])
       # Read res & get login/out/group etc., robot buttons
@@ -604,6 +636,10 @@ module MesscadaApp
 
     def reworks_repo
       @reworks_repo ||= ProductionApp::ReworksRepo.new
+    end
+
+    def product_setup_repo
+      @product_setup_repo ||= ProductionApp::ProductSetupRepo.new
     end
 
     def locations_repo

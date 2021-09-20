@@ -506,6 +506,19 @@ module ProductionApp
       DB[query, run_id].select_map(%i[code id])
     end
 
+    def allocation_for_button_code(system_resource_code) # rubocop:disable Metrics/AbcSize
+      line_res = ResourceRepo.new.plant_resource_parent_of_system_resource(Crossbeams::Config::ResourceDefinitions::LINE, system_resource_code)
+      raise Crossbeams::InfoError, "Button #{params[:device]} is not part of a LINE" unless line_res.success
+
+      run_id = labeling_run_for_line(line_res.instance)
+      raise Crossbeams::InfoError, "There is no active production run for #{params[:device]}" if run_id.nil?
+
+      plant_resource_id = DB[:plant_resources].where(system_resource_id: DB[:system_resources].where(system_resource_code: system_resource_code).get(:id)).get(:id)
+      DB[:product_resource_allocations]
+        .where(production_run_id: run_id, plant_resource_id: plant_resource_id)
+        .first
+    end
+
     # Is there an active tipping run on this line?
     def line_has_active_tipping_run?(production_line_id)
       DB[:production_runs].where(production_line_id: production_line_id, running: true, tipping: true).count.positive?
