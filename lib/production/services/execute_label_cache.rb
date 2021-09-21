@@ -43,7 +43,7 @@ module ProductionApp
     def print_command_for(product_resource_allocation_id, label_template_name)
       instance = messcada_repo.allocated_product_setup_label_printing_instance(product_resource_allocation_id)
       res = LabelPrintingApp::PrintCommandForLabel.call(label_template_name, instance)
-      raise res.message unless res.success
+      raise Crossbeams::InfoError, "#{label_template_name}: #{res.message}" unless res.success
 
       res.instance.print_command
     end

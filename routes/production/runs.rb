@@ -253,6 +253,11 @@ class Nspack < Roda
           acts << OpenStruct.new(type: :update_grid_row,  ids: res.instance[:other_run][:id], changes: select_attributes(res.instance[:other_run], row_keys.reject { |k| k == :re_executed_at })) if res.instance[:other_run]
           json_actions(acts, res.message)
         end
+      rescue Crossbeams::InfoError => e
+        ErrorMailer.send_exception_email(e, subject: e.message, message: "Execute run for #{id}.")
+        puts e.message
+        puts e.backtrace.join("\n")
+        show_json_exception(e)
       end
 
       r.on 're_execute_run' do
@@ -284,6 +289,11 @@ class Nspack < Roda
           ]
           update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
         end
+      rescue Crossbeams::InfoError => e
+        ErrorMailer.send_exception_email(e, subject: e.message, message: "Re-execute run for #{id}.")
+        puts e.message
+        puts e.backtrace.join("\n")
+        show_json_exception(e)
       end
 
       r.on 're_configure' do
