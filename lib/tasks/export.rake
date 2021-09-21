@@ -16,7 +16,7 @@ namespace :app do
       eos_cartons
       eos_deliveries
       eos_empty_bin_locations
-      eos_empty_bin_transactions
+      eos_bin_asset_transactions
       eos_inspection_pallets
       eos_loads
       eos_pallet_sequences

@@ -59,8 +59,8 @@ eos_empty_bin_locations:
   export_hidden_fields: true
   boolean_as_yn: true
   prefix_long_numbers_with_quote: true
-eos_empty_bin_transactions:
-  grid: empty_bin_transactions
+eos_bin_asset_transactions:
+  grid: bin_asset_transactions
   out_dir: /home/nspack/end_of_season
   export_hidden_fields: true
   boolean_as_yn: true

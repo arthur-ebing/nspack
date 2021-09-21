@@ -26,8 +26,8 @@ class EndOfSeasonTruncate < BaseScript
     ecert_agreements
     edi_in_transactions
     edi_out_transactions
-    empty_bin_transaction_items
-    empty_bin_transactions
+    bin_asset_transaction_items
+    bin_asset_transactions
     export_data_event_logs
     govt_inspection_pallets
     govt_inspection_sheets
