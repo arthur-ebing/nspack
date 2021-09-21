@@ -17,15 +17,16 @@
   AS pallet_format_description,\r\n    cartons_per_pallet.cartons_per_pallet,\r\n
   \   product_setups.extended_columns,\r\n    product_setups.client_size_reference,\r\n
   \   product_setups.client_product_code,\r\n    product_setups.marketing_order_number,\r\n
-  \   product_setups.sell_by_code,\r\n    product_setups.pallet_label_name,\r\n    (
-  SELECT array_agg(pst.treatment_code)\r\n      FROM ( SELECT t.treatment_code\r\n
-  \            FROM treatments t\r\n                      JOIN product_setups ps ON
-  t.id = ANY (ps.treatment_ids)\r\n             WHERE ps.id = product_setups.id\r\n
-  \            ORDER BY t.treatment_code DESC) AS pst) AS treatments,\r\n    packing_specification_items.active,\r\n
-  \   packing_specification_items.created_at,\r\n    packing_specification_items.updated_at,\r\n
-  \   CASE WHEN production_runs.running THEN 'warning'\r\n        WHEN NOT packing_specification_items.active
-  THEN 'inactive'\r\n        ELSE NULL\r\n    END AS colour_rule\r\n\r\nFROM product_setups\r\nJOIN
-  product_setup_templates ON product_setup_templates.id = product_setups.product_setup_template_id\r\nLEFT
+  \   product_setups.sell_by_code,\r\n    product_setups.pallet_label_name,\r\n    label_templates.label_template_name
+  AS carton_template_name,\r\n    ( SELECT array_agg(pst.treatment_code)\r\n      FROM
+  ( SELECT t.treatment_code\r\n             FROM treatments t\r\n                      JOIN
+  product_setups ps ON t.id = ANY (ps.treatment_ids)\r\n             WHERE ps.id =
+  product_setups.id\r\n             ORDER BY t.treatment_code DESC) AS pst) AS treatments,\r\n
+  \   packing_specification_items.active,\r\n    packing_specification_items.created_at,\r\n
+  \   packing_specification_items.updated_at,\r\n    CASE WHEN production_runs.running
+  THEN 'warning'\r\n        WHEN NOT packing_specification_items.active THEN 'inactive'\r\n
+  \       ELSE NULL\r\n    END AS colour_rule\r\n\r\nFROM product_setups\r\nJOIN product_setup_templates
+  ON product_setup_templates.id = product_setups.product_setup_template_id\r\nLEFT
   JOIN marketing_varieties ON marketing_varieties.id = product_setups.marketing_variety_id\r\nLEFT
   JOIN std_fruit_size_counts ON std_fruit_size_counts.id = product_setups.std_fruit_size_count_id\r\nLEFT
   JOIN commodities ON commodities.id = std_fruit_size_counts.commodity_id\r\nLEFT
@@ -47,7 +48,8 @@
   JOIN pm_boms ON pm_boms.id = packing_specification_items.pm_bom_id\r\nLEFT JOIN
   pm_marks ON pm_marks.id = packing_specification_items.pm_mark_id\r\n\r\nLEFT JOIN
   product_resource_allocations ON packing_specification_items.id = product_resource_allocations.packing_specification_item_id\r\nLEFT
-  JOIN production_runs ON production_runs.id = product_resource_allocations.production_run_id\r\n\r\nORDER
+  JOIN production_runs ON production_runs.id = product_resource_allocations.production_run_id\r\nLEFT
+  JOIN label_templates ON label_templates.id = product_setups.carton_label_template_id\r\nORDER
   BY packing_specification_items.id DESC"
 :limit: 
 :offset: 
@@ -553,9 +555,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  carton_template_name:
+    :name: carton_template_name
+    :sequence_no: 32
+    :caption: Carton template name
+    :namespaced_name: label_templates.label_template_name
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   treatments:
     :name: treatments
-    :sequence_no: 32
+    :sequence_no: 33
     :caption: Treatments
     :namespaced_name: 
     :data_type: :string
@@ -571,7 +589,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 33
+    :sequence_no: 34
     :caption: Active
     :namespaced_name: packing_specification_items.active
     :data_type: :boolean
@@ -587,7 +605,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 34
+    :sequence_no: 35
     :caption: Created at
     :namespaced_name: packing_specification_items.created_at
     :data_type: :datetime
@@ -603,7 +621,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 35
+    :sequence_no: 36
     :caption: Updated at
     :namespaced_name: packing_specification_items.updated_at
     :data_type: :datetime
@@ -619,7 +637,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 36
+    :sequence_no: 37
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

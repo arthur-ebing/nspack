@@ -17,7 +17,8 @@
   WHERE pm_products.id = tu_sticker_ids[2] ) AS tu_sticker_2,\r\n\r\n    (SELECT product_code
   FROM pm_products WHERE pm_products.id = ru_sticker_ids[1] ) AS ru_sticker_1,\r\n
   \   (SELECT product_code FROM pm_products WHERE pm_products.id = ru_sticker_ids[2]
-  ) AS ru_sticker_2,\r\n\r\n    packing_specification_items.active,\r\n    packing_specification_items.created_at,\r\n
+  ) AS ru_sticker_2,\r\n\r\n    label_templates.label_template_name AS carton_template_name,\r\n
+  \   packing_specification_items.active,\r\n    packing_specification_items.created_at,\r\n
   \   packing_specification_items.updated_at,\r\n    fn_current_status('packing_specification_items',
   packing_specification_items.id) AS status\r\n\r\nFROM packing_specification_items\r\n
   \        JOIN product_setups ON packing_specification_items.product_setup_id = product_setups.id\r\n
@@ -27,7 +28,8 @@
   \        LEFT JOIN marks ON marks.id = pm_marks.mark_id\r\n         LEFT JOIN pm_products
   pm_products_tu ON pm_products_tu.id = packing_specification_items.tu_labour_product_id\r\n
   \        LEFT JOIN pm_products pm_products_ru ON pm_products_ru.id = packing_specification_items.ru_labour_product_id\r\n
-  \        LEFT JOIN pm_products pm_products_ri ON pm_products_ri.id = packing_specification_items.ri_labour_product_id\r\nORDER
+  \        LEFT JOIN pm_products pm_products_ri ON pm_products_ri.id = packing_specification_items.ri_labour_product_id\r\n
+  \        LEFT JOIN label_templates ON label_templates.id = product_setups.carton_label_template_id\r\nORDER
   BY packing_specification_items.updated_at DESC"
 :limit: 
 :offset: 
@@ -369,9 +371,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  carton_template_name:
+    :name: carton_template_name
+    :sequence_no: 22
+    :caption: Carton template name
+    :namespaced_name: label_templates.label_template_name
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   active:
     :name: active
-    :sequence_no: 22
+    :sequence_no: 23
     :caption: Active
     :namespaced_name: packing_specification_items.active
     :data_type: :boolean
@@ -387,7 +405,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 23
+    :sequence_no: 24
     :caption: Created at
     :namespaced_name: packing_specification_items.created_at
     :data_type: :datetime
@@ -403,7 +421,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 24
+    :sequence_no: 25
     :caption: Updated at
     :namespaced_name: packing_specification_items.updated_at
     :data_type: :datetime
@@ -419,7 +437,7 @@
     :group_max: false
   status:
     :name: status
-    :sequence_no: 25
+    :sequence_no: 26
     :caption: Status
     :namespaced_name: 
     :data_type: :string
