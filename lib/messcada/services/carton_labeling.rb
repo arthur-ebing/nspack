@@ -76,6 +76,7 @@ module MesscadaApp
       end
 
       attrs = attrs.merge(resolve_marketing_attrs) if AppConst::CR_PROD.use_marketing_puc?
+      attrs = attrs.merge(gross_weight: params[:weight]) if params[:weight]
       res = validate_carton_label_params(attrs)
       return validation_failed_response(res) if res.failure?
 
