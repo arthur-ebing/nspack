@@ -877,6 +877,118 @@ class Nspack < Roda
         end
       end
 
+      # MOVE MULTIPLE PALLETS
+      # --------------------------------------------------------------------------
+
+      r.on 'move_multiple_pallets', Integer do |scanned_locn_id|
+        r.on 'complete_move' do
+          moved_pallets_count = (retrieve_from_local_store(:moved_pallets) || []).count
+          location_code = interactor.location_short_code_for(scanned_locn_id)
+          store_locally(:flash_notice, rmd_success_message("#{moved_pallets_count} pallets have been moved to location #{location_code}"))
+          r.redirect('/rmd/finished_goods/pallet_movements/move_multiple_pallets')
+        end
+
+        r.get do
+          pallet = {}
+          from_state = retrieve_from_local_store(:from_state)
+          pallet.merge!(from_state) unless from_state.nil?
+
+          error = retrieve_from_local_store(:error)
+          if error.is_a?(String)
+            pallet.merge!(error_message: error)
+          elsif !error.nil?
+            pallet.merge!(error_message: error.message)
+            pallet.merge!(errors: error.errors) unless error.errors.nil_or_empty?
+          end
+
+          form = Crossbeams::RMDForm.new(pallet,
+                                         form_name: :pallet,
+                                         notes: retrieve_from_local_store(:flash_notice),
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         caption: 'Scan Pallets',
+                                         action: "/rmd/finished_goods/pallet_movements/move_multiple_pallets/#{scanned_locn_id}",
+                                         button_caption: 'Submit')
+
+          location_code = interactor.location_short_code_for(scanned_locn_id)
+          form.add_label(:location, 'Location', location_code)
+          form.add_label(:remaining_num_position, 'Remaining No Position', pallet[:remaining_num_position]) unless pallet[:remaining_num_position].nil_or_empty?
+          form.add_label(:next_position, 'Next Position', pallet[:next_position]) unless pallet[:next_position].nil_or_empty?
+          form.add_field(:pallet_number, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: true, data_type: :number, required: false)
+
+          moved_pallets = retrieve_from_local_store(:moved_pallets) || []
+          unless moved_pallets.empty?
+            store_locally(:moved_pallets, moved_pallets)
+            form.add_section_header('Pallets Moved')
+            moved_pallets.each { |pallet_number| form.add_label(:pallet_number, '', pallet_number) }
+            form.add_button('Complete Move', "/rmd/finished_goods/pallet_movements/move_multiple_pallets/#{scanned_locn_id}/complete_move")
+          end
+
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+
+        r.post do
+          pallet_number = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: params[:pallet][:pallet_number]).pallet_number
+          val_res = interactor.validate_pallet_number(pallet_number)
+          unless val_res.success
+            store_locally(:error, val_res)
+            r.redirect("/rmd/finished_goods/pallet_movements/move_multiple_pallets/#{scanned_locn_id}")
+          end
+
+          res = interactor.move_location_pallet(val_res.instance[:id], scanned_locn_id)
+          locn_repo = MasterfilesApp::LocationRepo.new
+          if (scanned_locn = locn_repo.find_location(scanned_locn_id)) && AppConst::CALCULATE_PALLET_DECK_POSITIONS && scanned_locn.location_type_code == AppConst::LOCATION_TYPES_COLD_BAY_DECK && (positions = locn_repo.find_filled_deck_positions(scanned_locn_id)).length < locn_repo.find_max_position_for_deck_location(scanned_locn_id) && !positions.empty?
+            params[:pallet][:pallet_number] = nil
+            params[:pallet][:remaining_num_position] = positions.min - 1
+            params[:pallet][:next_position] = (positions.min - 1).positive? ? "#{scanned_locn.location_long_code}_P#{positions.min - 1}" : nil
+            store_locally(:from_state, params[:pallet])
+          end
+
+          if res.success
+            moved_pallets = retrieve_from_local_store(:moved_pallets) || []
+            moved_pallets << val_res.instance[:pallet_number]
+            store_locally(:moved_pallets, moved_pallets)
+            store_locally(:flash_notice, res.message)
+          else
+            store_locally(:error, res)
+          end
+          r.redirect("/rmd/finished_goods/pallet_movements/move_multiple_pallets/#{scanned_locn_id}")
+        rescue Crossbeams::InfoError => e
+          store_locally(:error, rmd_error_message(e.message))
+          r.redirect("/rmd/finished_goods/pallet_movements/move_multiple_pallets/#{scanned_locn_id}")
+        end
+      end
+
+      r.on 'move_multiple_pallets' do
+        r.get do
+          form_state = retrieve_from_local_store(:error).to_h
+          form = Crossbeams::RMDForm.new(form_state,
+                                         form_name: :pallet,
+                                         notes: retrieve_from_local_store(:flash_notice),
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         caption: 'Scan Location',
+                                         action: '/rmd/finished_goods/pallet_movements/move_multiple_pallets',
+                                         button_caption: 'Submit')
+          form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location, submit_form: true, required: true, lookup: true)
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+
+        r.post do
+          val_res = interactor.validate_location(params[:pallet][:location], params[:pallet][:location_scan_field])
+          if val_res.success
+            scanned_locn_id = val_res.instance
+            r.redirect("/rmd/finished_goods/pallet_movements/move_multiple_pallets/#{scanned_locn_id}")
+          else
+            store_locally(:error, val_res)
+            r.redirect('/rmd/finished_goods/pallet_movements/move_multiple_pallets')
+          end
+        rescue Crossbeams::InfoError => e
+          store_locally(:error, rmd_error_message(e.message))
+          r.redirect('/rmd/finished_goods/pallet_movements/move_multiple_pallets')
+        end
+      end
+
       r.on 'empty_pallet_location' do
         r.get do
           form_state = {}

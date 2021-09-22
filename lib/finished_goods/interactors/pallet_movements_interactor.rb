@@ -3,7 +3,7 @@
 module FinishedGoodsApp
   class PalletMovementsInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def move_pallet(pallet_number, location, location_scan_field) # rubocop:disable Metrics/AbcSize
-      pallet = ProductionApp::ProductionRunRepo.new.find_pallet_by_pallet_number(pallet_number)
+      pallet = prod_repo.find_pallet_by_pallet_number(pallet_number)
       return validation_failed_response(messages: { pallet_number: ['Pallet does not exist'] }) unless pallet
 
       location_id = locn_repo.resolve_location_id_from_scan(location, location_scan_field)
@@ -117,6 +117,37 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
+    def validate_location(scanned_location, location_scan_field)
+      location_id = locn_repo.resolve_location_id_from_scan(scanned_location, location_scan_field)
+      return validation_failed_response(messages: { location: ['Location does not exist'] }) if location_id.nil_or_empty?
+
+      success_response('ok', location_id)
+    end
+
+    def location_short_code_for(location_id)
+      repo.get(:locations, location_id, :location_short_code)
+    end
+
+    def validate_pallet_number(pallet_number)
+      pallet = prod_repo.find_pallet_by_pallet_number(pallet_number)
+      return validation_failed_response(messages: { pallet_number: ['Pallet does not exist'] }) unless pallet
+
+      success_response('ok', pallet)
+    end
+
+    def move_location_pallet(pallet_id, location_id) # rubocop:disable Metrics/AbcSize
+      repo.transaction do
+        FinishedGoodsApp::MoveStock.call(AppConst::PALLET_STOCK_TYPE, pallet_id, location_id, 'MOVE_PALLET', nil)
+      end
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("#{__method__} #{pallet_number}, Loc: #{location}"))
+      puts e.message
+      puts e.backtrace.join("\n")
+      failed_response(e.message)
+    end
+
     private
 
     def get_location_id_by_barcode(location_barcode)
@@ -145,6 +176,10 @@ module FinishedGoodsApp
 
     def party_repo
       @party_repo ||= MasterfilesApp::PartyRepo.new
+    end
+
+    def prod_repo
+      @prod_repo ||= ProductionApp::ProductionRunRepo.new
     end
   end
 end
