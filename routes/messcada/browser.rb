@@ -18,6 +18,19 @@ class Nspack < Roda
       end
     end
 
+    r.on 'robot_re_terminal' do
+      interactor = MesscadaApp::MesscadaInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      res = interactor.device_code_from_ip_address(request.ip, params)
+      raise Crossbeams::TaskNotPermittedError, res.message unless res.success
+
+      device = res.instance # This could be more - include printer
+
+      r.is do
+        @robot_page = interactor.build_robot(device)
+        view('re_terminal_page', layout: 'layout_browser_robot')
+      end
+    end
+
     r.on 'login_status', String do |device|
       interactor = MesscadaApp::MesscadaInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       res = interactor.login_state(device)

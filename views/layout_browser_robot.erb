@@ -298,7 +298,9 @@
       const robotStatsWidget = document.getElementById('robotStatsWidget') || document.createElement('div');
       const toggleLogout = document.getElementById('toggleLogout');
       const loginWidget = document.getElementById('robotLoginWidget');
+      const loginDisplay = document.getElementById('loginDisplay');
       const robotButtons = document.getElementById('robotButtons');
+      const sysInfoButton = document.getElementById('sysInfoButton');
 
       const recalcStats = () => {
         const tot = deviceStore.button_stats.reduce((a, b) => a + b, 0);
@@ -412,6 +414,11 @@
         }
       };
 
+      const loginByPersonnelNo = (number) => {
+        console.log('OK', number);
+        loginHandler('1', null, number);
+      };
+
       // Highlight label text for inputs that have focus.
       document.addEventListener('focus', function (event) {
         const prev = event.target.parentNode && event.target.parentNode.previousElementSibling;
@@ -423,10 +430,31 @@
       }, true);
 
       document.addEventListener('click', function (event) {
+        if (event.target.id === 'loginButton') {
+                console.log('have login');
+          swal({
+            title: 'Login',
+            text: 'Enter your personnel number',
+            type: 'question',
+            input: 'text', // should probably usually be a number?
+            inputValue: '',
+            showCancelButton: true,
+                }).then(loginByPersonnelNo).catch(swal.noop);
+          return;
+        }
+        if (event.target.id === 'sysInfoButton') {
+          crossbeamsUtils.alert({
+            prompt: 'This should be built up from the websocket + a server call.',
+            title: 'System information',
+            type: 'info',
+          });
+          return;
+        }
+
         if (!event.target.dataset || !event.target.dataset.buttonActionUrl) { return; }
         // if scale required...
         if (scaleWeight.textContent === '.') {
-          logActivity('Invalid weight. Transaction ignored.', 'warning');
+          logActivity('No weight from scale. Transaction ignored.', 'warning');
           crossbeamsUtils.showError('There is no weight from the scale.');
           return;
         }
@@ -505,6 +533,11 @@
           setLogoutMode(false);
         }
 
+        if (loginDisplay) {
+          loginDisplay.innerHTML = payload.users.join(', ');
+          return;
+        }
+              // bottom div display...
         const avatar_colours = ['#f2b736', '#c5523f', '#499255', '#1875e5', '#E7040F', '#FF4136', '#5E2CA5', '#D5008F', '#001B44', '#137752', '#19A974'];
         let splits = [];
         let init1 = '';
@@ -592,9 +625,12 @@
         scaleWeight.dataset.scaleReading = 'filled';
       };
 
-      const loginHandler = (cardReader, identifier) => {
+      const loginHandler = (cardReader, identifier, personnelNo) => {
         // console.log('Login:', cardReader, identifier);
-        const url = `/messcada/hr/${toggleLogout.checked ? 'logoff' : 'logon'}?device=${device}&card_reader=${cardReader}&identifier=${identifier}`
+        let url = `/messcada/hr/${toggleLogout.checked ? 'logoff' : 'logon'}?device=${device}&card_reader=${cardReader}&identifier=${identifier}`
+        if (personnelNo) {
+          url = `/messcada/hr/logon_with_no?device=${device}&card_reader=${cardReader}&identifier=${personnelNo}`
+        }
         // Login via fetch & update
         fetch(url, {
           method: 'GET',
