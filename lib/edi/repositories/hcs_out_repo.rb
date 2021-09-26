@@ -17,8 +17,8 @@ module EdiApp
           farms.farm_code AS grower_id,
           pallets.edi_in_consignment_note_number AS intake_consignment_id,
           govt_inspection_sheets.consignment_note_number AS exit_reference,
+          COALESCE(pm_boms.nett_weight, standard_product_weights.nett_weight) AS weight,
 
-          'unknown' AS weight,
           'unknown' AS raw_material_type,
 
           orders.customer_order_number AS remarks,
@@ -135,6 +135,8 @@ module EdiApp
         JOIN orders ON orders.id = order_items.order_id
         JOIN currencies ON currencies.id = orders.currency_id
         JOIN incoterms  ON incoterms.id = orders.incoterm_id
+        LEFT JOIN standard_product_weights ON standard_product_weights.commodity_id = cultivar_groups.commodity_id
+              AND standard_product_weights.standard_pack_id = pallet_sequences.standard_pack_code_id
         WHERE loads.id = ?
       SQL
       DB[query, load_id].all
