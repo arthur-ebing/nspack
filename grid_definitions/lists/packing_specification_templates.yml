@@ -54,9 +54,9 @@
     :permission: edit
 - :separator: true
 - :url: "/production/product_setups/product_setup_templates/$:id$/manage"
-  :text: Packing Specification
+  :text: Packing Specifications
   :icon: list
-  :title: Packing Specification
+  :title: Packing Specifications
   :hide_if_false: active
   :auth:
     :function: production

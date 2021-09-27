@@ -5,7 +5,6 @@
   :text: view
   :icon: view-show
   :title: View
-  :popup: true
 - :url: "/production/packing_specifications/wizard/setup?packing_specification_item_id=$:id$&product_setup_id=$:product_setup_id$&mode=edit"
   :text: edit
   :icon: edit
