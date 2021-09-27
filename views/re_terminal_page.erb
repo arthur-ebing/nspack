@@ -37,10 +37,10 @@
       <div id="robotButtons" class="pa2 mb2 flex flex-wrap h-50">
         <% button_colours = %w[#f2b736 #c5523f #499255 #1875e5 #E7040F #FF4136 #5E2CA5 #D5008F #001B44 #137752 #19A974] %>
         <% @robot_page.instance[:buttons].each_with_index do |btn, index| %>
-          <% btn_class = btn[:enabled] ? 'br3 pa3 dim f2 tl ml5 mt2 mb2 w-40 h-40 near-black' : 'br3 pa3 f2 tl ml5 mt2 mb2 w-40 h-40' %>
+          <% btn_class = btn[:enabled] ? 'br3 pa3 dim f1 tl ml5 mt2 mb2 w-40 h-40 near-black' : 'br3 pa3 f1 tl ml5 mt2 mb2 w-40 h-40' %>
           <% btn_style = btn[:enabled] ? "style=\"background-color:#{button_colours[index]}\"" : '' %>
           <% btn_enabled = btn[:enabled] ? 'data-enabled="true"' : 'data-enabled="false" disabled="true"' %>
-          <button id="button_<%= btn[:plant_resource_id] %>" data-button-index="<%= index %>" data-back-colour="<%= button_colours[index] %>" data-button-action-url="<%= btn[:url] %>" class="<%= btn_class%>" <%= btn_style %> <%= btn_enabled %>><span class="mid-gray f1"><%= (index + 65).chr %></span><br><span id="button_<%= btn[:plant_resource_id] %>_caption"><%= btn[:button_caption] %></span></button>
+          <button id="button_<%= btn[:plant_resource_id] %>" data-button-index="<%= index %>" data-back-colour="<%= button_colours[index] %>" data-button-action-url="<%= btn[:url] %>" class="<%= btn_class%>" <%= btn_style %> <%= btn_enabled %>><span id="button_<%= btn[:plant_resource_id] %>_caption"><%= btn[:button_caption] %></span></button>
         <% end %>
       </div>
       <!--
