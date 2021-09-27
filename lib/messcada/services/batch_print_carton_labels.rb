@@ -41,7 +41,7 @@ module MesscadaApp
       ok_response
     end
 
-    EXCLUDE_PROD_SET_COLS = %i[created_at updated_at id active product_setup_template_id pallet_label_name].freeze
+    EXCLUDE_PROD_SET_COLS = %i[created_at updated_at id active product_setup_template_id pallet_label_name carton_label_template_id].freeze
     INCLUDE_PROD_RUN_COLS = %i[farm_id puc_id orchard_id cultivar_group_id cultivar_id packhouse_resource_id production_line_id season_id].freeze
     # sell_by_code grade_id product_chars
     def prepare_carton_label_record # rubocop:disable Metrics/AbcSize
