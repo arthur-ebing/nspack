@@ -8,6 +8,8 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Added
 - Gossamer data dashboard
+- Multi-pallet moves
+- Packing specs can set a default label template
 ### Changed
 ### Fixed
 
