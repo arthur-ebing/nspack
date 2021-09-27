@@ -1,12 +1,53 @@
 ---
 :caption: Product Setups
-:sql: "SELECT \r\n    product_setups.id,\r\n    product_setups.product_setup_template_id,\r\n
-  \   fn_product_setup_code(product_setups.id) AS product_setup_code,\r\n    product_setups.gtin_code,\r\n
-  \   product_setups.active,\r\n    fn_product_setup_in_production(product_setups.id)
-  AS in_production,\r\n    CASE\r\n        WHEN fn_product_setup_in_production(product_setups.id)
-  THEN 'warning'\r\n        WHEN NOT product_setups.active THEN 'inactive'\r\n        ELSE
-  NULL\r\n    END AS colour_rule\r\nFROM product_setups\r\nLEFT OUTER JOIN pm_boms
-  ON pm_boms.id = product_setups.pm_bom_id"
+:sql: "SELECT fn_product_setup_code (product_setups.id) AS product_setup_code,\r\n
+  \      pm_boms.bom_code,\r\n       CONCAT(marks.mark_code, '_', COALESCE (array_to_string(pm_marks.packaging_marks,'_'),
+  ' ')) AS fg_marks,\r\n       product_setups.gtin_code,\r\n       fn_product_setup_in_production
+  (product_setups.id) AS in_production,\r\n       commodities.code AS commodity_code,\r\n
+  \      marketing_varieties.marketing_variety_code,\r\n       grades.grade_code,\r\n
+  \      basic_pack_codes.basic_pack_code AS pack_code,\r\n       standard_pack_codes.standard_pack_code
+  AS standard_pack,\r\n       std_fruit_size_counts.size_count_value AS size_count,\r\n
+  \      fruit_actual_counts_for_packs.actual_count_for_pack AS actual_count,\r\n
+  \      fruit_size_references.size_reference,\r\n       organizations.medium_description
+  AS marketing_organization,\r\n       target_market_groups.target_market_group_name,\r\n
+  \      target_markets.target_market_name,\r\n       fn_party_role_name (product_setups.target_customer_party_role_id)
+  AS target_customer,\r\n       marks.mark_code,\r\n       cust_mkt.marketing_variety_code
+  AS cust_mkt_variety,\r\n       inventory_codes.inventory_code,\r\n       pallet_formats.description
+  AS pallet_format_description,\r\n       cartons_per_pallet.cartons_per_pallet,\r\n
+  \      product_setups.id,\r\n       product_setups.product_setup_template_id,\r\n
+  \      product_setups.extended_columns,\r\n       product_setups.client_size_reference,\r\n
+  \      product_setups.client_product_code,\r\n       product_setups.marketing_order_number,\r\n
+  \      product_setups.sell_by_code,\r\n       product_setups.pallet_label_name,\r\n
+  \      label_templates.label_template_name AS carton_template_name,\r\n       product_setups.active,\r\n
+  \      product_setups.created_at,\r\n       product_setups.updated_at,\r\n       CASE
+  WHEN fn_product_setup_in_production (product_setups.id) THEN 'warning'\r\n            WHEN
+  NOT product_setups.active THEN 'inactive'\r\n            ELSE NULL\r\n           END
+  AS colour_rule,\r\n       ( SELECT array_agg(pst.treatment_code)\r\n         FROM
+  ( SELECT t.treatment_code\r\n                FROM treatments t\r\n                         JOIN
+  product_setups ps ON t.id = ANY (ps.treatment_ids)\r\n                WHERE ps.id
+  = product_setups.id\r\n                ORDER BY t.treatment_code DESC) AS pst) AS
+  product_setup_treatments\r\nFROM product_setups\r\n         JOIN marketing_varieties
+  ON marketing_varieties.id = product_setups.marketing_variety_id\r\n         LEFT
+  JOIN std_fruit_size_counts ON std_fruit_size_counts.id = product_setups.std_fruit_size_count_id\r\n
+  \        LEFT JOIN commodities ON commodities.id = std_fruit_size_counts.commodity_id\r\n
+  \        JOIN grades ON grades.id = product_setups.grade_id\r\n         JOIN basic_pack_codes
+  ON basic_pack_codes.id = product_setups.basic_pack_code_id\r\n         JOIN standard_pack_codes
+  ON standard_pack_codes.id = product_setups.standard_pack_code_id\r\n         LEFT
+  JOIN fruit_actual_counts_for_packs ON fruit_actual_counts_for_packs.id = product_setups.fruit_actual_counts_for_pack_id\r\n
+  \        LEFT JOIN fruit_size_references ON fruit_size_references.id = product_setups.fruit_size_reference_id\r\n
+  \        JOIN party_roles ON party_roles.id = product_setups.marketing_org_party_role_id\r\n
+  \        JOIN organizations ON organizations.id = party_roles.organization_id\r\n
+  \        JOIN target_market_groups ON target_market_groups.id = product_setups.packed_tm_group_id\r\n
+  \        LEFT JOIN target_markets ON target_markets.id = product_setups.target_market_id\r\n
+  \        JOIN marks ON marks.id = product_setups.mark_id\r\n         LEFT JOIN pm_marks
+  ON pm_marks.id = product_setups.pm_mark_id\r\n         LEFT JOIN customer_varieties
+  ON customer_varieties.id = product_setups.customer_variety_id\r\n         LEFT JOIN
+  marketing_varieties cust_mkt ON cust_mkt.id = customer_varieties.variety_as_customer_variety_id\r\n
+  \        LEFT JOIN inventory_codes ON inventory_codes.id = product_setups.inventory_code_id\r\n
+  \        JOIN pallet_formats ON pallet_formats.id = product_setups.pallet_format_id\r\n
+  \        JOIN cartons_per_pallet ON cartons_per_pallet.id = product_setups.cartons_per_pallet_id\r\n
+  \        LEFT JOIN pm_boms ON pm_boms.id = product_setups.pm_bom_id\r\n         LEFT
+  JOIN label_templates ON label_templates.id = product_setups.carton_label_template_id"
 :limit: 
 :offset: 
 :external_settings:
@@ -15,31 +56,31 @@
     warning: Active on a run
     inactive: De-activated
 :columns:
-  id:
-    :name: id
+  product_setup_code:
+    :name: product_setup_code
     :sequence_no: 1
-    :caption: Id
-    :namespaced_name: product_setups.id
-    :data_type: :integer
-    :width: 
+    :caption: Product setup code
+    :namespaced_name: 
+    :data_type: :string
+    :width: 350
     :format: 
-    :hide: true
-    :pinned: 
-    :groupable: true
+    :hide: false
+    :pinned: left
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
-  product_setup_template_id:
-    :name: product_setup_template_id
+  bom_code:
+    :name: bom_code
     :sequence_no: 2
-    :caption: Product setup template
-    :namespaced_name: product_setups.product_setup_template_id
+    :caption: Bom code
+    :namespaced_name: pm_boms.bom_code
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
-    :hide: true
+    :hide: false
     :pinned: 
     :groupable: false
     :group_by_seq: 
@@ -47,13 +88,13 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  product_setup_code:
-    :name: product_setup_code
+  fg_marks:
+    :name: fg_marks
     :sequence_no: 3
-    :caption: Product setup code
+    :caption: Fg marks
     :namespaced_name: 
     :data_type: :string
-    :width: 700
+    :width: 200
     :format: 
     :hide: false
     :pinned: 
@@ -79,25 +120,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  active:
-    :name: active
-    :sequence_no: 5
-    :caption: Active
-    :namespaced_name: product_setups.active
-    :data_type: :boolean
-    :width: 80
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   in_production:
     :name: in_production
-    :sequence_no: 6
+    :sequence_no: 5
     :caption: In production
     :namespaced_name: 
     :data_type: :boolean
@@ -111,15 +136,495 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  commodity_code:
+    :name: commodity_code
+    :sequence_no: 6
+    :caption: Commodity
+    :namespaced_name: commodities.code
+    :data_type: :string
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marketing_variety_code:
+    :name: marketing_variety_code
+    :sequence_no: 7
+    :caption: Mkt Var
+    :namespaced_name: marketing_varieties.marketing_variety_code
+    :data_type: :string
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  grade_code:
+    :name: grade_code
+    :sequence_no: 8
+    :caption: Grade
+    :namespaced_name: grades.grade_code
+    :data_type: :string
+    :width: 60
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pack_code:
+    :name: pack_code
+    :sequence_no: 9
+    :caption: Pack code
+    :namespaced_name: basic_pack_codes.basic_pack_code
+    :data_type: :string
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  standard_pack:
+    :name: standard_pack
+    :sequence_no: 10
+    :caption: Std pack
+    :namespaced_name: standard_pack_codes.standard_pack_code
+    :data_type: :string
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  size_count:
+    :name: size_count
+    :sequence_no: 11
+    :caption: Size count
+    :namespaced_name: std_fruit_size_counts.size_count_value
+    :data_type: :string
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  actual_count:
+    :name: actual_count
+    :sequence_no: 12
+    :caption: Actual count
+    :namespaced_name: fruit_actual_counts_for_packs.actual_count_for_pack
+    :data_type: :string
+    :width: 90
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  size_reference:
+    :name: size_reference
+    :sequence_no: 13
+    :caption: Size ref
+    :namespaced_name: fruit_size_references.size_reference
+    :data_type: :string
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marketing_organization:
+    :name: marketing_organization
+    :sequence_no: 14
+    :caption: Marketing Org.
+    :namespaced_name: organizations.medium_description
+    :data_type: :string
+    :width: 130
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  target_market_group_name:
+    :name: target_market_group_name
+    :sequence_no: 15
+    :caption: TM Group
+    :namespaced_name: target_market_groups.target_market_group_name
+    :data_type: :string
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  target_market_name:
+    :name: target_market_name
+    :sequence_no: 16
+    :caption: Target market
+    :namespaced_name: target_markets.target_market_name
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  target_customer:
+    :name: target_customer
+    :sequence_no: 17
+    :caption: Target customer
+    :namespaced_name: 
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mark_code:
+    :name: mark_code
+    :sequence_no: 18
+    :caption: Mark
+    :namespaced_name: marks.mark_code
+    :data_type: :string
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cust_mkt_variety:
+    :name: cust_mkt_variety
+    :sequence_no: 19
+    :caption: Cust mkt variety
+    :namespaced_name: cust_mkt.marketing_variety_code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inventory_code:
+    :name: inventory_code
+    :sequence_no: 20
+    :caption: Inv Code
+    :namespaced_name: inventory_codes.inventory_code
+    :data_type: :string
+    :width: 90
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_format_description:
+    :name: pallet_format_description
+    :sequence_no: 21
+    :caption: Pallet format
+    :namespaced_name: pallet_formats.description
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cartons_per_pallet:
+    :name: cartons_per_pallet
+    :sequence_no: 22
+    :caption: Cartons per pallet
+    :namespaced_name: cartons_per_pallet.cartons_per_pallet
+    :data_type: :string
+    :width: 110
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  id:
+    :name: id
+    :sequence_no: 23
+    :caption: Id
+    :namespaced_name: product_setups.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  product_setup_template_id:
+    :name: product_setup_template_id
+    :sequence_no: 24
+    :caption: Product setup template
+    :namespaced_name: product_setups.product_setup_template_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  extended_columns:
+    :name: extended_columns
+    :sequence_no: 25
+    :caption: Extended columns
+    :namespaced_name: product_setups.extended_columns
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  client_size_reference:
+    :name: client_size_reference
+    :sequence_no: 26
+    :caption: Client size ref
+    :namespaced_name: product_setups.client_size_reference
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  client_product_code:
+    :name: client_product_code
+    :sequence_no: 27
+    :caption: Client product code
+    :namespaced_name: product_setups.client_product_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marketing_order_number:
+    :name: marketing_order_number
+    :sequence_no: 28
+    :caption: Marketing order number
+    :namespaced_name: product_setups.marketing_order_number
+    :data_type: :string
+    :width: 130
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  sell_by_code:
+    :name: sell_by_code
+    :sequence_no: 29
+    :caption: Sell by code
+    :namespaced_name: product_setups.sell_by_code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_label_name:
+    :name: pallet_label_name
+    :sequence_no: 30
+    :caption: Pallet label name
+    :namespaced_name: product_setups.pallet_label_name
+    :data_type: :string
+    :width: 110
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  carton_template_name:
+    :name: carton_template_name
+    :sequence_no: 31
+    :caption: Carton template name
+    :namespaced_name: label_templates.label_template_name
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 32
+    :caption: Active
+    :namespaced_name: product_setups.active
+    :data_type: :boolean
+    :width: 80
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 33
+    :caption: Created at
+    :namespaced_name: product_setups.created_at
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 34
+    :caption: Updated at
+    :namespaced_name: product_setups.updated_at
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 7
+    :sequence_no: 35
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
     :width: 
     :format: 
     :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  product_setup_treatments:
+    :name: product_setup_treatments
+    :sequence_no: 36
+    :caption: Product setup treatments
+    :namespaced_name: 
+    :data_type: :string
+    :width: 140
+    :format: 
+    :hide: false
     :pinned: 
     :groupable: false
     :group_by_seq: 
