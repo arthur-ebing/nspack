@@ -141,7 +141,7 @@ module Crossbeams
              pallet_label_seqs_sql: nil,
              use_gtins: false,
              print_from_line_scanning: false,
-             incentive_palletizing: false,
+             incentive_palletizing: true,
              clm_button_caption_format: '$:size_reference$ $:product_chars$ $:target_market_group_name$',
              provide_pack_type_at_verification: false,
              group_incentive_packer_roles: false,
