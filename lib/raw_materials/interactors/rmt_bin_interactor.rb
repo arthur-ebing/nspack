@@ -759,6 +759,33 @@ module RawMaterialsApp
       repo.find_rmt_bin_flat(id)
     end
 
+    def validate_location(scanned_location, location_scan_field)
+      location_id = locn_repo.resolve_location_id_from_scan(scanned_location, location_scan_field)
+      return validation_failed_response(messages: { location: ['Location does not exist'] }) if location_id.nil_or_empty?
+
+      success_response('ok', location_id)
+    end
+
+    def location_short_code_for(location_id)
+      repo.get(:locations, location_id, :location_short_code)
+    end
+
+    def move_location_bin(bin_number, location_id) # rubocop:disable Metrics/AbcSize
+      bin = repo.find_rmt_bin(bin_number)
+      return failed_response('Bin is already at this location') if bin[:location_id] == location_id
+
+      repo.transaction do
+        FinishedGoodsApp::MoveStock.call(AppConst::BIN_STOCK_TYPE, bin_number, location_id, 'MOVE_BIN', nil)
+      end
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("#{__method__} #{bin_number}, Loc: #{location}"))
+      puts e.message
+      puts e.backtrace.join("\n")
+      failed_response(e.message)
+    end
+
     private
 
     def calc_rebin_params(params) # rubocop:disable Metrics/AbcSize
