@@ -569,7 +569,6 @@ module RawMaterialsApp
     def validate_bin(bin_number)
       bin = find_rmt_bin_by_id_or_asset_number(bin_number)
       return failed_response("Scanned Bin:#{bin_number} is not in stock") unless bin
-      return failed_response("Rebin Scanned:#{bin_number}. Please scan a bin instead") if bin[:production_run_rebin_id]
       return failed_response("Scanned Bin:#{bin_number} has been tipped") if bin[:bin_tipped]
 
       success_response('Valid Bin Scanned',
