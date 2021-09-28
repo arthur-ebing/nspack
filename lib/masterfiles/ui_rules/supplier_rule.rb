@@ -31,7 +31,7 @@ module UiRules
     def common_fields
       party_role_options = [['Create New Organization'], [@form_object.supplier, @form_object.supplier_party_role_id]] - [[nil, nil]]
       party_role_options += @party_repo.for_select_party_roles_exclude(AppConst::ROLE_SUPPLIER, where: { person_id: nil })
-      hide_org_renderers = @form_object.customer_party_role_id != 'Create New Organization'
+      hide_org_renderers = @form_object.supplier_party_role_id != 'Create New Organization'
       {
         supplier: { caption: 'Supplier',
                     renderer: :label,
