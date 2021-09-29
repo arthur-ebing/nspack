@@ -6,11 +6,9 @@ module RawMaterialsApp
       self.maximum_retry_count = 0
 
       def run(job_no)
-        RawMaterialsApp::RmtDeliveryRepo.new.transaction do
-          RawMaterialsApp::BinIntegrationQueueProcessor.call(job_no)
+        RawMaterialsApp::BinIntegrationQueueProcessor.call(job_no)
 
-          finish
-        end
+        finish
       end
     end
   end
