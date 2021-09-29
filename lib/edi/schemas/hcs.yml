@@ -1,77 +1,229 @@
 ---
-:carton_id: :string
-:pallet_id: :text
-:tradingpartner: :string
-:extended_fg_code: :string
-:target_market: :string
-:load_no: :string
-:grower_id: :string
-:intake_consignment_id: :string
-:exit_reference: :string
-:weight: :string
-:raw_material_type: :string
-:remarks: :string
-:container: :string
-:vessel_name: :string
-:voyage_no: :string
-:customerpono: :string
-:ucr: :string
-:sell_by_code: :string
-:fg_code: :string
-:fg_mark_code: :string
-:units_per_carton: :string
-:tu_gross_mass: :string
-:tu_nett_mass: :string
-:ri_diameter_range: :string
-:ri_weight_range: :string
-:ru_description: :string
-:old_fg_code: :string
-:marketing_org_code: :string
-:grade_code: :string
-:standard_size_count_value: :string
-:commodity_code: :string
-:ri_mark_code: :string
-:ru_mark_code: :string
-:tu_mark_code: :string
-:unit_pack_product_code: :string
-:carton_pack_product_code: :string
-:marketing_variety_code: :string
-:extended_fg_ru_description: :string
-:treatment_type_code: :string
-:treatment_description: :string
-:carton_pack_style_code: :string
-:carton_pack_style_description: :string
-:basic_pack_code: :string
-:short_code: :string
-:length: :string
-:basic_pack_width: :string
-:basic_pack_height: :string
-:carton_pack_type_type_code: :string
-:carton_pack_type_description: :string
-:carton_pack_products_height: :string
-:carton_pack_product_type_code: :string
-:unit_pack_product_type_type_code: :string
-:unit_pack_product_type_description: :string
-:subtype_code: :string
-:unit_pack_product_subtype_description: :string
-:unit_pack_product_nett_mass: :string
-:commodity_description_long: :string
-:commodity_description_short: :string
-:marketing_variety_description: :string
-:product_class_code: :string
-:size_ref: :string
-:cosmetic_code_name: :string
-:treatment_code: :string
-:actual_count: :string
-:hansaworld: :string
-:account: :string
-:farmsubgroup: :string
-:farmgroup: :string
-:depot_indicator: :string
-:season: :string
-:linetypedesc: :string
-:port_of_destination: :string
-:cultivar: :string
-:incoterm: :string
-:currency: :string
-:carton_price: :string
+:carton_id:
+  :type: :string
+  :head: Carton_ID
+:pallet_id:
+  :type: :text
+  :head: Pallet_ID
+:tradingpartner:
+  :type: :string
+  :head: TradingPartner
+:extended_fg_code:
+  :type: :string
+  :head: extended_fg_code
+:target_market:
+  :type: :string
+  :head: Target_Market
+:load_no:
+  :type: :string
+  :head: Load_No
+:grower_id:
+  :type: :string
+  :head: Grower_ID
+:intake_consignment_id:
+  :type: :string
+  :head: Intake_Consignment_ID
+:exit_reference:
+  :type: :string
+  :head: Exit_Reference
+:weight:
+  :type: :string
+  :head: Weight
+:raw_material_type:
+  :type: :string
+  :head: Raw_Material_Type
+:remarks:
+  :type: :string
+  :head: Remarks
+:container:
+  :type: :string
+  :head: Container
+:vessel_name:
+  :type: :string
+  :head: Vessel_Name
+:voyage_no:
+  :type: :string
+  :head: Voyage_no
+:customerpono:
+  :type: :string
+  :head: CustomerPONo
+:ucr:
+  :type: :string
+  :head: UCR
+:sell_by_code:
+  :type: :string
+  :head: sell_by_code
+:fg_code:
+  :type: :string
+  :head: fg_code
+:fg_mark_code:
+  :type: :string
+  :head: fg_mark_code
+:units_per_carton:
+  :type: :string
+  :head: units_per_carton
+:tu_gross_mass:
+  :type: :string
+  :head: tu_gross_mass
+:tu_nett_mass:
+  :type: :string
+  :head: tu_nett_mass
+:ri_diameter_range:
+  :type: :string
+  :head: ri_diameter_range
+:ri_weight_range:
+  :type: :string
+  :head: ri_weight_range
+:ru_description:
+  :type: :string
+  :head: ru_description
+:old_fg_code:
+  :type: :string
+  :head: old_fg_code
+:marketing_org_code:
+  :type: :string
+  :head: marketing_org_code
+:grade_code:
+  :type: :string
+  :head: grade_code
+:standard_size_count_value:
+  :type: :string
+  :head: standard_size_count_value
+:commodity_code:
+  :type: :string
+  :head: commodity_code
+:ri_mark_code:
+  :type: :string
+  :head: ri_mark_code
+:ru_mark_code:
+  :type: :string
+  :head: ru_mark_code
+:tu_mark_code:
+  :type: :string
+  :head: tu_mark_code
+:unit_pack_product_code:
+  :type: :string
+  :head: unit_pack_product_code
+:carton_pack_product_code:
+  :type: :string
+  :head: carton_pack_product_code
+:marketing_variety_code:
+  :type: :string
+  :head: marketing_variety_code
+:extended_fg_ru_description:
+  :type: :string
+  :head: extended_fg_ru_description
+:treatment_type_code:
+  :type: :string
+  :head: treatment_type_code
+:treatment_description:
+  :type: :string
+  :head: treatment_description
+:carton_pack_style_code:
+  :type: :string
+  :head: carton_pack_style_code
+:carton_pack_style_description:
+  :type: :string
+  :head: carton_pack_style_description
+:basic_pack_code:
+  :type: :string
+  :head: basic_pack_code
+:short_code:
+  :type: :string
+  :head: short_code
+:length:
+  :type: :string
+  :head: length
+:basic_pack_width:
+  :type: :string
+  :head: basic_pack_width
+:basic_pack_height:
+  :type: :string
+  :head: basic_pack_height
+:carton_pack_type_type_code:
+  :type: :string
+  :head: carton_pack_type_type_code
+:carton_pack_type_description:
+  :type: :string
+  :head: carton_pack_type_description
+:carton_pack_products_height:
+  :type: :string
+  :head: carton_pack_products_height
+:carton_pack_product_type_code:
+  :type: :string
+  :head: carton_pack_product_type_code
+:unit_pack_product_type_type_code:
+  :type: :string
+  :head: unit_pack_product_type_type_code
+:unit_pack_product_type_description:
+  :type: :string
+  :head: unit_pack_product_type_description
+:subtype_code:
+  :type: :string
+  :head: subtype_code
+:unit_pack_product_subtype_description:
+  :type: :string
+  :head: unit_pack_product_subtype_description
+:unit_pack_product_nett_mass:
+  :type: :string
+  :head: unit_pack_product_nett_mass
+:commodity_description_long:
+  :type: :string
+  :head: commodity_description_long
+:commodity_description_short:
+  :type: :string
+  :head: commodity_description_short
+:marketing_variety_description:
+  :type: :string
+  :head: marketing_variety_description
+:product_class_code:
+  :type: :string
+  :head: product_class_code
+:size_ref:
+  :type: :string
+  :head: size_ref
+:cosmetic_code_name:
+  :type: :string
+  :head: cosmetic_code_name
+:treatment_code:
+  :type: :string
+  :head: treatment_code
+:actual_count:
+  :type: :string
+  :head: actual_count
+:hansaworld:
+  :type: :string
+  :head: HansaWorld
+:account:
+  :type: :string
+  :head: Account
+:farmsubgroup:
+  :type: :string
+  :head: FarmSubGroup
+:farmgroup:
+  :type: :string
+  :head: FarmGroup
+:depot_indicator:
+  :type: :string
+  :head: Depot_Indicator
+:season:
+  :type: :string
+  :head: Season
+:linetypedesc:
+  :type: :string
+  :head: LineTypeDesc
+:port_of_destination:
+  :type: :string
+  :head: Port_Of_Destination
+:cultivar:
+  :type: :string
+  :head: Cultivar
+:incoterm:
+  :type: :string
+  :head: incoterm
+:currency:
+  :type: :string
+  :head: currency
+:carton_price:
+  :type: :string
+  :head: carton_price

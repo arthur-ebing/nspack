@@ -63,10 +63,15 @@ module EdiApp
           vessels.vessel_code AS vessel_name,
           voyages.voyage_code AS voyage_no,
           orders.customer_order_number AS customerpono,
+
           NULL AS ucr,
+
           order_items.sell_by_code,
+
           NULL AS fg_code,
+
           pm_marks.description AS fg_mark_code,
+
           NULL AS units_per_carton,  -- pm_products_tu.items_per_unit ---
           NULL AS tu_gross_mass,     -- pm_products_tu.gross_weight_per_unit ---
           NULL AS tu_nett_mass,      -- pm_products_tu.gross_weight_per_unit - pm_products_tu.material_mass ---
@@ -74,21 +79,26 @@ module EdiApp
           NULL AS ri_weight_range,   -- FROM _ri.std_fruit_size_count_id TO std_fruit_size_count.min & max weight ---
           NULL AS ru_description,    -- pm_products_ru.description AS ru_description
           NULL AS old_fg_code,
-          left(fn_party_role_name(orders.marketing_org_party_role_id), 2) AS marketing_org_code,
+
+          LEFT(fn_party_role_name(orders.marketing_org_party_role_id), 2) AS marketing_org_code,
           grades.grade_code,
           std_fruit_size_counts.size_count_value AS standard_size_count_value,
           commodities.code AS commodity_code,
           pm_marks.packaging_marks[1] AS ri_mark_code,
           pm_marks.packaging_marks[2] AS ru_mark_code,
           pm_marks.packaging_marks[3] AS tu_mark_code,
+
           NULL AS unit_pack_product_code,
           NULL AS carton_pack_product_code,
+
           marketing_varieties.marketing_variety_code,
+
           NULL AS extended_fg_ru_description,
           NULL AS treatment_type_code,
           NULL AS treatment_description,
           NULL AS carton_pack_style_code,
           NULL AS carton_pack_style_description,
+
           basic_pack_codes.footprint_code AS basic_pack_code,
 
           NULL AS short_code,
