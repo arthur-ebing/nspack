@@ -23,6 +23,11 @@ edi_out_uistk:
   data_type: :integer
   table: edi_out_transaction
   column: edi_sequence_number
+depot_carton_number:
+  db_sequence_name: doc_seqs_depot_carton_number
+  data_type: :integer
+  table: depot_cartons
+  column: depot_carton_number
 dummy_number:
   db_sequence_name: doc_seqs_dummy_number
   data_type: :integer

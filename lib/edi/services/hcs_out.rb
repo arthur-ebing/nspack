@@ -27,6 +27,7 @@ module EdiApp
     private
 
     def prepare_data
+      hcs_repo.prepare_depot_pallet_cartons(record_id)
       hcs_repo.hcs_rows(record_id).each { |row| add_csv_record(row) }
     end
   end

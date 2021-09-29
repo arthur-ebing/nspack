@@ -93,8 +93,12 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
     @output_paths.each do |path|
       raise Crossbeams::FrameworkError, "The path '#{path}' does not exist for writing EDI files" unless File.exist?(path)
 
+      # Override quote & delimiter for HCS...
       keys = record_definitions[flow_type].keys
-      CSV.open(File.join(path, @output_filename), 'w', headers: keys.map(&:to_s), write_headers: true) do |csv|
+      CSV.open(File.join(path, @output_filename), 'w',
+               col_sep: AppConst::CR_EDI.csv_column_separator(flow_type),
+               force_quotes: AppConst::CR_EDI.csv_force_quotes(flow_type),
+               headers: keys.map(&:to_s), write_headers: true) do |csv|
         record_entries[flow_type].each do |hash|
           csv << hash.values_at(*keys)
         end
