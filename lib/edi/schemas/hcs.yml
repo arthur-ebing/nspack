@@ -221,9 +221,9 @@
 :incoterm:
   :type: :string
   :head: incoterm
-:currency:
-  :type: :string
-  :head: currency
 :carton_price:
   :type: :string
   :head: carton_price
+:currency:
+  :type: :string
+  :head: currency
