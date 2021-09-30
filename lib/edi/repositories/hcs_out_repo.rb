@@ -139,8 +139,8 @@ module EdiApp
           pod_ports.port_code AS port_of_destination,
           cultivars.cultivar_name AS cultivar,
           incoterms.incoterm,
-          currencies.currency,
-          COALESCE(order_items.price_per_carton, order_items.price_per_kg) AS carton_price
+          COALESCE(order_items.price_per_carton, order_items.price_per_kg) AS carton_price,
+          currencies.currency
         FROM loads
         LEFT JOIN load_voyages ON load_voyages.load_id = loads.id
         LEFT JOIN voyage_ports pod_voyage_ports ON pod_voyage_ports.id = loads.pod_voyage_port_id
