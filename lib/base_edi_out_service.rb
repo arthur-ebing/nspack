@@ -282,7 +282,10 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
 
   def csv_value_for(name, value)
     data_type = record_definitions[flow_type][name][:type]
-    data_type == :text ? "'#{value}" : value
+    return value.to_s('F') if data_type == :decimal
+    return "'#{value}" if data_type == :text
+
+    value
   end
 
   def value_for(record_type, name, value)

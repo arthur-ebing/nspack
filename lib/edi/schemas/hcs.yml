@@ -222,7 +222,7 @@
   :type: :string
   :head: incoterm
 :carton_price:
-  :type: :string
+  :type: :decimal
   :head: carton_price
 :currency:
   :type: :string
