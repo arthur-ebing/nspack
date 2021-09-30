@@ -37,7 +37,19 @@ module EdiApp
       end
     end
 
+    def calculate_ucr_for_load(load_id)
+      # suffix = record.no_loads_on_order.to_i > 1 ? 'M' : 'S'
+      # ucr = "#{record.shipped_date_time[3,1]}ZA01507472CDEL#{order.order_number}#{suffix}"
+      _, shipped_at = DB[:loads].where(id: load_id).get(%i[order_number shipped_at])
+      order_id = DB[:orders_loads].where(load_id: load_id).get(:order_id)
+      order_no = DB[:orders].where(id: order_id).get(:customer_order_number)
+      cnt = DB[:orders_loads].where(order_id: order_id).count
+      "#{shipped_at.year.to_s[3, 1]}ZA01507472CDEL#{order_no}#{cnt > 1 ? 'M' : 'S'}"
+    end
+
     def hcs_rows(load_id)
+      ucr = calculate_ucr_for_load(load_id)
+
       query = <<~SQL
         SELECT
           CASE WHEN pallets.depot_pallet THEN
@@ -64,7 +76,7 @@ module EdiApp
           voyages.voyage_code AS voyage_no,
           orders.customer_order_number AS customerpono,
 
-          NULL AS ucr,
+          '#{ucr}' AS ucr,
 
           order_items.sell_by_code,
 
@@ -132,7 +144,7 @@ module EdiApp
           farm_groups.farm_group_code AS farmsubgroup,
           farm_groups.farm_group_code AS farmgroup,
           CASE WHEN pallets.depot_pallet THEN 'Depot' ELSE 'Packed_at_Kromco' END AS depot_indicator,
-          seasons.season_code AS season,
+          seasons.season_year AS season,
 
           NULL AS linetypedesc,
 

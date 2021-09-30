@@ -22,6 +22,29 @@ edi/schemas/<flow.xml>|<flow.yml>|<flow.xsd>:: Schema definition for output file
 AppConst::EDI_FLOW_*:: Constants for flow types (e.g. `EDI_FLOW_PO = 'PO'` for PO flow type)
 AppConst::EDI_OUT_RULES_TEMPLATE:: A hash of rules to govern the CRUD around `edi_out_rules` table.
 
+==== YAML flow definitions for csv files
+
+CSV files can be simply a list of column names and data types, or a list of column names with data type and headings.
+
+[source,yml]
+----
+:col1: :string    <1>
+:col2: :text      <2>
+:col3: :decimal   <3>
+----
+<1> `:string` works for all columns.
+<2> `:text` is used for long numbers and plcaes a single quote in front.
+<3> Use `:decimal` for a numeric column to prevent it being written in scientific notation.
+
+
+The other way of specifying columns allows you to provide a different heading:
+[source,yml]
+----
+:puc:
+  :type: :string
+  :head: PUC
+----
+
 ==== Client-specific config
 
 NOTE: This config is set up per client.
