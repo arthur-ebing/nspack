@@ -13,7 +13,7 @@ module MasterfilesApp
 
         params[:supplier_party_role_id] = res.instance.party_role_id
         res = SupplierSchema.call(params)
-        raise Crossbeams::ServiceError if res.failure?
+        return validation_failed_response(res) if res.failure?
 
         id = repo.create_supplier(res)
         log_status(:suppliers, id, 'CREATED')
