@@ -40,11 +40,10 @@ module EdiApp
     def calculate_ucr_for_load(load_id)
       # suffix = record.no_loads_on_order.to_i > 1 ? 'M' : 'S'
       # ucr = "#{record.shipped_date_time[3,1]}ZA01507472CDEL#{order.order_number}#{suffix}"
-      _, shipped_at = DB[:loads].where(id: load_id).get(%i[order_number shipped_at])
+      shipped_at = DB[:loads].where(id: load_id).get(:shipped_at)
       order_id = DB[:orders_loads].where(load_id: load_id).get(:order_id)
-      order_no = DB[:orders].where(id: order_id).get(:customer_order_number)
       cnt = DB[:orders_loads].where(order_id: order_id).count
-      "#{shipped_at.year.to_s[3, 1]}ZA01507472CDEL#{order_no}#{cnt > 1 ? 'M' : 'S'}"
+      "#{shipped_at.year.to_s[3, 1]}ZA01507472CDEL#{order_id}#{cnt > 1 ? 'M' : 'S'}"
     end
 
     def hcs_rows(load_id)

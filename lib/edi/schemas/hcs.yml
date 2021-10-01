@@ -27,7 +27,7 @@
   :type: :string
   :head: Exit_Reference
 :weight:
-  :type: :string
+  :type: :decimal
   :head: Weight
 :raw_material_type:
   :type: :string

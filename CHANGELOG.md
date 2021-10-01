@@ -10,6 +10,7 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 - Gossamer data dashboard
 - Multi-pallet moves
 - Packing specs can set a default label template
+- Ability to force the shipped date on loads
 ### Changed
 ### Fixed
 
