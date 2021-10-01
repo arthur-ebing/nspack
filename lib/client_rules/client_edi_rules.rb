@@ -13,7 +13,7 @@ module Crossbeams
             load_id_prefix: '',
             csv_overrides: {},
             ps_apply_substitutes: false },
-      kr: { install_location: 'KR',
+      kr: { install_location: 'RA_8AND9',
             load_id_prefix: '',
             csv_overrides: { hcs: { col_sep: '|', force_quotes: true } },
             ps_apply_substitutes: false },
