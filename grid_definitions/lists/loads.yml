@@ -29,6 +29,15 @@
   :title: Re-send HCS EDI
   :popup: true
   :hide_if_false: shipped,on_order
+- :url: "/finished_goods/dispatch/loads/$:id$/force_shipped_date"
+  :text: force shipped date
+  :icon: edit
+  :title: Edit shipped date
+  :popup: true
+  :hide_if_false: shipped
+  :has_permission:
+    - load
+    - can_ship
 - :separator: true
 - :url: "/development/statuses/list/loads/$:id$"
   :text: status
