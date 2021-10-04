@@ -21,6 +21,7 @@ module UiRules
                                  shipped_at requires_temp_tail rmt_load],
                      display_columns: 2)
       fields[:shipped_at] = { renderer: :datetime,
+                              maxvalue_date: Time.now.strftime('%Y-%m-%d'),
                               required: true }
     end
 
