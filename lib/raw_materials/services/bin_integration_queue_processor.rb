@@ -9,23 +9,26 @@ module RawMaterialsApp
 
     def call # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
       repo.bin_integration_queue_snapshot(job_no).each do |b|
-        legacy_bin_data = b[:bin_data]
-        bin_attrs_res = bin_attributes(legacy_bin_data)
-        if bin_attrs_res.success
-          existing_rmt_bin = repo.find_bin_by_asset_number(bin_attrs_res.instance[:bin_attrs][:bin_asset_number])
-          if existing_rmt_bin.nil?
-            id = repo.create_rmt_bin(bin_attrs_res.instance[:bin_attrs])
-            repo.log_status(:rmt_bins, id, 'BIN CREATED FROM EXTERNAL SYSTEM')
+        repo.transaction do
+          bin_attrs_res = bin_attributes(b[:bin_data])
+          if bin_attrs_res.success
+            existing_rmt_bin = repo.find_bin_by_asset_number(bin_attrs_res.instance[:bin_attrs][:bin_asset_number])
+            if existing_rmt_bin.nil?
+              id = repo.create_rmt_bin(bin_attrs_res.instance[:bin_attrs])
+              repo.log_status(:rmt_bins, id, 'BIN CREATED FROM EXTERNAL SYSTEM')
+            else
+              repo.update_rmt_bin(existing_rmt_bin[:id], bin_attrs_res.instance[:bin_attrs]) unless existing_rmt_bin[:bin_tipped] || existing_rmt_bin[:staged_for_presorting]
+            end
+            repo.delete_bin_integration_queue_item(b[:id])
           else
-            repo.update_rmt_bin(existing_rmt_bin[:id], bin_attrs_res.instance[:bin_attrs]) unless existing_rmt_bin[:bin_tipped] || existing_rmt_bin[:staged_for_presorting]
+            repo.log_bin_integration_queue_error(b[:id], bin_attrs_res.message)
           end
-          repo.delete_bin_integration_queue_item(b[:id])
-        else
-          repo.log_bin_integration_queue_error(b[:id], bin_attrs_res.message, legacy_bin_data['bin_number'])
         end
       rescue StandardError => e
-        repo.log_bin_integration_queue_error(b[:id], e.message, legacy_bin_data['bin_number'], e.backtrace.join("\n"))
+        repo.log_bin_integration_queue_error(b[:id], e.message, e.backtrace.join("\n"))
       end
+
+      send_email_if_bin_errors(job_no)
     end
 
     private

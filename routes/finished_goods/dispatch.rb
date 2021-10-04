@@ -420,6 +420,33 @@ class Nspack < Roda
         show_partial_or_page(r) { FinishedGoods::Orders::Order::New.call(form_values: form_values) }
       end
 
+      r.on 'force_shipped_date' do
+        r.get do
+          check_auth!('dispatch', 'edit')
+          interactor.can_ship_load?
+          show_partial do
+            FinishedGoods::Dispatch::Load::EditShippedDate.call(id)
+          end
+        end
+
+        r.post do
+          params[:load][:load_shipped_at] = interactor.load_shipped_date_for(id)
+          store_locally(:change_load_shipped_date, params[:load])
+          show_partial do
+            FinishedGoods::Tripsheet::Confirm.call(id,
+                                                   url: "/finished_goods/dispatch/loads/#{id}/confirm_force_shipped_date",
+                                                   notice: "Are you sure want to change the shipped date <br> From: #{params[:load][:load_shipped_at]} To: #{params[:load][:shipped_at]}?",
+                                                   button_captions: %w[Confirm Confirming])
+          end
+        end
+      end
+
+      r.on 'confirm_force_shipped_date' do
+        res = interactor.confirm_force_shipped_date(id, retrieve_from_local_store(:change_load_shipped_date))
+        flash[res.success ? :notice : :error] = res.message
+        redirect_to_last_grid(r)
+      end
+
       r.on 'edit' do   # EDIT
         check_auth!('dispatch', 'edit')
         interactor.assert_permission!(:edit, id)

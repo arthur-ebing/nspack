@@ -12,7 +12,16 @@ module UiRules
 
       common_values_for_fields common_fields
       set_show_fields if %i[show allocate].include? @mode
+      set_force_shipped_date_fields if @mode == :force_shipped_date
       form_name 'load'
+    end
+
+    def set_force_shipped_date_fields
+      compact_header(columns: %i[load_id order_number customer_order_number customer_reference location_of_issue
+                                 shipped_at requires_temp_tail rmt_load],
+                     display_columns: 2)
+      fields[:shipped_at] = { renderer: :datetime,
+                              required: true }
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize

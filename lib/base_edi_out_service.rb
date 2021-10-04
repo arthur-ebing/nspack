@@ -93,8 +93,13 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
     @output_paths.each do |path|
       raise Crossbeams::FrameworkError, "The path '#{path}' does not exist for writing EDI files" unless File.exist?(path)
 
+      # Override quote & delimiter for HCS...
       keys = record_definitions[flow_type].keys
-      CSV.open(File.join(path, @output_filename), 'w', headers: keys.map(&:to_s), write_headers: true) do |csv|
+      heads = record_definitions[flow_type].map { |_, v| v[:head] }
+      CSV.open(File.join(path, @output_filename), 'w',
+               col_sep: AppConst::CR_EDI.csv_column_separator(flow_type),
+               force_quotes: AppConst::CR_EDI.csv_force_quotes(flow_type),
+               headers: heads, write_headers: true) do |csv|
         record_entries[flow_type].each do |hash|
           csv << hash.values_at(*keys)
         end
@@ -157,7 +162,11 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
 
     schema = YAML.load_file(file_path)
     schema.each do |key, val|
-      record_definitions[flow_type][key] = val
+      record_definitions[flow_type][key] = if val.is_a?(Symbol)
+                                             { type: val, head: key }
+                                           else
+                                             val
+                                           end
     end
   end
 
@@ -272,8 +281,11 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
   end
 
   def csv_value_for(name, value)
-    data_type = record_definitions[flow_type][name]
-    data_type == :text ? "'#{value}" : value
+    data_type = record_definitions[flow_type][name][:type]
+    return value.to_s('F') if data_type == :decimal
+    return "'#{value}" if data_type == :text
+
+    value
   end
 
   def value_for(record_type, name, value)

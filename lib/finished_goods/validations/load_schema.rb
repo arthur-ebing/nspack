@@ -59,4 +59,9 @@ module FinishedGoodsApp
     required(:requires_temp_tail).filled(:bool)
     optional(:location_of_issue).maybe(Types::StrippedString)
   end
+
+  LoadEditShippedDateSchema = Dry::Schema.Params do
+    required(:shipped_at).filled(:time)
+    required(:load_shipped_at).filled(:time)
+  end
 end

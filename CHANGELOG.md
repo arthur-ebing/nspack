@@ -10,7 +10,9 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 - Gossamer data dashboard
 - Multi-pallet moves
 - Packing specs can set a default label template
+- Ability to force the shipped date on loads
 ### Changed
+- Pallets added to a previously shipped load get the new shipped date on ship event - even though the load's shipped at does not change.
 ### Fixed
 
 ## [1.0.0] - 2021-08-31

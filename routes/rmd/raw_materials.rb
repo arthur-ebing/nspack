@@ -651,6 +651,106 @@ class Nspack < Roda
         end
       end
 
+      # MOVE MULTIPLE BINS
+      # --------------------------------------------------------------------------
+
+      r.on 'move_multiple_bins', Integer do |scanned_locn_id|
+        r.on 'complete_move' do
+          moved_bins_count = (retrieve_from_local_store(:moved_bins) || []).count
+          location_code = interactor.location_short_code_for(scanned_locn_id)
+          store_locally(:flash_notice, rmd_success_message("#{moved_bins_count} bins have been moved to location #{location_code}"))
+          r.redirect('/rmd/rmt_deliveries/rmt_bins/move_multiple_bins')
+        end
+
+        r.get do
+          bin = {}
+
+          error = retrieve_from_local_store(:error)
+          if error.is_a?(String)
+            bin.merge!(error_message: error)
+          elsif !error.nil?
+            bin.merge!(error_message: error.message)
+            bin.merge!(errors: error.errors) unless error.errors.nil_or_empty?
+          end
+
+          form = Crossbeams::RMDForm.new(bin,
+                                         form_name: :bin,
+                                         notes: retrieve_from_local_store(:flash_notice),
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         caption: 'Scan Bins',
+                                         action: "/rmd/rmt_deliveries/rmt_bins/move_multiple_bins/#{scanned_locn_id}",
+                                         button_caption: 'Submit')
+
+          location_code = interactor.location_short_code_for(scanned_locn_id)
+          form.add_label(:location, 'Location', location_code)
+          form.add_field(:bin_number, 'Bin Number', scan: 'key248_all', scan_type: :bin_asset, required: false, submit_form: true)
+
+          moved_bins = retrieve_from_local_store(:moved_bins) || []
+          unless moved_bins.empty?
+            store_locally(:moved_bins, moved_bins)
+            form.add_section_header('Bins Moved')
+            moved_bins.each { |bin_number| form.add_label(:bin_number, '', bin_number) }
+            form.add_button('Complete Move', "/rmd/rmt_deliveries/rmt_bins/move_multiple_bins/#{scanned_locn_id}/complete_move")
+          end
+
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+
+        r.post do
+          val_res = interactor.validate_bin(params[:bin][:bin_number])
+          unless val_res.success
+            store_locally(:error, val_res)
+            r.redirect("/rmd/rmt_deliveries/rmt_bins/move_multiple_bins/#{scanned_locn_id}")
+          end
+
+          res = interactor.move_location_bin(val_res.instance[:id], scanned_locn_id)
+          if res.success
+            bin_number = AppConst::USE_PERMANENT_RMT_BIN_BARCODES ? val_res.instance[:bin_asset_number] : val_res.instance[:id]
+            moved_bins = retrieve_from_local_store(:moved_bins) || []
+            moved_bins << bin_number
+            store_locally(:moved_bins, moved_bins)
+            store_locally(:flash_notice, res.message)
+          else
+            store_locally(:error, res)
+          end
+          r.redirect("/rmd/rmt_deliveries/rmt_bins/move_multiple_bins/#{scanned_locn_id}")
+        rescue Crossbeams::InfoError => e
+          store_locally(:error, rmd_error_message(e.message))
+          r.redirect("/rmd/rmt_deliveries/rmt_bins/move_multiple_bins/#{scanned_locn_id}")
+        end
+      end
+
+      r.on 'move_multiple_bins' do
+        r.get do
+          form_state = retrieve_from_local_store(:error).to_h
+          form = Crossbeams::RMDForm.new(form_state,
+                                         form_name: :bin,
+                                         notes: retrieve_from_local_store(:flash_notice),
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         caption: 'Scan Location',
+                                         action: '/rmd/rmt_deliveries/rmt_bins/move_multiple_bins',
+                                         button_caption: 'Submit')
+          form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location, submit_form: true, required: true, lookup: true)
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+
+        r.post do
+          val_res = interactor.validate_location(params[:bin][:location], params[:bin][:location_scan_field])
+          if val_res.success
+            scanned_locn_id = val_res.instance
+            r.redirect("/rmd/rmt_deliveries/rmt_bins/move_multiple_bins/#{scanned_locn_id}")
+          else
+            store_locally(:error, val_res)
+            r.redirect('/rmd/rmt_deliveries/rmt_bins/move_multiple_bins')
+          end
+        rescue Crossbeams::InfoError => e
+          store_locally(:error, rmd_error_message(e.message))
+          r.redirect('/rmd/rmt_deliveries/rmt_bins/move_multiple_bins')
+        end
+      end
+
       # --------------------------------------------------------------------------
       # CREATE RMT REBIN
       # --------------------------------------------------------------------------

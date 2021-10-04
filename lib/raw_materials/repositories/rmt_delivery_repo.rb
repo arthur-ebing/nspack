@@ -586,13 +586,15 @@ module RawMaterialsApp
       DB[:bin_integration_queue].where(id: id).delete
     end
 
-    def log_bin_integration_queue_error(id, message, bin_number, stacktrace = nil)
+    def log_bin_integration_queue_error(id, message, stacktrace = nil)
       update(:bin_integration_queue, id, error: { err: message, stacktrace: stacktrace.to_s }.to_json)
+    end
+
+    def send_email_if_bin_errors(job_no)
+      return unless repo.exists?(:bin_integration_queue, Sequel.lit("job_no=#{job_no} and errors is not null"))
 
       mail = <<~STR
-        Bin:#{bin_number} could not be created
-
-        #{message}
+        There were bin errors when executing job: #{job_no}
       STR
 
       ErrorMailer.send_error_email(subject: 'LEGACY BIN INTEGRATION FAIL', message: mail, append_recipients: AppConst::LEGACY_SYSTEM_ERROR_RECIPIENTS)

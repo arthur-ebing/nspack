@@ -91,12 +91,20 @@ class QueueNspackBinIntegration < BaseScript
   end
 
   def insert_bin_integration_queue(bin_id)
+    bin_data = bin_data(bin_id)
+    if bin_data.nil?
+      @db_conn[:bin_nspack_integration_queue].where(bin_id: bin_id).update(errors: { err: 'Bin data could not be retrieved' }.to_json)
+      return
+    end
+
     DB[:bin_integration_queue].where(bin_id: bin_id).delete
-    DB[:bin_integration_queue].insert(bin_id: bin_id, bin_data: bin_data(bin_id).to_json)
+    DB[:bin_integration_queue].insert(bin_id: bin_id, bin_data: bin_data.to_json)
     @queued_bins << bin_id
   end
 
   def delete_nspack_integration_queue_bin(ids)
-    @db_conn[:bin_nspack_integration_queue].where(id: ids).delete
+    @db_conn[:bin_nspack_integration_queue]
+      .where(id: ids)
+      .where(Sequel.lit('errors is null')).delete
   end
 end

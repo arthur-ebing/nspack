@@ -349,6 +349,39 @@ module FinishedGoodsApp
       repo.find_load(id)
     end
 
+    def can_ship_load?
+      can_ship_load = Crossbeams::Config::UserPermissions.can_user?(@user, :load, :can_ship) unless @user&.permission_tree.nil?
+      message = "Cannot change load shipped date. Requires user with 'can_ship' permission"
+      raise Crossbeams::InfoError, message unless can_ship_load
+
+      ok_response
+    end
+
+    def load_shipped_date_for(load_id)
+      repo.get(:loads, load_id, :shipped_at).strftime('%Y-%m-%d')
+    end
+
+    def confirm_force_shipped_date(load_id, params) # rubocop:disable Metrics/AbcSize
+      res = can_ship_load?
+      return res unless res.success
+
+      res = LoadEditShippedDateSchema.call(params)
+      return validation_failed_response(res) if res.failure?
+
+      status = "SHIPPED DATE FORCED FROM #{res[:load_shipped_at]} TO #{res[:shipped_at]}"
+      pallet_ids = repo.select_values(:pallets, :id, load_id: load_id)
+      repo.transaction do
+        repo.update_load(load_id, shipped_at: res[:shipped_at])
+        repo.update(:pallets, pallet_ids, shipped_at: res[:shipped_at])
+        log_multiple_statuses(:pallets, pallet_ids, status)
+        log_status(:loads, load_id, status)
+        log_transaction
+      end
+      success_response("Updated shipped date for load: #{load_id} successfully.")
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     private
 
     def check!(task, id = nil, pallet_number = nil)
