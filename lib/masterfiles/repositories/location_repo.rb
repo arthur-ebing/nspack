@@ -418,6 +418,12 @@ module MasterfilesApp
       DB[:pallets].where(location_id: location_id).count
     end
 
+    def belongs_to_parent?(child_location_id, parent_location_id)
+      !DB[:tree_locations]
+        .where(ancestor_location_id: parent_location_id, descendant_location_id: child_location_id)
+        .first.nil?
+    end
+
     private
 
     def sql_for_missing_str_values(values, table, column)

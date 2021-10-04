@@ -169,13 +169,13 @@ module RawMaterialsApp
         parent_tables: [{ parent_table: :orchards,
                           flatten_columns: { orchard_code: :orchard_code } },
                         { parent_table: :farms,
-                          flatten_columns: { farm_code: :farm_code } },
+                          flatten_columns: { farm_code: :farm_code, description: :farm_description, farm_group_id: :farm_group_id } },
                         { parent_table: :rmt_sizes,
                           flatten_columns: { size_code: :size_code } },
                         { parent_table: :pucs,
                           flatten_columns: { puc_code: :puc_code } },
                         { parent_table: :seasons,
-                          flatten_columns: { season_code: :season_code } },
+                          flatten_columns: { season_code: :season_code, season_year: :season_year } },
                         { parent_table: :rmt_classes,
                           flatten_columns: { rmt_class_code: :class_code } },
                         { parent_table: :locations,
@@ -189,7 +189,7 @@ module RawMaterialsApp
                         { parent_table: :cultivar_groups, foreign_key: :cultivar_group_id,
                           flatten_columns: { cultivar_group_code: :cultivar_group_code, commodity_id: :commodity_id } },
                         { parent_table: :commodities, foreign_key: :commodity_id,
-                          flatten_columns: { code: :commodity_code } }],
+                          flatten_columns: { code: :commodity_code, description: :commodity_description } }],
         lookup_functions: [{ function: :fn_current_status, args: ['rmt_bins', :id], col_name: :status }]
       )
 

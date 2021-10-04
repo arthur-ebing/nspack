@@ -39,6 +39,7 @@ module RawMaterialsApp
     attribute? :scrapped, Types::Bool
     attribute? :active, Types::Bool
     attribute :scrapped_rmt_delivery_id, Types::Integer
+    attribute :legacy_data, Types::Hash
   end
 
   class RmtBinFlat < Dry::Struct
@@ -59,7 +60,9 @@ module RawMaterialsApp
     attribute :qty_bins, Types::Integer
     attribute :bin_asset_number, Types::String
     attribute :tipped_asset_number, Types::String
+    attribute :shipped_asset_number, Types::String
     attribute :rmt_inner_container_type_id, Types::Integer
+    attribute :bin_load_product_id, Types::Integer
     attribute :rmt_inner_container_material_id, Types::Integer
     attribute :qty_inner_bins, Types::Integer
     attribute :production_run_rebin_id, Types::Integer
@@ -94,7 +97,12 @@ module RawMaterialsApp
     attribute :location_long_code, Types::String
     attribute? :status, Types::String
     attribute? :asset_number, Types::String
+    attribute? :farm_description, Types::String
+    attribute? :commodity_description, Types::String
+    attribute :farm_group_id, Types::Integer
+    attribute :season_year, Types::Integer
     attribute :scrapped_rmt_delivery_id, Types::Integer
+    attribute :legacy_data, Types::Hash
     # attribute :container_material_owner_code, Types::String
   end
 end

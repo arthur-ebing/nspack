@@ -187,6 +187,35 @@ module RawMaterialsApp
       failed_response("Unable to delete presort staging run child. It is still referenced#{e.message.partition('referenced').last}")
     end
 
+    def stage_bins(params, request_path)
+      log_request(params, request_path)
+      bins = [params[:bin1], params[:bin2], params[:bin3]]
+      plant_resource = params[:unit]
+      MesscadaApp::BinStaging.call(bins, plant_resource)
+    end
+
+    def staging_override_provided(params, request_path) # rubocop:disable Metrics/AbcSize
+      log_request(params, "#{request_path}answer=#{params[:answer]}")
+      if params[:answer] == 'yes'
+        bins = [params[:bin1], params[:bin2], params[:bin3]]
+        plant_resource = params[:unit]
+        MesscadaApp::StagingOverride.call(bins, plant_resource)
+      else
+        bin_results = [{ bin_num: params[:bin1], bin_item: 1, status: 'OVERRIDE_CANCELLED', msg: 'bin override has been cancelled' }]
+        bin_results << { bin_num: params[:bin2], bin_item: 2, status: 'OVERRIDE_CANCELLED', msg: 'bin override has been cancelled' } if params[:bin2]
+        bin_results << { bin_num: params[:bin3], bin_item: 3, status: 'OVERRIDE_CANCELLED', msg: 'bin override has been cancelled' } if params[:bin3]
+        res = MesscadaApp::StageBins.result(bin_results)
+        success_response('Override Cancelled', res)
+      end
+    end
+
+    def log_request(params, msq)
+      msg = "#{msq}&unit=#{params[:unit]}&bin1=#{params[:bin1]}"
+      msg += "&bin2=#{params[:bin2]}" if params[:bin2]
+      msg += "&bin3=#{params[:bin3]}" if params[:bin3]
+      AppConst::BIN_STAGING_LOG.info(msg)
+    end
+
     def assert_permission!(task, id = nil)
       res = TaskPermissionCheck::PresortStagingRun.call(task, id)
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success

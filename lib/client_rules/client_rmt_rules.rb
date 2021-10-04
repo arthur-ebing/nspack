@@ -51,7 +51,7 @@ module Crossbeams
             pending_delivery_location: nil,
             default_delivery_location: nil,
             use_bin_asset_control: false,
-            presort_legacy_data_fields: %i[ripe_point_code track_indicator_code]  },
+            presort_legacy_data_fields: %i[treatment_code ripe_point_code track_indicator_code]  },
       um: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             use_delivery_destination: false,
