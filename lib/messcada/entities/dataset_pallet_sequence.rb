@@ -266,7 +266,9 @@ module MesscadaApp
          pallets.rmt_container_material_owner_id,
          CONCAT(container_material_type_code, ' - ', fn_party_role_name(rmt_material_owner_party_role_id)) AS rmt_container_material_owner,
          pallet_sequences.colour_percentage_id,
-         colour_percentages.colour_percentage
+         colour_percentages.colour_percentage,
+         pallet_sequences.work_order_item_id,
+         fn_work_order_item_code(pallet_sequences.work_order_item_id) AS work_order_item_code
 
         FROM pallet_sequences
         JOIN pallets ON pallets.id = pallet_sequences.pallet_id

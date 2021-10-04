@@ -824,6 +824,11 @@ class Nspack < Roda
         end
       end
 
+      r.on 'inline_select_work_order_items', Integer do |product_resource_allocation_id|
+        items = interactor.work_order_items_for(product_resource_allocation_id)
+        { items: items }.to_json
+      end
+
       r.on 'selected_template', Integer do |id|
         res = interactor.selected_template(id)
         if res.success

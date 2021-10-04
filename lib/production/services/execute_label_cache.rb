@@ -14,6 +14,7 @@ module ProductionApp
                                                packing_method_id: rec[:packing_method_id],
                                                label_name: rec[:label_template_name],
                                                target_customer_party_role_id: rec[:target_customer_party_role_id],
+                                               work_order_item_id: rec[:work_order_item_id],
                                                cultivar_id: cultivar_id,
                                                legacy_data: resolve_run_legacy_data(production_run.legacy_data.to_h))
         }
