@@ -26,10 +26,11 @@
   \   edi_size_count,\r\n    target_customer_party_role_id,\r\n    target_customer,\r\n
   \   consignment_note_number,\r\n    dispatch_note,\r\n    order_number,\r\n    customer_order_number,\r\n
   \   customer_reference, \r\n    depot,\r\n    po_file_name,\r\n    bom,\r\n    pm_bom_system_code,\r\n
-  \   batch_number,\r\n    colour_percentage_id,\r\n    colour_percentage,\r\n    colour_description,\r\n
-  \   CASE WHEN fn_pallet_verification_failed (pallet_id) THEN\r\n        'error'\r\n
-  \   ELSE\r\n        colour_rule\r\n    END AS colour_rule\r\nFROM\r\n    vw_pallet_sequence_flat\r\nORDER
-  BY pallet_id DESC, pallet_sequence_number ASC"
+  \   batch_number,\r\n    colour_percentage_id,\r\n    colour_percentage,\r\n    work_order_item_id,\r\n
+  \   work_order_item_code,\r\n    colour_description,\r\n    CASE WHEN fn_pallet_verification_failed
+  (pallet_id) THEN\r\n        'error'\r\n    ELSE\r\n        colour_rule\r\n    END
+  AS colour_rule\r\nFROM\r\n    vw_pallet_sequence_flat\r\nORDER BY pallet_id DESC,
+  pallet_sequence_number ASC"
 :limit: 
 :offset: 
 :external_settings:
@@ -1845,9 +1846,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  work_order_item_id:
+    :name: work_order_item_id
+    :sequence_no: 114
+    :caption: Work order item
+    :namespaced_name: work_order_item_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  work_order_item_code:
+    :name: work_order_item_code
+    :sequence_no: 115
+    :caption: Work order item code
+    :namespaced_name: work_order_item_code
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_description:
     :name: colour_description
-    :sequence_no: 114
+    :sequence_no: 116
     :caption: Colour description
     :namespaced_name: colour_description
     :data_type: :string
@@ -1863,7 +1896,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 115
+    :sequence_no: 117
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

@@ -36,7 +36,8 @@
   \   target_customer,\r\n    consignment_note_number,\r\n    dispatch_note,\r\n    customer_order_number,\r\n
   \   customer_reference, \r\n    depot,\r\n    po_file_name,\r\n    batch_number,\r\n
   \   colour_percentage_id,\r\n    colour_percentage,\r\n    colour_description,\r\n
-  \   colour_rule\r\nFROM\r\n    vw_pallet_sequence_flat"
+  \   work_order_item_id,\r\n    work_order_item_code,\r\n    colour_rule\r\nFROM\r\n
+  \   vw_pallet_sequence_flat"
 :limit: 
 :offset: 
 :external_settings:
@@ -2369,9 +2370,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  work_order_item_id:
+    :name: work_order_item_id
+    :sequence_no: 146
+    :caption: Work order item
+    :namespaced_name: work_order_item_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  work_order_item_code:
+    :name: work_order_item_code
+    :sequence_no: 147
+    :caption: Work order item code
+    :namespaced_name: work_order_item_code
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 146
+    :sequence_no: 148
     :caption: Colour rule
     :namespaced_name: colour_rule
     :data_type: :string
