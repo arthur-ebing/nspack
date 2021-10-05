@@ -49,6 +49,7 @@ module UiRules
       rmt_class_id_label = repo.get(:rmt_classes, @form_object.rmt_class_id, :rmt_class_code)
       rmt_size_id_label = repo.get(:rmt_sizes, @form_object.rmt_size_id, :size_code)
       season_id_label = repo.get(:seasons, @form_object.season_id, :season_code)
+      fields[:id] = { renderer: :label, with_value: @form_object.id, caption: 'Run Id' }
       fields[:setup_uncompleted_at] = { renderer: :label, format: :without_timezone_or_seconds }
       fields[:setup_completed] = { renderer: :label, as_boolean: true }
       fields[:presort_unit_plant_resource_id] = { renderer: :label, with_value: presort_unit_plant_resource_id_label, caption: 'Line Plant Resource' }
@@ -72,7 +73,8 @@ module UiRules
 
     def common_fields # rubocop:disable Metrics/AbcSize
       season_id_label = repo.get(:seasons, @form_object.season_id, :season_code)
-      fields = { presort_unit_plant_resource_id: { renderer: :select,
+      fields = { id: { renderer: :label, with_value: @form_object.id, caption: 'Run Id' },
+                 presort_unit_plant_resource_id: { renderer: :select,
                                                    options: @resource_repo.for_select_plant_resources_of_type(Crossbeams::Config::ResourceDefinitions::PRESORTING_UNIT),
                                                    caption: 'Line Plant Resource',
                                                    required: true,

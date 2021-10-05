@@ -90,13 +90,16 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def complete_staging(id)
+    def complete_staging(id) # rubocop:disable Metrics/AbcSize
       res = TaskPermissionCheck::PresortStagingRun.call(:complete_staging, id)
       return res unless res.success
 
       repo.transaction do
+        active_child_id = repo.get_value(:presort_staging_run_children, :id, presort_staging_run_id: id, running: true)
         repo.update_presort_staging_run(id, running: false, staged: true, staged_at: Time.now)
         log_status(:presort_staging_runs, id, 'STAGED')
+        repo.update_presort_staging_run_child(active_child_id, staged: true, running: false, staged_at: Time.now)
+        log_status(:presort_staging_run_children, active_child_id, 'STAGED')
         log_transaction
       end
       instance = presort_staging_run(id)

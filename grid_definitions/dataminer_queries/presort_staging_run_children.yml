@@ -11,7 +11,11 @@
   "presort_staging_run_children"."farm_id", "presort_staging_run_children"."editing",
   "presort_staging_run_children"."staged", "presort_staging_run_children"."running",
   "farms"."farm_code", "presort_staging_runs"."id" AS presort_staging_runs_id, fn_current_status('presort_staging_run_children',
-  "presort_staging_run_children"."id") AS status FROM "presort_staging_run_children"
+  "presort_staging_run_children"."id") AS status
+  ,CASE WHEN presort_staging_runs.staged THEN 'gray'
+  WHEN presort_staging_runs.running THEN 'green'
+  END AS colour_rule
+  FROM "presort_staging_run_children"
   JOIN "farms" ON "farms"."id" = "presort_staging_run_children"."farm_id" LEFT JOIN
   "presort_staging_runs" ON "presort_staging_runs"."id" = "presort_staging_run_children"."presort_staging_run_id"
   order by updated_at desc
