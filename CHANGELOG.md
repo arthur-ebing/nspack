@@ -7,13 +7,27 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
+### Changed
+### Fixed
+
+## [1.0.2] - 2021-10-05
+### Added
+- LI in EDI process
+- Presort bin staging
+- Work orders
+### Changed
+- Stock pallets for loads grids optimised
+### Fixed
+- Rework of cultivar for production run: allow current cultivar to apply to early cartons/pallets that differ.
+
+## [1.0.1] - 2021-10-04
+### Added
 - Gossamer data dashboard
 - Multi-pallet moves
 - Packing specs can set a default label template
 - Ability to force the shipped date on loads
 ### Changed
 - Pallets added to a previously shipped load get the new shipped date on ship event - even though the load's shipped at does not change.
-### Fixed
 
 ## [1.0.0] - 2021-08-31
 ### Added
