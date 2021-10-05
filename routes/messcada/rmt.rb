@@ -37,7 +37,7 @@ class Nspack < Roda
         r.get do       # TIP BIN
           if AppConst::CR_PROD.full_bin_tip_criteria_check?
             res = interactor.can_tip_bin?(params)
-            res = interactor.tip_rmt_bin(params) if res
+            res = interactor.tip_rmt_bin(params) if res.success
           else
             res = interactor.tip_rmt_bin(params)
           end
