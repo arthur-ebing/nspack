@@ -265,9 +265,8 @@ module ProductionApp
       res = validate_reworks_change_run_cultivar_params(add_run_labeling_attrs(params))
       return validation_failed_response(res) if res.failure?
 
-      from_cutivar_id = repo.get(:production_runs, res[:production_run_id], :cultivar_id)
-      message = 'INVALID CULTIVAR: Selected cultivar is the same as the cultivar on the run. Please select a different cultivar'
-      return failed_response(message, res.to_h)  if from_cutivar_id == res[:cultivar_id]
+      message = 'INVALID CULTIVAR: Selected cultivar is the same for all objects.'
+      return failed_response(message, res.to_h) unless repo.any_different_cultivar?(res)
 
       Job::ApplyRunCultivarChanges.enqueue(res.to_h, @user.user_name)
       success_response('Production run cultivar changes has been enqued.')

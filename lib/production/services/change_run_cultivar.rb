@@ -33,11 +33,11 @@ module ProductionApp
         change_attrs = params.to_h.slice(:cultivar_id)
         objects_reworks_run_attrs = resolve_reworks_run_attrs(parent_id)
         update_objects_changes('carton_labels',
-                               repo.select_values(:carton_labels, :id, { production_run_id: production_run_id }),
+                               repo.production_run_object_ids('carton_labels', params),
                                change_attrs,
                                objects_reworks_run_attrs)
         update_objects_changes('pallet_sequences', # scrapped???
-                               repo.select_values(:pallet_sequences, :id, { production_run_id: production_run_id }),
+                               repo.production_run_object_ids('pallet_sequences', params),
                                change_attrs,
                                objects_reworks_run_attrs)
 

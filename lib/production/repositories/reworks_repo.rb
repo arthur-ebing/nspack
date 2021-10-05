@@ -1176,5 +1176,29 @@ module ProductionApp
         .where(Sequel[:govt_inspection_sheets][:inspected] => false)
         .select_map(:pallet_number)
     end
+
+    def any_different_cultivar?(args)
+      # Does the run have at least one object with a different or null cultivar?
+      query = <<~SQL
+        SELECT EXISTS(
+         SELECT id FROM carton_labels WHERE production_run_id = #{args[:production_run_id]}
+          AND (cultivar_id IS NULL OR cultivar_id != #{args[:cultivar_id]})
+         UNION
+         SELECT id FROM pallet_sequences WHERE production_run_id = #{args[:production_run_id]}
+          AND (cultivar_id IS NULL OR cultivar_id != #{args[:cultivar_id]})
+        )
+      SQL
+      DB[query].single_value
+    end
+
+    def production_run_object_ids(objects_table_name, args)
+      query = <<~SQL
+        SELECT DISTINCT id
+        FROM #{objects_table_name}
+        WHERE production_run_id = #{args[:production_run_id]}
+          AND (cultivar_id IS NULL OR cultivar_id != #{args[:cultivar_id]})
+      SQL
+      DB[query].select_map(:id)
+    end
   end
 end
