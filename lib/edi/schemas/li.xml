@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<in-map name="li" identifier_size="2" root_identifier="BH">
+  <sequence>
+    <record name="doc_header" identifier="BH" size="27" occurence="1">
+      <fields>
+        <field name="header" size="2" default="BH" />
+        <field name="filler" size="25" />
+      </fields>
+      <children>
+        <sequence occurence = "1..n">
+          <record name="detail_header" identifier="DH" size="311" occurence="0..n" >
+            <transformer>
+              <action type="ruby" name="map_detail_header"/>
+            </transformer>
+            <fields>
+              <field name="record_type" size="2" default="DH" />
+              <field name="headerx" size="246" required="false" />
+              <field name="memo" size="63" required="false" />
+            </fields>
+          </record>
+          <record name="load_header" identifier="LH" size="233" occurence="1" >
+            <transformer>
+              <action type="ruby" name="map_header"/>
+            </transformer>
+            <fields>
+              <field name="record_type" size="2" default="LH" />
+              <field name="transaction_type" size="1" required="false"/>
+              <field name="location_code" size="7" required="false"/>
+              <field name="order_type" size="1"/>
+              <field name="order_number" size="6"/>
+              <field name="ship_number" size="6"/>
+              <field name="ship_name" size="25" required="false"/>
+              <field name="load_date" size="8" required="false"/>
+              <field name="order_status" size="1" required="false"/>
+              <field name="destination_type" size="2"/>
+              <field name="destination_code" size="7"/>
+              <field name="master_order" size="6" required="false"/>
+              <field name="cold_flag" size="1" required="false"/>
+              <field name="from_location" size="7" required="false"/>
+              <field name="from_user" size="7" required="false"/>
+              <field name="from_date" size="8" required="false"/>
+              <field name="from_time" size="8" required="false"/>
+              <field name="line_status" size="1" required="false"/>
+              <field name="line_number" size="4" required="false"/>
+              <field name="store" size="2" required="false"/>
+              <field name="bay" size="2" required="false"/>
+              <field name="sender" size="2" required="false"/>
+              <field name="agent" size="2" required="false"/>
+              <field name="shipping_sender" size="2" required="false"/>
+              <field name="shipping_agent" size="2" required="false"/>
+              <field name="channel" size="1"/>
+              <field name="stock_pool" size="2" required="false"/>
+              <field name="organization" size="2" required="false"/>
+              <field name="country" size="2" required="false"/>
+              <field name="commodity" size="2" required="false"/>
+              <field name="variety_group" size="2" required="false"/>
+              <field name="variety" size="3" required="false"/>
+              <field name="sub_variety" size="3" required="false"/>
+              <field name="actual_variety" size="3" required="false"/>
+              <field name="pack" size="4" required="false"/>
+              <field name="grade" size="4" required="false"/>
+              <field name="mark" size="5" required="false"/>
+              <field name="low_count" size="5" required="false"/>
+              <field name="low_sort_seq" size="4" required="false"/>
+              <field name="high_count" size="5" required="false"/>
+              <field name="high_sort_seq" size="4" required="false"/>
+              <field name="inventory_code" size="2" required="false"/>
+              <field name="picking_reference" size="4" required="false"/>
+              <field name="product_group" size="2" required="false"/>
+              <field name="product_chars" size="3" required="false"/>
+              <field name="target_market" size="2" required="false"/>
+              <field name="farm" size="7" required="false"/>
+              <field name="remarks" size="8" required="false"/>
+              <field name="cpp_ship" size="1" required="false"/>
+              <field name="pallet_base_type" size="1" required="false"/>
+              <field name="unit_type" size="1" required="false"/>
+              <field name="instruction_quantity" size="5" required="false"/>
+              <field name="xmit_flag" size="1" required="false"/>
+              <field name="revision" size="1" required="false"/>
+              <field name="message_number" size="1" required="false"/>
+              <field name="tran_user" size="7" required="false"/>
+              <field name="tran_date" size="8"/>
+              <field name="tran_time" size="8" required="false"/>
+            </fields>
+            <children>
+              <record name="load_detail" identifier="LD" size="311" occurence="1..n" >
+                <transformer>
+                  <action type="ruby" name="map_detail"/>
+                </transformer>
+                <fields>
+                  <field name="record_type" size="2" default="LD" />
+                  <field name="order_number" size="6"/>
+                  <field name="ship_number" size="6"/>
+                  <field name="location_code" size="7" required="false"/>
+                  <field name="handling_point" size="2" required="false"/>
+                  <field name="line_type" size="1" required="false"/>
+                  <field name="line_status" size="1" required="false"/>
+                  <field name="line_number" size="4" required="false"/>
+                  <field name="sequence_number" size="4" type="number"/>
+                  <field name="store" size="2" required="false"/>
+                  <field name="bay" size="2" required="false"/>
+                  <field name="position" size="6" required="false"/>
+                  <field name="destination_type" size="2"/>
+                  <field name="destination_code" size="7"/>
+                  <field name="sender" size="2" required="false"/>
+                  <field name="agent" size="2" required="false"/>
+                  <field name="shipping_sender" size="2" required="false"/>
+                  <field name="shipping_agent" size="2" required="false"/>
+                  <field name="consec_number" size="6" required="false"/>
+                  <field name="channel" size="1"/>
+                  <field name="stockpool" size="2" required="false"/>
+                  <field name="organization" size="2" map_to="marketing_org"/>
+                  <field name="country" size="2" required="false"/>
+                  <field name="commodity" size="2" map_to="commodity_code"/>
+                  <field name="variety_group" size="2" required="false"/>
+                  <field name="variety" size="3" map_to="marketing_variety_code"/>
+                  <field name="sub_variety" size="3" required="false"/>
+                  <field name="actual_variety" size="3" required="false"/>
+                  <field name="pack" size="4" map_to="old_pack_code"/>
+                  <field name="grade" size="4" map_to="grade_code"/>
+                  <field name="mark" size="5" map_to="brand_code"/>
+                  <field name="low_count" size="5" type="number" map_to="size_ref"/>
+                  <field name="low_sort_seq" size="4" required="false"/>
+                  <field name="high_count" size="5" required="false"/>
+                  <field name="high_sort_seq" size="4" required="false"/>
+                  <field name="inventory_code" size="2"/>
+                  <field name="picking_reference" size="4" required="false"/>
+                  <field name="product_group" size="2" required="false"/>
+                  <field name="product_chars" size="3" required="false"/>
+                  <field name="target_market" size="2" map_to="target_market_code"/>
+                  <field name="farm" size="7" required="false"/>
+                  <field name="remarks" size="8" required="false"/>
+                  <field name="unit_type" size="1"/>
+                  <field name="cpp_ship" size="1" required="false"/>
+                  <field name="pallet_base_type" size="1" required="false" default="S" />
+                  <field name="instruction_quantity" size="4" type="number" map_to="required_quantity"/>
+                  <field name="shipped_flag" size="4" required="false"/>
+                  <field name="xmit_flag" size="1" required="false"/>
+                  <field name="revision" size="1" required="false"/>
+                  <field name="message_number" size="1" required="false"/>
+                  <field name="tran_user" size="7" required="false"/>
+                  <field name="tran_date" size="8"/>
+                  <field name="tran_time" size="8" required="false"/>
+                  <field name="remote_qty" size="4" required="false"/>
+                  <field name="stock_locn" size="7" required="false"/>
+                  <field name="order_type" size="1"/>
+                  <field name="ship_name" size="25" required="false"/>
+                  <field name="load_date" size="13"/>
+                  <field name="berth" size="2" required="false"/>
+                  <field name="xmit_flag2" size="1" required="false"/>
+                  <field name="everything_else" size="76" required="false"/>
+                </fields>
+              </record>
+            </children>
+          </record>
+          <record name="detail_trailer" identifier="DT" size="311" occurence="0..n" >
+            <transformer>
+              <action type="ruby" name="map_detail_trailer"/>
+            </transformer>
+            <fields>
+              <field name="record_type" size="2" default="DT" />
+              <field name="filler" size="246" required="false" />
+              <field name="memo" size="63" required="false" />
+            </fields>
+          </record>
+        </sequence>
+      </children>
+    </record>
+    <record name="doc_trailer" identifier="BT" size="18" occurence="1">
+      <fields>
+        <field name="trailer" size="2" default="BT" />
+        <field name="filler" size="16" />
+      </fields>
+    </record>
+  </sequence>
+</in-map>
+

@@ -21,6 +21,8 @@ module EdiApp
     def records_from_file(file_name, fix_encoding: true)
       @out = []
       File.foreach(file_name) do |line|
+        next if line.strip.empty?
+
         # Any invalid or undefined characters are replaced with a space before any processing is done:
         # Typically invalid characters have been set to "\xA0" (a non-breaking space), so to convert to
         # an ascii space seems to be the best option because:

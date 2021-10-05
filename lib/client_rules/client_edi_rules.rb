@@ -7,30 +7,51 @@ module Crossbeams
     CLIENT_SETTINGS = {
       hb: { install_location: 'HABATA',
             load_id_prefix: '',
+            li_default_pallet_base: 'S',
+            li_default_pallet_stack_height: 'S',
+            li_receive_restricted_to_orgs: [],
             csv_overrides: {},
             ps_apply_substitutes: false },
       hl: { install_location: 'HABATA',
             load_id_prefix: '',
+            li_default_pallet_base: 'S',
+            li_default_pallet_stack_height: 'S',
+            li_receive_restricted_to_orgs: [],
             csv_overrides: {},
             ps_apply_substitutes: false },
       kr: { install_location: 'KROMCO',
             load_id_prefix: '',
+            li_default_pallet_base: 'BLU',
+            li_default_pallet_stack_height: 'S',
+            li_receive_restricted_to_orgs: ['TI'],
             csv_overrides: { hcs: { col_sep: '|', force_quotes: true } },
             ps_apply_substitutes: false },
       um: { install_location: 'MATCOLD',
             load_id_prefix: '',
+            li_default_pallet_base: 'S',
+            li_default_pallet_stack_height: 'S',
+            li_receive_restricted_to_orgs: [],
             csv_overrides: {},
             ps_apply_substitutes: false },
       ud: { install_location: 'UNIFRUT',
             load_id_prefix: '',
+            li_default_pallet_base: 'S',
+            li_default_pallet_stack_height: 'S',
+            li_receive_restricted_to_orgs: [],
             csv_overrides: {},
             ps_apply_substitutes: false },
       sr: { install_location: 'SRKIRKW',
             load_id_prefix: '',
+            li_default_pallet_base: 'S',
+            li_default_pallet_stack_height: 'S',
+            li_receive_restricted_to_orgs: [],
             csv_overrides: {},
             ps_apply_substitutes: false },
       sr2: { install_location: 'SRADDO',
              load_id_prefix: 'A',
+             li_default_pallet_base: 'S',
+             li_default_pallet_stack_height: 'S',
+             li_receive_restricted_to_orgs: [],
              csv_overrides: {},
              ps_apply_substitutes: false }
     }.freeze
@@ -57,6 +78,12 @@ module Crossbeams
       return 'For CSV output files, force every column to be quoted. The default is false, which means that only non-numeric columns are quoted (standard behaviour).' if explain
 
       (setting(:csv_overrides)[flow_type.downcase.to_sym] || {})[:force_quotes] || false
+    end
+
+    def process_li_for_org?(org_code, explain: false)
+      return 'An EDI LI can be restricted to only be received for one or more organizations.' if explain
+
+      setting(:li_receive_restricted_to_orgs).include?(org_code)
     end
 
     private

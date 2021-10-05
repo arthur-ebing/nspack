@@ -6,6 +6,7 @@
   :ps: false
   :uistk: false
   :palbin: false
+  :hbs: false
   :hcs: false
 :out_dirs:
   :paltrack: "$ROOT/edi_out/paltrack"

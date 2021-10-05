@@ -20,11 +20,20 @@ PI:
   PM: 452
   BT: 112
 RL: PO
+LI:
+  BH: 27
+  LH: 233
+  DH: 311
+  LD: 311
+  DT: 311
+  BT: 18
 NSLI:
   XML: true
 UISTK:
   CSV: true
 PALBIN:
+  CSV: true
+HBS:
   CSV: true
 HCS:
   CSV: true

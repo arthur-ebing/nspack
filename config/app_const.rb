@@ -458,8 +458,10 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # EDI Settings
   EDI_FLOW_PS = 'PS'
   EDI_FLOW_PO = 'PO'
+  EDI_FLOW_LI = 'LI'
   EDI_FLOW_UISTK = 'UISTK'
   EDI_FLOW_PALBIN = 'PALBIN'
+  EDI_FLOW_HBS = 'HBS'
   EDI_FLOW_HCS = 'HCS'
   DEPOT_DESTINATION_TYPE = 'DEPOT'
   PARTY_ROLE_DESTINATION_TYPE = 'PARTY_ROLE'
@@ -472,6 +474,10 @@ class AppConst # rubocop:disable Metrics/ClassLength
     EDI_FLOW_PO => {
       depot: true,
       roles: [ROLE_CUSTOMER, ROLE_SHIPPER, ROLE_EXPORTER]
+    },
+    EDI_FLOW_HBS => {
+      depot: false,
+      roles: [ROLE_EXPORTER]
     },
     EDI_FLOW_HCS => {
       depot: false,
