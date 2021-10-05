@@ -15,6 +15,7 @@ module Crossbeams
             group_incentive_packer_roles: false,
             integrate_with_external_rmt_system: false,
             bin_tip_match_farm_on_group: false,
+            full_bin_tip_criteria_checked: false,
             default_marketing_org: 'HABATA',
             allow_cultivar_group_mix: true,
             use_packing_specifications: false,
@@ -38,6 +39,7 @@ module Crossbeams
             group_incentive_packer_roles: false,
             integrate_with_external_rmt_system: false,
             bin_tip_match_farm_on_group: false,
+            full_bin_tip_criteria_checked: false,
             default_marketing_org: 'HABATA',
             allow_cultivar_group_mix: true,
             use_packing_specifications: false,
@@ -61,6 +63,7 @@ module Crossbeams
             group_incentive_packer_roles: true,
             integrate_with_external_rmt_system: true,
             bin_tip_match_farm_on_group: true,
+            full_bin_tip_criteria_checked: true,
             default_marketing_org: 'KR',
             allow_cultivar_group_mix: false,
             use_packing_specifications: true,
@@ -84,6 +87,7 @@ module Crossbeams
             group_incentive_packer_roles: false,
             integrate_with_external_rmt_system: false,
             bin_tip_match_farm_on_group: false,
+            full_bin_tip_criteria_checked: false,
             default_marketing_org: 'UI',
             allow_cultivar_group_mix: false,
             use_packing_specifications: false,
@@ -107,6 +111,7 @@ module Crossbeams
             group_incentive_packer_roles: false,
             integrate_with_external_rmt_system: false,
             bin_tip_match_farm_on_group: false,
+            full_bin_tip_criteria_checked: false,
             default_marketing_org: 'UI',
             allow_cultivar_group_mix: true,
             use_packing_specifications: false,
@@ -130,6 +135,7 @@ module Crossbeams
             group_incentive_packer_roles: false,
             integrate_with_external_rmt_system: false,
             bin_tip_match_farm_on_group: false,
+            full_bin_tip_criteria_checked: false,
             default_marketing_org: 'SY',
             allow_cultivar_group_mix: false,
             use_packing_specifications: false,
@@ -153,6 +159,7 @@ module Crossbeams
              group_incentive_packer_roles: false,
              integrate_with_external_rmt_system: false,
              bin_tip_match_farm_on_group: false,
+             full_bin_tip_criteria_checked: false,
              default_marketing_org: 'SY',
              allow_cultivar_group_mix: false,
              use_packing_specifications: false,
@@ -356,6 +363,12 @@ module Crossbeams
       return 'Allocate work order items to product_resource_allocations.' if explain
 
       setting(:use_work_orders)
+    end
+
+    def full_bin_tip_criteria_check?(explain: false)
+      return 'Should the full set of bin criteria be checked before tipping a bin.' if explain
+
+      setting(:full_bin_tip_criteria_checked)
     end
   end
 end
