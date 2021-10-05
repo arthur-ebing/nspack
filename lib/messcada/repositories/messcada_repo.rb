@@ -308,6 +308,15 @@ module MesscadaApp
       success_response('ok')
     end
 
+    def presort_staging_run_treatment_codes
+      url = "#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/get_presort_staging_run_treatment_codes"
+      http = Crossbeams::HTTPCalls.new
+      res = http.request_get(url)
+      raise res.message unless res.success
+
+      JSON.parse(res.instance.body)
+    end
+
     def run_treatment_codes
       url = "#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/get_run_treatment_codes"
       http = Crossbeams::HTTPCalls.new

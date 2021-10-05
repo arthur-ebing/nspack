@@ -47,7 +47,8 @@
   \       WHEN vw_pallets.palletized OR vw_pallets.partially_palletized THEN 'inprogress'\r\n
   \       WHEN vw_pallets.inspected AND NOT vw_pallets.govt_inspection_passed THEN
   'error'\r\n        WHEN fn_pallet_verification_failed(vw_pallets.pallet_id) THEN
-  'error'\r\n    END AS colour_rule,\r\n    -- Parameters\r\n    vw_pallet_sequences.target_customer_party_role_id\r\n\r\nFROM
+  'error'\r\n    END AS colour_rule,\r\n    -- Parameters\r\n    vw_pallet_sequences.target_customer_party_role_id,\r\n
+  \   vw_pallet_sequences.work_order_item_id,\r\n    vw_pallet_sequences.work_order_item_code\r\n\r\nFROM
   vw_pallets\r\nJOIN vw_pallet_sequences ON vw_pallets.pallet_id = vw_pallet_sequences.pallet_id\r\nLEFT
   JOIN vw_pallet_sequences_aggregated aggregated ON aggregated.pallet_id = vw_pallets.pallet_id\r\nLEFT
   JOIN vw_loads ON vw_pallets.load_id = vw_loads.load_id\r\n\r\nORDER BY vw_pallets.pallet_number
@@ -1833,6 +1834,38 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  work_order_item_id:
+    :name: work_order_item_id
+    :sequence_no: 112
+    :caption: Work order item
+    :namespaced_name: vw_pallet_sequences.work_order_item_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  work_order_item_code:
+    :name: work_order_item_code
+    :sequence_no: 113
+    :caption: Work order item code
+    :namespaced_name: vw_pallet_sequences.work_order_item_code
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
     :pinned: 
     :groupable: false
     :group_by_seq: 

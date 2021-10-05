@@ -51,5 +51,6 @@ module MesscadaApp
     attribute :rmt_container_material_owner_id, Types::Integer
     attribute :legacy_data, Types::Hash.optional
     attribute :colour_percentage_id, Types::Integer
+    attribute :work_order_item_id, Types::Integer
   end
 end

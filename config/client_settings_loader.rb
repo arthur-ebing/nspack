@@ -163,6 +163,8 @@ class AppClientSettingsLoader # rubocop:disable Metrics/ClassLength
                                  desc: 'Default pallet label_name for Carton Palletizing.' },
     RMT_INTEGRATION_SERVER_URI: { env_key: 'RMT_INTEGRATION_SERVER_URI',
                                   desc: 'HTTP address of the RMT Integration Server in the format http://IP:3000.' },
+    MSSQL_SERVER_INTERFACE_URI: { env_key: 'MSSQL_SERVER_INTERFACE_URI',
+                                  desc: 'HTTP address of the MsSql Interface Server in the format http://IP:3000.' },
     GLN_OR_LINE_NUMBERS: { env_key: 'GLN_OR_LINE_NUMBERS',
                            required: true,
                            array_split: ',',

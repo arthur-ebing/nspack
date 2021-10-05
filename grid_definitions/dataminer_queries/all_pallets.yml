@@ -54,7 +54,8 @@
   \   vw_pallets.consignment_note_number,\r\n    vw_loads.dispatch_note,\r\n    vw_loads.customer_order_number,\r\n
   \   vw_loads.customer_reference,\r\n    vw_loads.depot,\r\n    vw_loads.edi_file_name
   AS po_file_name,\r\n    vw_pallet_sequences.colour_percentage_id,\r\n    vw_pallet_sequences.colour_percentage,\r\n
-  \   vw_pallet_sequences.colour_description,\r\n    CASE\r\n        WHEN vw_pallets.scrapped
+  \   vw_pallet_sequences.colour_description,\r\n    vw_pallet_sequences.work_order_item_id,\r\n
+  \   vw_pallet_sequences.work_order_item_code,\r\n    CASE\r\n        WHEN vw_pallets.scrapped
   THEN 'warning'\r\n        WHEN vw_pallets.shipped THEN 'inactive'\r\n        WHEN
   vw_pallets.allocated THEN 'ready'\r\n        WHEN vw_pallets.in_stock THEN 'ok'\r\n
   \       WHEN vw_pallets.palletized OR vw_pallets.partially_palletized THEN 'inprogress'\r\n
@@ -2573,9 +2574,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  work_order_item_id:
+    :name: work_order_item_id
+    :sequence_no: 157
+    :caption: Work order item
+    :namespaced_name: vw_pallet_sequences.work_order_item_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  work_order_item_code:
+    :name: work_order_item_code
+    :sequence_no: 158
+    :caption: Work order item code
+    :namespaced_name: vw_pallet_sequences.work_order_item_code
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 157
+    :sequence_no: 159
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

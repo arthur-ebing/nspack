@@ -65,6 +65,7 @@ module UiRules
       fields[:running] = { renderer: :label, as_boolean: true }
       return fields unless rules[:implements_presort_legacy_data_fields]
 
+      fields[:treatment_code] = { renderer: :label, with_value: @form_object.legacy_data.to_h['treatment_code'] }
       fields[:ripe_point_code] = { renderer: :label, with_value: @form_object.legacy_data.to_h['ripe_point_code'] }
       fields[:track_indicator_code] = { renderer: :label, with_value: @form_object.legacy_data.to_h['track_indicator_code'] }
     end
@@ -95,6 +96,7 @@ module UiRules
 
       cultivar_name = repo.get(:cultivars, @form_object.cultivar_id, :cultivar_name)
       track_indicator_codes = messcada_repo.track_indicator_codes(cultivar_name).uniq if cultivar_name
+      fields[:treatment_code] = { renderer: :select, options: messcada_repo.presort_staging_run_treatment_codes.uniq, required: true, prompt: true }
       fields[:ripe_point_code] = { renderer: :select, options: messcada_repo.ripe_point_codes.map { |s| s[0] }.uniq, required: true, prompt: true }
       fields[:track_indicator_code] = { renderer: :select, options: track_indicator_codes, required: true, prompt: true }
       fields

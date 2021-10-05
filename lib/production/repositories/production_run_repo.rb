@@ -331,6 +331,45 @@ module ProductionApp
       success_response("Allocated #{packing_specification_item_code}", packing_specification_item_code: packing_specification_item_code)
     end
 
+    def automatically_allocate_work_order_item(product_resource_allocation_id)
+      # Only auto-allocate if there is zero or exactly one matching item (otherwise the user has to choose the match)
+      items = work_order_items_for(product_resource_allocation_id)
+      return if items.count > 1
+
+      allocate_work_order_item(product_resource_allocation_id, items.first)
+    end
+
+    def work_order_items_for(product_resource_allocation_id)
+      setup_id, target_cust_id = DB[:product_resource_allocations]
+                                 .where(id: product_resource_allocation_id)
+                                 .get(%i[product_setup_id target_customer_party_role_id])
+      ds = DB[:work_order_items]
+           .join(:work_orders, id: Sequel[:work_order_items][:work_order_id])
+           .left_join(:marketing_orders, id: :marketing_order_id)
+           .where(product_setup_id: setup_id)
+      ds = ds.where(customer_party_role_id: target_cust_id) unless target_cust_id.nil?
+      ds.select_map(Sequel.function(:fn_work_order_item_code, Sequel[:work_order_items][:id])).sort
+    end
+
+    def allocate_work_order_item(product_resource_allocation_id, work_order_item_code)
+      work_order_item_id = work_order_item_id_for(product_resource_allocation_id, work_order_item_code)
+      update(:product_resource_allocations, product_resource_allocation_id, work_order_item_id: work_order_item_id)
+
+      success_response("Allocated #{work_order_item_code}", work_order_item_code: work_order_item_code)
+    end
+
+    def work_order_item_id_for(product_resource_allocation_id, work_order_item_code)
+      product_setup_id = DB[:product_resource_allocations].where(id: product_resource_allocation_id).get(:product_setup_id)
+      DB[:work_order_items]
+        .where(product_setup_id: product_setup_id, Sequel.function(:fn_work_order_item_code, :id) => work_order_item_code)
+        .get(:id)
+    end
+
+    def work_order_item_code_for(product_resource_allocation_id)
+      work_order_item_id = DB[:product_resource_allocations].where(id: product_resource_allocation_id).get(:work_order_item_id)
+      DB.get(Sequel.function(:fn_work_order_item_code, work_order_item_id))
+    end
+
     def resource_allocation_label_name(product_resource_allocation_id)
       DB[:label_templates].where(id: DB[:product_resource_allocations]
                                        .where(id: product_resource_allocation_id)
@@ -412,7 +451,7 @@ module ProductionApp
       query = <<~SQL
         SELECT a.id AS product_resource_allocation_id, plant_resource_id AS resource_id,
                a.product_setup_id, a.label_template_id, COALESCE(s.system_resource_code, p.plant_resource_code) AS device_or_packpoint,
-               t.label_template_name, a.packing_method_id, a.packing_specification_item_id, a.target_customer_party_role_id
+               t.label_template_name, a.packing_method_id, a.packing_specification_item_id, a.target_customer_party_role_id, a.work_order_item_id
           FROM product_resource_allocations a
           JOIN plant_resources p ON p.id = a.plant_resource_id
           LEFT JOIN system_resources s ON s.id = p.system_resource_id

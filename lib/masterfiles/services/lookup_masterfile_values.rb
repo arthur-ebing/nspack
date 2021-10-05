@@ -46,7 +46,7 @@ module MasterfilesApp
       when :size_code
         simple_lookup(key, :size_code, :rmt_sizes, :rmt_size_id, 'Size')
       when :location_code
-        simple_lookup(key, :location_short_code, :locations, :location_id, 'Location')
+        simple_lookup(key, :location_long_code, :locations, :location_id, 'Location')
       when :container_material_type_code
         simple_lookup(key, :container_material_type_code, :rmt_container_material_types, :rmt_container_material_type_id, 'Container Material Type')
       when :delivery_destination_code

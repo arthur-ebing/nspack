@@ -33,9 +33,9 @@ module RawMaterialsApp
       end
 
       def activate_child_check
-        parent_id, plant_resource_id = @repo.child_run_parent_id_and_plant_resource_id(@id)
+        parent_id = @repo.get_value(:presort_staging_run_children, :presort_staging_run_id, id: @id)
         return failed_response("Cannot activate run: #{@id}. There's already an active child on this run", parent_id) if @repo.exists?(:presort_staging_run_children, presort_staging_run_id: parent_id, running: true)
-        return failed_response("Cannot activate run: #{@id}. There already an active child run for this plant unit", parent_id) if @repo.running_child_run_for_plant_resource_id?(plant_resource_id)
+        return failed_response("Cannot activate run: #{@id}. Parent is not active", parent_id) unless @repo.parent_run_active?(@id)
 
         success_response('ok', parent_id)
       end

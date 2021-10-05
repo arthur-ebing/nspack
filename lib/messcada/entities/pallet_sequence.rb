@@ -77,6 +77,7 @@ module MesscadaApp
     attribute :tu_sticker_ids, Types::Array
     attribute :target_customer_party_role_id, Types::Integer
     attribute :colour_percentage_id, Types::Integer
+    attribute :work_order_item_id, Types::Integer
     attribute? :legacy_data, Types::Hash.optional
     attribute? :active, Types::Bool
   end
@@ -173,6 +174,10 @@ module MesscadaApp
     attribute :tu_sticker_ids, Types::Array
     attribute :target_customer_party_role_id, Types::Integer
     attribute :target_customer, Types::String
+    attribute :colour_percentage_id, Types::Integer
+    attribute :colour_percentage, Types::String
+    attribute :work_order_item_id, Types::Integer
+    attribute :work_order_item_code, Types::String
     attribute? :active, Types::Bool
   end
 end

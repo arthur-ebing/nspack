@@ -41,11 +41,11 @@
   :hide_if_false: has_pallet_holdover
 :conditions:
   :unallocated_pallets:
-    - :col: vw_pallets.pallet_id
+    - :col: pallets.id
       :op: IN
       :val: "$:pallet_ids$"
   :on_load:
-    - :col: vw_pallets.load_id
+    - :col: pallets.load_id
       :op: "="
       :val: "$:load_id$"
 :multiselect:

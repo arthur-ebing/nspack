@@ -203,6 +203,7 @@ INSERT INTO business_processes(process, description) VALUES('REWORKS_MOVE_PALLET
 INSERT INTO business_processes(process, description) VALUES('MANUAL_TRIPSHEET', 'mamually created tripsheets') ON CONFLICT DO NOTHING;
 INSERT INTO business_processes(process, description) VALUES('DELIVERY_TRIPSHEET', 'tripsheets for deliveries') ON CONFLICT DO NOTHING;
 INSERT INTO business_processes(process, description) VALUES('BINS_TRIPSHEET', 'tripsheets for bins') ON CONFLICT DO NOTHING;
+INSERT INTO business_processes(process, description) VALUES('PRESORT_STAGING', 'presort staging run execution') ON CONFLICT DO NOTHING;
 
 -- STOCK TYPES
 INSERT INTO stock_types(stock_type_code, description) VALUES('PALLET', 'FG PALLETS') ON CONFLICT DO NOTHING;

@@ -78,7 +78,7 @@ module FinishedGoodsApp
 
     def stock_pallets_grid(ids, load_id)
       pallet_ids = repo.find_pallets_for_order_items(ids, load_id)
-      rpt = dataminer_report('stock_pallets_for_loads.yml', conditions: [{ col: 'vw_pallets.pallet_id', op: 'IN', val: pallet_ids }])
+      rpt = dataminer_report('stock_pallets_for_loads.yml', conditions: [{ col: 'pallets.id', op: 'IN', val: pallet_ids }])
 
       row_defs = dataminer_report_rows(rpt)
       {

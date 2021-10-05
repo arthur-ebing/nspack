@@ -32,21 +32,25 @@
   - fg_marks
   - gtin_code
   - packing_specification_item_code
+  - work_order_item_code
   um:
   - system_code
   - fg_marks
   - gtin_code
   - packing_specification_item_code
+  - work_order_item_code
   ud:
   - system_code
   - fg_marks
   - gtin_code
   - packing_specification_item_code
+  - work_order_item_code
   sr:
   - system_code
   - fg_marks
   - gtin_code
   - packing_specification_item_code
+  - work_order_item_code
   srp:
   - system_code
   - fg_marks
@@ -57,6 +61,7 @@
   - system_code
   - fg_marks
   - gtin_code
+  - work_order_item_code
   kr:
   - id
   - product_setup_code
@@ -67,3 +72,4 @@
   - system_code
   - fg_marks
   - gtin_code
+  - work_order_item_code

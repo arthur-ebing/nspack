@@ -46,7 +46,8 @@ module RawMaterialsApp
         active: true,
         scrapped: false,
         scrapped_at: '2010-01-01 12:00',
-        scrapped_rmt_delivery_id: 1
+        scrapped_rmt_delivery_id: 1,
+        legacy_data: {}
       }
       RawMaterialsApp::RmtBin.new(base_attrs.merge(attrs))
     end

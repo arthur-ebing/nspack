@@ -26,7 +26,8 @@ module Crossbeams
             capture_batch_number_for_pallets: true,
             derive_nett_weight: false,
             require_extended_packaging: false,
-            run_cache_legacy_data_fields: [] },
+            run_cache_legacy_data_fields: [],
+            use_work_orders: false },
       hl: { run_allocations: true,
             pallet_label_seqs_sql: nil,
             use_gtins: false,
@@ -48,7 +49,8 @@ module Crossbeams
             capture_batch_number_for_pallets: false,
             derive_nett_weight: false,
             require_extended_packaging: false,
-            run_cache_legacy_data_fields: [] },
+            run_cache_legacy_data_fields: [],
+            use_work_orders: false },
       kr: { run_allocations: true,
             pallet_label_seqs_sql: 'SELECT p.puc_code, p.gap_code, ps.gtin_code, ps.carton_quantity FROM pallet_sequences ps JOIN pucs p ON p.id = ps.puc_id WHERE ps.pallet_id = ? ORDER BY ps.pallet_sequence_number',
             use_gtins: true,
@@ -70,7 +72,8 @@ module Crossbeams
             capture_batch_number_for_pallets: false,
             derive_nett_weight: true,
             require_extended_packaging: true,
-            run_cache_legacy_data_fields: %i[pc_code track_indicator_code] },
+            run_cache_legacy_data_fields: %i[pc_code track_indicator_code],
+            use_work_orders: true },
       um: { run_allocations: true,
             pallet_label_seqs_sql: 'SELECT o.orchard_code, m.marketing_variety_code, s.size_reference, ps.carton_quantity FROM pallet_sequences ps JOIN orchards o ON o.id = ps.orchard_id JOIN marketing_varieties m ON m.id = ps.marketing_variety_id JOIN fruit_size_references s ON s.id = ps.fruit_size_reference_id WHERE ps.pallet_id = ? ORDER BY ps.pallet_sequence_number',
             use_gtins: false,
@@ -92,7 +95,8 @@ module Crossbeams
             capture_batch_number_for_pallets: false,
             derive_nett_weight: false,
             require_extended_packaging: false,
-            run_cache_legacy_data_fields: [] },
+            run_cache_legacy_data_fields: [],
+            use_work_orders: false },
       ud: { run_allocations: true,
             pallet_label_seqs_sql: nil,
             use_gtins: false,
@@ -114,7 +118,8 @@ module Crossbeams
             capture_batch_number_for_pallets: false,
             derive_nett_weight: false,
             require_extended_packaging: false,
-            run_cache_legacy_data_fields: [] },
+            run_cache_legacy_data_fields: [],
+            use_work_orders: false },
       sr: { run_allocations: true,
             pallet_label_seqs_sql: nil,
             use_gtins: false,
@@ -136,7 +141,8 @@ module Crossbeams
             capture_batch_number_for_pallets: false,
             derive_nett_weight: false,
             require_extended_packaging: false,
-            run_cache_legacy_data_fields: [] },
+            run_cache_legacy_data_fields: [],
+            use_work_orders: false },
       sr2: { run_allocations: true,
              pallet_label_seqs_sql: nil,
              use_gtins: false,
@@ -158,7 +164,8 @@ module Crossbeams
              capture_batch_number_for_pallets: false,
              derive_nett_weight: false,
              require_extended_packaging: false,
-             run_cache_legacy_data_fields: [] }
+             run_cache_legacy_data_fields: [],
+             use_work_orders: false }
     }.freeze
     # ALLOW_OVERFULL_REWORKS_PALLETIZING
     # BYPASS_QUALITY_TEST_LOAD_CHECK
@@ -343,6 +350,12 @@ module Crossbeams
       return 'Should product setup be extended to include basic pack, dimensions and mass?' if explain
 
       setting(:require_extended_packaging)
+    end
+
+    def use_work_orders?(explain: false)
+      return 'Allocate work order items to product_resource_allocations.' if explain
+
+      setting(:use_work_orders)
     end
   end
 end

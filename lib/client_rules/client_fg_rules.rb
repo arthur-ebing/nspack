@@ -41,7 +41,7 @@ module Crossbeams
             max_rmt_bins_on_load: 50,
             max_pallets_on_load: 50,
             use_inspection_destination_for_load_out: false,
-            use_continuous_govt_inspection_sheets: true,
+            use_continuous_govt_inspection_sheets: false,
             pallet_verification_required_for_inspection: false,
             pallet_weight_required_for_inspection: true,
             extra_barcode_scan_rules: [{ regex: '^(\\D\\D\\D)$', type: 'location', field: 'location_short_code' }],

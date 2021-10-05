@@ -85,16 +85,17 @@
   NULL::text) AS created_by,\r\n  array_remove(array_agg(DISTINCT ps.verified_by),
   NULL::text) AS verified_by,\r\n  array_remove(array_agg(DISTINCT fn_edi_size_count
   (standard_pack_codes.use_size_ref_for_edi, commodities.use_size_ref_for_edi, fruit_size_references.edi_out_code,
-  fruit_size_references.size_reference, fruit_actual_counts_for_packs.actual_count_for_pack)),
-  NULL::text) AS edi_size_counts,\r\n  pallets.created_at,\r\n  pallets.active,\r\n
-  \ array_remove(array_agg(DISTINCT ps.sell_by_code), NULL::text) AS sell_by_codes,\r\n
-  \ CASE WHEN pallets.scrapped THEN\r\n    'warning'\r\n  WHEN pallets.shipped THEN\r\n
-  \   'inactive'\r\n  WHEN pallets.allocated THEN\r\n    'ready'\r\n  WHEN pallets.in_stock
-  THEN\r\n    'ok'\r\n  WHEN pallets.palletized\r\n    OR pallets.partially_palletized
-  THEN\r\n    'inprogress'\r\n  WHEN pallets.inspected\r\n    AND NOT pallets.govt_inspection_passed
-  THEN\r\n    'error'\r\n  WHEN fn_pallet_verification_failed (pallets.id) THEN\r\n
-  \   'error'\r\n  END AS colour_rule\r\nFROM\r\n  pallet_sequences ps\r\n  LEFT JOIN
-  cultivars ON cultivars.id = ps.cultivar_id\r\n  JOIN cartons_per_pallet ON cartons_per_pallet.id
+  \r\n  fruit_size_references.size_reference, fruit_actual_counts_for_packs.actual_count_for_pack)),
+  NULL::text) AS edi_size_counts, \r\n  ps.work_order_item_id, fn_work_order_item_code(ps.work_order_item_id)
+  AS work_order_item_code,\r\n  pallets.created_at,\r\n  pallets.active,\r\n  array_remove(array_agg(DISTINCT
+  ps.sell_by_code), NULL::text) AS sell_by_codes,\r\n  CASE WHEN pallets.scrapped
+  THEN\r\n    'warning'\r\n  WHEN pallets.shipped THEN\r\n    'inactive'\r\n  WHEN
+  pallets.allocated THEN\r\n    'ready'\r\n  WHEN pallets.in_stock THEN\r\n    'ok'\r\n
+  \ WHEN pallets.palletized\r\n    OR pallets.partially_palletized THEN\r\n    'inprogress'\r\n
+  \ WHEN pallets.inspected\r\n    AND NOT pallets.govt_inspection_passed THEN\r\n
+  \   'error'\r\n  WHEN fn_pallet_verification_failed (pallets.id) THEN\r\n    'error'\r\n
+  \ END AS colour_rule\r\nFROM\r\n  pallet_sequences ps\r\n  LEFT JOIN cultivars ON
+  cultivars.id = ps.cultivar_id\r\n  JOIN cartons_per_pallet ON cartons_per_pallet.id
   = ps.cartons_per_pallet_id\r\n  JOIN farms ON farms.id = ps.farm_id\r\n  LEFT JOIN
   farm_groups ON farms.farm_group_id = farm_groups.id\r\n  JOIN pucs ON pucs.id =
   ps.puc_id\r\n  JOIN orchards ON orchards.id = ps.orchard_id\r\n  LEFT JOIN cultivar_groups
@@ -129,7 +130,7 @@
   \ pallets.id,\r\n  locations.location_long_code,\r\n  inspected_dest_country.country_name,\r\n
   \ pallet_bases.pallet_base_code,\r\n  pallet_stack_types.stack_type_code,\r\n  govt_inspection_sheets.consignment_note_number,\r\n
   \ pm_products.product_code,\r\n  pm_products_2.product_code,\r\n  palletizing_bays.plant_resource_code,\r\n
-  \ edi_in_transactions.file_name\r\n\r\n"
+  \ edi_in_transactions.file_name,\r\n  ps.work_order_item_id\r\n\r\n"
 :limit: 
 :offset: 
 :external_settings:
@@ -1773,9 +1774,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  work_order_item_id:
+    :name: work_order_item_id
+    :sequence_no: 103
+    :caption: Work order item
+    :namespaced_name: ps.work_order_item_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  work_order_item_code:
+    :name: work_order_item_code
+    :sequence_no: 104
+    :caption: Work order item code
+    :namespaced_name: 
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 103
+    :sequence_no: 105
     :caption: Created at
     :namespaced_name: pallets.created_at
     :data_type: :datetime
@@ -1791,7 +1824,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 104
+    :sequence_no: 106
     :caption: Active
     :namespaced_name: pallets.active
     :data_type: :boolean
@@ -1807,7 +1840,7 @@
     :group_max: false
   sell_by_codes:
     :name: sell_by_codes
-    :sequence_no: 105
+    :sequence_no: 107
     :caption: Sell by codes
     :namespaced_name: 
     :data_type: :string
@@ -1823,7 +1856,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 106
+    :sequence_no: 108
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

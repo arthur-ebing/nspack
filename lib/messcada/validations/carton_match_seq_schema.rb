@@ -48,5 +48,6 @@ module MesscadaApp
     required(:tu_sticker_ids).maybe(:array).maybe { each(:integer) }
     required(:treatment_ids).maybe(:array).maybe { each(:integer) }
     required(:colour_percentage_id).maybe(:integer)
+    required(:work_order_item_id).maybe(:integer)
   end
 end

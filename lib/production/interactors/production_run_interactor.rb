@@ -373,16 +373,36 @@ module ProductionApp
     end
 
     def allocate_product_setup(product_resource_allocation_id, params)
-      res = repo.allocate_product_setup(product_resource_allocation_id, params[:column_value])
-      label_template_name = repo.resource_allocation_label_name(product_resource_allocation_id)
-      res.instance = { changes: { product_setup_id: res.instance[:product_setup_id], label_template_name: label_template_name } }
+      res = nil
+      repo.transaction do
+        res = repo.allocate_product_setup(product_resource_allocation_id, params[:column_value])
+        repo.automatically_allocate_work_order_item(product_resource_allocation_id) if AppConst::CR_PROD.use_work_orders?
+      end
+      res.instance = { changes: { product_setup_id: res.instance[:product_setup_id],
+                                  label_template_name: repo.resource_allocation_label_name(product_resource_allocation_id),
+                                  work_order_item_code: repo.work_order_item_code_for(product_resource_allocation_id) } }
       res
     end
 
     def allocate_packing_specification(product_resource_allocation_id, params)
-      res = repo.allocate_packing_specification(product_resource_allocation_id, params[:column_value])
-      label_template_name = repo.resource_allocation_label_name(product_resource_allocation_id)
-      res.instance = { changes: { packing_specification_item_code: res.instance[:packing_specification_item_code], label_template_name: label_template_name } }
+      res = nil
+      repo.transaction do
+        res = repo.allocate_packing_specification(product_resource_allocation_id, params[:column_value])
+        repo.automatically_allocate_work_order_item(product_resource_allocation_id) if AppConst::CR_PROD.use_work_orders?
+      end
+      res.instance = { changes: { packing_specification_item_code: res.instance[:packing_specification_item_code],
+                                  label_template_name: repo.resource_allocation_label_name(product_resource_allocation_id),
+                                  work_order_item_code: repo.work_order_item_code_for(product_resource_allocation_id) } }
+      res
+    end
+
+    def work_order_items_for(product_resource_allocation_id)
+      repo.work_order_items_for(product_resource_allocation_id).unshift('')
+    end
+
+    def allocate_work_order_item(product_resource_allocation_id, params)
+      res = repo.allocate_work_order_item(product_resource_allocation_id, params[:column_value])
+      res.instance = { changes: { work_order_item_code: res.instance[:work_order_item_code] } }
       res
     end
 
@@ -414,7 +434,7 @@ module ProductionApp
       res
     end
 
-    def inline_edit_alloc(product_resource_allocation_id, params)
+    def inline_edit_alloc(product_resource_allocation_id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       if params[:column_name] == 'product_setup_code'
         allocate_product_setup(product_resource_allocation_id, params)
       elsif params[:column_name] == 'label_template_name'
@@ -425,6 +445,8 @@ module ProductionApp
         allocate_target_customer(product_resource_allocation_id, params)
       elsif params[:column_name] == 'packing_specification_item_code'
         allocate_packing_specification(product_resource_allocation_id, params)
+      elsif params[:column_name] == 'work_order_item_code'
+        allocate_work_order_item(product_resource_allocation_id, params)
       else
         failed_response(%(There is no handler for changed column "#{params[:column_name]}"))
       end

@@ -52,27 +52,34 @@
         = packing_specification_items.product_setup_id WHERE product_setups.product_setup_template_id
         = (SELECT product_setup_template_id FROM production_runs WHERE id = $:production_run_id$)
         ORDER BY 1 NULLS FIRST
+    work_order_item_code:
+      :editor: :search_select
+      :lookup_url: "/production/runs/production_runs/inline_select_work_order_items/$:id$"
 :hide_for_client:
   hb:
   - system_code
   - fg_marks
   - gtin_code
   - packing_specification_item_code
+  - work_order_item_code
   um:
   - system_code
   - fg_marks
   - gtin_code
   - packing_specification_item_code
+  - work_order_item_code
   ud:
   - system_code
   - fg_marks
   - gtin_code
   - packing_specification_item_code
+  - work_order_item_code
   sr:
   - system_code
   - fg_marks
   - gtin_code
   - packing_specification_item_code
+  - work_order_item_code
   srp:
   - system_code
   - fg_marks
@@ -83,6 +90,7 @@
   - system_code
   - fg_marks
   - gtin_code
+  - work_order_item_code
   kr:
   - product_setup_code
   - system_code
@@ -92,3 +100,4 @@
   - system_code
   - fg_marks
   - gtin_code
+  - work_order_item_code

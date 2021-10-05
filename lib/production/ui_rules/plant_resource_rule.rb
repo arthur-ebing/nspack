@@ -42,10 +42,11 @@ module UiRules
       at_ph_level = @form_object.plant_resource_type_code == Crossbeams::Config::ResourceDefinitions::PACKHOUSE
       at_gln_level = @form_object.plant_resource_type_code == Crossbeams::Config::ResourceDefinitions::LINE
       at_phc_level = @form_object.plant_resource_type_code == AppConst::PHC_LEVEL
+      is_presorting_unit = (Crossbeams::Config::ResourceDefinitions::PRESORTING_UNIT == @form_object.plant_resource_type_code)
       fields[:location_id] = { renderer: :lookup,
                                lookup_name: :plant_resource_locations,
-                               lookup_key: :standard,
-                               # param_values: { plant_resource_id: @options[:id] },
+                               lookup_key: is_presorting_unit ? :presort : :standard,
+                               param_values: { primary_assignment_id: @repo.get_value(:location_assignments, :id, assignment_code: AppConst::PRESORTING) },
                                hidden_fields: %i[location_id],
                                show_field: :location_long_code,
                                caption: 'Select Location',

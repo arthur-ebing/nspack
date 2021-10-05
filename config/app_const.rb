@@ -49,6 +49,10 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # Log for errors experienced by robot calls (Keep history: 10 files of up to 1Mb each):
   ROBOT_LOG = Logger.new('log/robot.log', 10, 1_024_000)
 
+  # Logs requests, responses and errors for bin staging execution services (Keep history: 10 files of up to 1Mb each)
+  BIN_STAGING_LOG_FILE = 'log/bin_staging_execution.log'
+  BIN_STAGING_LOG = Logger.new(BIN_STAGING_LOG_FILE, 10, 1_024_000)
+
   # labeling cached setup data path
   LABELING_CACHED_DATA_FILEPATH = File.expand_path('../tmp/run_cache', __dir__)
 
@@ -160,6 +164,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
 
   # Constants for location assignments:
   WAREHOUSE_RECEIVING_AREA = 'WAREHOUSE_RECEIVING_AREA'
+  PRESORTING = 'PRESORTING'
 
   # Constants for roles:
   ROLE_IMPLEMENTATION_OWNER = 'IMPLEMENTATION_OWNER'
@@ -263,6 +268,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   REWORKS_MOVE_PALLET_BUSINESS_PROCESS = 'MOVE_PALLET'
   DELIVERY_TRIPSHEET_BUSINESS_PROCESS = 'DELIVERY_TRIPSHEET'
   BINS_TRIPSHEET_BUSINESS_PROCESS = 'BINS_TRIPSHEET'
+  PRESORT_STAGING_BUSINESS_PROCESS = 'PRESORT_STAGING'
   REWORKS_BULK_UPDATE_PALLET_DATES = 'REWORKS BULK UPDATE PALLET DATES'
 
   REWORKS_RUN_NON_PALLET_RUNS = {
@@ -452,8 +458,10 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # EDI Settings
   EDI_FLOW_PS = 'PS'
   EDI_FLOW_PO = 'PO'
+  EDI_FLOW_LI = 'LI'
   EDI_FLOW_UISTK = 'UISTK'
   EDI_FLOW_PALBIN = 'PALBIN'
+  EDI_FLOW_HBS = 'HBS'
   EDI_FLOW_HCS = 'HCS'
   DEPOT_DESTINATION_TYPE = 'DEPOT'
   PARTY_ROLE_DESTINATION_TYPE = 'PARTY_ROLE'
@@ -466,6 +474,10 @@ class AppConst # rubocop:disable Metrics/ClassLength
     EDI_FLOW_PO => {
       depot: true,
       roles: [ROLE_CUSTOMER, ROLE_SHIPPER, ROLE_EXPORTER]
+    },
+    EDI_FLOW_HBS => {
+      depot: false,
+      roles: [ROLE_EXPORTER]
     },
     EDI_FLOW_HCS => {
       depot: false,

@@ -4,9 +4,15 @@
   :standard:
     :url: /production/resources/plant_resources/lookup_location/$:id$
     :section_caption: Select a Location
-    # :conditions: standard
-# :conditions:
-#   :standard:
+  :presort:
+    :url: /production/resources/plant_resources/lookup_location/$:id$
+    :section_caption: Select a Location
+    :conditions: presort
+:conditions:
+  :presort:
+    - :col: locations.primary_assignment_id
+      :op: =
+      :val: $:primary_assignment_id$
 #     - :col: mr_skus.sku_number
 #       :op: in
 #       :val: $:allowed_sku_numbers$
