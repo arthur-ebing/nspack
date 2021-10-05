@@ -22,6 +22,7 @@ module RawMaterials
                 else
                   form.no_submit!
                 end
+                form.add_field :id
                 form.add_field :presort_unit_plant_resource_id
                 form.add_field :supplier_id
                 form.add_field :cultivar_id

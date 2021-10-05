@@ -7,8 +7,11 @@
   "presort_staging_runs"."rmt_size_id", "presort_staging_runs"."season_id", "presort_staging_runs"."editing",
   "presort_staging_runs"."staged", "presort_staging_runs"."running", "presort_staging_runs"."legacy_data",
   "cultivars"."cultivar_name", "rmt_classes"."rmt_class_code", "rmt_sizes"."size_code",
-  "seasons"."season_code", "suppliers"."id" AS suppliers_id, fn_current_status('presort_staging_runs',
-  "presort_staging_runs"."id") AS status FROM "presort_staging_runs" JOIN "cultivars"
+  "seasons"."season_code", "suppliers"."id" AS suppliers_id, fn_current_status('presort_staging_runs', "presort_staging_runs"."id") AS status
+  ,CASE WHEN presort_staging_runs.staged THEN 'gray'
+  WHEN presort_staging_runs.running THEN 'green'
+  END AS colour_rule
+  FROM "presort_staging_runs" JOIN "cultivars"
   ON "cultivars"."id" = "presort_staging_runs"."cultivar_id" JOIN "rmt_classes" ON
   "rmt_classes"."id" = "presort_staging_runs"."rmt_class_id" JOIN "rmt_sizes" ON "rmt_sizes"."id"
   = "presort_staging_runs"."rmt_size_id" JOIN "seasons" ON "seasons"."id" = "presort_staging_runs"."season_id"
