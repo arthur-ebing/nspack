@@ -260,9 +260,22 @@ module EdiApp
       marketing_org_party_role_id = po_repo.find_variant_id(:marketing_party_roles, seq[:orgzn]) if marketing_org_party_role_id.nil?
       rec[:lookup_data][:marketing_org_party_role_id] = marketing_org_party_role_id
       rec[:missing_mf][:marketing_org_party_role_id] = { mode: :direct, keys: { orgzn: seq[:orgzn], role: AppConst::ROLE_MARKETER }, msg: "Organization: #{seq[:orgzn]} with role: #{AppConst::ROLE_MARKETER}" } if marketing_org_party_role_id.nil?
-      packed_tm_group_id = po_repo.find_packed_tm_group_id(seq[:targ_mkt])
-      rec[:lookup_data][:packed_tm_group_id] = packed_tm_group_id
-      rec[:missing_mf][:packed_tm_group_id] = { mode: :direct, raise: false, keys: { targ_mkt: seq[:targ_mkt] }, msg: "Target Market Group: #{seq[:targ_mkt]}" } if packed_tm_group_id.nil?
+
+      # --------------------- TARGET MARKET RELATED
+      targets = po_repo.find_targets(seq[:targ_mkt], seq[:target_region], seq[:target_country])
+      rec[:lookup_data][:packed_tm_group_id] = targets.instance[:packed_tm_group_id]
+      rec[:missing_mf][:packed_tm_group_id] = { mode: :direct, raise: false, keys: { targ_mkt: seq[:targ_mkt] }, msg: "Target Market Group: #{seq[:targ_mkt]}" } if targets.instance[:packed_tm_group_id].nil?
+      rec[:lookup_data][:target_market_id] = targets.instance[:target_market_id] unless targets.instance[:single]
+
+      # The EDI targ_mkt has not been applied as a packed tm grp or target market, so we expect it to be a target customer:
+      if targets.instance[:check_customer]
+        target_customer_party_role_id = MasterfilesApp::PartyRepo.new.find_party_role_from_org_code_for_role(seq[:targ_mkt], AppConst::ROLE_TARGET_CUSTOMER)
+        target_customer_party_role_id = po_repo.find_variant_id(:target_customer_party_roles, seq[:targ_mkt]) if target_customer_party_role_id.nil?
+        rec[:lookup_data][:target_customer_party_role_id] = target_customer_party_role_id
+        rec[:missing_mf][:target_customer_party_role_id] = { mode: :direct, keys: { targ_mkt: seq[:targ_mkt], role: AppConst::ROLE_TARGET_CUSTOMER }, msg: "Organization: #{seq[:targ_mkt]} with role: #{AppConst::ROLE_TARGET_CUSTOMER}" } if target_customer_party_role_id.nil?
+      end
+      # ---------------------
+
       mark_id = po_repo.find_mark_id(seq[:mark])
       rec[:lookup_data][:mark_id] = mark_id
       rec[:missing_mf][:mark_id] = { mode: :direct, raise: false, keys: { mark: seq[:mark] }, msg: "Mark: #{seq[:mark]}" } if mark_id.nil?
