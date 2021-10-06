@@ -6,7 +6,7 @@ module RawMaterialsApp
     optional(:uncompleted_at).maybe(:time)
     optional(:completed).maybe(:bool)
     required(:presort_unit_plant_resource_id).filled(:integer)
-    required(:supplier_id).filled(:integer)
+    optional(:supplier_id).maybe(:integer)
     optional(:completed_at).maybe(:time)
     optional(:canceled).maybe(:bool)
     optional(:canceled_at).maybe(:time)
