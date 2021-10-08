@@ -328,6 +328,12 @@ module RawMaterialsApp
         ).first
     end
 
+    def find_rmt_container_material_owner_by_container_material_type(rmt_container_material_type_id)
+      DB[:rmt_container_material_owners]
+        .where(rmt_container_material_type_id: rmt_container_material_type_id)
+        .get(:rmt_material_owner_party_role_id)
+    end
+
     def find_rmt_delivery_by_bin_id(id)
       OpenStruct.new DB[:rmt_deliveries].where(id: DB[:rmt_bins].where(id: id).select(:rmt_delivery_id)).first
     end
@@ -586,12 +592,12 @@ module RawMaterialsApp
       DB[:bin_integration_queue].where(id: id).delete
     end
 
-    def log_bin_integration_queue_error(id, message, stacktrace = nil)
-      update(:bin_integration_queue, id, error: { err: message, stacktrace: stacktrace.to_s }.to_json)
+    def log_bin_integration_queue_error(id, message, is_delivery_error, is_bin_error, stacktrace = nil)
+      update(:bin_integration_queue, id, error: { err: message, stacktrace: stacktrace.to_s }.to_json, is_delivery_error: is_delivery_error, is_bin_error: is_bin_error)
     end
 
     def send_email_if_bin_errors(job_no)
-      return unless repo.exists?(:bin_integration_queue, Sequel.lit("job_no=#{job_no} and errors is not null"))
+      return unless exists?(:bin_integration_queue, Sequel.lit("job_no=#{job_no} and error is not null"))
 
       mail = <<~STR
         There were bin errors when executing job: #{job_no}
