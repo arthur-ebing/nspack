@@ -8,6 +8,7 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Added
 ### Changed
+- Dataminer admin menu options moved to a separate `Manage` program.
 ### Fixed
 
 ## [1.0.2] - 2021-10-05

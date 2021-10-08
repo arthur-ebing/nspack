@@ -27,6 +27,7 @@ class Nspack < Roda
     end
 
     r.on 'list_all' do
+      check_auth!('manage', 'edit')
       show_page { DM::Report::Report::GridPage.call('/dataminer/prepared_reports/grid_all/', 'Prepared report listing - all reports') }
     end
 
