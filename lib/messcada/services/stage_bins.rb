@@ -20,7 +20,7 @@ module MesscadaApp
         raise unwrap_failed_response(res) unless res.success
       end
 
-      CreateApportBins.call(bin_ids, active_presort_staging_run_child_id)
+      CreateApportBins.call(bin_ids, active_presort_staging_run_child_id, plant_resource_code)
     end
 
     def self.result(bin_results)

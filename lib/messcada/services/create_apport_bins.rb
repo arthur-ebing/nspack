@@ -1,12 +1,13 @@
 module MesscadaApp
   class CreateApportBins < BaseService
-    attr_reader :repo, :delivery_repo, :bins, :presort_staging_child_run_id, :http
+    attr_reader :repo, :delivery_repo, :bins, :presort_staging_child_run_id, :http, :plant_resource_code
 
-    def initialize(bins, presort_staging_child_run_id)
+    def initialize(bins, presort_staging_child_run_id, plant_resource_code)
       @bins = bins
       @presort_staging_child_run_id = presort_staging_child_run_id
       @repo = RawMaterialsApp::PresortStagingRunRepo.new
       @delivery_repo = RawMaterialsApp::RmtDeliveryRepo.new
+      @plant_resource_code = plant_resource_code
       @http = Crossbeams::HTTPCalls.new(use_ssl: false, call_logger: call_logger)
     end
 
@@ -60,16 +61,22 @@ module MesscadaApp
 
     private
 
+    def mssql_server_uri_for_presort_unit
+      return AppConst::PRESORT1_MSSQL_SERVER_INTERFACE if plant_resource_code == 'PST-01'
+
+      AppConst::PRESORT2_MSSQL_SERVER_INTERFACE
+    end
+
     def find_stale_staged_untipped_apport_bin(bin_asset_number)
       sql = "select * from Apport where NumPalox = '#{bin_asset_number}' and LotMAF is null and DateLecture is null and StatusMAF is null"
       parameters = { method: 'select', statement: Base64.encode64(sql) }
-      http.request_post("#{AppConst::MSSQL_SERVER_INTERFACE_URI}/select", parameters)
+      http.request_post("#{mssql_server_uri_for_presort_unit}/select", parameters)
     end
 
     def delete_stale_staged_untipped_apport_bin(bin_asset_number)
       sql = "delete from Apport where NumPalox = '#{bin_asset_number}' and LotMAF is null and DateLecture is null and StatusMAF is null"
       parameters = { method: 'delete', statement: Base64.encode64(sql) }
-      http.request_post("#{AppConst::MSSQL_SERVER_INTERFACE_URI}/exec", parameters)
+      http.request_post("#{mssql_server_uri_for_presort_unit}/exec", parameters)
     end
 
     def calc_code_apporteur_and_code_parcelle_and_nom_parcelle(bin) # rubocop:disable Metrics/AbcSize
@@ -95,7 +102,7 @@ module MesscadaApp
     def create_apport_bin(inserts)
       insert_ql = "BEGIN TRANSACTION\n #{inserts.join} COMMIT TRANSACTION"
       parameters = { method: 'insert', statement: Base64.encode64(insert_ql) }
-      http.request_post("#{AppConst::MSSQL_SERVER_INTERFACE_URI}/exec", parameters)
+      http.request_post("#{mssql_server_uri_for_presort_unit}/exec", parameters)
     end
 
     def call_logger
