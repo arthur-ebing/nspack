@@ -245,7 +245,7 @@ module MesscadaApp
       query = <<~SQL
         select *
         from rmt_deliveries
-        where legacy_data  @> '{\"delivery_number\": \"#{delivery_number}\"}';
+        where delivery_tipped is false and legacy_data  @> '{\"delivery_number\": #{delivery_number}}';
       SQL
       DB[query].select_map(:id).first
     end

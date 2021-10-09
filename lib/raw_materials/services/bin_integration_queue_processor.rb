@@ -40,12 +40,13 @@ module RawMaterialsApp
     private
 
     def create_update_delivery(del_attrs)
-      existing_rmt_del = MesscadaApp::MesscadaRepo.new.find_external_bin_delivery(del_attrs[:delivery_number])
-      if existing_rmt_del.nil?
+      delivery_number = JSON.parse(del_attrs[:legacy_data])['delivery_number']
+      delivery_id = MesscadaApp::MesscadaRepo.new.find_external_bin_delivery(delivery_number)
+      if delivery_id.nil?
         delivery_id = RawMaterialsApp::RmtDeliveryRepo.new.create_rmt_delivery(del_attrs)
         repo.log_status(:rmt_deliveries, delivery_id, 'DELIVERY CREATED FROM EXTERNAL SYSTEM')
       else
-        repo.update_rmt_delivery(existing_rmt_del[:id], del_attrs) unless existing_rmt_del[:bin_tipped]
+        repo.update_rmt_delivery(delivery_id, del_attrs)
       end
       delivery_id
     end
