@@ -85,11 +85,14 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
     }).then((data) => {
       if (data.flash) {
         if (data.flash.type && data.flash.type === 'permission') {
+          crossbeamsAudio.beep();
           label.innerHTML = '<span class="light-red">Permission error</span>';
         } else {
+          crossbeamsAudio.beep();
           label.innerHTML = '<span class="light-red">Error</span>';
         }
         if (data.exception) {
+          crossbeamsAudio.beep();
           if (data.backtrace) {
             console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error); // eslint-disable-line no-console
             console.info('==Backend Backtrace=='); // eslint-disable-line no-console
@@ -102,6 +105,7 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
         hiddenVal.value = data.showField;
       }
     }).catch((data) => {
+      crossbeamsAudio.beep();
       console.info('==ERROR==', data); // eslint-disable-line no-console
     });
     return null;
@@ -253,6 +257,7 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
         }
       });
     if (matches.length !== 1) {
+      crossbeamsAudio.beep();
       res.error = matches.length === 0 ? `${val} does not match any scannable rules` : 'Too many rules match';
     } else {
       res.success = true;
@@ -265,6 +270,7 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
    */
   const startScanner = () => {
     const wsUrl = 'ws://127.0.0.1:2115';
+    // const wsUrl = 'ws://192.168.50.228:2115';
     // const wsUrl = 'ws://192.168.50.10:2115';
     let connectedState = false;
 
@@ -285,6 +291,7 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
 
     webSocket.onerror = function onerror(event) {
       if (connectedState) { // Ignore websocket errors if we are not connected.
+        crossbeamsAudio.beep();
         publicAPIs.logit('Connection ERROR', event);
       }
     };
@@ -294,6 +301,7 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
         const scanPack = unpackScanValue(event.data.split(',')[0].replace('[SCAN]', ''));
         if (!scanPack.success) {
           publicAPIs.logit(scanPack.error);
+          crossbeamsAudio.beep();
           return;
         }
         let cnt = 0;
