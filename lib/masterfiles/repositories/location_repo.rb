@@ -410,8 +410,8 @@ module MasterfilesApp
       DB[:locations]
         .join(:location_assignments, id: :primary_assignment_id)
         .where(assignment_code: assignment_code)
-        .select(Sequel[:locations][:id], :location_short_code)
-        .map(%i[location_short_code id])
+        .select(Sequel[:locations][:id], :location_long_code)
+        .map(%i[location_long_code id])
     end
 
     def location_pallets_count(location_id)
