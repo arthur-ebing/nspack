@@ -9,6 +9,7 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 ### Added
 ### Changed
 - Dataminer admin menu options moved to a separate `Manage` program.
+- RMD forms emit a beep when errors occur.
 ### Fixed
 
 ## [1.0.2] - 2021-10-05
