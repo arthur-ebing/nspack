@@ -1,16 +1,30 @@
 ---
 :caption: Work Order Items
-:sql: SELECT "work_order_items"."id", "work_order_items"."work_order_id", "work_order_items"."product_setup_id", "product_setup_templates"."template_name",
-  "work_order_items"."carton_qty_required", "work_order_items"."carton_qty_produced", fn_product_setup_code(product_setups.id) AS product_setup_code,
-  "work_order_items"."completed", "work_order_items"."completed_at", "product_setups"."client_size_reference",
-  "work_orders"."id" AS work_orders_id, "marketing_orders"."order_number", fn_current_status('work_order_items', "work_order_items"."id")
-  AS status FROM "work_order_items" JOIN "product_setups" ON "product_setups"."id" = "work_order_items"."product_setup_id"
-  JOIN "product_setup_templates" ON "product_setup_templates"."id"="product_setups"."product_setup_template_id"
-  JOIN "work_orders" ON "work_orders"."id"= "work_order_items"."work_order_id" LEFT JOIN "marketing_orders" ON "marketing_orders"."id"="work_orders"."marketing_order_id"
-  ORDER BY id desc
+:sql: "SELECT \"work_order_items\".\"id\", \"work_order_items\".\"work_order_id\",
+  \"work_order_items\".\"product_setup_id\", \r\n\t     \"product_setup_templates\".\"template_name\",
+  \"work_order_items\".\"carton_qty_required\", \r\n\t     \"work_order_items\".\"carton_qty_produced\",
+  fn_product_setup_code(product_setups.id) AS product_setup_code, \r\n\t     \"work_order_items\".\"completed\",
+  \"work_order_items\".\"completed_at\", \"product_setups\".\"client_size_reference\",
+  \r\n\t     \"work_orders\".\"id\" AS work_orders_id, \"marketing_orders\".\"order_number\",\r\n\t
+  \    \"work_order_items\".\"pallet_fulfillment_warning_level\",\r\n\t     fn_woi_pallets_outstanding(\"work_order_items\".\"id\")
+  AS pallets_outstanding,\r\n\t    CASE \r\n                WHEN fn_woi_pallets_outstanding(\"work_order_items\".\"id\")
+  = 0 THEN 'ok'::text\r\n                WHEN fn_woi_pallets_outstanding(\"work_order_items\".\"id\")
+  > \"work_order_items\".pallet_fulfillment_warning_level THEN 'ready'::text\r\n                WHEN
+  fn_woi_pallets_outstanding(\"work_order_items\".\"id\") > 0 AND fn_woi_pallets_outstanding(\"work_order_items\".\"id\")
+  <  \"work_order_items\".pallet_fulfillment_warning_level THEN 'warning'::text\r\n
+  \               WHEN fn_woi_pallets_outstanding(\"work_order_items\".\"id\") < 0
+  THEN 'error'::text\r\n                ELSE NULL::text\r\n            END AS colour_rule,\r\n\t
+  \   fn_current_status('work_order_items', \"work_order_items\".\"id\") AS status
+  \r\nFROM \"work_order_items\" \r\nJOIN \"product_setups\" ON \"product_setups\".\"id\"
+  = \"work_order_items\".\"product_setup_id\" \r\nJOIN \"product_setup_templates\"
+  ON \"product_setup_templates\".\"id\"=\"product_setups\".\"product_setup_template_id\"\r\nJOIN
+  \"work_orders\" ON \"work_orders\".\"id\"= \"work_order_items\".\"work_order_id\"
+  \r\nLEFT JOIN \"marketing_orders\" ON \"marketing_orders\".\"id\"=\"work_orders\".\"marketing_order_id\"\r\nORDER
+  BY id desc"
 :limit: 
 :offset: 
-:external_settings: {}
+:external_settings:
+  :colour_key: {}
 :columns:
   id:
     :name: id
@@ -24,22 +38,6 @@
     :pinned: 
     :groupable: true
     :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  template_name:
-    :name: template_name
-    :sequence_no: 2
-    :caption: Template name
-    :namespaced_name: product_setup_templates.template_name
-    :data_type: :string
-    :width:
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: true
-    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -60,22 +58,6 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  product_setup_code:
-    :name: product_setup_code
-    :sequence_no: 3
-    :caption: Product setup code
-    :namespaced_name:
-    :data_type: :string
-    :width: 680
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   product_setup_id:
     :name: product_setup_id
     :sequence_no: 3
@@ -92,14 +74,30 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  template_name:
+    :name: template_name
+    :sequence_no: 4
+    :caption: Template name
+    :namespaced_name: product_setup_templates.template_name
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   carton_qty_required:
     :name: carton_qty_required
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Carton qty required
     :namespaced_name: work_order_items.carton_qty_required
     :data_type: :integer
-    :width: 
-    :format:
+    :width: 110
+    :format: 
     :hide: false
     :pinned: 
     :groupable: true
@@ -110,12 +108,12 @@
     :group_max: false
   carton_qty_produced:
     :name: carton_qty_produced
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Carton qty produced
     :namespaced_name: work_order_items.carton_qty_produced
     :data_type: :integer
-    :width: 
-    :format:
+    :width: 120
+    :format: 
     :hide: false
     :pinned: 
     :groupable: true
@@ -124,13 +122,29 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  product_setup_code:
+    :name: product_setup_code
+    :sequence_no: 7
+    :caption: Product setup code
+    :namespaced_name: 
+    :data_type: :string
+    :width: 300
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   completed:
     :name: completed
-    :sequence_no: 6
-    :caption: Completed
+    :sequence_no: 8
+    :caption: Completed?
     :namespaced_name: work_order_items.completed
     :data_type: :boolean
-    :width: 
+    :width: 90
     :format: 
     :hide: false
     :pinned: 
@@ -142,11 +156,11 @@
     :group_max: false
   completed_at:
     :name: completed_at
-    :sequence_no: 7
+    :sequence_no: 9
     :caption: Completed at
     :namespaced_name: work_order_items.completed_at
     :data_type: :datetime
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -158,11 +172,11 @@
     :group_max: false
   client_size_reference:
     :name: client_size_reference
-    :sequence_no: 8
+    :sequence_no: 10
     :caption: Client size reference
     :namespaced_name: product_setups.client_size_reference
     :data_type: :string
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -174,7 +188,7 @@
     :group_max: false
   work_orders_id:
     :name: work_orders_id
-    :sequence_no: 9
+    :sequence_no: 11
     :caption: Work orders
     :namespaced_name: work_orders.id
     :data_type: :string
@@ -188,15 +202,79 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  order_number:
+    :name: order_number
+    :sequence_no: 12
+    :caption: Order number
+    :namespaced_name: marketing_orders.order_number
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_fulfillment_warning_level:
+    :name: pallet_fulfillment_warning_level
+    :sequence_no: 13
+    :caption: Plt fulfillment warning level
+    :namespaced_name: work_order_items.pallet_fulfillment_warning_level
+    :data_type: :integer
+    :width: 140
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallets_outstanding:
+    :name: pallets_outstanding
+    :sequence_no: 14
+    :caption: Pallets outstanding
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 110
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  colour_rule:
+    :name: colour_rule
+    :sequence_no: 15
+    :caption: Colour rule
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   status:
     :name: status
-    :sequence_no: 10
+    :sequence_no: 16
     :caption: Status
     :namespaced_name: 
     :data_type: :string
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :pinned: 
     :groupable: false
     :group_by_seq: 

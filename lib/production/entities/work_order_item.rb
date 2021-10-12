@@ -9,5 +9,6 @@ module ProductionApp
     attribute :carton_qty_produced, Types::Integer
     attribute :completed, Types::Bool
     attribute :completed_at, Types::DateTime
+    attribute :pallet_fulfillment_warning_level, Types::Integer
   end
 end

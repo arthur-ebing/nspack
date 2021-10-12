@@ -215,6 +215,7 @@ INSERT INTO inspection_failure_types (failure_type_code) VALUES('GOVERNMENT') ON
 INSERT INTO user_email_groups (mail_group) VALUES('label_approvers') ON CONFLICT DO NOTHING;
 INSERT INTO user_email_groups (mail_group) VALUES('label_publishers') ON CONFLICT DO NOTHING;
 INSERT INTO user_email_groups (mail_group) VALUES('edi_notifiers') ON CONFLICT DO NOTHING;
+INSERT INTO user_email_groups (mail_group) VALUES('work_order_managers') ON CONFLICT DO NOTHING;
 
 -- SCRAP_REASONS --
 INSERT INTO scrap_reasons(scrap_reason, description) VALUES ('REPACKED', 'Repacked') ON CONFLICT DO NOTHING;
