@@ -183,7 +183,7 @@ module EdiApp
       rec[:lookup_data][:pallet_format_id] = pallet_format_id
       rec[:missing_mf][:pallet_format_id] = { mode: :direct, raise: true, keys: { pallet_btype: seq[:pallet_btype], cartons: tot_cartons, basic_pack_code_id: basic_pack_code_id }, msg: "Pallet format for pallet base: #{seq[:pallet_btype]}"  } if pallet_format_id.nil?
       rec[:lookup_data][:cartons_per_pallet_id] = cartons_per_pallet_id
-      rec[:missing_mf][:cartons_per_pallet_id] = { mode: :direct, raise: true, keys: { pallet_btype: seq[:pallet_btype], cartons: tot_cartons, basic_pack_code_id: basic_pack_code_id }, msg: "Cartons Per Pallet for pallet base: #{seq[:pallet_btype]} and pack: #{seq[:pack]} and CCP: #{tot_cartons}" } if cartons_per_pallet_id.nil?
+      rec[:missing_mf][:cartons_per_pallet_id] = { mode: :direct, raise: true, keys: { pallet_btype: seq[:pallet_btype], cartons: tot_cartons, basic_pack_code_id: basic_pack_code_id }, msg: "Cartons Per Pallet for pallet #{pallet_number}, pallet base: #{seq[:pallet_btype]}, pack: #{seq[:pack]} and CCP: #{tot_cartons}" } if cartons_per_pallet_id.nil?
 
       # pallet_format_id: 0, # lookup
       rec[:record] = {
