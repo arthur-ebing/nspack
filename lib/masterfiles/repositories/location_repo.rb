@@ -67,10 +67,10 @@ module MasterfilesApp
         .join(:location_types, id: :location_type_id)
         .join(:location_storage_types_locations, location_id: Sequel[:locations][:id])
         .join(:location_storage_types, id: Sequel[:location_storage_types_locations][:location_storage_type_id])
-        .select(Sequel[:locations][:id], :location_short_code)
+        .select(Sequel[:locations][:id], :location_long_code)
         .where(location_type_code: location_type_code)
         .where(storage_type_code: storage_type_code)
-        .map(%i[location_short_code id])
+        .map(%i[location_long_code id])
     end
 
     def find_location(id)
