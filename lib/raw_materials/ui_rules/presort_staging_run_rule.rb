@@ -37,7 +37,6 @@ module UiRules
         fields[:supplier_id] = { renderer: :select, options: @supplier_repo.for_select_suppliers,
                                  disabled_options: @supplier_repo.for_select_inactive_suppliers,
                                  caption: 'Supplier',
-                                 required: true,
                                  prompt: true }
       end
     end
@@ -98,9 +97,9 @@ module UiRules
 
       cultivar_name = repo.get(:cultivars, @form_object.cultivar_id, :cultivar_name)
       track_indicator_codes = messcada_repo.track_indicator_codes(cultivar_name).uniq if cultivar_name
-      fields[:treatment_code] = { renderer: :select, options: messcada_repo.presort_staging_run_treatment_codes.uniq, required: true, prompt: true }
-      fields[:ripe_point_code] = { renderer: :select, options: messcada_repo.ripe_point_codes.map { |s| s[0] }.uniq, required: true, prompt: true }
-      fields[:track_indicator_code] = { renderer: :select, options: track_indicator_codes, required: true, prompt: true }
+      fields[:treatment_code] = { renderer: :select, options: messcada_repo.presort_staging_run_treatment_codes.uniq, prompt: true }
+      fields[:ripe_point_code] = { renderer: :select, options: messcada_repo.ripe_point_codes.map { |s| s[0] }.uniq, prompt: true }
+      fields[:track_indicator_code] = { renderer: :select, options: track_indicator_codes, prompt: true }
       fields
     end
 
