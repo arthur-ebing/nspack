@@ -1378,8 +1378,14 @@ class Nspack < Roda
     r.on 'create_pallet_vehicle_job_unit', Integer do |id|
       interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
-      res = MesscadaApp::ScanCartonLabelOrPallet.call(scanned_number: params[:pallet][:carton_number])
-      params[:pallet][:carton_number] = res.instance.carton_label_id
+      unless params[:pallet][:carton_number].nil_or_empty?
+        res = MesscadaApp::ScanCartonLabelOrPallet.call(scanned_number: params[:pallet][:carton_number])
+        unless res.success
+          store_locally(:error, unwrap_failed_response(res))
+          r.redirect("/rmd/finished_goods/scan_tripsheet_pallet/#{id}")
+        end
+        params[:pallet][:carton_number] = res.instance.carton_label_id
+      end
 
       res = interactor.create_pallet_vehicle_job_unit(id, params[:pallet][:pallet_number], params[:pallet][:carton_number])
 
