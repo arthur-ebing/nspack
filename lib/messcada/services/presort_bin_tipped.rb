@@ -1,10 +1,11 @@
 module MesscadaApp
   class PresortBinTipped < BaseService
-    attr_reader :repo, :bin, :tipped_apport_bin, :bin_id
+    attr_reader :repo, :bin, :tipped_apport_bin, :bin_id, :plant_resource_code
 
-    def initialize(bin)
+    def initialize(bin, plant_resource_code)
       @repo = RawMaterialsApp::PresortStagingRunRepo.new
       @bin = bin
+      @plant_resource_code = plant_resource_code
     end
 
     def call # rubocop:disable Metrics/AbcSize
@@ -48,7 +49,7 @@ module MesscadaApp
     end
 
     def apport_bin_exists? # rubocop:disable Metrics/AbcSize
-      response = repo.find_tipped_apport_bin(bin)
+      response = repo.find_tipped_apport_bin(bin, plant_resource_code)
       unless response.success
         msg = response.message
         raise Crossbeams::InfoError, "SQL Integration returned an error running: select Apport.* from Apport where Apport.NumPalox='#{bin}'. The http code is #{response.code}. Message: #{msg}."

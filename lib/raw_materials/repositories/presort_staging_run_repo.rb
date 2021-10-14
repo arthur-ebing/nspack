@@ -129,12 +129,12 @@ module RawMaterialsApp
       id
     end
 
-    def find_tipped_apport_bin(bin_asset_number)
+    def find_tipped_apport_bin(bin_asset_number, plant_resource_code)
       sql = "select Apport.* from Apport where Apport.NumPalox='#{bin_asset_number}'"
       parameters = { method: 'select', statement: Base64.encode64(sql) }
       call_logger = Crossbeams::HTTPTextCallLogger.new('APPORT-BIN-TIPPED', log_path: AppConst::PRESORT_BIN_TIPPED_LOG_FILE)
       http = Crossbeams::HTTPCalls.new(use_ssl: false, call_logger: call_logger)
-      http.request_post("#{AppConst::BIN_TIPPED_MSSQL_SERVER_INTERFACE}/select", parameters)
+      http.request_post("#{AppConst.mssql_server_interface(plant_resource_code)}/select", parameters)
     end
 
     def bin_mrl_failed?(bin_number)

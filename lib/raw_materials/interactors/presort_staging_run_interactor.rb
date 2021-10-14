@@ -212,9 +212,10 @@ module RawMaterialsApp
       end
     end
 
-    def bin_tipped(params, request_path)
+    def maf_bin_tipped(params, request_path)
       AppConst::PRESORT_BIN_TIPPED_LOG.info("#{request_path}&bin=#{params[:bin]}")
-      MesscadaApp::PresortBinTipped.call(params[:bin])
+      plant_resource = params[:unit]
+      MesscadaApp::PresortBinTipped.call(params[:bin], plant_resource)
     end
 
     def log_request(params, msq)
