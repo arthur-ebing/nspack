@@ -100,6 +100,14 @@ module EdiApp
       formatted_targets
     end
 
+    def existing_singleton?(flow_type, id)
+      !DB[:edi_out_rules].where(flow_type: flow_type).exclude(id: id).empty?
+    end
+
+    def can_transform_only_one_destination?(flow_type)
+      AppConst::EDI_OUT_RULES_TEMPLATE[flow_type][:singleton]
+    end
+
     def can_transform_for_depot?(flow_type)
       AppConst::EDI_OUT_RULES_TEMPLATE[flow_type][:depot]
     end
