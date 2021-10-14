@@ -217,6 +217,11 @@ module RawMaterialsApp
       MesscadaApp::PresortBinTipped.call(params[:bin])
     end
 
+    def bin_created(params, request_path)
+      AppConst::BIN_CREATED_LOG.info("#{request_path}&bin=#{params[:bin]}")
+      MesscadaApp::BinCreated.call(params[:bin])
+    end
+
     def log_request(params, msq)
       msg = "#{msq}&unit=#{params[:unit]}&bin1=#{params[:bin1]}"
       msg += "&bin2=#{params[:bin2]}" if params[:bin2]
