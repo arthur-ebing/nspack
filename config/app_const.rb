@@ -473,26 +473,32 @@ class AppConst # rubocop:disable Metrics/ClassLength
   DESTINATION_TYPES = [DEPOT_DESTINATION_TYPE, PARTY_ROLE_DESTINATION_TYPE].freeze
   EDI_OUT_RULES_TEMPLATE = {
     EDI_FLOW_PS => {
+      singleton: false,
       depot: false,
       roles: [ROLE_MARKETER, ROLE_TARGET_CUSTOMER]
     },
     EDI_FLOW_PO => {
+      singleton: false,
       depot: true,
       roles: [ROLE_CUSTOMER, ROLE_SHIPPER, ROLE_EXPORTER]
     },
     EDI_FLOW_HBS => {
+      singleton: true,
       depot: false,
-      roles: [ROLE_EXPORTER]
+      roles: []
     },
     EDI_FLOW_HCS => {
+      singleton: false,
       depot: false,
       roles: [ROLE_EXPORTER]
     },
     EDI_FLOW_UISTK => {
+      singleton: false,
       depot: false,
       roles: [ROLE_MARKETER]
     },
     EDI_FLOW_PALBIN => {
+      singleton: false,
       depot: true,
       roles: [ROLE_CUSTOMER, ROLE_EXPORTER]
     }

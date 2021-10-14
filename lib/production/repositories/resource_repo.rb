@@ -434,6 +434,7 @@ module ProductionApp
           AND s.active
         ORDER BY 1, s.system_resource_code
       SQL
+      # DB[query].to_hash_groups(:packhouse)
       DB[query].all.group_by { |rec| rec[:packhouse] }
     end
 

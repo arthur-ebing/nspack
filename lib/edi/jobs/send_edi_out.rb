@@ -3,15 +3,17 @@
 module EdiApp
   module Job
     class SendEdiOut < BaseQueJob
-      attr_reader :repo, :edi_out_rule_id, :hub_address, :flow_type, :email_notifiers
+      attr_reader :repo, :edi_out_rule_id, :hub_address, :flow_type, :email_notifiers, :context
 
       # No point in retrying
       self.maximum_retry_count = 0
 
-      def run(flow_type, party_role_id, user_name, record_id, edi_out_rule_id) # rubocop:disable Metrics/AbcSize
+      def run(flow_type, party_role_id, user_name, record_id, edi_out_rule_id, context) # rubocop:disable Metrics/AbcSize, Metrics/ParameterLists
         @email_notifiers = DevelopmentApp::UserRepo.new.email_addresses(user_email_group: AppConst::EMAIL_GROUP_EDI_NOTIFIERS)
         @flow_type = flow_type
         @edi_out_rule_id = edi_out_rule_id
+        # Context is stored in the que params as a string representation of a hash - hence the instance_eval here:
+        @context = instance_eval(context)
         @repo = EdiOutRepo.new
         work_out_hub_address
 
@@ -20,7 +22,8 @@ module EdiApp
                                              user_name: user_name,
                                              record_id: record_id,
                                              hub_address: hub_address,
-                                             edi_out_rule_id: edi_out_rule_id)
+                                             edi_out_rule_id: edi_out_rule_id,
+                                             context: @context)
         log("Transform started for party role '#{party_role_id}', record '#{record_id}', rule id '#{edi_out_rule_id}' and transaction id '#{id}'...")
 
         klass = "#{flow_type.capitalize}Out"

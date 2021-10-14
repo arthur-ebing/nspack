@@ -279,7 +279,7 @@ module EdiApp
       mark_id = po_repo.find_mark_id(seq[:mark])
       rec[:lookup_data][:mark_id] = mark_id
       rec[:missing_mf][:mark_id] = { mode: :direct, raise: false, keys: { mark: seq[:mark] }, msg: "Mark: #{seq[:mark]}" } if mark_id.nil?
-      inventory_code_id = po_repo.find_inventory_code_id(seq[:inv_code])
+      inventory_code_id = po_repo.find_inventory_code_id(seq[:inv_code] || AppConst::CR_EDI.default_edi_in_inv_code)
       rec[:lookup_data][:inventory_code_id] = inventory_code_id
       rec[:missing_mf][:inventory_code_id] = { mode: :direct, raise: false, keys: { inv_code: seq[:inv_code] }, msg: "Inventory code: #{seq[:inv_code]}" } if inventory_code_id.nil?
       grade_id = po_repo.find_grade_id(seq[:grade])

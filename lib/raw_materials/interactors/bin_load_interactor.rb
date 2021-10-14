@@ -152,6 +152,10 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
+    def send_hbs_edi(bin_load_id)
+      EdiApp::SendEdiOut.call(AppConst::EDI_FLOW_HBS, nil, @user.user_name, bin_load_id, context: { fg_load: false })
+    end
+
     def scan_bin_load(params) # rubocop:disable Metrics/AbcSize
       res = ScanBinLoadSchema.call(params)
       return validation_failed_response(res) if res.failure?
