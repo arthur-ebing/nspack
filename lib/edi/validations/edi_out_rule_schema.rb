@@ -22,4 +22,11 @@ module EdiApp
     required(:hub_address).filled(Types::StrippedString)
     required(:directory_keys).filled(:array).each(:string)
   end
+
+  EdiOutRuleSingletonSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:flow_type).filled(Types::StrippedString)
+    required(:hub_address).filled(Types::StrippedString)
+    required(:directory_keys).filled(:array).each(:string)
+  end
 end

@@ -37,6 +37,11 @@ namespace :deploy do
       puts("------------------------------------------------------------------------------------------------\n\n")
       puts %(curl -d '#{hash.to_json}' -H 'Content-Type: application/json' http://nosoft.deploys/log_event)
       puts("------------------------------------------------------------------------------------------------\n\n")
+
+      File.open('deploystats.txt', 'a') do |f|
+        f.puts %(curl -d '#{hash.to_json}' -H 'Content-Type: application/json' http://nosoft.deploys/log_event)
+        f.puts("------------------------------------------------------------------------------------------------\n\n")
+      end
     end
   end
 end
