@@ -19,5 +19,17 @@ class Nspack < Roda
       res = interactor.staging_override_provided(params, request.path)
       res.instance
     end
+
+    # Bin Tipped
+    # view-source:http://192.168.43.148:9296/messcada/presort/bin_tipped?bin=704
+    # --------------------------------------------------------------------------
+    r.on 'bin_tipped' do
+      res = interactor.bin_tipped(params, request.path)
+      res.instance
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: "PresortBinTipped - #{e.message}", message: 'PresortBinTipped Service.')
+      puts e.message
+      "<result><error msg=\"#{e.message}\" /></result>"
+    end
   end
 end

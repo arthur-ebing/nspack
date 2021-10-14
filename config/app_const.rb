@@ -53,6 +53,10 @@ class AppConst # rubocop:disable Metrics/ClassLength
   BIN_STAGING_LOG_FILE = 'log/bin_staging_execution.log'
   BIN_STAGING_LOG = Logger.new(BIN_STAGING_LOG_FILE, 10, 1_024_000)
 
+  # Logs requests, responses and errors for tipped bin service (Keep history: 10 files of up to 1Mb each)
+  PRESORT_BIN_TIPPED_LOG_FILE = 'log/presort_bin_tipped.log'
+  PRESORT_BIN_TIPPED_LOG = Logger.new(PRESORT_BIN_TIPPED_LOG_FILE, 10, 1_024_000)
+
   # labeling cached setup data path
   LABELING_CACHED_DATA_FILEPATH = File.expand_path('../tmp/run_cache', __dir__)
 
