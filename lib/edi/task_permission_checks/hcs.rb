@@ -5,7 +5,7 @@ module EdiApp
     class Hcs < BaseService
       attr_reader :task, :party_role_id, :record_id
 
-      def initialize(task, party_role_id, record_id)
+      def initialize(task, party_role_id, record_id, _context)
         @task = task
         @repo = FinishedGoodsApp::LoadRepo.new
         @party_role_id = party_role_id

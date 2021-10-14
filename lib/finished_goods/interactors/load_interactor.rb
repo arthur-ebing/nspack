@@ -83,7 +83,17 @@ module FinishedGoodsApp
     end
 
     def send_hcs_edi(load_id)
-      EdiApp::SendEdiOut.call(AppConst::EDI_FLOW_HCS, nil, @user.user_name, load_id)
+      load_entity = load_entity(load_id)
+      if load_entity.rmt_load # OR BOTH????
+        # EdiApp::SendEdiOut.call(AppConst::EDI_FLOW_HBS, nil, @user.user_name, bin_load_id, context: { fg_load: true }) # OR could we send both????
+      else
+        EdiApp::SendEdiOut.call(AppConst::EDI_FLOW_HCS, nil, @user.user_name, load_id)
+      end
+    end
+
+    def send_hbs_edi(load_id)
+      load_entity = load_entity(load_id)
+      EdiApp::SendEdiOut.call(AppConst::EDI_FLOW_HBS, nil, @user.user_name, bin_load_id, context: { fg_load: true }) if load_entity.rmt_load
     end
 
     def allocate_multiselect(load_id, pallet_numbers, initial_pallet_numbers = nil) # rubocop:disable Metrics/AbcSize
@@ -234,6 +244,7 @@ module FinishedGoodsApp
 
         send_edi(id)
         send_hcs_edi(id) if repo.load_is_on_order?(id)
+        send_hbs_edi(id)
 
         log_transaction
       end

@@ -162,6 +162,12 @@ class Nspack < Roda
         r.redirect "/raw_materials/dispatch/bin_loads/#{id}"
       end
 
+      r.on 're_send_hbs_edi' do
+        check_auth!('dispatch', 'edit')
+        res = interactor.send_hbs_edi(id)
+        update_dialog_content(content: wrap_content_in_style(res.message, res.success ? :success : :error, caption: ''))
+      end
+
       r.on 'delete' do    # DELETE
         check_auth!('dispatch', 'delete')
         res = interactor.delete_bin_load(id)

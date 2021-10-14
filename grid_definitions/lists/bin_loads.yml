@@ -14,6 +14,13 @@
   :icon: edit
   :popup: true
   :hide_if_false: shipped
+- :url: "/raw_materials/dispatch/bin_loads/$:id$/re_send_hbs_edi"
+  :text: re-send HBS EDI
+  :icon: play
+  :title: Re-send HBS EDI
+  :popup: true
+  :hide_if_false: shipped
+  :show_for_client_rule: CR_EDI.send_hbs_edi
 - :separator: true
 - :url: "/development/statuses/list/bin_loads/$:id$"
   :text: status

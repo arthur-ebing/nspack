@@ -18,6 +18,11 @@ edi_out_hcs:
   data_type: :integer
   table: edi_out_transaction
   column: edi_sequence_number
+edi_out_hbs:
+  db_sequence_name: doc_seqs_edi_out_hbs
+  data_type: :integer
+  table: edi_out_transaction
+  column: edi_sequence_number
 edi_out_uistk:
   db_sequence_name: doc_seqs_edi_out_uistk
   data_type: :integer

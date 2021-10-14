@@ -2,13 +2,14 @@
 
 class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
   attr_reader :flow_type, :hub_address, :record_id, :seq_no, :schema, :record_definitions,
-              :record_entries, :edi_out_rule_id, :party_role_id, :logger
+              :record_entries, :edi_out_rule_id, :party_role_id, :logger, :out_context
 
   def initialize(flow_type, id, logger) # rubocop:disable Metrics/AbcSize
     raise ArgumentError, "#{self.class.name}: flow type must be provided" if flow_type.nil?
 
     @repo = EdiApp::EdiOutRepo.new
     edi_out_transaction = @repo.find_edi_out_transaction(id)
+    @out_context = edi_out_transaction.context || {}
     @flow_type = edi_out_transaction.flow_type
     @logger = logger
     @party_role_id = edi_out_transaction.party_role_id

@@ -14,5 +14,6 @@ module EdiApp
     attribute :party_role_id, Types::Integer
     attribute :error_message, Types::String
     attribute :backtrace, Types::String
+    attribute :context, Types::Hash
   end
 end
