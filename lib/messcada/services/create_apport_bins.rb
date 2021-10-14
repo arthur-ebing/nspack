@@ -1,6 +1,6 @@
 module MesscadaApp
   class CreateApportBins < BaseService
-    attr_reader :repo, :delivery_repo, :bins, :presort_staging_child_run_id, :http, :plant_resource_code
+    attr_reader :repo, :delivery_repo, :bins, :presort_staging_child_run_id, :http, :plant_resource_code, :mssql_server_uri_for_presort_unit
 
     def initialize(bins, presort_staging_child_run_id, plant_resource_code)
       @bins = bins
@@ -9,6 +9,7 @@ module MesscadaApp
       @delivery_repo = RawMaterialsApp::RmtDeliveryRepo.new
       @plant_resource_code = plant_resource_code
       @http = Crossbeams::HTTPCalls.new(use_ssl: false, call_logger: call_logger)
+      @mssql_server_uri_for_presort_unit = AppConst.mssql_server_interface(plant_resource_code)
     end
 
     def call # rubocop:disable Metrics/AbcSize
@@ -60,12 +61,6 @@ module MesscadaApp
     end
 
     private
-
-    def mssql_server_uri_for_presort_unit
-      return AppConst::PRESORT1_MSSQL_SERVER_INTERFACE if plant_resource_code == 'PST-01'
-
-      AppConst::PRESORT2_MSSQL_SERVER_INTERFACE
-    end
 
     def find_stale_staged_untipped_apport_bin(bin_asset_number)
       sql = "select * from Apport where NumPalox = '#{bin_asset_number}' and LotMAF is null and DateLecture is null and StatusMAF is null"
