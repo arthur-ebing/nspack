@@ -471,11 +471,17 @@ module UiRules
                    url: "/finished_goods/reports/dispatch_note_summarised/#{id}",
                    loading_window: true,
                    style: :button }
-      reports << { control_type: :link,
+      picklist_items = [
+        { url: "/finished_goods/reports/picklist/#{id}",
+          text: 'Portrait',
+          loading_window: true },
+        { url: "/finished_goods/reports/dispatch_picklist/#{id}",
+          text: 'Landscape',
+          loading_window: true }
+      ]
+      reports << { control_type: :dropdown_button,
                    text: 'Dispatch Picklist',
-                   url: "/finished_goods/reports/picklist/#{id}",
-                   loading_window: true,
-                   style: :button }
+                   items: picklist_items }
 
       items = []
       AppConst::ADDENDUM_PLACE_OF_ISSUE.split(',').each do |place|

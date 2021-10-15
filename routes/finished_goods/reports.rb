@@ -59,6 +59,24 @@ class Nspack < Roda
       end
     end
 
+    r.on 'dispatch_picklist', Integer do |id|
+      file_name = AppConst::USE_EXTENDED_PALLET_PICKLIST ? 'dispatch_picklist' : 'picklist'
+      jasper_params = JasperParams.new('dispatch_picklist',
+                                       current_user.login_name,
+                                       load_id: id,
+                                       pallet_report: 'detail',
+                                       for_picklist: true,
+                                       cartons_equals_pallets: AppConst::CR_PROD.carton_equals_pallet?)
+      jasper_params.file_name = file_name
+      res = CreateJasperReport.call(jasper_params)
+
+      if res.success
+        change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
+      else
+        show_error(res.message, fetch?(r))
+      end
+    end
+
     # ADDENDUM
     # --------------------------------------------------------------------------
     r.on 'addendum', Integer, String do |id, place|
