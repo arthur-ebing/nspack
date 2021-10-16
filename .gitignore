@@ -22,6 +22,7 @@ public/js/ag-enterprise-activation.js
 public/tempfiles/*
 .rake_t_cache
 testjob.rb
+deploystats.sh
 api_mocks/static_response_server/responses/*
 
 # Used by dotenv library to load environment variables.

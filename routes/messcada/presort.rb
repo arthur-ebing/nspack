@@ -10,6 +10,10 @@ class Nspack < Roda
     r.on 'staging' do
       res = interactor.stage_bins(params, request.path)
       res.instance
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: "Presort staging - #{e.message}", message: 'Presort staging route.')
+      puts e.message
+      "<result><error msg=\"#{e.message}\" /></result>"
     end
 
     # STAGE BINS OVERRIDE
@@ -18,6 +22,10 @@ class Nspack < Roda
     r.on 'staging_override_provided' do
       res = interactor.staging_override_provided(params, request.path)
       res.instance
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: "Presort staging override - #{e.message}", message: 'Presort staging override route.')
+      puts e.message
+      "<result><error msg=\"#{e.message}\" /></result>"
     end
 
     # Bin Tipped
