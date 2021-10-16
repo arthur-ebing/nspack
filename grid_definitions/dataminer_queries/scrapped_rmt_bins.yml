@@ -1363,7 +1363,7 @@
   :list_def: SELECT puc_code, id FROM pucs ORDER BY puc_code
 - :column: bin_asset_number
   :caption: Bin asset number
-  :data_type: :integer
+  :data_type: :string
   :control_type: :text
   :default_value: 
   :ordered_list: false
