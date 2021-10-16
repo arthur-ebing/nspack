@@ -83,7 +83,8 @@ module MasterfilesApp
         active: true,
         created_at: '2010-01-01 12:00',
         updated_at: '2010-01-01 12:00',
-        fruit_industry_levy_id: fruit_industry_levy_id
+        fruit_industry_levy_id: fruit_industry_levy_id,
+        rmt_customer: false
       }
       DB[:customers].insert(default.merge(opts))
     end

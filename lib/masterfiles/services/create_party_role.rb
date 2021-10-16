@@ -5,12 +5,13 @@ module MasterfilesApp
     attr_reader :repo, :user, :party_role_id, :role_id
     attr_accessor :params
 
-    def initialize(role, params, user)
+    def initialize(role, params, user, column_name: nil)
       @repo = PartyRepo.new
       @user = user
       @params = params
-      @party_role_id = params["#{role.downcase}_party_role_id".to_sym]
-      raise Crossbeams::InfoError, "#{role.downcase}_party_role_id empty" if party_role_id.nil?
+      col = column_name || "#{role.downcase}_party_role_id".to_sym
+      @party_role_id = params[col]
+      raise Crossbeams::InfoError, "#{col} has no value" if party_role_id.nil?
 
       params[:role_id] = repo.get_id(:roles, name: role)
       raise Crossbeams::InfoError, "Role: #{role} not defined." if params[:role_id].nil?

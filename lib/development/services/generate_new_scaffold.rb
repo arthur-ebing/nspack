@@ -2223,6 +2223,8 @@ module DevelopmentApp
         <<~RUBY
           # Save this as something like [db/menu/#{Time.now.strftime('%Y%m%d%H%M')}_#{opts.applet}.rb]
 
+          # To generate a file via rake: [bundle exec rake menu:new_migration NAME=create_#{opts.applet}]
+
           # Then run [bundle exec rake menu:migrate]
 
           Crossbeams::MenuMigrations::Migrator.migration('#{opts.classnames[:roda_class]}') do
@@ -2248,6 +2250,9 @@ module DevelopmentApp
       def make_program_menu
         <<~RUBY
           # Save this as something like [db/menu/#{Time.now.strftime('%Y%m%d%H%M')}_#{opts.program}.rb]
+
+          # To generate a file via rake: [bundle exec rake menu:new_migration NAME=add_#{opts.program}_to_#{opts.applet}]
+
           # Or add it to the existing migration for functional area #{make_caption(opts.applet)}.
 
           # Then run [bundle exec rake menu:migrate]
@@ -2273,6 +2278,9 @@ module DevelopmentApp
       def make_progfunc_menu
         <<~RUBY
           # Save this as something like [db/menu/#{Time.now.strftime('%Y%m%d%H%M')}_#{opts.singlename}.rb]
+
+          # To generate a file via rake: [bundle exec rake menu:new_migration NAME=add_#{opts.singlename}_to_#{opts.program}]
+
           # Or add it to the existing migration for functional area #{make_caption(opts.applet)}.
           # Or add it to the existing migration for program #{make_caption(opts.program_text)}.
 

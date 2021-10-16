@@ -8,7 +8,11 @@ module MasterfilesApp
 
       id = nil
       repo.transaction do
-        res = CreatePartyRole.call(AppConst::ROLE_CUSTOMER, params, @user)
+        res = if res[:rmt_customer]
+                CreatePartyRole.call(AppConst::ROLE_RMT_CUSTOMER, params, @user, column_name: :customer_party_role_id)
+              else
+                CreatePartyRole.call(AppConst::ROLE_CUSTOMER, params, @user)
+              end
         raise Crossbeams::ServiceError unless res.success
 
         params[:customer_party_role_id] = res.instance.party_role_id
@@ -31,7 +35,8 @@ module MasterfilesApp
     end
 
     def update_customer(id, params)
-      res = validate_customer_params(params)
+      instance = customer(id)
+      res = validate_customer_params(params.merge(rmt_customer: instance.rmt_customer))
       return validation_failed_response(res) if res.failure?
 
       repo.transaction do

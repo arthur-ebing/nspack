@@ -10,9 +10,9 @@
   \       FROM ( SELECT unnest(c.contact_person_ids) contact_person_id\r\n               FROM
   customers c\r\n               WHERE c.id = customers.id) c\r\n    ) AS contact_people,\r\n
   \   fn_current_status ('customers', customers.id) AS status,\r\n    customers.active,\r\n
-  \   customers.created_at,\r\n    customers.updated_at\r\nFROM customers\r\n         LEFT
-  JOIN currencies ON currencies.id = customers.default_currency_id\r\n         LEFT
-  JOIN fruit_industry_levies ON fruit_industry_levies.id = customers.fruit_industry_levy_id\r\n"
+  \   customers.rmt_customer,\r\n    customers.created_at,\r\n    customers.updated_at\r\nFROM
+  customers\r\n         LEFT JOIN currencies ON currencies.id = customers.default_currency_id\r\n
+  \        LEFT JOIN fruit_industry_levies ON fruit_industry_levies.id = customers.fruit_industry_levy_id\r\n"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -225,9 +225,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  rmt_customer:
+    :name: rmt_customer
+    :sequence_no: 14
+    :caption: RMT customer
+    :namespaced_name: customers.rmt_customer
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: Created at
     :namespaced_name: customers.created_at
     :data_type: :datetime
@@ -243,7 +259,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Updated at
     :namespaced_name: customers.updated_at
     :data_type: :datetime
@@ -266,3 +282,11 @@
   :ordered_list: true
   :ui_priority: 1
   :list_def: SELECT currency, id FROM currencies ORDER BY currency
+- :column: customers.rmt_customer
+  :caption: RMT customer
+  :data_type: :boolean
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
