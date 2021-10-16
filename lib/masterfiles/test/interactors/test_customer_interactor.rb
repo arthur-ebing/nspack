@@ -90,7 +90,8 @@ module MasterfilesApp
         vat_number: 'ABC',
         company_reg_no: 'ABC',
         fruit_industry_levy_id: fruit_industry_levy_id,
-        fruit_industry_levy: 'ABC'
+        fruit_industry_levy: 'ABC',
+        rmt_customer: false
       }
     end
 

@@ -4,11 +4,11 @@ module Masterfiles
   module Finance
     module Customer
       class New
-        def self.call(form_values: nil, form_errors: nil, remote: true)
-          ui_rule = UiRules::Compiler.new(:customer, :new, form_values: form_values)
+        def self.call(rmt_customer, form_values: nil, form_errors: nil, remote: true)
+          ui_rule = UiRules::Compiler.new(:customer, :new, rmt_customer: rmt_customer, form_values: form_values)
           rules   = ui_rule.compile
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page|
+          Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
@@ -28,10 +28,9 @@ module Masterfiles
               form.add_field :long_description
               form.add_field :company_reg_no
               form.add_field :vat_number
+              form.add_field :rmt_customer
             end
           end
-
-          layout
         end
       end
     end

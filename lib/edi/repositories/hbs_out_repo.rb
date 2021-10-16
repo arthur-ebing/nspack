@@ -3,10 +3,6 @@
 module EdiApp
   class HbsOutRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     def hbs_rmt_rows(load_id)
-      # TODO: hw_customer_code, -- field needs to be create the same as public.customers.financial_account_code
-      # RMT Customers.financial_account_code for both columns
-      # TODO: trading_partner,  -- same as above
-
       query = <<~SQL
         SELECT
           bin_loads.id AS load_id,
@@ -17,8 +13,8 @@ module EdiApp
           COALESCE(rmt_bins.bin_asset_number, rmt_bins.tipped_asset_number, rmt_bins.shipped_asset_number, rmt_bins.scrapped_bin_asset_number) AS bin_id,
           bin_loads.id AS exit_ref,
           COALESCE(rmt_bins.exit_ref_date_time, rmt_bins.updated_at) AS exit_date,
-          NULL AS hw_customer_code, --field needs to be create the same as public.customers.financial_account_code
-          NULL trading_partner, --same as above
+          customers.financial_account_code AS hw_customer_code,
+          customers.financial_account_code AS trading_partner,
           'BINSALES' AS line_of_business,
           rmt_bins.legacy_data ->> 'track_slms_indicator_1_code' AS current_rmt_type,
           cultivars.cultivar_code AS cultivar,
@@ -51,6 +47,7 @@ module EdiApp
           LEFT JOIN plant_resources ON plant_resources.id = production_runs.packhouse_resource_id
           LEFT JOIN bin_load_products ON bin_load_products.id = rmt_bins.bin_load_product_id
           LEFT JOIN bin_loads ON bin_loads.id = bin_load_products.bin_load_id
+          LEFT JOIN customers ON customers.customer_party_role_id = bin_loads.customer_party_role_id
         WHERE bin_load_products.bin_load_id = ?
         ORDER BY COALESCE(rmt_bins.bin_asset_number, rmt_bins.tipped_asset_number, rmt_bins.shipped_asset_number, rmt_bins.scrapped_bin_asset_number)
       SQL
@@ -103,7 +100,7 @@ module EdiApp
           LEFT JOIN plant_resources ON plant_resources.id = production_runs.packhouse_resource_id
           LEFT JOIN bin_load_products ON bin_load_products.id = rmt_bins.bin_load_product_id
           LEFT JOIN bin_loads ON bin_loads.id = bin_load_products.bin_load_id
-          JOIN customers ON customers.id = loads.customer_id
+          LEFT JOIN customers ON customers.customer_party_role_id = loads.customer_party_role_id
         WHERE bin_load_products.bin_load_id = ?
         ORDER BY COALESCE(rmt_bins.bin_asset_number, rmt_bins.tipped_asset_number, rmt_bins.shipped_asset_number, rmt_bins.scrapped_bin_asset_number)
       SQL

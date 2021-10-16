@@ -115,6 +115,7 @@ class Nspack < Roda
               active
               fruit_industry_levy_id
               fruit_industry_levy
+              rmt_customer
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys),
                                 notice: res.message)
@@ -168,7 +169,8 @@ class Nspack < Roda
 
       r.on 'new' do    # NEW
         check_auth!('finance', 'new')
-        show_partial_or_page(r) { Masterfiles::Finance::Customer::New.call(remote: fetch?(r)) }
+        for_rmt = params[:rmt] == 'true'
+        show_partial_or_page(r) { Masterfiles::Finance::Customer::New.call(for_rmt, remote: fetch?(r)) }
       end
       r.post do        # CREATE
         res = interactor.create_customer(params[:customer])
@@ -186,12 +188,14 @@ class Nspack < Roda
             active
             fruit_industry_levy_id
             fruit_industry_levy
+            rmt_customer
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)
         else
           re_show_form(r, res, url: '/masterfiles/finance/customers/new') do
-            Masterfiles::Finance::Customer::New.call(form_values: params[:customer],
+            Masterfiles::Finance::Customer::New.call(params[:rmt_customer],
+                                                     form_values: params[:customer],
                                                      form_errors: res.errors,
                                                      remote: fetch?(r))
           end

@@ -26,6 +26,7 @@ module UiRules
       fields[:active] = { renderer: :label,
                           as_boolean: true }
       fields[:fruit_industry_levy] = { renderer: :label }
+      fields[:rmt_customer] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields
@@ -70,7 +71,8 @@ module UiRules
                                   options: @party_repo.for_select_fruit_industry_levies,
                                   disabled_options: @party_repo.for_select_inactive_fruit_industry_levies,
                                   prompt: true,
-                                  caption: 'Fruit Industry Levy' }
+                                  caption: 'Fruit Industry Levy' },
+        rmt_customer: { renderer: :hidden }
       }
     end
 
@@ -88,10 +90,9 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(default_currency_id: @repo.get_id(:currencies, currency: 'ZAR'),
-                                    customer_party_role_id: nil,
-                                    financial_account_code: nil,
-                                    fruit_industry_levy_id: nil)
+      @form_object = new_form_object_from_struct(MasterfilesApp::Customer,
+                                                 merge_hash: { default_currency_id: @repo.get_id(:currencies, currency: 'ZAR'),
+                                                               rmt_customer: @options[:rmt_customer] })
     end
 
     private
