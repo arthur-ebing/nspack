@@ -636,5 +636,37 @@ module MesscadaApp
         .where(rmt_grade: true)
         .empty?
     end
+
+    def standard_pack_attrs_for_rebin(standard_pack_code_id)
+      DB[:standard_pack_codes]
+        .where(id: standard_pack_code_id)
+        .select(:standard_pack_code,
+                :bin,
+                :rmt_container_material_owner_id)
+        .first
+    end
+
+    def carton_label_attrs_for_rebin(carton_label_id)
+      DB[:carton_labels]
+        .where(id: carton_label_id)
+        .select(:standard_pack_code_id,
+                :season_id,
+                :cultivar_group_id,
+                :cultivar_id,
+                :puc_id,
+                :farm_id,
+                :orchard_id,
+                :rmt_class_id,
+                :packhouse_resource_id,
+                :fruit_size_reference_id,
+                :production_run_id)
+        .first
+    end
+
+    def find_rmt_size_id_for(fruit_size_reference_id)
+      DB[:rmt_sizes]
+        .where(size_code: DB[:fruit_size_references].where(id: fruit_size_reference_id).get(:size_reference))
+        .get(:id)
+    end
   end
 end

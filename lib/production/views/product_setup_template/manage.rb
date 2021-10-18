@@ -23,6 +23,10 @@ module Production
                                     text: 'New Packing Specification',
                                     url: "/production/packing_specifications/wizard/setup?product_setup_template_id=#{id}",
                                     style: :button)
+                section.add_control(control_type: :link,
+                                    text: 'New Rebin Product Setup',
+                                    url: "/production/packing_specifications/wizard/setup?product_setup_template_id=#{id}&rebin=true",
+                                    style: :button)
                 section.add_grid('packing_specification_items',
                                  "/list/packing_specification_items/grid?key=product_setup_template&id=#{id}",
                                  caption: 'Packing Specifications Items')
@@ -43,6 +47,10 @@ module Production
                 section.add_control(control_type: :link,
                                     text: 'New Product Setup Wizard',
                                     url: "/production/packing_specifications/wizard/setup?product_setup_template_id=#{id}",
+                                    style: :button)
+                section.add_control(control_type: :link,
+                                    text: 'New Rebin Product Setup',
+                                    url: "/production/packing_specifications/wizard/setup?product_setup_template_id=#{id}&rebin=true",
                                     style: :button)
                 section.add_grid('product_setups',
                                  "/list/product_setups/grid?key=standard&product_setups.product_setup_template_id=#{id}",

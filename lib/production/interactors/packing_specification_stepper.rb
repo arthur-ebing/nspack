@@ -13,12 +13,13 @@ module ProductionApp
       form_state = opts
       form_state[:mode] ||= :new
       form_state[:mode] = form_state[:mode].to_sym
+      form_state[:rebin] = form_state[:rebin] == 'true'
       form_state.merge!(ProductionApp::ProductSetupRepo.new.find_product_setup(form_state[:product_setup_id]).to_h)
       form_state.merge!(ProductionApp::PackingSpecificationRepo.new.find_packing_specification_item(form_state[:packing_specification_item_id]).to_h)
 
       form_state[:step] ||= 0
       form_state[:steps] = %w[Fruit Marketing Treatments Pallet]
-      form_state[:steps] << 'Packaging' if AppConst::CR_PROD.use_packing_specifications?
+      form_state[:steps] << 'Packaging' if AppConst::CR_PROD.use_packing_specifications? && !form_state[:rebin]
       write(form_state)
     end
 
@@ -127,6 +128,8 @@ module ProductionApp
       form_state[:fruit_sticker_ids] ||= []
       form_state[:tu_sticker_ids] ||= []
       form_state[:ru_sticker_ids] ||= []
+      form_state[:pm_bom_id] ||= nil
+      form_state[:pm_mark_id] ||= nil
     end
   end
 end

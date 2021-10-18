@@ -9,6 +9,8 @@ module UiRules
       make_form_object
       apply_form_values
 
+      @rules[:rebin] ||= @repo.get(:product_setups, @form_object.product_setup_id, :rebin) || false
+
       set_show_fields if %i[show].include? @mode
 
       if %i[new edit].include? @mode
@@ -36,6 +38,7 @@ module UiRules
       fields[:fruit_stickers] = { renderer: :label, caption: 'Fruit Stickers' }
       fields[:tu_stickers] = { renderer: :label, caption: 'TU Stickers' }
       fields[:ru_stickers] = { renderer: :label, caption: 'RU Stickers' }
+      fields[:rebin] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize

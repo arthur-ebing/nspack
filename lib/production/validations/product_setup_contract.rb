@@ -31,6 +31,7 @@ module ProductionApp
       optional(:target_customer_party_role_id).maybe(:integer)
       optional(:colour_percentage_id).maybe(:integer)
       required(:carton_label_template_id).maybe(:integer)
+      optional(:rebin).maybe(:bool)
     end
     rule(:standard_pack_code_id) do
       key.failure 'must be filled' if values[:standard_pack_code_id].nil_or_empty? && !AppConst::CR_MF.basic_pack_equals_standard_pack?
@@ -56,6 +57,7 @@ module ProductionApp
       required(:rmt_class_id).maybe(:integer)
       required(:grade_id).filled(:integer)
       optional(:colour_percentage_id).maybe(:integer)
+      required(:rebin).maybe(:bool)
     end
     rule(:standard_pack_code_id) do
       key.failure 'must be filled' if values[:standard_pack_code_id].nil_or_empty? && !AppConst::CR_MF.basic_pack_equals_standard_pack?

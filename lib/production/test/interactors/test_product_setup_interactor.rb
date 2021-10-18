@@ -174,7 +174,8 @@ module ProductionApp
         cultivar_group: 'ABC',
         cultivar: 'ABC',
         carton_label_template_id: nil,
-        carton_template_name: 'ABC'
+        carton_template_name: 'ABC',
+        rebin: false
       }
     end
 

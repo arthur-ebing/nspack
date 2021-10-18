@@ -141,6 +141,8 @@ module UiRules
       fields[:carton_label_template_id] = { renderer: :label,
                                             with_value: carton_label_template_id_label,
                                             caption: 'Carton Label Name' }
+      fields[:rebin] = { renderer: :label,
+                         as_boolean: true }
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize
@@ -338,7 +340,6 @@ module UiRules
                                     caption: 'Carton Label Name',
                                     prompt: 'Select Carton Label Name',
                                     remove_search_for_small_list: false }
-
       }
     end
 
