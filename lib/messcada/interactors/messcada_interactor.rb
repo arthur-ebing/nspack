@@ -431,6 +431,57 @@ module MesscadaApp
       failed_response(e.message)
     end
 
+    def rebin_verification(scanned_number)  # rubocop:disable Metrics/AbcSize
+      res = nil
+      repo.transaction do
+        res = MesscadaApp::RebinVerification.call(@user, scanned_number)
+        log_transaction
+      end
+      res
+    rescue Crossbeams::InfoError => e
+      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message(__method__))
+      puts e.message
+      puts e.backtrace.join("\n")
+      failed_response(e.message)
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
+      puts e
+      puts e.backtrace.join("\n")
+      failed_response(e.message)
+    end
+
+    def rebin_verification_and_weighing(params) # rubocop:disable Metrics/AbcSize
+      res = CartonVerificationAndWeighingSchema.call(params)
+      return validation_failed_response(res) if res.failure?
+
+      check_res = validate_device_and_label_exist(res[:device], res[:carton_number])
+      return check_res unless check_res.success
+
+      cvl_res = nil
+      repo.transaction do
+        cvl_res = MesscadaApp::RebinVerification.call(@user, res[:carton_number])
+        return cvl_res unless cvl_res.success
+
+        attrs = res.to_h
+        attrs[:bin_number] = cvl_res.instance[:rebin_id]
+        options = { force_find_by_id: false, weighed_manually: true, avg_gross_weight: false }
+        cvl_res = MesscadaApp::UpdateBinWeights.call(attrs, options)
+
+        log_transaction
+      end
+      cvl_res
+    rescue Crossbeams::InfoError => e
+      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message(__method__))
+      puts e.message
+      puts e.backtrace.join("\n")
+      failed_response(e.message)
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
+      puts e.message
+      puts e.backtrace.join("\n")
+      failed_response(e.message)
+    end
+
     def pallet_sequence_ids(pallet_id)
       reworks_repo.pallet_sequence_ids(pallet_id)
     end

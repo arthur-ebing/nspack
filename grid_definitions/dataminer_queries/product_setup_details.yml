@@ -18,17 +18,18 @@
   \      product_setups.client_product_code,\r\n       product_setups.marketing_order_number,\r\n
   \      product_setups.sell_by_code,\r\n       product_setups.pallet_label_name,\r\n
   \      label_templates.label_template_name AS carton_template_name,\r\n       product_setups.active,\r\n
-  \      product_setups.created_at,\r\n       product_setups.updated_at,\r\n       CASE
-  WHEN fn_product_setup_in_production (product_setups.id) THEN 'warning'\r\n            WHEN
-  NOT product_setups.active THEN 'inactive'\r\n            ELSE NULL\r\n           END
-  AS colour_rule,\r\n       ( SELECT array_agg(pst.treatment_code)\r\n         FROM
-  ( SELECT t.treatment_code\r\n                FROM treatments t\r\n                         JOIN
-  product_setups ps ON t.id = ANY (ps.treatment_ids)\r\n                WHERE ps.id
-  = product_setups.id\r\n                ORDER BY t.treatment_code DESC) AS pst) AS
-  product_setup_treatments\r\nFROM product_setups\r\n         JOIN product_setup_templates
-  ON product_setup_templates.id = product_setups.product_setup_template_id\r\n         JOIN
-  marketing_varieties ON marketing_varieties.id = product_setups.marketing_variety_id\r\n
-  \        LEFT JOIN std_fruit_size_counts ON std_fruit_size_counts.id = product_setups.std_fruit_size_count_id\r\n
+  \      product_setups.rebin,\r\n       product_setups.created_at,\r\n       product_setups.updated_at,\r\n
+  \      CASE WHEN fn_product_setup_in_production (product_setups.id) THEN 'warning'\r\n
+  \           WHEN NOT product_setups.active THEN 'inactive'\r\n            WHEN product_setups.rebin
+  THEN 'inprogress'\r\n            ELSE NULL\r\n           END AS colour_rule,\r\n
+  \      ( SELECT array_agg(pst.treatment_code)\r\n         FROM ( SELECT t.treatment_code\r\n
+  \               FROM treatments t\r\n                         JOIN product_setups
+  ps ON t.id = ANY (ps.treatment_ids)\r\n                WHERE ps.id = product_setups.id\r\n
+  \               ORDER BY t.treatment_code DESC) AS pst) AS product_setup_treatments\r\nFROM
+  product_setups\r\n         JOIN product_setup_templates ON product_setup_templates.id
+  = product_setups.product_setup_template_id\r\n         JOIN marketing_varieties
+  ON marketing_varieties.id = product_setups.marketing_variety_id\r\n         LEFT
+  JOIN std_fruit_size_counts ON std_fruit_size_counts.id = product_setups.std_fruit_size_count_id\r\n
   \        LEFT JOIN commodities ON commodities.id = std_fruit_size_counts.commodity_id\r\n
   \        JOIN basic_pack_codes ON basic_pack_codes.id = product_setups.basic_pack_code_id\r\n
   \        JOIN standard_pack_codes ON standard_pack_codes.id = product_setups.standard_pack_code_id\r\n
@@ -55,6 +56,7 @@
   :colour_key:
     warning: Active on run
     inactive: De-activated
+    inprogress: Rebin
 :columns:
   template_name:
     :name: template_name
@@ -552,9 +554,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  rebin:
+    :name: rebin
+    :sequence_no: 32
+    :caption: Rebin
+    :namespaced_name: product_setups.rebin
+    :data_type: :boolean
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 32
+    :sequence_no: 33
     :caption: Created at
     :namespaced_name: product_setups.created_at
     :data_type: :datetime
@@ -570,7 +588,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 33
+    :sequence_no: 34
     :caption: Updated at
     :namespaced_name: product_setups.updated_at
     :data_type: :datetime
@@ -586,7 +604,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 34
+    :sequence_no: 35
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
@@ -602,7 +620,7 @@
     :group_max: false
   product_setup_treatments:
     :name: product_setup_treatments
-    :sequence_no: 35
+    :sequence_no: 36
     :caption: Product setup treatments
     :namespaced_name: 
     :data_type: :string

@@ -45,6 +45,7 @@ module Production
                     fold.add_field :class
                     fold.add_field :grade
                     fold.add_field :colour_percentage
+                    fold.add_field :rebin
                   end
                 end
                 row.column do |col|
@@ -86,24 +87,26 @@ module Production
                   end
                 end
               end
-              form.row do |row|
-                row.column do |col|
-                  col.fold_up do |fold|
-                    fold.caption 'Packing Specification'
-                    fold.add_field :product_setup
-                    fold.add_field :pm_bom
-                    fold.add_field :pm_mark
-                    fold.add_field :tu_labour_product
-                    fold.add_field :ru_labour_product
-                    fold.add_field :ri_labour_product
+              unless rules[:rebin]
+                form.row do |row|
+                  row.column do |col|
+                    col.fold_up do |fold|
+                      fold.caption 'Packing Specification'
+                      fold.add_field :product_setup
+                      fold.add_field :pm_bom
+                      fold.add_field :pm_mark
+                      fold.add_field :tu_labour_product
+                      fold.add_field :ru_labour_product
+                      fold.add_field :ri_labour_product
+                    end
                   end
-                end
-                row.column do |col|
-                  col.fold_up do |fold|
-                    fold.caption 'Packing Specification Stickers'
-                    fold.add_field :fruit_stickers
-                    fold.add_field :tu_stickers
-                    fold.add_field :ru_stickers
+                  row.column do |col|
+                    col.fold_up do |fold|
+                      fold.caption 'Packing Specification Stickers'
+                      fold.add_field :fruit_stickers
+                      fold.add_field :tu_stickers
+                      fold.add_field :ru_stickers
+                    end
                   end
                 end
               end

@@ -46,7 +46,8 @@ module ProductionApp
         rmt_class_id: 1,
         target_customer_party_role_id: 1,
         colour_percentage_id: 1,
-        carton_label_template_id: 1
+        carton_label_template_id: 1,
+        rebin: false
       }
       ProductionApp::ProductSetup.new(base_attrs.merge(attrs))
     end

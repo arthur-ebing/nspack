@@ -122,5 +122,53 @@ class Nspack < Roda
         end
       end
     end
+
+    r.on 'rebin_verification' do
+      interactor = MesscadaApp::MesscadaInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      r.on 'weighing' do
+        # --------------------------------------------------------------------------
+        # REBIN VERIFICATION + WEIGHING
+        # view-source:http://192.168.43.148:9296/messcada/production/rebin_verification/weighing?carton_number=123&gross_weight=600.23&measurement_unit=kg&device=CLM-01-B01
+        # --------------------------------------------------------------------------
+        r.get do
+          res = interactor.rebin_verification_and_weighing(params)
+          feedback = if res.success
+                       MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                      status: true,
+                                                      line1: res.message)
+                     else
+                       MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                      status: false,
+                                                      line1: unwrap_failed_response(res))
+                     end
+          Crossbeams::RobotResponder.new(feedback).render
+        end
+      end
+
+      # --------------------------------------------------------------------------
+      # REBIN VERIFICATION
+      # view-source:http://192.168.43.148:9296/messcada/production/rebin_verification?carton_number=123&device=CLM-01-B01
+      # --------------------------------------------------------------------------
+      r.get do
+        res = interactor.rebin_verification(params[:carton_number])
+        feedback = if res.success
+                     MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                    status: true,
+                                                    line1: res.message)
+                   else
+                     MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                    status: false,
+                                                    line1: unwrap_failed_response(res))
+                   end
+        Crossbeams::RobotResponder.new(feedback).render
+      rescue Rack::QueryParser::InvalidParameterError => e
+        ErrorMailer.send_exception_email(e, subject: 'Rebin verification invalid parameter', message: "Invalid param from route: #{request.path} with #{request.query_string}")
+
+        feedback = MesscadaApp::RobotFeedback.new(device: '',
+                                                  status: false,
+                                                  line1: 'Unable to read barcode')
+        return Crossbeams::RobotResponder.new(feedback).render
+      end
+    end
   end
 end

@@ -22,11 +22,12 @@
   \   product_setups.marketing_order_number,\r\n    product_setups.sell_by_code,\r\n
   \   product_setups.pallet_label_name,\r\n    CASE WHEN fn_product_setup_in_production
   (product_setups.id) THEN 'warning'\r\n             WHEN NOT product_setups.active
-  THEN 'inactive'\r\n             ELSE NULL\r\n    END AS colour_rule,\r\n    ( SELECT
-  array_agg(pst.treatment_code)\r\n      FROM ( SELECT t.treatment_code\r\n                   FROM
-  treatments t\r\n                   JOIN product_setups ps ON t.id = ANY (ps.treatment_ids)\r\n
-  \                  WHERE ps.id = product_setups.id\r\n                   ORDER BY
-  t.treatment_code DESC) AS pst) AS product_setup_treatments,\r\n\t\t\t\t\r\n    pm_products_tu.product_code
+  THEN 'inactive'\r\n             WHEN product_setups.rebin THEN 'inprogress'\r\n
+  \            ELSE NULL\r\n    END AS colour_rule,\r\n    ( SELECT array_agg(pst.treatment_code)\r\n
+  \     FROM ( SELECT t.treatment_code\r\n                   FROM treatments t\r\n
+  \                  JOIN product_setups ps ON t.id = ANY (ps.treatment_ids)\r\n                   WHERE
+  ps.id = product_setups.id\r\n                   ORDER BY t.treatment_code DESC)
+  AS pst) AS product_setup_treatments,\r\n\t\t\t\t\r\n    pm_products_tu.product_code
   AS tu_labour_product,\r\n    pm_products_ru.product_code AS ru_labour_product,\r\n
   \   pm_products_ri.product_code AS ri_labour_product,\r\n\r\n    (SELECT product_code
   FROM pm_products WHERE pm_products.id = fruit_sticker_ids[1] ) AS fruit_sticker_1,\r\n
@@ -36,16 +37,16 @@
   WHERE pm_products.id = tu_sticker_ids[2] ) AS tu_sticker_2,\r\n\r\n    (SELECT product_code
   FROM pm_products WHERE pm_products.id = ru_sticker_ids[1] ) AS ru_sticker_1,\r\n
   \   (SELECT product_code FROM pm_products WHERE pm_products.id = ru_sticker_ids[2]
-  ) AS ru_sticker_2,\r\n\r\n    packing_specification_items.active,\r\n    packing_specification_items.created_at,\r\n
-  \   packing_specification_items.updated_at,\r\n    fn_current_status('packing_specification_items',
-  packing_specification_items.id) AS status\r\n\r\nFROM packing_specification_items\r\nJOIN
-  product_setups ON packing_specification_items.product_setup_id = product_setups.id\r\nJOIN
-  product_setup_templates ON product_setup_templates.id = product_setups.product_setup_template_id\r\nLEFT
-  JOIN pm_boms ON pm_boms.id = packing_specification_items.pm_bom_id\r\nLEFT JOIN
-  pm_marks ON pm_marks.id = packing_specification_items.pm_mark_id\r\nLEFT JOIN marks
-  ON marks.id = pm_marks.mark_id\r\nLEFT JOIN pm_products pm_products_tu ON pm_products_tu.id
-  = packing_specification_items.tu_labour_product_id\r\nLEFT JOIN pm_products pm_products_ru
-  ON pm_products_ru.id = packing_specification_items.ru_labour_product_id\r\nLEFT
+  ) AS ru_sticker_2,\r\n\r\n    product_setups.rebin,\r\n    packing_specification_items.active,\r\n
+  \   packing_specification_items.created_at,\r\n    packing_specification_items.updated_at,\r\n
+  \   fn_current_status('packing_specification_items', packing_specification_items.id)
+  AS status\r\n\r\nFROM packing_specification_items\r\nJOIN product_setups ON packing_specification_items.product_setup_id
+  = product_setups.id\r\nJOIN product_setup_templates ON product_setup_templates.id
+  = product_setups.product_setup_template_id\r\nLEFT JOIN pm_boms ON pm_boms.id =
+  packing_specification_items.pm_bom_id\r\nLEFT JOIN pm_marks ON pm_marks.id = packing_specification_items.pm_mark_id\r\nLEFT
+  JOIN marks ON marks.id = pm_marks.mark_id\r\nLEFT JOIN pm_products pm_products_tu
+  ON pm_products_tu.id = packing_specification_items.tu_labour_product_id\r\nLEFT
+  JOIN pm_products pm_products_ru ON pm_products_ru.id = packing_specification_items.ru_labour_product_id\r\nLEFT
   JOIN pm_products pm_products_ri ON pm_products_ri.id = packing_specification_items.ri_labour_product_id\r\nLEFT
   JOIN label_templates ON label_templates.id = product_setups.carton_label_template_id\r\n\t\t
   \r\nJOIN marketing_varieties ON marketing_varieties.id = product_setups.marketing_variety_id\r\nLEFT
@@ -72,6 +73,7 @@
   :colour_key:
     warning: Active on run
     inactive: De-activated
+    inprogress: Rebin
 :columns:
   id:
     :name: id
@@ -809,9 +811,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  rebin:
+    :name: rebin
+    :sequence_no: 47
+    :caption: Rebin
+    :namespaced_name: product_setups.rebin
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   active:
     :name: active
-    :sequence_no: 47
+    :sequence_no: 48
     :caption: Active
     :namespaced_name: packing_specification_items.active
     :data_type: :boolean
@@ -827,7 +845,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 48
+    :sequence_no: 49
     :caption: Created at
     :namespaced_name: packing_specification_items.created_at
     :data_type: :datetime
@@ -843,7 +861,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 49
+    :sequence_no: 50
     :caption: Updated at
     :namespaced_name: packing_specification_items.updated_at
     :data_type: :datetime
@@ -859,7 +877,7 @@
     :group_max: false
   status:
     :name: status
-    :sequence_no: 50
+    :sequence_no: 51
     :caption: Status
     :namespaced_name: 
     :data_type: :string

@@ -23,17 +23,18 @@
   ( SELECT t.treatment_code\r\n             FROM treatments t\r\n                      JOIN
   product_setups ps ON t.id = ANY (ps.treatment_ids)\r\n             WHERE ps.id =
   product_setups.id\r\n             ORDER BY t.treatment_code DESC) AS pst) AS treatments,\r\n
-  \   packing_specification_items.active,\r\n    packing_specification_items.created_at,\r\n
+  \   packing_specification_items.active,\r\n    product_setups.rebin ,\r\n    packing_specification_items.created_at,\r\n
   \   packing_specification_items.updated_at,\r\n    CASE WHEN production_runs.running
   THEN 'warning'\r\n        WHEN NOT packing_specification_items.active THEN 'inactive'\r\n
-  \       ELSE NULL\r\n    END AS colour_rule\r\n\r\nFROM product_setups\r\nJOIN product_setup_templates
-  ON product_setup_templates.id = product_setups.product_setup_template_id\r\nLEFT
-  JOIN marketing_varieties ON marketing_varieties.id = product_setups.marketing_variety_id\r\nLEFT
-  JOIN std_fruit_size_counts ON std_fruit_size_counts.id = product_setups.std_fruit_size_count_id\r\nLEFT
-  JOIN commodities ON commodities.id = std_fruit_size_counts.commodity_id\r\nLEFT
-  JOIN basic_pack_codes ON basic_pack_codes.id = product_setups.basic_pack_code_id\r\nLEFT
-  JOIN standard_pack_codes ON standard_pack_codes.id = product_setups.standard_pack_code_id\r\nLEFT
-  JOIN fruit_actual_counts_for_packs ON fruit_actual_counts_for_packs.id = product_setups.fruit_actual_counts_for_pack_id\r\nLEFT
+  \       WHEN product_setups.rebin THEN 'inprogress'\r\n        ELSE NULL\r\n    END
+  AS colour_rule\r\n\r\nFROM product_setups\r\nJOIN product_setup_templates ON product_setup_templates.id
+  = product_setups.product_setup_template_id\r\nLEFT JOIN marketing_varieties ON marketing_varieties.id
+  = product_setups.marketing_variety_id\r\nLEFT JOIN std_fruit_size_counts ON std_fruit_size_counts.id
+  = product_setups.std_fruit_size_count_id\r\nLEFT JOIN commodities ON commodities.id
+  = std_fruit_size_counts.commodity_id\r\nLEFT JOIN basic_pack_codes ON basic_pack_codes.id
+  = product_setups.basic_pack_code_id\r\nLEFT JOIN standard_pack_codes ON standard_pack_codes.id
+  = product_setups.standard_pack_code_id\r\nLEFT JOIN fruit_actual_counts_for_packs
+  ON fruit_actual_counts_for_packs.id = product_setups.fruit_actual_counts_for_pack_id\r\nLEFT
   JOIN fruit_size_references ON fruit_size_references.id = product_setups.fruit_size_reference_id\r\nLEFT
   JOIN party_roles ON party_roles.id = product_setups.marketing_org_party_role_id\r\nLEFT
   JOIN organizations ON organizations.id = party_roles.organization_id\r\nLEFT JOIN
@@ -60,6 +61,7 @@
   :colour_key:
     warning: Active on run
     inactive: De-activated
+    inprogress: Rebin
 :columns:
   id:
     :name: id
@@ -637,9 +639,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  rebin:
+    :name: rebin
+    :sequence_no: 37
+    :caption: Rebin
+    :namespaced_name: product_setups.rebin
+    :data_type: :boolean
+    :width: 80
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 37
+    :sequence_no: 38
     :caption: Created at
     :namespaced_name: packing_specification_items.created_at
     :data_type: :datetime
@@ -655,7 +673,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 38
+    :sequence_no: 39
     :caption: Updated at
     :namespaced_name: packing_specification_items.updated_at
     :data_type: :datetime
@@ -671,7 +689,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 39
+    :sequence_no: 40
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
