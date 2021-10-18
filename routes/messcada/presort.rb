@@ -41,7 +41,7 @@ class Nspack < Roda
     end
 
     # Bin Created
-    # view-source:http://192.168.43.148:9296/messcada/presort/created?bin=704
+    # view-source:http://192.168.43.148:9296/messcada/presort/created?bin=704&unit=PST-02
     # --------------------------------------------------------------------------
     r.on 'bin_created' do
       res = interactor.bin_created(params, request.path)

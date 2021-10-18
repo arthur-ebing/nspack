@@ -219,8 +219,8 @@ module RawMaterialsApp
     end
 
     def bin_created(params, request_path)
-      AppConst::BIN_CREATED_LOG.info("#{request_path}&bin=#{params[:bin]}")
-      MesscadaApp::BinCreated.call(params[:bin])
+      AppConst::PRESORT_BIN_CREATED_LOG.info("#{request_path}&bin=#{params[:bin]}")
+      MesscadaApp::PresortBinCreated.call(params[:bin], params[:unit])
     end
 
     def log_request(params, msq)
