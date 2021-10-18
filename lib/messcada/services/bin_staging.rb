@@ -119,16 +119,10 @@ module MesscadaApp
       err = repo.bin_mrl_failed?(asset_number)
       errors << err unless err.nil?
 
-      # res = repo.bin_in_reworks?(asset_number)
-      # return res unless res.success
-
       errs = valid_bin_for_active_parent_run?(asset_number)
       errors += errs unless errs.nil?
 
       err = rebin?(asset_number)
-      errors << err unless err.nil?
-
-      err = not_on_delivery?(asset_number)
       errors << err unless err.nil?
 
       err = not_on_sale?(asset_number)
@@ -139,10 +133,6 @@ module MesscadaApp
 
     def rebin?(asset_number)
       return "Bin: #{asset_number} is a rebin" if current_validation_bin[:production_run_rebin_id]
-    end
-
-    def not_on_delivery?(asset_number)
-      return "Bin: #{asset_number} is not on delivery" unless current_validation_bin[:rmt_delivery_id]
     end
 
     def not_on_sale?(asset_number)
@@ -167,9 +157,6 @@ module MesscadaApp
     def bin_under_quarantine?(asset_number)
       return "Bin:#{asset_number} is quarantined" if %w[QFA QFS].include?(current_validation_bin[:legacy_data]['treatment_code'])
     end
-
-    # def bin_in_reworks?(asset_number)
-    # end
 
     def bin_run_error(key, bin_value, run_value)
       "bin #{key}[#{bin_value}] does not match that of the active staging_run #{key}[#{run_value}]"
