@@ -24,6 +24,7 @@ module UiRules
     end
 
     def set_show_fields
+      foreman_party_role_id_label = MasterfilesApp::PartyRepo.new.find_party_role(@form_object.foreman_party_role_id)&.party_name
       fields[:shift_type_id] = { renderer: :hidden }
       fields[:shift_type_code] = { renderer: :label,
                                    with_value: @form_object.shift_type_code,
@@ -35,6 +36,9 @@ module UiRules
                                    format: :without_timezone_or_seconds }
       fields[:end_date_time] = { renderer: :label,
                                  format: :without_timezone_or_seconds }
+      fields[:foreman_party_role_id] = { renderer: :label,
+                                         with_value: foreman_party_role_id_label,
+                                         caption: 'Foreman' }
     end
 
     def set_filter_fields
@@ -75,7 +79,12 @@ module UiRules
                            format: :without_timezone_or_seconds },
         end_date_time: { renderer: :datetime,
                          required: true,
-                         format: :without_timezone_or_seconds }
+                         format: :without_timezone_or_seconds },
+        foreman_party_role_id: { renderer: :select,
+                                 options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_FOREMAN),
+                                 caption: 'Foreman',
+                                 prompt: 'Select Foreman' }
+
       }
     end
 
@@ -121,10 +130,7 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(shift_type_id: nil,
-                                    running_hours: nil,
-                                    start_date_time: nil,
-                                    end_date_time: nil)
+      @form_object = new_form_object_from_struct(ProductionApp::Shift)
       apply_extended_column_defaults_to_form_object(:shifts)
     end
 

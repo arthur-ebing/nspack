@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class ShiftTypeRule < Base
+  class ShiftTypeRule < Base # rubocop:disable Metrics/ClassLength
     def generate_rules
       @repo = MasterfilesApp::HumanResourcesRepo.new
       @resource_repo = ProductionApp::ResourceRepo.new
@@ -31,6 +31,8 @@ module UiRules
       fields[:day_night_or_custom] = { renderer: :label }
       fields[:shift_type_code] = { renderer: :label,
                                    with_value: @form_object.shift_type_code }
+      fields[:starting_quarter] = { renderer: :label }
+      fields[:ending_quarter] = { renderer: :label }
     end
 
     def swap_fields
@@ -71,7 +73,13 @@ module UiRules
         day_night_or_custom: { renderer: :select,
                                options: [%w[Day D], %w[Night N],  %w[Custom C]],
                                required: true,
-                               min_charwidth: 30 }
+                               min_charwidth: 30 },
+        starting_quarter: { renderer: :select,
+                            options: (0..45).step(15).to_a,
+                            required: true },
+        ending_quarter: { renderer: :select,
+                          options: (0..45).step(15).to_a,
+                          required: true }
       }
     end
 

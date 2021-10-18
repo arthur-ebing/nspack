@@ -218,6 +218,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   ROLE_TARGET_CUSTOMER = 'TARGET CUSTOMER'
   ROLE_TRANSPORTER = 'TRANSPORTER'
   ROLE_FARM_MANAGER = 'FARM_MANAGER'
+  ROLE_FOREMAN = 'FOREMAN'
 
   PARTY_ROLE_REGISTRATION_TYPES = { 'LSP' => ROLE_SHIPPER,
                                     'CF' => ROLE_SHIPPER,

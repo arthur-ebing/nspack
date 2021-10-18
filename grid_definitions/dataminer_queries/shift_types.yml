@@ -2,7 +2,8 @@
 :caption: Shift Types
 :sql: "SELECT\r\n    shift_types.id,\r\n    shift_types.plant_resource_id,\r\n    shift_types.employment_type_id,\r\n
   \   fn_shift_type_code (shift_types.id) AS shift_type_code,\r\n    shift_types.start_hour,\r\n
-  \   shift_types.end_hour,\r\n    shift_types.day_night_or_custom,\r\n    employment_types.employment_type_code,\r\n
+  \   shift_types.starting_quarter,\r\n    shift_types.end_hour,\r\n    shift_types.ending_quarter,\r\n
+  \   shift_types.day_night_or_custom,\r\n    employment_types.employment_type_code,\r\n
   \   plant_resources.plant_resource_code,\r\n    EXISTS(select id from shifts where
   shift_type_id = shift_types.id) AS has_shifts\r\nFROM shift_types\r\nJOIN employment_types
   ON employment_types.id = shift_types.employment_type_id\r\nJOIN plant_resources
@@ -91,9 +92,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  starting_quarter:
+    :name: starting_quarter
+    :sequence_no: 6
+    :caption: Starting quarter
+    :namespaced_name: shift_types.starting_quarter
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   end_hour:
     :name: end_hour
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: End hour
     :namespaced_name: shift_types.end_hour
     :data_type: :integer
@@ -107,9 +124,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  ending_quarter:
+    :name: ending_quarter
+    :sequence_no: 8
+    :caption: Ending quarter
+    :namespaced_name: shift_types.ending_quarter
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   day_night_or_custom:
     :name: day_night_or_custom
-    :sequence_no: 7
+    :sequence_no: 9
     :caption: DNC
     :namespaced_name: shift_types.day_night_or_custom
     :data_type: :integer
@@ -125,7 +158,7 @@
     :group_max: false
   employment_type_code:
     :name: employment_type_code
-    :sequence_no: 8
+    :sequence_no: 10
     :caption: Employment type code
     :namespaced_name: employment_types.employment_type_code
     :data_type: :string
@@ -141,7 +174,7 @@
     :group_max: false
   plant_resource_code:
     :name: plant_resource_code
-    :sequence_no: 9
+    :sequence_no: 11
     :caption: Plant resource code
     :namespaced_name: plant_resources.plant_resource_code
     :data_type: :string
@@ -157,7 +190,7 @@
     :group_max: false
   has_shifts:
     :name: has_shifts
-    :sequence_no: 10
+    :sequence_no: 12
     :caption: Has shifts
     :namespaced_name: 
     :data_type: :boolean

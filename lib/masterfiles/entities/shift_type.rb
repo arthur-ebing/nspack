@@ -11,5 +11,7 @@ module MasterfilesApp
     attribute :shift_type_code, Types::String
     attribute :employment_type_code, Types::String
     attribute :plant_resource_code, Types::String
+    attribute :starting_quarter, Types::Integer
+    attribute :ending_quarter, Types::Integer
   end
 end
