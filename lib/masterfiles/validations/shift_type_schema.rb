@@ -10,6 +10,8 @@ module MasterfilesApp
       required(:start_hour).filled(:integer)
       required(:end_hour).filled(:integer)
       required(:day_night_or_custom).filled(:string)
+      required(:starting_quarter).filled(:integer)
+      required(:ending_quarter).filled(:integer)
     end
 
     rule(:end_hour, :start_hour) do

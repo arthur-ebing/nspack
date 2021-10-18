@@ -13,5 +13,7 @@ module ProductionApp
     attribute :status, Types::String
     attribute? :active, Types::Bool
     attribute :extended_columns, Types::Hash.optional
+    attribute :foreman_party_role_id, Types::Integer
+    attribute :foreman, Types::String
   end
 end

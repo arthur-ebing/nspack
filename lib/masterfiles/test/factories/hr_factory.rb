@@ -61,7 +61,9 @@ module MasterfilesApp
         employment_type_id: employment_type_id,
         start_hour: Faker::Number.number(digits: 4),
         end_hour: Faker::Number.number(digits: 4),
-        day_night_or_custom: Faker::Lorem.unique.word
+        day_night_or_custom: Faker::Lorem.unique.word,
+        starting_quarter: Faker::Number.number(digits: 2),
+        ending_quarter: Faker::Number.number(digits: 2)
       }
       DB[:shift_types].insert(default.merge(opts))
     end
