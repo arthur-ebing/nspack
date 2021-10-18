@@ -142,7 +142,7 @@ module MesscadaApp
     end
 
     def not_on_delivery?(asset_number)
-      return "Bin: #{asset_number} is on a delivery" if current_validation_bin[:rmt_delivery_id]
+      return "Bin: #{asset_number} is not on delivery" unless current_validation_bin[:rmt_delivery_id]
     end
 
     def not_on_sale?(asset_number)
