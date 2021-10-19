@@ -105,7 +105,7 @@ module MesscadaApp
                 from_external_system: false,
                 active: false)
 
-      logout_from_messcada(system_resource_id, contract_worker_id) unless system_resource_id.nil?
+      logout_from_messcada(system_resource_id, contract_worker_id) # unless system_resource_id.nil?
 
       ok_response
     end
@@ -123,16 +123,36 @@ module MesscadaApp
                 active: false)
 
       contract_worker_ids.each do |contract_worker_id|
-        logout_from_messcada(system_resource_id, contract_worker_id) unless system_resource_id.nil?
+        logout_from_messcada(system_resource_id, contract_worker_id) # unless system_resource_id.nil?
       end
 
       ok_response
     end
 
     def logout_from_messcada(system_resource_id, contract_worker_id)
+      # First queue a logout for individual
+      puts ">>> Logout INDIV - RES: #{system_resource_id} WRK: #{contract_worker_id}"
+      enqueue_logout_job(system_resource_id, contract_worker_id)
+
+      # Get the group id if the contract worker belongs to a group
+      group_id = contract_worker_active_group_incentive_id(contract_worker_id)
+      return if group_id.nil?
+
+      # Logout from the group if applicable
+      group_resource_id = DB[:group_incentives].where(id: group_id).get(:system_resource_id)
+      puts ">>> Logout GROUP - RES: #{group_resource_id} WRK: #{contract_worker_id}"
+      enqueue_logout_job(group_resource_id, contract_worker_id)
+    end
+
+    def enqueue_logout_job(system_resource_id, contract_worker_id)
+      return if system_resource_id.nil?
+
+      puts '>>> getting system resource data'
       opts = DB[:system_resources].where(id: system_resource_id).select(:system_resource_code, :ip_address, :legacy_messcada).first
+      puts '>>> not legacy messcada' unless opts[:legacy_messcada]
       return unless opts[:legacy_messcada]
 
+      puts '>>> enqueuing job to logoff messcada'
       Job::LogoutFromMesScadaRobot.enqueue(system_resource_id, opts[:system_resource_code], opts[:ip_address], contract_worker_id)
     end
 
