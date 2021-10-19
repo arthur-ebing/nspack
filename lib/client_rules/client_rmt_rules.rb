@@ -16,6 +16,7 @@ module Crossbeams
             create_farm_location: false,
             pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
             default_delivery_location: 'FRUIT_RECEPTION_1',
+            default_container_material_owner: nil,
             use_bin_asset_control: false,
             presort_legacy_data_fields: [] },
       hl: { bin_pallet_conversion_defaults: {},
@@ -29,6 +30,7 @@ module Crossbeams
             create_farm_location: false,
             pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
             default_delivery_location: 'FRUIT_RECEPTION_1',
+            default_container_material_owner: nil,
             use_bin_asset_control: false,
             presort_legacy_data_fields: []  },
       kr: { bin_pallet_conversion_defaults: { pallet_format: { stack_type: 'BIN', pallet_base: 'S' },
@@ -50,6 +52,7 @@ module Crossbeams
             create_farm_location: false,
             pending_delivery_location: nil,
             default_delivery_location: nil,
+            default_container_material_owner: 'KROMCO',
             use_bin_asset_control: false,
             presort_legacy_data_fields: %i[treatment_code ripe_point_code track_indicator_code]  },
       um: { bin_pallet_conversion_defaults: {},
@@ -63,6 +66,7 @@ module Crossbeams
             create_farm_location: false,
             pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
             default_delivery_location: 'FRUIT RECEPTION',
+            default_container_material_owner: nil,
             use_bin_asset_control: false,
             presort_legacy_data_fields: []  },
       ud: { bin_pallet_conversion_defaults: {},
@@ -76,6 +80,7 @@ module Crossbeams
             create_farm_location: true,
             pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
             default_delivery_location: 'FRUIT_RECEPTION_1',
+            default_container_material_owner: nil,
             use_bin_asset_control: false,
             presort_legacy_data_fields: []  },
       sr: { bin_pallet_conversion_defaults: {},
@@ -89,6 +94,7 @@ module Crossbeams
             create_farm_location: false,
             pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
             default_delivery_location: 'FRUIT_RECEPTION_1',
+            default_container_material_owner: nil,
             use_bin_asset_control: false,
             presort_legacy_data_fields: []  },
       sr2: { bin_pallet_conversion_defaults: {},
@@ -102,6 +108,7 @@ module Crossbeams
              create_farm_location: true,
              pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
              default_delivery_location: 'FRUIT_RECEPTION_1',
+             default_container_material_owner: nil,
              use_bin_asset_control: false,
              presort_legacy_data_fields: []  }
     }.freeze
@@ -213,6 +220,12 @@ module Crossbeams
         can_store_stock: true
       }
       repo.create(:locations, args)
+    end
+
+    def default_container_material_owner(explain: false)
+      return 'org long_description used in presort bin_created integration service as the container_material_owner.' if explain
+
+      setting(:default_container_material_owner)
     end
 
     def use_bin_asset_control?(explain: false)

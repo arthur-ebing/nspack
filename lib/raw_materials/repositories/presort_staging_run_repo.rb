@@ -162,5 +162,29 @@ module RawMaterialsApp
         .select(:farm_code)
         .get(:farm_code)
     end
+
+    def child_run_parent(presort_staging_run_child_id)
+      DB[:presort_staging_runs]
+        .select(Sequel.lit('presort_staging_runs.*'))
+        .join(:presort_staging_run_children, presort_staging_run_id: :id)
+        .where(Sequel[:presort_staging_run_children][:id] => presort_staging_run_child_id)
+        .first
+    end
+
+    def cultivar_commodity(cultivar_id)
+      DB[:cultivar_groups]
+        .join(:cultivars, cultivar_group_id: :id)
+        .join(:commodities, id: Sequel[:cultivar_groups][:commodity_id])
+        .where(Sequel[:cultivars][:id] => cultivar_id)
+        .get(:code)
+    end
+
+    def find_container_material_owner_by_container_material_type_and_org_code(container_material_type_id, long_description)
+      DB[:rmt_container_material_owners]
+        .join(:party_roles, id: :rmt_material_owner_party_role_id)
+        .join(:organizations, id: Sequel[:party_roles][:organization_id])
+        .where(rmt_container_material_type_id: container_material_type_id, long_description: long_description)
+        .get(Sequel[:rmt_container_material_owners][:id])
+    end
   end
 end
