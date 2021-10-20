@@ -18,11 +18,11 @@ class Nspack < Roda
             else
               %(<ContainerMove PID="200" Mode="5" Status="false" RunNumber="" Red="true" Yellow="false" Green="false" Msg="#{unwrap_failed_response(res)}" />)
             end
-        puts "MESSCADA XML - response: #{s}"
+        puts "#{Time.now.strftime('%Y-%m-%d %H:%M:%S')} MESSCADA XML - response: #{s}"
         s
       rescue Crossbeams::FrameworkError => e
         s = %(<ContainerMove PID="200" Mode="5" Status="false" RunNumber="" Red="true" Yellow="false" Green="false" Msg="#{e.message}" />)
-        puts "MESSCADA XML - response: #{s}"
+        puts "#{Time.now.strftime('%Y-%m-%d %H:%M:%S')} MESSCADA XML - response: #{s}"
         s
       end
 
@@ -34,11 +34,11 @@ class Nspack < Roda
             else
               %(<ContainerMove PID="200" Mode="6" Status="false" RunNumber="" Red="true" Yellow="false" Green="false" Msg="#{unwrap_failed_response(res)}" />)
             end
-        puts "MESSCADA XML - response: #{s}"
+        puts "#{Time.now.strftime('%Y-%m-%d %H:%M:%S')} MESSCADA XML - response: #{s}"
         s
       rescue Crossbeams::FrameworkError => e
         s = %(<ContainerMove PID="200" Mode="6" Status="false" RunNumber="" Red="true" Yellow="false" Green="false" Msg="#{e.message}" />)
-        puts "MESSCADA XML - response: #{s}"
+        puts "#{Time.now.strftime('%Y-%m-%d %H:%M:%S')} MESSCADA XML - response: #{s}"
         s
       end
     end
@@ -56,12 +56,12 @@ class Nspack < Roda
             res.instance
           else
             s = %(<ProductLabel PID="223" Status="false" Threading="true" LabelRenderAmount="0" Msg="#{res.message}" />)
-            puts "MESSCADA XML - response: #{s}"
+            puts "#{Time.now.strftime('%Y-%m-%d %H:%M:%S')} MESSCADA XML - response: #{s}"
             s
           end
         rescue Crossbeams::FrameworkError => e
           s = %(<ProductLabel PID="223" Status="false" Threading="true" LabelRenderAmount="0" Msg="#{e.message}" />)
-          puts "MESSCADA XML - response: #{s}"
+          puts "#{Time.now.strftime('%Y-%m-%d %H:%M:%S')} MESSCADA XML - response: #{s}"
           s
         end
       end

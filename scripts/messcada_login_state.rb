@@ -11,9 +11,9 @@
 #
 # To run:
 # -------
-# Debug : DEBUG=y RACK_ENV=production ruby scripts/base_script.rb ClearMesScadaLogins
-# Live  : RACK_ENV=production ruby scripts/base_script.rb ClearMesScadaLogins
-# Dev   : ruby scripts/base_script.rb ClearMesScadaLogins
+# Debug : DEBUG=y RACK_ENV=production ruby scripts/base_script.rb MesScadaLoginState
+# Live  : RACK_ENV=production ruby scripts/base_script.rb MesScadaLoginState
+# Dev   : ruby scripts/base_script.rb MesScadaLoginState
 #
 class MesScadaLoginState < BaseScript
   def run
