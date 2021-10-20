@@ -48,7 +48,7 @@ module MesscadaApp
       return res unless res.success
 
       bin_attrs = { bin_asset_number: res.instance['bin_number'], nett_weight: res.instance['weight'], bin_fullness: AppConst::BIN_FULL, qty_bins: 1,
-                    bin_received_date_time: res.instance['bin_receive_date_time'], rmt_container_type_id: repo.get_value(:rmt_container_types, :id, container_type_code: 'BIN') }
+                    bin_received_date_time: res.instance['bin_receive_date_time'], rmt_container_type_id: repo.get_value(:rmt_container_types, :id, container_type_code: AppConst::DEFAULT_RMT_CONTAINER_TYPE) }
 
       fields = %i[farm_code orchard_code product_class_code size_code rmt_variety_code season_code location_code commodity_code puc_code]
       hash = Hash[fields.zip(fields.map { |f| res.instance[f.to_s] })]

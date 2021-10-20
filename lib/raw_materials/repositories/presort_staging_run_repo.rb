@@ -18,7 +18,13 @@ module RawMaterialsApp
                           label: :id,
                           value: :id,
                           order_by: :id
+    build_for_select :bin_sequences,
+                     label: :presort_run_lot_number,
+                     value: :id,
+                     no_active_check: true,
+                     order_by: :presort_run_lot_number
 
+    crud_calls_for :bin_sequences, name: :bin_sequence, wrapper: BinSequence
     crud_calls_for :presort_staging_runs, name: :presort_staging_run, wrapper: PresortStagingRun
     crud_calls_for :presort_staging_run_children, name: :presort_staging_run_child, wrapper: PresortStagingRunChild
 
@@ -184,7 +190,23 @@ module RawMaterialsApp
         .join(:party_roles, id: :rmt_material_owner_party_role_id)
         .join(:organizations, id: Sequel[:party_roles][:organization_id])
         .where(rmt_container_material_type_id: container_material_type_id, long_description: long_description)
-        .get(Sequel[:rmt_container_material_owners][:id])
+        .get(Sequel[:party_roles][:id])
+    end
+
+    def puc_code_for_farm(farm_code)
+      DB[:farms]
+        .join(:farms_pucs, farm_id: :id)
+        .join(:pucs, id: Sequel[:farms_pucs][:puc_id])
+        .where(farm_code: farm_code)
+        .get(:puc_code)
+    end
+
+    def puc_id_for_farm(farm_code)
+      DB[:farms]
+        .join(:farms_pucs, farm_id: :id)
+        .join(:pucs, id: Sequel[:farms_pucs][:puc_id])
+        .where(farm_code: farm_code)
+        .get(:puc_id)
     end
   end
 end

@@ -1,10 +1,11 @@
 module MesscadaApp
   class PresortBinCreated < BaseService # rubocop:disable Metrics/ClassLength
-    attr_reader :repo, :bin, :presorted_bin, :logger, :plant_resource_code, :delivery_repo
+    attr_reader :repo, :bin, :presorted_bin, :logger, :plant_resource_code, :delivery_repo, :messcada_repo
 
     def initialize(bin, plant_resource_code)
       @repo = RawMaterialsApp::PresortStagingRunRepo.new
       @delivery_repo = RawMaterialsApp::RmtDeliveryRepo.new
+      @messcada_repo = MesscadaApp::MesscadaRepo.new
       @bin = bin
       @plant_resource_code = plant_resource_code
       @logger = AppConst::PRESORT_BIN_CREATED_LOG
@@ -22,14 +23,9 @@ module MesscadaApp
 
         presorted_bin_has_different_nom_articles = !presorted_bin.map { |b| b['Nom_article'] }.uniq.one?
         presorted_bin_rmt_product_code = presorted_bin_rmt_product_code(representative_bin['Nom_article'], presorted_bin_staging_run, presorted_bin_has_different_nom_articles)
-        rmt_container_material_type_id = repo.get_value(:rmt_container_material_types, :id, container_material_type_code: representative_bin['Code_article_caracteristique'])
-        rmt_material_owner_party_role_id = repo.find_container_material_owner_by_container_material_type_and_org_code(rmt_container_material_type_id, AppConst::CR_RMT.default_container_material_owner)
 
-        bin_attributes = bin_attributes(representative_bin, presorted_bin_staging_run, presorted_bin_rmt_product_code, rmt_container_material_type_id)
-        bin_attributes.merge!(rmt_material_owner_party_role_id: rmt_material_owner_party_role_id)
-
-        id = delivery_repo.create_rmt_bin(bin_attributes)
-        repo.log_status(:rmt_bins, id, "CREATED_IN_PRESORT_#{plant_resource_code}")
+        bin_attributes = bin_attributes(representative_bin, presorted_bin_staging_run, presorted_bin_rmt_product_code)
+        create_bin(bin_attributes)
 
         res = "<bins><bin result_status=\"OK\" msg=\"created bin #{bin}\" /></bins>"
         logger.info(res)
@@ -47,16 +43,32 @@ module MesscadaApp
       xml
     end
 
-    def bin_attributes(representative_bin, presorted_bin_staging_run, presorted_bin_rmt_product_code, rmt_container_material_type_id) # rubocop:disable Metrics/AbcSize
-      orchard_id = representative_bin['Code_parcelle'].split('_')[0]
-      raise "Missing MF. Orchard Id: #{orchard_id}" unless repo.exists?(:orchards, id: orchard_id)
+    def create_bin(bin_attributes) # rubocop:disable Metrics/AbcSize
+      bin_id = delivery_repo.create_rmt_bin(bin_attributes)
+      repo.log_status(:rmt_bins, bin_id, "CREATED_IN_PRESORT_#{plant_resource_code}")
+      return if presorted_bin.size == 1
 
+      presorted_bin.each do |b|
+        farm_id = repo.get_value(:farms, :id, farm_code: b['Code_adherent_max'])
+        puc_id = repo.puc_id_for_farm(b['Code_adherent_max'])
+        orchard_code = b['Code_parcelle'].split('_')[0]
+        orchard_id = delivery_repo.get_value(:orchards, :id, orchard_code: orchard_code, farm_id: farm_id, puc_id: puc_id)
+        orchard_id ||= messcada_repo.find_orchard_by_variant_and_puc_and_farm(orchard_code, puc_id, farm_id)
+        id = repo.create_bin_sequence(rmt_bin_id: bin_id, farm_id: farm_id, orchard_id: orchard_id, nett_weight: b['Palox_poids'], presort_run_lot_number: b['Numero_lot_max'])
+        repo.log_status(:bin_sequences, id, 'CREATED')
+      end
+    end
+
+    def bin_attributes(representative_bin, presorted_bin_staging_run, presorted_bin_rmt_product_code) # rubocop:disable Metrics/AbcSize
+      rmt_container_material_type_id = repo.get_value(:rmt_container_material_types, :id, container_material_type_code: representative_bin['Code_article_caracteristique'])
+      rmt_material_owner_party_role_id = repo.find_container_material_owner_by_container_material_type_and_org_code(rmt_container_material_type_id, AppConst::CR_RMT.default_container_material_owner)
       cultivar_group_id = repo.get_value(:cultivars, :cultivar_group_id, id: presorted_bin_staging_run[:cultivar_id])
       tare_weight = repo.get_value(:rmt_container_material_types, :tare_weight, id: rmt_container_material_type_id)
       location_id = repo.get_value(:plant_resources, :location_id, id: presorted_bin_staging_run[:presort_unit_plant_resource_id])
       bin_attrs = { season_id: presorted_bin_staging_run[:season_id],
                     cultivar_id: presorted_bin_staging_run[:cultivar_id],
                     rmt_container_material_type_id: rmt_container_material_type_id,
+                    rmt_material_owner_party_role_id: rmt_material_owner_party_role_id,
                     cultivar_group_id: cultivar_group_id,
                     bin_fullness: 'Full',
                     qty_bins: 1,
@@ -66,7 +78,7 @@ module MesscadaApp
                     gross_weight: tare_weight + representative_bin['Palox_poids'],
                     is_rebin: false,
                     main_presort_run_lot_number: representative_bin['Numero_lot_max'],
-                    orchard_id: orchard_id }
+                    rmt_container_type_id: repo.get_value(:rmt_container_types, :id, container_type_code: AppConst::DEFAULT_RMT_CONTAINER_TYPE) }
       bin_attrs[:legacy_data] = { 'cold_store_type' => representative_bin['Code_frigo'],
                                   'numero_lot_max' => representative_bin['Numero_lot_max'],
                                   'treatment_code' => presorted_bin_rmt_product_code.split('_')[2],
@@ -74,9 +86,12 @@ module MesscadaApp
                                   'code_cumul' => representative_bin['Code_cumul'],
                                   'ripe_point_code' => presorted_bin_rmt_product_code.split('_')[4] }
 
+      puc_code = repo.puc_code_for_farm(representative_bin['Code_adherent_max'])
       mfs = { farm_code: representative_bin['Code_adherent_max'],
+              puc_code: puc_code,
               product_class_code: presorted_bin_rmt_product_code.split('_')[3],
-              size_code: presorted_bin_rmt_product_code.split('_')[5] }
+              size_code: presorted_bin_rmt_product_code.split('_')[5],
+              orchard_code: representative_bin['Code_parcelle'].split('_')[0] }
       mf_res = MasterfilesApp::LookupMasterfileValues.call(mfs)
       raise mf_res.message unless mf_res.success
 
