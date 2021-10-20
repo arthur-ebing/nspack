@@ -24,7 +24,7 @@ class Nspack < Roda
     # view-source:http://192.168.43.148:9296/messcada/presort/bin_tipped?bin=704
     # --------------------------------------------------------------------------
     r.on 'bin_tipped' do
-      res = interactor.bin_tipped(params, request.path)
+      res = interactor.maf_bin_tipped(params, request.path)
       res.instance
     rescue StandardError => e
       ErrorMailer.send_exception_email(e, subject: "PresortBinTipped - #{e.message}", message: 'PresortBinTipped Service.')
