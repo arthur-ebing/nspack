@@ -243,19 +243,19 @@ module UiRules
                  text: 'Reopen Order',
                  url: "/finished_goods/orders/orders/#{id}/reopen",
                  icon: :checkon }
-      refresh_order_lines = { control_type: :link,
-                              style: :action_button,
-                              text: 'Refresh Order Lines',
-                              url: "/finished_goods/orders/orders/#{id}/refresh_order_lines",
-                              icon: :checkon }
+      # refresh_order_lines = { control_type: :link,
+      #                         style: :action_button,
+      #                         text: 'Refresh Order Lines',
+      #                         url: "/finished_goods/orders/orders/#{id}/refresh_order_lines",
+      #                         icon: :checkon }
 
       case @form_object.step
       when 0
         instance_controls = [back, edit, delete]
-        progress_controls = [refresh_order_lines]
+        progress_controls = [] # [refresh_order_lines]
       when 1
         instance_controls = [back]
-        progress_controls = [refresh_order_lines]
+        progress_controls = [] # [refresh_order_lines]
       when 2
         instance_controls = [back]
         progress_controls = [complete]

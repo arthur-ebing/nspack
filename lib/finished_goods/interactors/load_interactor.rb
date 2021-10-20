@@ -126,6 +126,7 @@ module FinishedGoodsApp
 
       repo.transaction do
         repo.allocate_pallets(load_id, pallet_numbers, @user)
+        FinishedGoodsApp::ProcessOrderLines.call(@user, load_id: load_id)
 
         log_transaction
       end
