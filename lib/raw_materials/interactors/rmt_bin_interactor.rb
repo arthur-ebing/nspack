@@ -796,7 +796,7 @@ module RawMaterialsApp
     private
 
     def calc_rebin_params(params) # rubocop:disable Metrics/AbcSize
-      default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE)
+      default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DEFAULT_RMT_CONTAINER_TYPE)
       if default_rmt_container_type
         params[:rmt_container_type_id] = default_rmt_container_type[:id]
         params[:rmt_inner_container_type_id] = default_rmt_container_type[:rmt_inner_container_type_id]

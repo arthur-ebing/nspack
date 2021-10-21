@@ -119,7 +119,7 @@ module UiRules
     end
 
     def make_new_form_object
-      @default_rmt_container_type = @repo.rmt_container_type_by_container_type_code(AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE)
+      @default_rmt_container_type = @repo.rmt_container_type_by_container_type_code(AppConst::DEFAULT_RMT_CONTAINER_TYPE)
       @form_object = OpenStruct.new(rmt_delivery_id: nil,
                                     season_id: nil,
                                     cultivar_id: @delivery[:cultivar_id],

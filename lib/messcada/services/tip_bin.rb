@@ -84,7 +84,7 @@ module MesscadaApp
                 farm_id: s[:farm_id],
                 puc_id: s[:puc_id],
                 rmt_class_id: s[:rmt_class_id] || MasterfilesApp::FruitRepo.new.find_rmt_class_by_grade(s[:grade_id]),
-                rmt_container_type_id: repo.get_value(:rmt_container_types, :id, container_type_code: AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE),
+                rmt_container_type_id: repo.get_value(:rmt_container_types, :id, container_type_code: AppConst::DEFAULT_RMT_CONTAINER_TYPE),
                 cultivar_group_id: s[:cultivar_group_id],
                 bin_fullness: AppConst::BIN_FULL,
                 qty_bins: 1,

@@ -818,7 +818,7 @@ class Nspack < Roda
           form_state.merge!(error_message: error[:error_message], errors:  {}) unless error.nil?
           form_state.merge!(details) unless details.nil?
 
-          default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE)
+          default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DEFAULT_RMT_CONTAINER_TYPE)
           capture_container_material_owner = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER
 
           form = Crossbeams::RMDForm.new(form_state,
@@ -917,7 +917,7 @@ class Nspack < Roda
           notice = retrieve_from_local_store(:flash_notice)
           form_state.merge!(error_message: error[:error_message], errors:  {}) unless error.nil?
 
-          default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE)
+          default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DEFAULT_RMT_CONTAINER_TYPE)
           capture_container_material_owner = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER
 
           form = Crossbeams::RMDForm.new(form_state,
@@ -1000,7 +1000,7 @@ class Nspack < Roda
 
       r.on 'bin_asset_number_changed' do
         repo = MasterfilesApp::RmtContainerMaterialTypeRepo.new
-        default_rmt_container_type_id = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE)[:id]
+        default_rmt_container_type_id = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DEFAULT_RMT_CONTAINER_TYPE)[:id]
         items = repo.for_select_rmt_container_material_types(where: { rmt_container_type_id: default_rmt_container_type_id })
         items.unshift([[]])
         container_material_owners = []
@@ -1253,7 +1253,7 @@ class Nspack < Roda
 
       r.on 'receive_rmt_bins', Integer do |id|
         delivery = interactor.get_delivery_confirmation_details(id)
-        default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE)
+        default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DEFAULT_RMT_CONTAINER_TYPE)
 
         capture_container_material = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL
         capture_container_material_owner = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER
@@ -1791,7 +1791,7 @@ class Nspack < Roda
     bin_delivery = RawMaterialsApp::RmtDeliveryRepo.new.get_bin_delivery(delivery_id)
     bin_delivery = {} if !bin_delivery && AppConst::USE_PERMANENT_RMT_BIN_BARCODES
     if bin_delivery
-      default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE)
+      default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DEFAULT_RMT_CONTAINER_TYPE)
       details = retrieve_from_local_store(:bin) || { bin_fullness: AppConst::BIN_FULL }
 
       capture_inner_bins = AppConst::DELIVERY_CAPTURE_INNER_BINS && !default_rmt_container_type[:id].nil? && !MasterfilesApp::RmtContainerTypeRepo.new.find_rmt_container_type(default_rmt_container_type[:id])&.rmt_inner_container_type_id

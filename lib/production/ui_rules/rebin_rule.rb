@@ -41,7 +41,7 @@ module UiRules
     end
 
     def make_form_object
-      default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE)
+      default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DEFAULT_RMT_CONTAINER_TYPE)
       @form_object = OpenStruct.new(@repo.find_production_run_flat(@options[:production_run_id]).to_h.merge(qty_bins_to_create: nil, rmt_container_type_id: default_rmt_container_type[:id], bin_fullness: AppConst::BIN_FULL))
     end
 
