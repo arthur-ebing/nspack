@@ -12,8 +12,18 @@ class AppConst # rubocop:disable Metrics/ClassLength
     ENV['RACK_ENV'] == 'test'
   end
 
-  def self.mssql_server_interface(plant)
-    name = "PRESORT#{plant[-1]}_MSSQL_SERVER_INTERFACE"
+  def self.mssql_staging_interface(plant)
+    name = "PRESORT#{plant[-1]}_STAGING_MSSQL_SERVER_INTERFACE"
+    raise Crossbeams::FrameworkError, "Plant #{plant} is not a valid name for mapping to a SQL server interface (#{name})." unless const_defined?(name)
+
+    val = const_get(name)
+    raise Crossbeams::FrameworkError, "Client setting \"#{name}\" has not been set." if val.nil?
+
+    val
+  end
+
+  def self.mssql_production_interface(plant)
+    name = "PRESORT#{plant[-1]}_PRODUCTION_MSSQL_SERVER_INTERFACE"
     raise Crossbeams::FrameworkError, "Plant #{plant} is not a valid name for mapping to a SQL server interface (#{name})." unless const_defined?(name)
 
     val = const_get(name)

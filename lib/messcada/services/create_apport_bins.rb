@@ -9,7 +9,7 @@ module MesscadaApp
       @delivery_repo = RawMaterialsApp::RmtDeliveryRepo.new
       @plant_resource_code = plant_resource_code
       @http = Crossbeams::HTTPCalls.new(use_ssl: false, call_logger: call_logger)
-      @mssql_server_uri_for_presort_unit = AppConst.mssql_server_interface(plant_resource_code)
+      @mssql_server_uri_for_presort_unit = AppConst.mssql_staging_interface(plant_resource_code)
     end
 
     def call # rubocop:disable Metrics/AbcSize

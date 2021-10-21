@@ -146,7 +146,7 @@ module MesscadaApp
 
       res = response.instance.body.split('resultset>').last.split('</res').first
       @presorted_bin = Marshal.load(Base64.decode64(res)) # rubocop:disable Security/MarshalLoad
-      raise Crossbeams::InfoError, Crossbeams::InfoError, "Presorted Bin:#{bin_asset_number} not found in MAF" if @presorted_bin.empty?
+      raise Crossbeams::InfoError, "Presorted Bin:#{bin_asset_number} not found in MAF" if @presorted_bin.empty?
     end
 
     def find_created_apport_bin(bin_asset_number)
@@ -154,7 +154,7 @@ module MesscadaApp
       parameters = { method: 'select', statement: Base64.encode64(sql) }
       call_logger = Crossbeams::HTTPTextCallLogger.new('FIND-CREATED-APPORT-BIN', log_path: AppConst::PRESORT_BIN_CREATED_LOG_FILE)
       http = Crossbeams::HTTPCalls.new(call_logger: call_logger)
-      http.request_post("#{AppConst.mssql_server_interface(plant_resource_code)}/select", parameters)
+      http.request_post("#{AppConst.mssql_production_interface(plant_resource_code)}/select", parameters)
     end
   end
 end
