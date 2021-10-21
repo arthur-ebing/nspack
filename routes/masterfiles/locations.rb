@@ -127,7 +127,11 @@ class Nspack < Roda
 
       r.on 'primary_storage_type_changed' do
         res = interactor.location_short_code_suggestion(params[:changed_value])
-        json_replace_input_value('location_location_short_code', res.success ? res.instance : nil)
+        if res.success
+          json_replace_input_value('location_location_short_code', res.instance)
+        else
+          blank_json_response
+        end
       end
 
       r.on 'add_child' do   # NEW CHILD
