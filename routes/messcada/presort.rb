@@ -39,5 +39,17 @@ class Nspack < Roda
       puts e.message
       "<result><error msg=\"#{e.message}\" /></result>"
     end
+
+    # Bin Created
+    # view-source:http://192.168.43.148:9296/messcada/presort/created?bin=704&unit=PST-02
+    # --------------------------------------------------------------------------
+    r.on 'bin_created' do
+      res = interactor.bin_created(params, request.path)
+      res.instance
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: "PresortBinCreated - #{e.message}", message: 'PresortBinCreated Service.')
+      puts e.message
+      "<result><error msg=\"#{e.message}\" /></result>"
+    end
   end
 end

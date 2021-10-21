@@ -18,7 +18,13 @@ module RawMaterialsApp
                           label: :id,
                           value: :id,
                           order_by: :id
+    build_for_select :bin_sequences,
+                     label: :presort_run_lot_number,
+                     value: :id,
+                     no_active_check: true,
+                     order_by: :presort_run_lot_number
 
+    crud_calls_for :bin_sequences, name: :bin_sequence, wrapper: BinSequence
     crud_calls_for :presort_staging_runs, name: :presort_staging_run, wrapper: PresortStagingRun
     crud_calls_for :presort_staging_run_children, name: :presort_staging_run_child, wrapper: PresortStagingRunChild
 
@@ -161,6 +167,46 @@ module RawMaterialsApp
         .join(:farms, id: :farm_id)
         .select(:farm_code)
         .get(:farm_code)
+    end
+
+    def child_run_parent(presort_staging_run_child_id)
+      DB[:presort_staging_runs]
+        .select(Sequel.lit('presort_staging_runs.*'))
+        .join(:presort_staging_run_children, presort_staging_run_id: :id)
+        .where(Sequel[:presort_staging_run_children][:id] => presort_staging_run_child_id)
+        .first
+    end
+
+    def cultivar_commodity(cultivar_id)
+      DB[:cultivar_groups]
+        .join(:cultivars, cultivar_group_id: :id)
+        .join(:commodities, id: Sequel[:cultivar_groups][:commodity_id])
+        .where(Sequel[:cultivars][:id] => cultivar_id)
+        .get(:code)
+    end
+
+    def find_container_material_owner_by_container_material_type_and_org_code(container_material_type_id, long_description)
+      DB[:rmt_container_material_owners]
+        .join(:party_roles, id: :rmt_material_owner_party_role_id)
+        .join(:organizations, id: Sequel[:party_roles][:organization_id])
+        .where(rmt_container_material_type_id: container_material_type_id, long_description: long_description)
+        .get(Sequel[:party_roles][:id])
+    end
+
+    def puc_code_for_farm(farm_code)
+      DB[:farms]
+        .join(:farms_pucs, farm_id: :id)
+        .join(:pucs, id: Sequel[:farms_pucs][:puc_id])
+        .where(farm_code: farm_code)
+        .get(:puc_code)
+    end
+
+    def puc_id_for_farm(farm_code)
+      DB[:farms]
+        .join(:farms_pucs, farm_id: :id)
+        .join(:pucs, id: Sequel[:farms_pucs][:puc_id])
+        .where(farm_code: farm_code)
+        .get(:puc_id)
     end
   end
 end
