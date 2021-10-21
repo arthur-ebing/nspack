@@ -200,13 +200,5 @@ module RawMaterialsApp
         .where(farm_code: farm_code)
         .get(:puc_code)
     end
-
-    def puc_id_for_farm(farm_code)
-      DB[:farms]
-        .join(:farms_pucs, farm_id: :id)
-        .join(:pucs, id: Sequel[:farms_pucs][:puc_id])
-        .where(farm_code: farm_code)
-        .get(:puc_id)
-    end
   end
 end

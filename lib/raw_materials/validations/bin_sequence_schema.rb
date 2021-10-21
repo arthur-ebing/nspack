@@ -5,7 +5,7 @@ module RawMaterialsApp
     optional(:id).filled(:integer)
     required(:rmt_bin_id).filled(:integer)
     required(:farm_id).filled(:integer)
-    required(:orchard_id).filled(:integer)
+    optional(:orchard_id).maybe(:integer)
     required(:nett_weight).maybe(:decimal)
     required(:presort_run_lot_number).maybe(Types::StrippedString)
   end

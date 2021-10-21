@@ -53,12 +53,18 @@ module MesscadaApp
       return if presorted_bin.size == 1
 
       presorted_bin.each do |b|
-        farm_id = repo.get_value(:farms, :id, farm_code: b['Code_adherent_max'])
-        puc_id = repo.puc_id_for_farm(b['Code_adherent_max'])
-        orchard_code = b['Code_parcelle'].split('_')[0]
-        orchard_id = delivery_repo.get_value(:orchards, :id, orchard_code: orchard_code, farm_id: farm_id, puc_id: puc_id)
-        orchard_id ||= messcada_repo.find_orchard_by_variant_and_puc_and_farm(orchard_code, puc_id, farm_id)
-        id = repo.create_bin_sequence(rmt_bin_id: bin_id, farm_id: farm_id, orchard_id: orchard_id, nett_weight: b['Palox_poids'], presort_run_lot_number: b['Numero_lot_max'])
+        puc_code = repo.puc_code_for_farm(b['Code_adherent_max'])
+        mfs = { farm_code: b['Code_adherent_max'],
+                puc_code: puc_code,
+                orchard_code: b['Code_parcelle'].split('_')[0] }
+        mf_res = MasterfilesApp::LookupMasterfileValues.call(mfs)
+        raise Crossbeams::InfoError, mf_res.message unless mf_res.success
+
+        id = repo.create_bin_sequence(rmt_bin_id: bin_id,
+                                      nett_weight: b['Palox_poids'],
+                                      presort_run_lot_number: b['Numero_lot_max'],
+                                      farm_id: mf_res.instance[:farm_id],
+                                      orchard_id: mf_res.instance[:orchard_id])
         repo.log_status(:bin_sequences, id, 'CREATED')
       end
     end
