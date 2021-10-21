@@ -409,6 +409,58 @@ class Nspack < Roda
         r.redirect("/rmd/raw_materials/print_bins_pallet/#{id}")
       end
     end
+
+    # --------------------------------------------------------------------------
+    # BIN ENQUIRY
+    # --------------------------------------------------------------------------
+    r.on 'bin_enquiry' do
+      interactor = RawMaterialsApp::RmtBinInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'scan_bin' do
+        r.get do
+          form_state = retrieve_from_local_store(:errors).to_h
+          form = Crossbeams::RMDForm.new(form_state,
+                                         form_name: :bin_enquiry,
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         caption: 'Bin Enquiry',
+                                         notes: retrieve_from_local_store(:flash_notice),
+                                         action: '/rmd/raw_materials/bin_enquiry/scan_bin',
+                                         button_caption: 'Submit')
+          form.add_field(:bin_number, 'Bin Number', data_type: :number, scan: 'key248_all', scan_type: :bin_asset, submit_form: true, required: true)
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+
+        r.post do
+          res = interactor.validate_bin(params[:bin_enquiry][:bin_number])
+          if res.success
+            r.redirect("/rmd/raw_materials/bin_enquiry/view_bin/#{res.instance[:id]}")
+          else
+            store_locally(:errors, errors: res.errors, error_message: unwrap_failed_response(res))
+            r.redirect('/rmd/raw_materials/bin_enquiry/scan_bin')
+          end
+        end
+      end
+
+      r.on 'view_bin', Integer do |id|
+        rmt_bin = interactor.rmt_bin_attrs_for_display(id)
+        form = Crossbeams::RMDForm.new({},
+                                       form_name: :rmt_bin,
+                                       scan_with_camera: @rmd_scan_with_camera,
+                                       caption: "View Bin #{rmt_bin[:bin_asset_number]}",
+                                       reset_button: false,
+                                       no_submit: true,
+                                       action: '/')
+        fields_for_rmd_rmt_bin_display(form, rmt_bin)
+        fields_for_rmd_rmt_bin_presort_staging_run_display(form, rmt_bin) if rmt_bin[:staged_for_presorting]
+        fields_for_rmd_presort_bin_info_display(form, rmt_bin) if AppConst::CR_RMT.presort_plant_integration? && !rmt_bin[:main_presort_run_lot_number].nil?
+        fields_for_rmd_rmt_bin_other_info_display(form, rmt_bin) if AppConst::CR_RMT.show_kromco_attributes? && !rmt_bin[:legacy_data].nil?
+        fields_for_rmd_rmt_bin_tripsheet_info_display(form, id)
+
+        form.add_csrf_tag csrf_tag
+        view(inline: form.render, layout: :layout_rmd)
+      end
+    end
   end
 
   # --------------------------------------------------------------------------
@@ -1804,5 +1856,80 @@ class Nspack < Roda
     else
       view(inline: rmd_warning_message('RMT Delivery not found'), layout: :layout_rmd)
     end
+  end
+
+  def fields_for_rmd_rmt_bin_display(form, rmt_bin) # rubocop:disable Metrics/AbcSize
+    form.add_label(:bin_asset_number, 'Bin Asset Number', rmt_bin[:bin_asset_number])
+    form.add_label(:bin_id, 'Bin Id', rmt_bin[:id])
+    form.add_label(:location, 'Location', rmt_bin[:location_long_code])
+    form.add_label(:status, 'Status', rmt_bin[:status])
+    form.add_label(:cultivar_group, 'Cultivar Group', rmt_bin[:cultivar_group_code])
+    form.add_label(:cultivar_name, 'Cultivar', rmt_bin[:cultivar_name])
+    form.add_label(:class_code, 'Class', rmt_bin[:class_code])
+    form.add_label(:size_code, 'Size', rmt_bin[:size_code])
+    form.add_label(:farm_code, 'Farm', rmt_bin[:farm_code])
+    form.add_label(:puc_code, 'Puc', rmt_bin[:puc_code])
+    form.add_label(:orchard_code, 'Orchard', rmt_bin[:orchard_code])
+    form.add_label(:rmt_delivery_id, 'Delivery', rmt_bin[:rmt_delivery_id])
+    form.add_label(:production_run_tipped_id, 'Tipped Run', rmt_bin[:production_run_tipped_id])
+    form.add_label(:production_run_rebin_id, 'Rebin Run', rmt_bin[:production_run_rebin_id])
+    form.add_label(:container_material_type_code, 'Container Material Type', rmt_bin[:container_material_type_code])
+    form.add_label(:container_material_owner_code, 'Container Material Owner', rmt_bin[:material_owner])
+    form.add_label(:qty_inner_bins, 'Qty Inner Bins', rmt_bin[:qty_inner_bins]) unless rmt_bin[:rmt_inner_container_type_id].nil?
+    form.add_label(:gross_weight, 'Gross Weight', rmt_bin[:gross_weight])
+    form.add_label(:nett_weight, 'Nett Weight', rmt_bin[:nett_weight])
+    form.add_label(:bin_fullness, 'Bin Fullness', rmt_bin[:bin_fullness])
+    form.add_label(:bin_received_date_time, 'Received At', rmt_bin[:bin_received_date_time])
+    form.add_label(:bin_load, 'Load Id', rmt_bin[:bin_load_id])
+    form.add_label(:converted_from_pallet, 'Converted_from_pallet?', rmt_bin[:converted_from_pallet_sequence_id].nil?)
+    form.add_label(:exit_ref, 'Exit Ref', rmt_bin[:exit_ref])
+  end
+
+  def fields_for_rmd_rmt_bin_presort_staging_run_display(form, rmt_bin)
+    form.add_section_header('PRESORT STAGING INFO')
+    form.add_label(:staged_for_presorting_at, 'Staged For Presorted At', rmt_bin[:staged_for_presorting_at])
+    form.add_label(:presort_staging_run_child_id, 'Presort Staging Run Child Id', rmt_bin[:presort_staging_run_child_id])
+    form.add_label(:presort_tip_lot_number, 'Presort Tip Lot Number', rmt_bin[:presort_tip_lot_number])
+    form.add_label(:tipped_in_presort_at, 'Tipped In presort At', rmt_bin[:tipped_in_presort_at])
+    form.add_label(:presort_unit, 'Presort Unit', rmt_bin[:presort_unit])
+  end
+
+  def fields_for_rmd_presort_bin_info_display(form, rmt_bin) # rubocop:disable Metrics/AbcSize
+    form.add_section_header('PRESORT BIN INFO')
+    form.add_label(:main_presort_run_lot_number, 'Main Presort Run Lot Number', rmt_bin[:main_presort_run_lot_number])
+    unless rmt_bin[:legacy_data].nil?
+      form.add_label(:numero_lot_max, 'Numero Lot Max', rmt_bin[:legacy_data]['numero_lot_max'])
+      form.add_label(:code_cumul, 'Code Cumul', rmt_bin[:legacy_data]['code_cumul'])
+    end
+
+    bin_sequences = RawMaterialsApp::RmtDeliveryRepo.new.pallet_sequences_attrs_for_rmt_bin(rmt_bin[:id])
+    form.add_section_header('SEQUENCES')
+    bin_sequences.each do |seq|
+      form.add_label(:pallet_number, 'Pallet Number', seq[:pallet_number])
+      form.add_label(:pallet_sequence_number, 'Seq Number', seq[:pallet_sequence_number])
+      form.add_label(:farm_code, 'Farm', seq[:farm_code])
+      form.add_label(:orchard_code, 'Orchard', seq[:orchard_code])
+      form.add_label(:nett_weight, 'Nett weight', seq[:nett_weight])
+    end
+  end
+
+  def fields_for_rmd_rmt_bin_other_info_display(form, rmt_bin)
+    form.add_section_header('OTHER INFO')
+    form.add_label(:cold_store_type, 'Cold Store Type', rmt_bin[:legacy_data]['cold_store_type'])
+    form.add_label(:treatment_code, 'Treatment Code', rmt_bin[:legacy_data]['treatment_code'])
+    form.add_label(:ripe_point_code, 'Ripe Point Code', rmt_bin[:legacy_data]['ripe_point_code'])
+    form.add_label(:track_slms_indicator_1_code, 'Track Indicator Code', rmt_bin[:legacy_data]['track_slms_indicator_1_code'])
+    form.add_label(:track_slms_indicator_2_code, 'Track Indicator Code 2', rmt_bin[:legacy_data]['track_slms_indicator_2_code'])
+  end
+
+  def fields_for_rmd_rmt_bin_tripsheet_info_display(form, rmt_bin_id)
+    tripsheet = RawMaterialsApp::RmtDeliveryRepo.new.most_recent_tripsheet_for_rmt_bin(rmt_bin_id)
+    return if tripsheet.nil?
+
+    form.add_section_header('TRIPSHEET INFO')
+    form.add_label(:tripsheet_number, 'Tripsheet Number', tripsheet[:id])
+    form.add_label(:location, 'Location', tripsheet[:location_long_code])
+    form.add_label(:loaded_at, 'Loaded At', tripsheet[:loaded_at])
+    form.add_label(:offloaded_at, 'Offloaded At', tripsheet[:offloaded_at])
   end
 end

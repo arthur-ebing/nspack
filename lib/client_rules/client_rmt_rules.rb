@@ -19,7 +19,9 @@ module Crossbeams
             pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
             default_delivery_location: 'FRUIT_RECEPTION_1',
             use_bin_asset_control: false,
-            presort_legacy_data_fields: [] },
+            presort_legacy_data_fields: [],
+            presort_plant_integration: false,
+            show_kromco_attributes: false },
       hl: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             use_delivery_destination: false,
@@ -34,7 +36,9 @@ module Crossbeams
             pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
             default_delivery_location: 'FRUIT_RECEPTION_1',
             use_bin_asset_control: false,
-            presort_legacy_data_fields: []  },
+            presort_legacy_data_fields: [],
+            presort_plant_integration: false,
+            show_kromco_attributes: false  },
       kr: { bin_pallet_conversion_defaults: { pallet_format: { stack_type: 'BIN', pallet_base: 'S' },
                                               basic_pack: 'BX750',
                                               grade: 'SA',
@@ -57,7 +61,9 @@ module Crossbeams
             pending_delivery_location: nil,
             default_delivery_location: nil,
             use_bin_asset_control: false,
-            presort_legacy_data_fields: %i[treatment_code ripe_point_code track_indicator_code]  },
+            presort_legacy_data_fields: %i[treatment_code ripe_point_code track_indicator_code],
+            presort_plant_integration: true,
+            show_kromco_attributes: true  },
       um: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             use_delivery_destination: false,
@@ -72,7 +78,9 @@ module Crossbeams
             pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
             default_delivery_location: 'FRUIT RECEPTION',
             use_bin_asset_control: false,
-            presort_legacy_data_fields: []  },
+            presort_legacy_data_fields: [],
+            presort_plant_integration: false,
+            show_kromco_attributes: false  },
       ud: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             use_delivery_destination: true,
@@ -87,7 +95,9 @@ module Crossbeams
             pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
             default_delivery_location: 'FRUIT_RECEPTION_1',
             use_bin_asset_control: false,
-            presort_legacy_data_fields: []  },
+            presort_legacy_data_fields: [],
+            presort_plant_integration: false,
+            show_kromco_attributes: false  },
       sr: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             use_delivery_destination: true,
@@ -102,7 +112,9 @@ module Crossbeams
             pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
             default_delivery_location: 'FRUIT_RECEPTION_1',
             use_bin_asset_control: false,
-            presort_legacy_data_fields: []  },
+            presort_legacy_data_fields: [],
+            presort_plant_integration: false,
+            show_kromco_attributes: false  },
       sr2: { bin_pallet_conversion_defaults: {},
              delivery_capture_inner_bins: false,
              use_delivery_destination: true,
@@ -117,7 +129,9 @@ module Crossbeams
              pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
              default_delivery_location: 'FRUIT_RECEPTION_1',
              use_bin_asset_control: false,
-             presort_legacy_data_fields: []  }
+             presort_legacy_data_fields: [],
+             presort_plant_integration: false,
+             show_kromco_attributes: false  }
     }.freeze
 
     def initialize(client_code)
@@ -245,6 +259,18 @@ module Crossbeams
       return 'Use bin asset control to manage bin movements.' if explain
 
       setting(:use_bin_asset_control)
+    end
+
+    def presort_plant_integration?(explain: false)
+      return 'Does bin carry attributes originating from external presort system' if explain
+
+      setting(:presort_plant_integration)
+    end
+
+    def show_kromco_attributes?(explain: false)
+      return 'Display attributes unique to Kromco - typically originating from legacy Kromco system' if explain
+
+      setting(:show_kromco_attributes)
     end
   end
 end

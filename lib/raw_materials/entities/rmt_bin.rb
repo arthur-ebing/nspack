@@ -104,5 +104,13 @@ module RawMaterialsApp
     attribute :scrapped_rmt_delivery_id, Types::Integer
     attribute :legacy_data, Types::Hash
     # attribute :container_material_owner_code, Types::String
+    attribute :cultivar_group_code, Types::String
+    attribute :converted_from_pallet_sequence_id, Types::Integer
+    attribute? :staged_for_presorting, Types::Bool
+    attribute :staged_for_presorting_at, Types::DateTime
+    attribute :presort_staging_run_child_id, Types::Integer
+    attribute :presort_tip_lot_number, Types::String
+    attribute :tipped_in_presort_at, Types::DateTime
+    attribute :verified_from_carton_label_id, Types::Integer
   end
 end

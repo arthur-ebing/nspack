@@ -785,6 +785,14 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
+    def rmt_bin_attrs_for_display(rmt_bin_id)
+      bin = repo.find_rmt_bin_flat(rmt_bin_id).to_h
+      bin[:bin_load_id] = repo.get(:bin_load_products, bin[:bin_load_product_id], :bin_load_id)
+      bin[:material_owner] = repo.container_material_owner_for(bin[:rmt_material_owner_party_role_id], bin[:rmt_container_material_type_id])
+      bin[:presort_unit] = repo.presort_unit_for(bin[:presort_staging_run_child_id])
+      bin
+    end
+
     private
 
     def calc_rebin_params(params) # rubocop:disable Metrics/AbcSize

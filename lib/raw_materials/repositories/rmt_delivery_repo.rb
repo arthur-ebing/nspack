@@ -605,5 +605,51 @@ module RawMaterialsApp
 
       ErrorMailer.send_error_email(subject: 'LEGACY BIN INTEGRATION FAIL', message: mail, append_recipients: AppConst::LEGACY_SYSTEM_ERROR_RECIPIENTS)
     end
+
+    def container_material_owner_for(rmt_material_owner_party_role_id, rmt_container_material_type_id)
+      owner_id = DB[:rmt_container_material_owners]
+                 .where(rmt_material_owner_party_role_id: rmt_material_owner_party_role_id, rmt_container_material_type_id:  rmt_container_material_type_id)
+                 .get(:id)
+      DB.get(Sequel.function(:fn_party_role_name_with_role, owner_id))
+    end
+
+    def presort_unit_for(presort_staging_run_child_id)
+      presort_unit_id = DB[:presort_staging_run_children]
+                        .join(:presort_staging_runs, id: :presort_staging_run_id)
+                        .where(Sequel[:presort_staging_run_children][:id] => presort_staging_run_child_id)
+                        .get(:presort_unit_plant_resource_id)
+      DB[:plant_resources].where(id: presort_unit_id).get(:plant_resource_code)
+    end
+
+    def most_recent_tripsheet_for_rmt_bin(rmt_bin_id) # rubocop:disable Metrics/AbcSize
+      DB[:rmt_bins]
+        .join(:vehicle_job_units, stock_item_id: :id)
+        .join(:vehicle_jobs, id: :vehicle_job_id)
+        .join(:stock_types, id: :stock_type_id)
+        .join(:locations, id: Sequel[:vehicle_jobs][:planned_location_to_id])
+        .where(Sequel[:rmt_bins][:id] => rmt_bin_id)
+        .where(stock_type_code: AppConst::BIN_STOCK_TYPE)
+        .select(Sequel[:vehicle_jobs][:id],
+                Sequel[:vehicle_jobs][:loaded_at],
+                Sequel[:vehicle_jobs][:offloaded_at],
+                :location_long_code)
+        .order(Sequel.desc(Sequel[:vehicle_jobs][:id]))
+        .first
+    end
+
+    def pallet_sequences_attrs_for_rmt_bin(rmt_bin_id)
+      DB[:pallet_sequences]
+        .join(:farms, id: :farm_id)
+        .join(:orchards, id: Sequel[:pallet_sequences][:orchard_id])
+        .exclude(pallet_id: nil)
+        .where(source_bin_id: rmt_bin_id)
+        .order(Sequel[:pallet_sequences][:id])
+        .select(:pallet_number,
+                :pallet_sequence_number,
+                :farm_code,
+                :orchard_code,
+                :nett_weight)
+        .all
+    end
   end
 end
