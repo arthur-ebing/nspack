@@ -364,6 +364,7 @@ module Crossbeams
 
     def field_value(value)
       return value.to_s('F') if value.is_a?(BigDecimal)
+      return value.strftime('%Y-%m-%d %H:%M') if value.is_a?(Time) || value.is_a?(DateTime)
 
       value
     end
