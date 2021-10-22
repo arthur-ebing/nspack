@@ -54,17 +54,21 @@ module MesscadaApp
 
       presorted_bin.each do |b|
         puc_code = repo.puc_code_for_farm(b['Code_adherent_max'])
-        mfs = { farm_code: b['Code_adherent_max'],
-                puc_code: puc_code,
-                orchard_code: b['Code_parcelle'].split('_')[0] }
-        mf_res = MasterfilesApp::LookupMasterfileValues.call(mfs)
-        raise Crossbeams::InfoError, mf_res.message unless mf_res.success
+        farm_mf = { farm_code: b['Code_adherent_max'] }
+        farm_mf_res = MasterfilesApp::LookupMasterfileValues.call(farm_mf)
+        raise Crossbeams::InfoError, farm_mf_res.message unless farm_mf_res.success
+
+        orchard_mf = { farm_code: b['Code_adherent_max'],
+                       puc_code: puc_code,
+                       orchard_code: b['Code_parcelle'].split('_')[0] }
+        orchard_mf_res = MasterfilesApp::LookupMasterfileValues.call(orchard_mf)
+        orchard_id = orchard_mf_res.instance[:orchard_id] if orchard_mf_res.success
 
         id = repo.create_bin_sequence(rmt_bin_id: bin_id,
-                                      nett_weight: b['Palox_poids'],
+                                      nett_weight: b['Poids'],
                                       presort_run_lot_number: b['Numero_lot_max'],
-                                      farm_id: mf_res.instance[:farm_id],
-                                      orchard_id: mf_res.instance[:orchard_id])
+                                      farm_id: farm_mf_res.instance[:farm_id],
+                                      orchard_id: orchard_id)
         repo.log_status(:bin_sequences, id, 'CREATED')
       end
     end
@@ -76,6 +80,7 @@ module MesscadaApp
       tare_weight = repo.get_value(:rmt_container_material_types, :tare_weight, id: rmt_container_material_type_id)
       location_id = repo.get_value(:plant_resources, :location_id, id: presorted_bin_staging_run[:presort_unit_plant_resource_id])
       bin_attrs = { season_id: presorted_bin_staging_run[:season_id],
+                    presorted: true,
                     cultivar_id: presorted_bin_staging_run[:cultivar_id],
                     rmt_container_material_type_id: rmt_container_material_type_id,
                     rmt_material_owner_party_role_id: rmt_material_owner_party_role_id,
@@ -126,11 +131,11 @@ module MesscadaApp
       repo.child_run_parent(numero_bon_apport)
     end
 
-    def main_bin_farm # rubocop:disable Metrics/AbcSize
+    def main_bin_farm
       no_weight_bin_farms = presorted_bin.find_all { |b| b['Poids'].nil_or_empty? }
       raise Crossbeams::InfoError, "Bin[#{no_weight_bin_farms.map { |f| f['Numero_palox'] }.uniq.join(',')}] does not have a value for weight. presort_lot_no[#{no_weight_bin_farms.map { |f| f['Numero_lot_max'] }.uniq.join(',')}]" unless no_weight_bin_farms.empty?
 
-      presorted_bin.min { |x, y| y['Poids'] <=> x['Poids'] }
+      presorted_bin.first
     end
 
     def validations
@@ -145,8 +150,11 @@ module MesscadaApp
     def presorted_bin_exists # rubocop:disable Metrics/AbcSize
       response = find_created_apport_bin(bin_asset_number)
       unless response.success
-        msg = response.message
-        err = "SQL Integration returned an error running : select * from ViewpaloxKromco where ViewpaloxKromco.Numero_palox=#{bin_asset_number}. The http code is #{response.code}. Message: #{msg}."
+        err = if response.instance&.start_with?('<message>')
+                "SQL Integration returned an error running : select * from ViewpaloxKromco where ViewpaloxKromco.Numero_palox=#{bin_asset_number}. Message: #{response.instance.split('</message>').first.split('<message>').last}."
+              else
+                "SQL Integration returned an error running : select * from ViewpaloxKromco where ViewpaloxKromco.Numero_palox=#{bin_asset_number}. Message: #{response.message}."
+              end
         raise Crossbeams::InfoError, err
       end
 
@@ -156,7 +164,7 @@ module MesscadaApp
     end
 
     def find_created_apport_bin(bin_asset_number)
-      sql = "select * from ViewpaloxKromco where  ViewpaloxKromco.Numero_palox=#{bin_asset_number}"
+      sql = "SELECT * FROM ViewpaloxKromco WHERE  ViewpaloxKromco.Numero_palox=#{bin_asset_number} ORDER BY Poids DESC"
       parameters = { method: 'select', statement: Base64.encode64(sql) }
       call_logger = Crossbeams::HTTPTextCallLogger.new('FIND-CREATED-APPORT-BIN', log_path: AppConst::PRESORT_BIN_CREATED_LOG_FILE)
       http = Crossbeams::HTTPCalls.new(call_logger: call_logger)

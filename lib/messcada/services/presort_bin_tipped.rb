@@ -51,8 +51,12 @@ module MesscadaApp
     def apport_bin_exists? # rubocop:disable Metrics/AbcSize
       response = repo.find_tipped_apport_bin(bin, plant_resource_code)
       unless response.success
-        msg = response.message
-        raise Crossbeams::InfoError, "SQL Integration returned an error running: select Apport.* from Apport where Apport.NumPalox='#{bin}'. The http code is #{response.code}. Message: #{msg}."
+        err = if response.instance&.start_with?('<message>')
+                "SQL Integration returned an error running: select Apport.* from Apport where Apport.NumPalox='#{bin}'. Message: #{response.instance.split('</message>').first.split('<message>').last}."
+              else
+                "SQL Integration returned an error running: select Apport.* from Apport where Apport.NumPalox='#{bin}'. Message: #{response.message}."
+              end
+        raise Crossbeams::InfoError, err
       end
 
       res = response.instance.body.split('resultset>').last.split('</res').first
