@@ -33,8 +33,13 @@ class MesScadaUserState < BaseScript # rubocop:disable Metrics/ClassLength
     groups
     logins
     # messcada_group_data
-    messcada_people_group_members
-    people
+    if @name =~ /rfid/i
+      messcada_people_group_members_id
+      people_id
+    else
+      messcada_people_group_members
+      people
+    end
 
     success_response('MesScada user state')
   end
@@ -51,10 +56,16 @@ class MesScadaUserState < BaseScript # rubocop:disable Metrics/ClassLength
     @old_db.extension :pg_inet
   end
 
-  def prep_ids
-    @contract_worker_id = DB[:contract_workers].where(first_name: @name, surname: @surname).get(:id)
-    @kr_people_id = DB[Sequel[:kromco_legacy][:people]].where(first_name: @name, last_name: @surname).get(:id)
-    @old_people_id = @old_db[:people].where(first_name: @name, last_name: @surname).get(:id) if @old_mes
+  def prep_ids # rubocop:disable Metrics/AbcSize
+    if @name =~ /rfid/i
+      @contract_worker_id = DB[:contract_workers].where(personnel_identifier_id: DB[:personnel_identifiers].where(identifier: @surname).get(:id)).get(:id)
+      @kr_people_id = DB[Sequel[:kromco_legacy][:messcada_people_view_messcada_rfid_allocations]].where(rfid: @surname).get(:person_id)
+      @old_people_id = @old_db[:messcada_people_view_messcada_rfid_allocations].where(rfid: @surname).get(:person_id) if @old_mes
+    else
+      @contract_worker_id = DB[:contract_workers].where(first_name: @name, surname: @surname).get(:id)
+      @kr_people_id = DB[Sequel[:kromco_legacy][:people]].where(first_name: @name, last_name: @surname).get(:id)
+      @old_people_id = @old_db[:people].where(first_name: @name, last_name: @surname).get(:id) if @old_mes
+    end
   end
 
   def workers
@@ -124,6 +135,17 @@ class MesScadaUserState < BaseScript # rubocop:disable Metrics/ClassLength
     SQL
   end
 
+  def members_query_id(prefix = 'kromco_legacy.')
+    <<~SQL
+      SELECT id, reader_id AS rdr, rfid, industry_number, group_id, group_date,
+      module_name, last_name, first_name, person_role AS role, #{prefix.empty? ? '' : 'from_external_system AS ext,'}
+      updated_at
+      FROM #{prefix}messcada_people_group_members p
+      WHERE p.rfid = ?
+      ORDER BY p.updated_at DESC LIMIT 10
+    SQL
+  end
+
   def messcada_people_group_members
     puts "\nMesScada group members"
     table = UtilityFunctions.make_text_table(DB[members_query, @name, @surname].all, times: %i[updated_at], rjust: %i[id])
@@ -132,6 +154,17 @@ class MesScadaUserState < BaseScript # rubocop:disable Metrics/ClassLength
 
     puts "\nOLD MES: MesScada group members"
     table = UtilityFunctions.make_text_table(@old_db[members_query(''), @name, @surname].all, times: %i[updated_at], rjust: %i[id])
+    puts table.join("\n")
+  end
+
+  def messcada_people_group_members_id
+    puts "\nMesScada group members"
+    table = UtilityFunctions.make_text_table(DB[members_query_id, @surname].all, times: %i[updated_at], rjust: %i[id])
+    puts table.join("\n")
+    return unless @old_mes
+
+    puts "\nOLD MES: MesScada group members"
+    table = UtilityFunctions.make_text_table(@old_db[members_query_id(''), @surname].all, times: %i[updated_at], rjust: %i[id])
     puts table.join("\n")
   end
 
@@ -145,6 +178,16 @@ class MesScadaUserState < BaseScript # rubocop:disable Metrics/ClassLength
     SQL
   end
 
+  def people_query_id(prefix = 'kromco_legacy.')
+    <<~SQL
+      SELECT p.id, p.first_name, p.last_name, p.industry_number, p.is_logged_on, p.logged_onto_module, p.logged_onoff_time, p.reader_id,
+      p.selected_role AS role, #{prefix.empty? ? '' : 'p.from_external_system AS ext,'} p.updated_at
+      FROM #{prefix}messcada_people_view_messcada_rfid_allocations m
+      JOIN #{prefix}people p ON p.id = m.person_id
+      WHERE m.rfid = ?
+    SQL
+  end
+
   def people
     puts "\nMesScada people"
     table = UtilityFunctions.make_text_table(DB[people_query, @name, @surname].all, times: %i[logged_onoff_time updated_at], rjust: %i[id])
@@ -153,6 +196,17 @@ class MesScadaUserState < BaseScript # rubocop:disable Metrics/ClassLength
 
     puts "\nOLD MES: MesScada people"
     table = UtilityFunctions.make_text_table(@old_db[people_query(''), @name, @surname].all, times: %i[logged_onoff_time updated_at], rjust: %i[id])
+    puts table.join("\n")
+  end
+
+  def people_id
+    puts "\nMesScada people"
+    table = UtilityFunctions.make_text_table(DB[people_query_id, @surname].all, times: %i[logged_onoff_time updated_at], rjust: %i[id])
+    puts table.join("\n")
+    return unless @old_mes
+
+    puts "\nOLD MES: MesScada people"
+    table = UtilityFunctions.make_text_table(@old_db[people_query_id(''), @surname].all, times: %i[logged_onoff_time updated_at], rjust: %i[id])
     puts table.join("\n")
   end
 end
