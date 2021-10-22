@@ -23,6 +23,7 @@ class MesScadaUserState < BaseScript # rubocop:disable Metrics/ClassLength
     raise ArgumentError, 'First name and surname was not provided' unless @name
     raise ArgumentError, 'Surname was not provided' unless @surname
 
+    old_mes_connection
     prep_ids
     return failed_response("No contract worker for #{@name} #{@surname}") if @contract_worker_id.nil?
     return failed_response("No kromco_legacy person for #{@name} #{@surname}") if @kr_people_id.nil?
@@ -46,7 +47,7 @@ class MesScadaUserState < BaseScript # rubocop:disable Metrics/ClassLength
     @old_db = Sequel.connect('postgres://postgres:postgres@172.16.16.15/kromco_mes')
     @old_db.extension :pg_array
     @old_db.extension :pg_json
-    @old_db.extension :pg_hstore
+    # @old_db.extension :pg_hstore
     @old_db.extension :pg_inet
   end
 
@@ -114,7 +115,7 @@ class MesScadaUserState < BaseScript # rubocop:disable Metrics/ClassLength
   def members_query(prefix = 'kromco_legacy.')
     <<~SQL
       SELECT id, reader_id AS rdr, rfid, industry_number, group_id, group_date,
-      module_name, last_name, first_name, person_role AS role, from_external_system AS ext,
+      module_name, last_name, first_name, person_role AS role, #{prefix.empty? ? '' : 'from_external_system AS ext,'}
       updated_at
       FROM #{prefix}messcada_people_group_members p
       WHERE p.first_name = ?
@@ -137,7 +138,7 @@ class MesScadaUserState < BaseScript # rubocop:disable Metrics/ClassLength
   def people_query(prefix = 'kromco_legacy.')
     <<~SQL
       SELECT p.id, p.first_name, p.last_name, p.industry_number, p.is_logged_on, p.logged_onto_module, p.logged_onoff_time, p.reader_id,
-      p.selected_role AS role, p.from_external_system AS ext, p.updated_at
+      p.selected_role AS role, #{prefix.empty? ? '' : 'p.from_external_system AS ext,'} p.updated_at
       FROM #{prefix}people p
       WHERE p.first_name = ?
         AND p.last_name = ?
