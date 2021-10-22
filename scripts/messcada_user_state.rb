@@ -84,11 +84,12 @@ class MesScadaUserState < BaseScript # rubocop:disable Metrics/ClassLength
 
   def groups
     query = <<~SQL
-      SELECT id, system_resource_id AS sys_res_id, contract_worker_ids, active,
-      created_at, from_external_system AS ext, incentive_target_worker_ids AS target_ids, incentive_non_target_worker_ids AS non_target_ids
-      FROM group_incentives
+      SELECT g.id, g.system_resource_id AS sys_res_id, s.system_resource_code AS code, g.contract_worker_ids, g.active,
+      g.created_at, g.from_external_system AS ext, g.incentive_target_worker_ids AS target_ids, g.incentive_non_target_worker_ids AS non_target_ids
+      FROM group_incentives g
+      LEFT JOIN system_resources s ON s.id = g.system_resource_id
       WHERE #{@contract_worker_id} = ANY(contract_worker_ids)
-      ORDER BY created_at DESC LIMIT 10
+      ORDER BY g.created_at DESC LIMIT 10
     SQL
     puts "\nNSpack group incentives"
     table = UtilityFunctions.make_text_table(DB[query].all, times: [:created_at], rjust: %i[id sys_res_id])
