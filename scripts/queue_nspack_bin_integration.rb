@@ -32,7 +32,7 @@ class QueueNspackBinIntegration < BaseScript
       queue.map { |b| b[:bin_id] }.uniq.each do |bin_id|
         insert_bin_integration_queue(bin_id)
       end
-      # delete_nspack_integration_queue_bin(queue.map { |b| b[:id] })
+      delete_nspack_integration_queue_bin(queue.map { |b| b[:id] })
 
       infodump
 
