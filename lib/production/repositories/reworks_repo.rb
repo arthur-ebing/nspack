@@ -257,7 +257,7 @@ module ProductionApp
     end
 
     def repack_pallet(pallet_id, user_name)
-      pallet = pallet(pallet_id)
+      pallet = get_pallet(pallet_id)
       sequence_ids = pallet_sequence_ids(pallet_id)
       return failed_response("Pallet number #{pallet[:pallet_number]} is missing sequences") if sequence_ids.empty?
 
@@ -292,7 +292,7 @@ module ProductionApp
     end
 
     def clone_pallet_sequences(old_pallet_id, pallet_id, sequence_ids, user_name) # rubocop:disable Metrics/AbcSize
-      pallet = pallet(pallet_id)
+      pallet = get_pallet(pallet_id)
       repack_attrs = { pallet_id: pallet[:id], pallet_number: pallet[:pallet_number], repacked_from_pallet_id: old_pallet_id,
                        repacked_at: Time.now, created_at: Time.now, updated_at: Time.now, created_by: user_name }
       ps_rejected_fields = %i[id pallet_id pallet_number pallet_sequence_number depot_pallet verified verification_passed
@@ -328,12 +328,12 @@ module ProductionApp
       DB[upd].update
     end
 
-    def pallet(id)
+    def get_pallet(id)
       find_hash(:pallets, id)
     end
 
     # def pallet_sequence_pallet_params(new_pallet_id)
-    #   pallet = pallet(new_pallet_id)
+    #   pallet = get_pallet(new_pallet_id)
     #   {
     #     pallet_id: pallet[:pallet_id],
     #     pallet_number: pallet[:pallet_number]

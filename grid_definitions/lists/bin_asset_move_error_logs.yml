@@ -1,0 +1,15 @@
+---
+:dataminer_definition: bin_asset_move_error_logs
+:actions:
+- :url: "/raw_materials/bin_assets/bin_asset_move_error_logs/$:id$/resolve_transaction_error"
+  :text: resolve
+  :icon: play
+  :hide_if_true: completed
+:conditions:
+  :standard:
+    - :col: completed
+      :op: "="
+      :val: false
+    - :col: bin_asset_location_id
+      :op: "="
+      :val: "$:bin_asset_location_id$"

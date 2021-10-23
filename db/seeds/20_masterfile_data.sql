@@ -50,6 +50,7 @@ INSERT INTO roles (name, specialised) VALUES ('CUSTOMER', true) ON CONFLICT DO N
 INSERT INTO roles (name) VALUES ('CUSTOMER_CONTACT_PERSON') ON CONFLICT DO NOTHING;
 INSERT INTO roles (name) VALUES ('SALES_PERSON') ON CONFLICT DO NOTHING;
 INSERT INTO roles (name) VALUES ('FOREMAN') ON CONFLICT DO NOTHING;
+INSERT INTO roles (name) VALUES ('RMT_CUSTOMER') ON CONFLICT DO NOTHING;
 
 -- TARGET MARKET GROUP TYPES
 INSERT INTO target_market_group_types (target_market_group_type_code) VALUES('PACKED') ON CONFLICT DO NOTHING;
@@ -205,6 +206,7 @@ INSERT INTO business_processes(process, description) VALUES('MANUAL_TRIPSHEET', 
 INSERT INTO business_processes(process, description) VALUES('DELIVERY_TRIPSHEET', 'tripsheets for deliveries') ON CONFLICT DO NOTHING;
 INSERT INTO business_processes(process, description) VALUES('BINS_TRIPSHEET', 'tripsheets for bins') ON CONFLICT DO NOTHING;
 INSERT INTO business_processes(process, description) VALUES('PRESORT_STAGING', 'presort staging run execution') ON CONFLICT DO NOTHING;
+INSERT INTO business_processes(process, description) VALUES('BIN_ASSET_CONTROL', 'Bin Asset Control') ON CONFLICT DO NOTHING;
 
 -- STOCK TYPES
 INSERT INTO stock_types(stock_type_code, description) VALUES('PALLET', 'FG PALLETS') ON CONFLICT DO NOTHING;
@@ -233,6 +235,26 @@ INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES 
 INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('ADHOC_DESTROY', 'Adhoc Destroy Empty Bins') ON CONFLICT DO NOTHING;
 INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('ISSUE_BINS', 'Issue Bins to Farms') ON CONFLICT DO NOTHING;
 INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('RECEIVE_BINS', 'Receive Bins Empty Bins') ON CONFLICT DO NOTHING;
+INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('RECEIVE_BINS', 'Receive Empty Bins') ON CONFLICT DO NOTHING;
+INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('DELIVERY_RECEIVED', 'Receive full bins from farm location on delivery') ON CONFLICT DO NOTHING;
+INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('REBIN_CREATED', 'Move bins from empty bin location to full bin location') ON CONFLICT DO NOTHING;
+INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('BIN_DELETED', 'Reverse full bins receipt from farm location on bin delete') ON CONFLICT DO NOTHING;
+INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('REBIN_DELETED', 'Reverse move bins from empty bin location to full bin location') ON CONFLICT DO NOTHING;
+INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('BIN_TIPPED', 'Move bins from full bin location to empty bin location') ON CONFLICT DO NOTHING;
+INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('BIN_UNTIPPED', 'Move bins from empty bin location to full bin location') ON CONFLICT DO NOTHING;
+INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('BIN_SCRAPPED', 'Move bins from full bin location to farm location') ON CONFLICT DO NOTHING;
+INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('BIN_UNSCRAPPED', 'Move bins from farm location to full bin location') ON CONFLICT DO NOTHING;
+INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('REBIN_SCRAPPED', 'Reverse move bins from empty bin location to full bin location') ON CONFLICT DO NOTHING;
+INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('REBIN_UNSCRAPPED', 'Move bins from full bin location to empty bin location') ON CONFLICT DO NOTHING;
+INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('BIN_DISPATCHED_VIA_RMT', 'Move bins from full bin location to bin load destination depot') ON CONFLICT DO NOTHING;
+INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('BIN_DISPATCHED_VIA_FG', 'Move bins from full bin location to pallet load depot') ON CONFLICT DO NOTHING;
+INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('BIN_UNSHIPPED', 'Reverse move bins from full bin location to bin load destination depot') ON CONFLICT DO NOTHING;
+INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('BIN_UNSHIPPED_VIA_FG', 'Reverse move bins from full bin location to pallet load depot') ON CONFLICT DO NOTHING;
+INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('FARM_CHANGED', 'Reverse move bins from old farm location to full bin location and move bins from new farm location to full bin location') ON CONFLICT DO NOTHING;
+INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('MATERIAL_OWNER_CHANGED', 'Reverse move bins from old owner to full bin location and move bins from new owner to full bin location') ON CONFLICT DO NOTHING;
+INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('REBIN_MATERIAL_OWNER_CHANGED', 'Reverse move bins from old owner to empty bin location and move bins from new owner to empty bin location') ON CONFLICT DO NOTHING;
+INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('BIN_PALLET_MATERIAL_OWNER_CHANGED', 'Destroy bin asset move from full bin location to old owner and create new move from full bin location to new owner') ON CONFLICT DO NOTHING;
+
 
 -- EMPLOYMENT TYPE CODE
 INSERT INTO employment_types (employment_type_code) VALUES ('PACKERS') ON CONFLICT DO NOTHING;

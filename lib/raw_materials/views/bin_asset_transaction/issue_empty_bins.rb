@@ -18,6 +18,7 @@ module RawMaterials
               form.remote! if remote
               form.add_field :asset_transaction_type_id
               form.add_field :reference_number
+              form.add_field :bin_asset_from_location
               form.add_field :bin_asset_to_location_id
               form.add_field :bin_asset_from_location_id
               form.add_field :truck_registration_number

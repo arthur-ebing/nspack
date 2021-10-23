@@ -7,3 +7,9 @@
   :title: Transaction History
   :popup: true
   :hide_if_false: transaction_history
+- :url: "/list/bin_asset_move_error_logs/with_params?key=standard&bin_asset_location_id=$:id$"
+  :text: errors
+  :title: Bin Asset Move Error Logs
+  :icon: list
+  :popup: true
+  :hide_if_false: has_errors

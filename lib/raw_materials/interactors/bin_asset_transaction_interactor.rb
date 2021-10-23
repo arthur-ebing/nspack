@@ -103,6 +103,19 @@ module RawMaterialsApp
       repo.get_applicable_transaction_item_ids(location_id)
     end
 
+    def resolve_transaction_error(transaction_error_id)
+      repo.transaction do
+        rec = repo.where_hash(:bin_asset_move_error_logs, id: transaction_error_id)
+        res = repo.update_quantity_for_bin_asset_location(rec[:bin_asset_location_id], rec[:quantity])
+        return res unless res.success
+
+        repo.update(:bin_asset_move_error_logs, transaction_error_id, { completed: true })
+      end
+      success_response('Bin Asset Transaction error resolved successfully')
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     private
 
     def repo
@@ -120,11 +133,22 @@ module RawMaterialsApp
     def perform_bin_operation(set, info) # rubocop:disable Metrics/AbcSize
       owner_id = repo.get_owner_id(set)
       if info.destroy
-        DestroyBinAssets.call(owner_id, info.bin_asset_from_location_id, set[:quantity_bins].to_i, info.to_h)
+        DestroyBinAssets.call({ owner_id: owner_id,
+                                location_id: info.bin_asset_from_location_id,
+                                quantity: set[:quantity_bins].to_i },
+                              info.to_h)
       elsif info.create
-        CreateBinAssets.call(info.quantity_bins, info.bin_asset_to_location_id, info.ref_no, [set], info.to_h)
+        CreateBinAssets.call({ total_quantity: info.quantity_bins,
+                               to_location_id: info.bin_asset_to_location_id,
+                               ref_no: info.ref_no },
+                             [set],
+                             info.to_h)
       else
-        MoveBinAssets.call(owner_id, set[:quantity_bins].to_i, info.bin_asset_to_location_id, info.bin_asset_from_location_id, info.to_h)
+        MoveBinAssets.call({ owner_id: owner_id,
+                             quantity: set[:quantity_bins].to_i,
+                             to_location_id: info.bin_asset_to_location_id,
+                             from_location_id: info.bin_asset_from_location_id },
+                           info.to_h)
       end
     end
   end

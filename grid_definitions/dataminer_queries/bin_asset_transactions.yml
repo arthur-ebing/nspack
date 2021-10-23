@@ -53,7 +53,7 @@
   bin_asset_to_location_id:
     :name: bin_asset_to_location_id
     :sequence_no: 3
-    :caption: Empty bin to location
+    :caption: Bin Asset to location
     :namespaced_name: bin_asset_transactions.bin_asset_to_location_id
     :data_type: :integer
     :width: 
@@ -285,7 +285,7 @@
   :list_def: SELECT transaction_type_code, id FROM asset_transaction_types ORDER BY
     transaction_type_code
 - :column: bin_asset_transactions.bin_asset_to_location_id
-  :caption: Empty bin to location
+  :caption: Bin Asset to location
   :data_type: :integer
   :control_type: :list
   :default_value: 

@@ -244,5 +244,18 @@ class Nspack < Roda
       history_ids = res.instance.join(',')
       r.redirect "/list/transaction_history_items/with_params?key=history&history_ids=#{history_ids}"
     end
+
+    # RESOLVE BIN ASSET MOVE ERROR
+    r.on 'bin_asset_move_error_logs', Integer do |id|
+      r.on 'resolve_transaction_error' do
+        res = interactor.resolve_transaction_error(id)
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
+        redirect_to_last_grid(r)
+      end
+    end
   end
 end

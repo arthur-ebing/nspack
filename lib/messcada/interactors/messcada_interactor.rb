@@ -410,7 +410,7 @@ module MesscadaApp
     end
 
     def repack_pallet(pallet_id) # rubocop:disable Metrics/AbcSize
-      pallet = reworks_repo.pallet(pallet_id)
+      pallet = reworks_repo.get_pallet(pallet_id)
       return validation_failed_response(messages: { pallet_number: ['Pallet does not exist'] }) unless pallet
 
       res = nil

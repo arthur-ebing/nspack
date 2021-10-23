@@ -1,24 +1,46 @@
 ---
 :caption: Bin Asset Locations
-:sql: "SELECT\r\n    locations.location_long_code,\r\n    bin_asset_locations.rmt_container_material_owner_id,\r\n
+:sql: "SELECT bin_asset_locations.id,\r\n    locations.location_long_code,\r\n    bin_asset_locations.rmt_container_material_owner_id,\r\n
   \   bin_asset_locations.location_id,\r\n    bin_asset_locations.quantity,\r\n    rcmt.container_material_type_code,\r\n
   \   fn_party_role_name (rmt_container_material_owners.rmt_material_owner_party_role_id)
   AS rmt_container_material_owner,\r\n    EXISTS(select ebti.id from bin_asset_transaction_items
   ebti where bin_asset_locations.location_id = ebti.bin_asset_from_location_id)\r\n
   \     OR EXISTS(select ebti.id from bin_asset_transaction_items ebti where bin_asset_locations.location_id
-  = ebti.bin_asset_to_location_id) as transaction_history\r\nFROM bin_asset_locations\r\n
-  \        JOIN locations ON bin_asset_locations.location_id = locations.id\r\n         JOIN
-  rmt_container_material_owners ON bin_asset_locations.rmt_container_material_owner_id
+  = ebti.bin_asset_to_location_id) as transaction_history,\r\n    EXISTS(SELECT id
+  FROM bin_asset_move_error_logs\r\n\t\tWHERE bin_asset_move_error_logs.bin_asset_location_id
+  = bin_asset_locations.id\r\n                AND NOT completed) AS has_errors,\r\n
+  \       CASE\r\n            WHEN EXISTS(SELECT id FROM bin_asset_move_error_logs\r\n\t\tWHERE
+  bin_asset_move_error_logs.bin_asset_location_id = bin_asset_locations.id \r\n                AND
+  NOT completed) THEN 'error'::text\r\n            ELSE NULL::text\r\n        END
+  AS colour_rule\r\n\r\nFROM bin_asset_locations\r\n         JOIN locations ON bin_asset_locations.location_id
+  = locations.id\r\n         JOIN rmt_container_material_owners ON bin_asset_locations.rmt_container_material_owner_id
   = rmt_container_material_owners.id\r\n         JOIN rmt_container_material_types
   rcmt ON rmt_container_material_owners.rmt_container_material_type_id = rcmt.id\r\nORDER
   BY locations.location_long_code, rmt_container_material_owner\r\n"
 :limit: 
 :offset: 
-:external_settings: {}
+:external_settings:
+  :colour_key: {}
 :columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: bin_asset_locations.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   location_long_code:
     :name: location_long_code
-    :sequence_no: 1
+    :sequence_no: 2
     :caption: Location Long Code
     :namespaced_name: locations.location_long_code
     :data_type: :string
@@ -34,7 +56,7 @@
     :group_max: false
   rmt_container_material_owner_id:
     :name: rmt_container_material_owner_id
-    :sequence_no: 2
+    :sequence_no: 3
     :caption: RMT container material owner
     :namespaced_name: bin_asset_locations.rmt_container_material_owner_id
     :data_type: :integer
@@ -50,7 +72,7 @@
     :group_max: false
   location_id:
     :name: location_id
-    :sequence_no: 3
+    :sequence_no: 4
     :caption: Location
     :namespaced_name: bin_asset_locations.location_id
     :data_type: :integer
@@ -66,7 +88,7 @@
     :group_max: false
   quantity:
     :name: quantity
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Quantity
     :namespaced_name: bin_asset_locations.quantity
     :data_type: :integer
@@ -82,7 +104,7 @@
     :group_max: false
   container_material_type_code:
     :name: container_material_type_code
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Container Material Type
     :namespaced_name: rcmt.container_material_type_code
     :data_type: :string
@@ -98,7 +120,7 @@
     :group_max: false
   rmt_container_material_owner:
     :name: rmt_container_material_owner
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Owner
     :namespaced_name: 
     :data_type: :string
@@ -114,8 +136,40 @@
     :group_max: false
   transaction_history:
     :name: transaction_history
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Transaction history
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  has_errors:
+    :name: has_errors
+    :sequence_no: 9
+    :caption: Has errors
+    :namespaced_name: 
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  colour_rule:
+    :name: colour_rule
+    :sequence_no: 10
+    :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
     :width: 
