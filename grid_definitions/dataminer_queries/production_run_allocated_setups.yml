@@ -7,17 +7,17 @@
   \ CONCAT(marks.mark_code, '_', COALESCE(array_to_string(pm_marks.packaging_marks,
   '_'), ' ')) AS fg_marks,\r\n  s.gtin_code,\r\n  a.label_template_id,\r\n  l.label_template_name,\r\n
   \ a.packing_method_id,\r\n  pm.packing_method_code,\r\n  a. active,\r\n  a.production_run_id,\r\n
-  \ CASE parent_type.plant_resource_type_code\r\n  WHEN 'BIN_FILLER_ROBOT' THEN\r\n
-  \ 'warning'\r\n  ELSE\r\n    NULL\r\n  END AS colour_rule\r\nFROM\r\n  production_runs
-  r\r\n  JOIN tree_plant_resources t ON t.ancestor_plant_resource_id = r.production_line_id\r\n
-  \ JOIN plant_resources p ON p.id = t.descendant_plant_resource_id\r\n    AND (\"p\".\"plant_resource_type_id\"
-  = (\r\n        SELECT\r\n          \"id\"\r\n        FROM\r\n          \"plant_resource_types\"\r\n
-  \     WHERE\r\n        \"plant_resource_type_code\" = 'ROBOT_BUTTON')\r\n      OR
-  \"p\".\"plant_resource_type_id\" = (\r\n        SELECT\r\n          \"id\"\r\n        FROM\r\n
-  \         \"plant_resource_types\"\r\n        WHERE\r\n          \"plant_resource_type_code\"
-  = 'PACK_POINT'))\r\n    LEFT OUTER JOIN product_resource_allocations a ON a.production_run_id
-  = r.id\r\n    AND a.plant_resource_id = p.id\r\n  LEFT OUTER JOIN product_setups
-  s ON s.id = a.product_setup_id\r\n  LEFT OUTER JOIN packing_specification_items
+  \ s.rebin,\r\n  CASE \r\n  WHEN s.rebin THEN  'warning'\r\n  WHEN parent_type.plant_resource_type_code
+  = 'BIN_FILLER_ROBOT' THEN\r\n  'warning'\r\n  ELSE\r\n    NULL\r\n  END AS colour_rule\r\nFROM\r\n
+  \ production_runs r\r\n  JOIN tree_plant_resources t ON t.ancestor_plant_resource_id
+  = r.production_line_id\r\n  JOIN plant_resources p ON p.id = t.descendant_plant_resource_id\r\n
+  \   AND (\"p\".\"plant_resource_type_id\" = (\r\n        SELECT\r\n          \"id\"\r\n
+  \       FROM\r\n          \"plant_resource_types\"\r\n      WHERE\r\n        \"plant_resource_type_code\"
+  = 'ROBOT_BUTTON')\r\n      OR \"p\".\"plant_resource_type_id\" = (\r\n        SELECT\r\n
+  \         \"id\"\r\n        FROM\r\n          \"plant_resource_types\"\r\n        WHERE\r\n
+  \         \"plant_resource_type_code\" = 'PACK_POINT'))\r\n    LEFT OUTER JOIN product_resource_allocations
+  a ON a.production_run_id = r.id\r\n    AND a.plant_resource_id = p.id\r\n  LEFT
+  OUTER JOIN product_setups s ON s.id = a.product_setup_id\r\n  LEFT OUTER JOIN packing_specification_items
   psi ON psi.id = a.packing_specification_item_id\r\n  LEFT OUTER JOIN work_order_items
   woi ON woi.id = a.work_order_item_id\r\n  LEFT OUTER JOIN label_templates l ON l.id
   = a.label_template_id\r\n  LEFT OUTER JOIN tree_plant_resources tpl ON tpl.descendant_plant_resource_id
@@ -307,9 +307,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  rebin:
+    :name: rebin
+    :sequence_no: 18
+    :caption: Rebin
+    :namespaced_name: s.rebin
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 18
+    :sequence_no: 19
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

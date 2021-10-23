@@ -380,7 +380,8 @@ module ProductionApp
       end
       res.instance = { changes: { product_setup_id: res.instance[:product_setup_id],
                                   label_template_name: repo.resource_allocation_label_name(product_resource_allocation_id),
-                                  work_order_item_code: repo.work_order_item_code_for(product_resource_allocation_id) } }
+                                  work_order_item_code: repo.work_order_item_code_for(product_resource_allocation_id),
+                                  colour_rule: res.instance[:colour_rule] } }
       res
     end
 
@@ -392,7 +393,8 @@ module ProductionApp
       end
       res.instance = { changes: { packing_specification_item_code: res.instance[:packing_specification_item_code],
                                   label_template_name: repo.resource_allocation_label_name(product_resource_allocation_id),
-                                  work_order_item_code: repo.work_order_item_code_for(product_resource_allocation_id) } }
+                                  work_order_item_code: repo.work_order_item_code_for(product_resource_allocation_id),
+                                  colour_rule: res.instance[:colour_rule] } }
       res
     end
 

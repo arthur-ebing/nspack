@@ -145,12 +145,22 @@ module UiRules
                          as_boolean: true }
     end
 
-    def common_fields # rubocop:disable Metrics/AbcSize
+    def common_fields # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
       product_setup_template_id = @options[:product_setup_template_id].nil_or_empty? ? @repo.find_product_setup(@options[:id]).product_setup_template_id : @options[:product_setup_template_id]
       # commodity_id = @form_object[:commodity_id].nil_or_empty? ? @repo.get_commodity_id(cultivar_group_id, cultivar_id) : @form_object.commodity_id
       commodity_id = @form_object[:commodity_id].nil_or_empty? ? @repo.get(:cultivar_groups, @form_object.cultivar_group_id, :commodity_id) : @form_object.commodity_id
       colour_applies = @repo.get(:commodities, commodity_id, :colour_applies)
       default_mkting_org_id = @form_object[:marketing_org_party_role_id].nil_or_empty? ? @party_repo.find_party_role_from_party_name_for_role(AppConst::CR_PROD.default_marketing_org, AppConst::ROLE_MARKETER) : @form_object[:marketing_org_party_role_id]
+      basic_pack_codes = if @form_object.rebin
+                           @fruit_size_repo.for_select_basic_packs(where: { bin: true })
+                         else
+                           @fruit_size_repo.for_select_basic_packs
+                         end
+      standard_packs = if @form_object.rebin
+                         @fruit_size_repo.for_select_standard_packs(where: { bin: true })
+                       else
+                         @fruit_size_repo.for_select_standard_packs
+                       end
       {
         product_setup_template: { renderer: :label,
                                   caption: 'Product Setup Template',
@@ -185,14 +195,14 @@ module UiRules
                                    prompt: 'Select Size Count',
                                    remove_search_for_small_list: false },
         basic_pack_code_id: { renderer: :select,
-                              options: @fruit_size_repo.for_select_basic_packs,
+                              options: basic_pack_codes,
                               disabled_options: @fruit_size_repo.for_select_inactive_basic_packs,
                               caption: 'Basic Pack',
                               required: true,
                               prompt: 'Select Basic Pack',
                               remove_search_for_small_list: false },
         standard_pack_code_id: { renderer: :select,
-                                 options: @fruit_size_repo.for_select_standard_packs,
+                                 options: standard_packs,
                                  disabled_options: @fruit_size_repo.for_select_inactive_standard_packs,
                                  caption: 'Standard Pack',
                                  required: !@rules[:basic_pack_equals_standard_pack],
