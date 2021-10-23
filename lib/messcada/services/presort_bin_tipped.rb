@@ -51,7 +51,7 @@ module MesscadaApp
     def apport_bin_exists? # rubocop:disable Metrics/AbcSize
       response = repo.find_tipped_apport_bin(bin, plant_resource_code)
       unless response.success
-        err = if response.instance&.start_with?('<message>')
+        err = if response.instance.is_a?(String) && response.instance&.start_with?('<message>')
                 "SQL Integration returned an error running: select Apport.* from Apport where Apport.NumPalox='#{bin}'. Message: #{response.instance.split('</message>').first.split('<message>').last}."
               else
                 "SQL Integration returned an error running: select Apport.* from Apport where Apport.NumPalox='#{bin}'. Message: #{response.message}."

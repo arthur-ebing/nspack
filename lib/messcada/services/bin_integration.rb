@@ -59,6 +59,9 @@ module MesscadaApp
       bin_attrs.merge!(mf_res.instance)
 
       bin_columns = %w[bin_number weight is_half_bin bin_receive_date_time orchard_code farm_code product_class_code rmt_variety_code season_code size_code location_code commodity_id]
+      res.instance.delete('treatment_code')
+      res.instance.delete('color')
+      res.instance['colour'] = res.instance.delete('rmtp_treatment_code')
       bin_attrs[:legacy_data] = res.instance.delete_if { |k, _v| bin_columns.include?(k) }.to_json
       success_response('ok', { bin_attrs: bin_attrs, delivery_number: res.instance['delivery_number'] })
     end

@@ -200,5 +200,14 @@ module RawMaterialsApp
         .where(farm_code: farm_code)
         .get(:puc_code)
     end
+
+    def legacy_pc_code(ripe_point_code)
+      url = "#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/get_legacy_pc_code?ripe_point_code=#{ripe_point_code}"
+      http = Crossbeams::HTTPCalls.new
+      res = http.request_get(url)
+      raise res.message unless res.success
+
+      JSON.parse(res.instance.body)
+    end
   end
 end

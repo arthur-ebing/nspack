@@ -96,10 +96,12 @@ module MesscadaApp
                     rmt_container_type_id: repo.get_value(:rmt_container_types, :id, container_type_code: AppConst::CR_RMT.default_rmt_container_type) }
       bin_attrs[:legacy_data] = { 'cold_store_type' => representative_bin['Code_frigo'],
                                   'numero_lot_max' => representative_bin['Numero_lot_max'],
-                                  'treatment_code' => presorted_bin_rmt_product_code.split('_')[2],
-                                  'track_slms_indicator1_code' => presorted_bin_staging_run[:legacy_data]['track_indicator_code'],
+                                  'colour' => presorted_bin_rmt_product_code.split('_')[2],
+                                  'track_slms_indicator_1_code' => presorted_bin_staging_run[:legacy_data]['track_indicator_code'],
                                   'code_cumul' => representative_bin['Code_cumul'],
-                                  'ripe_point_code' => presorted_bin_rmt_product_code.split('_')[4] }
+                                  'coldstore_type' => representative_bin['Code_frigo'],
+                                  'ripe_point_code' => presorted_bin_rmt_product_code.split('_')[4],
+                                  'pc_code' => repo.legacy_pc_code(presorted_bin_rmt_product_code.split('_')[4]) }
 
       puc_code = repo.puc_code_for_farm(representative_bin['Code_adherent_max'])
       mfs = { farm_code: representative_bin['Code_adherent_max'],
@@ -150,7 +152,7 @@ module MesscadaApp
     def presorted_bin_exists # rubocop:disable Metrics/AbcSize
       response = find_created_apport_bin(bin_asset_number)
       unless response.success
-        err = if response.instance&.start_with?('<message>')
+        err = if response.instance.is_a?(String) && response.instance&.start_with?('<message>')
                 "SQL Integration returned an error running : select * from ViewpaloxKromco where ViewpaloxKromco.Numero_palox=#{bin_asset_number}. Message: #{response.instance.split('</message>').first.split('<message>').last}."
               else
                 "SQL Integration returned an error running : select * from ViewpaloxKromco where ViewpaloxKromco.Numero_palox=#{bin_asset_number}. Message: #{response.message}."

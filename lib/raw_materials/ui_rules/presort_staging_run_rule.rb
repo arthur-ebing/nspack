@@ -85,11 +85,11 @@ module UiRules
                  rmt_class_id: { renderer: :select, options: @fruit_repo.for_select_rmt_classes,
                                  disabled_options: @fruit_repo.for_select_inactive_rmt_classes,
                                  caption: 'Rmt Class',
-                                 required: true,
+                                 required: false,
                                  prompt: true },
                  rmt_size_id: { renderer: :select, options: @size_repo.for_select_rmt_sizes,
                                 caption: 'Rmt Size',
-                                required: true,
+                                required: false,
                                 prompt: true },
                  season_id: { renderer: :label, with_value: season_id_label, caption: 'Season' } }
 

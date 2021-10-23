@@ -12,8 +12,8 @@
   WHEN presort_staging_runs.running THEN 'green'
   END AS colour_rule
   FROM "presort_staging_runs" JOIN "cultivars"
-  ON "cultivars"."id" = "presort_staging_runs"."cultivar_id" JOIN "rmt_classes" ON
-  "rmt_classes"."id" = "presort_staging_runs"."rmt_class_id" JOIN "rmt_sizes" ON "rmt_sizes"."id"
+  ON "cultivars"."id" = "presort_staging_runs"."cultivar_id" LEFT JOIN "rmt_classes" ON
+  "rmt_classes"."id" = "presort_staging_runs"."rmt_class_id" LEFT JOIN "rmt_sizes" ON "rmt_sizes"."id"
   = "presort_staging_runs"."rmt_size_id" JOIN "seasons" ON "seasons"."id" = "presort_staging_runs"."season_id"
   JOIN "plant_resources" ON "plant_resources"."id" = "presort_staging_runs"."presort_unit_plant_resource_id"
   LEFT JOIN "suppliers" ON "suppliers"."id" = "presort_staging_runs"."supplier_id"

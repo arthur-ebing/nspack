@@ -32,7 +32,7 @@ class QueueNspackBinIntegration < BaseScript
       queue.map { |b| b[:bin_id] }.uniq.each do |bin_id|
         insert_bin_integration_queue(bin_id)
       end
-      delete_nspack_integration_queue_bin(queue.map { |b| b[:id] })
+      # delete_nspack_integration_queue_bin(queue.map { |b| b[:id] })
 
       infodump
 
@@ -82,12 +82,18 @@ class QueueNspackBinIntegration < BaseScript
     @db_conn[:bin_nspack_integration_queue].select(:bin_id, :id).all
   end
 
-  def bin_data(id)
-    @db_conn[:vwbins]
-      .join(:farms, farm_code: Sequel[:vwbins][:farm_code])
-      .select(Sequel[:vwbins].*, Sequel[:farms][:remark1_ptlocation].as(:puc_code))
-      .where(Sequel[:vwbins][:id] => id)
-      .first
+  def bin_data(id) # rubocop:disable Metrics/AbcSize
+    hash = @db_conn[:vwbins]
+           .join(:farms, farm_code: Sequel[:vwbins][:farm_code])
+           .select(Sequel[:vwbins].*, Sequel[:farms][:remark1_ptlocation].as(:puc_code))
+           .where(Sequel[:vwbins][:id] => id)
+           .first
+    return if hash.nil?
+
+    hash.delete(:treatment_code)
+    hash.delete(:color)
+    hash[:colour] = hash.delete(:rmtp_treatment_code)
+    hash
   end
 
   def delivery_data(id)
