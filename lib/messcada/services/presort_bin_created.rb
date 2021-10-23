@@ -53,12 +53,12 @@ module MesscadaApp
       return if presorted_bin.size == 1
 
       presorted_bin.each do |b|
-        puc_code = repo.puc_code_for_farm(b['Code_adherent_max'])
-        farm_mf = { farm_code: b['Code_adherent_max'] }
+        puc_code = repo.puc_code_for_farm(b['Code_adherent'])
+        farm_mf = { farm_code: b['Code_adherent'] }
         farm_mf_res = MasterfilesApp::LookupMasterfileValues.call(farm_mf)
         raise Crossbeams::InfoError, farm_mf_res.message unless farm_mf_res.success
 
-        orchard_mf = { farm_code: b['Code_adherent_max'],
+        orchard_mf = { farm_code: b['Code_adherent'],
                        puc_code: puc_code,
                        orchard_code: b['Code_parcelle'].split('_')[0] }
         orchard_mf_res = MasterfilesApp::LookupMasterfileValues.call(orchard_mf)
@@ -66,7 +66,7 @@ module MesscadaApp
 
         id = repo.create_bin_sequence(rmt_bin_id: bin_id,
                                       nett_weight: b['Poids'],
-                                      presort_run_lot_number: b['Numero_lot_max'],
+                                      presort_run_lot_number: b['Numero_lot'],
                                       farm_id: farm_mf_res.instance[:farm_id],
                                       orchard_id: orchard_id)
         repo.log_status(:bin_sequences, id, 'CREATED')
