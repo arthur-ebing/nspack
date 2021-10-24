@@ -179,11 +179,11 @@ module MesscadaApp
       errs = []
       errs << bin_run_error('season_code', current_validation_bin.season_code, staging_run.season_code) if current_validation_bin.season_id != staging_run.season_id
       errs << bin_run_error('cultivar_name', current_validation_bin.cultivar_name, staging_run.cultivar_name) if current_validation_bin.cultivar_id != staging_run.cultivar_id
-      errs << bin_run_error('track_indicator_code', current_validation_bin.legacy_data.to_h['track_slms_indicator_1_code'], staging_run.legacy_data.to_h['track_indicator_code']) if current_validation_bin.legacy_data.to_h['track_slms_indicator_1_code'] != staging_run.legacy_data.to_h['track_indicator_code']
-      errs << bin_run_error('ripe_point_code', current_validation_bin.legacy_data.to_h['ripe_point_code'], staging_run.legacy_data.to_h['ripe_point_code']) if current_validation_bin.legacy_data.to_h['ripe_point_code'] != staging_run.legacy_data.to_h['ripe_point_code']
-      errs << bin_run_error('colour', current_validation_bin.legacy_data.to_h['colour'], staging_run.legacy_data.to_h['treatment_code']) if current_validation_bin.legacy_data.to_h['colour'] != staging_run.legacy_data.to_h['treatment_code']
-      errs << bin_run_error('rmt_class_code', current_validation_bin.class_code, staging_run.rmt_class_code) if current_validation_bin[:rmt_class_id] != staging_run[:rmt_class_id]
-      errs << bin_run_error('size_code', current_validation_bin.size_code, staging_run.size_code) if current_validation_bin[:rmt_size_id] != staging_run[:rmt_size_id]
+      errs << bin_run_error('track_indicator_code', current_validation_bin.legacy_data.to_h['track_slms_indicator_1_code'], staging_run.legacy_data.to_h['track_indicator_code']) if !staging_run.legacy_data.to_h['track_indicator_code'].nil_or_empty? && current_validation_bin.legacy_data.to_h['track_slms_indicator_1_code'] != staging_run.legacy_data.to_h['track_indicator_code']
+      errs << bin_run_error('ripe_point_code', current_validation_bin.legacy_data.to_h['ripe_point_code'], staging_run.legacy_data.to_h['ripe_point_code']) if !staging_run.legacy_data.to_h['ripe_point_code'].nil_or_empty? && current_validation_bin.legacy_data.to_h['ripe_point_code'] != staging_run.legacy_data.to_h['ripe_point_code']
+      errs << bin_run_error('colour', current_validation_bin.legacy_data.to_h['colour'], staging_run.legacy_data.to_h['treatment_code']) if !staging_run.legacy_data.to_h['treatment_code'].nil_or_empty? && current_validation_bin.legacy_data.to_h['colour'] != staging_run.legacy_data.to_h['treatment_code']
+      errs << bin_run_error('rmt_class_code', current_validation_bin.class_code, staging_run.rmt_class_code) if !staging_run[:rmt_class_id].nil? && current_validation_bin[:rmt_class_id] != staging_run[:rmt_class_id]
+      errs << bin_run_error('size_code', current_validation_bin.size_code, staging_run.size_code) if !staging_run[:rmt_size_id].nil? && current_validation_bin[:rmt_size_id] != staging_run[:rmt_size_id]
       errs << "bin location_code[#{current_validation_bin.location_long_code}] is not in [RA_6 or RA_7 or PRESORT]" unless valid_bin_location_for_staging?(asset_number)
       return errs unless errs.empty?
     end
