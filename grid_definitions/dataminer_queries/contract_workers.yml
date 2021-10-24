@@ -153,7 +153,7 @@
     :caption: 'NO'
     :namespaced_name: contract_workers.personnel_number
     :data_type: :string
-    :width: 80
+    :width: 100
     :format: 
     :hide: false
     :pinned: 

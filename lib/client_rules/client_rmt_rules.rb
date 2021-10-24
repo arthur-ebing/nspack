@@ -57,7 +57,7 @@ module Crossbeams
             delivery_capture_container_material_owner: true,
             set_defaults_for_new_rmt_delivery: true,
             convert_carton_to_rebins: false,
-            create_farm_location: false,
+            create_farm_location: true,
             pending_delivery_location: nil,
             default_delivery_location: nil,
             use_bin_asset_control: true,

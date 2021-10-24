@@ -27,8 +27,8 @@ module RawMaterialsApp
     end
 
     def call
-      return failed_response('To location does not exist') unless repo.exists?(:locations, id: to_location_id)
-      return failed_response('From location does not exist') unless from_location_id && repo.exists?(:locations, id: from_location_id)
+      return failed_response("To location does not exist - id: #{to_location_id}.") unless repo.exists?(:locations, id: to_location_id)
+      return failed_response("From location does not exist - id: #{from_location_id}.") unless from_location_id && repo.exists?(:locations, id: from_location_id)
 
       res = move_bin_assets
       return res unless res.success
