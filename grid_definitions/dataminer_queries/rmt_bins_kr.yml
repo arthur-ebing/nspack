@@ -7,8 +7,8 @@
   \   (SELECT STRING_AGG( distinct orchard_code, ',') FROM bin_sequences JOIN orchards on orchards.id = bin_sequences.orchard_id where rmt_bin_id = vw_rmt_bins_flat.id) as sequence_orchards,\r\n
   \   (SELECT STRING_AGG( nett_weight::text, ',') FROM bin_sequences where rmt_bin_id = vw_rmt_bins_flat.id) as sequence_weights,\r\n
   \   status,\r\n    qty_bins,\r\n    farm_section_name,\r\n    farm_manager,\r\n
-  \   discrete_bin,\r\n    qty_inner_bins,\r\n    bin_fullness,\r\n    nett_weight,\r\n
-  \   gross_weight,\r\n    avg_gross_weight,\r\n    weighed_manually,\r\n    active,\r\n
+  \   discrete_bin,\r\n    qty_inner_bins,\r\n    bin_fullness,\r\n    nett_weight,\r\n    staged_for_presorting,\r\n
+  \   gross_weight,\r\n    avg_gross_weight,\r\n    weighed_manually,\r\n    active,\r\n    tipped_in_presort_at,\r\n
   \   created_at,\r\n    updated_at,\r\n    location_id,\r\n    location_long_code,\r\n
   \   production_run_tipped_id,\r\n    bin_tipping_plant_resource_id,\r\n    packhouse,\r\n
   \   season_id,\r\n    season_code,\r\n    farm_id,\r\n    farm_group_code,\r\n    farm_code,\r\n
@@ -1396,6 +1396,38 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  staged_for_presorting:
+    :name: staged_for_presorting
+    :sequence_no: 151
+    :caption: Staged?
+    :namespaced_name: staged_for_presorting
+    :data_type: :boolean
+    :width:
+    :format:
+    :hide: true
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  tipped_in_presort_at:
+    :name: tipped_in_presort_at
+    :sequence_no: 152
+    :caption: Tipped In Presort At
+    :namespaced_name: tipped_in_presort_at
+    :data_type: :datetime
+    :width:
+    :format: :datetime_with_secs
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
 :query_parameter_definitions:
   - :column: rmt_delivery_id
     :caption: RMT delivery
@@ -1608,6 +1640,38 @@
     :caption: Received At
     :data_type: :datetime
     :control_type: :daterange
+    :default_value:
+    :ordered_list: false
+    :ui_priority: 1
+    :list_def:
+  - :column: staged_for_presorting
+    :caption: Staged?
+    :data_type: :boolean
+    :control_type: :text
+    :default_value:
+    :ordered_list: false
+    :ui_priority: 1
+    :list_def:
+  - :column: tipped_in_presort_at
+    :caption: Tipped In Presort At
+    :data_type: :datetime
+    :control_type: :daterange
+    :default_value:
+    :ordered_list: false
+    :ui_priority: 1
+    :list_def:
+  - :column: shipped_asset_number
+    :caption: Shipped asset number
+    :data_type: :string
+    :control_type: :text
+    :default_value:
+    :ordered_list: false
+    :ui_priority: 1
+    :list_def:
+  - :column: tipped_asset_number
+    :caption: Tipped asset number
+    :data_type: :string
+    :control_type: :text
     :default_value:
     :ordered_list: false
     :ui_priority: 1
