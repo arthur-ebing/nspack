@@ -1387,6 +1387,13 @@ class Nspack < Roda
         params[:pallet][:carton_number] = res.instance.carton_label_id
       end
 
+      res = MesscadaApp::ScanCartonLabelOrPallet.call(scanned_number: params[:pallet][:pallet_number], expect: :pallet_number)
+      unless res.success
+        store_locally(:error, unwrap_failed_response(res))
+        r.redirect("/rmd/finished_goods/scan_tripsheet_pallet/#{id}")
+      end
+      params[:pallet][:pallet_number] = res.instance.pallet_number
+
       res = interactor.create_pallet_vehicle_job_unit(id, params[:pallet][:pallet_number], params[:pallet][:carton_number])
 
       if res.instance[:carton_required]

@@ -1439,6 +1439,13 @@ class Nspack < Roda
             end
           end
 
+          form.add_select(:printer,
+                          'Printer',
+                          items: LabelApp::PrinterRepo.new.select_printers_for_application(AppConst::PRINT_APP_PALLET_TRIPSHEET),
+                          value: LabelApp::PrinterRepo.new.default_printer_for_application(AppConst::PRINT_APP_PALLET_TRIPSHEET),
+                          required: false,
+                          prompt: true)
+
           form.add_button('Cancel', "/rmd/rmt_deliveries/rmt_bins/cancel_bins_tripsheet/#{id}")
           form.add_button('Complete', "/rmd/rmt_deliveries/rmt_bins/complete_bins_tripsheet/#{id}")
           form.add_csrf_tag csrf_tag
@@ -1470,7 +1477,7 @@ class Nspack < Roda
                                            current_user.login_name,
                                            vehicle_job_id: id)
           jasper_params.mode = :print
-          printer_id = interactor.default_printer_for_application(AppConst::PRINT_APP_PALLET_TRIPSHEET)
+          printer_id = params[:printer] # interactor.default_printer_for_application(AppConst::PRINT_APP_PALLET_TRIPSHEET)
           jasper_params.printer = interactor.find_printer(printer_id)&.printer_code
           res = CreateJasperReport.call(jasper_params)
 
