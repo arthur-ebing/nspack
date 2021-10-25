@@ -24,6 +24,7 @@ module FinishedGoodsApp
       return validation_failed_response(res) if res.failure?
 
       pallets = res.to_h.select { |k, v| (k.to_s.match(/^p\d+$/) || (k == :pallet_number)) && !v.to_s.empty? }.values.compact
+
       non_existing = pallets - repo.get_pallets(pallets)
       return validation_failed_response(messages: error_messages(res.to_h, non_existing, "doesn't exist")) unless non_existing.empty?
 
@@ -150,7 +151,31 @@ module FinishedGoodsApp
     private
 
     def validate_pallet_buildup_params(params)
-      PalletBuildupContract.new.call(params)
+      res = PalletBuildupContract.new.call(params)
+      return res if res.failure?
+
+      # Resolve the scanned pallets (remove "00" prefix etc.)
+      invalid_pallets, new_params = build_new_params_with_scanned_pallet_nos(params)
+
+      raise Crossbeams::InfoError, invalid_pallets.join("\n") unless invalid_pallets.empty?
+
+      PalletBuildupContract.new.call(new_params)
+    end
+
+    def build_new_params_with_scanned_pallet_nos(params)
+      new_params = {}
+      invalid_pallets = []
+      params.each do |k, v|
+        if (k.to_s.match(/^p\d+$/) || (k == :pallet_number)) && !v.to_s.empty?
+          scan_res = MesscadaApp::ScanCartonLabelOrPallet.call(scanned_number: v, expect: :pallet_number)
+          p scan_res
+          invalid_pallets << scan_res.message unless scan_res.success
+          new_params[k] = scan_res.success ? scan_res.instance.pallet_number : v
+        else
+          new_params[k] = v
+        end
+      end
+      [invalid_pallets, new_params]
     end
 
     def validate_shipped(pallets)
