@@ -127,7 +127,7 @@ module MesscadaApp
 
     def validate_dp_bin
       rmt_bin_id = repo.find_rmt_bin_by_tipped_asset_number(params[:bin_number])
-      raise Crossbeams::InfoError, "DP Bin : #{rmt_bin_id} not found" unless rmt_bin_exists?(rmt_bin_id)
+      raise Crossbeams::InfoError, "DP Bin : #{rmt_bin_id} (#{params[:bin_number]}) not found" unless rmt_bin_exists?(rmt_bin_id)
 
       @bin_attrs = { rmt_bin_id: rmt_bin_id, dp_carton: true }
 

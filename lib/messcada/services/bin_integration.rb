@@ -97,7 +97,7 @@ module MesscadaApp
                                  else
                                    run_legacy_data[c[0]]
                                  end
-          return failed_response("Tipping Criteria Fails. Bin #{c[0]}: '#{mf_keys.include?(c[0]) ? res.instance[c[0]] : bin_legacy_data[c[0]]}'. Run requires #{c[0]}: '#{run_legacy_data_code}'")
+          return failed_response("Tipping Criteria Fails. Bin #{c[0]}: #{mf_keys.include?(c[0]) ? res.instance[c[0]] : bin_legacy_data[c[0]]}. Run requires #{c[0]}: #{run_legacy_data_code}.")
         end
       end
 
