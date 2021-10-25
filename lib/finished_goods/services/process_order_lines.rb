@@ -24,15 +24,16 @@ module FinishedGoodsApp
 
     def create_order_items # rubocop:disable Metrics/AbcSize
       current_order_items = DB[:order_items].where(order_id: order_id).all
+      contract = OrderItemContract.new
 
       compile_order_items_from_pallet_sequences.each do |order_item|
         order_item_id = nil
         pallet_sequence_ids = Array(order_item.delete(:pallet_sequence_ids))
-        order_item = OrderItemSchema.call(order_item).to_h
+        order_item = contract.call(order_item).to_h
         next unless current_order_items
 
         current_order_items.each do |item|
-          item = OrderItemSchema.call(item).to_h
+          item = contract.call(item).to_h
 
           item_id = item.delete(:id)
           compare = item.compact.reject { |k| %i[order_id carton_quantity price_per_carton price_per_kg].include?(k) }
@@ -48,7 +49,7 @@ module FinishedGoodsApp
     end
 
     def create_order_item(params)
-      res = OrderItemSchema.call(params)
+      res = OrderItemContract.new.call(params)
       raise Crossbeams::InfoError, validation_failed_response(res).errors if res.failure?
 
       id = repo.create(:order_items, res)

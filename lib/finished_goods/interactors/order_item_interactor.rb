@@ -122,7 +122,7 @@ module FinishedGoodsApp
     end
 
     def validate_order_item_params(params)
-      OrderItemSchema.call(params)
+      OrderItemContract.new.call(params)
     end
   end
 end
