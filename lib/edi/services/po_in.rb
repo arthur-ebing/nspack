@@ -236,9 +236,14 @@ module EdiApp
                          end
       rec[:lookup_data][:farm_id] = farm_id
       rec[:missing_mf][:farm_id] = { mode: :indirect, raise: true, keys: { puc_id: puc_id }, msg: "Farm for PUC: #{seq[:farm]}" } if farm_id.nil?
-      orchard_id = po_repo.find_orchard_id(farm_id, seq[:orchard])
+      orchard_id = if seq[:orchard].nil_or_empty? && AppConst::CR_EDI.create_unknown_orchard?
+                     po_repo.find_unknown_orchard_id(farm_id, puc_id)
+                   else
+                     po_repo.find_orchard_id(farm_id, seq[:orchard])
+                   end
       rec[:lookup_data][:orchard_id] = orchard_id
       rec[:missing_mf][:orchard_id] = { mode: :direct, raise: false, keys: { farm_id: farm_id, orchard: seq[:orchard] }, msg: "Orchard: #{seq[:orchard]} for #{farm_or_puc_desc}" } if orchard_id.nil?
+
       marketing_variety_id = po_repo.find_marketing_variety_id(seq[:variety])
       rec[:lookup_data][:marketing_variety_id] = marketing_variety_id
       rec[:missing_mf][:marketing_variety_id] = { mode: :direct, raise: true, keys: { variety: seq[:variety] }, msg: "Marketing variety: #{seq[:variety]}" } if marketing_variety_id.nil?

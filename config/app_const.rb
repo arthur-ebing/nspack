@@ -235,6 +235,9 @@ class AppConst # rubocop:disable Metrics/ClassLength
   UOM_TYPE = 'INVENTORY'
   DEFAULT_UOM_CODE = 'EACH'
 
+  # Orchard code to be used for creating unknown orchards
+  UNKNOWN_ORCHARD = 'UN'
+
   # Constants for Reworks run types:
   RUN_TYPE_SINGLE_PALLET_EDIT = 'SINGLE PALLET EDIT'
   RUN_TYPE_BATCH_PALLET_EDIT = 'BATCH PALLET EDIT'

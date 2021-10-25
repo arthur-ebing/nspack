@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Crossbeams
-  class ClientEdiRules < BaseClientRules
+  class ClientEdiRules < BaseClientRules # rubocop:disable Metrics/ClassLength
     include Crossbeams::AutoDocumentation
 
     CLIENT_SETTINGS = {
@@ -13,6 +13,7 @@ module Crossbeams
             li_receive_restricted_to_orgs: [],
             csv_overrides: {},
             send_hbs_edi: false,
+            po_in_force_orchard: false,
             ps_apply_substitutes: false },
       hl: { install_location: 'HABATA',
             load_id_prefix: '',
@@ -22,6 +23,7 @@ module Crossbeams
             li_receive_restricted_to_orgs: [],
             csv_overrides: {},
             send_hbs_edi: false,
+            po_in_force_orchard: false,
             ps_apply_substitutes: false },
       kr: { install_location: 'KROMCO',
             load_id_prefix: '',
@@ -32,6 +34,7 @@ module Crossbeams
             csv_overrides: { hbs: { col_sep: '|', force_quotes: true },
                              hcs: { col_sep: '|', force_quotes: true } },
             send_hbs_edi: true,
+            po_in_force_orchard: true,
             ps_apply_substitutes: false },
       um: { install_location: 'MATCOLD',
             load_id_prefix: '',
@@ -41,6 +44,7 @@ module Crossbeams
             li_receive_restricted_to_orgs: [],
             csv_overrides: {},
             send_hbs_edi: false,
+            po_in_force_orchard: false,
             ps_apply_substitutes: false },
       ud: { install_location: 'UNIFRUT',
             load_id_prefix: '',
@@ -50,6 +54,7 @@ module Crossbeams
             li_receive_restricted_to_orgs: [],
             csv_overrides: {},
             send_hbs_edi: false,
+            po_in_force_orchard: false,
             ps_apply_substitutes: false },
       sr: { install_location: 'SRKIRKW',
             load_id_prefix: '',
@@ -59,6 +64,7 @@ module Crossbeams
             li_receive_restricted_to_orgs: [],
             csv_overrides: {},
             send_hbs_edi: false,
+            po_in_force_orchard: false,
             ps_apply_substitutes: false },
       sr2: { install_location: 'SRADDO',
              load_id_prefix: 'A',
@@ -68,6 +74,7 @@ module Crossbeams
              li_receive_restricted_to_orgs: [],
              csv_overrides: {},
              send_hbs_edi: false,
+             po_in_force_orchard: false,
              ps_apply_substitutes: false }
     }.freeze
 
@@ -99,6 +106,12 @@ module Crossbeams
       return 'An EDI LI can be restricted to only be received for one or more organizations.' if explain
 
       setting(:li_receive_restricted_to_orgs).include?(org_code)
+    end
+
+    def create_unknown_orchard?(explain: false)
+      return 'Should EDI PO in create an orchard if the input value is missing.' if explain
+
+      setting(:po_in_force_orchard)
     end
 
     private

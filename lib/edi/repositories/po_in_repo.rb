@@ -53,6 +53,15 @@ module EdiApp
       DB[:orchards].where(farm_id: farm_id, orchard_code: orchard).get(:id)
     end
 
+    def find_unknown_orchard_id(farm_id, puc_id)
+      return nil if farm_id.nil? || puc_id.nil?
+
+      id = DB[:orchards].where(farm_id: farm_id, orchard_code: AppConst::UNKNOWN_ORCHARD).get(:id)
+      return id unless id.nil?
+
+      create(:orchards, farm_id: farm_id, puc_id: puc_id, orchard_code: AppConst::UNKNOWN_ORCHARD)
+    end
+
     def find_variant_id(table_name, code)
       DB[:masterfile_variants].where(masterfile_table: table_name.to_s, variant_code: code).get(:masterfile_id)
     end
