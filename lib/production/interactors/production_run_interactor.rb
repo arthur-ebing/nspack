@@ -408,10 +408,21 @@ module ProductionApp
       res
     end
 
-    def update_product_resource_allocation(id, params)
-      params[:product_setup_id] = repo.find_packing_spec_item_setup_id(params[:packing_specification_item_id]) if AppConst::CR_PROD.use_packing_specifications?
+    def add_product_setup_from_pack_spec(params)
+      return params unless AppConst::CR_PROD.use_packing_specifications?
 
-      res = validate_product_resource_allocation(params)
+      product_setup_id = if params[:packing_specification_item_id].nil_or_empty?
+                           nil
+                         else
+                           repo.find_packing_spec_item_setup_id(params[:packing_specification_item_id])
+                         end
+      params.merge(product_setup_id: product_setup_id)
+    end
+
+    def update_product_resource_allocation(id, params)
+      attrs = add_product_setup_from_pack_spec(params)
+
+      res = validate_product_resource_allocation(attrs)
       return validation_failed_response(res) if res.failure?
 
       repo.transaction do
