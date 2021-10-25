@@ -11,14 +11,6 @@ module MesscadaApp
     end
 
     def call # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
-      if !bin_exists? && AppConst::CR_PROD.kromco_rmt_integration?
-        res = active_run_for_device
-        return res unless res.success
-
-        res = BinIntegration.call(bin_number, res.instance)
-        return res unless res.success
-      end
-
       if !bin_exists? && AppConst::CR_RMT.convert_carton_to_rebins? && repo.can_pallet_become_rebin?(bin_number)
         res = convert_carton_to_rebin
         return res unless res.success
