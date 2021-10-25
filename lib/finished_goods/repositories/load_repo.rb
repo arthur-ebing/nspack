@@ -178,6 +178,10 @@ module FinishedGoodsApp
                    .where(params.compact)
                    .select_map(:pallet_id)
 
+      # Get all allocated pallets too - in case they no longer match the above filter criteria:
+      allocated_ids = DB[:pallets].where(load_id: id).select_map(:id)
+      pallet_ids = (pallet_ids + allocated_ids).uniq
+
       DB[:pallets]
         .where(in_stock: true, id: pallet_ids)
         .where(Sequel.lit("load_id is null OR load_id = #{id}"))
