@@ -90,14 +90,14 @@ class Nspack < Roda
       end
 
       r.on 'edit' do   # EDIT
-        check_auth!('finance', 'edit')
+        check_auth!(%w[finance parties], 'edit')
         interactor.assert_permission!(:edit, id)
         show_partial { Masterfiles::Finance::Customer::Edit.call(id) }
       end
 
       r.is do
         r.get do       # SHOW
-          check_auth!('finance', 'read')
+          check_auth!(%w[finance parties], 'read')
           show_partial { Masterfiles::Finance::Customer::Show.call(id) }
         end
         r.patch do     # UPDATE
@@ -125,7 +125,7 @@ class Nspack < Roda
         end
 
         r.delete do    # DELETE
-          check_auth!('finance', 'delete')
+          check_auth!(%w[finance parties], 'delete')
           interactor.assert_permission!(:delete, id)
           res = interactor.delete_customer(id)
           if res.success
@@ -168,7 +168,7 @@ class Nspack < Roda
       end
 
       r.on 'new' do    # NEW
-        check_auth!('finance', 'new')
+        check_auth!(%w[finance parties], 'new')
         for_rmt = params[:rmt] == 'true'
         show_partial_or_page(r) { Masterfiles::Finance::Customer::New.call(for_rmt, remote: fetch?(r)) }
       end

@@ -33,7 +33,7 @@ module FinishedGoodsApp
     required(:commodity_id).filled(:integer)
     required(:basic_pack_id).filled(:integer)
     required(:standard_pack_id).filled(:integer)
-    required(:actual_count_id).filled(:integer)
+    required(:actual_count_id).maybe(:integer) # TODO: make contract that either actual / ref must be filled...
     required(:size_reference_id).maybe(:integer)
     required(:grade_id).filled(:integer)
     required(:mark_id).filled(:integer)
