@@ -155,11 +155,7 @@ module MesscadaApp
     end
 
     def find_rmt_bin
-      @find_rmt_bin ||= if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
-                          RawMaterialsApp::RmtDeliveryRepo.new.find_bin_by_asset_number(bin_number)
-                        else
-                          RawMaterialsApp::RmtDeliveryRepo.new.find_rmt_bin(bin_number)
-                        end
+      @find_rmt_bin = RawMaterialsApp::RmtDeliveryRepo.new.find_bin_by_asset_number(bin_number)
     end
 
     def bin_exists?
