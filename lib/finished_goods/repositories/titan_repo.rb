@@ -318,7 +318,7 @@ module FinishedGoodsApp
       pallet_ids.each do |pallet_id| # rubocop:disable Metrics/BlockLength
         pallet = find_pallet_for_titan(pallet_id)
         govt_inspection_sheet = gi_repo.find_govt_inspection_sheet(pallet.govt_inspection_sheet_id)
-        raise Crossbeams::FrameworkError, "Pallet #{pallet_number} is not on a govt. inspection sheet" if govt_inspection_sheet.nil?
+        raise Crossbeams::FrameworkError, "Pallet #{pallet.pallet_number} is not on a govt. inspection sheet" if govt_inspection_sheet.nil?
 
         govt_inspection_pallet = gi_repo.find_govt_inspection_pallet(pallet.govt_inspection_pallet_id)
         details << {
