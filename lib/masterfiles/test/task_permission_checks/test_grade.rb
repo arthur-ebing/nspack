@@ -12,8 +12,9 @@ module MasterfilesApp
         grade_code: Faker::Lorem.unique.word,
         description: 'ABC',
         rmt_grade: false,
-        active: true,
-        qa_level: 1
+        qa_level: 1,
+        inspection_class: 'ABC',
+        active: true
       }
       MasterfilesApp::Grade.new(base_attrs.merge(attrs))
     end

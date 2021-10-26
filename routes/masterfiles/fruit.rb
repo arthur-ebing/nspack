@@ -1058,6 +1058,7 @@ class Nspack < Roda
               description
               rmt_grade
               qa_level
+              inspection_class
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
@@ -1093,6 +1094,7 @@ class Nspack < Roda
             rmt_grade
             active
             qa_level
+            inspection_class
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)
