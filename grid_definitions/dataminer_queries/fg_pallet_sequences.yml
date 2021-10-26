@@ -28,21 +28,15 @@
   \  packed_at,\r\n   packed_date,\r\n   packed_week,\r\n   repacked,\r\n   repacked_at,\r\n
   \  repacked_from_pallet_id,\r\n   created_by,\r\n   verified_by,\r\n   edi_size_count,\r\n
   \  target_customer_party_role_id,\r\n   target_customer,\r\n   consignment_note_number,\r\n
-  \  dispatch_note,\r\n   depot,\r\n   po_file_name,\r\n   batch_number,\r\n    colour_percentage_id,\r\n
-  \   colour_percentage,\r\n    colour_description,\r\n    work_order_item_id,\r\n
-  \   work_order_item_code,\r\n   colour_rule\r\nFROM vw_pallet_sequence_flat\r\nORDER
+  \  dispatch_note,\r\n   booking_reference,\r\n   depot,\r\n   po_file_name,\r\n
+  \  batch_number,\r\n    colour_percentage_id,\r\n    colour_percentage,\r\n    colour_description,\r\n
+  \   work_order_item_id,\r\n    work_order_item_code,\r\n   colour_rule\r\nFROM vw_pallet_sequence_flat\r\nORDER
   BY pallet_sequence_number DESC"
 :limit: 
 :offset: 
 :external_settings:
   :render_url: 
-  :colour_key:
-    ok: In Stock Pallet Sequences
-    ready: Allocated Pallet Sequences
-    inactive: Shipped Pallet Sequences
-    warning: Scrapped Pallet Sequences
-    inprogress: Palletized and/or partially palletized Pallet Sequences
-    error: Failed inspection and/or failed verifications Pallet Sequences
+  :colour_key: {}
 :columns:
   id:
     :name: id
@@ -2060,9 +2054,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  booking_reference:
+    :name: booking_reference
+    :sequence_no: 127
+    :caption: Booking ref
+    :namespaced_name: booking_reference
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   depot:
     :name: depot
-    :sequence_no: 127
+    :sequence_no: 128
     :caption: Depot
     :namespaced_name: depot
     :data_type: :string
@@ -2078,7 +2088,7 @@
     :group_max: false
   po_file_name:
     :name: po_file_name
-    :sequence_no: 128
+    :sequence_no: 129
     :caption: Po file name
     :namespaced_name: po_file_name
     :data_type: :string
@@ -2094,7 +2104,7 @@
     :group_max: false
   batch_number:
     :name: batch_number
-    :sequence_no: 129
+    :sequence_no: 130
     :caption: Batch number
     :namespaced_name: batch_number
     :data_type: :string
@@ -2110,7 +2120,7 @@
     :group_max: false
   colour_percentage_id:
     :name: colour_percentage_id
-    :sequence_no: 130
+    :sequence_no: 131
     :caption: Colour percentage
     :namespaced_name: colour_percentage_id
     :data_type: :integer
@@ -2126,7 +2136,7 @@
     :group_max: false
   colour_percentage:
     :name: colour_percentage
-    :sequence_no: 131
+    :sequence_no: 132
     :caption: Colour percentage
     :namespaced_name: colour_percentage
     :data_type: :string
@@ -2142,7 +2152,7 @@
     :group_max: false
   colour_description:
     :name: colour_description
-    :sequence_no: 132
+    :sequence_no: 133
     :caption: Colour description
     :namespaced_name: colour_description
     :data_type: :string
@@ -2158,7 +2168,7 @@
     :group_max: false
   work_order_item_id:
     :name: work_order_item_id
-    :sequence_no: 133
+    :sequence_no: 134
     :caption: Work order item
     :namespaced_name: work_order_item_id
     :data_type: :integer
@@ -2174,7 +2184,7 @@
     :group_max: false
   work_order_item_code:
     :name: work_order_item_code
-    :sequence_no: 134
+    :sequence_no: 135
     :caption: Work order item code
     :namespaced_name: work_order_item_code
     :data_type: :string
@@ -2190,7 +2200,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 135
+    :sequence_no: 136
     :caption: Colour rule
     :namespaced_name: colour_rule
     :data_type: :string
