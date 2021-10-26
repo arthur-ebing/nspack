@@ -86,6 +86,7 @@ module RawMaterialsApp
     attribute :farm_code, Types::String
     attribute :puc_code, Types::String
     attribute :cultivar_name, Types::String
+    attribute :cultivar_code, Types::String
     attribute :season_code, Types::String
     attribute :class_code, Types::String
     attribute :size_code, Types::String

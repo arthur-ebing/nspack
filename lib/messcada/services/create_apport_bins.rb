@@ -76,20 +76,16 @@ module MesscadaApp
 
     def calc_code_apporteur_and_code_parcelle_and_nom_parcelle(bin) # rubocop:disable Metrics/AbcSize
       child_run_farm_code = repo.child_run_farm(presort_staging_child_run_id)
-      season_year = repo.get_value(:seasons, :season_year, id: bin[:season_id])
       if child_run_farm_code.upcase == '0P'
         code_apporteur = '0P'
         code_parcelle = "0P_#{bin[:legacy_data]['track_slms_indicator_1_code']}"
         nom_parcelle = "0P_#{bin[:legacy_data]['track_slms_indicator_1_code']}"
       else
         code_apporteur = bin[:farm_code]
-        if season_year == 2014
-          nom_parcelle = "#{bin[:farm_code]}_#{bin[:legacy_data]['track_slms_indicator_1_code']}"
-          code_parcelle = "#{bin[:farm_code]}_#{bin[:legacy_data]['track_slms_indicator_1_code']}"
-        else
-          nom_parcelle = "#{bin[:orchard_code]}_#{bin[:farm_code]}_#{bin[:legacy_data]['track_slms_indicator_1_code']}"
-          code_parcelle = "#{bin[:orchard_code]}_#{bin[:farm_code]}_#{bin[:legacy_data]['track_slms_indicator_1_code']}"
-        end
+        registered_orchard_code = repo.get_value(:registered_orchards, :orchard_code, puc_code: bin[:puc_code], cultivar_code: bin[:cultivar_code], marketing_orchard: true)
+        orchard_code = registered_orchard_code.nil? ? bin[:orchard_code] : registered_orchard_code
+        nom_parcelle = "#{orchard_code}_#{bin[:farm_code]}_#{bin[:legacy_data]['track_slms_indicator_1_code']}"
+        code_parcelle = "#{orchard_code}_#{bin[:farm_code]}_#{bin[:legacy_data]['track_slms_indicator_1_code']}"
       end
       [code_apporteur, code_parcelle, nom_parcelle]
     end
