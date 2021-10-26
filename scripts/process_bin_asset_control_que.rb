@@ -17,6 +17,7 @@
 #
 class ProcessBinAssetControlQue < BaseScript
   def run
+    res = nil
     DB.transaction do
       puts 'RUNNING'
 
@@ -24,14 +25,14 @@ class ProcessBinAssetControlQue < BaseScript
         puts 'Bin Asset Control:'
       else
         puts 'Processing Bin Asset Control:'
-        RawMaterialsApp::BinAssetControlProcessor.call
+        res = RawMaterialsApp::BinAssetControlProcessor.call
       end
 
       infodump
-      success_response('Bin Asset Control Que processed successfully')
     end
-  rescue StandardError => e
-    failed_response(e.message)
+    raise Crossbeams::InfoError, res.message unless res.success
+
+    success_response('Bin Asset Control Que processed successfully')
   end
 
   def infodump
