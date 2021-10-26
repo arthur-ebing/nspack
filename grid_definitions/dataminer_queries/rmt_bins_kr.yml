@@ -1,23 +1,29 @@
 ---
 :caption: RMT Bins
-:sql: "SELECT\r\n    id,\r\n    asset_number,\r\n    puc_id,\r\n    puc_code,\r\n    legacy_data::text as legacy_data,\r\n
-  \   orchard_id,\r\n    orchard_code,\r\n    bin_received_at AS bin_received_date_time,\r\n
-  \   (SELECT count(id) FROM bin_sequences where rmt_bin_id = vw_rmt_bins_flat.id) as sequences,\r\n
-  \   (SELECT STRING_AGG( distinct farm_code, ',') FROM bin_sequences JOIN farms on farms.id = bin_sequences.farm_id where rmt_bin_id = vw_rmt_bins_flat.id) as sequence_farms,\r\n
-  \   (SELECT STRING_AGG( distinct orchard_code, ',') FROM bin_sequences JOIN orchards on orchards.id = bin_sequences.orchard_id where rmt_bin_id = vw_rmt_bins_flat.id) as sequence_orchards,\r\n
-  \   (SELECT STRING_AGG( nett_weight::text, ',') FROM bin_sequences where rmt_bin_id = vw_rmt_bins_flat.id) as sequence_weights,\r\n
-  \   status,\r\n    qty_bins,\r\n    farm_section_name,\r\n    farm_manager,\r\n
-  \   discrete_bin,\r\n    qty_inner_bins,\r\n    bin_fullness,\r\n    nett_weight,\r\n    staged_for_presorting,\r\n
-  \   gross_weight,\r\n    avg_gross_weight,\r\n    weighed_manually,\r\n    active,\r\n    tipped_in_presort_at,\r\n
-  \   created_at,\r\n    updated_at,\r\n    location_id,\r\n    location_long_code,\r\n
-  \   production_run_tipped_id,\r\n    bin_tipping_plant_resource_id,\r\n    packhouse,\r\n
-  \   season_id,\r\n    season_code,\r\n    farm_id,\r\n    farm_group_code,\r\n    farm_code,\r\n
-  \   cultivar_group_id,\r\n    cultivar_group_code,\r\n    cultivar_id,\r\n    cultivar_name,\r\n
-  \   cultivar_code,\r\n    cultivar_description,\r\n    commodity_code,\r\n    rmt_class_id,\r\n
-  \   rmt_class_code,\r\n    rmt_material_owner_party_role_id,\r\n    container_material_owner,\r\n
-  \   rmt_container_type_id,\r\n    container_type_code,\r\n    rmt_container_material_type_id,\r\n
-  \   container_material_type_code,\r\n    rmt_inner_container_type_id,\r\n    inner_container_type_code,\r\n
-  \   rmt_inner_container_material_id,\r\n    inner_container_material_type_code,\r\n
+:sql: "SELECT\r\n    id,\r\n    asset_number,\r\n    puc_id,\r\n    puc_code,\r\n
+  \   legacy_data::text as legacy_data,\r\n    orchard_id,\r\n    orchard_code,\r\n
+  \   bin_received_at AS bin_received_date_time,\r\n    (SELECT count(id) FROM bin_sequences
+  where rmt_bin_id = vw_rmt_bins_flat.id) as sequences,\r\n    (SELECT STRING_AGG(
+  distinct farm_code, ',') FROM bin_sequences JOIN farms on farms.id = bin_sequences.farm_id
+  where rmt_bin_id = vw_rmt_bins_flat.id) as sequence_farms,\r\n    (SELECT STRING_AGG(
+  distinct orchard_code, ',') FROM bin_sequences JOIN orchards on orchards.id = bin_sequences.orchard_id
+  where rmt_bin_id = vw_rmt_bins_flat.id) as sequence_orchards,\r\n    (SELECT STRING_AGG(
+  nett_weight::text, ',') FROM bin_sequences where rmt_bin_id = vw_rmt_bins_flat.id)
+  as sequence_weights,\r\n    status,\r\n    qty_bins,\r\n    farm_section_name,\r\n
+  \   farm_manager,\r\n    discrete_bin,\r\n    qty_inner_bins,\r\n    bin_fullness,\r\n
+  \   nett_weight,\r\n    staged_for_presorting,\r\n    gross_weight,\r\n    avg_gross_weight,\r\n
+  \   weighed_manually,\r\n    active,\r\n    CASE WHEN presorted THEN\r\n      'Presorted'\r\n
+  \   WHEN rmt_delivery_id IS NOT NULL THEN\r\n      'ORun'\r\n    WHEN production_run_rebin_id
+  IS NOT NULL THEN\r\n      'Rebin'\r\n    ELSE\r\n      NULL\r\n    END AS stock_type_code,\r\n
+  \   tipped_in_presort_at,\r\n    created_at,\r\n    updated_at,\r\n    location_id,\r\n
+  \   location_long_code,\r\n    production_run_tipped_id,\r\n    bin_tipping_plant_resource_id,\r\n
+  \   packhouse,\r\n    season_id,\r\n    season_code,\r\n    farm_id,\r\n    farm_group_code,\r\n
+  \   farm_code,\r\n    cultivar_group_id,\r\n    cultivar_group_code,\r\n    cultivar_id,\r\n
+  \   cultivar_name,\r\n    cultivar_code,\r\n    cultivar_description,\r\n    commodity_code,\r\n
+  \   rmt_class_id,\r\n    rmt_class_code,\r\n    rmt_material_owner_party_role_id,\r\n
+  \   container_material_owner,\r\n    rmt_container_type_id,\r\n    container_type_code,\r\n
+  \   rmt_container_material_type_id,\r\n    container_material_type_code,\r\n    rmt_inner_container_type_id,\r\n
+  \   inner_container_type_code,\r\n    rmt_inner_container_material_id,\r\n    inner_container_material_type_code,\r\n
   \   rmt_delivery_id,\r\n    delivery_destination_code,\r\n    picked_at,\r\n    delivery_truck_registration_number,\r\n
   \   exit_ref,\r\n    null_exit_ref,\r\n    exit_ref_at AS exit_ref_date_time,\r\n
   \   exit_ref_date,\r\n    bin_asset_number,\r\n    bin_received_date,\r\n    tipped_asset_number,\r\n
@@ -28,13 +34,13 @@
   \   production_run_rebin_id,\r\n    rebin_created_at,\r\n    age,\r\n    CASE \r\n
   \   WHEN bin_tipped THEN 'gray'\r\n    WHEN shipped THEN 'blue'\r\n    END AS colour_rule\r\nFROM\r\n
   \   vw_rmt_bins_flat\r\nWHERE\r\n    NOT scrapped\r\nORDER BY\r\n    id DESC"
-:limit:
-:offset:
+:limit: 
+:offset: 
 :external_settings:
   :colour_key:
     gray: Tipped
     blue: Shipped
-  :render_url:
+  :render_url: 
 :columns:
   id:
     :name: id
@@ -43,11 +49,11 @@
     :namespaced_name: id
     :data_type: :integer
     :width: 80
-    :format:
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: true
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -59,11 +65,11 @@
     :namespaced_name: asset_number
     :data_type: :string
     :width: 120
-    :format:
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -74,12 +80,12 @@
     :caption: PUC
     :namespaced_name: puc_id
     :data_type: :integer
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: true
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -91,1588 +97,1604 @@
     :namespaced_name: puc_code
     :data_type: :string
     :width: 100
-    :format:
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  orchard_id:
-    :name: orchard_id
-    :sequence_no: 5
-    :caption: Orchard
-    :namespaced_name: orchard_id
-    :data_type: :integer
-    :width:
-    :format:
-    :hide: true
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  orchard_code:
-    :name: orchard_code
-    :sequence_no: 6
-    :caption: Orchard code
-    :namespaced_name: orchard_code
-    :data_type: :string
-    :width: 120
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  bin_received_date_time:
-    :name: bin_received_date_time
-    :sequence_no: 7
-    :caption: Bin received at
-    :namespaced_name: bin_received_at
-    :data_type: :datetime
-    :width:
-    :format: :datetime_with_secs
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  status:
-    :name: status
-    :sequence_no: 8
-    :caption: Status
-    :namespaced_name: status
-    :data_type: :string
-    :width: 200
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  qty_bins:
-    :name: qty_bins
-    :sequence_no: 9
-    :caption: Qty bins
-    :namespaced_name: qty_bins
-    :data_type: :integer
-    :width: 90
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  farm_section_name:
-    :name: farm_section_name
-    :sequence_no: 10
-    :caption: Farm Section
-    :namespaced_name: farm_section_name
-    :data_type: :string
-    :width: 150
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  farm_manager:
-    :name: farm_manager
-    :sequence_no: 11
-    :caption: Farm manager
-    :namespaced_name: farm_manager
-    :data_type: :string
-    :width: 150
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  discrete_bin:
-    :name: discrete_bin
-    :sequence_no: 12
-    :caption: Discrete bin
-    :namespaced_name: discrete_bin
-    :data_type: :boolean
-    :width:
-    :format:
-    :hide: true
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  qty_inner_bins:
-    :name: qty_inner_bins
-    :sequence_no: 13
-    :caption: Qty inner
-    :namespaced_name: qty_inner_bins
-    :data_type: :integer
-    :width:
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  bin_fullness:
-    :name: bin_fullness
-    :sequence_no: 14
-    :caption: Bin fullness
-    :namespaced_name: bin_fullness
-    :data_type: :string
-    :width: 120
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  nett_weight:
-    :name: nett_weight
-    :sequence_no: 15
-    :caption: Nett weight
-    :namespaced_name: nett_weight
-    :data_type: :number
-    :width:
-    :format: :delimited_1000
-    :hide: false
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: true
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  gross_weight:
-    :name: gross_weight
-    :sequence_no: 16
-    :caption: Gross weight
-    :namespaced_name: gross_weight
-    :data_type: :number
-    :width:
-    :format: :delimited_1000
-    :hide: false
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: true
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  avg_gross_weight:
-    :name: avg_gross_weight
-    :sequence_no: 17
-    :caption: Avg gross weight
-    :namespaced_name: avg_gross_weight
-    :data_type: :boolean
-    :width:
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  weighed_manually:
-    :name: weighed_manually
-    :sequence_no: 18
-    :caption: Weighed manually
-    :namespaced_name: weighed_manually
-    :data_type: :boolean
-    :width:
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  active:
-    :name: active
-    :sequence_no: 19
-    :caption: Active
-    :namespaced_name: active
-    :data_type: :boolean
-    :width:
-    :format:
-    :hide: true
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  created_at:
-    :name: created_at
-    :sequence_no: 20
-    :caption: Created at
-    :namespaced_name: created_at
-    :data_type: :datetime
-    :width:
-    :format: :datetime_with_secs
-    :hide: true
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  updated_at:
-    :name: updated_at
-    :sequence_no: 21
-    :caption: Updated at
-    :namespaced_name: updated_at
-    :data_type: :datetime
-    :width:
-    :format: :datetime_with_secs
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  location_id:
-    :name: location_id
-    :sequence_no: 22
-    :caption: Location
-    :namespaced_name: location_id
-    :data_type: :string
-    :width:
-    :format:
-    :hide: true
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  location_long_code:
-    :name: location_long_code
-    :sequence_no: 23
-    :caption: Location Code
-    :namespaced_name: location_long_code
-    :data_type: :string
-    :width: 150
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  production_run_tipped_id:
-    :name: production_run_tipped_id
-    :sequence_no: 24
-    :caption: Tip Run
-    :namespaced_name: production_run_tipped_id
-    :data_type: :integer
-    :width:
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  bin_tipping_plant_resource_id:
-    :name: bin_tipping_plant_resource_id
-    :sequence_no: 25
-    :caption: Bin tipping plant resource
-    :namespaced_name: bin_tipping_plant_resource_id
-    :data_type: :integer
-    :width:
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  packhouse:
-    :name: packhouse
-    :sequence_no: 26
-    :caption: Packhouse
-    :namespaced_name: packhouse
-    :data_type: :string
-    :width:
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  season_id:
-    :name: season_id
-    :sequence_no: 27
-    :caption: Season
-    :namespaced_name: season_id
-    :data_type: :integer
-    :width:
-    :format:
-    :hide: true
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  season_code:
-    :name: season_code
-    :sequence_no: 28
-    :caption: Season code
-    :namespaced_name: season_code
-    :data_type: :string
-    :width: 100
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  farm_id:
-    :name: farm_id
-    :sequence_no: 29
-    :caption: Farm
-    :namespaced_name: farm_id
-    :data_type: :integer
-    :width:
-    :format:
-    :hide: true
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  farm_group_code:
-    :name: farm_group_code
-    :sequence_no: 30
-    :caption: Farm group
-    :namespaced_name: farm_group_code
-    :data_type: :string
-    :width: 150
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  farm_code:
-    :name: farm_code
-    :sequence_no: 31
-    :caption: Farm code
-    :namespaced_name: farm_code
-    :data_type: :string
-    :width: 150
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  cultivar_group_id:
-    :name: cultivar_group_id
-    :sequence_no: 32
-    :caption: Cultivar group
-    :namespaced_name: cultivar_group_id
-    :data_type: :integer
-    :width:
-    :format:
-    :hide: true
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  cultivar_group_code:
-    :name: cultivar_group_code
-    :sequence_no: 33
-    :caption: Cultivar group code
-    :namespaced_name: cultivar_group_code
-    :data_type: :string
-    :width: 150
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  cultivar_id:
-    :name: cultivar_id
-    :sequence_no: 34
-    :caption: Cultivar
-    :namespaced_name: cultivar_id
-    :data_type: :integer
-    :width:
-    :format:
-    :hide: true
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  cultivar_name:
-    :name: cultivar_name
-    :sequence_no: 35
-    :caption: Cultivar name
-    :namespaced_name: cultivar_name
-    :data_type: :string
-    :width: 120
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  cultivar_code:
-    :name: cultivar_code
-    :sequence_no: 36
-    :caption: Cultivar code
-    :namespaced_name: cultivar_code
-    :data_type: :string
-    :width: 120
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  cultivar_description:
-    :name: cultivar_description
-    :sequence_no: 37
-    :caption: Cultivar description
-    :namespaced_name: cultivar_description
-    :data_type: :string
-    :width: 150
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  commodity_code:
-    :name: commodity_code
-    :sequence_no: 38
-    :caption: Commodity code
-    :namespaced_name: commodity_code
-    :data_type: :string
-    :width: 120
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  rmt_class_id:
-    :name: rmt_class_id
-    :sequence_no: 39
-    :caption: RMT class
-    :namespaced_name: rmt_class_id
-    :data_type: :integer
-    :width:
-    :format:
-    :hide: true
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  rmt_class_code:
-    :name: rmt_class_code
-    :sequence_no: 40
-    :caption: RMT class code
-    :namespaced_name: rmt_class_code
-    :data_type: :string
-    :width: 120
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  rmt_material_owner_party_role_id:
-    :name: rmt_material_owner_party_role_id
-    :sequence_no: 41
-    :caption: RMT material owner party role
-    :namespaced_name: rmt_material_owner_party_role_id
-    :data_type: :integer
-    :width:
-    :format:
-    :hide: true
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  container_material_owner:
-    :name: container_material_owner
-    :sequence_no: 42
-    :caption: Container material owner
-    :namespaced_name: container_material_owner
-    :data_type: :string
-    :width: 120
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  rmt_container_type_id:
-    :name: rmt_container_type_id
-    :sequence_no: 43
-    :caption: RMT container type
-    :namespaced_name: rmt_container_type_id
-    :data_type: :integer
-    :width:
-    :format:
-    :hide: true
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  container_type_code:
-    :name: container_type_code
-    :sequence_no: 44
-    :caption: Container type code
-    :namespaced_name: container_type_code
-    :data_type: :string
-    :width: 120
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  rmt_container_material_type_id:
-    :name: rmt_container_material_type_id
-    :sequence_no: 45
-    :caption: RMT container material type
-    :namespaced_name: rmt_container_material_type_id
-    :data_type: :integer
-    :width:
-    :format:
-    :hide: true
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  container_material_type_code:
-    :name: container_material_type_code
-    :sequence_no: 46
-    :caption: Container material type
-    :namespaced_name: container_material_type_code
-    :data_type: :string
-    :width: 120
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  rmt_inner_container_type_id:
-    :name: rmt_inner_container_type_id
-    :sequence_no: 47
-    :caption: RMT inner container type
-    :namespaced_name: rmt_inner_container_type_id
-    :data_type: :integer
-    :width:
-    :format:
-    :hide: true
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  inner_container_type_code:
-    :name: inner_container_type_code
-    :sequence_no: 48
-    :caption: Inner Container Type
-    :namespaced_name: inner_container_type_code
-    :data_type: :string
-    :width: 120
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  rmt_inner_container_material_id:
-    :name: rmt_inner_container_material_id
-    :sequence_no: 49
-    :caption: RMT inner container material
-    :namespaced_name: rmt_inner_container_material_id
-    :data_type: :integer
-    :width:
-    :format:
-    :hide: true
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  inner_container_material_type_code:
-    :name: inner_container_material_type_code
-    :sequence_no: 50
-    :caption: Inner Container Material Type
-    :namespaced_name: inner_container_material_type_code
-    :data_type: :string
-    :width: 120
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  rmt_delivery_id:
-    :name: rmt_delivery_id
-    :sequence_no: 51
-    :caption: Delivery
-    :namespaced_name: rmt_delivery_id
-    :data_type: :integer
-    :width:
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  delivery_destination_code:
-    :name: delivery_destination_code
-    :sequence_no: 52
-    :caption: Delivery Destination Code
-    :namespaced_name: delivery_destination_code
-    :data_type: :string
-    :width:
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  picked_at:
-    :name: picked_at
-    :sequence_no: 53
-    :caption: Picked at
-    :namespaced_name: picked_at
-    :data_type: :datetime
-    :width:
-    :format: :datetime_with_secs
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  delivery_truck_registration_number:
-    :name: delivery_truck_registration_number
-    :sequence_no: 54
-    :caption: Delivery truck registration number
-    :namespaced_name: delivery_truck_registration_number
-    :data_type: :string
-    :width:
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  exit_ref:
-    :name: exit_ref
-    :sequence_no: 55
-    :caption: Exit ref
-    :namespaced_name: exit_ref
-    :data_type: :string
-    :width: 120
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  null_exit_ref:
-    :name: null_exit_ref
-    :sequence_no: 56
-    :caption: Null exit ref
-    :namespaced_name: null_exit_ref
-    :data_type: :boolean
-    :width:
-    :format:
-    :hide: true
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  exit_ref_date_time:
-    :name: exit_ref_date_time
-    :sequence_no: 57
-    :caption: Exit ref at
-    :namespaced_name: exit_ref_at
-    :data_type: :datetime
-    :width:
-    :format: :datetime_with_secs
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  exit_ref_date:
-    :name: exit_ref_date
-    :sequence_no: 58
-    :caption: Exit ref date
-    :namespaced_name: exit_ref_date
-    :data_type: :date
-    :width: 100
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  bin_asset_number:
-    :name: bin_asset_number
-    :sequence_no: 59
-    :caption: Bin asset number
-    :namespaced_name: bin_asset_number
-    :data_type: :string
-    :width: 120
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  bin_received_date:
-    :name: bin_received_date
-    :sequence_no: 60
-    :caption: Bin received
-    :namespaced_name: bin_received_date
-    :data_type: :date
-    :width: 100
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  tipped_asset_number:
-    :name: tipped_asset_number
-    :sequence_no: 61
-    :caption: Tipped asset number
-    :namespaced_name: tipped_asset_number
-    :data_type: :string
-    :width: 130
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  bin_tipped:
-    :name: bin_tipped
-    :sequence_no: 62
-    :caption: Bin tipped
-    :namespaced_name: bin_tipped
-    :data_type: :boolean
-    :width: 100
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  tipped_manually:
-    :name: tipped_manually
-    :sequence_no: 63
-    :caption: Tipped manually
-    :namespaced_name: tipped_manually
-    :data_type: :boolean
-    :width: 110
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  bin_tipped_date_time:
-    :name: bin_tipped_date_time
-    :sequence_no: 64
-    :caption: Bin tipped at
-    :namespaced_name: bin_tipped_at
-    :data_type: :datetime
-    :width:
-    :format: :datetime_with_secs
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  bin_tipped_date:
-    :name: bin_tipped_date
-    :sequence_no: 65
-    :caption: Bin tipped date
-    :namespaced_name: bin_tipped_date
-    :data_type: :date
-    :width: 110
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  bin_tipped_week:
-    :name: bin_tipped_week
-    :sequence_no: 66
-    :caption: Bin tipped week
-    :namespaced_name: bin_tipped_week
-    :data_type: :string
-    :width: 110
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  shipped_asset_number:
-    :name: shipped_asset_number
-    :sequence_no: 67
-    :caption: Shipped asset number
-    :namespaced_name: shipped_asset_number
-    :data_type: :string
-    :width: 150
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  shipped:
-    :name: shipped
-    :sequence_no: 68
-    :caption: Shipped
-    :namespaced_name: shipped
-    :data_type: :boolean
-    :width: 100
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  shipped_at:
-    :name: shipped_at
-    :sequence_no: 69
-    :caption: Shipped at
-    :namespaced_name: shipped_at
-    :data_type: :datetime
-    :width:
-    :format: :datetime_with_secs
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  bin_load_id:
-    :name: bin_load_id
-    :sequence_no: 70
-    :caption: Bin load
-    :namespaced_name: bin_load_id
-    :data_type: :string
-    :width: 90
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  bin_load_product_id:
-    :name: bin_load_product_id
-    :sequence_no: 71
-    :caption: Bin load product
-    :namespaced_name: bin_load_product_id
-    :data_type: :string
-    :width: 90
-    :format:
-    :hide: true
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  scrapped_bin_asset_number:
-    :name: scrapped_bin_asset_number
-    :sequence_no: 72
-    :caption: Scrapped bin asset number
-    :namespaced_name: scrapped_bin_asset_number
-    :data_type: :string
-    :width: 120
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  scrapped:
-    :name: scrapped
-    :sequence_no: 73
-    :caption: Scrapped
-    :namespaced_name: scrapped
-    :data_type: :boolean
-    :width: 100
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  scrapped_at:
-    :name: scrapped_at
-    :sequence_no: 74
-    :caption: Scrapped at
-    :namespaced_name: scrapped_at
-    :data_type: :datetime
-    :width:
-    :format: :datetime_with_secs
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  scrap_remarks:
-    :name: scrap_remarks
-    :sequence_no: 75
-    :caption: Scrap remarks
-    :namespaced_name: scrap_remarks
-    :data_type: :string
-    :width: 150
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  unscrapped_at:
-    :name: unscrapped_at
-    :sequence_no: 76
-    :caption: Unscrapped at
-    :namespaced_name: unscrapped_at
-    :data_type: :datetime
-    :width:
-    :format: :datetime_with_secs
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  production_run_rebin_id:
-    :name: production_run_rebin_id
-    :sequence_no: 77
-    :caption: Rebin Production run
-    :namespaced_name: production_run_rebin_id
-    :data_type: :integer
-    :width: 100
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  rebin_created_at:
-    :name: rebin_created_at
-    :sequence_no: 78
-    :caption: Rebin created at
-    :namespaced_name: rebin_created_at
-    :data_type: :datetime
-    :width:
-    :format: :datetime_with_secs
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  age:
-    :name: age
-    :sequence_no: 79
-    :caption: Age
-    :namespaced_name: age
-    :data_type: :integer
-    :width: 80
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  colour_rule:
-    :name: colour_rule
-    :sequence_no: 80
-    :caption: Colour rule
-    :namespaced_name:
-    :data_type: :string
-    :width:
-    :format:
-    :hide: true
-    :pinned:
-    :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
   legacy_data:
     :name: legacy_data
-    :sequence_no: 76
+    :sequence_no: 5
     :caption: Legacy Data
-    :namespaced_name: legacy_data
+    :namespaced_name: 
     :data_type: :string
     :width: 150
-    :format:
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  orchard_id:
+    :name: orchard_id
+    :sequence_no: 6
+    :caption: Orchard
+    :namespaced_name: orchard_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  orchard_code:
+    :name: orchard_code
+    :sequence_no: 7
+    :caption: Orchard code
+    :namespaced_name: orchard_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  bin_received_date_time:
+    :name: bin_received_date_time
+    :sequence_no: 8
+    :caption: Bin received at
+    :namespaced_name: bin_received_at
+    :data_type: :datetime
+    :width: 
+    :format: :datetime_with_secs
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
   sequences:
     :name: sequences
-    :sequence_no: 81
+    :sequence_no: 9
     :caption: Sequences
-    :namespaced_name: sequences
+    :namespaced_name: 
     :data_type: :string
     :width: 150
-    :format:
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
   sequence_farms:
     :name: sequence_farms
-    :sequence_no: 82
+    :sequence_no: 10
     :caption: Sequence Farms
-    :namespaced_name: sequence_farms
+    :namespaced_name: 
     :data_type: :string
     :width: 150
-    :format:
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
   sequence_orchards:
     :name: sequence_orchards
-    :sequence_no: 83
+    :sequence_no: 11
     :caption: Sequence Orchards
-    :namespaced_name: sequence_orchards
+    :namespaced_name: 
     :data_type: :string
     :width: 150
-    :format:
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
   sequence_weights:
     :name: sequence_weights
-    :sequence_no: 84
+    :sequence_no: 12
     :caption: Sequence Weights
-    :namespaced_name: sequence_weights
+    :namespaced_name: 
     :data_type: :string
     :width: 150
-    :format:
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 13
+    :caption: Status
+    :namespaced_name: status
+    :data_type: :string
+    :width: 200
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  qty_bins:
+    :name: qty_bins
+    :sequence_no: 14
+    :caption: Qty bins
+    :namespaced_name: qty_bins
+    :data_type: :integer
+    :width: 90
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  farm_section_name:
+    :name: farm_section_name
+    :sequence_no: 15
+    :caption: Farm Section
+    :namespaced_name: farm_section_name
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  farm_manager:
+    :name: farm_manager
+    :sequence_no: 16
+    :caption: Farm manager
+    :namespaced_name: farm_manager
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  discrete_bin:
+    :name: discrete_bin
+    :sequence_no: 17
+    :caption: Discrete bin
+    :namespaced_name: discrete_bin
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  qty_inner_bins:
+    :name: qty_inner_bins
+    :sequence_no: 18
+    :caption: Qty inner
+    :namespaced_name: qty_inner_bins
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  bin_fullness:
+    :name: bin_fullness
+    :sequence_no: 19
+    :caption: Bin fullness
+    :namespaced_name: bin_fullness
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  nett_weight:
+    :name: nett_weight
+    :sequence_no: 20
+    :caption: Nett weight
+    :namespaced_name: nett_weight
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: true
     :group_avg: false
     :group_min: false
     :group_max: false
   staged_for_presorting:
     :name: staged_for_presorting
-    :sequence_no: 151
+    :sequence_no: 21
     :caption: Staged?
     :namespaced_name: staged_for_presorting
     :data_type: :boolean
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: true
-    :pinned:
+    :pinned: 
     :groupable: true
-    :group_by_seq:
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  gross_weight:
+    :name: gross_weight
+    :sequence_no: 22
+    :caption: Gross weight
+    :namespaced_name: gross_weight
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: true
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  avg_gross_weight:
+    :name: avg_gross_weight
+    :sequence_no: 23
+    :caption: Avg gross weight
+    :namespaced_name: avg_gross_weight
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  weighed_manually:
+    :name: weighed_manually
+    :sequence_no: 24
+    :caption: Weighed manually
+    :namespaced_name: weighed_manually
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 25
+    :caption: Active
+    :namespaced_name: active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  stock_type_code:
+    :name: stock_type_code
+    :sequence_no: 26
+    :caption: Stock type code
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
   tipped_in_presort_at:
     :name: tipped_in_presort_at
-    :sequence_no: 152
+    :sequence_no: 27
     :caption: Tipped In Presort At
     :namespaced_name: tipped_in_presort_at
     :data_type: :datetime
-    :width:
+    :width: 
     :format: :datetime_with_secs
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 28
+    :caption: Created at
+    :namespaced_name: created_at
+    :data_type: :datetime
+    :width: 
+    :format: :datetime_with_secs
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 29
+    :caption: Updated at
+    :namespaced_name: updated_at
+    :data_type: :datetime
+    :width: 
+    :format: :datetime_with_secs
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  location_id:
+    :name: location_id
+    :sequence_no: 30
+    :caption: Location
+    :namespaced_name: location_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  location_long_code:
+    :name: location_long_code
+    :sequence_no: 31
+    :caption: Location Code
+    :namespaced_name: location_long_code
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  production_run_tipped_id:
+    :name: production_run_tipped_id
+    :sequence_no: 32
+    :caption: Tip Run
+    :namespaced_name: production_run_tipped_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  bin_tipping_plant_resource_id:
+    :name: bin_tipping_plant_resource_id
+    :sequence_no: 33
+    :caption: Bin tipping plant resource
+    :namespaced_name: bin_tipping_plant_resource_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packhouse:
+    :name: packhouse
+    :sequence_no: 34
+    :caption: Packhouse
+    :namespaced_name: packhouse
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  season_id:
+    :name: season_id
+    :sequence_no: 35
+    :caption: Season
+    :namespaced_name: season_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  season_code:
+    :name: season_code
+    :sequence_no: 36
+    :caption: Season code
+    :namespaced_name: season_code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  farm_id:
+    :name: farm_id
+    :sequence_no: 37
+    :caption: Farm
+    :namespaced_name: farm_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  farm_group_code:
+    :name: farm_group_code
+    :sequence_no: 38
+    :caption: Farm group
+    :namespaced_name: farm_group_code
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  farm_code:
+    :name: farm_code
+    :sequence_no: 39
+    :caption: Farm code
+    :namespaced_name: farm_code
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_group_id:
+    :name: cultivar_group_id
+    :sequence_no: 40
+    :caption: Cultivar group
+    :namespaced_name: cultivar_group_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_group_code:
+    :name: cultivar_group_code
+    :sequence_no: 41
+    :caption: Cultivar group code
+    :namespaced_name: cultivar_group_code
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_id:
+    :name: cultivar_id
+    :sequence_no: 42
+    :caption: Cultivar
+    :namespaced_name: cultivar_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_name:
+    :name: cultivar_name
+    :sequence_no: 43
+    :caption: Cultivar name
+    :namespaced_name: cultivar_name
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_code:
+    :name: cultivar_code
+    :sequence_no: 44
+    :caption: Cultivar code
+    :namespaced_name: cultivar_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_description:
+    :name: cultivar_description
+    :sequence_no: 45
+    :caption: Cultivar description
+    :namespaced_name: cultivar_description
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  commodity_code:
+    :name: commodity_code
+    :sequence_no: 46
+    :caption: Commodity code
+    :namespaced_name: commodity_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_class_id:
+    :name: rmt_class_id
+    :sequence_no: 47
+    :caption: RMT class
+    :namespaced_name: rmt_class_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_class_code:
+    :name: rmt_class_code
+    :sequence_no: 48
+    :caption: RMT class code
+    :namespaced_name: rmt_class_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_material_owner_party_role_id:
+    :name: rmt_material_owner_party_role_id
+    :sequence_no: 49
+    :caption: RMT material owner party role
+    :namespaced_name: rmt_material_owner_party_role_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  container_material_owner:
+    :name: container_material_owner
+    :sequence_no: 50
+    :caption: Container material owner
+    :namespaced_name: container_material_owner
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_container_type_id:
+    :name: rmt_container_type_id
+    :sequence_no: 51
+    :caption: RMT container type
+    :namespaced_name: rmt_container_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  container_type_code:
+    :name: container_type_code
+    :sequence_no: 52
+    :caption: Container type code
+    :namespaced_name: container_type_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_container_material_type_id:
+    :name: rmt_container_material_type_id
+    :sequence_no: 53
+    :caption: RMT container material type
+    :namespaced_name: rmt_container_material_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  container_material_type_code:
+    :name: container_material_type_code
+    :sequence_no: 54
+    :caption: Container material type
+    :namespaced_name: container_material_type_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_inner_container_type_id:
+    :name: rmt_inner_container_type_id
+    :sequence_no: 55
+    :caption: RMT inner container type
+    :namespaced_name: rmt_inner_container_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inner_container_type_code:
+    :name: inner_container_type_code
+    :sequence_no: 56
+    :caption: Inner Container Type
+    :namespaced_name: inner_container_type_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_inner_container_material_id:
+    :name: rmt_inner_container_material_id
+    :sequence_no: 57
+    :caption: RMT inner container material
+    :namespaced_name: rmt_inner_container_material_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inner_container_material_type_code:
+    :name: inner_container_material_type_code
+    :sequence_no: 58
+    :caption: Inner Container Material Type
+    :namespaced_name: inner_container_material_type_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_delivery_id:
+    :name: rmt_delivery_id
+    :sequence_no: 59
+    :caption: Delivery
+    :namespaced_name: rmt_delivery_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  delivery_destination_code:
+    :name: delivery_destination_code
+    :sequence_no: 60
+    :caption: Delivery Destination Code
+    :namespaced_name: delivery_destination_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  picked_at:
+    :name: picked_at
+    :sequence_no: 61
+    :caption: Picked at
+    :namespaced_name: picked_at
+    :data_type: :datetime
+    :width: 
+    :format: :datetime_with_secs
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  delivery_truck_registration_number:
+    :name: delivery_truck_registration_number
+    :sequence_no: 62
+    :caption: Delivery truck registration number
+    :namespaced_name: delivery_truck_registration_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  exit_ref:
+    :name: exit_ref
+    :sequence_no: 63
+    :caption: Exit ref
+    :namespaced_name: exit_ref
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  null_exit_ref:
+    :name: null_exit_ref
+    :sequence_no: 64
+    :caption: Null exit ref
+    :namespaced_name: null_exit_ref
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  exit_ref_date_time:
+    :name: exit_ref_date_time
+    :sequence_no: 65
+    :caption: Exit ref at
+    :namespaced_name: exit_ref_at
+    :data_type: :datetime
+    :width: 
+    :format: :datetime_with_secs
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  exit_ref_date:
+    :name: exit_ref_date
+    :sequence_no: 66
+    :caption: Exit ref date
+    :namespaced_name: exit_ref_date
+    :data_type: :date
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  bin_asset_number:
+    :name: bin_asset_number
+    :sequence_no: 67
+    :caption: Bin asset number
+    :namespaced_name: bin_asset_number
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  bin_received_date:
+    :name: bin_received_date
+    :sequence_no: 68
+    :caption: Bin received
+    :namespaced_name: bin_received_date
+    :data_type: :date
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  tipped_asset_number:
+    :name: tipped_asset_number
+    :sequence_no: 69
+    :caption: Tipped asset number
+    :namespaced_name: tipped_asset_number
+    :data_type: :string
+    :width: 130
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  bin_tipped:
+    :name: bin_tipped
+    :sequence_no: 70
+    :caption: Bin tipped
+    :namespaced_name: bin_tipped
+    :data_type: :boolean
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  tipped_manually:
+    :name: tipped_manually
+    :sequence_no: 71
+    :caption: Tipped manually
+    :namespaced_name: tipped_manually
+    :data_type: :boolean
+    :width: 110
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  bin_tipped_date_time:
+    :name: bin_tipped_date_time
+    :sequence_no: 72
+    :caption: Bin tipped at
+    :namespaced_name: bin_tipped_at
+    :data_type: :datetime
+    :width: 
+    :format: :datetime_with_secs
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  bin_tipped_date:
+    :name: bin_tipped_date
+    :sequence_no: 73
+    :caption: Bin tipped date
+    :namespaced_name: bin_tipped_date
+    :data_type: :date
+    :width: 110
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  bin_tipped_week:
+    :name: bin_tipped_week
+    :sequence_no: 74
+    :caption: Bin tipped week
+    :namespaced_name: bin_tipped_week
+    :data_type: :string
+    :width: 110
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  shipped_asset_number:
+    :name: shipped_asset_number
+    :sequence_no: 75
+    :caption: Shipped asset number
+    :namespaced_name: shipped_asset_number
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  shipped:
+    :name: shipped
+    :sequence_no: 76
+    :caption: Shipped
+    :namespaced_name: shipped
+    :data_type: :boolean
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  shipped_at:
+    :name: shipped_at
+    :sequence_no: 77
+    :caption: Shipped at
+    :namespaced_name: shipped_at
+    :data_type: :datetime
+    :width: 
+    :format: :datetime_with_secs
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  bin_load_id:
+    :name: bin_load_id
+    :sequence_no: 78
+    :caption: Bin load
+    :namespaced_name: bin_load_id
+    :data_type: :string
+    :width: 90
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  bin_load_product_id:
+    :name: bin_load_product_id
+    :sequence_no: 79
+    :caption: Bin load product
+    :namespaced_name: bin_load_product_id
+    :data_type: :string
+    :width: 90
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  scrapped_bin_asset_number:
+    :name: scrapped_bin_asset_number
+    :sequence_no: 80
+    :caption: Scrapped bin asset number
+    :namespaced_name: scrapped_bin_asset_number
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  scrapped:
+    :name: scrapped
+    :sequence_no: 81
+    :caption: Scrapped
+    :namespaced_name: scrapped
+    :data_type: :boolean
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  scrapped_at:
+    :name: scrapped_at
+    :sequence_no: 82
+    :caption: Scrapped at
+    :namespaced_name: scrapped_at
+    :data_type: :datetime
+    :width: 
+    :format: :datetime_with_secs
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  scrap_remarks:
+    :name: scrap_remarks
+    :sequence_no: 83
+    :caption: Scrap remarks
+    :namespaced_name: scrap_remarks
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  unscrapped_at:
+    :name: unscrapped_at
+    :sequence_no: 84
+    :caption: Unscrapped at
+    :namespaced_name: unscrapped_at
+    :data_type: :datetime
+    :width: 
+    :format: :datetime_with_secs
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  production_run_rebin_id:
+    :name: production_run_rebin_id
+    :sequence_no: 85
+    :caption: Rebin Production run
+    :namespaced_name: production_run_rebin_id
+    :data_type: :integer
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rebin_created_at:
+    :name: rebin_created_at
+    :sequence_no: 86
+    :caption: Rebin created at
+    :namespaced_name: rebin_created_at
+    :data_type: :datetime
+    :width: 
+    :format: :datetime_with_secs
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  age:
+    :name: age
+    :sequence_no: 87
+    :caption: Age
+    :namespaced_name: age
+    :data_type: :integer
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  colour_rule:
+    :name: colour_rule
+    :sequence_no: 88
+    :caption: Colour rule
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
 :query_parameter_definitions:
-  - :column: rmt_delivery_id
-    :caption: RMT delivery
-    :data_type: :integer
-    :control_type: :list
-    :default_value:
-    :ordered_list: true
-    :ui_priority: 1
-    :list_def: SELECT truck_registration_number, id FROM rmt_deliveries ORDER BY truck_registration_number
-  - :column: season_id
-    :caption: Season
-    :data_type: :integer
-    :control_type: :list
-    :default_value:
-    :ordered_list: true
-    :ui_priority: 1
-    :list_def: SELECT season_code, id FROM seasons ORDER BY season_code
-  - :column: cultivar_id
-    :caption: Cultivar
-    :data_type: :integer
-    :control_type: :list
-    :default_value:
-    :ordered_list: true
-    :ui_priority: 1
-    :list_def: SELECT cultivar_name, id FROM cultivars ORDER BY cultivar_name
-  - :column: orchard_id
-    :caption: Orchard
-    :data_type: :integer
-    :control_type: :list
-    :default_value:
-    :ordered_list: true
-    :ui_priority: 1
-    :list_def: SELECT orchard_code, id FROM orchards ORDER BY orchard_code
-  - :column: farm_id
-    :caption: Farm
-    :data_type: :integer
-    :control_type: :list
-    :default_value:
-    :ordered_list: true
-    :ui_priority: 1
-    :list_def: SELECT farm_code, id FROM farms ORDER BY farm_code
-  - :column: rmt_class_id
-    :caption: RMT class
-    :data_type: :integer
-    :control_type: :list
-    :default_value:
-    :ordered_list: true
-    :ui_priority: 1
-    :list_def: SELECT rmt_class_code, id FROM rmt_classes ORDER BY rmt_class_code
-  - :column: rmt_container_type_id
-    :caption: RMT container type
-    :data_type: :integer
-    :control_type: :list
-    :default_value:
-    :ordered_list: true
-    :ui_priority: 1
-    :list_def: SELECT container_type_code, id FROM rmt_container_types ORDER BY container_type_code
-  - :column: rmt_container_material_type_id
-    :caption: RMT container material type
-    :data_type: :integer
-    :control_type: :list
-    :default_value:
-    :ordered_list: true
-    :ui_priority: 1
-    :list_def: SELECT container_material_type_code, id FROM rmt_container_material_types
-      ORDER BY container_material_type_code
-  - :column: cultivar_group_id
-    :caption: Cultivar group
-    :data_type: :integer
-    :control_type: :list
-    :default_value:
-    :ordered_list: true
-    :ui_priority: 1
-    :list_def: SELECT cultivar_group_code, id FROM cultivar_groups ORDER BY cultivar_group_code
-  - :column: puc_id
-    :caption: PUC
-    :data_type: :integer
-    :control_type: :list
-    :default_value:
-    :ordered_list: true
-    :ui_priority: 1
-    :list_def: SELECT puc_code, id FROM pucs ORDER BY puc_code
-  - :column: bin_asset_number
-    :caption: Bin asset number
-    :data_type: :string
-    :control_type: :text
-    :default_value:
-    :ordered_list: false
-    :ui_priority: 1
-    :list_def:
-  - :column: rmt_inner_container_type_id
-    :caption: RMT inner container type
-    :data_type: :integer
-    :control_type: :text
-    :default_value:
-    :ordered_list: false
-    :ui_priority: 1
-    :list_def:
-  - :column: rmt_inner_container_material_id
-    :caption: RMT inner container material
-    :data_type: :integer
-    :control_type: :text
-    :default_value:
-    :ordered_list: false
-    :ui_priority: 1
-    :list_def:
-  - :column: production_run_rebin_id
-    :caption: Production run rebin
-    :data_type: :integer
-    :control_type: :text
-    :default_value:
-    :ordered_list: false
-    :ui_priority: 1
-    :list_def:
-  - :column: production_run_tipped_id
-    :caption: Production run tipped
-    :data_type: :integer
-    :control_type: :text
-    :default_value:
-    :ordered_list: false
-    :ui_priority: 1
-    :list_def:
-  - :column: production_run_tipping_id
-    :caption: Production run tipping
-    :data_type: :integer
-    :control_type: :text
-    :default_value:
-    :ordered_list: false
-    :ui_priority: 1
-    :list_def:
-  - :column: bin_tipping_plant_resource_id
-    :caption: Bin tipping plant resource
-    :data_type: :integer
-    :control_type: :text
-    :default_value:
-    :ordered_list: false
-    :ui_priority: 1
-    :list_def:
-  - :column: bin_tipped
-    :caption: Tipped?
-    :data_type: :boolean
-    :control_type: :list
-    :default_value:
-    :ordered_list: false
-    :ui_priority: 7
-    :list_def:
-      - true
-      - false
-  - :column: scrapped
-    :caption: Scrapped?
-    :data_type: :boolean
-    :control_type: :list
-    :default_value:
-    :ordered_list: false
-    :ui_priority: 8
-    :list_def:
-      - true
-      - false
-  - :column: location_id
-    :caption: Location Id
-    :data_type: :integer
-    :control_type: :text
-    :default_value:
-    :ordered_list: false
-    :ui_priority: 9
-    :list_def:
-  - :column: null_exit_ref
-    :caption: Null exit ref?
-    :data_type: :boolean
-    :control_type: :list
-    :default_value:
-    :ordered_list: false
-    :ui_priority: 10
-    :list_def:
-      - true
-      - false
-  - :column: bin_load_id
-    :caption: Bin Load
-    :data_type: :string
-    :control_type: :text
-    :default_value:
-    :ordered_list: false
-    :ui_priority: 1
-    :list_def:
-  - :column: id
-    :caption: Id
-    :data_type: :string
-    :control_type: :text
-    :default_value:
-    :ordered_list: false
-    :ui_priority: 1
-    :list_def:
-  - :column: bin_load_product_id
-    :caption: Bin Load Product Id
-    :data_type: :integer
-    :control_type: :text
-    :default_value:
-    :ordered_list: false
-    :ui_priority: 1
-    :list_def:
-  - :column: shipped
-    :caption: Shipped?
-    :data_type: :boolean
-    :control_type: :text
-    :default_value:
-    :ordered_list: false
-    :ui_priority: 1
-    :list_def:
-  - :column: bin_received_at
-    :caption: Received At
-    :data_type: :datetime
-    :control_type: :daterange
-    :default_value:
-    :ordered_list: false
-    :ui_priority: 1
-    :list_def:
-  - :column: staged_for_presorting
-    :caption: Staged?
-    :data_type: :boolean
-    :control_type: :text
-    :default_value:
-    :ordered_list: false
-    :ui_priority: 1
-    :list_def:
-  - :column: tipped_in_presort_at
-    :caption: Tipped In Presort At
-    :data_type: :datetime
-    :control_type: :daterange
-    :default_value:
-    :ordered_list: false
-    :ui_priority: 1
-    :list_def:
-  - :column: shipped_asset_number
-    :caption: Shipped asset number
-    :data_type: :string
-    :control_type: :text
-    :default_value:
-    :ordered_list: false
-    :ui_priority: 1
-    :list_def:
-  - :column: tipped_asset_number
-    :caption: Tipped asset number
-    :data_type: :string
-    :control_type: :text
-    :default_value:
-    :ordered_list: false
-    :ui_priority: 1
-    :list_def:
+- :column: rmt_delivery_id
+  :caption: RMT delivery
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT truck_registration_number, id FROM rmt_deliveries ORDER BY truck_registration_number
+- :column: season_id
+  :caption: Season
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT season_code, id FROM seasons ORDER BY season_code
+- :column: cultivar_id
+  :caption: Cultivar
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT cultivar_name, id FROM cultivars ORDER BY cultivar_name
+- :column: orchard_id
+  :caption: Orchard
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT orchard_code, id FROM orchards ORDER BY orchard_code
+- :column: farm_id
+  :caption: Farm
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT farm_code, id FROM farms ORDER BY farm_code
+- :column: rmt_class_id
+  :caption: RMT class
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT rmt_class_code, id FROM rmt_classes ORDER BY rmt_class_code
+- :column: rmt_container_type_id
+  :caption: RMT container type
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT container_type_code, id FROM rmt_container_types ORDER BY container_type_code
+- :column: rmt_container_material_type_id
+  :caption: RMT container material type
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT container_material_type_code, id FROM rmt_container_material_types
+    ORDER BY container_material_type_code
+- :column: cultivar_group_id
+  :caption: Cultivar group
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT cultivar_group_code, id FROM cultivar_groups ORDER BY cultivar_group_code
+- :column: puc_id
+  :caption: PUC
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT puc_code, id FROM pucs ORDER BY puc_code
+- :column: bin_asset_number
+  :caption: Bin asset number
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: rmt_inner_container_type_id
+  :caption: RMT inner container type
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: rmt_inner_container_material_id
+  :caption: RMT inner container material
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: production_run_rebin_id
+  :caption: Production run rebin
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: production_run_tipped_id
+  :caption: Production run tipped
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: production_run_tipping_id
+  :caption: Production run tipping
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: bin_tipping_plant_resource_id
+  :caption: Bin tipping plant resource
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: bin_tipped
+  :caption: Tipped?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 7
+  :list_def:
+  - true
+  - false
+- :column: scrapped
+  :caption: Scrapped?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 8
+  :list_def:
+  - true
+  - false
+- :column: location_id
+  :caption: Location Id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 9
+  :list_def: 
+- :column: null_exit_ref
+  :caption: Null exit ref?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 10
+  :list_def:
+  - true
+  - false
+- :column: bin_load_id
+  :caption: Bin Load
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: id
+  :caption: Id
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: bin_load_product_id
+  :caption: Bin Load Product Id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: shipped
+  :caption: Shipped?
+  :data_type: :boolean
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: bin_received_at
+  :caption: Received At
+  :data_type: :datetime
+  :control_type: :daterange
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: staged_for_presorting
+  :caption: Staged?
+  :data_type: :boolean
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: tipped_in_presort_at
+  :caption: Tipped In Presort At
+  :data_type: :datetime
+  :control_type: :daterange
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: shipped_asset_number
+  :caption: Shipped asset number
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: tipped_asset_number
+  :caption: Tipped asset number
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
