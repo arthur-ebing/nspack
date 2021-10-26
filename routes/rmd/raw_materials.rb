@@ -1477,7 +1477,7 @@ class Nspack < Roda
                                            current_user.login_name,
                                            vehicle_job_id: id)
           jasper_params.mode = :print
-          printer_id = params[:printer] # interactor.default_printer_for_application(AppConst::PRINT_APP_PALLET_TRIPSHEET)
+          printer_id = params[:bin][:printer] # interactor.default_printer_for_application(AppConst::PRINT_APP_PALLET_TRIPSHEET)
           jasper_params.printer = interactor.find_printer(printer_id)&.printer_code
           res = CreateJasperReport.call(jasper_params)
 
