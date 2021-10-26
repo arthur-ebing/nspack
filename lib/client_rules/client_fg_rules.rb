@@ -45,7 +45,7 @@ module Crossbeams
             use_inspection_destination_for_load_out: false,
             use_continuous_govt_inspection_sheets: false,
             pallet_verification_required_for_inspection: false,
-            pallet_weight_required_for_inspection: true,
+            pallet_weight_required_for_inspection: false,
             extra_barcode_scan_rules: [{ regex: '^(\\D\\D\\D)$', type: 'location', field: 'location_short_code' }],
             titan_cold_store_fbo_code: 'E2064',
             valid_pallet_destination: { failed: [/\AREWORKS$/], pending: [/\AREWORKS$/, /\ARA_10/, /\APACKHSE/], loaded: [/\APART_PALLETS/] },
