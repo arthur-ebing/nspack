@@ -91,7 +91,10 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def complete_bins_tripsheet(vehicle_job_id)
+    def complete_bins_tripsheet(vehicle_job_id) # rubocop:disable Metrics/AbcSize
+      unit1 = insp_repo.find_vehicle_job_unit_by(:vehicle_job_id, vehicle_job_id)
+      return failed_response('Cannot complete: No bins on tripsheet') if unit1.nil?
+
       repo.transaction do
         repo.update(:vehicle_jobs, vehicle_job_id, loaded_at: Time.now)
         insp_repo.load_vehicle_job_units(vehicle_job_id)

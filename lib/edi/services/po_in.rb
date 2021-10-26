@@ -197,7 +197,7 @@ module EdiApp
         govt_first_inspection_at: orig_inspec_date || inspec_date,
         govt_reinspection_at: reinspect_at,
         stock_created_at: intake_date || inspec_date || Time.now,
-        phc: seq[:packh_code],
+        phc: seq[:packh_code] || AppConst::CR_EDI.edi_in_default_phc,
         intake_created_at: intake_date,
         gross_weight: seq[:pallet_gross_mass].nil? || seq[:pallet_gross_mass].to_f.zero? ? nil : seq[:pallet_gross_mass],
         gross_weight_measured_at: weighed_date,

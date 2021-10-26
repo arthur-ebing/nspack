@@ -139,7 +139,7 @@ module UiRules
     end
 
     def peripheral_models
-      %w[GK420d gk420d argox Unknown]
+      %w[GK420d gk420d argox datamax Unknown]
     end
 
     def connection_types
