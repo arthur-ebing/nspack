@@ -2,7 +2,7 @@
 
 # What this script does:
 # ----------------------
-# Loops through the bin_asset_transactions_queue records and creates a job for each bin_event_type group.
+# Calls a RawMaterialsApp::BinAssetControlProcessor service that loops through and processes bin_asset_transactions_queue records.
 #
 # Reason for this script:
 # -----------------------
@@ -17,17 +17,21 @@
 #
 class ProcessBinAssetControlQue < BaseScript
   def run
-    puts 'RUNNING'
+    DB.transaction do
+      puts 'RUNNING'
 
-    if debug_mode
-      puts 'Bin Asset Control:'
-    else
-      puts 'Processing Bin Asset Control:'
-      RawMaterialsApp::BinAssetControlProcessor.call
+      if debug_mode
+        puts 'Bin Asset Control:'
+      else
+        puts 'Processing Bin Asset Control:'
+        RawMaterialsApp::BinAssetControlProcessor.call
+      end
+
+      infodump
+      success_response('Bin Asset Control Que processed successfully')
     end
-
-    infodump
-    success_response('Bin Asset Control Que processed successfully')
+  rescue StandardError => e
+    failed_response(e.message)
   end
 
   def infodump
@@ -36,7 +40,7 @@ class ProcessBinAssetControlQue < BaseScript
 
       What this script does:
       -----------------------
-      Loops through the bin_asset_transactions_queue table records and creates a job for each bin_event_type group.
+      Calls RawMaterialsApp::BinAssetControlProcessor service that loops through and processes bin_asset_transactions_queue records.
 
       Reason for this script:
       -----------------------

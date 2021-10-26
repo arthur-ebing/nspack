@@ -52,32 +52,30 @@ module RawMaterialsApp
     end
 
     def for_select_bin_asset_locations
-      onsite_location_type_id = DB[:location_types].where(location_type_code: AppConst::LOCATION_TYPES_BIN_ASSET).get(:id)
-      farm_location_type_id = DB[:location_types].where(location_type_code: AppConst::LOCATION_TYPES_FARM).get(:id)
-      MasterfilesApp::LocationRepo.new.for_select_locations(where: { location_type_id: [onsite_location_type_id, farm_location_type_id] })
+      loc_type_ids = DB[:location_types].where(location_type_code: [AppConst::LOCATION_TYPES_BIN_ASSET, AppConst::LOCATION_TYPES_FARM]).select_map(:id)
+      location_repo.for_select_locations(where: { location_type_id: loc_type_ids })
     end
 
     def for_select_onsite_bin_asset_locations
       location_type_id = DB[:location_types].where(location_type_code: AppConst::LOCATION_TYPES_BIN_ASSET).get(:id)
-      MasterfilesApp::LocationRepo.new.for_select_locations(where: { location_type_id: location_type_id })
+      location_repo.for_select_locations(where: { location_type_id: location_type_id })
     end
 
     def for_select_farm_bin_asset_locations
       location_type_id = DB[:location_types].where(location_type_code: AppConst::LOCATION_TYPES_FARM).get(:id)
-      MasterfilesApp::LocationRepo.new.for_select_locations(where: { location_type_id: location_type_id })
+      location_repo.for_select_locations(where: { location_type_id: location_type_id })
     end
 
     def for_select_available_bin_asset_locations
       available_ids = DB[:bin_asset_locations].select_map(:location_id)
-      onsite_location_type_id = DB[:location_types].where(location_type_code: AppConst::LOCATION_TYPES_BIN_ASSET).get(:id)
-      farm_location_type_id = DB[:location_types].where(location_type_code: AppConst::LOCATION_TYPES_FARM).get(:id)
-      MasterfilesApp::LocationRepo.new.for_select_locations(where: { location_type_id: [onsite_location_type_id, farm_location_type_id], id: available_ids })
+      loc_type_ids = DB[:location_types].where(location_type_code: [AppConst::LOCATION_TYPES_BIN_ASSET, AppConst::LOCATION_TYPES_FARM]).select_map(:id)
+      location_repo.for_select_locations(where: { location_type_id: loc_type_ids, id: available_ids })
     end
 
     def for_select_available_farm_bin_asset_locations
       available_ids = DB[:bin_asset_locations].select_map(:location_id)
       location_type_id = DB[:location_types].where(location_type_code: AppConst::LOCATION_TYPES_FARM).get(:id)
-      MasterfilesApp::LocationRepo.new.for_select_locations(where: { location_type_id: location_type_id, id: available_ids })
+      location_repo.for_select_locations(where: { location_type_id: location_type_id, id: available_ids })
     end
 
     def find_owner_bin_type(owner_id, type_id)
@@ -146,16 +144,16 @@ module RawMaterialsApp
     # @param [Integer] location_id
     # @param [Bool] add: add or subtract
     def update_bin_asset_location_qty(owner_id, quantity, location_id, add: false)
-      location = DB[:bin_asset_locations].where(rmt_container_material_owner_id: owner_id,
-                                                location_id: location_id)
-      return failed_response('Bin Asset location does not exist') unless location.first
+      location_ds = DB[:bin_asset_locations].where(rmt_container_material_owner_id: owner_id,
+                                                   location_id: location_id)
+      return failed_response('Bin Asset location does not exist') unless location_ds.first
 
-      existing_qty = location.get(:quantity) || AppConst::BIG_ZERO
+      existing_qty = location_ds.get(:quantity) || 0
       qty = add ? (existing_qty + quantity) : (existing_qty - quantity)
       if qty.negative?
         failed_response('can not update with negative amount', qty)
       else
-        location.update(quantity: qty)
+        location_ds.update(quantity: qty)
         success_response('updated successfully')
       end
     end
@@ -240,51 +238,68 @@ module RawMaterialsApp
         .select_map(:id)
     end
 
+    def bin_asset_transactions_queue_records_for(queue_ids)
+      return [] if queue_ids.nil_or_empty?
+
+      query = <<~SQL
+        SELECT bin_event_type, pallet, changes_made,
+               array(SELECT DISTINCT rmt_bin_id
+                     FROM bin_asset_transactions_queue a
+                     WHERE a.bin_event_type = bin_asset_transactions_queue.bin_event_type
+                     AND id IN ?) AS rmt_bin_ids
+        FROM bin_asset_transactions_queue
+        WHERE id IN ?
+        GROUP BY bin_event_type, pallet, changes_made
+      SQL
+      DB[query, queue_ids, queue_ids].all
+    end
+
     def delete_transactions_queue_records(queue_ids)
       DB[:bin_asset_transactions_queue]
         .where(id: queue_ids)
         .delete
     end
 
-    def rmt_bins_missing_owner_attributes(queue_ids)
-      return [] if queue_ids.nil_or_empty?
+    def transactions_missing_owner_attributes(bin_event_type, is_pallet, rec_ids)
+      return [] if rec_ids.nil_or_empty?
 
-      query = <<~SQL
-        SELECT id FROM rmt_bins
-        WHERE id IN (SELECT DISTINCT rmt_bin_id FROM bin_asset_transactions_queue
-                     WHERE id IN (#{queue_ids.join(',')}) AND NOT pallet)
-        AND (rmt_material_owner_party_role_id IS NULL OR rmt_container_material_type_id IS NULL)
-        ORDER BY id
-      SQL
-      DB[query].all.map { |r| r[:id] }
+      query = if %w[BIN_DELETED REBIN_DELETED].include? bin_event_type
+                missing_owner_attributes_query_for_deleted_bins
+              else
+                is_pallet ? missing_owner_attributes_query_for_pallets : missing_owner_attributes_query_for_rmt_bins
+              end
+      DB[query, rec_ids].all.map { |r| r[:id] }
     end
 
-    def pallets_missing_owner_attributes(queue_ids)
-      return [] if queue_ids.nil_or_empty?
+    def missing_owner_attributes_query_for_deleted_bins
+      <<~SQL
+        SELECT a.row_data_id AS id FROM audit.logged_actions a
+        WHERE a.table_name = 'rmt_bins'
+        AND a.action = 'D'
+        AND a.row_data_id IN ?
+        AND (a.row_data ->'rmt_material_owner_party_role_id' IS NULL OR a.row_data ->'rmt_container_material_type_id' IS NULL)
+        ORDER BY id
+      SQL
+    end
 
-      query = <<~SQL
+    def missing_owner_attributes_query_for_pallets
+      <<~SQL
         SELECT pallets.id FROM pallets
         JOIN pallet_sequences ON pallet_sequences.pallet_id = pallets.id
         JOIN rmt_bins ON pallet_sequences.source_bin_id = rmt_bins.id
-        WHERE pallets.id IN (SELECT DISTINCT rmt_bin_id FROM bin_asset_transactions_queue
-                             WHERE id IN (#{queue_ids.join(',')}) AND pallet)
+        WHERE pallets.id IN ?
         AND (rmt_bins.rmt_material_owner_party_role_id IS NULL OR rmt_bins.rmt_container_material_type_id IS NULL)
         ORDER BY pallets.id
       SQL
-      DB[query].all.map { |r| r[:id] }
     end
 
-    def bin_asset_control_events_for(queue_ids)
-      return [] if queue_ids.nil_or_empty?
-
-      query = <<~SQL
-        SELECT bin_event_type, changes_made,
-               array_agg(distinct rmt_bin_id) AS rmt_bin_ids
-        FROM bin_asset_transactions_queue
-        WHERE id IN (#{queue_ids.join(',')})
-        GROUP BY bin_event_type, changes_made
+    def missing_owner_attributes_query_for_rmt_bins
+      <<~SQL
+        SELECT id FROM rmt_bins
+        WHERE id IN ?
+        AND (rmt_material_owner_party_role_id IS NULL OR rmt_container_material_type_id IS NULL)
+        ORDER BY id
       SQL
-      DB[query].all
     end
 
     def bin_asset_move_error_logs_for(error_log_ids)
@@ -293,14 +308,14 @@ module RawMaterialsApp
       query = <<~SQL
         SELECT bin_asset_location_id, sum(quantity) as quantity
         FROM bin_asset_move_error_logs
-        WHERE id IN (#{error_log_ids.join(',')})
+        WHERE id IN ?
         GROUP BY bin_asset_location_id
       SQL
-      DB[query].all
+      DB[query, error_log_ids].all
     end
 
     def update_quantity_for_bin_asset_location(bin_asset_location_id, quantity)
-      existing_qty = get(:bin_asset_locations, bin_asset_location_id, :quantity) || AppConst::BIG_ZERO
+      existing_qty = get(:bin_asset_locations, bin_asset_location_id, :quantity) || 0
       qty = existing_qty - quantity
 
       if qty.negative?
@@ -317,54 +332,79 @@ module RawMaterialsApp
         .update(attrs)
     end
 
-    def pallet_bins_delivery_sets(pallet_ids)
-      return {} if pallet_ids.nil_or_empty?
+    def bin_event_type_delivery_sets(bin_event_type, rec_ids)
+      return {} if rec_ids.nil_or_empty?
 
-      query = <<~SQL
+      query = case bin_event_type
+              when 'BIN_DISPATCHED_VIA_FG', 'BIN_UNSHIPPED_VIA_FG', 'BIN_PALLET_MATERIAL_OWNER_CHANGED'
+                delivery_sets_query_for_pallet_bins
+              when 'BIN_DISPATCHED_VIA_RMT', 'BIN_UNSHIPPED'
+                delivery_sets_query_for_allocated_bins
+              when 'BIN_DELETED', 'REBIN_DELETED'
+                delivery_sets_query_for_deleted_bins
+              else
+                # 'DELIVERY_RECEIVED', 'REBIN_CREATED', 'BIN_TIPPED'
+                # 'BIN_UNTIPPED', 'FARM_CHANGED', 'MATERIAL_OWNER_CHANGED', 'BIN_SCRAPPED'
+                # 'BIN_UNSCRAPPED' ,'REBIN_MATERIAL_OWNER_CHANGED', 'REBIN_SCRAPPED', 'REBIN_UNSCRAPPED'
+                delivery_sets_query_for_rmt_bins
+              end
+      DB[query, rec_ids].all
+    end
+
+    def delivery_sets_query_for_pallet_bins
+      <<~SQL
         SELECT COALESCE(rmt_delivery_id, scrapped_rmt_delivery_id) AS rmt_delivery_id, production_run_rebin_id,
-        COALESCE(rcmo.rmt_material_owner_party_role_id, rmt_bins.rmt_material_owner_party_role_id) AS rmt_material_owner_party_role_id,
-        COALESCE(rcmo.rmt_container_material_type_id, rmt_bins.rmt_container_material_type_id) AS rmt_container_material_type_id,
-        pallets.rmt_container_material_owner_id, loads.depot_id AS dest_depot_id,
-        SUM(qty_bins) AS quantity_bins
+               COALESCE(rcmo.rmt_material_owner_party_role_id, rmt_bins.rmt_material_owner_party_role_id) AS rmt_material_owner_party_role_id,
+               COALESCE(rcmo.rmt_container_material_type_id, rmt_bins.rmt_container_material_type_id) AS rmt_container_material_type_id,
+               pallets.rmt_container_material_owner_id, loads.depot_id AS dest_depot_id,
+               SUM(qty_bins) AS quantity_bins
         FROM pallets
         JOIN pallet_sequences ON pallet_sequences.pallet_id = pallets.id
         JOIN rmt_bins ON pallet_sequences.source_bin_id = rmt_bins.id
         LEFT JOIN loads ON loads.id = pallets.load_id
         LEFT JOIN rmt_container_material_owners rcmo ON rcmo.id = pallets.rmt_container_material_owner_id
-        WHERE pallets.id IN (#{pallet_ids.join(',')})
+        WHERE pallets.id IN ?
         GROUP BY 1, production_run_rebin_id, 3, 4, pallets.rmt_container_material_owner_id, loads.depot_id
       SQL
-      DB[query].all
     end
 
-    def allocated_bins_delivery_sets(rmt_bin_ids)
-      return {} if rmt_bin_ids.nil_or_empty?
-
-      query = <<~SQL
+    def delivery_sets_query_for_allocated_bins
+      <<~SQL
         SELECT COALESCE(rmt_delivery_id, scrapped_rmt_delivery_id) AS rmt_delivery_id, production_run_rebin_id,
-        rmt_bins.rmt_material_owner_party_role_id, rmt_bins.rmt_container_material_type_id, bin_loads.dest_depot_id,
-        SUM(rmt_bins.qty_bins) AS quantity_bins
+               rmt_bins.rmt_material_owner_party_role_id, rmt_bins.rmt_container_material_type_id, bin_loads.dest_depot_id,
+               SUM(rmt_bins.qty_bins) AS quantity_bins
         FROM rmt_bins
         JOIN bin_load_products ON bin_load_products.id = rmt_bins.bin_load_product_id
         JOIN bin_loads ON bin_loads.id = bin_load_products.bin_load_id
-        WHERE rmt_bins.id IN (#{rmt_bin_ids.join(',')})
+        WHERE rmt_bins.id IN ?
         GROUP BY 1, production_run_rebin_id, rmt_bins.rmt_material_owner_party_role_id, rmt_bins.rmt_container_material_type_id, bin_loads.dest_depot_id
       SQL
-      DB[query].all
     end
 
-    def rmt_bins_delivery_sets(rmt_bin_ids)
-      return {} if rmt_bin_ids.nil_or_empty?
+    def delivery_sets_query_for_deleted_bins
+      <<~SQL
+        SELECT COALESCE(a.row_data ->'rmt_delivery_id', a.row_data ->'scrapped_rmt_delivery_id') AS rmt_delivery_id,
+               a.row_data ->'production_run_rebin_id' AS production_run_rebin_id,
+               a.row_data ->'rmt_material_owner_party_role_id' AS rmt_material_owner_party_role_id,
+               a.row_data ->'rmt_container_material_type_id' AS rmt_container_material_type_id,
+               SUM((a.row_data ->'qty_bins')::INTEGER) AS quantity_bins
+        FROM audit.logged_actions a
+        WHERE a.table_name = 'rmt_bins'
+        AND a.action = 'D'
+        AND a.row_data_id IN ?
+        GROUP BY rmt_delivery_id, production_run_rebin_id, rmt_material_owner_party_role_id, rmt_container_material_type_id
+      SQL
+    end
 
-      query = <<~SQL
+    def delivery_sets_query_for_rmt_bins
+      <<~SQL
         SELECT COALESCE(rmt_delivery_id, scrapped_rmt_delivery_id) AS rmt_delivery_id, production_run_rebin_id,
-        rmt_material_owner_party_role_id, rmt_container_material_type_id,
-        SUM(qty_bins) AS quantity_bins
+               rmt_material_owner_party_role_id, rmt_container_material_type_id,
+               SUM(qty_bins) AS quantity_bins
         FROM rmt_bins
-        WHERE rmt_bins.id IN (#{rmt_bin_ids.join(',')})
+        WHERE rmt_bins.id IN ?
         GROUP BY 1, production_run_rebin_id, rmt_material_owner_party_role_id, rmt_container_material_type_id
       SQL
-      DB[query].all
     end
 
     def find_rmt_delivery_attrs(rmt_delivery_id)

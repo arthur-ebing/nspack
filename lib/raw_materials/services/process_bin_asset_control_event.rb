@@ -7,7 +7,7 @@ module RawMaterialsApp
     def initialize(params)
       @repo = RawMaterialsApp::BinAssetsRepo.new
       @bin_event_type = params[:bin_event_type]
-      @rmt_bin_ids = params[:rmt_bin_ids]
+      @rmt_bin_ids = Array(params[:rmt_bin_ids])
       @changes_made = params[:changes_made].nil_or_empty? ? {} : eval(params[:changes_made]) # rubocop:disable Security/Eval:
     end
 
@@ -22,29 +22,13 @@ module RawMaterialsApp
 
     def process_bin_asset_control_event
       res = nil
-      repo.transaction do
-        bin_event_type_delivery_sets.each do |set|
-          res = perform_bin_asset_control_operation(set)
-          return res unless res.success
-        end
+      repo.bin_event_type_delivery_sets(bin_event_type, rmt_bin_ids).each do |set|
+        res = perform_bin_asset_control_operation(set)
+        return res unless res.success
       end
       ok_response
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
-    end
-
-    def bin_event_type_delivery_sets
-      case bin_event_type
-      when 'BIN_DISPATCHED_VIA_FG', 'BIN_UNSHIPPED_VIA_FG', 'BIN_PALLET_MATERIAL_OWNER_CHANGED'
-        repo.pallet_bins_delivery_sets(rmt_bin_ids)
-      when 'BIN_DISPATCHED_VIA_RMT', 'BIN_UNSHIPPED'
-        repo.allocated_bins_delivery_sets(rmt_bin_ids)
-      else
-        # 'DELIVERY_RECEIVED', 'REBIN_CREATED', 'BIN_DELETED', 'REBIN_DELETED', 'BIN_TIPPED'
-        # 'BIN_UNTIPPED', 'FARM_CHANGED', 'MATERIAL_OWNER_CHANGED', 'BIN_SCRAPPED'
-        # 'BIN_UNSCRAPPED' ,'REBIN_MATERIAL_OWNER_CHANGED', 'REBIN_SCRAPPED', 'REBIN_UNSCRAPPED'
-        repo.rmt_bins_delivery_sets(rmt_bin_ids)
-      end
     end
 
     def perform_bin_asset_control_operation(set)
@@ -55,9 +39,9 @@ module RawMaterialsApp
     end
 
     def resolve_delivery_set_attrs(set) # rubocop:disable Metrics/AbcSize
-      bin_attrs = find_bin_attrs(set)
+      attrs = find_delivery_attrs(set)
       @set_attrs = {
-        farm_location_id: get_farm_location_id(bin_attrs[:farm_id]),
+        farm_location_id: get_farm_location_id(attrs[:farm_id]),
         dest_depot_location_id: get_dest_depot_location_id(set[:dest_depot_id]),
         owner_id: resolve_owner_id(set),
         quantity_bins: set[:quantity_bins].to_i,
@@ -66,15 +50,15 @@ module RawMaterialsApp
                 asset_transaction_type_id: repo.get_id(:asset_transaction_types, transaction_type_code: bin_event_type),
                 is_adhoc: false,
                 fruit_reception_delivery_id: set[:rmt_delivery_id],
-                truck_registration_number: bin_attrs[:truck_registration_number],
-                ref_no: bin_attrs[:reference_number],
+                truck_registration_number: attrs[:truck_registration_number],
+                ref_no: attrs[:reference_number],
                 quantity_bins: 1,
                 changes_made: repo.hash_for_jsonb_col(changes_made),
                 affected_rmt_bin_ids: repo.array_for_db_col(rmt_bin_ids) }
       }
     end
 
-    def find_bin_attrs(set)
+    def find_delivery_attrs(set)
       hash = repo.find_rmt_delivery_attrs(set[:rmt_delivery_id])
       return hash unless hash.nil?
 

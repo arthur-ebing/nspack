@@ -74,13 +74,13 @@ module RawMaterialsApp
       assert_equal value, after[:exit_ref]
     end
 
-    # def test_delete_rmt_bin
-    #   id = create_rmt_bin
-    #   assert_count_changed(:rmt_bins, -1) do
-    #     res = interactor.delete_rmt_bin(id)
-    #     assert res.success, res.message
-    #   end
-    # end
+    def test_delete_rmt_bin
+      id = create_rmt_bin
+      assert_count_changed(:rmt_bins, -1) do
+        res = interactor.delete_rmt_bin(id)
+        assert res.success, res.message
+      end
+    end
 
     private
 
