@@ -144,6 +144,7 @@ class Nspack < Roda
       jasper_params = JasperParams.new('container_mass_declaration',
                                        current_user.login_name,
                                        load_container_id: @repo.get_id(:load_containers, load_id: id),
+                                       pallets_weighed: AppConst::CR_PROD.are_pallets_weighed?,
                                        user_name: current_user.user_name)
       res = CreateJasperReport.call(jasper_params)
 

@@ -347,6 +347,12 @@ module Crossbeams
       setting(:capture_batch_number_for_pallets)
     end
 
+    def are_pallets_weighed?(explain: false)
+      return 'Are pallets weighed or are weights derived_from masterfiles.' if explain
+
+      !setting(:derive_nett_weight)
+    end
+
     def derive_nett_weight?(explain: false)
       return 'Set derived_weight on pallets.' if explain
 
