@@ -13,6 +13,12 @@
   :has_permission:
   - load
   - can_unship
+- :separator: true
+- :url: "/development/statuses/list/pallets/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
 :page_controls:
 - :control_type: :link
   :url: "/finished_goods/stock/local_pallets_to_in_stock"

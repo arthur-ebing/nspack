@@ -39,6 +39,12 @@
   :popup: true
   :hide_if_true: pallet_holdover_completed
   :hide_if_false: has_pallet_holdover
+- :separator: true
+- :url: "/development/statuses/list/pallets/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
 :conditions:
   :unallocated_pallets:
     - :col: pallets.id
