@@ -106,6 +106,9 @@ module RawMaterialsApp
     end
 
     def can_continue_bin_tripsheet(vehicle_job_id)
+      res = UtilityFunctions.validate_integer_length(:tripsheet, vehicle_job_id)
+      return failed_response("Bin Tripsheet: #{unwrap_error_set(res.errors)}") if res.failure?
+
       repo.can_continue_bin_tripsheet(vehicle_job_id)
     end
 
