@@ -306,3 +306,18 @@ INSERT INTO incoterms (incoterm) VALUES ('EX Coldstore') ON CONFLICT DO NOTHING;
 
 -- QA STANDARD TYPES
 INSERT INTO qa_standard_types (qa_standard_type_code, description) VALUES('MRL', 'Minimum Residue Level') ON CONFLICT DO NOTHING;
+
+-- SECURITY ROLES AND PERMISSIONS
+INSERT INTO security_permissions (security_permission) VALUES('weights') ON CONFLICT DO NOTHING;
+INSERT INTO security_groups (security_group_name) VALUES('container_weights') ON CONFLICT DO NOTHING;
+
+INSERT INTO security_groups_security_permissions (security_group_id, security_permission_id)
+SELECT (SELECT id FROM security_groups WHERE security_group_name = 'container_weights'), p.security_permission_id
+FROM security_groups_security_permissions p
+WHERE p.security_group_id = (SELECT id FROM security_groups WHERE security_group_name = 'basic') ON CONFLICT DO NOTHING;
+
+INSERT INTO security_groups_security_permissions (security_group_id, security_permission_id)
+SELECT g.id,
+(SELECT id FROM security_permissions WHERE security_permission = 'weights')
+FROM security_groups g WHERE g.security_group_name = 'container_weights' ON CONFLICT DO NOTHING;
+

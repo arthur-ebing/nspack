@@ -4,6 +4,7 @@ module UiRules
   class LoadRule < Base # rubocop:disable Metrics/ClassLength
     def generate_rules
       make_form_object
+      add_container_specifics_to_form if @mode == :container_weights
       apply_form_values
 
       add_progress_step
@@ -13,6 +14,7 @@ module UiRules
       common_values_for_fields common_fields
       set_show_fields if %i[show allocate].include? @mode
       set_force_shipped_date_fields if @mode == :force_shipped_date
+      set_container_weight_fields if @mode == :container_weights
       form_name 'load'
     end
 
@@ -23,6 +25,20 @@ module UiRules
       fields[:shipped_at] = { renderer: :datetime,
                               maxvalue_date: Time.now.strftime('%Y-%m-%d'),
                               required: true }
+    end
+
+    def set_container_weight_fields
+      compact_header(columns: %i[load_id order_number customer_order_number customer_reference location_of_issue
+                                 shipped_at requires_temp_tail rmt_load],
+                     display_columns: 2)
+      fields[:container_code] = { renderer: :label }
+      fields[:container_seal_code] = { renderer: :label }
+      fields[:internal_container_code] = { renderer: :label }
+      fields[:verified_gross_weight] = { renderer: :label, css_class: 'tr', with_value: UtilityFunctions.delimited_number(container_weight_vgm) }
+      fields[:max_gross_weight] = { renderer: :number }
+      fields[:tare_weight] = { renderer: :number }
+      fields[:max_payload] = { renderer: :number }
+      fields[:actual_payload] = { renderer: :number }
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
@@ -284,6 +300,22 @@ module UiRules
       }
     end
 
+    def add_container_specifics_to_form
+      load_container_id = @repo.get_id(:load_containers, load_id: @form_object.id)
+      container = FinishedGoodsApp::LoadContainerRepo.new.find_load_container(load_container_id)
+      cont_hash = {
+        container_code: container&.container_code,
+        container_seal_code: container&.container_seal_code,
+        internal_container_code: container&.internal_container_code,
+        verified_gross_weight: container&.verified_gross_weight,
+        max_gross_weight: container&.max_gross_weight,
+        tare_weight: container&.tare_weight,
+        max_payload: container&.max_payload,
+        actual_payload: container&.actual_payload
+      }
+      @form_object = OpenStruct.new(@form_object.to_h.merge(cont_hash))
+    end
+
     def make_form_object
       @repo = FinishedGoodsApp::LoadRepo.new
       @party_repo = MasterfilesApp::PartyRepo.new
@@ -325,6 +357,12 @@ module UiRules
     end
 
     private
+
+    def container_weight_vgm
+      return @form_object.verified_gross_weight if AppConst::CR_PROD.are_pallets_weighed?
+
+      (@form_object.actual_payload || 0) + (@form_object.tare_weight || 0)
+    end
 
     def add_progress_step
       steps = ['Allocate Pallets', 'Truck Arrival', 'Load Truck', 'Ship', 'Finished']

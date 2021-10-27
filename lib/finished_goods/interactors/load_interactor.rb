@@ -394,7 +394,35 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
+    def apply_container_weights(id, params)
+      check!(:change_container_weights, id)
+
+      res = LoadContainerWeightSchema.call(params)
+      return validation_failed_response(res) if res.failure?
+
+      load_container_id = repo.get_id(:load_containers, load_id: id)
+      changed_weights = weights_changed?(load_container_id, res)
+      return success_response('Nothing to update - weights were not changed') unless changed_weights
+
+      repo.transaction do
+        repo.update(:load_containers, load_container_id, res)
+
+        log_status(:loads, id, 'CONTAINER WEIGHTS SET')
+      end
+
+      success_response('Weights applied to container')
+    end
+
     private
+
+    def weights_changed?(load_container_id, res)
+      rec = repo.where_hash(:load_containers, id: load_container_id)
+      change = false
+      res.to_h.each do |k, v|
+        change = true if rec[k] != v
+      end
+      change
+    end
 
     def check!(task, id = nil, pallet_number = nil)
       res = TaskPermissionCheck::Load.call(task, id, pallet_number)

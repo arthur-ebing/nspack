@@ -447,6 +447,30 @@ class Nspack < Roda
         redirect_to_last_grid(r)
       end
 
+      r.on 'container_weights' do
+        r.get do
+          check_auth!('dispatch', 'weights')
+          show_partial do
+            FinishedGoods::Dispatch::Load::ContainerWeights.call(id)
+          end
+        end
+
+        r.post do
+          res = interactor.apply_container_weights(id, params[:load])
+          if res.success
+            show_partial(notice: res.message) do
+              FinishedGoods::Dispatch::Load::ContainerWeights.call(id)
+            end
+          else
+            re_show_form(r, res) do
+              FinishedGoods::Dispatch::Load::ContainerWeights.call(id,
+                                                                   form_values: params[:load],
+                                                                   form_errors: res.errors)
+            end
+          end
+        end
+      end
+
       r.on 'edit' do   # EDIT
         check_auth!('dispatch', 'edit')
         interactor.assert_permission!(:edit, id)

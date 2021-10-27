@@ -64,4 +64,11 @@ module FinishedGoodsApp
     required(:shipped_at).filled(:time)
     required(:load_shipped_at).filled(:time)
   end
+
+  LoadContainerWeightSchema = Dry::Schema.Params do
+    required(:max_gross_weight).maybe(:decimal)
+    required(:max_payload).maybe(:decimal)
+    required(:tare_weight).filled(:decimal)
+    required(:actual_payload).filled(:decimal)
+  end
 end

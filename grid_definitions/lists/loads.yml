@@ -38,6 +38,14 @@
   :has_permission:
     - load
     - can_ship
+- :url: "/finished_goods/dispatch/loads/$:id$/container_weights"
+  :text: container weights
+  :icon: document-add
+  :title: Edit container weights
+  :popup: true
+  :hide_if_false: shipped
+  :hide_if_null: container_code
+  :hide_for_client_rule: CR_PROD.are_pallets_weighed?
 - :separator: true
 - :url: "/development/statuses/list/loads/$:id$"
   :text: status
