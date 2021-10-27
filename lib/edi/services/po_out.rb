@@ -109,6 +109,11 @@ module EdiApp
       hash[:ctn_qty] = @current_row[:tot_ctn_qty]
       hash[:plt_qty] = @current_row[:tot_plt_qty]
       hash[:locn_code] = AppConst::FROM_DEPOT
+      hash[:cons_type] = if AppConst::FROM_DEPOT && @header_rec[:next_code] == AppConst::FROM_DEPOT
+                           'RL' # 'DP' was the default, but Kromco/TruCape says RL. Remove this comment after 2022 if no other clients have a problem
+                         else
+                           'OT'
+                         end
       add_record('OC', hash)
       @oc_count += 1
     end
