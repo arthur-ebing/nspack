@@ -144,6 +144,20 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
   };
 
   /**
+   * Check if all scan fields that belong to a set have values.
+   */
+  const formSetIsFull = () => {
+    const set = document.querySelectorAll('[data-submit-form-set]');
+    let assigned = true;
+    set.forEach((node) => {
+      if (!node.value || node.value === '') {
+        assigned = false;
+      }
+    });
+    return assigned;
+  };
+
+  /**
    * Event listeners for the RMD page.
    */
   const setupListeners = () => {
@@ -301,7 +315,9 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
 
     webSocket.onmessage = function onmessage(event) {
       if (event.data.includes('[SCAN]')) {
-        publicAPIs.logit(`SCAN GOT: -> ${event.data} <-`);
+        if (publicAPIs.debug) {
+          publicAPIs.logit(`RAW SCAN GOT: ${event.data}`);
+        }
         const scanPack = unpackScanValue(event.data.split(',')[0].replace('[SCAN]', ''));
         if (!scanPack.success) {
           publicAPIs.logit(scanPack.error);
@@ -327,6 +343,10 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
             }
             cnt += 1;
             if (e.dataset.submitForm) {
+              subCount = 0;
+              formSubmitter();
+            }
+            if (e.dataset.submitFormSet && formSetIsFull()) {
               subCount = 0;
               formSubmitter();
             }
@@ -372,9 +392,10 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
    * @param {object} rules - the rules for identifying scan values.
    * @param {boolean} bypassRules - should the rules be ignored (scan any barcode).
    */
-  publicAPIs.init = (rules, bypassRules) => {
+  publicAPIs.init = (rules, bypassRules, debug) => {
     publicAPIs.rules = rules;
     publicAPIs.bypassRules = bypassRules;
+    publicAPIs.debug = debug;
     publicAPIs.expectedScanTypes = Array.from(document.querySelectorAll('[data-scan-rule]')).map(a => a.dataset.scanRule);
     publicAPIs.expectedScanTypes = publicAPIs.expectedScanTypes.filter((it, i, ar) => ar.indexOf(it) === i);
 
