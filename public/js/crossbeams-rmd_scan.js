@@ -301,6 +301,7 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
 
     webSocket.onmessage = function onmessage(event) {
       if (event.data.includes('[SCAN]')) {
+        publicAPIs.logit(`SCAN GOT: -> ${event.data} <-`);
         const scanPack = unpackScanValue(event.data.split(',')[0].replace('[SCAN]', ''));
         if (!scanPack.success) {
           publicAPIs.logit(scanPack.error);
