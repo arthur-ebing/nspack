@@ -381,7 +381,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
     # { regex: '^SK(\\d+)', type: 'sku', field: 'sku_number' },
     { regex: '^DN(\\d+)', type: 'delivery', field: 'delivery_number' },
     { regex: '^BN(\\d+)', type: 'bin', field: 'id' },
-    { regex: '^(\\d+)', type: 'pallet_number', field: 'pallet_number' },
+    { regex: '^(\\d+)$', type: 'pallet_number', field: 'pallet_number' },
     { regex: '^(\\d+)', type: 'carton_label_id', field: 'id' },
     # { regex: '^SK(\\d+)', type: 'bin_asset', field: 'bin_asset_number' }, # asset no should change to string and this should not require SK.
     { regex: '^([A-Z0-9]+)', type: 'bin_asset', field: 'bin_asset_number' }, # asset no should change to string and this should not require SK.

@@ -103,6 +103,9 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
       } else {
         label.innerHTML = data.showField;
         hiddenVal.value = data.showField;
+        if (data.beep) {
+          crossbeamsAudio.beep();
+        }
       }
     }).catch((data) => {
       crossbeamsAudio.beep();

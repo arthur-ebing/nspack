@@ -16,14 +16,18 @@ class Nspack < Roda
       scan_rule = AppConst::BARCODE_LOOKUP_RULES[scan_type.to_sym]
       rule = scan_rule[scan_field.to_sym] unless scan_rule.nil?
       if rule.nil?
-        { showField: 'There is no lookup' }.to_json
+        { showField: 'There is no lookup', beep: true }.to_json
       else
         show_field = if rule[:join]
                        DB[rule[:table]].join(rule[:join], rule[:on]).where(rule[:field] => scan_value).get(rule[:show_field])
                      else
                        DB[rule[:table]].where(rule[:field] => scan_value).get(rule[:show_field])
                      end
-        { showField: show_field || 'Not found' }.to_json
+        if show_field.nil?
+          { showField: 'Not found', beep: true }.to_json
+        else
+          { showField: show_field }.to_json
+        end
       end
     end
 
