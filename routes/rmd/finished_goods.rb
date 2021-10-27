@@ -844,10 +844,14 @@ class Nspack < Roda
                                          action: '/rmd/finished_goods/pallet_movements/move_pallet',
                                          button_caption: 'Submit')
 
-          form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location, submit_form: false, required: true, lookup: true)
+          # form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location, submit_form: false, required: true, lookup: true)
+          # KROMCO: temporary: swap which field submits the form:
+          form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location, submit_form: true, required: true, lookup: true)
           form.add_label(:remaining_num_position, 'Remaining No Position', pallet[:remaining_num_position]) unless pallet[:remaining_num_position].nil_or_empty?
           form.add_label(:next_position, 'Next Position', pallet[:next_position]) unless pallet[:next_position].nil_or_empty?
-          form.add_field(:pallet_number, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: true, data_type: :number, required: true)
+          # form.add_field(:pallet_number, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: true, data_type: :number, required: true)
+          # KROMCO: temporary: swap which field submits the form:
+          form.add_field(:pallet_number, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, data_type: :number, required: true)
           form.add_csrf_tag csrf_tag
           view(inline: form.render, layout: :layout_rmd)
         end
