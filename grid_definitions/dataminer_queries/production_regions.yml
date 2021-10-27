@@ -1,8 +1,9 @@
 ---
 :caption: Production Regions
 :sql: "SELECT \"production_regions\".\"id\", \"production_regions\".\"production_region_code\",
-  \"production_regions\".\"description\", \"production_regions\".\"active\", \"production_regions\".\"created_at\",
-  \"production_regions\".\"updated_at\"\r\nFROM \"production_regions\""
+  \"production_regions\".\"description\", \"production_regions\".\"inspection_region\",
+  \"production_regions\".\"active\", \"production_regions\".\"created_at\", \"production_regions\".\"updated_at\"\r\nFROM
+  \"production_regions\""
 :limit: 
 :offset: 
 :external_settings: {}
@@ -55,9 +56,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  inspection_region:
+    :name: inspection_region
+    :sequence_no: 4
+    :caption: Inspection region
+    :namespaced_name: production_regions.inspection_region
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   active:
     :name: active
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Active
     :namespaced_name: production_regions.active
     :data_type: :boolean
@@ -73,7 +90,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Created at
     :namespaced_name: production_regions.created_at
     :data_type: :datetime
@@ -89,7 +106,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Updated at
     :namespaced_name: production_regions.updated_at
     :data_type: :datetime

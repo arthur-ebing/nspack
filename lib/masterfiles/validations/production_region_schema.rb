@@ -5,5 +5,6 @@ module MasterfilesApp
     optional(:id).filled(:integer)
     required(:production_region_code).filled(Types::StrippedString)
     required(:description).maybe(Types::StrippedString)
+    required(:inspection_region).maybe(Types::StrippedString)
   end
 end

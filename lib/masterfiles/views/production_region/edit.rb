@@ -19,6 +19,7 @@ module Masterfiles
               form.method :update
               form.add_field :production_region_code
               form.add_field :description
+              form.add_field :inspection_region
             end
           end
 

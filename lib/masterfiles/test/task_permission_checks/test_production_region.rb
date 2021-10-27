@@ -11,7 +11,8 @@ module MasterfilesApp
         id: 1,
         production_region_code: 'ABC',
         description: 'ABC',
-        active: true
+        active: true,
+        inspection_region: 'ABC'
       }
       MasterfilesApp::ProductionRegion.new(base_attrs.merge(attrs))
     end
