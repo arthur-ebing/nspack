@@ -48,17 +48,6 @@ module MesscadaApp
       repo.update_carton(carton_id, { pallet_sequence_id: pallet_sequence_id })
       prod_repo.decrement_sequence(orig_seq)
 
-      unless repo.sequence_has_cartons?(orig_seq)
-        src_pallet_id = repo.get_value(:pallet_sequences, :pallet_id, id: orig_seq)
-        ProductionApp::ReworksRepo.new.update_pallet_sequence(orig_seq, { pallet_id: nil, exit_ref: AppConst::PALLET_EXIT_REF_SCRAPPED })
-        repo.log_status('pallets', src_pallet_id, AppConst::SEQUENCE_REMOVED_BY_CTN_TRANSFER)
-
-        if ProductionApp::ReworksRepo.new.unscrapped_sequences_count(src_pallet_id) <= 0
-          ProductionApp::ReworksRepo.new.update_pallet(src_pallet_id, { scrapped_at: Time.now, scrapped: true, exit_ref: AppConst::PALLET_EXIT_REF_SCRAPPED_BY_BUILDUP })
-          repo.log_status('pallets', src_pallet_id, AppConst::SCRAPPED_BY_BUILDUP)
-        end
-      end
-
       repo.log_status('pallets', pallet_id, AppConst::CARTON_TRANSFER)
       repo.log_status('cartons', carton_id, AppConst::CARTON_TRANSFER)
       ok_response

@@ -5,6 +5,7 @@ module FinishedGoodsApp
     def move_pallet(pallet_number, location, location_scan_field) # rubocop:disable Metrics/AbcSize
       pallet = prod_repo.find_pallet_by_pallet_number(pallet_number)
       return validation_failed_response(messages: { pallet_number: ['Pallet does not exist'] }) unless pallet
+      return failed_response('Cannot move pallet. Pallet is on a tripsheet') if repo.exists?(:vehicle_job_units, stock_item_id: pallet[:id], offloaded_at: nil)
 
       location_id = locn_repo.resolve_location_id_from_scan(location, location_scan_field)
       return validation_failed_response(messages: { location: ['Location does not exist'] }) if location_id.nil_or_empty?

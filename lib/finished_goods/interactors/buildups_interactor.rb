@@ -156,6 +156,7 @@ module FinishedGoodsApp
 
     def remove_sequence_from_pallet(src_seq_id)
       src_pallet_id = repo.get_value(:pallet_sequences, :pallet_id, id: src_seq_id)
+      src_pallet_ctn_qty = repo.get_value(:pallets, :carton_quantity, id: src_pallet_id)
       attrs = { removed_from_pallet: true,
                 removed_from_pallet_at: Time.now,
                 pallet_id: nil,
@@ -165,7 +166,7 @@ module FinishedGoodsApp
       reworks_repo.update_pallet_sequence(src_seq_id, attrs)
       repo.log_status('pallets', src_pallet_id, AppConst::SEQ_REMOVED_BY_CTN_TRANSFER)
       repo.log_status('pallet_sequences', src_seq_id, AppConst::SEQ_REMOVED_BY_CTN_TRANSFER)
-      scrap_src_pallet(src_pallet_id) if repo.get_value(:pallets, :carton_quantity, id: src_pallet_id).zero?
+      scrap_src_pallet(src_pallet_id) if src_pallet_ctn_qty.zero?
     end
 
     def scrap_src_pallet(src_pallet_id)

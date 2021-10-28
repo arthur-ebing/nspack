@@ -16,6 +16,12 @@ module MesscadaApp
         return res unless res.success
       end
 
+      is_kr_bin = AppConst::CR_PROD.kromco_rmt_integration?
+      if is_kr_bin
+        res = BinIntegration.new(bin_number, run_res.instance).valid_bin_for_kromco_rmt_system?
+        return res unless res.success
+      end
+
       errors = validations
       return failed_response(errors) unless errors.nil?
 

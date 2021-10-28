@@ -138,6 +138,7 @@ module FinishedGoodsApp
       @stock_item = repo.find_stock_item(stock_item_id, stock_type)
 
       return failed_response("#{stock_type} does not exist") unless @stock_item
+      return failed_response("Cannot move #{stock_type}. #{stock_type} is on a tripsheet") if repo.exists?(:vehicle_job_units, stock_item_id: stock_item_id, offloaded_at: nil)
 
       unless business_process == AppConst::REWORKS_MOVE_PALLET_BUSINESS_PROCESS
         return failed_response("#{stock_type} has been scrapped") if @stock_item[:scrapped]

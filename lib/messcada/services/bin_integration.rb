@@ -37,9 +37,6 @@ module MesscadaApp
     end
 
     def valid_bin_for_kromco_rmt_system?
-      res = repo.can_bin_be_tipped?(bin_number)
-      return res unless res.success
-
       bintip_criteria_passed?
     end
 
