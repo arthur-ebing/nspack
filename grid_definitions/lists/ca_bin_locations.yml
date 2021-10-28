@@ -1,0 +1,14 @@
+---
+:dataminer_definition: ca_bin_locations
+:actions:
+- :url: "/raw_materials/locations/ca_treatment/$:id$/apply_status"
+  :text: Apply Status
+  :icon: edit
+  :title: Apply Status
+  :popup: true
+- :separator: true
+- :url: "/development/statuses/list/locations/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
