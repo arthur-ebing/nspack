@@ -5,7 +5,7 @@ module RawMaterials
     module Location
       class ApplyStatus
         def self.call(id, form_values: nil, form_errors: nil)
-          ui_rule = UiRules::Compiler.new(:location, :apply_status, id: id, form_values: form_values)
+          ui_rule = UiRules::Compiler.new(:rmt_location, :apply_status, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
           Crossbeams::Layout::Page.build(rules) do |page|

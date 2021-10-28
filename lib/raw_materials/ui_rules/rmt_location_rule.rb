@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class LocationRule < Base
+  class RmtLocationRule < Base
     def generate_rules
       @repo = RawMaterialsApp::LocationRepo.new
       make_form_object
@@ -21,14 +21,15 @@ module UiRules
 
     def common_fields
       {
-        status: { renderer: :select, options: AppConst::CA_TREATMENT_LOCATION_STATUSES, required: true },
+        status: { renderer: :select, options: AppConst::CA_TREATMENT_LOCATION_STATUSES, required: true, min_charwidth: 30 },
         current_status: { renderer: :label },
         location_long_code: { renderer: :label }
       }
     end
 
     def make_form_object
-      @form_object = OpenStruct.new(@repo.find_location(@options[:id]).to_h.merge(status: nil))
+      hash = @repo.find_location(@options[:id])
+      @form_object = OpenStruct.new(hash.to_h.merge(status: hash[:current_status]))
     end
   end
 end

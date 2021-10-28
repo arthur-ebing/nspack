@@ -17,7 +17,7 @@ module RawMaterialsApp
         log_transaction
       end
       instance = location(id)
-      success_response("Updated location #{instance.location_long_code} and #{ids.length} bin#{ids.length == 1 ? '' : 's'}", instance)
+      success_response("Set location #{instance.location_long_code} and #{ids.length} bin#{ids.length == 1 ? '' : 's'} to #{res[:status]}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
