@@ -19,6 +19,8 @@ module Masterfiles
               form.add_field :default_currency
               form.add_field :currencies
               form.add_field :contact_people
+              form.add_field :location_id
+              form.add_field :bin_asset_trading_partner
               form.add_field :active
               # form.add_field :rmt_customer
             end

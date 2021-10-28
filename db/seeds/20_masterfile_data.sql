@@ -116,6 +116,7 @@ INSERT INTO location_types (location_type_code, short_code, hierarchical) VALUES
 INSERT INTO location_types (location_type_code, short_code, hierarchical) VALUES('PENDING_LOCATION', 'PENDING_LOCATION', 't') ON CONFLICT DO NOTHING;
 INSERT INTO location_types (location_type_code, short_code, hierarchical) VALUES('IN_TRANSIT', 'IN_TRANSIT', 'f') ON CONFLICT DO NOTHING;
 INSERT INTO location_types (location_type_code, short_code, hierarchical) VALUES('UNTIPPED_BIN', 'UNTIPPED_BIN', 'f') ON CONFLICT DO NOTHING;
+INSERT INTO location_types (location_type_code, short_code, hierarchical) VALUES('BIN_ASSET_TRADING_PARTNER', 'BIN_ASSET_TRADING_PARTNER', 'f') ON CONFLICT DO NOTHING;
 
 -- LOCATION STORAGE TYPES
 INSERT INTO location_storage_types (storage_type_code) VALUES('SITE') ON CONFLICT DO NOTHING;

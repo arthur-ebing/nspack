@@ -22,6 +22,7 @@ module Masterfiles
               form.add_field :financial_account_code
               form.add_field :fruit_industry_levy_id
               form.add_field :default_currency_id
+              form.add_field :bin_asset_trading_partner
               form.add_field :currency_ids
               form.add_field :contact_person_ids
             end

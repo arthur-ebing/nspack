@@ -52,7 +52,7 @@ module RawMaterialsApp
     end
 
     def for_select_bin_asset_locations
-      loc_type_ids = DB[:location_types].where(location_type_code: [AppConst::LOCATION_TYPES_BIN_ASSET, AppConst::LOCATION_TYPES_FARM]).select_map(:id)
+      loc_type_ids = DB[:location_types].where(location_type_code: [AppConst::LOCATION_TYPES_BIN_ASSET, AppConst::LOCATION_TYPES_FARM, AppConst::LOCATION_TYPES_BIN_ASSET_TRADING_PARTNER]).select_map(:id)
       location_repo.for_select_locations(where: { location_type_id: loc_type_ids })
     end
 
@@ -68,14 +68,14 @@ module RawMaterialsApp
 
     def for_select_available_bin_asset_locations
       available_ids = DB[:bin_asset_locations].select_map(:location_id)
-      loc_type_ids = DB[:location_types].where(location_type_code: [AppConst::LOCATION_TYPES_BIN_ASSET, AppConst::LOCATION_TYPES_FARM]).select_map(:id)
+      loc_type_ids = DB[:location_types].where(location_type_code: [AppConst::LOCATION_TYPES_BIN_ASSET, AppConst::LOCATION_TYPES_FARM, AppConst::LOCATION_TYPES_BIN_ASSET_TRADING_PARTNER]).select_map(:id)
       location_repo.for_select_locations(where: { location_type_id: loc_type_ids, id: available_ids })
     end
 
     def for_select_available_farm_bin_asset_locations
       available_ids = DB[:bin_asset_locations].select_map(:location_id)
-      location_type_id = DB[:location_types].where(location_type_code: AppConst::LOCATION_TYPES_FARM).get(:id)
-      location_repo.for_select_locations(where: { location_type_id: location_type_id, id: available_ids })
+      loc_type_ids = DB[:location_types].where(location_type_code: [AppConst::LOCATION_TYPES_FARM, AppConst::LOCATION_TYPES_BIN_ASSET_TRADING_PARTNER]).select_map(:id)
+      location_repo.for_select_locations(where: { location_type_id: loc_type_ids, id: available_ids })
     end
 
     def find_owner_bin_type(owner_id, type_id)

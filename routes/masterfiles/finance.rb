@@ -116,6 +116,7 @@ class Nspack < Roda
               fruit_industry_levy_id
               fruit_industry_levy
               rmt_customer
+              bin_asset_trading_partner
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys),
                                 notice: res.message)
@@ -189,6 +190,7 @@ class Nspack < Roda
             fruit_industry_levy_id
             fruit_industry_levy
             rmt_customer
+            bin_asset_trading_partner
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)

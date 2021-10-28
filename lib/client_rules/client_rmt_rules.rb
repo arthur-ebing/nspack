@@ -22,7 +22,8 @@ module Crossbeams
             presort_legacy_data_fields: [],
             presort_plant_integration: false,
             show_kromco_attributes: false,
-            create_depot_location: false },
+            create_depot_location: false,
+            create_bin_asset_trading_partner_location: false  },
       hl: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             use_delivery_destination: false,
@@ -40,7 +41,8 @@ module Crossbeams
             presort_legacy_data_fields: [],
             presort_plant_integration: false,
             show_kromco_attributes: false,
-            create_depot_location: false  },
+            create_depot_location: false,
+            create_bin_asset_trading_partner_location: false  },
       kr: { bin_pallet_conversion_defaults: { pallet_format: { stack_type: 'BIN', pallet_base: 'S' },
                                               basic_pack: 'BX750',
                                               grade: 'SA',
@@ -66,7 +68,8 @@ module Crossbeams
             presort_legacy_data_fields: %i[treatment_code ripe_point_code track_indicator_code],
             presort_plant_integration: true,
             show_kromco_attributes: true,
-            create_depot_location: true  },
+            create_depot_location: true,
+            create_bin_asset_trading_partner_location: true  },
       um: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             use_delivery_destination: false,
@@ -84,7 +87,8 @@ module Crossbeams
             presort_legacy_data_fields: [],
             presort_plant_integration: false,
             show_kromco_attributes: false,
-            create_depot_location: false  },
+            create_depot_location: false,
+            create_bin_asset_trading_partner_location: false  },
       ud: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             use_delivery_destination: true,
@@ -102,7 +106,8 @@ module Crossbeams
             presort_legacy_data_fields: [],
             presort_plant_integration: false,
             show_kromco_attributes: false,
-            create_depot_location: false  },
+            create_depot_location: false,
+            create_bin_asset_trading_partner_location: false  },
       sr: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             use_delivery_destination: true,
@@ -120,7 +125,8 @@ module Crossbeams
             presort_legacy_data_fields: [],
             presort_plant_integration: false,
             show_kromco_attributes: false,
-            create_depot_location: false  },
+            create_depot_location: false,
+            create_bin_asset_trading_partner_location: false   },
       sr2: { bin_pallet_conversion_defaults: {},
              delivery_capture_inner_bins: false,
              use_delivery_destination: true,
@@ -138,7 +144,8 @@ module Crossbeams
              presort_legacy_data_fields: [],
              presort_plant_integration: false,
              show_kromco_attributes: false,
-             create_depot_location: false  }
+             create_depot_location: false,
+             create_bin_asset_trading_partner_location: false  }
     }.freeze
 
     def initialize(client_code)
@@ -284,6 +291,12 @@ module Crossbeams
       return 'Create a location record for depot.' if explain
 
       setting(:create_depot_location)
+    end
+
+    def create_bin_asset_trading_partner_location?(explain: false)
+      return 'Create a location record for depot.' if explain
+
+      setting(:create_bin_asset_trading_partner_location)
     end
   end
 end

@@ -6,6 +6,8 @@ module UiRules
       make_form_object
       apply_form_values
 
+      @rules[:show_trading_partner] = AppConst::CR_RMT.create_bin_asset_trading_partner_location? && @form_object.rmt_customer
+
       common_values_for_fields common_fields
 
       set_show_fields if %i[show].include? @mode
@@ -15,7 +17,8 @@ module UiRules
       form_name 'customer'
     end
 
-    def set_show_fields
+    def set_show_fields # rubocop:disable Metrics/AbcSize
+      location_id_label = @repo.get(:locations, @form_object.location_id, :location_long_code)
       fields[:currencies] = { renderer: :list,
                               items: @form_object.currencies }
       fields[:default_currency] = { renderer: :label }
@@ -27,6 +30,13 @@ module UiRules
                           as_boolean: true }
       fields[:fruit_industry_levy] = { renderer: :label }
       fields[:rmt_customer] = { renderer: :label, as_boolean: true }
+      fields[:bin_asset_trading_partner] = { renderer: :label,
+                                             as_boolean: true,
+                                             invisible: !@rules[:show_trading_partner] }
+      fields[:location_id] = { renderer: :label,
+                               with_value: location_id_label,
+                               caption: 'Location',
+                               invisible: !@form_object.bin_asset_trading_partner }
     end
 
     def common_fields
@@ -72,7 +82,9 @@ module UiRules
                                   disabled_options: @party_repo.for_select_inactive_fruit_industry_levies,
                                   prompt: true,
                                   caption: 'Fruit Industry Levy' },
-        rmt_customer: { renderer: :hidden }
+        rmt_customer: { renderer: :hidden },
+        bin_asset_trading_partner: { renderer: :checkbox,
+                                     hide_on_load: !@rules[:show_trading_partner] }
       }
     end
 
