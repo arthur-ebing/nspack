@@ -10,7 +10,7 @@ module MesscadaApp
       @device = params[:device]
     end
 
-    def call # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+    def call # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       if !bin_exists? && AppConst::CR_RMT.convert_carton_to_rebins? && repo.can_pallet_become_rebin?(bin_number)
         res = convert_carton_to_rebin
         return res unless res.success
@@ -29,7 +29,7 @@ module MesscadaApp
       res = FinishedGoodsApp::MoveStock.call(AppConst::BIN_STOCK_TYPE, rmt_bin_id, location_to_id, AppConst::BIN_TIP_MOVE_BIN_BUSINESS_PROCESS, nil)
       return res unless res.success
 
-      repo.complete_external_bin_tipping(bin_number, @run_id) if AppConst::CR_PROD.kromco_rmt_integration?
+      # repo.complete_external_bin_tipping(bin_number, @run_id) if AppConst::CR_PROD.kromco_rmt_integration?
 
       update_bin
 
