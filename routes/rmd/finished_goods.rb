@@ -88,8 +88,16 @@ class Nspack < Roda
       r.post do
         repo = MesscadaApp::MesscadaRepo.new
         if FinishedGoodsApp::GovtInspectionRepo.new.find_vehicle_job(id).business_process_id == repo.find_business_process('FIRST_INTAKE')[:id]
-          seqs = repo.find_pallet_sequences_by_pallet_number(params[:pallet][:pallet_number]).all
-          form = Crossbeams::RMDForm.new({ pallet_number: params[:pallet][:pallet_number] },
+
+          res = MesscadaApp::ScanCartonLabelOrPallet.call(scanned_number: params[:pallet][:pallet_number], expect: :pallet_number)
+          unless res.success
+            store_locally(:error, res)
+            route.redirect("/rmd/finished_goods/scan_offload_vehicle_pallet/#{id}")
+          end
+          pallet_no = res.instance.pallet_number
+
+          seqs = repo.find_pallet_sequences_by_pallet_number(pallet_no).all
+          form = Crossbeams::RMDForm.new({ pallet_number: pallet_no },
                                          form_name: :pallet,
                                          notes: nil,
                                          scan_with_camera: @rmd_scan_with_camera,
@@ -98,7 +106,7 @@ class Nspack < Roda
                                          action: "/rmd/finished_goods/reject_vehicle_pallet/#{id}",
                                          button_caption: 'Reject Pallet')
 
-          form.add_label(:pallet_number, 'Pallet Number', params[:pallet][:pallet_number], params[:pallet][:pallet_number])
+          form.add_label(:pallet_number, 'Pallet Number', pallet_no, pallet_no)
           form.add_label(:pallet_sequences, 'Pallet Number Sequences', seqs.length)
           form.add_label(:pallet_sequences, 'Pallet Ctn Qty', seqs.empty? ? '-' : seqs[0][:pallet_carton_quantity])
           form.add_label(:packhouse, 'Packhouse', seqs.map { |s| s[:packhouse] }.uniq.join(','))
@@ -1515,7 +1523,8 @@ class Nspack < Roda
   def offload_valid_vehicle_pallet(route, id) # rubocop:disable Metrics/AbcSize
     interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
-    res = interactor.offload_vehicle_pallet(params[:pallet][:pallet_number])
+    res = MesscadaApp::ScanCartonLabelOrPallet.call(scanned_number: params[:pallet][:pallet_number], expect: :pallet_number)
+    res = interactor.offload_vehicle_pallet(res.instance.pallet_number) if res.success
     if res.success
       store_locally(:flash_notice, res.message)
     else
