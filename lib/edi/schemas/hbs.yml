@@ -3,7 +3,7 @@
   :type: :string
   :head: Load_ID
  :weight:
-  :type: :string
+  :type: :decimal
   :head: weight
  :class:
   :type: :string
