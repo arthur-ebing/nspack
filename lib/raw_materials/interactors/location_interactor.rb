@@ -13,7 +13,7 @@ module RawMaterialsApp
       repo.transaction do
         ids = repo.bin_ids_for_location(id)
         log_status(:locations, id, res[:status])
-        log_multiple_statuses(:rmt_bins, ids, res[:status])
+        log_multiple_statuses(:rmt_bins, ids, res[:status], comment: "in location #{instance.location_long_code}")
         log_transaction
       end
       instance = location(id)
