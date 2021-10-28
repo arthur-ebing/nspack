@@ -71,7 +71,8 @@ module MasterfilesApp
         depot_code: Faker::Lorem.unique.word,
         description: 'ABC',
         bin_depot: false,
-        active: true
+        active: true,
+        magisterial_district: 'ABC'
       }
     end
 

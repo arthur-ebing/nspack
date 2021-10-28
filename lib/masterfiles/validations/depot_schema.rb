@@ -7,5 +7,6 @@ module MasterfilesApp
     required(:depot_code).filled(Types::StrippedString)
     required(:description).maybe(Types::StrippedString)
     required(:bin_depot).maybe(:bool)
+    required(:magisterial_district).maybe(Types::StrippedString)
   end
 end

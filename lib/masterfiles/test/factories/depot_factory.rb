@@ -13,7 +13,8 @@ module MasterfilesApp
         bin_depot: true,
         active: true,
         created_at: '2010-01-01 12:00',
-        updated_at: '2010-01-01 12:00'
+        updated_at: '2010-01-01 12:00',
+        magisterial_district: Faker::Lorem.word
       }
       DB[:depots].insert(default.merge(opts))
     end

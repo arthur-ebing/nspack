@@ -477,6 +477,7 @@ class Nspack < Roda
               depot_code
               bin_depot
               description
+              magisterial_district
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
@@ -513,6 +514,7 @@ class Nspack < Roda
             city_name
             bin_depot
             active
+            magisterial_district
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)

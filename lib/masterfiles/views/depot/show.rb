@@ -16,6 +16,7 @@ module Masterfiles
               form.add_field :depot_code
               form.add_field :description
               form.add_field :city_id
+              form.add_field :magisterial_district
               form.add_field :bin_depot
               form.add_field :active
             end
