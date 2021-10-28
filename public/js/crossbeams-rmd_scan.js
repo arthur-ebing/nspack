@@ -118,7 +118,6 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
    * Handle form submission, delaying if the connection is not available.
    * @returns {void}
    */
-
   const formSubmitter = () => {
     // Note this might not work if the OS does not trigger on/offline events in the browser...
     // In that case we will need to trigger fetch requests to check the connection.
@@ -144,13 +143,18 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
   };
 
   /**
+   * isHiddenFromView - returns true if a node is hidden in the DOM.
+   */
+  const isHiddenFromView = elem => elem.getClientRects().length === 0;
+
+  /**
    * Check if all scan fields that belong to a set have values.
    */
   const formSetIsFull = () => {
     const set = document.querySelectorAll('[data-submit-form-set]');
     let assigned = true;
     set.forEach((node) => {
-      if (!node.value || node.value === '') {
+      if ((!node.value || node.value === '') && !isHiddenFromView(node)) {
         assigned = false;
       }
     });
@@ -326,7 +330,7 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
         }
         let cnt = 0;
         scannableInputs.forEach((e) => {
-          if (e.value === '' && cnt === 0 && (publicAPIs.bypassRules || e.dataset.scanRule === scanPack.scanType)) {
+          if (e.value === '' && cnt === 0 && (publicAPIs.bypassRules || e.dataset.scanRule === scanPack.scanType) && !isHiddenFromView(e)) {
             e.value = scanPack.value;
             const evt = new Event('change', {
               bubbles: true,
