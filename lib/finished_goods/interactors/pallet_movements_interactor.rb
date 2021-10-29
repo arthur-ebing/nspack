@@ -97,25 +97,26 @@ module FinishedGoodsApp
       return failed_response('Location does not exist') if location_id.nil_or_empty?
 
       location_code = repo.get_value(:locations, :location_short_code, id: location_id)
-      pallet_count = locn_repo.location_pallets_count(location_id)
+      pallet_count = locn_repo.location_pallets_count(location_id, recursive: true)
       return failed_response("Location: #{location_code} is empty") if pallet_count.zero?
 
-      success_response("There are #{pallet_count} pallets in this location: #{location_code}. Are you sure these pallets are no longer there?", location_id)
+      success_response("There are #{pallet_count} pallets in this location: #{location_code} and any sub-locations. Are you sure these pallets are no longer there?", location_id)
     end
 
     def move_all_pallet_out_of_location(location_id) # rubocop:disable Metrics/AbcSize
       pending_location_id = repo.get_value(:locations, :id, location_short_code: AppConst::PENDING_LOCATION)
-      pallets = repo.select_values(:pallets, :id, location_id: location_id)
+
+      pallets_id = locn_repo.location_pallet_ids(location_id, recursive: true)
       location_code = repo.get_value(:locations, :location_short_code, id: location_id)
 
       repo.transaction do
-        pallets.each do |id|
+        pallet_ids.each do |id|
           res = FinishedGoodsApp::MoveStock.call(AppConst::PALLET_STOCK_TYPE, id, pending_location_id, 'MOVE_PALLET', nil)
           raise Crossbeams::InfoError, res.message unless res.success
         end
       end
 
-      success_response("#{pallets.size} pallets moved from #{location_code} to #{AppConst::PENDING_LOCATION}")
+      success_response("#{pallets_id.size} pallets moved from #{location_code} and its sub-locations to #{AppConst::PENDING_LOCATION}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

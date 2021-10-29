@@ -414,8 +414,22 @@ module MasterfilesApp
         .map(%i[location_long_code id])
     end
 
-    def location_pallets_count(location_id)
-      DB[:pallets].where(location_id: location_id).count
+    # Get the count of all pallets in a location.
+    # If recursive is true, get the count of pallets in the location and all its sub-locations.
+    def location_pallets_count(location_id, recursive: false)
+      return DB[:pallets].where(location_id: location_id).count unless recursive
+
+      location_ids = DB[:tree_locations].where(ancestor_location_id: location_id).select_map(:descendant_location_id)
+      DB[:pallets].where(location_id: location_ids).count
+    end
+
+    # Get the ids of all pallets in a location.
+    # If recursive is true, get pallet ids in the location and all its sub-locations.
+    def location_pallet_ids(location_id, recursive: false)
+      return select_values(:pallets, :id, location_id: location_id) unless recursive
+
+      location_ids = DB[:tree_locations].where(ancestor_location_id: location_id).select_map(:descendant_location_id)
+      select_values(:pallets, :id, location_id: location_ids)
     end
 
     def belongs_to_parent?(child_location_id, parent_location_id)
