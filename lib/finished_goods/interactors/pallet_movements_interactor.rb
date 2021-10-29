@@ -106,7 +106,7 @@ module FinishedGoodsApp
     def move_all_pallet_out_of_location(location_id) # rubocop:disable Metrics/AbcSize
       pending_location_id = repo.get_value(:locations, :id, location_short_code: AppConst::PENDING_LOCATION)
 
-      pallets_id = locn_repo.location_pallet_ids(location_id, recursive: true)
+      pallet_ids = locn_repo.location_pallet_ids(location_id, recursive: true)
       location_code = repo.get_value(:locations, :location_short_code, id: location_id)
 
       repo.transaction do
@@ -116,7 +116,7 @@ module FinishedGoodsApp
         end
       end
 
-      success_response("#{pallets_id.size} pallets moved from #{location_code} and its sub-locations to #{AppConst::PENDING_LOCATION}")
+      success_response("#{pallet_ids.size} pallets moved from #{location_code} and its sub-locations to #{AppConst::PENDING_LOCATION}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
