@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module EdiApp
-  class PsOutRepo < BaseRepo
+  class PsOutRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     def ps_rows(party_role_id)
       party_role_condition = party_role_condition_for(party_role_id)
 
@@ -27,7 +27,9 @@ module EdiApp
           COALESCE(inventory_codes.edi_out_inventory_code, inventory_codes.inventory_code) AS inventory_code,
           pallet_sequences.pick_ref AS picking_reference,
           pallet_sequences.product_chars AS product_characteristic_code,
-          COALESCE(target_markets.target_market_name, target_market_groups.target_market_group_name) AS target_market,
+          COALESCE(fn_party_role_org_code(pallet_sequences.target_customer_party_role_id),
+                   target_markets.target_market_name,
+                   target_market_groups.target_market_group_name) AS target_market,
           pucs.puc_code AS farm,
           pucs.gap_code AS global_gap_number,
           pallet_sequences.carton_quantity,

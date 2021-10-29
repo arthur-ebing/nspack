@@ -61,6 +61,9 @@ module EdiApp
           pallet_sequences.legacy_data ->> 'extended_fg_code' AS extended_fg_code,
           -- target_market_groups.target_market_group_name AS target_market,
           fn_party_role_name(pallet_sequences.target_customer_party_role_id) AS target_market,
+          COALESCE(fn_party_role_org_code(pallet_sequences.target_customer_party_role_id),
+                   target_markets.target_market_name,
+                   target_market_groups.target_market_group_name) AS target_market,
           loads.id AS load_no,
           farms.farm_code AS grower_id,
           -- pallets.edi_in_consignment_note_number AS intake_consignment_id,
@@ -162,6 +165,7 @@ module EdiApp
         JOIN pallets ON pallets.load_id = loads.id
         JOIN pallet_sequences ON pallet_sequences.pallet_id = pallets.id
         LEFT JOIN std_fruit_size_counts ON std_fruit_size_counts.id = pallet_sequences.std_fruit_size_count_id
+        JOIN target_markets ON target_markets.id = pallet_sequences.target_market_id
         JOIN target_market_groups ON target_market_groups.id = pallet_sequences.packed_tm_group_id
         JOIN farms ON farms.id = pallet_sequences.farm_id
         LEFT JOIN farm_groups ON farms.farm_group_id = farm_groups.id
