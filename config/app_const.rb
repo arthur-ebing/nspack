@@ -655,5 +655,5 @@ class AppConst # rubocop:disable Metrics/ClassLength
 
   # Refresh pallet data
   REFRESH_PALLET_DATA_TABLES = %w[carton_labels pallet_sequences].freeze
-  REFRESH_PALLET_DATA_COLUMNS = %w[fruit_actual_counts_for_pack_id fruit_size_reference_id].freeze
+  REFRESH_PALLET_DATA_COLUMNS = %w[fruit_actual_counts_for_pack_id fruit_size_reference_id sell_by_code].freeze
 end
