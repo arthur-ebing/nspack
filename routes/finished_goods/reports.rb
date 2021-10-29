@@ -98,7 +98,8 @@ class Nspack < Roda
     r.on 'accompanying_phyto', Integer do |id|
       jasper_params = JasperParams.new('accompanying_phyto',
                                        current_user.login_name,
-                                       load_id: id)
+                                       load_id: id,
+                                       from_depot: AppConst::FROM_DEPOT)
       res = CreateJasperReport.call(jasper_params)
 
       if res.success
