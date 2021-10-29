@@ -190,7 +190,7 @@ module FinishedGoodsApp
       return failed_response('Pallet does not exist') unless pallet
       return failed_response('Pallet has been scrapped') if pallet[:scrapped]
       return failed_response('Pallet has been shipped') if pallet[:shipped]
-      return failed_response("Pallet:#{pallet_number} belongs to another tripsheet") if repo.vehicle_job_unit_in_different_tripsheet?(pallet[:id], id, AppConst::PALLET_STOCK_TYPE_)
+      return failed_response("Pallet:#{pallet_number} belongs to another tripsheet") if repo.vehicle_job_unit_in_different_tripsheet?(pallet[:id], id, AppConst::PALLET_STOCK_TYPE)
       return failed_response("Cannot add:#{pallet_number}. Tripsheet has already been offloaded") if repo.get(:vehicle_jobs, id, :offloaded_at)
       return failed_response("Pallet is still on bay: #{repo.palletizing_bay_for_pallet(pallet_number)}") if pallet[:has_individual_cartons] && !pallet[:palletized]
 
