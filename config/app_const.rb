@@ -539,7 +539,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
     EDI_FLOW_HCS => {
       singleton: false,
       depot: false,
-      roles: [ROLE_EXPORTER]
+      roles: [ROLE_MARKETER]
     },
     EDI_FLOW_UISTK => {
       singleton: false,

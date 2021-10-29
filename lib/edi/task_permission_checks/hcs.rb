@@ -18,7 +18,7 @@ module EdiApp
       }.freeze
 
       VALID_ROLES = {
-        AppConst::ROLE_EXPORTER => :exporter_party_role_id
+        AppConst::ROLE_MARKETER => :marketing_org_party_role_id
       }.freeze
 
       DEPOT_VALID = false
