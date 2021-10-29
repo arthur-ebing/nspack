@@ -111,12 +111,12 @@ module FinishedGoodsApp
 
       all_hash(:govt_inspection_pallets, govt_inspection_sheet_id: id).each do |govt_inspection_pallet|
         pallet_id = govt_inspection_pallet[:pallet_id]
-        pallet = find_hash(:pallets, pallet_id)
+        # pallet = find_hash(:pallets, pallet_id)
 
         params = { inspected: true,
                    govt_inspection_passed: govt_inspection_pallet[:passed],
                    last_govt_inspection_pallet_id: govt_inspection_pallet[:id] }
-        params[:govt_first_inspection_at] = Time.now if pallet[:govt_first_inspection_at].nil?
+        params[:govt_first_inspection_at] = Time.now unless reinspection # if pallet[:govt_first_inspection_at].nil?
         params[:govt_reinspection_at] = Time.now if reinspection
         if govt_inspection_pallet[:passed] && !AppConst::CREATE_STOCK_AT_FIRST_INTAKE
           params[:in_stock] = true
