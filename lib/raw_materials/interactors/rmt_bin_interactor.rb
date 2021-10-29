@@ -40,7 +40,9 @@ module RawMaterialsApp
       stock_type_id = repo.get_value(:stock_types, :id, stock_type_code: AppConst::BIN_STOCK_TYPE)
       bin_id = repo.get_value(:rmt_bins, :id, bin_asset_number: bin_number)
       return failed_response("Bin:#{bin_number} not found") unless bin_id
-      return failed_response("Bin:#{bin_number} belongs to another tripsheet") if insp_repo.vehicle_job_unit_in_different_tripsheet?(bin_id, vehicle_job_id) && repo.get_value(:vehicle_job_units, :vehicle_job_id, stock_item_id: bin_id, offloaded_at: nil) != vehicle_job[:items_moved_from_job_id]
+
+      stock_type_id = repo.get_id(:stock_types, stock_type_code: AppConst::BIN_STOCK_TYPE)
+      return failed_response("Bin:#{bin_number} belongs to another tripsheet") if insp_repo.vehicle_job_unit_in_different_tripsheet?(bin_id, vehicle_job_id, AppConst::BIN_STOCK_TYPE) && repo.get_value(:vehicle_job_units, :vehicle_job_id, stock_type_id: stock_type_id, stock_item_id: bin_id, offloaded_at: nil) != vehicle_job[:items_moved_from_job_id]
 
       res = validate_vehicle_job_unit_params(stock_item_id: bin_id, stock_type_id: stock_type_id, vehicle_job_id: vehicle_job_id)
       return failed_response(unwrap_failed_response(validation_failed_response(res))) if res.failure?
@@ -56,7 +58,7 @@ module RawMaterialsApp
           log_status(:rmt_bins, bin_id, "BIN_MOVED_FROM_SHEET(#{from_vehicle_job[:id]})_TO_SHEET(#{vehicle_job_id})")
         end
 
-        vehicle_job_unit_id = repo.get_value(:vehicle_job_units, :id, stock_item_id: bin_id, vehicle_job_id: vehicle_job_id)
+        vehicle_job_unit_id = repo.get_value(:vehicle_job_units, :id, stock_type_id: stock_type_id, stock_item_id: bin_id, vehicle_job_id: vehicle_job_id)
         if vehicle_job_unit_id
           insp_repo.delete_vehicle_job_unit(vehicle_job_unit_id)
           log_status(:rmt_bins, bin_id, AppConst::RMT_BIN_REMOVED_FROM_BINS_TRIPSHEET)
@@ -74,12 +76,13 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def cancel_bins_tripheet(vehicle_job_id)
+    def cancel_bins_tripheet(vehicle_job_id) # rubocop:disable Metrics/AbcSize
       offloaded_bins = insp_repo.offloaded_vehicle_job_units_size(vehicle_job_id)
       return failed_response("Couldn't cancel tripsheet: #{offloaded_bins} bins have already been offloaded") unless offloaded_bins.zero?
 
       repo.transaction do
-        bins = repo.select_values(:vehicle_job_units, :stock_item_id, vehicle_job_id: vehicle_job_id)
+        stock_type_id = repo.get_id(:stock_types, stock_type_code: AppConst::BIN_STOCK_TYPE)
+        bins = repo.select_values(:vehicle_job_units, :stock_item_id, stock_type_id: stock_type_id, vehicle_job_id: vehicle_job_id)
         insp_repo.delete_vehicle_job(vehicle_job_id)
         log_multiple_statuses(:rmt_bins, bins, AppConst::BIN_TRIPSHEET_CANCELED)
       end
@@ -96,9 +99,10 @@ module RawMaterialsApp
       return failed_response('Cannot complete: No bins on tripsheet') if unit1.nil?
 
       repo.transaction do
+        stock_type_id = repo.get_id(:stock_types, stock_type_code: AppConst::BIN_STOCK_TYPE)
         repo.update(:vehicle_jobs, vehicle_job_id, loaded_at: Time.now)
         insp_repo.load_vehicle_job_units(vehicle_job_id)
-        log_multiple_statuses(:rmt_bins, repo.select_values(:vehicle_job_units, :stock_item_id, vehicle_job_id: vehicle_job_id), AppConst::RMT_BIN_LOADED_ON_VEHICLE)
+        log_multiple_statuses(:rmt_bins, repo.select_values(:vehicle_job_units, :stock_item_id, stock_type_id: stock_type_id, vehicle_job_id: vehicle_job_id), AppConst::RMT_BIN_LOADED_ON_VEHICLE)
       end
 
       success_response 'Tripsheet completed successfully'
@@ -576,7 +580,9 @@ module RawMaterialsApp
       bin = find_rmt_bin_by_id_or_asset_number(bin_number)
       return failed_response("Scanned Bin:#{bin_number} is not in stock") unless bin
       return failed_response("Scanned Bin:#{bin_number} has been tipped") if bin[:bin_tipped]
-      return failed_response("Cannot move bin: #{bin_number}. Bin is on a tripsheet") if repo.exists?(:vehicle_job_units, stock_item_id: bin[:id], offloaded_at: nil)
+
+      stock_type_id = repo.get_id(:stock_types, stock_type_code: AppConst::BIN_STOCK_TYPE)
+      return failed_response("Cannot move bin: #{bin_number}. Bin is on a tripsheet") if repo.exists?(:vehicle_job_units, stock_type_id: stock_type_id, stock_item_id: bin[:id], offloaded_at: nil)
 
       success_response('Valid Bin Scanned',
                        bin)

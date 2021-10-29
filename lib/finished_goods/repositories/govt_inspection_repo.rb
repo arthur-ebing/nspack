@@ -58,14 +58,17 @@ module FinishedGoodsApp
       GovtInspectionSheet.new(hash)
     end
 
-    def vehicle_job_unit_in_different_tripsheet?(vehicle_job_unit_id, vehicle_job_id)
+    def vehicle_job_unit_in_different_tripsheet?(stock_item_id, vehicle_job_id, stock_type)
       query = <<~SQL
         SELECT u.id
-        FROM  vehicle_job_units u
-        JOIN vehicle_jobs j on j.id=u.vehicle_job_id
-        WHERE u.stock_item_id = ? and u.vehicle_job_id <> ? and j.offloaded_at is null
+        FROM vehicle_job_units u
+        JOIN vehicle_jobs j ON j.id = u.vehicle_job_id
+        WHERE u.stock_item_id = ?
+        AND u.vehicle_job_id <> ?
+        AND j.offloaded_at IS NULL
+        AND u.stock_type_id = (SELECT id FROM stock_types WHERE stock_type_code = ?)
       SQL
-      !DB[query, vehicle_job_unit_id, vehicle_job_id].empty?
+      !DB[query, stock_item_id, vehicle_job_id, stock_type].empty?
     end
 
     def clone_govt_inspection_sheet(id, user)
