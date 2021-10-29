@@ -576,7 +576,7 @@ module RawMaterialsApp
       bin = find_rmt_bin_by_id_or_asset_number(bin_number)
       return failed_response("Scanned Bin:#{bin_number} is not in stock") unless bin
       return failed_response("Scanned Bin:#{bin_number} has been tipped") if bin[:bin_tipped]
-      return failed_response('Cannot move bin. Bin is on a tripsheet') if repo.exists?(:vehicle_job_units, stock_item_id: bin[:id], offloaded_at: nil)
+      return failed_response("Cannot move bin: #{bin_number}. Bin is on a tripsheet") if repo.exists?(:vehicle_job_units, stock_item_id: bin[:id], offloaded_at: nil)
 
       success_response('Valid Bin Scanned',
                        bin)

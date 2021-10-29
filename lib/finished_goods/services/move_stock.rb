@@ -136,6 +136,11 @@ module FinishedGoodsApp
 
     def validate_stock_item # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       @stock_item = repo.find_stock_item(stock_item_id, stock_type)
+      stock_item_code = if stock_type == AppConst::PALLET_STOCK_TYPE
+                          stock_item[:pallet_number]
+                        elsif stock_type == AppConst::BIN_STOCK_TYPE
+                          stock_item[:bin_asset_number]
+                        end
 
       return failed_response("#{stock_type} does not exist") unless @stock_item
       return failed_response("Cannot move #{stock_type}. #{stock_type} is on a tripsheet") if repo.exists?(:vehicle_job_units, stock_type_id: stock_type_id, stock_item_id: stock_item_id, offloaded_at: nil)
