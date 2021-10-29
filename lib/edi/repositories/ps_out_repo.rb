@@ -60,6 +60,7 @@ module EdiApp
           END AS substitute_for_original_account,
           SUBSTRING(location_types.location_type_code, 1, 16) AS substitute_for_saftbin1,
           SUBSTRING(locations.location_long_code, 1, 16) AS substitute_for_saftbin2,
+          #{AppConst::CR_EDI.orig_account} AS original_account,
           (SELECT t.treatment_code
             FROM treatments t
             JOIN treatment_types y ON y.id = t.treatment_type_id

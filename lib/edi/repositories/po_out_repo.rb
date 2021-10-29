@@ -89,6 +89,7 @@ module EdiApp
           ph_resource.resource_properties ->> 'edi_out_value' AS prod_grp,
           depots.depot_code AS dest_locn,
           depots.depot_code AS orig_depot,
+          #{AppConst::CR_EDI.orig_account} AS orig_account,
           CASE WHEN govt_inspection_sheets.use_inspection_destination_for_load_out THEN
             (SELECT destination_regions.destination_region_name
               FROM destination_regions_tm_groups

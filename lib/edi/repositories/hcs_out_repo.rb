@@ -142,7 +142,7 @@ module EdiApp
 
           fruit_actual_counts_for_packs.actual_count_for_pack AS actual_count,
           customers.financial_account_code AS hansaworld,
-          '8385' AS account,
+          #{AppConst::CR_EDI.orig_account} AS account,
           farm_groups.farm_group_code AS farmsubgroup,
           farm_groups.farm_group_code AS farmgroup,
           CASE WHEN pallets.depot_pallet THEN 'Depot' ELSE 'Packed_at_Kromco' END AS depot_indicator,
@@ -165,7 +165,7 @@ module EdiApp
         JOIN pallets ON pallets.load_id = loads.id
         JOIN pallet_sequences ON pallet_sequences.pallet_id = pallets.id
         LEFT JOIN std_fruit_size_counts ON std_fruit_size_counts.id = pallet_sequences.std_fruit_size_count_id
-        JOIN target_markets ON target_markets.id = pallet_sequences.target_market_id
+        LEFT JOIN target_markets ON target_markets.id = pallet_sequences.target_market_id
         JOIN target_market_groups ON target_market_groups.id = pallet_sequences.packed_tm_group_id
         JOIN farms ON farms.id = pallet_sequences.farm_id
         LEFT JOIN farm_groups ON farms.farm_group_id = farm_groups.id
