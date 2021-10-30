@@ -15,6 +15,7 @@ module Crossbeams
             send_hbs_edi: false,
             po_in_force_orchard: false,
             edi_in_default_phc: nil,
+            edi_out_account: nil,
             ps_apply_substitutes: false },
       hl: { install_location: 'HABATA',
             load_id_prefix: '',
@@ -26,6 +27,7 @@ module Crossbeams
             send_hbs_edi: false,
             po_in_force_orchard: false,
             edi_in_default_phc: nil,
+            edi_out_account: nil,
             ps_apply_substitutes: false },
       kr: { install_location: 'KROMCO',
             load_id_prefix: '',
@@ -38,6 +40,7 @@ module Crossbeams
             send_hbs_edi: true,
             po_in_force_orchard: true,
             edi_in_default_phc: 'Unknown',
+            edi_out_account: '8385',
             ps_apply_substitutes: false },
       um: { install_location: 'MATCOLD',
             load_id_prefix: '',
@@ -49,6 +52,7 @@ module Crossbeams
             send_hbs_edi: false,
             po_in_force_orchard: false,
             edi_in_default_phc: nil,
+            edi_out_account: nil,
             ps_apply_substitutes: false },
       ud: { install_location: 'UNIFRUT',
             load_id_prefix: '',
@@ -60,6 +64,7 @@ module Crossbeams
             send_hbs_edi: false,
             po_in_force_orchard: false,
             edi_in_default_phc: nil,
+            edi_out_account: nil,
             ps_apply_substitutes: false },
       sr: { install_location: 'SRKIRKW',
             load_id_prefix: '',
@@ -71,6 +76,7 @@ module Crossbeams
             send_hbs_edi: false,
             po_in_force_orchard: false,
             edi_in_default_phc: nil,
+            edi_out_account: nil,
             ps_apply_substitutes: false },
       sr2: { install_location: 'SRADDO',
              load_id_prefix: 'A',
@@ -82,6 +88,7 @@ module Crossbeams
              send_hbs_edi: false,
              po_in_force_orchard: false,
              edi_in_default_phc: nil,
+             edi_out_account: nil,
              ps_apply_substitutes: false }
     }.freeze
 
@@ -119,6 +126,13 @@ module Crossbeams
       return 'Should EDI PO in create an orchard if the input value is missing.' if explain
 
       setting(:po_in_force_orchard)
+    end
+
+    def orig_account(explain: false)
+      return 'Account to be used in EDI out files. Formatted for SQL.' if explain
+
+      acc = setting(:edi_out_account)
+      acc ? "'#{acc}'" : 'NULL'
     end
 
     private
