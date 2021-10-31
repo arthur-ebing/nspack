@@ -43,7 +43,8 @@ module RawMaterialsApp
         rebin_created_at: '2010-01-01 12:00',
         scrapped: false,
         scrapped_at: '2010-01-01 12:00',
-        scrapped_rmt_delivery_id: Faker::Number.number(digits: 4)
+        scrapped_rmt_delivery_id: Faker::Number.number(digits: 4),
+        legacy_data: nil
       }
       DB[:rmt_bins].insert(default.merge(opts))
     end

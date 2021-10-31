@@ -164,34 +164,7 @@ module RawMaterialsApp
     end
 
     def find_rmt_bin_flat(id)
-      hash = find_with_association(
-        :rmt_bins, id,
-        parent_tables: [{ parent_table: :orchards,
-                          flatten_columns: { orchard_code: :orchard_code } },
-                        { parent_table: :farms,
-                          flatten_columns: { farm_code: :farm_code, description: :farm_description, farm_group_id: :farm_group_id } },
-                        { parent_table: :rmt_sizes,
-                          flatten_columns: { size_code: :size_code } },
-                        { parent_table: :pucs,
-                          flatten_columns: { puc_code: :puc_code } },
-                        { parent_table: :seasons,
-                          flatten_columns: { season_code: :season_code, season_year: :season_year } },
-                        { parent_table: :rmt_classes,
-                          flatten_columns: { rmt_class_code: :class_code } },
-                        { parent_table: :locations,
-                          flatten_columns: { location_long_code: :location_long_code } },
-                        { parent_table: :rmt_container_types,
-                          flatten_columns: { container_type_code: :container_type_code } },
-                        { parent_table: :rmt_container_material_types,
-                          flatten_columns: { container_material_type_code: :container_material_type_code } },
-                        { parent_table: :cultivars, foreign_key: :cultivar_id,
-                          flatten_columns: { cultivar_code: :cultivar_code,  cultivar_name: :cultivar_name, cultivar_group_id: :cultivar_group_id } },
-                        { parent_table: :cultivar_groups, foreign_key: :cultivar_group_id,
-                          flatten_columns: { cultivar_group_code: :cultivar_group_code, commodity_id: :commodity_id } },
-                        { parent_table: :commodities, foreign_key: :commodity_id,
-                          flatten_columns: { code: :commodity_code, description: :commodity_description } }],
-        lookup_functions: [{ function: :fn_current_status, args: ['rmt_bins', :id], col_name: :status }]
-      )
+      hash = flat_bin_hash(id)
 
       return nil if hash.nil?
 
@@ -354,6 +327,44 @@ module RawMaterialsApp
       return rmt_bin unless rmt_bin.nil_or_empty?
 
       DB["SELECT * FROM rmt_bins WHERE (tipped_asset_number = '#{bin_asset_number}')"].first
+    end
+
+    def flat_bin_hash(id)
+      find_with_association(
+        :rmt_bins, id,
+        parent_tables: [{ parent_table: :orchards,
+                          flatten_columns: { orchard_code: :orchard_code } },
+                        { parent_table: :farms,
+                          flatten_columns: { farm_code: :farm_code, description: :farm_description, farm_group_id: :farm_group_id } },
+                        { parent_table: :rmt_sizes,
+                          flatten_columns: { size_code: :size_code } },
+                        { parent_table: :pucs,
+                          flatten_columns: { puc_code: :puc_code } },
+                        { parent_table: :seasons,
+                          flatten_columns: { season_code: :season_code, season_year: :season_year } },
+                        { parent_table: :rmt_classes,
+                          flatten_columns: { rmt_class_code: :class_code } },
+                        { parent_table: :locations,
+                          flatten_columns: { location_long_code: :location_long_code } },
+                        { parent_table: :rmt_container_types,
+                          flatten_columns: { container_type_code: :container_type_code } },
+                        { parent_table: :rmt_container_material_types,
+                          flatten_columns: { container_material_type_code: :container_material_type_code } },
+                        { parent_table: :cultivars, foreign_key: :cultivar_id,
+                          flatten_columns: { cultivar_code: :cultivar_code,  cultivar_name: :cultivar_name, cultivar_group_id: :cultivar_group_id } },
+                        # NOTE: Cultivar_group is read from rmt_bins.cultivars.cultivar_group_id - not rmt_bins.cultivar_group_id...
+                        #       (cultivar_group_id is optional on rmt_bins, but cultivar_id is not)
+                        { parent_table: :cultivar_groups, foreign_key: :cultivar_group_id,
+                          flatten_columns: { cultivar_group_code: :cultivar_group_code, commodity_id: :commodity_id } },
+                        { parent_table: :commodities, foreign_key: :commodity_id,
+                          flatten_columns: { code: :commodity_code, description: :commodity_description } }],
+        lookup_functions: [{ function: :fn_current_status, args: ['rmt_bins', :id], col_name: :status }]
+      )
+    end
+
+    def find_flat_bin_by_asset_number(bin_asset_number)
+      id = DB[:rmt_bins].where(bin_asset_number: bin_asset_number, exit_ref: nil).or(tipped_asset_number: bin_asset_number).reverse(:id).get(:id)
+      flat_bin_hash(id)
     end
 
     def find_rmt_bin_stock(bin_number)
