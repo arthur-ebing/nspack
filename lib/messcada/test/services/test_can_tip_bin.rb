@@ -72,7 +72,7 @@ module MesscadaApp
         'cold_store_type' => 'CA',
         'colour' => 'Y',
         'numero_lot_max' => 108_799,
-        'pc_code' => 9,
+        'pc_name' => 'CA SMRTFRSH',
         'ripe_point_code' => '2CS',
         'track_slms_indicator_1_code' => 'GDL'
       }

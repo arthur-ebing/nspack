@@ -25,6 +25,12 @@ module MesscadaApp
       errors = check_basic_validations
       return failed_response(errors) unless errors.nil?
 
+      stock_type_id = repo.get_id(:stock_types, stock_type_code: AppConst::BIN_STOCK_TYPE)
+      return failed_response("Cannot move BIN #{bin_number}. BIN is on a tripsheet") if repo.exists?(:vehicle_job_units,
+                                                                                                     stock_type_id: stock_type_id,
+                                                                                                     stock_item_id: rmt_bin[:id],
+                                                                                                     offloaded_at: nil)
+
       if AppConst::CR_PROD.kromco_rmt_integration?
         res = check_valid_bin_for_kromco_rmt_system
         return res unless res.success
@@ -140,9 +146,9 @@ module MesscadaApp
 
     def legacy_check_pc_code
       # log_code_check('PC Code', run_criteria['pc_code'], rmt_bin[:legacy_data]['pc_code'])
-      return if run_criteria['pc_code'] == rmt_bin[:legacy_data]['pc_code']
+      return if run_criteria['pc_code'] == rmt_bin[:legacy_data]['pc_name']
 
-      legacy_errors << format(LEGACY_ERROR_MSG, 'PC Code', run_criteria['pc_code'] || 'blank', rmt_bin[:legacy_data]['pc_code'] || 'blank')
+      legacy_errors << format(LEGACY_ERROR_MSG, 'PC Code', run_criteria['pc_code'] || 'blank', rmt_bin[:legacy_data]['pc_name'] || 'blank')
     end
 
     def legacy_check_cold_store_type
