@@ -26,11 +26,15 @@ module EdiApp
       prepare_bh
       return success_response('No data for PO') if @header_rec.nil?
 
+      @mail_tokens[:load_id] = record_id
+      @mail_tokens[:customer_order_no] = @header_rec[:master_ord]
+
       prepare_oh
       prepare_lf
       prepare_lt
 
       recs = po_repo.po_details(record_id).group_by { |r| r[:container] }
+      @mail_tokens[:container_code] = recs.keys.join(', ')
       recs.each do |container, details|
         @current_row = details.first
         prepare_ok if container

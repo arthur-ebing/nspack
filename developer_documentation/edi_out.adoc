@@ -94,6 +94,13 @@ An example:
   :ajax:                                     #<6>
     :to: person1@place.com,person2@place.com #<7>
     :cc: someone@here.com                    #<8>
+  :bjax:
+    :to: person1@place.com,person2@place.com
+    :subject: Attention, EDI file attached   #<9>
+  :cjax:
+    :to: person1@place.com,person2@place.com
+    :subject:
+      PO: PO attached - load $:load_id$, container: $:container_code$ for order $:customer_order_no$ #<10>
 ----
 <1> The directory under which all other out directories live.
 <2> All files to be sent by mail will be written to this directory.
@@ -103,6 +110,8 @@ An example:
 <6> This is a mail key. There can be several.
 <7> The email addresses that will receive the file for `mail:ajax` target. A comma-separated list. No spaces.
 <8> The `cc` is typically used to send a copy of the file to someone on site. A comma-separated list. No spaces.
+<9> The default mail subject is `"<FLOW-TYPE> file attached"` but can be overridden with a string.
+<10> The subject can also be specified as a hash with a value for each flow type. For `(9)` and `(10)`, if no subject is found, the default is used. Certain tokens can be replaced in the subject - `$:load_id$`, `$:customer_order_no$`, `$:container_code$`. Note that not all flows will produce values for every token.
 
 === Starting an EDI process
 

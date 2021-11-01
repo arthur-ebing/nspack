@@ -14,6 +14,8 @@ module EdiApp
       prepare_data
       return success_response('No data for HBS') if record_entries.length.zero?
 
+      @mail_tokens[:load_id] = record_id
+
       fname = create_csv_file
       hbs_repo.log_hbs_success(fname, record_id)
       log('Ending transform...')

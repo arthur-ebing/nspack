@@ -29,6 +29,7 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
     @record_entries = Hash.new { |h, k| h[k] = [] }
     @output_filename = "#{@flow_type.upcase}#{AppConst::EDI_NETWORK_ADDRESS}#{@formatted_seq}.#{hub_address}"
     @mail_keys = []
+    @mail_tokens = {}
 
     load_output_paths
     load_schema
@@ -222,11 +223,30 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
     out_dest.sub('$ROOT', base_path)
   end
 
-  def send_emails
+  def add_tokens_to_subject(subject)
+    new_subject = subject.dup
+    @mail_tokens.each do |k, v|
+      new_subject.gsub!("$:#{k}$", v.to_s)
+    end
+    new_subject
+  end
+
+  def send_emails # rubocop:disable Metrics/AbcSize
     config = @repo.load_config
     @mail_keys.each do |key|
       email_settings = config[:mail_recipients][key]
-      email_settings[:subject] = "#{flow_type} file attached" unless email_settings[:subject]
+      default_subject = "#{flow_type} file attached"
+      email_settings[:subject] = case email_settings[:subject]
+                                 when nil
+                                   default_subject
+                                 when String
+                                   add_tokens_to_subject(email_settings[:subject])
+                                 when Hash
+                                   add_tokens_to_subject(email_settings[:subject][flow_type] || default_subject)
+                                 else
+                                   default_subject
+                                 end
+
       email_settings[:body] = "Attached please find #{flow_type} EDI file." unless email_settings[:body]
       path = build_edi_mail_out_path(config[:root], config[:email_dir])
       # p "Sending - #{key} from #{File.join(path, @output_filename)} to #{email_settings.inspect}"
