@@ -27,14 +27,6 @@ module EdiApp
       )
     end
 
-    def csv_grid(file_name)
-      recs = CSV.read(file_name, headers: true)
-      {
-        columnDefs: grid_columns_for_csv(recs.first),
-        rowDefs: recs.map { |r| Hash[r.to_a] }
-      }.to_json
-    end
-
     def file_path_from_in_transaction(id)
       repo = EdiInRepo.new
       tran = repo.find_edi_in_transaction(id)
@@ -222,12 +214,6 @@ module EdiApp
         mk.col 'edi_in', 'EDI in?', data_type: :boolean, hide: true
         mk.col 'edi_out', 'EDI out?', data_type: :boolean, hide: true
         mk.col 'in_error', 'Error?', data_type: :boolean, hide: true
-      end
-    end
-
-    def grid_columns_for_csv(rec)
-      Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
-        rec.to_a.each { |key, _| mk.col key }
       end
     end
 
