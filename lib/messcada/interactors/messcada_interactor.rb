@@ -179,7 +179,7 @@ module MesscadaApp
       return validation_failed_response(res) if res.failure?
 
       repo.transaction do
-        res = MesscadaApp::TipBin.new(res).call
+        res = MesscadaApp::TipBin.call(res)
 
         if res.success
           log_status(:rmt_bins, res.instance[:rmt_bin_id], 'TIPPED')
@@ -201,7 +201,7 @@ module MesscadaApp
       res = validate_tip_rmt_bin_params(params)
       return validation_failed_response(res) if res.failure?
 
-      MesscadaApp::TipBin.new(res).can_tip_bin?
+      MesscadaApp::CanTipBin.call(res[:bin_number], res[:device])
     rescue Crossbeams::InfoError => e
       ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message(__method__))
       failed_response(e.message)
@@ -559,10 +559,7 @@ module MesscadaApp
       UpdateRmtBinWeightsSchema.call(params)
     end
 
-    # TODO: split validation if using asset no or not (string asset vs int id)
     def validate_tip_rmt_bin_params(params)
-      # For now: bin asset is integer, so strip Habata's SK prefix. LATER make this a string.
-      # TipRmtBinSchema.call(params.transform_values { |v| v.match?(/SK/) ? v.sub('SK', '') : v })
       TipRmtBinSchema.call(params)
     end
 

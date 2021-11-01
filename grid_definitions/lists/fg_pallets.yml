@@ -6,6 +6,16 @@
   :title: Pallet sequences for Pallet No $:pallet_number$
   :icon: list
   :popup: true
+- :url: "/development/statuses/list/pallets/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+- :url: "/development/transactions/list/pallets/$:id$"
+  :text: transactions
+  :icon: code
+  :title: Transactions
+  :popup: true
 :captions:
   :conditions:
     :active: Active Pallets

@@ -146,10 +146,10 @@ module MesscadaApp
     end
 
     def legacy_check_cold_store_type
-      # log_code_check('Coldstore type', run_criteria['cold_store_type'], rmt_bin[:legacy_data]['coldstore_type'])
-      return if run_criteria['cold_store_type'] == rmt_bin[:legacy_data]['coldstore_type']
+      # log_code_check('Cold store type', run_criteria['cold_store_type'], rmt_bin[:legacy_data]['cold_store_type'])
+      return if run_criteria['cold_store_type'] == rmt_bin[:legacy_data]['cold_store_type']
 
-      legacy_errors << format(LEGACY_ERROR_MSG, 'Coldstore type', run_criteria['cold_store_type'] || 'blank', rmt_bin[:legacy_data]['coldstore_type'] || 'blank')
+      legacy_errors << format(LEGACY_ERROR_MSG, 'Cold store type', run_criteria['cold_store_type'] || 'blank', rmt_bin[:legacy_data]['cold_store_type'] || 'blank')
     end
 
     def legacy_check_season_code

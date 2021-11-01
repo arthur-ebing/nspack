@@ -274,40 +274,6 @@ module MesscadaApp
       success_response('ok', instance)
     end
 
-    # def complete_external_bin_tipping(bin_number, run_id)
-    #   url = "#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/integrate?type=bin_tipped&record_id=#{bin_number}&model=BinsTipped&nspack_run_id=#{run_id}"
-    #   http = Crossbeams::HTTPCalls.new
-    #   res = http.request_get(url)
-    #   err = res.message unless res.success
-    #
-    #   unless err
-    #     packet = Nokogiri::XML(res.instance.body)
-    #     err = packet.root.child.text if packet.root.child.name == 'error'
-    #   end
-    #
-    #   return unless err
-    #
-    #   mail = <<~STR
-    #     Bin:#{bin_number} could not be tipped successfully
-    #
-    #     #{err}
-    #   STR
-    #
-    #   ErrorMailer.send_error_email(subject: 'LEGACY BIN TIP FAIL', message: mail, append_recipients: AppConst::LEGACY_SYSTEM_ERROR_RECIPIENTS)
-    # end
-
-    def can_bin_be_tipped?(bin_number)
-      url = "#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/can_bin_be_tipped?bin_number=#{bin_number}"
-      http = Crossbeams::HTTPCalls.new
-      res = http.request_get(url)
-      return failed_response(res.message) unless res.success
-
-      instance = JSON.parse(res.instance.body)
-      return failed_response(instance['msg']) unless instance['can_tip_bin']
-
-      success_response('ok')
-    end
-
     def presort_staging_run_treatment_codes
       url = "#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/get_presort_staging_run_treatment_codes"
       http = Crossbeams::HTTPCalls.new
@@ -360,15 +326,6 @@ module MesscadaApp
 
     def get_run_setup_reqs(run_id)
       ProductionApp::ProductionRunRepo.new.find_production_run_flat(run_id).to_h
-      # DB["select r.id, r.farm_id, r.orchard_id, r.cultivar_group_id, r.cultivar_id, r.allow_cultivar_mixing, r.allow_orchard_mixing
-      #   ,c.cultivar_name, cg.cultivar_group_code,f.farm_code, o.orchard_code, p.puc_code
-      #   from production_runs r
-      #   left join cultivars c on c.id=r.cultivar_id
-      #   join cultivar_groups cg on cg.id=r.cultivar_group_id
-      #   join farms f on f.id=r.farm_id
-      #   join orchards o on o.id=r.orchard_id
-      #   join pucs p on p.id=r.puc_id
-      #   WHERE r.id = ?", run_id].first
     end
 
     def get_pallet_sequence_id_from_carton_label(carton_label_id)

@@ -70,7 +70,6 @@ module MesscadaApp
       {
         'code_cumul' => 'M',
         'cold_store_type' => 'CA',
-        'coldstore_type' => 'CA',
         'colour' => 'Y',
         'numero_lot_max' => 108_799,
         'pc_code' => 9,
