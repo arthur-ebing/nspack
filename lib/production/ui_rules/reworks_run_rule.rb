@@ -10,7 +10,6 @@ module UiRules
 
       @rules[:show_changes_made] = !@form_object.changes_made.nil_or_empty?
       @rules[:single_pallet_selected] = @form_object.pallets_selected.split("\n").length == 1 unless @form_object.pallets_selected.nil_or_empty?
-      @rules[:scan_rmt_bin_asset_numbers] = AppConst::USE_PERMANENT_RMT_BIN_BARCODES
       @rules[:has_children] = @form_object.has_children
       @rules[:allow_cultivar_group_mixing] = AppConst::CR_PROD.can_mix_cultivar_groups?
 
@@ -156,7 +155,7 @@ module UiRules
       text_caption = if @rules[:single_pallet_edit]
                        'Pallet Number'
                      else
-                       'Bin' # @rules[:scan_rmt_bin_asset_numbers] ? 'Bin asset number' : 'Bin id'
+                       'Bin'
                      end
 
       where = if @rules[:scrap_bin]

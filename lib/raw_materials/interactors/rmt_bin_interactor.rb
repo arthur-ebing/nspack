@@ -286,7 +286,7 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def create_rebin(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+    def create_rebin(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       bin_asset = repo.get_available_bin_asset_numbers(1)
       bin_asset_id = bin_asset.map(&:last).last
       params[:bin_asset_number] = bin_asset.map(&:last).first
@@ -294,7 +294,7 @@ module RawMaterialsApp
 
       vres = validate_bin_asset_no_format(params)
       return vres unless vres.success
-      return failed_response("Scanned Bin Number:#{params[:bin_asset_number]} is already in stock") if AppConst::USE_PERMANENT_RMT_BIN_BARCODES && !bin_asset_number_available?(params[:bin_asset_number])
+      return failed_response("Scanned Bin Number:#{params[:bin_asset_number]} is already in stock") unless bin_asset_number_available?(params[:bin_asset_number])
 
       params = calc_rebin_params(params)
 
@@ -337,10 +337,10 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def create_rmt_bin(delivery_id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity,  Metrics/PerceivedComplexity
+    def create_rmt_bin(delivery_id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       vres = validate_bin_asset_no_format(params)
       return vres unless vres.success
-      return failed_response("Scanned Bin Number:#{params[:bin_asset_number]} is already in stock") if AppConst::USE_PERMANENT_RMT_BIN_BARCODES && !bin_asset_number_available?(params[:bin_asset_number])
+      return failed_response("Scanned Bin Number:#{params[:bin_asset_number]} is already in stock") unless bin_asset_number_available?(params[:bin_asset_number])
 
       delivery = find_rmt_delivery(delivery_id)
       params = params.merge(get_header_inherited_field(delivery, params[:rmt_container_type_id]))
@@ -354,7 +354,7 @@ module RawMaterialsApp
 
         unless params[:gross_weight].nil_or_empty?
           options = { force_find_by_id: false, weighed_manually: true, avg_gross_weight: false }
-          bin_number = (AppConst::USE_PERMANENT_RMT_BIN_BARCODES ? res.to_h[:bin_asset_number] : id)
+          bin_number = res.to_h[:bin_asset_number]
           attrs = { bin_number: bin_number, gross_weight: params[:gross_weight].to_i }
           rw_res = MesscadaApp::UpdateBinWeights.call(attrs, options)
           raise rw_res.message unless rw_res.success
@@ -374,7 +374,6 @@ module RawMaterialsApp
     end
 
     def validate_bin_asset_no_format(params)
-      return ok_response unless AppConst::USE_PERMANENT_RMT_BIN_BARCODES
       return validation_failed_response(OpenStruct.new(messages: { bin_asset_number: ['is not in a valid format'] })) unless bin_asset_regex_check_ok?(params[:bin_asset_number])
 
       ok_response
@@ -617,9 +616,7 @@ module RawMaterialsApp
     end
 
     def find_rmt_bin_by_id_or_asset_number(bin_number)
-      return repo.find_bin_by_asset_number(bin_number) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
-
-      repo.find_rmt_bin_stock(bin_number)
+      repo.find_bin_by_asset_number(bin_number)
     end
 
     def find_container_material_owners_by_container_material_type(container_material_type_id)

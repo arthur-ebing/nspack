@@ -1293,14 +1293,15 @@ module ProductionApp
       defaults
     end
 
-    def manually_tip_bin_before_state(attrs, avg_gross_weight = false) # rubocop:disable Metrics/AbcSize
+    def manually_tip_bin_before_state(attrs, avg_gross_weight = false)
       defaults = { bin_tipped_date_time: nil,
                    production_run_tipped_id: nil,
+                   tipped_asset_number: nil,
+                   bin_asset_number: attrs[:pallets_selected].first,
                    exit_ref_date_time: nil,
                    bin_tipped: false,
                    exit_ref: nil,
                    tipped_manually: false }
-      defaults = defaults.merge(tipped_asset_number: nil, bin_asset_number: attrs[:pallets_selected].first) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
       defaults = defaults.merge(allow_cultivar_mixing: production_run_allow_cultivar_mixing(attrs[:production_run_id])) if attrs[:allow_cultivar_mixing]
       defaults = defaults.merge(manually_weigh_rmt_bin_state(attrs[:pallets_selected].first)) if avg_gross_weight
       if attrs[:tip_orchard_mixing]
@@ -1310,14 +1311,15 @@ module ProductionApp
       defaults
     end
 
-    def manually_tip_bin_after_state(attrs, avg_gross_weight = false) # rubocop:disable Metrics/AbcSize
+    def manually_tip_bin_after_state(attrs, avg_gross_weight = false)
       defaults = { bin_tipped_date_time: Time.now,
                    production_run_tipped_id: attrs[:production_run_id],
+                   tipped_asset_number: attrs[:pallets_selected].first,
+                   bin_asset_number: nil,
                    exit_ref_date_time: Time.now,
                    bin_tipped: true,
                    exit_ref: 'TIPPED',
                    tipped_manually: true }
-      defaults = defaults.merge(tipped_asset_number: attrs[:pallets_selected].first, bin_asset_number: nil) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
       defaults = defaults.merge(allow_cultivar_mixing: attrs[:allow_cultivar_mixing]) if attrs[:allow_cultivar_mixing]
       defaults = defaults.merge(manually_weigh_rmt_bin_state(attrs[:pallets_selected].first)) if avg_gross_weight
       if attrs[:tip_orchard_mixing]
@@ -1337,7 +1339,7 @@ module ProductionApp
                        bin_tipped: false,
                        exit_ref: nil,
                        tipped_manually: false }
-      change_attrs = change_attrs.merge(asset_number_attrs(res)) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+      change_attrs = change_attrs.merge(asset_number_attrs(res))
 
       rw_res = nil
       repo.transaction do
@@ -1375,17 +1377,14 @@ module ProductionApp
     end
 
     def manually_untip_bin_before_state(res)
-      attrs = { bin_tipped_date_time: res[:bin_tipped_date_time],
-                production_run_tipped_id: res[:production_run_tipped_id],
-                exit_ref_date_time: res[:exit_ref_date_time],
-                bin_tipped: true,
-                exit_ref: 'TIPPED',
-                tipped_manually: true }
-      if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
-        attrs = attrs.merge({ tipped_asset_number: res[:tipped_asset_number],
-                              bin_asset_number: res[:bin_asset_number] })
-      end
-      attrs
+      { bin_tipped_date_time: res[:bin_tipped_date_time],
+        production_run_tipped_id: res[:production_run_tipped_id],
+        tipped_asset_number: res[:tipped_asset_number],
+        bin_asset_number: res[:bin_asset_number],
+        exit_ref_date_time: res[:exit_ref_date_time],
+        bin_tipped: true,
+        exit_ref: 'TIPPED',
+        tipped_manually: true }
     end
 
     def bulk_weigh_bins(attrs) # rubocop:disable Metrics/AbcSize
@@ -1830,8 +1829,6 @@ module ProductionApp
     end
 
     def find_rmt_bin(bin_number)
-      # return repo.rmt_bin_from_asset_number(bin_number) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
-
       repo.find_rmt_bin(bin_number.to_i)
     end
 
@@ -2042,11 +2039,8 @@ module ProductionApp
       rmt_bins = rmt_bins.split(/\n|,/).map(&:strip).reject(&:empty?)
       rmt_bins = rmt_bins.map { |x| x.gsub(/['"]/, '') }
 
-      # unless AppConst::USE_PERMANENT_RMT_BIN_BARCODES
       invalid_rmt_bins = rmt_bins.reject { |x| x.match(/\A\d+\Z/) }
       return OpenStruct.new(success: false, messages: { pallets_selected: ["#{invalid_rmt_bins.join(', ')} must be numeric"] }, pallets_selected: rmt_bins) unless invalid_rmt_bins.nil_or_empty?
-
-      # end
 
       existing_rmt_bins = repo.rmt_bins_exists?(rmt_bins)
       missing_rmt_bins = (rmt_bins - existing_rmt_bins.map(&:to_s))

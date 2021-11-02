@@ -33,7 +33,7 @@ module MesscadaApp
       repo.log_status(:rmt_bins, id, AppConst::VERIFIED_FROM_BIN_LABEL)
       repo.log_status(:carton_labels, carton_label_id, AppConst::VERIFIED_AS_REBIN)
 
-      bin_number = (AppConst::USE_PERMANENT_RMT_BIN_BARCODES ? res.to_h[:bin_asset_number] : id)
+      bin_number = res.to_h[:bin_asset_number]
       success_response('ok', OpenStruct.new(rebin_id: bin_number, carton_label_id: carton_label_id))
     end
 

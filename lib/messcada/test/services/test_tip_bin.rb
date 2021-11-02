@@ -83,7 +83,6 @@ module MesscadaApp
       assert_equal run_id, upd_bin[:production_run_tipped_id]
       assert upd_bin[:bin_tipped]
       assert_nil upd_bin[:bin_asset_number]
-      # TODO: make AppConst::USE_PERMANENT_RMT_BIN_BARCODES a client rule and test here for bin_asset
     ensure
       AppConst::TEST_SETTINGS.client_code = AppConst::TEST_SETTINGS.boot_client_code
     end

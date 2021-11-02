@@ -685,7 +685,7 @@ class Nspack < Roda
                                          caption: 'Scan Bin',
                                          action: "/rmd/rmt_deliveries/rmt_bins/move_rmt_bin_submit/#{id}",
                                          button_caption: 'Move Bin')
-          form.add_label(:bin_number, 'Bin Number', AppConst::USE_PERMANENT_RMT_BIN_BARCODES ? bin[:bin_asset_number] : bin[:id])
+          form.add_label(:bin_number, 'Bin Number', bin[:bin_asset_number])
           form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location, submit_form: true, required: true, lookup: false)
           form.add_csrf_tag csrf_tag
           view(inline: form.render, layout: :layout_rmd)
@@ -758,7 +758,7 @@ class Nspack < Roda
 
           res = interactor.move_location_bin(val_res.instance[:id], scanned_locn_id)
           if res.success
-            bin_number = AppConst::USE_PERMANENT_RMT_BIN_BARCODES ? val_res.instance[:bin_asset_number] : val_res.instance[:id]
+            bin_number = val_res.instance[:bin_asset_number]
             moved_bins = retrieve_from_local_store(:moved_bins) || []
             moved_bins << bin_number
             store_locally(:moved_bins, moved_bins)
@@ -1347,11 +1347,9 @@ class Nspack < Roda
 
       r.on 'receive_single_bin' do
         id = interactor.find_current_delivery
-        if id.nil_or_empty?
-          return new_bin_screen(nil, '/rmd/rmt_deliveries/rmt_bins/receive_single_bin_submit') if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+        return new_bin_screen(nil, '/rmd/rmt_deliveries/rmt_bins/receive_single_bin_submit') if id.nil_or_empty?
 
-          receive_single_bin_error_screen('There Is No Current Delivery To Add Bins To')
-        elsif RawMaterialsApp::RmtDeliveryInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {}).delivery_tipped?(id)
+        if RawMaterialsApp::RmtDeliveryInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {}).delivery_tipped?(id)
           receive_single_bin_error_screen('Cannot Add Bin To Current Delivery. Delivery Has Been Tipped')
         else
           new_bin_screen(id, '/rmd/rmt_deliveries/rmt_bins/receive_single_bin_submit')
@@ -1796,7 +1794,7 @@ class Nspack < Roda
 
   def new_bin_screen(delivery_id, action, notes = nil) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
     bin_delivery = RawMaterialsApp::RmtDeliveryRepo.new.get_bin_delivery(delivery_id)
-    bin_delivery = {} if !bin_delivery && AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+    bin_delivery ||= {}
     if bin_delivery
       default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DEFAULT_RMT_CONTAINER_TYPE)
       details = retrieve_from_local_store(:bin) || { bin_fullness: AppConst::BIN_FULL }

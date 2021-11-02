@@ -25,8 +25,6 @@ module UiRules
       @rules[:show_rmt_inner_container_type_id] = !@form_object.rmt_inner_container_type_id.nil?
       @rules[:show_rmt_inner_container_material_id] = !@form_object.rmt_inner_container_material_id.nil?
 
-      @rules[:scan_rmt_bin_asset_numbers] = AppConst::USE_PERMANENT_RMT_BIN_BARCODES
-
       compact_header(columns: %i[farm_code puc_code orchard_code date_picked date_delivered qty_bins_tipped qty_bins_received], display_columns: 1) if @mode == :new
 
       common_values_for_fields common_fields
@@ -69,7 +67,7 @@ module UiRules
       rmt_inner_container_material_id_label = MasterfilesApp::RmtContainerMaterialTypeRepo.new.find_rmt_container_material_type(@form_object.rmt_inner_container_material_id)&.container_material_type_code
       farm_id_label = MasterfilesApp::FarmRepo.new.find_farm(@form_object.farm_id)&.farm_code
 
-      fields[:bin_asset_number] = { renderer: :label, hide_on_load: @rules[:scan_rmt_bin_asset_numbers] ? false : true }
+      fields[:bin_asset_number] = { renderer: :label }
       fields[:orchard_id] = { renderer: :label, with_value: orchard_id_label, caption: 'Orchard' }
       fields[:season_id] = { renderer: :label, with_value: season_id_label, caption: 'Season' }
       fields[:cultivar_id] = { renderer: :label, with_value: cultivar_id_label, caption: 'Cultivar' }

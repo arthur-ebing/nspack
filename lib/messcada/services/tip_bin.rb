@@ -99,8 +99,13 @@ module MesscadaApp
     end
 
     def update_bin
-      updates = { bin_tipped_date_time: Time.now, production_run_tipped_id: @run_id, exit_ref_date_time: Time.now, bin_tipped: true, exit_ref: 'TIPPED'  }
-      updates.merge!(tipped_asset_number: bin_number, bin_asset_number: nil) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+      updates = { bin_tipped_date_time: Time.now,
+                  production_run_tipped_id: @run_id,
+                  tipped_asset_number: bin_number,
+                  bin_asset_number: nil,
+                  exit_ref_date_time: Time.now,
+                  bin_tipped: true,
+                  exit_ref: 'TIPPED'  }
       RawMaterialsApp::RmtDeliveryRepo.new.update_rmt_bin(@rmt_bin_id, updates)
     end
 

@@ -4,11 +4,11 @@ module RawMaterials
   module Deliveries
     module RmtBin
       class Edit
-        def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/CyclomaticComplexity
+        def self.call(id, form_values: nil, form_errors: nil)
           ui_rule = UiRules::Compiler.new(:rmt_bin, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page|
+          Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
@@ -17,7 +17,7 @@ module RawMaterials
               form.action "/raw_materials/deliveries/rmt_bins/#{id}"
               form.remote!
               form.method :update
-              form.add_field :bin_asset_number if rules[:scan_rmt_bin_asset_numbers]
+              form.add_field :bin_asset_number
               form.add_field :rmt_class_id
               form.add_field :rmt_container_type_id
               form.add_field :qty_bins
@@ -29,8 +29,6 @@ module RawMaterials
               form.add_field :bin_received_date_time if rules[:edit_bin_received_date_time]
             end
           end
-
-          layout
         end
       end
     end

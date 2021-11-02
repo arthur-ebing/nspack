@@ -43,8 +43,6 @@ module ProductionApp
     end
 
     def find_rmt_bin
-      # return repo.rmt_bin_from_asset_number(bin_number) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
-
       repo.find_rmt_bin(bin_number.to_i)
     end
 
@@ -92,19 +90,14 @@ module ProductionApp
     end
 
     def rmt_bin_updates
-      defaults = { bin_tipped_date_time: Time.now,
-                   production_run_tipped_id: production_run_id,
-                   exit_ref_date_time: Time.now,
-                   bin_tipped: true,
-                   exit_ref: 'TIPPED',
-                   tipped_manually: true }
-      defaults = defaults.merge!(rmt_bin_asset_number_updates) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
-      defaults
-    end
-
-    def rmt_bin_asset_number_updates
-      { tipped_asset_number: rmt_bin_asset_number,
-        bin_asset_number: nil }
+      { bin_tipped_date_time: Time.now,
+        production_run_tipped_id: production_run_id,
+        tipped_asset_number: rmt_bin_asset_number,
+        bin_asset_number: nil,
+        exit_ref_date_time: Time.now,
+        bin_tipped: true,
+        exit_ref: 'TIPPED',
+        tipped_manually: true }
     end
 
     def rmt_bin_asset_number
