@@ -1658,6 +1658,41 @@ class Nspack < Roda
         end
       end
 
+      r.on 'offload_bins_trip' do
+        r.get do
+          notice = retrieve_from_local_store(:flash_notice)
+          form_state = {}
+          error = retrieve_from_local_store(:error)
+          form_state.merge!(error_message: error[:message]) unless error.nil?
+          form = Crossbeams::RMDForm.new(form_state,
+                                         form_name: :vehicle,
+                                         notes: notice,
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         caption: 'Scan Tripsheet And Location',
+                                         action: '/rmd/rmt_deliveries/rmt_bins/offload_bins_trip',
+                                         button_caption: 'Submit')
+
+          form.add_field(:vehicle_job, 'Tripsheet Number', scan: 'key248_all', scan_type: :vehicle_job, submit_form: false, required: true, lookup: false)
+          form.add_select(:location,
+                          'Location',
+                          items: interactor.find_locations_by_location_type_and_storage_type(AppConst::LOCATION_TYPES_WAREHOUSE, AppConst::STORAGE_TYPE_BINS),
+                          required: true,
+                          prompt: true)
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+
+        r.post do
+          res = interactor.offload_bins_trip(params[:vehicle][:vehicle_job], params[:vehicle][:location])
+          if res.success
+            store_locally(:flash_notice, res.message)
+          else
+            store_locally(:error, res)
+          end
+          r.redirect('/rmd/rmt_deliveries/rmt_bins/offload_bins_trip')
+        end
+      end
+
       r.on 'scan_bin_to_offload', Integer do |id|
         r.get do
           notice = retrieve_from_local_store(:flash_notice)

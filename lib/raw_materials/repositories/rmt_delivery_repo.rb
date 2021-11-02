@@ -663,6 +663,10 @@ module RawMaterialsApp
         .all
     end
 
+    def tripsheet_bin_count(vehicle_job_id, stock_type_id)
+      DB[:vehicle_job_units].where(vehicle_job_id: vehicle_job_id, stock_type_id: stock_type_id).count
+    end
+
     def maximum_units_exceeded_for_location?(location_id, scanned_bins_count)
       units_in_location, maximum_units = get_value(:locations, %i[units_in_location maximum_units], id: location_id)
       (units_in_location + scanned_bins_count) > maximum_units

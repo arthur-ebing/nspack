@@ -175,6 +175,30 @@ module RawMaterialsApp
       failed_response(e.message, stock_type_id)
     end
 
+    def offload_bins_trip(vehicle_job_id, location_id) # rubocop:disable Metrics/AbcSize
+      res = validate_bins_tripsheet_to_offload_(vehicle_job_id, location_id)
+      return res unless res.success
+
+      repo.transaction do
+        stock_type_id = MesscadaApp::MesscadaRepo.new.get_value(:stock_types, :id, stock_type_code: AppConst::BIN_STOCK_TYPE)
+        ids = repo.select_values(:vehicle_job_units, %i[id stock_item_id], vehicle_job_id: vehicle_job_id, stock_type_id: stock_type_id)
+        unit_ids = ids.map(&:first)
+        bin_ids = ids.map(&:last)
+        repo.update(:vehicle_job_units, unit_ids, offloaded_at: Time.now)
+        complete_bins_offload_vehicle(vehicle_job_id, bin_ids)
+        govt_inspection_sheet_id = repo.get(:vehicle_jobs, vehicle_job_id, :govt_inspection_sheet_id)
+        log_status(:vehicle_jobs, vehicle_job_id, 'BIN TRIP OFFLOADED')
+        log_status(:govt_inspection_sheets, govt_inspection_sheet_id, 'BIN TRIP OFFLOADED')
+        bins_moved = repo.tripsheet_bin_count(vehicle_job_id, stock_type_id)
+        location_code = repo.get(:locations, location_id, :location_long_code)
+        success_response("moved #{bins_moved} bins to location #{location_code}")
+      end
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      failed_response(e.message)
+    end
+
     def offload_bin(vehicle_job_id, bin_id) # rubocop:disable Metrics/AbcSize
       vehicle_job_unit = insp_repo.find_vehicle_job_unit_by_stock_item_and_vehicle_job(bin_id, vehicle_job_id)
       instance = { vehicle_job_offloaded: false, vehicle_job_id: vehicle_job_unit[:vehicle_job_id] }
