@@ -13,7 +13,7 @@
   :hide_if_true: offloaded
   :has_permission:
     - tripsheet
-    - can_be_force_offloaded_by_user
+    - can_force_offload
 :conditions:
   :standard:
     - :col: vehicle_jobs.stock_type_id
