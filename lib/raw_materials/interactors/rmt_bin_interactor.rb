@@ -815,6 +815,28 @@ module RawMaterialsApp
       bin
     end
 
+    def validate_print_rebin_labels(params)
+      res = validate_print_rebin_labels_params(params)
+      return validation_failed_response(res) if res.failure?
+
+      success_response('ok', res.to_h)
+    end
+
+    def print_run_rebin_labels(rebin_ids, params)
+      return failed_response('Rebin selection cannot be empty') if rebin_ids.nil_or_empty?
+
+      label_name = repo.get(:label_templates, params[:label_template_id], :label_template_name)
+      print_params = { no_of_prints: 1, printer: params[:printer] }
+
+      res = nil
+      rebin_ids.each do |rebin_id|
+        instance = repo.rebin_label_printing_instance(rebin_id)
+        res = LabelPrintingApp::PrintLabel.call(label_name, instance, print_params)
+        return res unless res.success
+      end
+      success_response('Rebin Labels Printed Successfully', rebin_ids.join(','))
+    end
+
     private
 
     def calc_rebin_params(params) # rubocop:disable Metrics/AbcSize
@@ -911,6 +933,13 @@ module RawMaterialsApp
 
     def validate_vehicle_job_unit_params(params)
       FinishedGoodsApp::VehicleJobUnitSchema.call(params)
+    end
+
+    def validate_print_rebin_labels_params(params)
+      Dry::Schema.Params do
+        optional(:printer).filled(:integer)
+        required(:label_template_id).filled(:integer)
+      end.call(params)
     end
   end
 end

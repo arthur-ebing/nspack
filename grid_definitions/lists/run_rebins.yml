@@ -10,3 +10,7 @@
     :url: "/production/runs/production_runs/$:id$/print_barcodes"
     :conditions: standard
     :multiselect_save_method: loading
+  :print_rebin_labels:
+    :url: "/production/runs/production_runs/$:id$/print_rebin_labels/print_labels"
+    :conditions: standard
+    :multiselect_save_method: remote

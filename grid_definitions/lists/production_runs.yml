@@ -176,6 +176,9 @@
       - :url: "/list/run_rebins/multi?key=standard&id=$:id$"
         :text: print barcodes
         :popup: true
+      - :url: "/production/runs/production_runs/$:id$/print_rebin_labels"
+        :text: print labels
+        :popup: true
 - :separator: true
 - :url: "/production/runs/production_runs/$:id$/refresh_pallet_data"
   :text: refresh pallet data
