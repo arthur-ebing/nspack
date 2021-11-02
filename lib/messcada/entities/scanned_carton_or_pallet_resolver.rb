@@ -80,8 +80,8 @@ module MesscadaApp
 
     private
 
-    def respond_to_missing?(meth)
-      VALUE_FIELDS.include?(meth)
+    def respond_to_missing?(meth, include_private = false)
+      VALUE_FIELDS.include?(meth) || super
     end
 
     def method_missing(meth, *args)
