@@ -803,6 +803,109 @@ class Nspack < Roda
         end
       end
 
+      # FORKLIFT BIN MOVE
+      # --------------------------------------------------------------------------
+      r.on 'forklift_bin_move' do
+        r.on 'scan_location' do
+          bin = {}
+          error = retrieve_from_local_store(:error)
+          if error.is_a?(String)
+            bin.merge!(error_message: error)
+          elsif !error.nil?
+            bin.merge!(error_message: error.message)
+            bin.merge!(errors: error.errors) unless error.errors.nil_or_empty?
+          end
+
+          form = Crossbeams::RMDForm.new(bin,
+                                         form_name: :bin,
+                                         notes: retrieve_from_local_store(:flash_notice),
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         caption: 'Scan Location',
+                                         action: '/rmd/rmt_deliveries/rmt_bins/forklift_bin_move/move_bins',
+                                         button_caption: 'Submit')
+          form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location, submit_form: true, required: true, lookup: true)
+
+          scanned_bins = retrieve_from_local_store(:scanned_bins) || []
+          unless scanned_bins.empty?
+            store_locally(:scanned_bins, scanned_bins)
+            form.add_section_header('Scanned Bins')
+            scanned_bins.each { |bin_number| form.add_label(:bin_number, '', bin_number) }
+          end
+
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+
+        r.on 'move_bins' do
+          val_res = interactor.validate_location(params[:bin][:location], params[:bin][:location_scan_field])
+          unless val_res.success
+            store_locally(:error, val_res)
+            r.redirect('/rmd/rmt_deliveries/rmt_bins/forklift_bin_move/scan_location')
+          end
+
+          scanned_bins = retrieve_from_local_store(:scanned_bins) || []
+          res = interactor.move_forklift_bins(scanned_bins, val_res.instance)
+          if res.success
+            store_locally(:flash_notice, rmd_success_message(res.message))
+          else
+            store_locally(:error, res)
+            store_locally(:scanned_bins, scanned_bins)
+          end
+          r.redirect('/rmd/rmt_deliveries/rmt_bins/forklift_bin_move')
+        rescue Crossbeams::InfoError => e
+          store_locally(:error, rmd_error_message(e.message))
+          r.redirect('/rmd/rmt_deliveries/rmt_bins/forklift_bin_move')
+        end
+
+        r.get do
+          bin = {}
+          error = retrieve_from_local_store(:error)
+          if error.is_a?(String)
+            bin.merge!(error_message: error)
+          elsif !error.nil?
+            bin.merge!(error_message: error.message)
+            bin.merge!(errors: error.errors) unless error.errors.nil_or_empty?
+          end
+
+          form = Crossbeams::RMDForm.new(bin,
+                                         form_name: :bin,
+                                         notes: retrieve_from_local_store(:flash_notice),
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         caption: 'Scan Bins',
+                                         action: '/rmd/rmt_deliveries/rmt_bins/forklift_bin_move',
+                                         button_caption: 'Submit')
+          form.add_field(:bin_number, 'Bin Number', scan: 'key248_all', scan_type: :bin_asset, required: false, submit_form: true)
+
+          scanned_bins = retrieve_from_local_store(:scanned_bins) || []
+          unless scanned_bins.empty?
+            store_locally(:scanned_bins, scanned_bins)
+            form.add_section_header('Scanned Bins')
+            scanned_bins.each { |bin_number| form.add_label(:bin_number, '', bin_number) }
+            form.add_button('Scan Location', '/rmd/rmt_deliveries/rmt_bins/forklift_bin_move/scan_location')
+          end
+
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+
+        r.post do
+          res = interactor.validate_bin(params[:bin][:bin_number])
+          unless res.success
+            store_locally(:error, res)
+            r.redirect('/rmd/rmt_deliveries/rmt_bins/forklift_bin_move')
+          end
+
+          bin_number = res.instance[:bin_asset_number]
+          scanned_bins = retrieve_from_local_store(:scanned_bins) || []
+          scanned_bins.include?(bin_number) ? scanned_bins.delete(bin_number) : scanned_bins << bin_number
+          store_locally(:scanned_bins, scanned_bins)
+          r.redirect('/rmd/rmt_deliveries/rmt_bins/forklift_bin_move')
+        rescue Crossbeams::InfoError => e
+          store_locally(:error, rmd_error_message(e.message))
+          r.redirect('/rmd/rmt_deliveries/rmt_bins/forklift_bin_move')
+        end
+      end
+
       # --------------------------------------------------------------------------
       # CREATE RMT REBIN
       # --------------------------------------------------------------------------

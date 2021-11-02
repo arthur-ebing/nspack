@@ -662,5 +662,10 @@ module RawMaterialsApp
                 :nett_weight)
         .all
     end
+
+    def maximum_units_exceeded_for_location?(location_id, scanned_bins_count)
+      units_in_location, maximum_units = get_value(:locations, %i[units_in_location maximum_units], id: location_id)
+      (units_in_location + scanned_bins_count) > maximum_units
+    end
   end
 end

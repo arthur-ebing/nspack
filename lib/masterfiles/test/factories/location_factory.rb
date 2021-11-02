@@ -24,7 +24,8 @@ module MasterfilesApp
         can_be_moved: false,
         print_code: Faker::Lorem.word,
         can_store_stock: false,
-        units_in_location: Faker::Number.number(digits: 4)
+        units_in_location: Faker::Number.number(digits: 4),
+        maximum_units: Faker::Number.number(digits: 4)
       }
       DB[:locations].insert(default.merge(opts))
     end

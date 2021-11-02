@@ -815,6 +815,31 @@ module RawMaterialsApp
       bin
     end
 
+    def move_forklift_bins(bin_numbers, location_id) # rubocop:disable Metrics/AbcSize
+      location_code = location_short_code_for(location_id)
+      return failed_response("Maximum units for location :#{location_code} has been exceeded") if repo.maximum_units_exceeded_for_location?(location_id, bin_numbers.length)
+
+      location_bin_numbers = repo.select_values(:rmt_bins, :bin_asset_number, bin_asset_number: bin_numbers, location_id: location_id)
+      return failed_response("Following bins are already at this location: \n #{location_bin_numbers.join(', ')}") unless location_bin_numbers.nil_or_empty?
+
+      repo.transaction do
+        bin_numbers.each do |bin_number|
+          bin = find_rmt_bin_by_id_or_asset_number(bin_number)
+
+          res = FinishedGoodsApp::MoveStock.call(AppConst::BIN_STOCK_TYPE, bin[:id], location_id, 'MOVE_BIN', nil)
+          raise Crossbeams::InfoError, res.message unless res.success
+        end
+      end
+      success_response("#{bin_numbers.length} bins have been moved to location #{location_code}")
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("#{__method__} #{bin_numbers.join(',')}, Loc: #{location_code}"))
+      puts e.message
+      puts e.backtrace.join("\n")
+      failed_response(e.message)
+    end
+
     def validate_print_rebin_labels(params)
       res = validate_print_rebin_labels_params(params)
       return validation_failed_response(res) if res.failure?

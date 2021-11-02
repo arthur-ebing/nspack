@@ -16,5 +16,6 @@ module MasterfilesApp
     required(:consumption_area).maybe(:bool)
     optional(:can_be_moved).maybe(:bool)
     required(:can_store_stock).maybe(:bool)
+    required(:maximum_units).maybe(:integer)
   end
 end

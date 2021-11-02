@@ -218,6 +218,7 @@ class Nspack < Roda
               can_be_moved
               can_store_stock
               consumption_area
+              maximum_units
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else

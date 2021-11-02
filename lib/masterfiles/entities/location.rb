@@ -19,5 +19,6 @@ module MasterfilesApp
     attribute :print_code, Types::String
     attribute :can_be_moved, Types::Bool
     attribute :can_store_stock, Types::Bool
+    attribute :maximum_units, Types::Integer
   end
 end
