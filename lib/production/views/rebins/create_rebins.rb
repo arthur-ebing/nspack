@@ -19,6 +19,7 @@ module Production
               form.remote! if remote
               form.add_field :qty_bins_to_create
               form.add_field :rmt_class_id
+              form.add_field :rmt_size_id
               form.add_field :farm_code
               form.add_field :puc_code
               form.add_field :orchard_code

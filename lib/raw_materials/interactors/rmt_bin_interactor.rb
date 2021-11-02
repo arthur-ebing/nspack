@@ -273,9 +273,7 @@ module RawMaterialsApp
 
     def create_rebin_groups(production_run_id, params) # rubocop:disable Metrics/AbcSize
       params = params.merge(production_run_rebin_id: production_run_id)
-
       params = calc_rebin_params(params)
-
       res = validate_rmt_rebin_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -286,10 +284,8 @@ module RawMaterialsApp
 
       created_rebins = []
       repo.transaction do
-        params.delete(:qty_bins_to_create)
         bin_asset_numbers.map(&:last).each do |bin_asset_number|
-          params[:bin_asset_number] = bin_asset_number
-          id = repo.create_rmt_bin(params)
+          id = repo.create_rmt_bin(res.to_h.merge(bin_asset_number: bin_asset_number))
           log_status(:rmt_bins, id, 'REBIN_CREATED')
           created_rebins << rmt_bin(id)
         end
