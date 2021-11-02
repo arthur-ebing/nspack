@@ -1194,5 +1194,76 @@ module ProductionApp
       SQL
       DB[query].select_map(:id)
     end
+
+    def add_bins_to_wip(bin_ids, context, user_name) # rubocop:disable Metrics/AbcSize
+      res = validate_wip_bins_or_pallets(bin_ids, user_name, context)
+      return validation_failed_response(res) if res.failure?
+      return failed_response('Some bins are already works in progress') if DB[:wip_bins].where(rmt_bin_id: res[:ids]).count.positive?
+
+      DB[:wip_bins].multi_insert(res[:ids].map { |id| { rmt_bin_id: id, context: context } })
+      log_multiple_statuses(:rmt_bins, res[:ids], 'WIP', comment: context, user_name: user_name)
+      ok_response
+    rescue Sequel::ForeignKeyConstraintViolation
+      failed_response('Not all ids are valid bin ids')
+    end
+
+    def remove_bins_from_wip(bin_ids, user_name)
+      res = validate_wip_bins_or_pallets(bin_ids, user_name, out: true)
+      return validation_failed_response(res) if res.failure?
+      return failed_response('None of these bins are works in progress') if DB[:wip_bins].where(rmt_bin_id: bin_ids).count.zero?
+
+      DB[:wip_bins].where(rmt_bin_id: bin_ids).delete
+      log_multiple_statuses(:rmt_bins, bin_ids, 'WIP_RELEASED', user_name: user_name)
+      ok_response
+    end
+
+    def add_pallets_to_wip(pallet_ids, context, user_name) # rubocop:disable Metrics/AbcSize
+      res = validate_wip_bins_or_pallets(pallet_ids, user_name, context)
+      return validation_failed_response(res) if res.failure?
+      return failed_response('Some pallets are already works in progress') if DB[:wip_pallets].where(pallet_id: res[:ids]).count.positive?
+
+      DB[:wip_pallets].multi_insert(res[:ids].map { |id| { pallet_id: id, context: context } })
+      log_multiple_statuses(:pallets, res[:ids], 'WIP', comment: context, user_name: user_name)
+      ok_response
+    rescue Sequel::ForeignKeyConstraintViolation
+      failed_response('Not all ids are valid pallet ids')
+    end
+
+    def remove_pallets_from_wip(pallet_ids, user_name)
+      res = validate_wip_bins_or_pallets(pallet_ids, user_name, out: true)
+      return validation_failed_response(res) if res.failure?
+      return failed_response('None of these pallets are works in progress') if DB[:wip_pallets].where(pallet_id: pallet_ids).count.zero?
+
+      DB[:wip_pallets].where(pallet_id: pallet_ids).delete
+      log_multiple_statuses(:pallets, pallet_ids, 'WIP_RELEASED', user_name: user_name)
+      ok_response
+    end
+
+    def are_bins_out_of_wip?(bin_ids)
+      wip_ids = DB[:wip_bins].where(rmt_bin_id: bin_ids).select_map(:rmt_bin_id)
+      return failed_response("Bin id: #{wip_ids.join(', ')} are works in progress", wip_ids) unless wip_ids.empty?
+
+      success_response('None of the bins are WIP')
+    end
+
+    def are_pallets_out_of_wip?(pallet_ids)
+      wip_ids = DB[:wip_pallets].where(pallet_id: pallet_ids).select_map(:pallet_id)
+      return failed_response("Pallet id: #{wip_ids.join(', ')} are works in progress", wip_ids) unless wip_ids.empty?
+
+      success_response('None of the pallets are WIP')
+    end
+
+    private
+
+    def validate_wip_bins_or_pallets(ids, user_name, context = nil, out: false)
+      params = { ids: ids&.uniq,
+                 user_name: user_name }
+      params[:context] = context unless out
+      Dry::Schema.Params do
+        required(:ids).filled(:array).each(:integer)
+        optional(:context).filled(:string)
+        required(:user_name).filled(:string)
+      end.call(params)
+    end
   end
 end
