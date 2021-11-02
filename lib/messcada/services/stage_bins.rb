@@ -16,8 +16,10 @@ module MesscadaApp
       delivery_repo.update_rmt_bin(bin_ids, presort_staging_run_child_id: active_presort_staging_run_child_id, staged_for_presorting_at: Time.now, staged_for_presorting: true)
 
       bin_ids.each do |b|
-        res = FinishedGoodsApp::MoveStock.call(AppConst::BIN_STOCK_TYPE, b, location_to_id, AppConst::PRESORT_STAGING_BUSINESS_PROCESS, nil)
-        raise unwrap_failed_response(res) unless res.success
+        unless repo.exists?(:rmt_bins, id: b, location_id: location_to_id)
+          res = FinishedGoodsApp::MoveStock.call(AppConst::BIN_STOCK_TYPE, b, location_to_id, AppConst::PRESORT_STAGING_BUSINESS_PROCESS, nil)
+          raise unwrap_failed_response(res) unless res.success
+        end
       end
 
       CreateApportBins.call(bin_ids, active_presort_staging_run_child_id, plant_resource_code)
