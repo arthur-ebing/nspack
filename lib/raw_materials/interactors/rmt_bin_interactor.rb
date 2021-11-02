@@ -159,6 +159,22 @@ module RawMaterialsApp
       success_response('ok', bin_id)
     end
 
+    def force_bin_tripsheet_offload(vehicle_job_id) # rubocop:disable Metrics/AbcSize
+      stock_type_id = MesscadaApp::MesscadaRepo.new.get_value(:stock_types, :id, stock_type_code: AppConst::BIN_STOCK_TYPE)
+      repo.transaction do
+        vehicle_job_units = repo.select_values(:vehicle_job_units, :id, vehicle_job_id: vehicle_job_id)
+        bin_ids = repo.select_values(:vehicle_job_units, :stock_item_id, vehicle_job_id: vehicle_job_id)
+        repo.update(:vehicle_job_units, vehicle_job_units, offloaded_at: Time.now)
+        location_to_id = complete_bins_offload_vehicle(vehicle_job_id, bin_ids)
+        log_status(:vehicle_jobs, vehicle_job_id, 'OFFLOAD_FORCED')
+        success_response("Tipsheet: #{vehicle_job_id} offloaded at #{repo.get_value(:locations, :location_long_code, id: location_to_id)}", stock_type_id)
+      end
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message, stock_type_id)
+    rescue StandardError => e
+      failed_response(e.message, stock_type_id)
+    end
+
     def offload_bin(vehicle_job_id, bin_id) # rubocop:disable Metrics/AbcSize
       vehicle_job_unit = insp_repo.find_vehicle_job_unit_by_stock_item_and_vehicle_job(bin_id, vehicle_job_id)
       instance = { vehicle_job_offloaded: false, vehicle_job_id: vehicle_job_unit[:vehicle_job_id] }

@@ -592,6 +592,30 @@ class Nspack < Roda
       stock_type_id = MesscadaApp::MesscadaRepo.new.get_value(:stock_types, :id, stock_type_code: AppConst::PALLET_STOCK_TYPE)
       r.redirect "/list/vehicle_jobs/with_params?key=standard&stock_type_id=#{stock_type_id}"
     end
+
+    r.on 'force_pallet_tripsheet_offload', Integer do |id|
+      interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      res = interactor.force_pallet_tripsheet_offload(id)
+      if res.success
+        flash[:notice] = res.message
+      else
+        flash[:error] = res.message
+      end
+      r.redirect "/list/vehicle_jobs/with_params?key=standard&stock_type_id=#{res.instance}"
+    end
+
+    r.on 'force_bin_tripsheet_offload', Integer do |id|
+      interactor = RawMaterialsApp::RmtBinInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      res = interactor.force_bin_tripsheet_offload(id)
+      if res.success
+        flash[:notice] = res.message
+      else
+        flash[:error] = res.message
+      end
+      r.redirect "/list/bins_tripsheets/with_params?key=standard&stock_type_id=#{res.instance}"
+    end
   end
 
   route 'buildups', 'finished_goods' do |r|

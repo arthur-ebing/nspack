@@ -21,6 +21,10 @@
   :text: open
   :icon: toggle-off
   :hide_if_false: can_open
+- :url: "/finished_goods/interwarehouse_transfers/force_pallet_tripsheet_offload/$:id$"
+  :text: force_offload
+  :icon: toggle-off
+  :hide_if_true: offloaded
 :conditions:
   :standard:
     - :col: vehicle_jobs.stock_type_id
