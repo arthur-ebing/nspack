@@ -7,10 +7,11 @@ module EdiApp
 
       def initialize(task, party_role_id, record_id, _context)
         @task = task
-        @repo = FinishedGoodsApp::LoadRepo.new
+        @repo = FinishedGoodsApp::OrderRepo.new
         @party_role_id = party_role_id
         @record_id = record_id
-        @entity = @repo.find_load(@record_id)
+        order_id = @repo.get_value(:orders_loads, :order_id, load_id: @record_id)
+        @entity = @repo.find_order(order_id)
       end
 
       CHECKS = {
@@ -24,7 +25,7 @@ module EdiApp
       DEPOT_VALID = false
 
       def call
-        return failed_response("There is no load with id #{record_id}") unless @entity
+        return failed_response("There is no order with load id #{record_id}") unless @entity
 
         check = CHECKS[task]
         raise ArgumentError, "Task \"#{task}\" is unknown for #{self.class}" if check.nil?
