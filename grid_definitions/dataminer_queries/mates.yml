@@ -1,0 +1,692 @@
+---
+:caption: Mates
+:sql: "SELECT \r\n   id,\r\n   pallet_id,\r\n   vessel,\r\n   voyage,\r\n   voyage_number,\r\n
+  \  pod,\r\n   pol,\r\n   customer,\r\n   departure_date,\r\n   booking_reference,\r\n
+  \  customer_order_number,\r\n   shipped_date,\r\n   marketing_org,\r\n   container,\r\n
+  \  container_seal_code,\r\n   temp_tail,\r\n   exporter,\r\n   pallet_number,\r\n
+  \  marketing_variety,\r\n   std_pack,\r\n   mark,\r\n   actual_count,\r\n   grade,\r\n
+  \  puc,\r\n   phc,\r\n   target_market,\r\n   region,\r\n   edi_in_consignment_note_number,\r\n
+  \  inspection_point,\r\n   govt_first_inspection_at,\r\n   orchard,\r\n   packhouse,\r\n
+  \  diameter_range,\r\n   pallet_size,\r\n   carton_quantity,\r\n   load_id,\r\n
+  \  sequence_nett_weight,\r\n   gross_weight,\r\n   gap_code,\r\n   'ZA' AS country_of_origin,\r\n
+  \  colour_rule\r\nFROM vw_pallet_sequence_flat\r\nWHERE shipped\r\nORDER BY pallet_sequence_number
+  DESC"
+:limit: 
+:offset: 
+:external_settings:
+  :render_url: 
+  :colour_key: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_id:
+    :name: pallet_id
+    :sequence_no: 2
+    :caption: Pallet
+    :namespaced_name: pallet_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  vessel:
+    :name: vessel
+    :sequence_no: 3
+    :caption: Vessel
+    :namespaced_name: vessel
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  voyage:
+    :name: voyage
+    :sequence_no: 4
+    :caption: Voyage
+    :namespaced_name: voyage
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  voyage_number:
+    :name: voyage_number
+    :sequence_no: 5
+    :caption: Voyage number
+    :namespaced_name: voyage_number
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pod:
+    :name: pod
+    :sequence_no: 6
+    :caption: POD
+    :namespaced_name: pod
+    :data_type: :string
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pol:
+    :name: pol
+    :sequence_no: 7
+    :caption: POL
+    :namespaced_name: pol
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  customer:
+    :name: customer
+    :sequence_no: 8
+    :caption: Customer
+    :namespaced_name: customer
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  departure_date:
+    :name: departure_date
+    :sequence_no: 9
+    :caption: Departure date
+    :namespaced_name: departure_date
+    :data_type: :datetime
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  booking_reference:
+    :name: booking_reference
+    :sequence_no: 10
+    :caption: Booking ref
+    :namespaced_name: booking_reference
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  customer_order_number:
+    :name: customer_order_number
+    :sequence_no: 11
+    :caption: Customer No
+    :namespaced_name: customer_order_number
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  shipped_date:
+    :name: shipped_date
+    :sequence_no: 12
+    :caption: Shipped date
+    :namespaced_name: shipped_date
+    :data_type: :date
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marketing_org:
+    :name: marketing_org
+    :sequence_no: 13
+    :caption: Marketing org
+    :namespaced_name: marketing_org
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  container:
+    :name: container
+    :sequence_no: 14
+    :caption: Container
+    :namespaced_name: container
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  container_seal_code:
+    :name: container_seal_code
+    :sequence_no: 15
+    :caption: Seal No
+    :namespaced_name: container_seal_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  temp_tail:
+    :name: temp_tail
+    :sequence_no: 16
+    :caption: Temp tail
+    :namespaced_name: temp_tail
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  exporter:
+    :name: exporter
+    :sequence_no: 17
+    :caption: Exporter
+    :namespaced_name: exporter
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_number:
+    :name: pallet_number
+    :sequence_no: 18
+    :caption: Pallet number
+    :namespaced_name: pallet_number
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marketing_variety:
+    :name: marketing_variety
+    :sequence_no: 19
+    :caption: Mkt Var
+    :namespaced_name: marketing_variety
+    :data_type: :string
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  std_pack:
+    :name: std_pack
+    :sequence_no: 20
+    :caption: Std pack
+    :namespaced_name: std_pack
+    :data_type: :string
+    :width: 90
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mark:
+    :name: mark
+    :sequence_no: 21
+    :caption: Mark
+    :namespaced_name: mark
+    :data_type: :string
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  actual_count:
+    :name: actual_count
+    :sequence_no: 22
+    :caption: Actual count
+    :namespaced_name: actual_count
+    :data_type: :integer
+    :width: 90
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  grade:
+    :name: grade
+    :sequence_no: 23
+    :caption: Grade
+    :namespaced_name: grade
+    :data_type: :string
+    :width: 60
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  puc:
+    :name: puc
+    :sequence_no: 24
+    :caption: PUC
+    :namespaced_name: puc
+    :data_type: :string
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  phc:
+    :name: phc
+    :sequence_no: 25
+    :caption: PHC
+    :namespaced_name: phc
+    :data_type: :string
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  target_market:
+    :name: target_market
+    :sequence_no: 26
+    :caption: Target market
+    :namespaced_name: target_market
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  region:
+    :name: region
+    :sequence_no: 27
+    :caption: Region
+    :namespaced_name: region
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  edi_in_consignment_note_number:
+    :name: edi_in_consignment_note_number
+    :sequence_no: 28
+    :caption: EDI Cons
+    :namespaced_name: edi_in_consignment_note_number
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inspection_point:
+    :name: inspection_point
+    :sequence_no: 29
+    :caption: Inspection point
+    :namespaced_name: inspection_point
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  govt_first_inspection_at:
+    :name: govt_first_inspection_at
+    :sequence_no: 30
+    :caption: Govt first inspection at
+    :namespaced_name: govt_first_inspection_at
+    :data_type: :datetime
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  orchard:
+    :name: orchard
+    :sequence_no: 31
+    :caption: Orch
+    :namespaced_name: orchard
+    :data_type: :string
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packhouse:
+    :name: packhouse
+    :sequence_no: 32
+    :caption: Packhouse
+    :namespaced_name: packhouse
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  diameter_range:
+    :name: diameter_range
+    :sequence_no: 33
+    :caption: Diameter range
+    :namespaced_name: diameter_range
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_size:
+    :name: pallet_size
+    :sequence_no: 34
+    :caption: Plt size
+    :namespaced_name: pallet_size
+    :data_type: :number
+    :width: 90
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  carton_quantity:
+    :name: carton_quantity
+    :sequence_no: 35
+    :caption: Ctn Qty
+    :namespaced_name: carton_quantity
+    :data_type: :integer
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  load_id:
+    :name: load_id
+    :sequence_no: 36
+    :caption: Load
+    :namespaced_name: load_id
+    :data_type: :integer
+    :width: 70
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  sequence_nett_weight:
+    :name: sequence_nett_weight
+    :sequence_no: 37
+    :caption: Sequence nett weight
+    :namespaced_name: sequence_nett_weight
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  gross_weight:
+    :name: gross_weight
+    :sequence_no: 38
+    :caption: Plt Gross weight
+    :namespaced_name: gross_weight
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  gap_code:
+    :name: gap_code
+    :sequence_no: 39
+    :caption: GAP code
+    :namespaced_name: gap_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  country_of_origin:
+    :name: country_of_origin
+    :sequence_no: 40
+    :caption: Country of origin
+    :namespaced_name: 
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  colour_rule:
+    :name: colour_rule
+    :sequence_no: 41
+    :caption: Colour rule
+    :namespaced_name: colour_rule
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: pallet_id
+  :caption: Pallet Id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: pallet_number
+  :caption: Pallet number
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 2
+  :list_def: 
