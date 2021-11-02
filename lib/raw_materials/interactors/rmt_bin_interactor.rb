@@ -805,7 +805,7 @@ module RawMaterialsApp
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("#{__method__} #{bin_number}, Loc: #{location}"))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("#{__method__} #{bin_number}, Loc: #{location_id}"))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
