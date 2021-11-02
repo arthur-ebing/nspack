@@ -21,6 +21,7 @@ module Crossbeams
       BASE = {
         WEBAPP => {
           password: { can_be_changed_by_user: true },
+          tripsheet: { can_be_force_offloaded_by_user: false },
           load: { can_unship: false, can_ship: false },
           reworks: { can_change_in_stock_pallets: false,
                      can_change_govt_inspected_pallets: false }
@@ -33,6 +34,7 @@ module Crossbeams
       DOCUMENTATION = {
         WEBAPP => {
           password: { can_be_changed_by_user: 'Allow this user to change their own password' },
+          tripsheet: { can_be_force_offloaded_by_user: 'Allow this user to force offload tripsheet' },
           load: { can_unship: 'Allow this user to unship loads', can_ship: 'Allow this user to ship loads'  },
           reworks: { can_change_in_stock_pallets: 'Allow this user to change in_stock pallets in reworks',
                      can_change_govt_inspected_pallets: 'Allow this user to change govt_inspected pallets in reworks' }
