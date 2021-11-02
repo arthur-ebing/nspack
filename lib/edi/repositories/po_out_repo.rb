@@ -58,7 +58,6 @@ module EdiApp
           cargo_temperatures.set_point_temperature AS temp_set,
           pod_ports.port_code AS disch_port,
           voyages.voyage_number AS ship_number,
-          pallet_bases.edi_out_pallet_base AS pallet_btype,
           vessels.vessel_code AS ship_name,
           fn_party_role_org_code(load_voyages.shipping_line_party_role_id) AS ship_line,
           #{load_code} AS doc_no,
@@ -141,6 +140,7 @@ module EdiApp
           COALESCE(pallets.stock_created_at, pallets.created_at) AS transaction_date,
           COALESCE(pallets.stock_created_at, pallets.created_at) AS transaction_time,
           pallet_bases.edi_out_pallet_base AS pallet_btype,
+          pallet_stack_types.stack_type_code AS stack_variance,
           pallets.pallet_number AS sscc,
           govt_inspection_sheets.consignment_note_number AS waybill_no,
           pallet_sequences.sell_by_code AS sellbycode,
@@ -175,6 +175,7 @@ module EdiApp
         JOIN seasons ON seasons.id = pallet_sequences.season_id
         LEFT JOIN pallet_formats ON pallet_formats.id = pallets.pallet_format_id
         LEFT JOIN pallet_bases ON pallet_bases.id = pallet_formats.pallet_base_id
+        LEFT JOIN pallet_stack_types ON pallet_stack_types.id = pallet_formats.pallet_stack_type_id
         JOIN party_roles mpr ON mpr.id = pallet_sequences.marketing_org_party_role_id
         JOIN organizations marketing_org ON marketing_org.party_id = mpr.party_id
         LEFT OUTER JOIN govt_inspection_pallets ON govt_inspection_pallets.id = pallets.last_govt_inspection_pallet_id

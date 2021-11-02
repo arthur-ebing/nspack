@@ -41,6 +41,7 @@ module EdiApp
           COALESCE(pallets.stock_created_at, pallets.created_at) AS transaction_date,
           COALESCE(pallets.stock_created_at, pallets.created_at) AS transaction_time,
           pallet_bases.edi_out_pallet_base AS pallet_base_type,
+          pallet_stack_types.stack_type_code AS stack_variance,
           pallets.pallet_number AS sscc,
           COALESCE(govt_inspection_sheets.consignment_note_number, pallets.edi_in_consignment_note_number) AS waybill_no,
           pallet_sequences.sell_by_code AS sellbycode,
@@ -90,6 +91,7 @@ module EdiApp
         JOIN orchards ON orchards.id = pallet_sequences.orchard_id
         LEFT JOIN pallet_formats ON pallet_formats.id = pallets.pallet_format_id
         LEFT JOIN pallet_bases ON pallet_bases.id = pallet_formats.pallet_base_id
+        LEFT JOIN pallet_stack_types ON pallet_stack_types.id = pallet_formats.pallet_stack_type_id
         WHERE pallets.in_stock
           AND #{party_role_condition} = ?
         ORDER BY pallet_sequences.pallet_number, pallet_sequences.pallet_sequence_number
