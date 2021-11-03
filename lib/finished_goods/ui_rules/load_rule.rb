@@ -57,6 +57,7 @@ module UiRules
       fields[:voyage_code] = { renderer: :label, with_value: voyage_code_label, caption: 'Voyage Code' }
       fields[:depot_id] = { renderer: :label, with_value: depot_label, caption: 'Depot' }
       fields[:rmt_load] = { renderer: :label, as_boolean: true, caption: 'RMT Load' }
+      fields[:truck_must_be_weighed] = { renderer: :label, as_boolean: true, invisible: !AppConst::CR_PROD.derive_nett_weight? }
       fields[:order_id] = { renderer: :label, caption: 'Order', hide_on_load: @form_object.order_id.nil?  }
       fields[:order_number] = { renderer: :label, caption: 'Internal Order Number' }
       fields[:customer_order_number] = { renderer: :label }
@@ -218,8 +219,9 @@ module UiRules
                     required: true },
         rmt_load: { renderer: :checkbox,
                     caption: 'RMT Load',
-                    hide_on_load: @form_object.allocated || on_order,
-                    as_boolean: true },
+                    hide_on_load: @form_object.allocated || on_order },
+        truck_must_be_weighed: { renderer: :checkbox,
+                                 invisible: !AppConst::CR_PROD.derive_nett_weight? },
         exporter_certificate_code: {},
         edi_file_name: { renderer: :label },
         shipped_at: { renderer: rules[:can_unship] ? :datetime : :label,
@@ -333,6 +335,7 @@ module UiRules
     def make_new_form_object
       @form_object = OpenStruct.new(depot_id: @repo.get_id(:depots, depot_code: AppConst::DEFAULT_DEPOT),
                                     rmt_load: false,
+                                    truck_must_be_weighed: false,
                                     customer_party_role_id: nil,
                                     consignee_party_role_id: nil,
                                     billing_client_party_role_id: nil,

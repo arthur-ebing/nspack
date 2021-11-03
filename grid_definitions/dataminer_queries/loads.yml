@@ -20,8 +20,9 @@
   || ' - ' || cargo_temperatures.set_point_temperature AS cargo_temperature,\r\n    container_stack_types.stack_type_code
   || ' - ' || COALESCE(container_stack_types.description,'') AS stack_type,\r\n    EXISTS(select
   id from edi_out_transactions where record_id = loads.id and flow_type = 'PO') AS
-  edi_out_transactions,\r\n    loads.rmt_load,\r\n    orders_loads.order_id,\r\n    COALESCE(orders_loads.order_id,
-  0) AS zero_order_id,\r\n    orders_loads.order_id IS NOT NULL AS on_order,\r\n    pallet_sequences.packed_tm_group_id,\r\n
+  edi_out_transactions,\r\n    loads.rmt_load,\r\n    loads.truck_must_be_weighed,\r\n
+  \   orders_loads.order_id,\r\n    COALESCE(orders_loads.order_id, 0) AS zero_order_id,\r\n
+  \   orders_loads.order_id IS NOT NULL AS on_order,\r\n    pallet_sequences.packed_tm_group_id,\r\n
   \   pallet_sequences.packed_tm_group,\r\n    pallet_sequences.marketing_org_party_role_id,\r\n
   \   pallet_sequences.marketing_org,\r\n    loads.created_at,\r\n    loads.updated_at,\r\n
   \   CASE\r\n        WHEN loads.shipped THEN 'blue'\r\n        WHEN loads.allocated
@@ -761,9 +762,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  truck_must_be_weighed:
+    :name: truck_must_be_weighed
+    :sequence_no: 45
+    :caption: Truck must be weighed
+    :namespaced_name: loads.truck_must_be_weighed
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   order_id:
     :name: order_id
-    :sequence_no: 45
+    :sequence_no: 46
     :caption: Order
     :namespaced_name: orders_loads.order_id
     :data_type: :integer
@@ -779,7 +796,7 @@
     :group_max: false
   zero_order_id:
     :name: zero_order_id
-    :sequence_no: 46
+    :sequence_no: 47
     :caption: Zero order
     :namespaced_name: 
     :data_type: :integer
@@ -795,7 +812,7 @@
     :group_max: false
   on_order:
     :name: on_order
-    :sequence_no: 47
+    :sequence_no: 48
     :caption: On order
     :namespaced_name: 
     :data_type: :boolean
@@ -811,7 +828,7 @@
     :group_max: false
   packed_tm_group_id:
     :name: packed_tm_group_id
-    :sequence_no: 48
+    :sequence_no: 49
     :caption: Packed tm group id
     :namespaced_name: pallet_sequences.packed_tm_group_id
     :data_type: :string
@@ -827,7 +844,7 @@
     :group_max: false
   packed_tm_group:
     :name: packed_tm_group
-    :sequence_no: 49
+    :sequence_no: 50
     :caption: Packed TM group
     :namespaced_name: pallet_sequences.packed_tm_group
     :data_type: :string
@@ -843,7 +860,7 @@
     :group_max: false
   marketing_org_party_role_id:
     :name: marketing_org_party_role_id
-    :sequence_no: 50
+    :sequence_no: 51
     :caption: Marketing org party role id
     :namespaced_name: pallet_sequences.marketing_org_party_role_id
     :data_type: :string
@@ -859,7 +876,7 @@
     :group_max: false
   marketing_org:
     :name: marketing_org
-    :sequence_no: 51
+    :sequence_no: 52
     :caption: Marketing org
     :namespaced_name: pallet_sequences.marketing_org
     :data_type: :string
@@ -875,7 +892,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 52
+    :sequence_no: 53
     :caption: Created at
     :namespaced_name: loads.created_at
     :data_type: :datetime
@@ -891,7 +908,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 53
+    :sequence_no: 54
     :caption: Updated at
     :namespaced_name: loads.updated_at
     :data_type: :datetime
@@ -907,7 +924,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 54
+    :sequence_no: 55
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

@@ -38,6 +38,7 @@ module FinishedGoodsApp
     attribute :allocated, Types::Bool
     attribute :edi, Types::Bool
     attribute :status, Types::String
+    attribute :truck_must_be_weighed, Types::Bool
     attribute? :active, Types::Bool
 
     # Voyage

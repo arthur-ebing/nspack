@@ -54,6 +54,7 @@ module FinishedGoods
                     col.add_field :temp_tail_pallet_number
                     col.add_field :temp_tail
                     col.add_field :rmt_load
+                    col.add_field :truck_must_be_weighed
                   end
                 end
               end

@@ -237,13 +237,13 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def ship_load(id)
+    def ship_load(id) # rubocop:disable Metrics/AbcSize
       res = nil
       repo.transaction do
         res = ShipLoad.call(id, @user)
         raise Crossbeams::InfoError, res.message unless res.success
 
-        send_edi(id)
+        send_edi(id) unless repo.get(:loads, id, :truck_must_be_weighed)
         send_hcs_edi(id) if repo.load_is_on_order?(id)
         send_hbs_edi(id)
 
@@ -394,7 +394,7 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def apply_container_weights(id, params)
+    def apply_container_weights(id, params) # rubocop:disable Metrics/AbcSize
       check!(:change_container_weights, id)
 
       res = LoadContainerWeightSchema.call(params)
@@ -404,13 +404,15 @@ module FinishedGoodsApp
       changed_weights = weights_changed?(load_container_id, res)
       return success_response('Nothing to update - weights were not changed') unless changed_weights
 
+      send_for_weight = repo.get(:loads, id, :truck_must_be_weighed)
       repo.transaction do
         repo.update(:load_containers, load_container_id, res)
+        send_edi(id) if send_for_weight
 
         log_status(:loads, id, 'CONTAINER WEIGHTS SET')
       end
 
-      success_response('Weights applied to container')
+      success_response(send_for_weight ? 'Weights applied to container and EDI has been queued' : 'Weights applied to container')
     end
 
     private

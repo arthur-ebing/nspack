@@ -32,6 +32,7 @@ module FinishedGoodsApp
     optional(:booking_reference).maybe(Types::StrippedString)
     optional(:memo_pad).maybe(Types::StrippedString)
     optional(:location_of_issue).maybe(Types::StrippedString)
+    optional(:truck_must_be_weighed).maybe(:bool)
   end
 
   LoadSchema = Dry::Schema.Params do
@@ -58,6 +59,7 @@ module FinishedGoodsApp
     optional(:allocated_at).maybe(:time)
     required(:requires_temp_tail).filled(:bool)
     optional(:location_of_issue).maybe(Types::StrippedString)
+    optional(:truck_must_be_weighed).maybe(:bool)
   end
 
   LoadEditShippedDateSchema = Dry::Schema.Params do
