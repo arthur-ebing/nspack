@@ -1373,7 +1373,7 @@ class Nspack < Roda
     r.on 'cancel_pallet_tripsheet', Integer do |id|
       interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
-      res = interactor.cancel_manual_tripsheet(id)
+      res = interactor.cancel_manual_tripsheet(id, AppConst::PALLET_STOCK_TYPE)
       if res.success
         store_locally(:flash_notice, res.message)
         r.redirect('/rmd/finished_goods/create_pallet_tripsheet')
