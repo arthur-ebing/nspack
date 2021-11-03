@@ -185,6 +185,11 @@ module EdiApp
       rec[:lookup_data][:cartons_per_pallet_id] = cartons_per_pallet_id
       rec[:missing_mf][:cartons_per_pallet_id] = { mode: :direct, raise: true, keys: { pallet_btype: seq[:pallet_btype], cartons: tot_cartons, basic_pack_code_id: basic_pack_code_id }, msg: "Cartons Per Pallet for pallet #{pallet_number}, pallet base: #{seq[:pallet_btype]}, pack: #{seq[:pack]} and CCP: #{tot_cartons}" } if cartons_per_pallet_id.nil?
 
+      gross_weight = if AppConst::CR_PROD.derive_nett_weight?
+                       nil
+                     else
+                       seq[:pallet_gross_mass].nil? || seq[:pallet_gross_mass].to_f.zero? ? nil : seq[:pallet_gross_mass]
+                     end
       # pallet_format_id: 0, # lookup
       rec[:record] = {
         depot_pallet: true,
@@ -199,8 +204,9 @@ module EdiApp
         stock_created_at: intake_date || inspec_date || Time.now,
         phc: seq[:packh_code] || AppConst::CR_EDI.edi_in_default_phc,
         intake_created_at: intake_date,
-        gross_weight: seq[:pallet_gross_mass].nil? || seq[:pallet_gross_mass].to_f.zero? ? nil : seq[:pallet_gross_mass],
-        gross_weight_measured_at: weighed_date,
+        gross_weight: gross_weight,
+        gross_weight_measured_at: AppConst::CR_PROD.derive_nett_weight ? nil : weighed_date,
+        derived_weight: AppConst::CR_PROD.derive_nett_weight?,
         palletized: true,
         palletized_at: intake_date,
         created_at: intake_date,
