@@ -245,7 +245,7 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def cancel_manual_tripsheet(vehicle_job_id) # rubocop:disable Metrics/AbcSize
+    def cancel_manual_tripsheet(vehicle_job_id, stock_type_code) # rubocop:disable Metrics/AbcSize
       return failed_response('Cannot cancel. Tripsheet has already been offloaded') if repo.get(:vehicle_jobs, vehicle_job_id, :offloaded_at)
       return failed_response('Cannot cancel. Tripsheet has been completed') if repo.get(:vehicle_jobs, vehicle_job_id, :loaded_at)
 
@@ -255,19 +255,21 @@ module FinishedGoodsApp
         log_multiple_statuses(:pallets, tripsheet_pallets, 'MANUAL SHEET CANCELLED')
       end
 
-      success_response "Tripsheet:#{vehicle_job_id} cancelled successfully"
+      stock_type_id = MesscadaApp::MesscadaRepo.new.get_value(:stock_types, :id, stock_type_code: stock_type_code)
+      success_response("Tripsheet:#{vehicle_job_id} cancelled successfully", stock_type_id)
     rescue StandardError => e
       failed_response(e.message)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
-    def open_manual_tripsheet(vehicle_job_id)
+    def open_tripsheet(vehicle_job_id, stock_type_code)
       repo.transaction do
         repo.update(:vehicle_jobs, vehicle_job_id, loaded_at: nil)
       end
 
-      success_response "Tripsheet:#{vehicle_job_id} is now open"
+      stock_type_id = MesscadaApp::MesscadaRepo.new.get_value(:stock_types, :id, stock_type_code: stock_type_code)
+      success_response("Tripsheet:#{vehicle_job_id} is now open", stock_type_id)
     rescue StandardError => e
       failed_response(e.message)
     rescue Crossbeams::InfoError => e

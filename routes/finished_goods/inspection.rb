@@ -558,6 +558,8 @@ class Nspack < Roda
   route 'interwarehouse_transfers', 'finished_goods' do |r|
     # VEHICLE JOBS
     # --------------------------------------------------------------------------
+    interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
     r.on 'vehicle_jobs', Integer do |id|
       r.is do
         r.get do       # SHOW
@@ -568,40 +570,26 @@ class Nspack < Roda
     end
 
     r.on 'cancel_pallet_tripsheet', Integer do |id|
-      interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-
-      res = interactor.cancel_manual_tripsheet(id)
-      if res.success
-        flash[:notice] = res.message
-      else
-        flash[:error] = res.message
-      end
-      stock_type_id = MesscadaApp::MesscadaRepo.new.get_value(:stock_types, :id, stock_type_code: AppConst::PALLET_STOCK_TYPE)
-      r.redirect "/list/vehicle_jobs/with_params?key=standard&stock_type_id=#{stock_type_id}"
+      res = interactor.cancel_manual_tripsheet(id, AppConst::PALLET_STOCK_TYPE)
+      flash[res.success ? :notice : :error] = res.message
+      r.redirect "/list/vehicle_jobs/with_params?key=standard&stock_type_id=#{res.instance}"
     end
 
     r.on 'open_pallet_tripsheet', Integer do |id|
-      interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      res = interactor.open_tripsheet(id, AppConst::PALLET_STOCK_TYPE)
+      flash[res.success ? :notice : :error] = res.message
+      r.redirect "/list/vehicle_jobs/with_params?key=standard&stock_type_id=#{res.instance}"
+    end
 
-      res = interactor.open_manual_tripsheet(id)
-      if res.success
-        flash[:notice] = res.message
-      else
-        flash[:error] = res.message
-      end
-      stock_type_id = MesscadaApp::MesscadaRepo.new.get_value(:stock_types, :id, stock_type_code: AppConst::PALLET_STOCK_TYPE)
-      r.redirect "/list/vehicle_jobs/with_params?key=standard&stock_type_id=#{stock_type_id}"
+    r.on 'open_bin_tripsheet', Integer do |id|
+      res = interactor.open_tripsheet(id, AppConst::BIN_STOCK_TYPE)
+      flash[res.success ? :notice : :error] = res.message
+      r.redirect "/list/bins_tripsheets/with_params?key=standard&stock_type_id=#{res.instance}"
     end
 
     r.on 'force_pallet_tripsheet_offload', Integer do |id|
-      interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-
       res = interactor.force_pallet_tripsheet_offload(id)
-      if res.success
-        flash[:notice] = res.message
-      else
-        flash[:error] = res.message
-      end
+      flash[res.success ? :notice : :error] = res.message
       r.redirect "/list/vehicle_jobs/with_params?key=standard&stock_type_id=#{res.instance}"
     end
 
@@ -609,11 +597,7 @@ class Nspack < Roda
       interactor = RawMaterialsApp::RmtBinInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       res = interactor.force_bin_tripsheet_offload(id)
-      if res.success
-        flash[:notice] = res.message
-      else
-        flash[:error] = res.message
-      end
+      flash[res.success ? :notice : :error] = res.message
       r.redirect "/list/bins_tripsheets/with_params?key=standard&stock_type_id=#{res.instance}"
     end
   end
