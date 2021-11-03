@@ -372,7 +372,7 @@ module UiRules
       step = 0
       step = 1 if @form_object.allocated
       step = 2 if @form_object.vehicle
-      step = 3 if @form_object.loaded || @form_object.temp_tail
+      step = 3 if @form_object.loaded
       step = 4 if @form_object.shipped
 
       @form_object = OpenStruct.new(@form_object.to_h.merge(steps: steps, step: step))
@@ -448,7 +448,7 @@ module UiRules
                       url: "/finished_goods/dispatch/loads/#{id}/delete_temp_tail",
                       prompt: 'Are you sure, you want to delete the temp tail on this load?',
                       visible: @form_object.temp_tail,
-                      icon: :back }
+                      icon: :minus }
       ship = { control_type: :link,
                style: :action_button,
                text: 'Ship',
