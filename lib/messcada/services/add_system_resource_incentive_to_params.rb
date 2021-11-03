@@ -39,6 +39,11 @@ module MesscadaApp
       return merge_incentive_contract_worker unless get_group_incentive && sys_res.group_incentive
 
       merge_incentive_group_incentive
+    rescue Crossbeams::InfoError => e
+      AppConst::ROBOT_LOG.error(e.message)
+      puts e.message
+      puts e.backtrace.join("\n")
+      failed_response(e.message)
     rescue StandardError => e
       ErrorMailer.send_exception_email(e, subject: "#{self.class.name} : #{e.message}", message: <<~STR)
         params: #{params.inspect}
@@ -91,6 +96,7 @@ module MesscadaApp
     def merge_incentive_group_incentive
       group_incentive_id = repo.active_group_incentive_id(sys_res.id)
       return failed_response('No active group') if group_incentive_id.nil?
+      return failed_response('No incentive worker logged in to group') unless repo.group_has_incentive_workers?(group_incentive_id)
 
       attrs = params.merge(system_resource: ProductionApp::SystemResourceWithIncentive.new(sys_res.to_h.merge(group_incentive_id: group_incentive_id)))
       success_response('ok', attrs)

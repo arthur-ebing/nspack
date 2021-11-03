@@ -166,6 +166,13 @@ module MesscadaApp
         .get(:id)
     end
 
+    def group_has_incentive_workers?(group_incentive_id)
+      ar = DB[:group_incentives]
+           .where(id: group_incentive_id, active: true)
+           .get(:incentive_target_worker_ids) || []
+      ar.length.positive?
+    end
+
     def packer_belongs_to_incentive_group?(group_incentive_id, contract_worker_id)
       query = <<~SQL
         SELECT EXISTS(
