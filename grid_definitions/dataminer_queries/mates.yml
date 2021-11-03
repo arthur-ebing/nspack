@@ -8,9 +8,9 @@
   \  puc,\r\n   phc,\r\n   target_market,\r\n   region,\r\n   edi_in_consignment_note_number,\r\n
   \  inspection_point,\r\n   govt_first_inspection_at,\r\n   orchard,\r\n   packhouse,\r\n
   \  diameter_range,\r\n   pallet_size,\r\n   carton_quantity,\r\n   load_id,\r\n
-  \  sequence_nett_weight,\r\n   gross_weight,\r\n   gap_code,\r\n   'ZA' AS country_of_origin,\r\n
-  \  colour_rule\r\nFROM vw_pallet_sequence_flat\r\nWHERE shipped\r\nORDER BY pallet_sequence_number
-  DESC"
+  \  sequence_nett_weight,\r\n   sequence_gross_weight,\r\n   gap_code,\r\n   'ZA'
+  AS country_of_origin,\r\n   colour_rule\r\nFROM vw_pallet_sequence_flat\r\nWHERE
+  shipped\r\nORDER BY pallet_sequence_number DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -609,17 +609,17 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  gross_weight:
-    :name: gross_weight
+  sequence_gross_weight:
+    :name: sequence_gross_weight
     :sequence_no: 38
-    :caption: Plt Gross weight
-    :namespaced_name: gross_weight
+    :caption: Sequence gross weight
+    :namespaced_name: sequence_gross_weight
     :data_type: :number
-    :width: 
+    :width: 130
     :format: :delimited_1000
     :hide: false
     :pinned: 
-    :groupable: true
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false

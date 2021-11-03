@@ -1,11 +1,11 @@
 ---
 :caption: RMT Bins
 :sql: "SELECT\r\n    id,\r\n    asset_number,\r\n    puc_id,\r\n    puc_code,\r\n
-  \   orchard_id,\r\n    orchard_code,\r\n    bin_received_at AS bin_received_date_time,\r\n
-  \   status,\r\n    qty_bins,\r\n    farm_section_name,\r\n    farm_manager,\r\n
-  \   discrete_bin,\r\n    qty_inner_bins,\r\n    bin_fullness,\r\n    nett_weight,\r\n
-  \   gross_weight,\r\n    avg_gross_weight,\r\n    weighed_manually,\r\n    active,\r\n
-  \   created_at,\r\n    updated_at,\r\n    location_id,\r\n    location_long_code,\r\n
+  \   tip_line,\r\n    orchard_id,\r\n    orchard_code,\r\n    bin_received_at AS
+  bin_received_date_time,\r\n    status,\r\n    qty_bins,\r\n    farm_section_name,\r\n
+  \   farm_manager,\r\n    discrete_bin,\r\n    qty_inner_bins,\r\n    bin_fullness,\r\n
+  \   nett_weight,\r\n    gross_weight,\r\n    avg_gross_weight,\r\n    weighed_manually,\r\n
+  \   active,\r\n    created_at,\r\n    updated_at,\r\n    location_id,\r\n    location_long_code,\r\n
   \   production_run_tipped_id,\r\n    bin_tipping_plant_resource_id,\r\n    packhouse,\r\n
   \   season_id,\r\n    season_code,\r\n    farm_id,\r\n    farm_group_code,\r\n    farm_code,\r\n
   \   cultivar_group_id,\r\n    cultivar_group_code,\r\n    cultivar_id,\r\n    cultivar_name,\r\n
@@ -96,9 +96,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  tip_line:
+    :name: tip_line
+    :sequence_no: 5
+    :caption: Tip line
+    :namespaced_name: tip_line
+    :data_type: :string
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   orchard_id:
     :name: orchard_id
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Orchard
     :namespaced_name: orchard_id
     :data_type: :integer
@@ -114,7 +130,7 @@
     :group_max: false
   orchard_code:
     :name: orchard_code
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Orchard code
     :namespaced_name: orchard_code
     :data_type: :string
@@ -130,7 +146,7 @@
     :group_max: false
   bin_received_date_time:
     :name: bin_received_date_time
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Bin received at
     :namespaced_name: bin_received_at
     :data_type: :datetime
@@ -146,7 +162,7 @@
     :group_max: false
   status:
     :name: status
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Status
     :namespaced_name: status
     :data_type: :string
@@ -162,7 +178,7 @@
     :group_max: false
   qty_bins:
     :name: qty_bins
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Qty bins
     :namespaced_name: qty_bins
     :data_type: :integer
@@ -178,7 +194,7 @@
     :group_max: false
   farm_section_name:
     :name: farm_section_name
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Farm Section
     :namespaced_name: farm_section_name
     :data_type: :string
@@ -194,7 +210,7 @@
     :group_max: false
   farm_manager:
     :name: farm_manager
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Farm manager
     :namespaced_name: farm_manager
     :data_type: :string
@@ -210,7 +226,7 @@
     :group_max: false
   discrete_bin:
     :name: discrete_bin
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Discrete bin
     :namespaced_name: discrete_bin
     :data_type: :boolean
@@ -226,7 +242,7 @@
     :group_max: false
   qty_inner_bins:
     :name: qty_inner_bins
-    :sequence_no: 13
+    :sequence_no: 14
     :caption: Qty inner
     :namespaced_name: qty_inner_bins
     :data_type: :integer
@@ -242,7 +258,7 @@
     :group_max: false
   bin_fullness:
     :name: bin_fullness
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: Bin fullness
     :namespaced_name: bin_fullness
     :data_type: :string
@@ -258,7 +274,7 @@
     :group_max: false
   nett_weight:
     :name: nett_weight
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Nett weight
     :namespaced_name: nett_weight
     :data_type: :number
@@ -274,7 +290,7 @@
     :group_max: false
   gross_weight:
     :name: gross_weight
-    :sequence_no: 16
+    :sequence_no: 17
     :caption: Gross weight
     :namespaced_name: gross_weight
     :data_type: :number
@@ -290,7 +306,7 @@
     :group_max: false
   avg_gross_weight:
     :name: avg_gross_weight
-    :sequence_no: 17
+    :sequence_no: 18
     :caption: Avg gross weight
     :namespaced_name: avg_gross_weight
     :data_type: :boolean
@@ -306,7 +322,7 @@
     :group_max: false
   weighed_manually:
     :name: weighed_manually
-    :sequence_no: 18
+    :sequence_no: 19
     :caption: Weighed manually
     :namespaced_name: weighed_manually
     :data_type: :boolean
@@ -322,7 +338,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 19
+    :sequence_no: 20
     :caption: Active
     :namespaced_name: active
     :data_type: :boolean
@@ -338,7 +354,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 20
+    :sequence_no: 21
     :caption: Created at
     :namespaced_name: created_at
     :data_type: :datetime
@@ -354,7 +370,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 21
+    :sequence_no: 22
     :caption: Updated at
     :namespaced_name: updated_at
     :data_type: :datetime
@@ -370,7 +386,7 @@
     :group_max: false
   location_id:
     :name: location_id
-    :sequence_no: 22
+    :sequence_no: 23
     :caption: Location
     :namespaced_name: location_id
     :data_type: :string
@@ -386,7 +402,7 @@
     :group_max: false
   location_long_code:
     :name: location_long_code
-    :sequence_no: 23
+    :sequence_no: 24
     :caption: Location Code
     :namespaced_name: location_long_code
     :data_type: :string
@@ -402,7 +418,7 @@
     :group_max: false
   production_run_tipped_id:
     :name: production_run_tipped_id
-    :sequence_no: 24
+    :sequence_no: 25
     :caption: Tip Run
     :namespaced_name: production_run_tipped_id
     :data_type: :integer
@@ -418,7 +434,7 @@
     :group_max: false
   bin_tipping_plant_resource_id:
     :name: bin_tipping_plant_resource_id
-    :sequence_no: 25
+    :sequence_no: 26
     :caption: Bin tipping plant resource
     :namespaced_name: bin_tipping_plant_resource_id
     :data_type: :integer
@@ -434,7 +450,7 @@
     :group_max: false
   packhouse:
     :name: packhouse
-    :sequence_no: 26
+    :sequence_no: 27
     :caption: Packhouse
     :namespaced_name: packhouse
     :data_type: :string
@@ -450,7 +466,7 @@
     :group_max: false
   season_id:
     :name: season_id
-    :sequence_no: 27
+    :sequence_no: 28
     :caption: Season
     :namespaced_name: season_id
     :data_type: :integer
@@ -466,7 +482,7 @@
     :group_max: false
   season_code:
     :name: season_code
-    :sequence_no: 28
+    :sequence_no: 29
     :caption: Season code
     :namespaced_name: season_code
     :data_type: :string
@@ -482,7 +498,7 @@
     :group_max: false
   farm_id:
     :name: farm_id
-    :sequence_no: 29
+    :sequence_no: 30
     :caption: Farm
     :namespaced_name: farm_id
     :data_type: :integer
@@ -498,7 +514,7 @@
     :group_max: false
   farm_group_code:
     :name: farm_group_code
-    :sequence_no: 30
+    :sequence_no: 31
     :caption: Farm group
     :namespaced_name: farm_group_code
     :data_type: :string
@@ -514,7 +530,7 @@
     :group_max: false
   farm_code:
     :name: farm_code
-    :sequence_no: 31
+    :sequence_no: 32
     :caption: Farm code
     :namespaced_name: farm_code
     :data_type: :string
@@ -530,7 +546,7 @@
     :group_max: false
   cultivar_group_id:
     :name: cultivar_group_id
-    :sequence_no: 32
+    :sequence_no: 33
     :caption: Cultivar group
     :namespaced_name: cultivar_group_id
     :data_type: :integer
@@ -546,7 +562,7 @@
     :group_max: false
   cultivar_group_code:
     :name: cultivar_group_code
-    :sequence_no: 33
+    :sequence_no: 34
     :caption: Cultivar group code
     :namespaced_name: cultivar_group_code
     :data_type: :string
@@ -562,7 +578,7 @@
     :group_max: false
   cultivar_id:
     :name: cultivar_id
-    :sequence_no: 34
+    :sequence_no: 35
     :caption: Cultivar
     :namespaced_name: cultivar_id
     :data_type: :integer
@@ -578,7 +594,7 @@
     :group_max: false
   cultivar_name:
     :name: cultivar_name
-    :sequence_no: 35
+    :sequence_no: 36
     :caption: Cultivar name
     :namespaced_name: cultivar_name
     :data_type: :string
@@ -594,7 +610,7 @@
     :group_max: false
   cultivar_code:
     :name: cultivar_code
-    :sequence_no: 36
+    :sequence_no: 37
     :caption: Cultivar code
     :namespaced_name: cultivar_code
     :data_type: :string
@@ -610,7 +626,7 @@
     :group_max: false
   cultivar_description:
     :name: cultivar_description
-    :sequence_no: 37
+    :sequence_no: 38
     :caption: Cultivar description
     :namespaced_name: cultivar_description
     :data_type: :string
@@ -626,7 +642,7 @@
     :group_max: false
   commodity_code:
     :name: commodity_code
-    :sequence_no: 38
+    :sequence_no: 39
     :caption: Commodity code
     :namespaced_name: commodity_code
     :data_type: :string
@@ -642,7 +658,7 @@
     :group_max: false
   rmt_class_id:
     :name: rmt_class_id
-    :sequence_no: 39
+    :sequence_no: 40
     :caption: RMT class
     :namespaced_name: rmt_class_id
     :data_type: :integer
@@ -658,7 +674,7 @@
     :group_max: false
   rmt_class_code:
     :name: rmt_class_code
-    :sequence_no: 40
+    :sequence_no: 41
     :caption: RMT class code
     :namespaced_name: rmt_class_code
     :data_type: :string
@@ -674,7 +690,7 @@
     :group_max: false
   rmt_size_code:
     :name: rmt_size_code
-    :sequence_no: 41
+    :sequence_no: 42
     :caption: Rmt size code
     :namespaced_name: rmt_size_code
     :data_type: :string
@@ -690,7 +706,7 @@
     :group_max: false
   rmt_material_owner_party_role_id:
     :name: rmt_material_owner_party_role_id
-    :sequence_no: 42
+    :sequence_no: 43
     :caption: RMT material owner party role
     :namespaced_name: rmt_material_owner_party_role_id
     :data_type: :integer
@@ -706,7 +722,7 @@
     :group_max: false
   container_material_owner:
     :name: container_material_owner
-    :sequence_no: 43
+    :sequence_no: 44
     :caption: Container material owner
     :namespaced_name: container_material_owner
     :data_type: :string
@@ -722,7 +738,7 @@
     :group_max: false
   rmt_container_type_id:
     :name: rmt_container_type_id
-    :sequence_no: 44
+    :sequence_no: 45
     :caption: RMT container type
     :namespaced_name: rmt_container_type_id
     :data_type: :integer
@@ -738,7 +754,7 @@
     :group_max: false
   container_type_code:
     :name: container_type_code
-    :sequence_no: 45
+    :sequence_no: 46
     :caption: Container type code
     :namespaced_name: container_type_code
     :data_type: :string
@@ -754,7 +770,7 @@
     :group_max: false
   rmt_container_material_type_id:
     :name: rmt_container_material_type_id
-    :sequence_no: 46
+    :sequence_no: 47
     :caption: RMT container material type
     :namespaced_name: rmt_container_material_type_id
     :data_type: :integer
@@ -770,7 +786,7 @@
     :group_max: false
   container_material_type_code:
     :name: container_material_type_code
-    :sequence_no: 47
+    :sequence_no: 48
     :caption: Container material type
     :namespaced_name: container_material_type_code
     :data_type: :string
@@ -786,7 +802,7 @@
     :group_max: false
   rmt_inner_container_type_id:
     :name: rmt_inner_container_type_id
-    :sequence_no: 48
+    :sequence_no: 49
     :caption: RMT inner container type
     :namespaced_name: rmt_inner_container_type_id
     :data_type: :integer
@@ -802,7 +818,7 @@
     :group_max: false
   inner_container_type_code:
     :name: inner_container_type_code
-    :sequence_no: 49
+    :sequence_no: 50
     :caption: Inner Container Type
     :namespaced_name: inner_container_type_code
     :data_type: :string
@@ -818,7 +834,7 @@
     :group_max: false
   rmt_inner_container_material_id:
     :name: rmt_inner_container_material_id
-    :sequence_no: 50
+    :sequence_no: 51
     :caption: RMT inner container material
     :namespaced_name: rmt_inner_container_material_id
     :data_type: :integer
@@ -834,7 +850,7 @@
     :group_max: false
   inner_container_material_type_code:
     :name: inner_container_material_type_code
-    :sequence_no: 51
+    :sequence_no: 52
     :caption: Inner Container Material Type
     :namespaced_name: inner_container_material_type_code
     :data_type: :string
@@ -850,7 +866,7 @@
     :group_max: false
   rmt_delivery_id:
     :name: rmt_delivery_id
-    :sequence_no: 52
+    :sequence_no: 53
     :caption: Delivery
     :namespaced_name: rmt_delivery_id
     :data_type: :integer
@@ -866,7 +882,7 @@
     :group_max: false
   delivery_destination_code:
     :name: delivery_destination_code
-    :sequence_no: 53
+    :sequence_no: 54
     :caption: Delivery Destination Code
     :namespaced_name: delivery_destination_code
     :data_type: :string
@@ -882,7 +898,7 @@
     :group_max: false
   picked_at:
     :name: picked_at
-    :sequence_no: 54
+    :sequence_no: 55
     :caption: Picked at
     :namespaced_name: picked_at
     :data_type: :datetime
@@ -898,7 +914,7 @@
     :group_max: false
   delivery_truck_registration_number:
     :name: delivery_truck_registration_number
-    :sequence_no: 55
+    :sequence_no: 56
     :caption: Delivery truck registration number
     :namespaced_name: delivery_truck_registration_number
     :data_type: :string
@@ -914,7 +930,7 @@
     :group_max: false
   exit_ref:
     :name: exit_ref
-    :sequence_no: 56
+    :sequence_no: 57
     :caption: Exit ref
     :namespaced_name: exit_ref
     :data_type: :string
@@ -930,7 +946,7 @@
     :group_max: false
   null_exit_ref:
     :name: null_exit_ref
-    :sequence_no: 57
+    :sequence_no: 58
     :caption: Null exit ref
     :namespaced_name: null_exit_ref
     :data_type: :boolean
@@ -946,7 +962,7 @@
     :group_max: false
   exit_ref_date_time:
     :name: exit_ref_date_time
-    :sequence_no: 58
+    :sequence_no: 59
     :caption: Exit ref at
     :namespaced_name: exit_ref_at
     :data_type: :datetime
@@ -962,7 +978,7 @@
     :group_max: false
   exit_ref_date:
     :name: exit_ref_date
-    :sequence_no: 59
+    :sequence_no: 60
     :caption: Exit ref date
     :namespaced_name: exit_ref_date
     :data_type: :date
@@ -978,7 +994,7 @@
     :group_max: false
   bin_asset_number:
     :name: bin_asset_number
-    :sequence_no: 60
+    :sequence_no: 61
     :caption: Bin asset number
     :namespaced_name: bin_asset_number
     :data_type: :string
@@ -994,7 +1010,7 @@
     :group_max: false
   bin_received_date:
     :name: bin_received_date
-    :sequence_no: 61
+    :sequence_no: 62
     :caption: Bin received
     :namespaced_name: bin_received_date
     :data_type: :date
@@ -1010,7 +1026,7 @@
     :group_max: false
   tipped_asset_number:
     :name: tipped_asset_number
-    :sequence_no: 62
+    :sequence_no: 63
     :caption: Tipped asset number
     :namespaced_name: tipped_asset_number
     :data_type: :string
@@ -1026,7 +1042,7 @@
     :group_max: false
   bin_tipped:
     :name: bin_tipped
-    :sequence_no: 63
+    :sequence_no: 64
     :caption: Bin tipped
     :namespaced_name: bin_tipped
     :data_type: :boolean
@@ -1042,7 +1058,7 @@
     :group_max: false
   tipped_manually:
     :name: tipped_manually
-    :sequence_no: 64
+    :sequence_no: 65
     :caption: Tipped manually
     :namespaced_name: tipped_manually
     :data_type: :boolean
@@ -1058,7 +1074,7 @@
     :group_max: false
   bin_tipped_date_time:
     :name: bin_tipped_date_time
-    :sequence_no: 65
+    :sequence_no: 66
     :caption: Bin tipped at
     :namespaced_name: bin_tipped_at
     :data_type: :datetime
@@ -1074,7 +1090,7 @@
     :group_max: false
   bin_tipped_date:
     :name: bin_tipped_date
-    :sequence_no: 66
+    :sequence_no: 67
     :caption: Bin tipped date
     :namespaced_name: bin_tipped_date
     :data_type: :date
@@ -1090,7 +1106,7 @@
     :group_max: false
   bin_tipped_week:
     :name: bin_tipped_week
-    :sequence_no: 67
+    :sequence_no: 68
     :caption: Bin tipped week
     :namespaced_name: bin_tipped_week
     :data_type: :string
@@ -1106,7 +1122,7 @@
     :group_max: false
   shipped_asset_number:
     :name: shipped_asset_number
-    :sequence_no: 68
+    :sequence_no: 69
     :caption: Shipped asset number
     :namespaced_name: shipped_asset_number
     :data_type: :string
@@ -1122,7 +1138,7 @@
     :group_max: false
   shipped:
     :name: shipped
-    :sequence_no: 69
+    :sequence_no: 70
     :caption: Shipped
     :namespaced_name: shipped
     :data_type: :boolean
@@ -1138,7 +1154,7 @@
     :group_max: false
   shipped_at:
     :name: shipped_at
-    :sequence_no: 70
+    :sequence_no: 71
     :caption: Shipped at
     :namespaced_name: shipped_at
     :data_type: :datetime
@@ -1154,7 +1170,7 @@
     :group_max: false
   bin_load_id:
     :name: bin_load_id
-    :sequence_no: 71
+    :sequence_no: 72
     :caption: Bin load
     :namespaced_name: bin_load_id
     :data_type: :string
@@ -1170,7 +1186,7 @@
     :group_max: false
   bin_load_product_id:
     :name: bin_load_product_id
-    :sequence_no: 72
+    :sequence_no: 73
     :caption: Bin load product
     :namespaced_name: bin_load_product_id
     :data_type: :string
@@ -1186,7 +1202,7 @@
     :group_max: false
   scrapped_bin_asset_number:
     :name: scrapped_bin_asset_number
-    :sequence_no: 73
+    :sequence_no: 74
     :caption: Scrapped bin asset number
     :namespaced_name: scrapped_bin_asset_number
     :data_type: :string
@@ -1202,7 +1218,7 @@
     :group_max: false
   scrapped:
     :name: scrapped
-    :sequence_no: 74
+    :sequence_no: 75
     :caption: Scrapped
     :namespaced_name: scrapped
     :data_type: :boolean
@@ -1218,7 +1234,7 @@
     :group_max: false
   scrapped_at:
     :name: scrapped_at
-    :sequence_no: 75
+    :sequence_no: 76
     :caption: Scrapped at
     :namespaced_name: scrapped_at
     :data_type: :datetime
@@ -1234,7 +1250,7 @@
     :group_max: false
   scrap_remarks:
     :name: scrap_remarks
-    :sequence_no: 76
+    :sequence_no: 77
     :caption: Scrap remarks
     :namespaced_name: scrap_remarks
     :data_type: :string
@@ -1250,7 +1266,7 @@
     :group_max: false
   unscrapped_at:
     :name: unscrapped_at
-    :sequence_no: 77
+    :sequence_no: 78
     :caption: Unscrapped at
     :namespaced_name: unscrapped_at
     :data_type: :datetime
@@ -1266,7 +1282,7 @@
     :group_max: false
   production_run_rebin_id:
     :name: production_run_rebin_id
-    :sequence_no: 78
+    :sequence_no: 79
     :caption: Rebin Production run
     :namespaced_name: production_run_rebin_id
     :data_type: :integer
@@ -1282,7 +1298,7 @@
     :group_max: false
   rebin_created_at:
     :name: rebin_created_at
-    :sequence_no: 79
+    :sequence_no: 80
     :caption: Rebin created at
     :namespaced_name: rebin_created_at
     :data_type: :datetime
@@ -1298,7 +1314,7 @@
     :group_max: false
   age:
     :name: age
-    :sequence_no: 80
+    :sequence_no: 81
     :caption: Age
     :namespaced_name: age
     :data_type: :integer
@@ -1314,7 +1330,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 81
+    :sequence_no: 82
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
