@@ -269,6 +269,8 @@ class AppConst # rubocop:disable Metrics/ClassLength
   RUN_TYPE_SINGLE_BIN_EDIT = 'SINGLE BIN EDIT'
   RUN_TYPE_SCRAP_CARTON = 'SCRAP CARTON'
   RUN_TYPE_UNSCRAP_CARTON = 'UNSCRAP CARTON'
+  RUN_TYPE_WIP_PALLETS = 'WIP PALLETS'
+  RUN_TYPE_WIP_BINS = 'WIP BINS'
 
   # Constants for Reworks run actions:
   REWORKS_ACTION_SINGLE_EDIT = 'SINGLE EDIT'
@@ -315,6 +317,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
     RUN_TYPE_TIP_MIXED_ORCHARDS => :bin,
     RUN_TYPE_SINGLE_BIN_EDIT => :bin,
     RUN_TYPE_CHANGE_BIN_DELIVERY => :bin,
+    RUN_TYPE_WIP_BINS => :bin,
     RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE => :prodrun,
     RUN_TYPE_BULK_BIN_RUN_UPDATE => :prodrun,
     RUN_TYPE_SCRAP_CARTON => :carton,

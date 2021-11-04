@@ -1560,3 +1560,11 @@
   :ordered_list: false
   :ui_priority: 1
   :list_def: 
+- :column: vw_rmt_bins_flat.id
+  :caption: Id
+  :data_type: :integer
+  :control_type: :integer
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:

@@ -15,6 +15,7 @@
 :captions:
   :conditions:
     :production_run_pallets: Pallets for Production Run
+    :work_in_progress: Work In Progress Pallets
 :conditions:
   :standard:
     - :col: vw_pallets.pallet_id
@@ -24,3 +25,21 @@
     - :col: pallet_sequences.production_run_id
       :op: =
       :val: $:production_run_id$
+  :work_in_progress:
+    - :col: vw_pallets.pallet_id
+      :op: IN
+      :val: $:wip_ids$
+:multiselect:
+  :work_in_progress:
+    :url: "/production/reworks/reworks_run_types/wip_pallets/reworks_runs/work_in_progress/multiselect_wip_submit"
+    :section_caption: "WIP Pallets"
+    :multiselect_save_method: remote
+    :conditions: work_in_progress
+:page_controls:
+- :control_type: :link
+  :url: "/production/reworks/reworks_run_types/wip_pallets/reworks_runs/new"
+  :text: Set WIP Lock
+  :style: :button
+  :hide_for_key:
+    - standard
+    - production_run_pallets

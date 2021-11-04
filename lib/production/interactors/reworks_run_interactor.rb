@@ -1763,6 +1763,79 @@ module ProductionApp
       failed_response(e.message)
     end
 
+    def resolve_work_in_progress_attrs(reworks_run_type_id)
+      reworks_run_type = reworks_run_type(reworks_run_type_id)
+      attrs = case reworks_run_type
+              when AppConst::RUN_TYPE_WIP_PALLETS
+                { grid: 'pallets_view', wip_ids: repo.select_values(:wip_pallets, :pallet_id).uniq }
+              when AppConst::RUN_TYPE_WIP_BINS
+                { grid: 'rmt_bins_reworks', wip_ids: repo.select_values(:wip_bins, :rmt_bin_id).uniq }
+              end
+
+      success_response('ok', attrs)
+    end
+
+    def create_work_in_progress_lock(reworks_run_type_id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      reworks_run_type = reworks_run_type(reworks_run_type_id)
+      res = validate_pallets_selected_input(reworks_run_type, params)
+      return validation_failed_response(res) unless res.success
+
+      wip_ids = if reworks_run_type == AppConst::RUN_TYPE_WIP_PALLETS
+                  repo.select_values(:pallets, :id, pallet_number: res.instance[:pallet_numbers])
+                else
+                  res.instance[:pallet_numbers]
+                end
+      res = validate_wip_objects(reworks_run_type, wip_ids, res.instance[:pallet_numbers])
+      return validation_failed_response(res) unless res.success
+
+      repo.transaction do
+        res =  case reworks_run_type
+               when AppConst::RUN_TYPE_WIP_PALLETS
+                 repo.add_pallets_to_wip(wip_ids, params[:context], @user.user_name)
+               when AppConst::RUN_TYPE_WIP_BINS
+                 repo.add_bins_to_wip(wip_ids, params[:context], @user.user_name)
+               end
+        raise Crossbeams::InfoError, res.message unless res.success
+      end
+      success_response('Work In Progress Lock created successfully.')
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def validate_wip_objects(reworks_run_type, wip_ids, pallet_numbers)
+      res = case reworks_run_type
+            when AppConst::RUN_TYPE_WIP_PALLETS
+              repo.are_pallets_out_of_wip?(wip_ids)
+            when AppConst::RUN_TYPE_WIP_BINS
+              repo.are_bins_out_of_wip?(wip_ids)
+            end
+      unless res.success
+        in_wip_ids = reworks_run_type == AppConst::RUN_TYPE_WIP_PALLETS ? repo.select_values(:pallets, :pallet_number, id: res.instance) : res.instance
+        msg = "#{reworks_run_type}: #{in_wip_ids.join(', ')} are works in progress"
+        return OpenStruct.new(success: false, messages: { pallets_selected: [msg] }, pallets_selected: pallet_numbers)
+      end
+
+      ok_response
+    end
+
+    def remove_work_in_progress_lock(reworks_run_type_id, multiselect_list) # rubocop:disable Metrics/AbcSize
+      reworks_run_type = reworks_run_type(reworks_run_type_id)
+      return failed_response('WIP id selection cannot be empty') if multiselect_list.nil_or_empty?
+
+      repo.transaction do
+        res =  case reworks_run_type
+               when AppConst::RUN_TYPE_WIP_PALLETS
+                 repo.remove_pallets_from_wip(multiselect_list, @user.user_name)
+               when AppConst::RUN_TYPE_WIP_BINS
+                 repo.remove_bins_from_wip(multiselect_list, @user.user_name)
+               end
+        raise Crossbeams::InfoError, res.message unless res.success
+      end
+      success_response('Work In Progress Lock released successfully.')
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     private
 
     def repo

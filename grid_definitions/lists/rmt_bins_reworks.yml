@@ -47,6 +47,10 @@
     - :col: rmt_delivery_id
       :op: =
       :val: $:rmt_delivery_id$
+  :work_in_progress:
+    - :col: vw_rmt_bins_flat.id
+      :op: IN
+      :val: $:wip_ids$
 :multiselect:
   :tip_bins_reworks:
     :url: "/production/reworks/reworks_run_types/$:id$/reworks_runs/multiselect_reworks_run_rmt_bins"
@@ -86,3 +90,21 @@
     :multiselect_save_method: remote
     :can_be_cleared: false
     :conditions: change_bin_delivery
+  :work_in_progress:
+    :url: "/production/reworks/reworks_run_types/wip_bins/reworks_runs/work_in_progress/multiselect_wip_submit"
+    :section_caption: "WIP Bins"
+    :multiselect_save_method: remote
+    :conditions: work_in_progress
+:page_controls:
+  - :control_type: :link
+    :url: "/production/reworks/reworks_run_types/wip_bins/reworks_runs/new"
+    :text: Set WIP Lock
+    :style: :button
+    :hide_for_key:
+      - tip_bins_reworks
+      - scrap_bins_reworks
+      - production_run_tip_bins
+      - bulk_weigh_bins
+      - untip_bins_reworks
+      - tip_bins_reworks_with_orchard_id
+      - change_bin_delivery

@@ -447,6 +447,8 @@ class Nspack < Roda
               show_partial_or_page(r) { Production::Reworks::ReworksRun::ChangeRunDetails.call(id, remote: fetch?(r)) }
             elsif reworks_run_type == AppConst::RUN_TYPE_CHANGE_BIN_DELIVERY
               show_partial_or_page(r) { Production::Reworks::ReworksRun::ChangeBinDelivery.call(id, remote: fetch?(r)) }
+            elsif [AppConst::RUN_TYPE_WIP_BINS, AppConst::RUN_TYPE_WIP_PALLETS].include?(reworks_run_type)
+              show_partial_or_page(r) { Production::Reworks::ReworksRun::NewWipLock.call(id, remote: fetch?(r)) }
             else
               show_partial_or_page(r) { Production::Reworks::ReworksRun::New.call(id, remote: fetch?(r)) }
             end
@@ -611,6 +613,39 @@ class Nspack < Roda
 
         r.on 'rmt_container_material_type_changed' do
           handle_ui_change(:reworks_run_rmt_bin, :rmt_container_material_type, params)
+        end
+
+        r.on 'work_in_progress' do
+          r.on 'multiselect_wip_submit' do
+            res = interactor.remove_work_in_progress_lock(id, multiselect_grid_choices(params))
+            if res.success
+              flash[:notice] = res.message
+            else
+              flash[:error] = res.message
+            end
+            redirect_via_json "/production/reworks/reworks_run_types/#{id}/reworks_runs/work_in_progress"
+          end
+
+          r.get do
+            res = interactor.resolve_work_in_progress_attrs(id)
+            r.redirect "/list/#{res.instance[:grid]}/multi?key=work_in_progress&wip_ids=#{res.instance[:wip_ids]}"
+          end
+
+          r.post do
+            res = interactor.create_work_in_progress_lock(id, params[:reworks_run])
+            if res.success
+              flash[:notice] = res.message
+              r.redirect "/production/reworks/reworks_run_types/#{id}/reworks_runs/work_in_progress"
+            else
+              url = "/production/reworks/reworks_run_types/#{id}/reworks_runs/new"
+              re_show_form(r, res, url: url) do
+                Production::Reworks::ReworksRun::NewWipLock.call(id,
+                                                                 form_values: params[:reworks_run],
+                                                                 form_errors: res.errors,
+                                                                 remote: fetch?(r))
+              end
+            end
+          end
         end
       end
 

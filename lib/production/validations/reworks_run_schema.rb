@@ -276,4 +276,10 @@ module ProductionApp # rubocop:disable Metrics/ModuleLength
       key.failure 'Bin Id and Bin Asset Number are both filled. Please choose either a Bin Id or Bin Asset Number' if !values[:pallets_selected].nil_or_empty? && !values[:bin_asset_number].nil_or_empty?
     end
   end
+
+  ReworksRunWipSchema = Dry::Schema.Params do
+    required(:reworks_run_type_id).filled(:integer)
+    required(:pallets_selected).filled(:array).each(:string)
+    required(:context).filled(Types::StrippedString)
+  end
 end
