@@ -2,7 +2,7 @@
 
 class Nspack < Roda
   route 'reports', 'finished_goods' do |r|
-    @repo = BaseRepo.new
+    report_repo = BaseRepo.new
     # DELIVERY NOTE
     # --------------------------------------------------------------------------
     r.on 'dispatch_note', Integer do |id|
@@ -129,7 +129,7 @@ class Nspack < Roda
     # r.on 'verified_gross_mass', Integer do |id|
     #   jasper_params = JasperParams.new('container_mass_declaration',
     #                                    current_user.login_name,
-    #                                    load_container_id: @repo.get_id(:load_containers, load_id: id))
+    #                                    load_container_id: report_repo.get_id(:load_containers, load_id: id))
     #   res = CreateJasperReport.call(jasper_params)
     #
     #   if res.success
@@ -144,7 +144,7 @@ class Nspack < Roda
     r.on 'verified_gross_mass', Integer do |id|
       jasper_params = JasperParams.new('container_mass_declaration',
                                        current_user.login_name,
-                                       load_container_id: @repo.get_id(:load_containers, load_id: id),
+                                       load_container_id: report_repo.get_id(:load_containers, load_id: id),
                                        pallets_weighed: AppConst::CR_PROD.are_pallets_weighed?,
                                        user_name: current_user.user_name)
       res = CreateJasperReport.call(jasper_params)

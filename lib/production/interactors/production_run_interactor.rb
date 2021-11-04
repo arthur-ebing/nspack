@@ -750,6 +750,19 @@ module ProductionApp
       end
     end
 
+    def build_pallet_history(pallet_number)
+      success_response('ok', id: repo.get_id(:pallets, pallet_number: pallet_number), pallet_number: pallet_number)
+    end
+
+    def ext_fg_codes_for(pallet_id)
+      items = repo.select_values(:pallet_sequences, %i[pallet_sequence_number packing_specification_item_id], pallet_id: pallet_id)
+      fg_codes = {}
+      items.each do |_, spec_id|
+        fg_codes[spec_id] ||= product_setup_repo.calculate_extended_fg_code(spec_id)
+      end
+      success_response('ok', items.sort.map { |seq, spec_id| { seq => fg_codes[spec_id] } })
+    end
+
     private
 
     def repo

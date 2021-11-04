@@ -2,6 +2,32 @@
 
 class Nspack < Roda
   route 'reports', 'production' do |r|
+    r.on 'pallet_history' do
+      interactor = ProductionApp::ProductionRunInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'pallet', Integer do |pallet_id|
+        r.on 'extended_fg_codes' do
+          res = interactor.ext_fg_codes_for(pallet_id)
+          # show_partial_or_page(r) { FinishedGoods::Dispatch::Load::TempTail.call(id) }
+          update_dialog_content(content: res.instance.inspect.gsub(/[\[\]]/, '').gsub(',', '<br>'))
+        end
+      end
+
+      r.on 'pallet' do
+        show_page { Production::Reports::PalletHistory::Pallet.call }
+      end
+
+      r.is do
+        res = interactor.build_pallet_history(params[:pallet_history][:pallet_number])
+        if res.success
+          show_page { Production::Reports::PalletHistory::Show.call(res.instance) }
+        else
+          flash[:error] = res.message
+          r.redirect('/production/reports/pallet_history/pallet')
+        end
+      end
+    end
+
     # PACKOUT RUNS REPORT
     # --------------------------------------------------------------------------
     r.on 'packout_runs' do
