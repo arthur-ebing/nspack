@@ -105,9 +105,13 @@ module FinishedGoodsApp
         return failed_response('Allocation mismatch') unless current_allocation.sort == initial_pallet_numbers.sort
       end
 
+      pallet_numbers = new_allocation - current_allocation
+      res = validate_wip_pallet_numbers(pallet_numbers)
+      raise Crossbeams::InfoError, unwrap_error_set(res.messages) unless res.success
+
       repo.transaction do
         repo.unallocate_pallets(current_allocation - new_allocation, @user)
-        repo.allocate_pallets(load_id, new_allocation - current_allocation, @user)
+        repo.allocate_pallets(load_id, pallet_numbers, @user)
         FinishedGoodsApp::ProcessOrderLines.call(@user, load_id: load_id)
 
         log_transaction
@@ -124,6 +128,9 @@ module FinishedGoodsApp
       pallet_numbers = res.instance
       check_pallets!(:allocate, pallet_numbers, load_id)
 
+      res = validate_wip_pallet_numbers(pallet_numbers)
+      return validation_failed_response(res) unless res.success
+
       repo.transaction do
         repo.allocate_pallets(load_id, pallet_numbers, @user)
         FinishedGoodsApp::ProcessOrderLines.call(@user, load_id: load_id)
@@ -133,6 +140,18 @@ module FinishedGoodsApp
       success_response("Allocation applied to load: #{load_id}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    end
+
+    def validate_wip_pallet_numbers(pallet_numbers)
+      pallet_ids = repo.select_values(:pallets, :id, pallet_number: pallet_numbers)
+      res = reworks_repo.are_pallets_out_of_wip?(pallet_ids)
+
+      unless res.success
+        msg = "Pallets: #{repo.select_values(:pallets, :pallet_number, id: res.instance).join(', ')} are works in progress"
+        return OpenStruct.new(success: false, messages: { pallet_list: [msg] }, pallet_list: pallet_numbers)
+      end
+
+      ok_response
     end
 
     def allocate_grid(load_id)
@@ -438,6 +457,10 @@ module FinishedGoodsApp
 
     def repo
       @repo ||= LoadRepo.new
+    end
+
+    def reworks_repo
+      @reworks_repo ||= ProductionApp::ReworksRepo.new
     end
   end
 end
