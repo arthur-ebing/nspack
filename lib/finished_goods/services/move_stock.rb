@@ -145,6 +145,9 @@ module FinishedGoodsApp
       return failed_response("#{stock_type}:#{stock_item_code} does not exist") unless @stock_item
       return failed_response("Cannot move #{stock_type}:#{stock_item_code}. It is on a tripsheet") if repo.exists?(:vehicle_job_units, stock_type_id: stock_type_id, stock_item_id: stock_item_id, offloaded_at: nil)
 
+      units_in_location, maximum_units = repo.get_value(:locations, %i[units_in_location maximum_units], id: location_to_id)
+      return failed_response("Cannot move #{stock_type}:#{stock_item_code}. Maximun units in location have been reached.") if maximum_units.positive? && (units_in_location + 1) > maximum_units
+
       unless business_process == AppConst::REWORKS_MOVE_PALLET_BUSINESS_PROCESS
         return failed_response("#{stock_type}:#{stock_item_code} has been scrapped") if @stock_item[:scrapped]
       end
