@@ -652,6 +652,19 @@ module ProductionApp
 
     def create_reworks_run(reworks_run_type_id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       reworks_run_type = reworks_run_type(reworks_run_type_id)
+
+      if AppConst::RUN_TYPE_WEIGH_RMT_BINS == reworks_run_type
+        res = ReworksWeighRmtBinsContract.new.call(params.merge(pallets_selected: Array(params[:pallets_selected]).reject(&:empty?)))
+        return validation_failed_response(res) if res.failure?
+
+        if res[:pallets_selected].nil_or_empty?
+          rmt_bin_id = repo.get_id(:rmt_bins, bin_asset_number: res[:bin_asset_number])
+          return validation_failed_response(OpenStruct.new(success: false, messages: { bin_asset_number: ["#{res[:bin_asset_number]} doesn't exist"] }, bin_asset_number: res[:bin_asset_number])) if rmt_bin_id.nil_or_empty?
+
+          params[:pallets_selected] = rmt_bin_id.to_s
+        end
+      end
+
       res = validate_pallets_selected_input(reworks_run_type, params)
       return validation_failed_response(res) unless res.success
 

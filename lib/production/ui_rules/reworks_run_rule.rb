@@ -155,7 +155,7 @@ module UiRules
       text_caption = if @rules[:single_pallet_edit]
                        'Pallet Number'
                      else
-                       'Bin'
+                       'Bin Id'
                      end
 
       where = if @rules[:scrap_bin]
@@ -216,7 +216,8 @@ module UiRules
         first_cold_storage_at: { renderer: :input,
                                  subtype: :date,
                                  required: true,
-                                 hide_on_load: @rules[:bulk_update_pallet_dates] ? false : true }
+                                 hide_on_load: @rules[:bulk_update_pallet_dates] ? false : true },
+        bin_asset_number: { hide_on_load: @rules[:weigh_rmt_bins] ? false : true }
       }
     end
 
