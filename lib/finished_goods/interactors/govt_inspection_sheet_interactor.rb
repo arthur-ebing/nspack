@@ -194,6 +194,12 @@ module FinishedGoodsApp
       return failed_response("Cannot add:#{pallet_number}. Tripsheet has already been offloaded") if repo.get(:vehicle_jobs, id, :offloaded_at)
       return failed_response("Pallet is still on bay: #{repo.palletizing_bay_for_pallet(pallet_number)}") if pallet[:has_individual_cartons] && !pallet[:palletized]
 
+      res = ProductionApp::ReworksRepo.new.are_pallets_out_of_wip?(pallet[:id])
+      unless res.success
+        context = repo.get_value(:wip_pallets, :context, pallet_id: pallet[:id])
+        return failed_response("Pallet: #{pallet_number} has a Work-in-progess lock. Reason is:#{context}")
+      end
+
       pallet_stock_type_id = MesscadaApp::MesscadaRepo.new.find_stock_type('PALLET')[:id]
       res = validate_vehicle_job_unit_params(stock_item_id: pallet[:id], stock_type_id: pallet_stock_type_id, vehicle_job_id: id)
       return validation_failed_response(res) if res.failure?
