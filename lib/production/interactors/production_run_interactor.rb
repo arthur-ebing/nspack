@@ -754,13 +754,22 @@ module ProductionApp
       success_response('ok', id: repo.get_id(:pallets, pallet_number: pallet_number), pallet_number: pallet_number)
     end
 
-    def ext_fg_codes_for(pallet_id)
-      items = repo.select_values(:pallet_sequences, %i[pallet_sequence_number packing_specification_item_id], pallet_id: pallet_id)
+    def ext_fg_codes_for(pallet_id) # rubocop:disable Metrics/AbcSize
+      items = repo.select_values(:pallet_sequences, %i[id pallet_sequence_number packing_specification_item_id], pallet_id: pallet_id)
       fg_codes = {}
-      items.each do |_, spec_id|
+      seq_nos = {}
+      items.each do |id, seq_no, spec_id|
+        seq_nos[id] = seq_no
         fg_codes[spec_id] ||= product_setup_repo.calculate_extended_fg_code(spec_id)
       end
-      success_response('ok', items.sort.map { |seq, spec_id| { seq => fg_codes[spec_id] } })
+
+      seq_items = product_setup_repo.sequences_grouped_for_ext_fg(pallet_id)
+      sfg_codes = {}
+      seq_items.each do |seq|
+        fg_code = product_setup_repo.calculate_extended_fg_code_from_sequences(seq)
+        seq[:ids].each { |i| sfg_codes[seq_nos[i]] = fg_code }
+      end
+      success_response('ok', items.sort.map { |_, seq, spec_id| { seq => fg_codes[spec_id] } } + sfg_codes.sort.map { |i, v| { i => v } })
     end
 
     private
