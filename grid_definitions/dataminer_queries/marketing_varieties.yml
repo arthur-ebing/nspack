@@ -1,10 +1,11 @@
 ---
 :caption: Marketing Varieties
 :sql: "SELECT\r\n    marketing_varieties.id,\r\n    marketing_varieties.marketing_variety_code,\r\n
-  \   marketing_varieties.description,\r\n    fn_masterfile_variants('marketing_varieties',
-  marketing_varieties.id) AS variant_codes,\r\n    array_agg(distinct cultivars.cultivar_group_id)
-  AS cultivar_group_ids,\r\n    array_agg(distinct cultivars.cultivar_code) AS cultivar_code,\r\n
-  \   marketing_varieties.active,\r\n    marketing_varieties.created_at,\r\n    marketing_varieties.updated_at\r\nFROM
+  \   marketing_varieties.description,\r\n    marketing_varieties.inspection_variety,\r\n
+  \   fn_masterfile_variants('marketing_varieties', marketing_varieties.id) AS variant_codes,\r\n
+  \   array_agg(distinct cultivars.cultivar_group_id) AS cultivar_group_ids,\r\n    array_agg(distinct
+  cultivars.cultivar_code) AS cultivar_code,\r\n    marketing_varieties.active,\r\n
+  \   marketing_varieties.created_at,\r\n    marketing_varieties.updated_at\r\nFROM
   marketing_varieties\r\nLEFT JOIN marketing_varieties_for_cultivars ON marketing_varieties.id
   = marketing_varieties_for_cultivars.marketing_variety_id\r\nLEFT JOIN cultivars
   ON cultivars.id = marketing_varieties_for_cultivars.cultivar_id\r\nLEFT JOIN cultivar_groups
@@ -63,9 +64,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  inspection_variety:
+    :name: inspection_variety
+    :sequence_no: 4
+    :caption: Inspection variety
+    :namespaced_name: marketing_varieties.inspection_variety
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   variant_codes:
     :name: variant_codes
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Variant codes
     :namespaced_name: 
     :data_type: :string
@@ -81,7 +98,7 @@
     :group_max: false
   cultivar_group_ids:
     :name: cultivar_group_ids
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Cultivar group ids
     :namespaced_name: 
     :data_type: :string
@@ -97,7 +114,7 @@
     :group_max: false
   cultivar_code:
     :name: cultivar_code
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Cultivar code
     :namespaced_name: 
     :data_type: :string
@@ -113,7 +130,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Active
     :namespaced_name: marketing_varieties.active
     :data_type: :boolean
@@ -129,7 +146,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Created at
     :namespaced_name: marketing_varieties.created_at
     :data_type: :datetime
@@ -145,7 +162,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Updated at
     :namespaced_name: marketing_varieties.updated_at
     :data_type: :datetime

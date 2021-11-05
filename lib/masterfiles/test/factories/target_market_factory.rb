@@ -9,7 +9,8 @@ module MasterfilesApp
       default = {
         marketing_variety_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
-        active: true
+        active: true,
+        inspection_variety: Faker::Lorem.word
       }
       DB[:marketing_varieties].insert(default.merge(opts))
     end

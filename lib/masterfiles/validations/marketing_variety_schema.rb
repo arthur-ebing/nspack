@@ -5,5 +5,6 @@ module MasterfilesApp
     optional(:id).filled(:integer)
     required(:marketing_variety_code).filled(Types::StrippedString)
     required(:description).maybe(Types::StrippedString)
+    required(:inspection_variety).maybe(Types::StrippedString)
   end
 end

@@ -18,12 +18,14 @@ module UiRules
       fields[:marketing_variety_code] = { renderer: :label }
       fields[:description] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
+      fields[:inspection_variety] = { renderer: :label }
     end
 
     def common_fields
       {
         marketing_variety_code: { required: true },
-        description: {}
+        description: {},
+        inspection_variety: {}
       }
     end
 

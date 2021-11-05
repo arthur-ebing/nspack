@@ -6,5 +6,6 @@ module MasterfilesApp
     attribute :marketing_variety_code, Types::String
     attribute :description, Types::String
     attribute? :active, Types::Bool
+    attribute :inspection_variety, Types::String
   end
 end

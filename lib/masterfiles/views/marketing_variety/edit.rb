@@ -18,6 +18,7 @@ module Masterfiles
               form.method :update
               form.add_field :marketing_variety_code
               form.add_field :description
+              form.add_field :inspection_variety
             end
           end
 

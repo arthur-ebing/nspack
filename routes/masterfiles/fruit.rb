@@ -391,10 +391,12 @@ class Nspack < Roda
         r.patch do     # UPDATE
           res = interactor.update_marketing_variety(id, params[:marketing_variety])
           if res.success
-            update_grid_row(id,
-                            changes: { marketing_variety_code: res.instance[:marketing_variety_code],
-                                       description: res.instance[:description] },
-                            notice: res.message)
+            row_keys = %i[
+              marketing_variety_code
+              description
+              inspection_variety
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::Fruit::MarketingVariety::Edit.call(id, params[:marketing_variety], res.errors) }
           end
