@@ -769,7 +769,14 @@ module ProductionApp
         fg_code = product_setup_repo.calculate_extended_fg_code_from_sequences(seq)
         seq[:ids].each { |i| sfg_codes[seq_nos[i]] = fg_code }
       end
-      success_response('ok', items.sort.map { |_, seq, spec_id| { seq => fg_codes[spec_id] } } + sfg_codes.sort.map { |i, v| { i => v } })
+
+      seq_items2 = product_setup_repo.sequences_grouped_for_ext_fg(pallet_id)
+      sfg_codes2 = {}
+      seq_items2.each do |seq|
+        fg_code = product_setup_repo.calculate_extended_fg_code_from_sequences(seq, packaging_marks_join: '-')
+        seq[:ids].each { |i| sfg_codes2[seq_nos[i]] = fg_code }
+      end
+      success_response('ok', ['Current values'] + items.sort.map { |_, seq, spec_id| { seq => fg_codes[spec_id] } } + ['With -'] + sfg_codes.sort.map { |i, v| { i => v } } + ['With _'] + sfg_codes2.sort.map { |i, v| { i => v } })
     end
 
     private
