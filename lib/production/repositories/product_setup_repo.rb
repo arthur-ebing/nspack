@@ -465,6 +465,10 @@ module ProductionApp
                         .get(:packaging_marks)
       return ['No packaging marks found'] unless packaging_marks
 
+      translate_pm_marks(packaging_marks)
+    end
+
+    def translate_pm_marks(packaging_marks)
       marks = []
       packaging_marks.each do |inner_pm_mark_code|
         id = get_id(:inner_pm_marks, inner_pm_mark_code: inner_pm_mark_code)
@@ -482,7 +486,8 @@ module ProductionApp
 
     def cosmetic_code_for_seq(pm_mark_id)
       fruit_mark = (get(:pm_marks, pm_mark_id, :packaging_marks) || []).last
-      return 'UL' if fruit_mark == 'NONE'
+      return 'No packaging marks found' unless fruit_mark
+      return 'UL' if translate_pm_marks(Array(fruit_mark)).first == 'NONE'
 
       'LB'
     end
@@ -566,7 +571,9 @@ module ProductionApp
       fg_code_components << carton_pack_product
 
       fg_code_components << get_kromco_mes_value(:organizations, seq[:organization_id], :short_description)
-      fg_code_components << get(:pm_marks, seq[:pm_mark_id], :packaging_marks).reverse.join(packaging_marks_join)
+      marks_set = get(:pm_marks, seq[:pm_mark_id], :packaging_marks)
+      marks_set = translate_pm_marks(marks_set || ['No packaging marks found'])
+      fg_code_components << marks_set.reverse.join(packaging_marks_join)
       fg_code_components.join('_')
     end
 
