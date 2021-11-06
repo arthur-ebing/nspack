@@ -119,8 +119,10 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def reverse_previous_asset_move
+    def reverse_previous_asset_move # rubocop:disable Metrics/AbcSize
       return ok_response unless %w[FARM_CHANGED MATERIAL_OWNER_CHANGED REBIN_MATERIAL_OWNER_CHANGED].include?(bin_event_type)
+
+      return ok_response if changes_made[:before].nil_or_empty?
 
       res = MoveBinAssets.call({ owner_id: resolve_previous_owner_id,
                                  quantity: set_attrs[:quantity_bins],
@@ -140,7 +142,15 @@ module RawMaterialsApp
     end
 
     def resolve_previous_from_location_id
-      bin_event_type == 'FARM_CHANGED' ? get_farm_location_id(changes_made[:before].to_h[:farm_id]) : set_attrs[:farm_location_id]
+      case bin_event_type
+      when 'FARM_CHANGED'
+        get_farm_location_id(changes_made[:before].to_h[:farm_id])
+      when 'REBIN_MATERIAL_OWNER_CHANGED'
+        onsite_full_location_id
+      else
+        # MATERIAL_OWNER_CHANGED
+        set_attrs[:farm_location_id]
+      end
     end
 
     def resolve_previous_to_location_id
