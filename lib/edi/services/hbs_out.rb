@@ -9,6 +9,10 @@ module EdiApp
       super(AppConst::EDI_FLOW_HBS, edi_out_transaction_id, logger)
     end
 
+    def output_file_prefix
+      'bs_sales_export'
+    end
+
     def call
       log('Starting transform...')
       prepare_data

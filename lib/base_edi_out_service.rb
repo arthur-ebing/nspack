@@ -27,12 +27,16 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
 
     @record_definitions = Hash.new { |h, k| h[k] = {} } # Hash.new { |h, k| h[k] = [] }
     @record_entries = Hash.new { |h, k| h[k] = [] }
-    @output_filename = "#{@flow_type.upcase}#{AppConst::EDI_NETWORK_ADDRESS}#{@formatted_seq}.#{hub_address}"
+    @output_filename = "#{output_file_prefix}#{AppConst::EDI_NETWORK_ADDRESS}#{@formatted_seq}.#{hub_address}"
     @mail_keys = []
     @mail_tokens = {}
 
     load_output_paths
     load_schema
+  end
+
+  def output_file_prefix
+    @flow_type.upcase
   end
 
   # Reads an XML schema and compares each record size attribute against the sum of its field sizes.
