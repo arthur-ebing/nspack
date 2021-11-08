@@ -90,6 +90,7 @@ module MesscadaApp
                   login_at: Time.now,
                   identifier: identifier)
       end
+      AppConst.log_authentication("DB login - contract worker_id: #{system_resource[:contract_worker_id]}, system_resource_id: #{system_resource[:id]}")
 
       success_response('Logged on', contract_worker: name, identifier: identifier)
     end
@@ -97,6 +98,7 @@ module MesscadaApp
     def logout_worker(contract_worker_id)
       # 1. find the resource
       system_resource_id = DB[:system_resource_logins].where(contract_worker_id: contract_worker_id, active: true).get(:system_resource_id)
+      return ok_response if system_resource_id.nil?
 
       # 2. Logout
       DB[:system_resource_logins]
@@ -105,6 +107,7 @@ module MesscadaApp
                 from_external_system: false,
                 active: false)
 
+      AppConst.log_authentication("DB logout contract_worker_id: #{contract_worker_id}, system_resource_id: #{system_resource_id}")
       logout_from_messcada(system_resource_id, contract_worker_id) # unless system_resource_id.nil?
 
       ok_response
@@ -122,6 +125,7 @@ module MesscadaApp
                 from_external_system: false,
                 active: false)
 
+      AppConst.log_authentication("DB logout device - contract worker_ids: #{contract_worker_ids.inspect}, system_resource_id: #{system_resource_id}")
       contract_worker_ids.each do |contract_worker_id|
         logout_from_messcada(system_resource_id, contract_worker_id) # unless system_resource_id.nil?
       end
@@ -153,6 +157,7 @@ module MesscadaApp
       return unless opts[:legacy_messcada]
 
       puts '>>> enqueuing job to logoff messcada'
+      AppConst.log_authentication("DB enqueuing job to logoff messcada - contract_worker_id: #{contract_worker_id}, system_resource_id: #{system_resource_id} code: #{opts[:system_resource_code]} ip: #{opts[:ip_address]}")
       Job::LogoutFromMesScadaRobot.enqueue(system_resource_id, opts[:system_resource_code], opts[:ip_address], contract_worker_id)
     end
 
@@ -210,6 +215,7 @@ module MesscadaApp
       attrs = params.to_h
       append_worker_targets(attrs)
 
+      AppConst.log_authentication("DB create group - attributes: #{attrs.inspect}")
       create(:group_incentives, attrs)
     end
 
@@ -219,6 +225,7 @@ module MesscadaApp
       append_worker_targets(attrs) if attrs.key?(:active) && !attrs[:active]
 
       attrs[:from_external_system] = false
+      AppConst.log_authentication("DB update group - group incentive_id: #{group_incentive_id}, changes: #{attrs.inspect}")
       update(:group_incentives, group_incentive_id, attrs)
     end
 

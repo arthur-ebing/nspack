@@ -7,6 +7,7 @@ class Nspack < Roda
     # REGISTER PERSONNEL IDENTIFIERS
     # --------------------------------------------------------------------------
     r.on 'register_id' do
+      AppConst.log_authentication("register_id params: #{params.inspect}")
       res = interactor.register_identifier(params)
 
       feedback = if res.success
@@ -21,10 +22,12 @@ class Nspack < Roda
                                                   line3: 'Please try again',
                                                   line4: res.message)
                  end
+      AppConst.log_authentication("register_id result: #{Crossbeams::RobotResponder.new(feedback)}")
       Crossbeams::RobotResponder.new(feedback).render
     end
 
     r.on 'logon' do
+      AppConst.log_authentication("nspi logon params: #{params.inspect}")
       res = MesscadaApp::AddSystemResourceIncentiveToParams.call(params, get_group_incentive: false)
       res = interactor.login_with_identifier(res.instance) if res.success
 
@@ -40,10 +43,12 @@ class Nspack < Roda
                                                   line1: 'Cannot login',
                                                   line4: res.message)
                  end
+      AppConst.log_authentication("nspi logon result: #{Crossbeams::RobotResponder.new(feedback)}")
       Crossbeams::RobotResponder.new(feedback).render
     end
 
     r.on 'logoff' do
+      AppConst.log_authentication("nspi logoff params: #{params.inspect}")
       res = MesscadaApp::AddSystemResourceIncentiveToParams.call(params, get_group_incentive: false)
       res = interactor.logout(res.instance) if res.success
 
@@ -58,10 +63,12 @@ class Nspack < Roda
                                                   line1: 'Cannot logout',
                                                   line4: res.message)
                  end
+      AppConst.log_authentication("nspi logoff result: #{Crossbeams::RobotResponder.new(feedback)}")
       Crossbeams::RobotResponder.new(feedback).render
     end
 
     r.on 'logon_with_no' do
+      AppConst.log_authentication("nspi logon with no params: #{params.inspect}")
       res = MesscadaApp::AddSystemResourceIncentiveToParams.call(params.merge(identifier_is_person: true), get_group_incentive: false)
       res = interactor.login_with_no(res.instance) if res.success
 
@@ -78,10 +85,12 @@ class Nspack < Roda
                  end
       resp = Crossbeams::RobotResponder.new(feedback)
       resp.extra_elements = { identifier: res.instance[:identifier] } if res.success && res.instance[:identifier]
+      AppConst.log_authentication("nspi logon with no result: #{resp}")
       resp.render
     end
 
     r.on 'logoff_with_no' do
+      AppConst.log_authentication("nspi logoff with no params: #{params.inspect}")
       res = MesscadaApp::AddSystemResourceIncentiveToParams.call(params.merge(identifier_is_person: true), get_group_incentive: false)
       res = interactor.logout_with_no(res.instance) if res.success
 
@@ -96,6 +105,7 @@ class Nspack < Roda
                                                   line1: 'Cannot logout',
                                                   line4: res.message)
                  end
+      AppConst.log_authentication("nspi logoff with no result: #{Crossbeams::RobotResponder.new(feedback)}")
       Crossbeams::RobotResponder.new(feedback).render
     end
 

@@ -32,6 +32,11 @@ class AppConst # rubocop:disable Metrics/ClassLength
     val
   end
 
+  # Conditional logging of login/logout events
+  def self.log_authentication(str)
+    AUTH_LOG.info(str) if ENV['LOG_ALL_LOGIN_ACTIVITY']
+  end
+
   # Client-specific code
   CLIENT_SET = {
     'hb' => 'Habata (Badlands)',
@@ -68,6 +73,9 @@ class AppConst # rubocop:disable Metrics/ClassLength
 
   # Log for errors experienced by robot calls (Keep history: 10 files of up to 1Mb each):
   ROBOT_LOG = Logger.new('log/robot.log', 10, 1_024_000)
+
+  # Log all login/logout events
+  AUTH_LOG = Logger.new('log/robot_authorization.log', 10, 1_024_000)
 
   # Logs requests, responses and errors for bin staging execution services (Keep history: 10 files of up to 1Mb each)
   BIN_STAGING_LOG_FILE = 'log/bin_staging_execution.log'
