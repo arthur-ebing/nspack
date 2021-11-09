@@ -16,7 +16,7 @@ module MesscadaApp
         result = sock.read
 
         puts "RESPONSE FROM #{system_resource_code} : #{result}"
-        AppConst.log_authentication("TCP clear messcada logins - #{result}")
+        AppConst.log_authentication("TCP clear messcada logins #{system_resource_code} result - #{result.chomp}")
         sock.close
         finish
       end
