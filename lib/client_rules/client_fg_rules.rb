@@ -38,7 +38,7 @@ module Crossbeams
             wo_fulfillment_pallet_warning_level: 2 },
       kr: { place_of_issue_for_addendum: 'CPT',
             vgm_required: true,
-            reporting_industry: { default: nil, can_override: false },
+            reporting_industry: { default: 'apples', can_override: false },
             integrate_extended_fg: true,
             max_rmt_bins_on_load: 50,
             max_pallets_on_load: 50,
