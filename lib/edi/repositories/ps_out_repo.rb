@@ -94,6 +94,7 @@ module EdiApp
         LEFT JOIN pallet_stack_types ON pallet_stack_types.id = pallet_formats.pallet_stack_type_id
         WHERE pallets.in_stock
           AND pallets.palletized -- Build status is full
+          AND NOT pallets.partially_palletized -- Build status is full
           AND #{party_role_condition} = ?
           AND NOT EXISTS(SELECT id FROM wip_pallets WHERE pallet_id = pallets.id)
         ORDER BY pallet_sequences.pallet_number, pallet_sequences.pallet_sequence_number
