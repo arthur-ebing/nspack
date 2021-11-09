@@ -100,6 +100,7 @@ class Nspack < Roda
                                        current_user.login_name,
                                        load_id: id,
                                        from_depot: AppConst::FROM_DEPOT)
+      jasper_params.parent_folder = AppConst::CR_FG.reporting_industry
       res = CreateJasperReport.call(jasper_params)
 
       if res.success
