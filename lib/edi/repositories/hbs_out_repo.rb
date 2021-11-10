@@ -5,13 +5,13 @@ module EdiApp
     def hbs_rmt_rows(load_id)
       query = <<~SQL
         SELECT
-          bin_loads.id AS load_id,
+          'BS' || lpad(bin_loads.id::text, 6, '0') AS load_id,
           rmt_bins.nett_weight AS weight,
           rmt_classes.description AS class,
           commodities.code AS fruit_class,
           rmt_sizes.size_code AS bin_size,
           COALESCE(rmt_bins.bin_asset_number, rmt_bins.tipped_asset_number, rmt_bins.shipped_asset_number, rmt_bins.scrapped_bin_asset_number) AS bin_id,
-          bin_loads.id AS exit_ref,
+          'BS' || lpad(bin_loads.id::text, 6, '0') AS exit_ref,
           COALESCE(rmt_bins.exit_ref_date_time, rmt_bins.updated_at) AS exit_date,
           customers.financial_account_code AS hw_customer_code,
           customers.financial_account_code AS trading_partner,
