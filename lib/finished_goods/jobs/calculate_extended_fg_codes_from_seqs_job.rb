@@ -5,7 +5,7 @@ module FinishedGoodsApp
     class CalculateExtendedFgCodesFromSeqs < BaseQueJob
       def run(pallet_ids)
         DB.transaction do
-          res = FinishedGoodsApp::CalculateExtendedFgCodes.call(pallet_ids)
+          res = FinishedGoodsApp::CalculateExtendedFgCodesFromSeqs.call(pallet_ids)
           raise res.message unless res.success
         end
       ensure

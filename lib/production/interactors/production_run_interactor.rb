@@ -755,10 +755,10 @@ module ProductionApp
     end
 
     def ext_fg_codes_for(pallet_id) # rubocop:disable Metrics/AbcSize
-      items = repo.select_values(:pallet_sequences, %i[id pallet_sequence_number packing_specification_item_id], pallet_id: pallet_id)
+      items = repo.select_values(:pallet_sequences, %i[id pallet_sequence_number packing_specification_item_id legacy_data], pallet_id: pallet_id)
       fg_codes = {}
       seq_nos = {}
-      items.each do |id, seq_no, spec_id|
+      items.each do |id, seq_no, spec_id, _|
         seq_nos[id] = seq_no
         fg_codes[spec_id] ||= product_setup_repo.calculate_extended_fg_code(spec_id)
       end
@@ -776,14 +776,18 @@ module ProductionApp
         fg_code = product_setup_repo.calculate_extended_fg_code_from_sequences(seq, packaging_marks_join: '-')
         seq[:ids].each { |i| sfg_codes2[seq_nos[i]] = fg_code }
       end
-      success_response('ok', ['Current values'] + items.sort.map { |_, seq, spec_id| { seq => fg_codes[spec_id] } } + ['With -'] + sfg_codes.sort.map { |i, v| { i => v } } + ['With _'] + sfg_codes2.sort.map { |i, v| { i => v } })
+      success_response('ok',
+                       ['Current values:'] + items.sort.map { |_, seq, _, data| { seq => data['extended_fg_code'] } } +
+                       ['Spec values:'] + items.sort.map { |_, seq, spec_id, _| { seq => fg_codes[spec_id] } } +
+                       ['With -'] + sfg_codes.sort.map { |i, v| { i => v } } +
+                       ['With _'] + sfg_codes2.sort.map { |i, v| { i => v } })
     end
 
     def ext_fg_codes_with_lookup_for(pallet_id) # rubocop:disable Metrics/AbcSize
-      items = repo.select_values(:pallet_sequences, %i[id pallet_sequence_number packing_specification_item_id], pallet_id: pallet_id)
+      items = repo.select_values(:pallet_sequences, %i[id pallet_sequence_number packing_specification_item_id legacy_data], pallet_id: pallet_id)
       fg_codes = {}
       seq_nos = {}
-      items.each do |id, seq_no, spec_id|
+      items.each do |id, seq_no, spec_id, _|
         seq_nos[id] = seq_no
         fg_codes[spec_id] ||= product_setup_repo.calculate_extended_fg_code(spec_id)
       end
@@ -805,7 +809,10 @@ module ProductionApp
           end
         end
       end
-      success_response('ok', ['Current values'] + items.sort.map { |_, seq, spec_id| { seq => fg_codes[spec_id] } } + ['Lookups -'] + sfg_codes.sort.map { |i, v| { i => v } })
+      success_response('ok',
+                       ['Current values:'] + items.sort.map { |_, seq, _, data| { seq => data['extended_fg_code'] } } +
+                       ['Spec values:'] + items.sort.map { |_, seq, spec_id, _| { seq => fg_codes[spec_id] } } +
+                       ['Lookups:'] + sfg_codes.sort.map { |i, v| { i => v } })
     end
 
     private

@@ -20,9 +20,9 @@ module Production
                                   ])
               section.add_control control_type: :link,
                                   style: :action_button,
-                                  text: 'Check extended FG codes',
-                                  url: "/production/reports/pallet_history/pallet/#{data[:id]}/extended_fg_codes",
-                                  icon: :checkon,
+                                  text: 'Status',
+                                  url: "/development/statuses/list/pallets/#{data[:id]}",
+                                  icon: :info,
                                   behaviour: :popup
             end
           end

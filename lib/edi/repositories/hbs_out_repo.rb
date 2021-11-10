@@ -22,7 +22,7 @@ module EdiApp
           seasons.season_year season,
           farms.farm_code AS farm_id,
           farm_groups.farm_group_code AS farm_sub_group,
-          concat(rmt_bins.legacy_data ->> 'track_slms_indicator_1_code'::text, '_', commodities.code, '_', cultivars.cultivar_code, '_', rmt_bins.legacy_data ->> 'rmtp_treatment_code'::text, '_', rmt_classes.rmt_class_code, '_', rmt_bins.legacy_data ->> 'ripe_point_code'::text, '_', rmt_sizes.size_code) AS product_code
+          concat(rmt_bins.legacy_data ->> 'track_slms_indicator_1_code'::text, '_', commodities.code, '_', cultivars.cultivar_code, '_', rmt_bins.legacy_data ->> 'colour'::text, '_', rmt_classes.rmt_class_code, '_', rmt_bins.legacy_data ->> 'ripe_point_code'::text, '_', rmt_sizes.size_code) AS product_code
         FROM
           rmt_bins
           LEFT JOIN seasons ON seasons.id = rmt_bins.season_id
