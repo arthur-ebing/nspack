@@ -32,9 +32,12 @@
   \   bin_tipped_date,\r\n    bin_tipped_week,\r\n    shipped_asset_number,\r\n    shipped,\r\n
   \   shipped_at,\r\n    bin_load_id,\r\n    bin_load_product_id,\r\n    scrapped_bin_asset_number,\r\n
   \   scrapped,\r\n    scrapped_at,\r\n    scrap_remarks,\r\n    unscrapped_at,\r\n
-  \   production_run_rebin_id,\r\n    rebin_created_at,\r\n    age,\r\n    CASE \r\n
-  \   WHEN bin_tipped THEN 'gray'\r\n    WHEN shipped THEN 'blue'\r\n    END AS colour_rule\r\nFROM\r\n
-  \   vw_rmt_bins_flat\r\nWHERE\r\n    NOT scrapped\r\nORDER BY\r\n    id DESC"
+  \   production_run_rebin_id,\r\n    rebin_created_at,\r\n    age,\r\n    legacy_data
+  ->> 'colour' AS colour,\r\n    legacy_data ->> 'track_slms_indicator_1_code' AS
+  rmt_code,\r\n    legacy_data ->> 'pc_code' AS pc_code,\r\n    legacy_data ->> 'cold_store_type'
+  AS regime_code,\r\n    CASE \r\n    WHEN bin_tipped THEN 'gray'\r\n    WHEN shipped
+  THEN 'blue'\r\n    END AS colour_rule\r\nFROM\r\n    vw_rmt_bins_flat\r\nWHERE\r\n
+  \   NOT scrapped\r\nORDER BY\r\n    id DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -1499,9 +1502,73 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  colour:
+    :name: colour
+    :sequence_no: 92
+    :caption: Colour
+    :namespaced_name: 
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_code:
+    :name: rmt_code
+    :sequence_no: 93
+    :caption: Rmt code
+    :namespaced_name: 
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pc_code:
+    :name: pc_code
+    :sequence_no: 94
+    :caption: Pc code
+    :namespaced_name: 
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  regime_code:
+    :name: regime_code
+    :sequence_no: 95
+    :caption: Regime code
+    :namespaced_name: 
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 92
+    :sequence_no: 96
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
