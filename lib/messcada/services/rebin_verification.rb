@@ -93,9 +93,11 @@ module MesscadaApp
         is_rebin: true
       }.merge(carton_label.slice(*arr))
 
+      owner_party_role_id, material_type_id = repo.get_value(:rmt_container_material_owners, %i[rmt_material_owner_party_role_id rmt_container_material_type_id], id: owner_id)
       params[:rmt_container_material_owner_id] = owner_id
-      params[:rmt_container_material_type_id] = repo.get(:rmt_container_material_owners, owner_id, :rmt_container_material_type_id)
-      params[:rmt_container_type_id] = repo.get(:rmt_container_material_types, params[:rmt_container_material_type_id], :rmt_container_type_id)
+      params[:rmt_material_owner_party_role_id] = owner_party_role_id
+      params[:rmt_container_material_type_id] = material_type_id
+      params[:rmt_container_type_id] = repo.get(:rmt_container_material_types, material_type_id, :rmt_container_type_id)
       params[:location_id] = repo.get(:plant_resources, carton_label[:packhouse_resource_id], :location_id)
       params[:rmt_size_id] = repo.find_rmt_size_id_for(carton_label[:fruit_size_reference_id])
       params[:production_run_rebin_id] = carton_label[:production_run_id]
