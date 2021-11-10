@@ -779,6 +779,35 @@ module ProductionApp
       success_response('ok', ['Current values'] + items.sort.map { |_, seq, spec_id| { seq => fg_codes[spec_id] } } + ['With -'] + sfg_codes.sort.map { |i, v| { i => v } } + ['With _'] + sfg_codes2.sort.map { |i, v| { i => v } })
     end
 
+    def ext_fg_codes_with_lookup_for(pallet_id) # rubocop:disable Metrics/AbcSize
+      items = repo.select_values(:pallet_sequences, %i[id pallet_sequence_number packing_specification_item_id], pallet_id: pallet_id)
+      fg_codes = {}
+      seq_nos = {}
+      items.each do |id, seq_no, spec_id|
+        seq_nos[id] = seq_no
+        fg_codes[spec_id] ||= product_setup_repo.calculate_extended_fg_code(spec_id)
+      end
+
+      seq_items = product_setup_repo.sequences_grouped_for_ext_fg(pallet_id)
+      sfg_codes = {}
+      seq_items.each do |seq|
+        fg_code = product_setup_repo.calculate_extended_fg_code_from_sequences(seq)
+        lkp = ProductionApp::LookupExtendedFgCodeId.call(fg_code)
+        if lkp.success
+          seq[:ids].each { |i| sfg_codes[seq_nos[i]] = { code: fg_code, id: lkp.instance } }
+        else
+          fg_code = product_setup_repo.calculate_extended_fg_code_from_sequences(seq, packaging_marks_join: '-')
+          lkp = ProductionApp::LookupExtendedFgCodeId.call(fg_code)
+          if lkp.success
+            seq[:ids].each { |i| sfg_codes[seq_nos[i]] = { code: fg_code, id: lkp.instance } }
+          else
+            seq[:ids].each { |i| sfg_codes[seq_nos[i]] = { code: fg_code, id: 'Neither FG code could be found' } }
+          end
+        end
+      end
+      success_response('ok', ['Current values'] + items.sort.map { |_, seq, spec_id| { seq => fg_codes[spec_id] } } + ['Lookups -'] + sfg_codes.sort.map { |i, v| { i => v } })
+    end
+
     private
 
     def repo

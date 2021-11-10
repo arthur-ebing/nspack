@@ -8,7 +8,10 @@ class Nspack < Roda
       r.on 'pallet', Integer do |pallet_id|
         r.on 'extended_fg_codes' do
           res = interactor.ext_fg_codes_for(pallet_id)
-          # show_partial_or_page(r) { FinishedGoods::Dispatch::Load::TempTail.call(id) }
+          update_dialog_content(content: res.instance.inspect.gsub(/[\[\]]/, '').gsub(',', '<br>'))
+        end
+        r.on 'extended_fg_codes_with_lookup' do
+          res = interactor.ext_fg_codes_with_lookup_for(pallet_id)
           update_dialog_content(content: res.instance.inspect.gsub(/[\[\]]/, '').gsub(',', '<br>'))
         end
       end
