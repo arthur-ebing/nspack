@@ -25,7 +25,7 @@ class UpdateExtendedFGCodes < BaseScript
       SELECT DISTINCT pallet_id
       FROM pallet_sequences
       JOIN pallets ON pallets.id = pallet_sequences.pallet_id
-      WHERE pallet_sequences.created_at > ?
+      WHERE pallet_sequences.updated_at > ?
         AND NOT pallets.allocated
     SQL
     pallet_ids = DB[query, from_date].select_map(:pallet_id)
