@@ -4,8 +4,8 @@
   \  pod,\r\n   pol,\r\n   customer,\r\n   departure_date,\r\n   booking_reference,\r\n
   \  customer_order_number,\r\n   shipped_date,\r\n   marketing_org,\r\n   container,\r\n
   \  container_seal_code,\r\n   temp_tail,\r\n   exporter,\r\n   pallet_number,\r\n
-  \  marketing_variety,\r\n   std_pack,\r\n   mark,\r\n   actual_count,\r\n   grade,\r\n
-  \  puc,\r\n   phc,\r\n   target_market,\r\n   region,\r\n   edi_in_consignment_note_number,\r\n
+  \  commodity,\r\n   marketing_variety,\r\n   std_pack,\r\n   mark,\r\n   actual_count,\r\n
+  \  grade,\r\n   puc,\r\n   phc,\r\n   packed_tm_group,\r\n   region,\r\n   edi_in_consignment_note_number,\r\n
   \  inspection_point,\r\n   govt_first_inspection_at,\r\n   orchard,\r\n   packhouse,\r\n
   \  diameter_range,\r\n   pallet_size,\r\n   carton_quantity,\r\n   load_id,\r\n
   \  sequence_nett_weight,\r\n   sequence_gross_weight,\r\n   gap_code,\r\n   'ZA'
@@ -305,13 +305,29 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  commodity:
+    :name: commodity
+    :sequence_no: 19
+    :caption: Commodity
+    :namespaced_name: commodity
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   marketing_variety:
     :name: marketing_variety
-    :sequence_no: 19
-    :caption: Mkt Var
+    :sequence_no: 20
+    :caption: Marketing Variety
     :namespaced_name: marketing_variety
     :data_type: :string
-    :width: 80
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -323,7 +339,7 @@
     :group_max: false
   std_pack:
     :name: std_pack
-    :sequence_no: 20
+    :sequence_no: 21
     :caption: Std pack
     :namespaced_name: std_pack
     :data_type: :string
@@ -339,7 +355,7 @@
     :group_max: false
   mark:
     :name: mark
-    :sequence_no: 21
+    :sequence_no: 22
     :caption: Mark
     :namespaced_name: mark
     :data_type: :string
@@ -355,7 +371,7 @@
     :group_max: false
   actual_count:
     :name: actual_count
-    :sequence_no: 22
+    :sequence_no: 23
     :caption: Actual count
     :namespaced_name: actual_count
     :data_type: :integer
@@ -371,7 +387,7 @@
     :group_max: false
   grade:
     :name: grade
-    :sequence_no: 23
+    :sequence_no: 24
     :caption: Grade
     :namespaced_name: grade
     :data_type: :string
@@ -387,7 +403,7 @@
     :group_max: false
   puc:
     :name: puc
-    :sequence_no: 24
+    :sequence_no: 25
     :caption: PUC
     :namespaced_name: puc
     :data_type: :string
@@ -403,7 +419,7 @@
     :group_max: false
   phc:
     :name: phc
-    :sequence_no: 25
+    :sequence_no: 26
     :caption: PHC
     :namespaced_name: phc
     :data_type: :string
@@ -417,11 +433,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  target_market:
-    :name: target_market
-    :sequence_no: 26
-    :caption: Target market
-    :namespaced_name: target_market
+  packed_tm_group:
+    :name: packed_tm_group
+    :sequence_no: 27
+    :caption: Packed tm group
+    :namespaced_name: packed_tm_group
     :data_type: :string
     :width: 120
     :format: 
@@ -435,7 +451,7 @@
     :group_max: false
   region:
     :name: region
-    :sequence_no: 27
+    :sequence_no: 28
     :caption: Region
     :namespaced_name: region
     :data_type: :string
@@ -451,7 +467,7 @@
     :group_max: false
   edi_in_consignment_note_number:
     :name: edi_in_consignment_note_number
-    :sequence_no: 28
+    :sequence_no: 29
     :caption: EDI Cons
     :namespaced_name: edi_in_consignment_note_number
     :data_type: :string
@@ -467,7 +483,7 @@
     :group_max: false
   inspection_point:
     :name: inspection_point
-    :sequence_no: 29
+    :sequence_no: 30
     :caption: Inspection point
     :namespaced_name: inspection_point
     :data_type: :string
@@ -483,7 +499,7 @@
     :group_max: false
   govt_first_inspection_at:
     :name: govt_first_inspection_at
-    :sequence_no: 30
+    :sequence_no: 31
     :caption: Govt first inspection at
     :namespaced_name: govt_first_inspection_at
     :data_type: :datetime
@@ -499,7 +515,7 @@
     :group_max: false
   orchard:
     :name: orchard
-    :sequence_no: 31
+    :sequence_no: 32
     :caption: Orch
     :namespaced_name: orchard
     :data_type: :string
@@ -515,7 +531,7 @@
     :group_max: false
   packhouse:
     :name: packhouse
-    :sequence_no: 32
+    :sequence_no: 33
     :caption: Packhouse
     :namespaced_name: packhouse
     :data_type: :string
@@ -531,7 +547,7 @@
     :group_max: false
   diameter_range:
     :name: diameter_range
-    :sequence_no: 33
+    :sequence_no: 34
     :caption: Diameter range
     :namespaced_name: diameter_range
     :data_type: :string
@@ -547,7 +563,7 @@
     :group_max: false
   pallet_size:
     :name: pallet_size
-    :sequence_no: 34
+    :sequence_no: 35
     :caption: Plt size
     :namespaced_name: pallet_size
     :data_type: :number
@@ -563,7 +579,7 @@
     :group_max: false
   carton_quantity:
     :name: carton_quantity
-    :sequence_no: 35
+    :sequence_no: 36
     :caption: Ctn Qty
     :namespaced_name: carton_quantity
     :data_type: :integer
@@ -579,7 +595,7 @@
     :group_max: false
   load_id:
     :name: load_id
-    :sequence_no: 36
+    :sequence_no: 37
     :caption: Load
     :namespaced_name: load_id
     :data_type: :integer
@@ -595,7 +611,7 @@
     :group_max: false
   sequence_nett_weight:
     :name: sequence_nett_weight
-    :sequence_no: 37
+    :sequence_no: 38
     :caption: Sequence nett weight
     :namespaced_name: sequence_nett_weight
     :data_type: :number
@@ -611,7 +627,7 @@
     :group_max: false
   sequence_gross_weight:
     :name: sequence_gross_weight
-    :sequence_no: 38
+    :sequence_no: 39
     :caption: Sequence gross weight
     :namespaced_name: sequence_gross_weight
     :data_type: :number
@@ -627,7 +643,7 @@
     :group_max: false
   gap_code:
     :name: gap_code
-    :sequence_no: 39
+    :sequence_no: 40
     :caption: GAP code
     :namespaced_name: gap_code
     :data_type: :string
@@ -643,7 +659,7 @@
     :group_max: false
   country_of_origin:
     :name: country_of_origin
-    :sequence_no: 40
+    :sequence_no: 41
     :caption: Country of origin
     :namespaced_name: 
     :data_type: :string
@@ -659,7 +675,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 41
+    :sequence_no: 42
     :caption: Colour rule
     :namespaced_name: colour_rule
     :data_type: :string

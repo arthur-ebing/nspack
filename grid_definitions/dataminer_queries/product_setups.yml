@@ -157,7 +157,7 @@
   marketing_variety_code:
     :name: marketing_variety_code
     :sequence_no: 7
-    :caption: Mkt Var
+    :caption: Marketing Variety
     :namespaced_name: marketing_varieties.marketing_variety_code
     :data_type: :string
     :width: 80
