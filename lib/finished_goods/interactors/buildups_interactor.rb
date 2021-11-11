@@ -137,7 +137,7 @@ module FinishedGoodsApp
 
         if AppConst::CR_FG.lookup_extended_fg_code?
           pallet_ids = repo.select_values(:pallets, :id, pallet_number: [pallet_buildup.destination_pallet_number] + pallet_buildup.source_pallets)
-          FinishedGoodsApp::Job::CalculateExtendedFgCodes.enqueue(pallet_ids)
+          FinishedGoodsApp::Job::CalculateExtendedFgCodesFromSeqs.enqueue(pallet_ids)
         end
 
         success_response("Pallet buildup:#{id} has been completed successfully")

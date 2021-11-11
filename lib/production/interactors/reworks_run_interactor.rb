@@ -1041,7 +1041,7 @@ module ProductionApp
 
         if AppConst::CR_FG.lookup_extended_fg_code?
           pallet_ids = repo.select_values(:pallet_sequences, :pallet_id, id: sequences)
-          FinishedGoodsApp::Job::CalculateExtendedFgCodes.enqueue(pallet_ids)
+          FinishedGoodsApp::Job::CalculateExtendedFgCodesFromSeqs.enqueue(pallet_ids)
         end
       end
       instance = { pallet_number: pallet_sequence_pallet_number(sequence_id).first,
