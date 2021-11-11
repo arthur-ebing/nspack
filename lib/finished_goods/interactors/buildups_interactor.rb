@@ -124,7 +124,7 @@ module FinishedGoodsApp
             v.each do |cl_id|
               unless cl_id == creator_ctn_label
                 orig_seq = repo.get_value(:cartons, :pallet_sequence_id, carton_label_id: cl_id)
-                res = MesscadaApp::TransferCarton.call(prod_run_repo.find_carton_by_carton_label_id(cl_id)[:id], dest_pallet_id)
+                res = MesscadaApp::TransferCarton.call(prod_run_repo.find_carton_by_carton_label_id(cl_id)[:id], dest_pallet_id, @user.user_name)
                 raise Crossbeams::InfoError, res.message unless res.success
               end
 
