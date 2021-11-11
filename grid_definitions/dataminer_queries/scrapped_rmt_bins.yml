@@ -23,9 +23,10 @@
   \   unscrapped_at,\r\n    production_run_rebin_id,\r\n    rebin_created_at,\r\n
   \   legacy_data ->> 'colour' AS colour,\r\n    legacy_data ->> 'track_slms_indicator_1_code'
   AS rmt_code,\r\n    legacy_data ->> 'pc_code' AS pc_code,\r\n    legacy_data ->>
-  'cold_store_type' AS regime_code,\r\n    CASE \r\n    WHEN bin_tipped THEN 'gray'\r\n
-  \   WHEN shipped THEN 'blue'\r\n    END AS colour_rule\r\nFROM\r\n    vw_rmt_bins_flat\r\nWHERE\r\n
-  \   scrapped\r\nORDER BY\r\n    id DESC"
+  'cold_store_type' AS regime_code,\r\n    last_coldroom_event,\r\n    coldroom_events,\r\n
+  \   CASE \r\n    WHEN bin_tipped THEN 'gray'\r\n    WHEN shipped THEN 'blue'\r\n
+  \   END AS colour_rule\r\nFROM\r\n    vw_rmt_bins_flat\r\nWHERE\r\n    scrapped\r\nORDER
+  BY\r\n    id DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -1346,9 +1347,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  last_coldroom_event:
+    :name: last_coldroom_event
+    :sequence_no: 83
+    :caption: Last coldroom event
+    :namespaced_name: last_coldroom_event
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  coldroom_events:
+    :name: coldroom_events
+    :sequence_no: 84
+    :caption: Coldroom events
+    :namespaced_name: coldroom_events
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 83
+    :sequence_no: 85
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

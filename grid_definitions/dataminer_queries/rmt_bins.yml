@@ -21,9 +21,10 @@
   \   bin_tipped_date,\r\n    bin_tipped_week,\r\n    shipped_asset_number,\r\n    shipped,\r\n
   \   shipped_at,\r\n    bin_load_id,\r\n    bin_load_product_id,\r\n    scrapped_bin_asset_number,\r\n
   \   scrapped,\r\n    scrapped_at,\r\n    scrap_remarks,\r\n    unscrapped_at,\r\n
-  \   production_run_rebin_id,\r\n    rebin_created_at,\r\n    age,\r\n    CASE \r\n
-  \   WHEN bin_tipped THEN 'gray'\r\n    WHEN shipped THEN 'blue'\r\n    END AS colour_rule\r\nFROM\r\n
-  \   vw_rmt_bins_flat\r\nWHERE\r\n    NOT scrapped\r\nORDER BY\r\n    id DESC"
+  \   production_run_rebin_id,\r\n    rebin_created_at,\r\n    age,\r\n    last_coldroom_event,\r\n
+  \   coldroom_events,\r\n    CASE \r\n    WHEN bin_tipped THEN 'gray'\r\n    WHEN
+  shipped THEN 'blue'\r\n    END AS colour_rule\r\nFROM\r\n    vw_rmt_bins_flat\r\nWHERE\r\n
+  \   NOT scrapped\r\nORDER BY\r\n    id DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -1328,9 +1329,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  last_coldroom_event:
+    :name: last_coldroom_event
+    :sequence_no: 82
+    :caption: Last coldroom event
+    :namespaced_name: last_coldroom_event
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  coldroom_events:
+    :name: coldroom_events
+    :sequence_no: 83
+    :caption: Coldroom events
+    :namespaced_name: coldroom_events
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 82
+    :sequence_no: 84
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
@@ -1564,7 +1597,7 @@
   :caption: Id
   :data_type: :integer
   :control_type: :integer
-  :default_value:
+  :default_value: 
   :ordered_list: false
   :ui_priority: 1
-  :list_def:
+  :list_def: 
