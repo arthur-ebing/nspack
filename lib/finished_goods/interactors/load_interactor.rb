@@ -96,7 +96,7 @@ module FinishedGoodsApp
       EdiApp::SendEdiOut.call(AppConst::EDI_FLOW_HBS, nil, @user.user_name, bin_load_id, context: { fg_load: true }) if load_entity.rmt_load
     end
 
-    def allocate_multiselect(load_id, pallet_numbers, initial_pallet_numbers = nil) # rubocop:disable Metrics/AbcSize
+    def allocate_multiselect(load_id, pallet_numbers, initial_pallet_numbers = nil) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       check_pallets!(:allocate, pallet_numbers, load_id) unless pallet_numbers.empty?
       new_allocation = pallet_numbers
       current_allocation = repo.select_values(:pallets, :pallet_number, load_id: load_id)
@@ -114,6 +114,11 @@ module FinishedGoodsApp
         repo.allocate_pallets(load_id, pallet_numbers, @user)
         FinishedGoodsApp::ProcessOrderLines.call(@user, load_id: load_id)
 
+        if AppConst::CR_FG.lookup_extended_fg_code?
+          pallet_ids = repo.select_values(:pallets, :id, pallet_number: pallet_numbers)
+          FinishedGoodsApp::Job::CalculateExtendedFgCodesFromSeqs.enqueue(pallet_ids)
+        end
+
         log_transaction
       end
       success_response("Allocation applied to load: #{load_id}")
@@ -121,7 +126,7 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def allocate_list(load_id, pallets_string)
+    def allocate_list(load_id, pallets_string) # rubocop:disable Metrics/AbcSize
       res = MesscadaApp::ParseString.call(pallets_string)
       return res unless res.success
 
@@ -134,6 +139,11 @@ module FinishedGoodsApp
       repo.transaction do
         repo.allocate_pallets(load_id, pallet_numbers, @user)
         FinishedGoodsApp::ProcessOrderLines.call(@user, load_id: load_id)
+
+        if AppConst::CR_FG.lookup_extended_fg_code?
+          pallet_ids = repo.select_values(:pallets, :id, pallet_number: pallet_numbers)
+          FinishedGoodsApp::Job::CalculateExtendedFgCodesFromSeqs.enqueue(pallet_ids)
+        end
 
         log_transaction
       end
