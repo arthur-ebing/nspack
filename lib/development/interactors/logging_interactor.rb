@@ -17,7 +17,7 @@ module DevelopmentApp
       logged_action_changes(logged_action.table_name, logged_action.row_data_id).each { |c| row_defs << c }
 
       {
-        columnDefs: col_defs_for_logged_actions(logged_action),
+        columnDefs: col_defs_for_logged_actions(logged_action, logged_action.table_name),
         rowDefs: row_defs
       }.to_json
     end
@@ -53,15 +53,26 @@ module DevelopmentApp
       hash.reject { |k, _| AppConst::FIELDS_TO_EXCLUDE_FROM_DIFF.include?(k) }
     end
 
-    def col_defs_for_logged_actions(logged_action) # rubocop:disable Metrics/AbcSize
+    def col_defs_for_logged_actions(logged_action, table_name) # rubocop:disable Metrics/AbcSize
       col_names = DevelopmentRepo.new.table_col_names(logged_action.table_name)
-      Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
+      Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk| # rubocop:disable Metrics/BlockLength
         mk.action_column do |act|
           act.popup_link 'Detail diff', '/development/logging/logged_actions/$col1$/diff',
                          col1: 'event_id',
                          icon: 'list',
                          title: 'View differences',
                          hide_if_null: :event_id
+          act.separator
+          act.popup_link 'Status', "/development/statuses/list/#{table_name}/$col1$",
+                         col1: 'rowid',
+                         icon: 'information-solid',
+                         title: 'Status',
+                         hide_if_null: :rowid
+          act.popup_link 'Transactions', "/development/transactions/list/#{table_name}/$col1$",
+                         col1: 'rowid',
+                         icon: 'code',
+                         title: 'Transactions',
+                         hide_if_null: :rowid
         end
         mk.col 'action_tstamp_tx', 'Action time'
         mk.col 'action'
@@ -84,6 +95,7 @@ module DevelopmentApp
       data_record[:action_tstamp_tx] = Time.now
       data_record[:action] = 'N/A'
       data_record[:event_id] = nil
+      data_record[:rowid] = nil
       data_record[:id] = 1
       data_record
     end
@@ -119,7 +131,7 @@ module DevelopmentApp
         rows << if changed_fields.nil?
                   row.merge(Sequel.hstore(row_data).to_hash)
                 else
-                  row.merge(Sequel.hstore(changed_fields).to_hash)
+                  row.merge(Sequel.hstore(changed_fields.merge(rowid: row_data[:rowid])).to_hash)
                 end
       end
       rows

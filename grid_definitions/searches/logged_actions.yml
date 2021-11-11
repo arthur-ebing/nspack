@@ -10,3 +10,14 @@
   :icon: code
   :title: View Transaction SQL
   :popup: true
+- :separator: true
+- :url: "/development/statuses/list/$:table_name$/$:row_data_id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+- :url: "/development/transactions/list/$:table_name$/$:row_data_id$"
+  :text: transactions
+  :icon: code
+  :title: Transactions
+  :popup: true
