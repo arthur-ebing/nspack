@@ -102,6 +102,14 @@ module MesscadaApp
       params[:rmt_size_id] = repo.find_rmt_size_id_for(carton_label[:fruit_size_reference_id])
       params[:production_run_rebin_id] = carton_label[:production_run_id]
 
+      if AppConst::CR_RMT.maintain_legacy_columns?
+        legacy_data = repo.get_value(:production_runs, :legacy_data, id: carton_label[:production_run_id])
+        params[:legacy_data] = { colour: legacy_data['treatment_code'],
+                                 pc_code: legacy_data['pc_code'],
+                                 cold_store_type: legacy_data['cold_store_type'],
+                                 track_slms_indicator_1_code: legacy_data['track_indicator_code'],
+                                 ripe_point_code: legacy_data['ripe_point_code'] }
+      end
       params
     end
 

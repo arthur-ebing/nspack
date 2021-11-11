@@ -37,5 +37,6 @@ module MesscadaApp
     optional(:rmt_size_id).maybe(:integer)
     optional(:scrapped_rmt_delivery_id).maybe(:integer)
     required(:verified_from_carton_label_id).filled(:integer)
+    optional(:legacy_data).maybe(:hash)
   end
 end
