@@ -749,7 +749,7 @@ class Nspack < Roda
                           line_code
                           status
                           allow_cultivar_group_mixing]
-            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message, grid_id: 'grid_production_runs')
           else
             re_show_form(r, res) { Production::Runs::ProductionRun::Edit.call(id, form_values: params[:production_run], form_errors: res.errors) }
           end
