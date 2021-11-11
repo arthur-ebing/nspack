@@ -12,8 +12,9 @@ module RawMaterialsApp
       ids = 0
       repo.transaction do
         ids = repo.bin_ids_for_location(id)
+        repo.create_location_coldroom_event(res[:status], id, ids)
         log_status(:locations, id, res[:status])
-        log_multiple_statuses(:rmt_bins, ids, res[:status], comment: "in location #{instance.location_long_code}")
+        log_multiple_statuses(:rmt_bins, ids, res[:status], comment: "in location #{instance.location_long_code}") unless ids.empty?
         log_transaction
       end
       instance = location(id)
