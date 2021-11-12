@@ -111,10 +111,8 @@ class Nspack < Roda
         if res.success
           qty_cartons_remaining = res.instance.qty_cartons_to_move - res.instance.cartons_moved.values.flatten.length
           r.redirect("/rmd/buildups/complete_confirmation/#{id}") if qty_cartons_remaining <= 0
-        elsif res.respond_to?(:errors)
-          store_locally(:error, res)
         else
-          store_locally(:error, failed_response(res.message))
+          store_locally(:error, res)
         end
         r.redirect("/rmd/buildups/move_cartons/#{id}")
       end

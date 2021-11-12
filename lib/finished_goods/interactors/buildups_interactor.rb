@@ -63,7 +63,7 @@ module FinishedGoodsApp
       return validation_failed_response(messages: { carton_number: ['field cannot be empty'] }) if params[:carton_number].nil_or_empty?
 
       res = MesscadaApp::ScanCartonLabelOrPallet.call(params[:carton_number])
-      return res unless res.success
+      return validation_failed_message_response(res.message) unless res.success
 
       params[:carton_number] = res.instance.carton_label_id
       carton = ProductionApp::ProductionRunRepo.new.find_carton_by_carton_label_id(params[:carton_number])
