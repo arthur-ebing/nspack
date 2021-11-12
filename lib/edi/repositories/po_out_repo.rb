@@ -142,7 +142,7 @@ module EdiApp
           pallet_bases.edi_out_pallet_base AS pallet_btype,
           pallet_stack_types.stack_type_code AS stack_variance,
           pallets.pallet_number AS sscc,
-          govt_inspection_sheets.consignment_note_number AS waybill_no,
+          COALESCE(govt_inspection_sheets.consignment_note_number, pallets.edi_in_consignment_note_number) AS waybill_no,
           pallet_sequences.sell_by_code AS sellbycode,
           pallets.pallet_number AS combo_sscc,
           pallets.phc AS packh_code,
