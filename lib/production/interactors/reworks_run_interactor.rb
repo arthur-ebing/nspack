@@ -849,6 +849,28 @@ module ProductionApp
       failed_response(e.message)
     end
 
+    def print_reworks_carton_label_for_sequence(sequence_id, params) # rubocop:disable Metrics/AbcSize
+      res = validate_print_params(params)
+      return validation_failed_response(res) if res.failure?
+
+      labels = reworks_run_carton_print_data_for_sequence(sequence_id)
+      label_name = label_template_name(res[:label_template_id])
+
+      repo.transaction do
+        labels.each do |label|
+          LabelPrintingApp::PrintLabel.call(label_name,
+                                            label,
+                                            no_of_prints: 1,
+                                            printer: res[:printer],
+                                            supporting_data: { packed_date: label[:packed_date] })
+        end
+        log_transaction
+      end
+      success_response("#{labels.length} Carton Labels on sequence printed successfully")
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def clone_pallet_sequence(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       res = validate_clone_sequence_params(params)
       return validation_failed_response(res) if res.failure?
@@ -1955,6 +1977,10 @@ module ProductionApp
 
     def reworks_run_carton_print_data(sequence_id)
       repo.reworks_run_pallet_seq_print_data(sequence_id)
+    end
+
+    def reworks_run_carton_print_data_for_sequence(sequence_id)
+      repo.reworks_run_pallet_seq_print_data_for_sequence(sequence_id)
     end
 
     def vw_flat_sequence_data(sequence_id)

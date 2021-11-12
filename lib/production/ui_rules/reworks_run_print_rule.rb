@@ -25,7 +25,7 @@ module UiRules
                    options: @print_repo.select_printers_for_application(rules[:print_app]),
                    required: true,
                    invisible: print_to_robot? },
-        no_of_prints: { renderer: :integer, required: true },
+        no_of_prints: { renderer: :integer, required: true, readonly: @mode == :print_seq_cartons },
         label_template_id: { renderer: :select,
                              options: @template_repo.for_select_label_templates(where: { application: rules[:print_app] }),
                              required: true }

@@ -22,6 +22,12 @@
   :icon: printer
   :title: Print carton label
   :popup: true
+- :url: "/production/reworks/pallet_sequences/$:id$/print_reworks_carton_label_for_sequence"
+  :text: Print all carton labels on sequence
+  :icon: printer
+  :title: Print all carton labels on sequence
+  :hide_if_false: has_individual_cartons
+  :popup: true
 - :url: "/production/reworks/pallet_sequences/$:id$/clone_sequence"
   :text: clone
   :icon: copy

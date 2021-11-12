@@ -357,6 +357,11 @@ module ProductionApp
       DB[qry, id].first
     end
 
+    def reworks_run_pallet_seq_print_data_for_sequence(id)
+      ids = DB[:cartons].where(pallet_sequence_id: id).select_map(:carton_label_id)
+      DB[:vw_carton_label_pseq].where(carton_label_id: ids).all
+    end
+
     def reworks_run_pallet_seq_data(id)
       query = MesscadaApp::DatasetPalletSequence.call('WHERE pallet_sequences.id = ?')
       DB[query, id].first

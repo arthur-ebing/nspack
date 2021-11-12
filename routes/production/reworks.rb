@@ -1243,6 +1243,26 @@ class Nspack < Roda
         end
       end
 
+      r.on 'print_reworks_carton_label_for_sequence' do # Print Carton Label
+        r.get do
+          show_partial { Production::Reworks::ReworksRun::PrintReworksLabelForSequence.call(id, nil, true) }
+        end
+        r.post do
+          res = interactor.print_reworks_carton_label_for_sequence(id, params[:reworks_run_print])
+          if res.success
+            update_grid_row(id, changes: {}, notice: res.message)
+          else
+            re_show_form(r, res) do
+              Production::Reworks::ReworksRun::PrintReworksLabelForSequence.call(id,
+                                                                                 nil,
+                                                                                 true,
+                                                                                 form_values: params[:reworks_run_print],
+                                                                                 form_errors: res.errors)
+            end
+          end
+        end
+      end
+
       r.on 'clone_sequence' do
         r.get do
           pallet_numbers = interactor.pallet_sequence_pallet_number(id)
