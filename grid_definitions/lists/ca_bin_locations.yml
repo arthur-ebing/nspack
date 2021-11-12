@@ -6,6 +6,10 @@
   :icon: edit
   :title: Apply Status
   :popup: true
+- :url: "/list/rmt_bins/with_params?key=in_location&location_id=$:id$"
+  :text: bins in location
+  :popup: true
+  :icon: list
 - :separator: true
 - :url: "/development/statuses/list/locations/$:id$"
   :text: status

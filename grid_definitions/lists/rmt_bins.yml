@@ -74,6 +74,10 @@
     - :col: production_run_rebin_id
       :op: =
       :val: $:id$
+  :in_location:
+    - :col: location_id
+      :op: =
+      :val: $:location_id$
 :multiselect:
   :allocate:
     :url: "/raw_materials/dispatch/bin_load_products/$:id$/allocate_multiselect"
