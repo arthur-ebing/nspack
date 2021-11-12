@@ -30,5 +30,11 @@ class Nspack < Roda
         end
       end
     end
+
+    r.on 'ca_treatments' do
+      r.on 'rmt_bin', Integer do |id|
+        show_partial_or_page(r) { RawMaterials::Locations::RmtBin::ColdstoreEvents.call(id, remote: fetch?(r)) }
+      end
+    end
   end
 end

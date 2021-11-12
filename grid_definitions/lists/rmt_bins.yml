@@ -37,6 +37,11 @@
   :icon: code
   :title: Transactions
   :popup: true
+- :url: "/raw_materials/locations/ca_treatments/rmt_bin/$:id$"
+  :text: coldroom events
+  :icon: view-column
+  :title: Coldroom Events for bin $:asset_number$
+  :popup: true
 :captions:
   :conditions:
     :location_bins: Location Bins

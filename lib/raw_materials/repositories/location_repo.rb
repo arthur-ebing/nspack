@@ -22,5 +22,20 @@ module RawMaterialsApp
       SQL
       DB[upd, id, rmt_bin_ids].update
     end
+
+    def coldroom_events_for_bin(rmt_bin_id)
+      query = <<~SQL
+        SELECT location_coldroom_events.id, location_coldroom_events.event_name, location_coldroom_events.created_at,
+          locations.location_long_code
+        FROM location_coldroom_events
+        JOIN locations ON locations.id = location_coldroom_events.location_id
+        WHERE location_coldroom_events.id IN (SELECT UNNEST(rmt_bins.coldroom_events) FROM rmt_bins WHERE rmt_bins.id = ?)
+        ORDER BY created_at DESC
+      SQL
+      rows = DB[query, rmt_bin_id].all
+      cols = %i[event_name created_at location_long_code]
+      heads = { created_at: 'Start at', location_long_code: 'in Location' }
+      [rows, cols, heads]
+    end
   end
 end
