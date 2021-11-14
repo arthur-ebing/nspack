@@ -353,6 +353,9 @@ class Nspack < Roda
     r.on 'terminus' do
       r.message_bus
       # view(inline: 'Maybe we show all unattended messages for a user here')
+    rescue StandardError
+      # Do not react to  error conditions for MessageBus exceptions
+      blank_json_response
     end
 
     # - :url: "/list/users/multi?key=program_users&id=$:id$/"
