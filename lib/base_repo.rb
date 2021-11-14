@@ -513,6 +513,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # @param user_name [String] the current user's name.
   def log_multiple_statuses(table_name, in_ids, status, comment: nil, user_name: nil) # rubocop:disable Metrics/AbcSize
     ids = Array(in_ids)
+    return if ids.empty?
 
     ids.each do |id|
       DB[Sequel[:audit][:current_statuses]].insert_conflict(target: %i[table_name row_data_id],

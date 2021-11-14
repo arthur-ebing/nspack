@@ -76,21 +76,21 @@ module EdiApp
 
     def prepare_oh
       hash = build_hash_from_data(@header_rec, 'OH')
-      hash[:location_code] = AppConst::FROM_DEPOT
+      hash[:location_code] = AppConst::CR_EDI.install_depot
       add_record('OH', hash)
       @oh_count += 1
     end
 
     def prepare_lf
       hash = build_hash_from_data(@header_rec, 'LF')
-      hash[:locn_code] = AppConst::FROM_DEPOT
+      hash[:locn_code] = AppConst::CR_EDI.install_depot
       add_record('LF', hash)
       @ol_count += 1
     end
 
     def prepare_lt
       hash = build_hash_from_data(@header_rec, 'LT')
-      if AppConst::FROM_DEPOT && @header_rec[:next_code] == AppConst::FROM_DEPOT
+      if AppConst::CR_EDI.install_depot && @header_rec[:next_code] == AppConst::CR_EDI.install_depot
         hash[:locn_type] = 'CU'
         hash[:locn_code] = @header_rec[:customer]
       end
@@ -103,7 +103,7 @@ module EdiApp
       hash[:ctn_qty] = @current_row[:tot_ctn_qty]
       hash[:plt_qty] = @current_row[:tot_plt_qty]
       hash[:ship_line] = (@current_row[:ship_line] || '')[0, 1] # Just the 1st char
-      hash[:sender] = AppConst::FROM_DEPOT
+      hash[:sender] = AppConst::CR_EDI.install_depot
       add_record('OK', hash)
       @ok_count += 1
     end
@@ -112,8 +112,8 @@ module EdiApp
       hash = build_hash_from_data(@current_row, 'OC')
       hash[:ctn_qty] = @current_row[:tot_ctn_qty]
       hash[:plt_qty] = @current_row[:tot_plt_qty]
-      hash[:locn_code] = AppConst::FROM_DEPOT
-      hash[:cons_type] = if AppConst::FROM_DEPOT && @header_rec[:next_code] == AppConst::FROM_DEPOT
+      hash[:locn_code] = AppConst::CR_EDI.install_depot
+      hash[:cons_type] = if AppConst::CR_EDI.install_depot && @header_rec[:next_code] == AppConst::CR_EDI.install_depot
                            'RL' # 'DP' was the default, but Kromco/TruCape says RL. Remove this comment after 2022 if no other clients have a problem
                          else
                            'OT'
@@ -124,9 +124,9 @@ module EdiApp
 
     def prepare_op(row)
       hash = build_hash_from_data(row, 'OP')
-      hash[:locn_code] = AppConst::FROM_DEPOT
-      hash[:sender] = AppConst::FROM_DEPOT
-      hash[:orig_depot] = AppConst::FROM_DEPOT
+      hash[:locn_code] = AppConst::CR_EDI.install_depot
+      hash[:sender] = AppConst::CR_EDI.install_depot
+      hash[:orig_depot] = AppConst::CR_EDI.install_depot
 
       add_record('OP', hash)
       @total_carton_count += row[:ctn_qty]

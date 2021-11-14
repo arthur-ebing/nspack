@@ -6,6 +6,7 @@ module Crossbeams
 
     CLIENT_SETTINGS = {
       hb: { install_location: 'HABATA',
+            install_depot: 'HB',
             load_id_prefix: '',
             default_edi_in_inv_code: 'UL',
             li_default_pallet_base: 'S',
@@ -18,6 +19,7 @@ module Crossbeams
             edi_out_account: nil,
             ps_apply_substitutes: false },
       hl: { install_location: 'HABATA',
+            install_depot: 'HB',
             load_id_prefix: '',
             default_edi_in_inv_code: 'UL',
             li_default_pallet_base: 'S',
@@ -30,6 +32,7 @@ module Crossbeams
             edi_out_account: nil,
             ps_apply_substitutes: false },
       kr: { install_location: 'KROMCO',
+            install_depot: 'KROMCO',
             load_id_prefix: '',
             default_edi_in_inv_code: 'UL',
             li_default_pallet_base: 'BLU',
@@ -43,6 +46,7 @@ module Crossbeams
             edi_out_account: '8385',
             ps_apply_substitutes: false },
       um: { install_location: 'MATCOLD',
+            install_depot: '',
             load_id_prefix: '',
             default_edi_in_inv_code: 'UL',
             li_default_pallet_base: 'S',
@@ -55,6 +59,7 @@ module Crossbeams
             edi_out_account: nil,
             ps_apply_substitutes: false },
       ud: { install_location: 'UNIFRUT',
+            install_depot: 'UD',
             load_id_prefix: '',
             default_edi_in_inv_code: 'UL',
             li_default_pallet_base: 'S',
@@ -67,6 +72,7 @@ module Crossbeams
             edi_out_account: nil,
             ps_apply_substitutes: false },
       sr: { install_location: 'SRKIRKW',
+            install_depot: 'SR',
             load_id_prefix: '',
             default_edi_in_inv_code: 'UL',
             li_default_pallet_base: 'S',
@@ -79,6 +85,7 @@ module Crossbeams
             edi_out_account: nil,
             ps_apply_substitutes: false },
       sr2: { install_location: 'SRADDO',
+             install_depot: 'SR',
              load_id_prefix: 'A',
              default_edi_in_inv_code: 'UL',
              li_default_pallet_base: 'S',
@@ -135,11 +142,20 @@ module Crossbeams
       acc ? "'#{acc}'" : 'NULL'
     end
 
+    def install_depot(explain: false)
+      return "This installation's depot code. Used in PO output EDI flows." if explain
+
+      setting(:install_depot)
+    end
+
     private
 
     def validate_settings
       loc = setting(:install_location)
       raise "Install location #{loc} cannot be more than 7 characters in length" if loc.length > 7
+
+      depot = setting(:install_depot)
+      raise "Install depot #{depot} cannot be more than 7 characters in length" if depot.length > 7
     end
   end
 end

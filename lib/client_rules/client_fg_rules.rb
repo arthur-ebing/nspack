@@ -11,6 +11,7 @@ module Crossbeams
       hb: { place_of_issue_for_addendum: 'PLZ',
             vgm_required: false,
             reporting_industry: { default: 'citrus', can_override: true },
+            default_depot_for_loads: nil,
             integrate_extended_fg: false,
             max_rmt_bins_on_load: 80,
             max_pallets_on_load: 96,
@@ -25,6 +26,7 @@ module Crossbeams
       hl: { place_of_issue_for_addendum: 'PLZ',
             vgm_required: false,
             reporting_industry: { default: 'melons', can_override: false },
+            default_depot_for_loads: nil,
             integrate_extended_fg: false,
             max_rmt_bins_on_load: 50,
             max_pallets_on_load: 120,
@@ -39,6 +41,7 @@ module Crossbeams
       kr: { place_of_issue_for_addendum: 'CPT',
             vgm_required: true,
             reporting_industry: { default: 'apples', can_override: false },
+            default_depot_for_loads: nil,
             integrate_extended_fg: true,
             max_rmt_bins_on_load: 50,
             max_pallets_on_load: 50,
@@ -54,6 +57,7 @@ module Crossbeams
       um: { place_of_issue_for_addendum: nil,
             vgm_required: true,
             reporting_industry: { default: nil, can_override: false },
+            default_depot_for_loads: nil,
             integrate_extended_fg: false,
             max_rmt_bins_on_load: 78,
             max_pallets_on_load: 40,
@@ -68,6 +72,7 @@ module Crossbeams
       ud: { place_of_issue_for_addendum: 'PLZ',
             vgm_required: true,
             reporting_industry: { default: 'citrus', can_override: false },
+            default_depot_for_loads: nil,
             integrate_extended_fg: false,
             max_rmt_bins_on_load: 50,
             max_pallets_on_load: 50,
@@ -82,6 +87,7 @@ module Crossbeams
       sr: { place_of_issue_for_addendum: 'PLZ',
             vgm_required: true,
             reporting_industry: { default: 'citrus', can_override: false },
+            default_depot_for_loads: 'PECSCGA',
             integrate_extended_fg: false,
             max_rmt_bins_on_load: 80,
             max_pallets_on_load: 80,
@@ -96,6 +102,7 @@ module Crossbeams
       sr2: { place_of_issue_for_addendum: 'PLZ',
              vgm_required: true,
              reporting_industry: { default: 'citrus', can_override: false },
+             default_depot_for_loads: 'SRW',
              integrate_extended_fg: false,
              max_rmt_bins_on_load: 80,
              max_pallets_on_load: 80,
@@ -111,7 +118,6 @@ module Crossbeams
     # ALLOW_EXPORT_PALLETS_TO_BYPASS_INSPECTION
     # CALCULATE_PALLET_DECK_POSITIONS
     # DEFAULT_CARGO_TEMP_ON_ARRIVAL
-    # DEFAULT_DEPOT
     # DEFAULT_EXPORTER
     # DEFAULT_FIRST_INTAKE_LOCATION
     # DEFAULT_INSPECTION_BILLING
@@ -225,6 +231,12 @@ module Crossbeams
       return 'Regular expression rules for capturing and identifying values from scanned input.' if explain
 
       AppConst::BARCODE_SCAN_RULES + setting(:extra_barcode_scan_rules)
+    end
+
+    def default_depot_for_loads(explain: false)
+      return 'The destination depot for most dispatch loads. Used to speed up the creation of new loads if most loads go to the same destination.' if explain
+
+      setting(:default_depot_for_loads)
     end
   end
 end

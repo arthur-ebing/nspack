@@ -333,7 +333,7 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(depot_id: @repo.get_id(:depots, depot_code: AppConst::DEFAULT_DEPOT),
+      @form_object = OpenStruct.new(depot_id: @repo.get_id(:depots, depot_code: AppConst::CR_FG.default_depot_for_loads),
                                     rmt_load: false,
                                     truck_must_be_weighed: false,
                                     customer_party_role_id: nil,

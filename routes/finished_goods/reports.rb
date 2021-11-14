@@ -99,7 +99,7 @@ class Nspack < Roda
       jasper_params = JasperParams.new('accompanying_phyto',
                                        current_user.login_name,
                                        load_id: id,
-                                       from_depot: AppConst::FROM_DEPOT)
+                                       from_depot: AppConst::CR_EDI.install_depot)
       jasper_params.parent_folder = AppConst::CR_FG.reporting_industry
       res = CreateJasperReport.call(jasper_params)
 
