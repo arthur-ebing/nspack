@@ -103,7 +103,7 @@ module EdiApp
       hash[:ctn_qty] = @current_row[:tot_ctn_qty]
       hash[:plt_qty] = @current_row[:tot_plt_qty]
       hash[:ship_line] = (@current_row[:ship_line] || '')[0, 1] # Just the 1st char
-      hash[:sender] = AppConst::CR_EDI.install_depot
+      hash[:sender] = AppConst::CR_EDI.sender
       add_record('OK', hash)
       @ok_count += 1
     end
@@ -125,7 +125,7 @@ module EdiApp
     def prepare_op(row)
       hash = build_hash_from_data(row, 'OP')
       hash[:locn_code] = AppConst::CR_EDI.install_depot
-      hash[:sender] = AppConst::CR_EDI.install_depot
+      hash[:sender] = AppConst::CR_EDI.sender
       hash[:orig_depot] = AppConst::CR_EDI.install_depot
 
       add_record('OP', hash)

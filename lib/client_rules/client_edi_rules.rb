@@ -7,6 +7,7 @@ module Crossbeams
     CLIENT_SETTINGS = {
       hb: { install_location: 'HABATA',
             install_depot: 'HB',
+            sender: 'HB',
             load_id_prefix: '',
             default_edi_in_inv_code: 'UL',
             li_default_pallet_base: 'S',
@@ -20,6 +21,7 @@ module Crossbeams
             ps_apply_substitutes: false },
       hl: { install_location: 'HABATA',
             install_depot: 'HB',
+            sender: 'HB',
             load_id_prefix: '',
             default_edi_in_inv_code: 'UL',
             li_default_pallet_base: 'S',
@@ -33,6 +35,7 @@ module Crossbeams
             ps_apply_substitutes: false },
       kr: { install_location: 'KROMCO',
             install_depot: 'KROMCO',
+            sender: 'KR',
             load_id_prefix: '',
             default_edi_in_inv_code: 'UL',
             li_default_pallet_base: 'BLU',
@@ -47,6 +50,7 @@ module Crossbeams
             ps_apply_substitutes: false },
       um: { install_location: 'MATCOLD',
             install_depot: '',
+            sender: 'UM',
             load_id_prefix: '',
             default_edi_in_inv_code: 'UL',
             li_default_pallet_base: 'S',
@@ -60,6 +64,7 @@ module Crossbeams
             ps_apply_substitutes: false },
       ud: { install_location: 'UNIFRUT',
             install_depot: 'UD',
+            sender: 'UD',
             load_id_prefix: '',
             default_edi_in_inv_code: 'UL',
             li_default_pallet_base: 'S',
@@ -73,6 +78,7 @@ module Crossbeams
             ps_apply_substitutes: false },
       sr: { install_location: 'SRKIRKW',
             install_depot: 'SR',
+            sender: 'SR',
             load_id_prefix: '',
             default_edi_in_inv_code: 'UL',
             li_default_pallet_base: 'S',
@@ -86,6 +92,7 @@ module Crossbeams
             ps_apply_substitutes: false },
       sr2: { install_location: 'SRADDO',
              install_depot: 'SR',
+             sender: 'SR',
              load_id_prefix: 'A',
              default_edi_in_inv_code: 'UL',
              li_default_pallet_base: 'S',
@@ -148,6 +155,12 @@ module Crossbeams
       setting(:install_depot)
     end
 
+    def sender(explain: false)
+      return "This installation's sender code. Used in PO output EDI flows." if explain
+
+      setting(:sender)
+    end
+
     private
 
     def validate_settings
@@ -156,6 +169,9 @@ module Crossbeams
 
       depot = setting(:install_depot)
       raise "Install depot #{depot} cannot be more than 7 characters in length" if depot.length > 7
+
+      sender = setting(:sender)
+      raise "Sender #{sender} cannot be more than 2 characters in length" if sender.length > 2
     end
   end
 end
