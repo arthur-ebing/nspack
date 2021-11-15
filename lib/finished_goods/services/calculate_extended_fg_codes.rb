@@ -10,6 +10,7 @@ module FinishedGoodsApp
     end
 
     def call
+      @pallet_ids = repo.select_values(:pallets, :id, id: pallet_ids, depot_pallet: false) # Make sure to exclude depot pallets
       packing_specification_item_ids = repo.select_values(:pallet_sequences,
                                                           :packing_specification_item_id,
                                                           { pallet_id: pallet_ids }).uniq
@@ -44,7 +45,6 @@ module FinishedGoodsApp
         update_pallet_sequence(id, args)
       end
     end
-
 
     def update_pallet_sequence(id, attrs)
       legacy_data = UtilityFunctions.symbolize_keys(repo.get(:pallet_sequences, id, :legacy_data).to_h)

@@ -553,8 +553,10 @@ module ProductionApp
           pallet_sequences
           JOIN cultivar_groups ON cultivar_groups.id = pallet_sequences.cultivar_group_id
           LEFT JOIN party_roles ON party_roles.id = pallet_sequences.marketing_org_party_role_id
+          JOIN pallets ON pallets.id = pallet_sequences.pallet_id
         WHERE
           pallet_id IN ?
+          AND NOT pallets.depot_pallet
         GROUP BY
           cultivar_groups.commodity_id,
           marketing_variety_id,
