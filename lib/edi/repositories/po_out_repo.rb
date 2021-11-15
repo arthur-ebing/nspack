@@ -157,7 +157,8 @@ module EdiApp
           pallets.gross_weight_measured_at AS weighing_time,
           pallet_sequences.nett_weight AS mass,
           pallets.temp_tail AS temp_device_id,
-          pallet_sequences.phyto_data
+          pallet_sequences.phyto_data,
+          production_regions.inspection_region AS production_area
 
         FROM loads
         JOIN pallets ON pallets.load_id = loads.id AND NOT scrapped
@@ -201,6 +202,8 @@ module EdiApp
         JOIN pucs ON pucs.id = pallet_sequences.puc_id
         JOIN orchards ON orchards.id = pallet_sequences.orchard_id
         LEFT JOIN plant_resources ph_resource ON ph_resource.id = pallet_sequences.packhouse_resource_id
+        JOIN farms ON farms.id = pallet_sequences.farm_id
+        JOIN production_regions ON production_regions.id = farms.pdn_region_id
         WHERE loads.id = ?
         ORDER BY pallet_sequences.pallet_number, pallet_sequences.pallet_sequence_number
       SQL
