@@ -31,20 +31,25 @@ class Nspack < Roda
       res = MesscadaApp::AddSystemResourceIncentiveToParams.call(params, get_group_incentive: false)
       res = interactor.login_with_identifier(res.instance) if res.success
 
-      feedback = if res.success
-                   MesscadaApp::RobotFeedback.new(device: params[:device],
-                                                  status: true,
-                                                  line1: res.instance[:contract_worker],
-                                                  line3: 'Logged on',
-                                                  line4: res.message)
-                 else
-                   MesscadaApp::RobotFeedback.new(device: params[:device],
-                                                  status: false,
-                                                  line1: 'Cannot login',
-                                                  line4: res.message)
-                 end
-      AppConst.log_authentication("nspi logon result: #{Crossbeams::RobotResponder.new(feedback)}")
-      Crossbeams::RobotResponder.new(feedback).render
+      if fetch?(r)
+        { success: res.success,
+          message: res.success ? "#{res.instance[:contract_worker]} logged on" : res.message }.to_json
+      else
+        feedback = if res.success
+                     MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                    status: true,
+                                                    line1: res.instance[:contract_worker],
+                                                    line3: 'Logged on',
+                                                    line4: res.message)
+                   else
+                     MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                    status: false,
+                                                    line1: 'Cannot login',
+                                                    line4: res.message)
+                   end
+        AppConst.log_authentication("nspi logon result: #{Crossbeams::RobotResponder.new(feedback)}")
+        Crossbeams::RobotResponder.new(feedback).render
+      end
     end
 
     r.on 'logoff' do
@@ -52,19 +57,24 @@ class Nspack < Roda
       res = MesscadaApp::AddSystemResourceIncentiveToParams.call(params, get_group_incentive: false)
       res = interactor.logout(res.instance) if res.success
 
-      feedback = if res.success
-                   MesscadaApp::RobotFeedback.new(device: params[:device],
-                                                  status: true,
-                                                  line1: res.instance[:contract_worker],
-                                                  line4: 'Logged off')
-                 else
-                   MesscadaApp::RobotFeedback.new(device: params[:device],
-                                                  status: false,
-                                                  line1: 'Cannot logout',
-                                                  line4: res.message)
-                 end
-      AppConst.log_authentication("nspi logoff result: #{Crossbeams::RobotResponder.new(feedback)}")
-      Crossbeams::RobotResponder.new(feedback).render
+      if fetch?(r)
+        { success: res.success,
+          message: res.success ? "#{res.instance[:contract_worker]} logged off" : res.message }.to_json
+      else
+        feedback = if res.success
+                     MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                    status: true,
+                                                    line1: res.instance[:contract_worker],
+                                                    line4: 'Logged off')
+                   else
+                     MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                    status: false,
+                                                    line1: 'Cannot logout',
+                                                    line4: res.message)
+                   end
+        AppConst.log_authentication("nspi logoff result: #{Crossbeams::RobotResponder.new(feedback)}")
+        Crossbeams::RobotResponder.new(feedback).render
+      end
     end
 
     r.on 'logon_with_no' do
@@ -72,21 +82,26 @@ class Nspack < Roda
       res = MesscadaApp::AddSystemResourceIncentiveToParams.call(params.merge(identifier_is_person: true), get_group_incentive: false)
       res = interactor.login_with_no(res.instance) if res.success
 
-      feedback = if res.success
-                   MesscadaApp::RobotFeedback.new(device: params[:device],
-                                                  status: true,
-                                                  line1: res.instance[:contract_worker],
-                                                  line4: 'Logged on')
-                 else
-                   MesscadaApp::RobotFeedback.new(device: params[:device],
-                                                  status: false,
-                                                  line1: 'Cannot login',
-                                                  line4: res.message)
-                 end
-      resp = Crossbeams::RobotResponder.new(feedback)
-      resp.extra_elements = { identifier: res.instance[:identifier] } if res.success && res.instance[:identifier]
-      AppConst.log_authentication("nspi logon with no result: #{resp}")
-      resp.render
+      if fetch?(r)
+        { success: res.success,
+          message: res.success ? "#{res.instance[:contract_worker]} logged on" : res.message }.to_json
+      else
+        feedback = if res.success
+                     MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                    status: true,
+                                                    line1: res.instance[:contract_worker],
+                                                    line4: 'Logged on')
+                   else
+                     MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                    status: false,
+                                                    line1: 'Cannot login',
+                                                    line4: res.message)
+                   end
+        resp = Crossbeams::RobotResponder.new(feedback)
+        resp.extra_elements = { identifier: res.instance[:identifier] } if res.success && res.instance[:identifier]
+        AppConst.log_authentication("nspi logon with no result: #{resp}")
+        resp.render
+      end
     end
 
     r.on 'logoff_with_no' do
@@ -94,19 +109,24 @@ class Nspack < Roda
       res = MesscadaApp::AddSystemResourceIncentiveToParams.call(params.merge(identifier_is_person: true), get_group_incentive: false)
       res = interactor.logout_with_no(res.instance) if res.success
 
-      feedback = if res.success
-                   MesscadaApp::RobotFeedback.new(device: params[:device],
-                                                  status: true,
-                                                  line1: res.instance[:contract_worker],
-                                                  line4: 'Logged off')
-                 else
-                   MesscadaApp::RobotFeedback.new(device: params[:device],
-                                                  status: false,
-                                                  line1: 'Cannot logout',
-                                                  line4: res.message)
-                 end
-      AppConst.log_authentication("nspi logoff with no result: #{Crossbeams::RobotResponder.new(feedback)}")
-      Crossbeams::RobotResponder.new(feedback).render
+      if fetch?(r)
+        { success: res.success,
+          message: res.success ? "#{res.instance[:contract_worker]} logged off" : res.message }.to_json
+      else
+        feedback = if res.success
+                     MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                    status: true,
+                                                    line1: res.instance[:contract_worker],
+                                                    line4: 'Logged off')
+                   else
+                     MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                    status: false,
+                                                    line1: 'Cannot logout',
+                                                    line4: res.message)
+                   end
+        AppConst.log_authentication("nspi logoff with no result: #{Crossbeams::RobotResponder.new(feedback)}")
+        Crossbeams::RobotResponder.new(feedback).render
+      end
     end
 
     r.on 'modules', Integer do |id|

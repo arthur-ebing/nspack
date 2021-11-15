@@ -2,7 +2,7 @@
 
 module MesscadaApp
   module Job
-    class NotifyProductionRunResourceStates < BaseQueJob
+    class NotifyProductionRunResourceStates < BaseQueJob # rubocop:disable Metrics/ClassLength
       attr_reader :production_run_id, :xml, :repo
 
       def run(production_run_id, user_name)
@@ -40,8 +40,23 @@ module MesscadaApp
       end
 
       def send_notification_for_resource_states
+        # send_to_browser_robots
         build_xml
         send_xml
+      end
+
+      def send_to_browser_robots
+        modules_for_lbl = clm_modules # do for browser robots only...
+        modules_for_lbl.each do |mod, buttons|
+          btns = []
+          buttons.each do |rec|
+            btns << { button: rec[:button],
+                      button_id: rec[:id],
+                      enabled: !rec[:product_setup_id].nil? && !rec[:label_template_id].nil?,
+                      caption: build_caption(rec) }
+          end
+          send_bus_message_to_device(mod.first, btns)
+        end
       end
 
       def build_caption(rec)

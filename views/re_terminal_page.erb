@@ -1,0 +1,68 @@
+<% if @robot_page.success %>
+  <div class="robotBase flex vh-100">
+    <div style="display:none" class="robotLeft pa1 w-20 br b--mid-gray"><h2 class="pl2 mid-gray"><%= @robot_page.instance[:name] %> (<%= @robot_page.instance[:device] %>)</h2>
+      <div class="robotLoginWidget pa2 mb2 bt bb b--mid-gray">
+        <div id="robotLoginWidget" class="flex flex-wrap">
+        </div>
+        <div id="logoutSection">
+          <label class="switch">
+            <input type="checkbox" class="pa2 toggleCheck" id="toggleLogout" value="t"><span class="slider round"></span>
+          </label>
+        <span class="mid-gray v-btm">Logout mode</span>
+      </div>
+      </div>
+      <div class="pa2 f3 mb2 bb h-10 tc">
+        Scale: <div id="scaleWeight" data-scale-reading="empty" class="dib ba b b--mid-gray mid-gray w-two-thirds tr pa2">.</div>
+      </div>
+      <div id="robotStatsWidget" class="robotStatsWidget pa2 h-25 flex-auto">
+        Stats widget
+      </div>
+    </div>
+    <div class="robotRight flex-auto pa1">
+      <div class="flex">
+      <div class="pa1 w-75 ba mb2 b--gray h-20">
+        <ul id="robotActivityLog" class="h4 f3 list pl0 overflow-y-scroll">
+          <li>Loaded...</li>
+        </ul>
+      </div>
+      <div class="pa1 w-25 ba mb2 b--purple h-20">
+        <div id="txtShow" class="h4 f3 navy bg-light-blue pa2 overflow-y-scroll"></div>
+      </div>
+      </div>
+      <!-- Only include the following if cartons must be weighed... -->
+      <!--
+        Adjust dimensions based on no of buttons. (2 :: h-90, w-40) (4 :: h-40, w-40) (6 :: h-30, w-40) (1 :: h-90, w-90)
+        Also change the relative text size...
+      -->
+      <div id="robotButtons" class="pa2 mb2 flex flex-wrap h-50">
+        <% button_colours = %w[#f2b736 #c5523f #499255 #1875e5 #E7040F #FF4136 #5E2CA5 #D5008F #001B44 #137752 #19A974] %>
+        <% @robot_page.instance[:buttons].each_with_index do |btn, index| %>
+          <% btn_class = btn[:enabled] ? 'br3 pa3 dim f1 tl ml5 mt2 mb2 w-40 h-40 near-black' : 'br3 pa3 f1 tl ml5 mt2 mb2 w-40 h-40' %>
+          <% btn_style = btn[:enabled] ? "style=\"background-color:#{button_colours[index]}\"" : '' %>
+          <% btn_enabled = btn[:enabled] ? 'data-enabled="true"' : 'data-enabled="false" disabled="true"' %>
+          <button id="button_<%= btn[:plant_resource_id] %>" data-button-index="<%= index %>" data-back-colour="<%= button_colours[index] %>" data-button-action-url="<%= btn[:url] %>" class="<%= btn_class%>" <%= btn_style %> <%= btn_enabled %>><span id="button_<%= btn[:plant_resource_id] %>_caption"><%= btn[:button_caption] %></span></button>
+        <% end %>
+      </div>
+      <!--
+      <div class="pa1 mb2 bt b--gray h-20">
+        <ul id="robotActivityLog" class="h4 list pl0 overflow-y-scroll">
+          <li>Loaded...</li>
+        </ul>
+      </div>
+      -->
+      <!--
+      <div class="pa2 bt b--purple h4">
+        <div id="txtShow" class="navy bg-light-blue h-100 pa2 overflow-y-scroll"></div>
+      </div>
+      -->
+      <div class="ba">
+        <button id="loginButton" class="br3 pa3 dim f2 tl ml5 mt2 mb2 near-black bg-silver">Login</button>
+        <div id="loginDisplay" class="dib"></div>
+        <button id="sysInfoButton" class="br3 pa3 dim f2 tl ml5 mt2 mb2 near-black bg-silver">Sys Info</button>
+      </div>
+    </div>
+  </div>
+<% else %>
+  <h2>Unable to initialise robot: <%= @robot_page.message %></h2>
+<% end %>
+

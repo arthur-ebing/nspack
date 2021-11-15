@@ -137,7 +137,7 @@ module MesscadaApp
     end
 
     def logout(params) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
-      return failed_response("Login not set: #{params[:device]}") unless params[:system_resource][:login] && params[:system_resource][:logoff]
+      return failed_response("Logoff not set: #{params[:device]}") unless params[:system_resource][:login] && params[:system_resource][:logoff]
 
       name = repo.contract_worker_name(params[:identifier])
       return failed_response("#{params[:identifier]} not assigned") if name.nil_or_empty?

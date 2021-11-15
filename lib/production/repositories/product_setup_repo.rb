@@ -285,6 +285,22 @@ module ProductionApp
       find_gtin_code(gtin_id)
     end
 
+    def check_weights_for_product_setup(product_setup_id)
+      query = <<~SQL
+        SELECT standard_product_weights.min_gross_weight, standard_product_weights.max_gross_weight,
+        standard_pack_codes.standard_pack_code AS pack_code, commodities.code AS commodity_code
+        FROM product_setups
+        JOIN product_setup_templates ON product_setup_templates.id = product_setups.product_setup_template_id
+        JOIN cultivar_groups ON cultivar_groups.id = product_setup_templates.cultivar_group_id
+        JOIN commodities ON commodities.id = cultivar_groups.commodity_id
+        JOIN standard_pack_codes ON standard_pack_codes.id = product_setups.standard_pack_code_id
+        LEFT JOIN standard_product_weights ON standard_product_weights.commodity_id = cultivar_groups.commodity_id
+          AND standard_product_weights.standard_pack_id = product_setups.standard_pack_code_id
+        WHERE product_setups.id = ?
+      SQL
+      DB[query, product_setup_id].first
+    end
+
     def resolve_gtin_attrs(attrs)
       std_fruit_size_count_id = attrs[:std_fruit_size_count_id].nil_or_empty? ? find_setup_std_fruit_size_count_id(attrs[:fruit_size_reference_id], attrs[:fruit_actual_counts_for_pack_id]) : attrs[:std_fruit_size_count_id]
       commodity_id = attrs[:commodity_id].nil_or_empty? ? find_size_count_commodity(std_fruit_size_count_id) : attrs[:commodity_id]

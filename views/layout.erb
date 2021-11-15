@@ -169,6 +169,9 @@
       // @message_bus_client_id
       MessageBus.subscribe("/terminus", function(msg){
         console.log('MSG', msg);
+        if (msg.targetDevice) {
+          return;
+        }
         if (msg.actions) {
           msg.actions.forEach((action) => {
             if (action.toggle_classes) {

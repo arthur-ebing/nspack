@@ -330,6 +330,23 @@ module ProductionApp
       DB[:plant_resources_system_resources].where(plant_resource_id: plant_resource_id).select_map(:system_resource_id)
     end
 
+    # Given a device name (system resource code), return a list
+    # of printer codes linked to it.
+    def linked_printer_for_device(system_resource_code)
+      plant_resource_id = plant_resource_id_for_system_code(system_resource_code)
+      system_resource_ids = existing_system_resource_ids_for_plant_resource(plant_resource_id)
+
+      query = <<~SQL
+        SELECT s.id, s.system_resource_code
+        FROM plant_resources p
+        JOIN system_resources s ON s.id = p.system_resource_id
+        JOIN plant_resource_types t ON t.id = p.plant_resource_type_id
+        WHERE p.system_resource_id IN ?
+          AND t.plant_resource_type_code = 'PRINTER'
+      SQL
+      DB[query, system_resource_ids].all
+    end
+
     # Given a system resource, find its parent of a particular plant type.
     def plant_resource_parent_of_system_resource(plant_resource_type, system_resource_code)
       query = <<~SQL
@@ -546,6 +563,14 @@ module ProductionApp
       SystemResourceIncentiveSettings.new(hash.merge(packpoint: packpoint, cache_key: cache_key, card_reader: card_reader || '1'))
     end
 
+    def active_group_incentive_id_for(system_resource_id)
+      DB[:group_incentives].where(system_resource_id: system_resource_id, active: true).get(:id)
+    end
+
+    def active_individual_incentive_id_for(system_resource_id)
+      DB[:system_resource_logins].where(system_resource_id: system_resource_id, active: true).get(:id)
+    end
+
     def packpoint_for_button(system_resource_code)
       system_resource_id = get_id(:system_resources, system_resource_code: system_resource_code)
       return nil if system_resource_id.nil?
@@ -595,6 +620,10 @@ module ProductionApp
     def remove_rmd_mode(plant_resource_id)
       sysres_id = DB[:plant_resources].where(id: plant_resource_id).get(:system_resource_id)
       DB[:registered_mobile_devices].where(act_as_system_resource_id: sysres_id).update(act_as_system_resource_id: nil, act_as_reader_id: nil)
+    end
+
+    def device_code_from_ip_address(ip_address)
+      DB[:system_resources].where(ip_address: ip_address).get(:system_resource_code)
     end
 
     def device_handled_by_rmd?(device)

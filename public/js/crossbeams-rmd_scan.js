@@ -12,7 +12,7 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
   const stdMsg = 'You are currently offline. Please check network settings and re-connect.';
   const subMsg = 'Attempting to process transation - waiting for connection. Please re-connect.';
   const menu = document.getElementById('rmd_menu');
-  const logout = document.getElementById('logout');
+  const logout = document.getElementById('logout') || document.createElement('div');
   const offlineStatus = document.getElementById('rmd-offline-status');
   const scannableInputs = document.querySelectorAll('[data-scanner]');
   const cameraScan = document.getElementById('cameraScan');
@@ -247,6 +247,23 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
     }
   };
 
+  const unpackLoginValue = (rawVal) => {
+    const val = rawVal.split(/\r\n|\r|\n/)[0]; // remove newlines
+    const res = { success: false };
+    res.success = true;
+    res.identifier = val;
+    res.readerId = '1';
+    return res;
+  };
+
+  const unpackScaleValue = (rawVal) => {
+    const val = rawVal.split(/\r\n|\r|\n/)[0]; // remove newlines
+    const res = { success: false };
+    res.success = true;
+    res.weight = val;
+    return res;
+  };
+
   /**
    * Apply scan rules to the scanned value
    * to dig out the actual value and type.
@@ -318,6 +335,30 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
     };
 
     webSocket.onmessage = function onmessage(event) {
+      if (event.data.includes('[LOGIN]')) {
+        const loginPack = unpackLoginValue(event.data.split(',')[0].replace('[LOGIN]', ''));
+        if (!loginPack.success) {
+          publicAPIs.logit(loginPack.error);
+          return;
+        }
+        if (publicAPIs.loginFunc) {
+          publicAPIs.loginFunc(loginPack.readerId, loginPack.identifier);
+        } else {
+          publicAPIs.logit('Login not enabled.');
+        }
+      }
+      if (event.data.includes('[SCALE]')) {
+        const scalePack = unpackScaleValue(event.data.split(',')[0].replace('[SCALE]', ''));
+        if (!scalePack.success) {
+          publicAPIs.logit(scalePack.error);
+          return;
+        }
+        if (publicAPIs.weightFunc) {
+          publicAPIs.weightFunc(scalePack.weight);
+        } else {
+          publicAPIs.logit('Scale weighing not enabled.');
+        }
+      }
       if (event.data.includes('[SCAN]')) {
         if (publicAPIs.debug) {
           publicAPIs.logit(`RAW SCAN GOT: ${event.data}`);
@@ -373,7 +414,8 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
   publicAPIs.logit = (...args) => {
     console.info(...args); // eslint-disable-line no-console
     if (txtShow !== null) {
-      txtShow.insertAdjacentHTML('beforeend', `${Array.from(args).map(a => (typeof (a) === 'string' ? a : JSON.stringify(a))).join(' ')}<br>`);
+      // txtShow.insertAdjacentHTML('beforeend', `${Array.from(args).map(a => (typeof (a) === 'string' ? a : JSON.stringify(a))).join(' ')}<br>`);
+      txtShow.insertAdjacentHTML('afterbegin', `${Array.from(args).map(a => (typeof (a) === 'string' ? a : JSON.stringify(a))).join(' ')}<br>`);
     }
   };
 
@@ -396,10 +438,12 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
    * @param {object} rules - the rules for identifying scan values.
    * @param {boolean} bypassRules - should the rules be ignored (scan any barcode).
    */
-  publicAPIs.init = (rules, bypassRules, debug) => {
+  publicAPIs.init = (rules, bypassRules, debug, loginFunc, weightFunc) => {
     publicAPIs.rules = rules;
     publicAPIs.bypassRules = bypassRules;
     publicAPIs.debug = debug;
+    publicAPIs.loginFunc = loginFunc;
+    publicAPIs.weightFunc = weightFunc;
     publicAPIs.expectedScanTypes = Array.from(document.querySelectorAll('[data-scan-rule]')).map(a => a.dataset.scanRule);
     publicAPIs.expectedScanTypes = publicAPIs.expectedScanTypes.filter((it, i, ar) => ar.indexOf(it) === i);
 

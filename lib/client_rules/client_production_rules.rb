@@ -59,6 +59,7 @@ module Crossbeams
             print_from_line_scanning: true,
             incentive_palletizing: false,
             clm_button_caption_format: nil,
+            # clm_button_caption_format: '$:size_ref_or_count$ $:product_chars$ $:target_market_group_name$',
             provide_pack_type_at_verification: false,
             group_incentive_packer_roles: true,
             integrate_with_external_rmt_system: true,
@@ -273,7 +274,7 @@ module Crossbeams
       # * size_ref_or_count
       # * standard_pack_code
       # * target_market_group_name
-      setting(:clm_button_caption_format)
+      setting(:clm_button_caption_format) || ''
     end
 
     def provide_pack_type_at_carton_verification?(explain: false)
