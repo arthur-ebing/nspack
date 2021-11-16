@@ -282,4 +282,11 @@ module ProductionApp # rubocop:disable Metrics/ModuleLength
     required(:pallets_selected).filled(:array).each(:string)
     required(:context).filled(Types::StrippedString)
   end
+
+  ReprintPalletCartonLabelsSchema = Dry::Schema.Params do
+    required(:pallet_number).maybe(Types::StrippedString)
+    required(:pallet_id).filled(:integer)
+    required(:printer).filled(:integer)
+    required(:label_template_id).filled(:integer)
+  end
 end

@@ -47,6 +47,12 @@ module Production
                                     url: "/production/reworks/pallets/#{pallet_number}/edit_carton_quantities",
                                     style: :button)
                   end
+                  col.add_control(control_type: :link,
+                                  text: 'Reprint Pallet Carton Labels',
+                                  url: "/production/reworks/pallets/#{pallet_number}/reprint_pallet_carton_labels",
+                                  behaviour: :popup,
+                                  style: :button,
+                                  visible: rules[:has_individual_cartons])
                 end
               end
             end

@@ -1858,6 +1858,31 @@ module ProductionApp
       failed_response(e.message)
     end
 
+    def validate_pallet_reprint_carton_labels(pallet_number, params)
+      params[:pallet_id] = repo.get_id(:pallets, pallet_number: pallet_number)
+      res = validate_pallet_reprint_carton_labels_params(params)
+      return validation_failed_response(res) if res.failure?
+
+      success_response('ok', res.to_h)
+    end
+
+    def reprint_pallet_carton_labels(carton_ids, params)
+      return failed_response('Carton selection cannot be empty') if carton_ids.nil_or_empty?
+
+      label_name = repo.get(:label_templates, params[:label_template_id], :label_template_name)
+      labels = repo.reworks_run_pallet_seq_print_data_for_cartons(carton_ids)
+      labels.each do |label|
+        LabelPrintingApp::PrintLabel.call(label_name,
+                                          label,
+                                          no_of_prints: 1,
+                                          printer: params[:printer],
+                                          supporting_data: { packed_date: label[:packed_date] })
+      end
+      success_response("#{labels.length} Pallet Carton Labels printed successfully")
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     private
 
     def repo
@@ -2337,6 +2362,10 @@ module ProductionApp
 
     def validate_edit_rmt_bin_params(params)
       EditRmtBinSchema.call(params)
+    end
+
+    def validate_pallet_reprint_carton_labels_params(params)
+      ReprintPalletCartonLabelsSchema.call(params)
     end
   end
 end

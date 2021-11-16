@@ -21,6 +21,7 @@
   :text: Print carton label
   :icon: printer
   :title: Print carton label
+  :hide_if_true: has_individual_cartons
   :popup: true
 - :url: "/production/reworks/pallet_sequences/$:id$/print_reworks_carton_label_for_sequence"
   :text: Print all carton labels on sequence

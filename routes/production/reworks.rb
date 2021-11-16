@@ -834,6 +834,40 @@ class Nspack < Roda
                                      dom_id: 'reworks_run_pallet_fruit_sticker_pm_product_2_id',
                                      options_array: second_fruit_stickers)])
       end
+
+      r.on 'reprint_pallet_carton_labels' do # Reprint Pallet Carton Labels
+        r.on 'reprint_pallet_carton_labels' do
+          attrs = retrieve_from_local_store(:reprint_pallet_carton_labels_params)
+          res = interactor.reprint_pallet_carton_labels(multiselect_grid_choices(params), attrs)
+          if res.success
+            show_json_notice(res.message)
+          else
+            re_show_form(r, res) do
+              Production::Reworks::ReworksRun::ReprintPalletCartonLabels.call(attrs[:pallet_number],
+                                                                              form_values: attrs,
+                                                                              form_errors: res.errors)
+            end
+          end
+        end
+
+        r.get do
+          show_partial { Production::Reworks::ReworksRun::ReprintPalletCartonLabels.call(pallet_number) }
+        end
+
+        r.post do
+          res = interactor.validate_pallet_reprint_carton_labels(pallet_number, params[:reworks_run_print])
+          if res.success
+            store_locally(:reprint_pallet_carton_labels_params, res.instance)
+            r.redirect("/list/reworks_pallet_sequence_cartons/multi?key=reprint_pallet_carton_labels&pallet_id=#{res.instance[:pallet_id]}")
+          else
+            re_show_form(r, res) do
+              Production::Reworks::ReworksRun::ReprintPalletCartonLabels.call(pallet_number,
+                                                                              form_values: params[:reworks_run_print],
+                                                                              form_errors: res.errors)
+            end
+          end
+        end
+      end
     end
 
     r.on 'pallet_sequences', Integer do |id|
