@@ -162,8 +162,8 @@ module RawMaterialsApp
     def force_bin_tripsheet_offload(vehicle_job_id) # rubocop:disable Metrics/AbcSize
       stock_type_id = MesscadaApp::MesscadaRepo.new.get_value(:stock_types, :id, stock_type_code: AppConst::BIN_STOCK_TYPE)
       repo.transaction do
-        vehicle_job_units = repo.select_values(:vehicle_job_units, :id, vehicle_job_id: vehicle_job_id)
-        bin_ids = repo.select_values(:vehicle_job_units, :stock_item_id, vehicle_job_id: vehicle_job_id)
+        vehicle_job_units = repo.select_values(:vehicle_job_units, :id, vehicle_job_id: vehicle_job_id, offloaded_at: nil)
+        bin_ids = repo.select_values(:vehicle_job_units, :stock_item_id, vehicle_job_id: vehicle_job_id, offloaded_at: nil)
         repo.update(:vehicle_job_units, vehicle_job_units, offloaded_at: Time.now)
         location_to_id = complete_bins_offload_vehicle(vehicle_job_id, bin_ids)
         log_status(:vehicle_jobs, vehicle_job_id, 'OFFLOAD_FORCED')
