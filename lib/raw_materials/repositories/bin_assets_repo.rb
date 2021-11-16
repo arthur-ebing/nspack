@@ -130,7 +130,10 @@ module RawMaterialsApp
         id = get_id_or_create(:bin_asset_locations,
                               rmt_container_material_owner_id: get_owner_id(set),
                               location_id: to_location_id)
-        update(:bin_asset_locations, id, quantity: set[:quantity_bins])
+
+        existing_qty = get(:bin_asset_locations, id, :quantity) || 0
+        qty = existing_qty + set[:quantity_bins].to_i
+        update(:bin_asset_locations, id, quantity: qty)
       end
       ok_response
     end

@@ -82,7 +82,8 @@ module RawMaterialsApp
         quantity_bins: opts[:quantity_bins],
         is_adhoc: opts[:is_adhoc],
         created_by: opts[:user_name],
-        changes_made: opts[:changes_made]
+        changes_made: opts[:changes_made],
+        affected_rmt_bin_ids: opts[:affected_rmt_bin_ids]
       }
       opts[:parent_transaction_id] = repo.create_bin_asset_transaction(attrs)
       ok_response
