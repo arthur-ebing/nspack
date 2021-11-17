@@ -9,7 +9,7 @@
   \  inspection_point,\r\n   govt_first_inspection_at,\r\n   orchard,\r\n   packhouse,\r\n
   \  diameter_range,\r\n   pallet_size,\r\n   carton_quantity,\r\n   load_id,\r\n
   \  sequence_nett_weight,\r\n   sequence_gross_weight,\r\n   gap_code,\r\n   'ZA'
-  AS country_of_origin,\r\n   colour_rule\r\nFROM vw_pallet_sequence_flat\r\nWHERE
+  AS country_of_origin,\r\n   edi_in_load_number,\r\n   colour_rule\r\nFROM vw_pallet_sequence_flat\r\nWHERE
   shipped\r\nORDER BY pallet_sequence_number DESC"
 :limit: 
 :offset: 
@@ -673,9 +673,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  edi_in_load_number:
+    :name: edi_in_load_number
+    :sequence_no: 42
+    :caption: Edi in load number
+    :namespaced_name: edi_in_load_number
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 42
+    :sequence_no: 43
     :caption: Colour rule
     :namespaced_name: colour_rule
     :data_type: :string
