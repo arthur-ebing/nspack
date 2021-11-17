@@ -51,6 +51,7 @@ module MesscadaApp
         depot_pallet: false,
         edi_in_transaction_id: nil,
         edi_in_consignment_note_number: Faker::Lorem.word,
+        edi_in_load_number: Faker::Lorem.word,
         re_calculate_nett: false,
         edi_in_inspection_point: Faker::Lorem.word,
         repacked: false,

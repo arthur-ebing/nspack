@@ -214,6 +214,7 @@ module MesscadaApp
           pallets.depot_pallet,
           edi_in_transactions.file_name AS edi_in_file,
           pallets.edi_in_consignment_note_number,
+          pallets.edi_in_load_number,
           COALESCE(pallets.govt_reinspection_at, pallets.govt_first_inspection_at)::date AS inspection_date,
           COALESCE(pallets.edi_in_consignment_note_number,
               CASE

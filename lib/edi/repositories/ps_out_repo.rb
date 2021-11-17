@@ -10,7 +10,7 @@ module EdiApp
           substring(pallet_sequences.pallet_number from '.........$') AS pallet_id,
           pallet_sequences.pallet_sequence_number AS sequence_number,
           COALESCE(govt_inspection_sheets.consignment_note_number, pallets.edi_in_consignment_note_number) AS consignment_number,
-          COALESCE(govt_inspection_sheets.consignment_note_number, pallets.edi_in_consignment_note_number) AS original_cons_no,
+          COALESCE(pallets.edi_in_consignment_note_number, govt_inspection_sheets.consignment_note_number) AS original_cons_no,
           marketing_org.short_description AS organisation,
           substring(commodity_groups.code FROM '..') AS commodity_group,
           commodities.code AS commodity,

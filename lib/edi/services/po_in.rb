@@ -193,7 +193,8 @@ module EdiApp
       # pallet_format_id: 0, # lookup
       rec[:record] = {
         depot_pallet: true,
-        edi_in_consignment_note_number: seq[:cons_no],
+        edi_in_consignment_note_number: seq[:orig_cons], # orig_cons is the consignment number
+        edi_in_load_number: seq[:cons_no],               # cons_no   is the load number
         edi_in_transaction_id: edi_in_transaction.id,
         pallet_number: pallet_number,
         location_id: location_id,

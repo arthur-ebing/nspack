@@ -43,6 +43,7 @@ module MesscadaApp
     attribute :depot_pallet, Types::Bool
     attribute :edi_in_transaction_id, Types::Integer
     attribute :edi_in_consignment_note_number, Types::String
+    attribute :edi_in_load_number, Types::String
     attribute :re_calculate_nett, Types::Bool
     attribute :edi_in_inspection_point, Types::String
     attribute :repacked, Types::Bool
@@ -95,6 +96,7 @@ module MesscadaApp
     attribute :depot_pallet, Types::Bool
     attribute :edi_in_transaction_id, Types::Integer
     attribute :edi_in_consignment_note_number, Types::String
+    attribute :edi_in_load_number, Types::String
     attribute :edi_in_inspection_point, Types::String
     attribute :repacked, Types::Bool
     attribute :repacked_at, Types::DateTime
