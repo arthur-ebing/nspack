@@ -10,9 +10,7 @@ Sequel.migration do
       SELECT audit.audit_table('destination_cities', true, true, '{updated_at}'::text[]);
       SELECT audit.audit_table('destination_countries', true, true, '{updated_at}'::text[]);
       SELECT audit.audit_table('destination_regions', true, true, '{updated_at}'::text[]);
-      SELECT audit.audit_table('farm_puc_orgs', true, true, '{updated_at}'::text[]);
       SELECT audit.audit_table('farm_sections', true, true, '{updated_at}'::text[]);
-      SELECT audit.audit_table('farms_pucs', true, true, '{updated_at}'::text[]);
       SELECT audit.audit_table('fruit_actual_counts_for_packs', true, true, '{updated_at}'::text[]);
       SELECT audit.audit_table('fruit_size_references', true, true, '{updated_at}'::text[]);
       SELECT audit.audit_table('govt_inspection_pallets', true, true, '{updated_at}'::text[]);
@@ -63,12 +61,8 @@ Sequel.migration do
     drop_trigger(:destination_countries, :audit_trigger_stm)
     drop_trigger(:destination_regions, :audit_trigger_row)
     drop_trigger(:destination_regions, :audit_trigger_stm)
-    drop_trigger(:farm_puc_orgs, :audit_trigger_row)
-    drop_trigger(:farm_puc_orgs, :audit_trigger_stm)
     drop_trigger(:farm_sections, :audit_trigger_row)
     drop_trigger(:farm_sections, :audit_trigger_stm)
-    drop_trigger(:farms_pucs, :audit_trigger_row)
-    drop_trigger(:farms_pucs, :audit_trigger_stm)
     drop_trigger(:fruit_actual_counts_for_packs, :audit_trigger_row)
     drop_trigger(:fruit_actual_counts_for_packs, :audit_trigger_stm)
     drop_trigger(:fruit_size_references, :audit_trigger_row)
