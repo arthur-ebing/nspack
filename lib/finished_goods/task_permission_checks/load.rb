@@ -23,7 +23,8 @@ module FinishedGoodsApp
         ship: :ship_check,
         unship: :unship_check,
         titan_addendum: :titan_addendum_check,
-        delete: :delete_check
+        delete: :delete_check,
+        change_container_weights: :change_container_weights_check
       }.freeze
 
       def call # rubocop:disable Metrics/AbcSize
@@ -146,6 +147,13 @@ module FinishedGoodsApp
           failed_pallet_numbers << pallet_number unless inspected
         end
         return failed_response("Pallet: #{failed_pallet_numbers.join(', ')} not inspected, Unable to request Addendum.") unless failed_pallet_numbers.empty?
+
+        all_ok
+      end
+
+      def change_container_weights_check
+        return failed_response('Load has not been shipped') unless shipped?
+        return failed_response('Pallets are weighed - cannot set weights') if AppConst::CR_PROD.are_pallets_weighed?
 
         all_ok
       end

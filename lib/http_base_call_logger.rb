@@ -29,6 +29,8 @@ module Crossbeams
     end
 
     def unpack_request(request, url)
+      return { time: Time.now.strftime('%Y-%m-%d %H:%M:%S'), method: 'UNKNOWN', url: url, request_body: 'UNKNOWN', request_headers: [] } if request.nil?
+
       {
         time: Time.now.strftime('%Y-%m-%d %H:%M:%S'),
         method: request.method,

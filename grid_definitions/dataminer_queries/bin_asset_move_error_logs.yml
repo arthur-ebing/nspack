@@ -1,0 +1,228 @@
+---
+:caption: Bin Asset Move Error Logs
+:sql: "SELECT bin_asset_move_error_logs.id,  \r\nbin_asset_location_id, \r\nlocations.location_long_code,\r\nrcmt.container_material_type_code,\r\nfn_party_role_name
+  (rmt_container_material_owners.rmt_material_owner_party_role_id) AS rmt_container_material_owner,\r\nCOALESCE(bin_asset_locations.quantity,
+  0) AS available_quantity, \r\nbin_asset_move_error_logs.quantity AS quantity, \r\ncompleted,
+  \r\nerror_message, \r\nbin_asset_move_error_logs.created_at,\r\nbin_asset_move_error_logs.updated_at,\r\nfn_current_status('bin_asset_move_error_logs',
+  \ bin_asset_move_error_logs.id) AS status\r\nFROM bin_asset_move_error_logs\r\nJOIN
+  bin_asset_locations ON bin_asset_move_error_logs.bin_asset_location_id = bin_asset_locations.id\r\nJOIN
+  locations ON bin_asset_locations.location_id = locations.id\r\nJOIN rmt_container_material_owners
+  ON bin_asset_locations.rmt_container_material_owner_id = rmt_container_material_owners.id\r\nJOIN
+  rmt_container_material_types rcmt ON rmt_container_material_owners.rmt_container_material_type_id
+  = rcmt.id\r\nORDER BY locations.location_long_code, rcmt.container_material_type_code,
+  rmt_container_material_owner,  quantity"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: bin_asset_move_error_logs.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  bin_asset_location_id:
+    :name: bin_asset_location_id
+    :sequence_no: 2
+    :caption: Bin asset location
+    :namespaced_name: bin_asset_location_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  location_long_code:
+    :name: location_long_code
+    :sequence_no: 3
+    :caption: Location
+    :namespaced_name: locations.location_long_code
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  container_material_type_code:
+    :name: container_material_type_code
+    :sequence_no: 4
+    :caption: Container material type
+    :namespaced_name: rcmt.container_material_type_code
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_container_material_owner:
+    :name: rmt_container_material_owner
+    :sequence_no: 5
+    :caption: Owner
+    :namespaced_name: 
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  available_quantity:
+    :name: available_quantity
+    :sequence_no: 6
+    :caption: Available quantity
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  quantity:
+    :name: quantity
+    :sequence_no: 7
+    :caption: Quantity
+    :namespaced_name: bin_asset_move_error_logs.quantity
+    :data_type: :integer
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  completed:
+    :name: completed
+    :sequence_no: 8
+    :caption: Completed
+    :namespaced_name: completed
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  error_message:
+    :name: error_message
+    :sequence_no: 9
+    :caption: Error message
+    :namespaced_name: error_message
+    :data_type: :string
+    :width: 300
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 10
+    :caption: Created at
+    :namespaced_name: bin_asset_move_error_logs.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 11
+    :caption: Updated at
+    :namespaced_name: bin_asset_move_error_logs.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 12
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: bin_asset_location_id
+  :caption: Bin asset location
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: completed
+  :caption: Completed?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 2
+  :list_def:
+  - true
+  - false

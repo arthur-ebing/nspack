@@ -83,6 +83,16 @@ class JsonRobotInterface # rubocop:disable Metrics/ClassLength
     res
   end
 
+  def log_feedback(feedback, success)
+    lcd1, lcd2, lcd3, lcd4 = feedback.four_lines
+    cnt = 0
+    lines = [lcd1, lcd2, lcd3, lcd4].map do |txt|
+      cnt += 1
+      txt.nil? ? nil : "line#{cnt}: #{txt}"
+    end.compact
+    "robot feedback - status: #{true_state(success)}, #{lines.join(' ')}"
+  end
+
   def decorate_mail_message(message)
     "#{message}\n\nRequest path: #{@request.path}\n\nAction: #{@action_type}\n\nParams: #{@robot_params.inspect}\n\nMAC: #{@mac_addr}"
   end
@@ -233,6 +243,7 @@ class JsonRobotInterface # rubocop:disable Metrics/ClassLength
 
     interactor = MesscadaApp::HrInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
     params = { device: robot.system_resource_code, identifier: robot_params[:id], card_reader: '1' }
+    AppConst.log_authentication("JSON robot login params: #{params.inspect}")
     res = MesscadaApp::AddSystemResourceIncentiveToParams.call(params, get_group_incentive: false)
     res = interactor.login_with_identifier(res.instance) if res.success
 
@@ -247,6 +258,7 @@ class JsonRobotInterface # rubocop:disable Metrics/ClassLength
                                                 line1: 'Cannot login',
                                                 line4: res.message)
                end
+    AppConst.log_authentication("JSON robot login result: #{log_feedback(feedback, res.success)}")
     respond(feedback, res.success)
   end
 

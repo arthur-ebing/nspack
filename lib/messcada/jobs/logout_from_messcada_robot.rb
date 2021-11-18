@@ -18,6 +18,7 @@ module MesscadaApp
 
         request = %(<LogoffMes PID="430" Type="local" ReaderID="#{reader_id || '1'}" Name="#{worker[:first_name]} #{worker[:surname]}" RFID="#{worker[:identifier]}" IndustryNumber="#{worker[:personnel_number]}" Group="#{new_group}" />)
         # <LogoffMes PID="430"  Module="LBL-3A"  Type="local" ReaderID="1" Name="Sannie Smith"  RFID="9876512345"  IndustryNumber="12345" />
+        AppConst.log_authentication("TCP logoff messcada - #{request}")
 
         sock = TCPSocket.open(ip_address, 2071)
         puts "MESSCADA LOGOUT AT #{system_resource_code} (#{ip_address}) : #{worker[:first_name]} #{worker[:surname]} (#{worker[:personnel_number]})"
@@ -27,6 +28,7 @@ module MesscadaApp
         result = sock.read
 
         puts "RESPONSE FROM #{system_resource_code} : #{result}"
+        AppConst.log_authentication("TCP logoff messcada result - #{result}")
         sock.close
         finish
       end

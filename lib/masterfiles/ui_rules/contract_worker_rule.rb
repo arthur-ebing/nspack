@@ -62,7 +62,7 @@ module UiRules
     def set_print_fields
       fields[:personnel_number] = { renderer: :label }
       fields[:printer] = { renderer: :select,
-                           options: @print_repo.select_printers_for_application(AppConst::PRINT_APP_PACKPOINT),
+                           options: @print_repo.select_printers_for_application(AppConst::PRINT_APP_PERSONNEL),
                            required: true }
       fields[:no_of_prints] = { renderer: :integer, required: true }
     end

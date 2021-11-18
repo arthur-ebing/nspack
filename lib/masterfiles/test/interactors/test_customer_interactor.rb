@@ -6,6 +6,7 @@ module MasterfilesApp
   class TestCustomerInteractor < MiniTestWithHooks
     include FinanceFactory
     include PartyFactory
+    include LocationFactory
 
     def test_repo
       repo = interactor.send(:repo)
@@ -70,6 +71,7 @@ module MasterfilesApp
       currency_id = create_currency
       party_role_id = create_party_role
       fruit_industry_levy_id = create_fruit_industry_levy
+      location_id = create_location
 
       {
         id: 1,
@@ -90,7 +92,11 @@ module MasterfilesApp
         vat_number: 'ABC',
         company_reg_no: 'ABC',
         fruit_industry_levy_id: fruit_industry_levy_id,
-        fruit_industry_levy: 'ABC'
+        fruit_industry_levy: 'ABC',
+        rmt_customer: false,
+        bin_asset_trading_partner: false,
+        location_id: location_id,
+        location_long_code: 'ABC'
       }
     end
 

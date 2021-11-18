@@ -409,6 +409,58 @@ class Nspack < Roda
         r.redirect("/rmd/raw_materials/print_bins_pallet/#{id}")
       end
     end
+
+    # --------------------------------------------------------------------------
+    # BIN ENQUIRY
+    # --------------------------------------------------------------------------
+    r.on 'bin_enquiry' do
+      interactor = RawMaterialsApp::RmtBinInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'scan_bin' do
+        r.get do
+          form_state = retrieve_from_local_store(:errors).to_h
+          form = Crossbeams::RMDForm.new(form_state,
+                                         form_name: :bin_enquiry,
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         caption: 'Bin Enquiry',
+                                         notes: retrieve_from_local_store(:flash_notice),
+                                         action: '/rmd/raw_materials/bin_enquiry/scan_bin',
+                                         button_caption: 'Submit')
+          form.add_field(:bin_number, 'Bin Number', data_type: :number, scan: 'key248_all', scan_type: :bin_asset, submit_form: true, required: true)
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+
+        r.post do
+          res = interactor.validate_bin(params[:bin_enquiry][:bin_number])
+          if res.success
+            r.redirect("/rmd/raw_materials/bin_enquiry/view_bin/#{res.instance[:id]}")
+          else
+            store_locally(:errors, errors: res.errors, error_message: unwrap_failed_response(res))
+            r.redirect('/rmd/raw_materials/bin_enquiry/scan_bin')
+          end
+        end
+      end
+
+      r.on 'view_bin', Integer do |id|
+        rmt_bin = interactor.rmt_bin_attrs_for_display(id)
+        form = Crossbeams::RMDForm.new({},
+                                       form_name: :rmt_bin,
+                                       scan_with_camera: @rmd_scan_with_camera,
+                                       caption: "View Bin #{rmt_bin[:bin_asset_number]}",
+                                       reset_button: false,
+                                       no_submit: true,
+                                       action: '/')
+        fields_for_rmd_rmt_bin_display(form, rmt_bin)
+        fields_for_rmd_rmt_bin_presort_staging_run_display(form, rmt_bin) if rmt_bin[:staged_for_presorting]
+        fields_for_rmd_presort_bin_info_display(form, rmt_bin) if AppConst::CR_RMT.presort_plant_integration? && !rmt_bin[:main_presort_run_lot_number].nil?
+        fields_for_rmd_rmt_bin_other_info_display(form, rmt_bin) if AppConst::CR_RMT.show_kromco_attributes? && !rmt_bin[:legacy_data].nil?
+        fields_for_rmd_rmt_bin_tripsheet_info_display(form, id)
+
+        form.add_csrf_tag csrf_tag
+        view(inline: form.render, layout: :layout_rmd)
+      end
+    end
   end
 
   # --------------------------------------------------------------------------
@@ -633,7 +685,7 @@ class Nspack < Roda
                                          caption: 'Scan Bin',
                                          action: "/rmd/rmt_deliveries/rmt_bins/move_rmt_bin_submit/#{id}",
                                          button_caption: 'Move Bin')
-          form.add_label(:bin_number, 'Bin Number', AppConst::USE_PERMANENT_RMT_BIN_BARCODES ? bin[:bin_asset_number] : bin[:id])
+          form.add_label(:bin_number, 'Bin Number', bin[:bin_asset_number])
           form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location, submit_form: true, required: true, lookup: false)
           form.add_csrf_tag csrf_tag
           view(inline: form.render, layout: :layout_rmd)
@@ -706,7 +758,7 @@ class Nspack < Roda
 
           res = interactor.move_location_bin(val_res.instance[:id], scanned_locn_id)
           if res.success
-            bin_number = AppConst::USE_PERMANENT_RMT_BIN_BARCODES ? val_res.instance[:bin_asset_number] : val_res.instance[:id]
+            bin_number = val_res.instance[:bin_asset_number]
             moved_bins = retrieve_from_local_store(:moved_bins) || []
             moved_bins << bin_number
             store_locally(:moved_bins, moved_bins)
@@ -751,6 +803,109 @@ class Nspack < Roda
         end
       end
 
+      # FORKLIFT BIN MOVE
+      # --------------------------------------------------------------------------
+      r.on 'forklift_bin_move' do
+        r.on 'scan_location' do
+          bin = {}
+          error = retrieve_from_local_store(:error)
+          if error.is_a?(String)
+            bin.merge!(error_message: error)
+          elsif !error.nil?
+            bin.merge!(error_message: error.message)
+            bin.merge!(errors: error.errors) unless error.errors.nil_or_empty?
+          end
+
+          form = Crossbeams::RMDForm.new(bin,
+                                         form_name: :bin,
+                                         notes: retrieve_from_local_store(:flash_notice),
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         caption: 'Scan Location',
+                                         action: '/rmd/rmt_deliveries/rmt_bins/forklift_bin_move/move_bins',
+                                         button_caption: 'Submit')
+          form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location, submit_form: true, required: true, lookup: true)
+
+          scanned_bins = retrieve_from_local_store(:scanned_bins) || []
+          unless scanned_bins.empty?
+            store_locally(:scanned_bins, scanned_bins)
+            form.add_section_header('Scanned Bins')
+            scanned_bins.each { |bin_number| form.add_label(:bin_number, '', bin_number) }
+          end
+
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+
+        r.on 'move_bins' do
+          val_res = interactor.validate_location(params[:bin][:location], params[:bin][:location_scan_field])
+          unless val_res.success
+            store_locally(:error, val_res)
+            r.redirect('/rmd/rmt_deliveries/rmt_bins/forklift_bin_move/scan_location')
+          end
+
+          scanned_bins = retrieve_from_local_store(:scanned_bins) || []
+          res = interactor.move_forklift_bins(scanned_bins, val_res.instance)
+          if res.success
+            store_locally(:flash_notice, rmd_success_message(res.message))
+          else
+            store_locally(:error, res)
+            store_locally(:scanned_bins, scanned_bins)
+          end
+          r.redirect('/rmd/rmt_deliveries/rmt_bins/forklift_bin_move')
+        rescue Crossbeams::InfoError => e
+          store_locally(:error, rmd_error_message(e.message))
+          r.redirect('/rmd/rmt_deliveries/rmt_bins/forklift_bin_move')
+        end
+
+        r.get do
+          bin = {}
+          error = retrieve_from_local_store(:error)
+          if error.is_a?(String)
+            bin.merge!(error_message: error)
+          elsif !error.nil?
+            bin.merge!(error_message: error.message)
+            bin.merge!(errors: error.errors) unless error.errors.nil_or_empty?
+          end
+
+          form = Crossbeams::RMDForm.new(bin,
+                                         form_name: :bin,
+                                         notes: retrieve_from_local_store(:flash_notice),
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         caption: 'Scan Bins',
+                                         action: '/rmd/rmt_deliveries/rmt_bins/forklift_bin_move',
+                                         button_caption: 'Submit')
+          form.add_field(:bin_number, 'Bin Number', scan: 'key248_all', scan_type: :bin_asset, required: false, submit_form: true)
+
+          scanned_bins = retrieve_from_local_store(:scanned_bins) || []
+          unless scanned_bins.empty?
+            store_locally(:scanned_bins, scanned_bins)
+            form.add_section_header('Scanned Bins')
+            scanned_bins.each { |bin_number| form.add_label(:bin_number, '', bin_number) }
+            form.add_button('Scan Location', '/rmd/rmt_deliveries/rmt_bins/forklift_bin_move/scan_location')
+          end
+
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+
+        r.post do
+          res = interactor.validate_bin(params[:bin][:bin_number])
+          unless res.success
+            store_locally(:error, res)
+            r.redirect('/rmd/rmt_deliveries/rmt_bins/forklift_bin_move')
+          end
+
+          bin_number = res.instance[:bin_asset_number]
+          scanned_bins = retrieve_from_local_store(:scanned_bins) || []
+          scanned_bins.include?(bin_number) ? scanned_bins.delete(bin_number) : scanned_bins << bin_number
+          store_locally(:scanned_bins, scanned_bins)
+          r.redirect('/rmd/rmt_deliveries/rmt_bins/forklift_bin_move')
+        rescue Crossbeams::InfoError => e
+          store_locally(:error, rmd_error_message(e.message))
+          r.redirect('/rmd/rmt_deliveries/rmt_bins/forklift_bin_move')
+        end
+      end
+
       # --------------------------------------------------------------------------
       # CREATE RMT REBIN
       # --------------------------------------------------------------------------
@@ -766,7 +921,7 @@ class Nspack < Roda
           form_state.merge!(error_message: error[:error_message], errors:  {}) unless error.nil?
           form_state.merge!(details) unless details.nil?
 
-          default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE)
+          default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DEFAULT_RMT_CONTAINER_TYPE)
           capture_container_material_owner = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER
 
           form = Crossbeams::RMDForm.new(form_state,
@@ -865,7 +1020,7 @@ class Nspack < Roda
           notice = retrieve_from_local_store(:flash_notice)
           form_state.merge!(error_message: error[:error_message], errors:  {}) unless error.nil?
 
-          default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE)
+          default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DEFAULT_RMT_CONTAINER_TYPE)
           capture_container_material_owner = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER
 
           form = Crossbeams::RMDForm.new(form_state,
@@ -948,7 +1103,7 @@ class Nspack < Roda
 
       r.on 'bin_asset_number_changed' do
         repo = MasterfilesApp::RmtContainerMaterialTypeRepo.new
-        default_rmt_container_type_id = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE)[:id]
+        default_rmt_container_type_id = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DEFAULT_RMT_CONTAINER_TYPE)[:id]
         items = repo.for_select_rmt_container_material_types(where: { rmt_container_type_id: default_rmt_container_type_id })
         items.unshift([[]])
         container_material_owners = []
@@ -1201,7 +1356,7 @@ class Nspack < Roda
 
       r.on 'receive_rmt_bins', Integer do |id|
         delivery = interactor.get_delivery_confirmation_details(id)
-        default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE)
+        default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DEFAULT_RMT_CONTAINER_TYPE)
 
         capture_container_material = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL
         capture_container_material_owner = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER
@@ -1295,11 +1450,9 @@ class Nspack < Roda
 
       r.on 'receive_single_bin' do
         id = interactor.find_current_delivery
-        if id.nil_or_empty?
-          return new_bin_screen(nil, '/rmd/rmt_deliveries/rmt_bins/receive_single_bin_submit') if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+        return new_bin_screen(nil, '/rmd/rmt_deliveries/rmt_bins/receive_single_bin_submit') if id.nil_or_empty?
 
-          receive_single_bin_error_screen('There Is No Current Delivery To Add Bins To')
-        elsif RawMaterialsApp::RmtDeliveryInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {}).delivery_tipped?(id)
+        if RawMaterialsApp::RmtDeliveryInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {}).delivery_tipped?(id)
           receive_single_bin_error_screen('Cannot Add Bin To Current Delivery. Delivery Has Been Tipped')
         else
           new_bin_screen(id, '/rmd/rmt_deliveries/rmt_bins/receive_single_bin_submit')
@@ -1387,6 +1540,13 @@ class Nspack < Roda
             end
           end
 
+          form.add_select(:printer,
+                          'Printer',
+                          items: LabelApp::PrinterRepo.new.select_printers_for_application(AppConst::PRINT_APP_PALLET_TRIPSHEET),
+                          value: LabelApp::PrinterRepo.new.default_printer_for_application(AppConst::PRINT_APP_PALLET_TRIPSHEET),
+                          required: false,
+                          prompt: true)
+
           form.add_button('Cancel', "/rmd/rmt_deliveries/rmt_bins/cancel_bins_tripsheet/#{id}")
           form.add_button('Complete', "/rmd/rmt_deliveries/rmt_bins/complete_bins_tripsheet/#{id}")
           form.add_csrf_tag csrf_tag
@@ -1418,7 +1578,7 @@ class Nspack < Roda
                                            current_user.login_name,
                                            vehicle_job_id: id)
           jasper_params.mode = :print
-          printer_id = interactor.default_printer_for_application(AppConst::PRINT_APP_PALLET_TRIPSHEET)
+          printer_id = params[:bin][:printer] # interactor.default_printer_for_application(AppConst::PRINT_APP_PALLET_TRIPSHEET)
           jasper_params.printer = interactor.find_printer(printer_id)&.printer_code
           res = CreateJasperReport.call(jasper_params)
 
@@ -1495,6 +1655,41 @@ class Nspack < Roda
             store_locally(:error, res)
             r.redirect('/rmd/rmt_deliveries/rmt_bins/offload_bins')
           end
+        end
+      end
+
+      r.on 'offload_bins_trip' do
+        r.get do
+          notice = retrieve_from_local_store(:flash_notice)
+          form_state = {}
+          error = retrieve_from_local_store(:error)
+          form_state.merge!(error_message: error[:message]) unless error.nil?
+          form = Crossbeams::RMDForm.new(form_state,
+                                         form_name: :vehicle,
+                                         notes: notice,
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         caption: 'Scan Tripsheet And Location',
+                                         action: '/rmd/rmt_deliveries/rmt_bins/offload_bins_trip',
+                                         button_caption: 'Submit')
+
+          form.add_field(:vehicle_job, 'Tripsheet Number', scan: 'key248_all', scan_type: :vehicle_job, submit_form: false, required: true, lookup: false)
+          form.add_select(:location,
+                          'Location',
+                          items: interactor.find_locations_by_location_type_and_storage_type(AppConst::LOCATION_TYPES_WAREHOUSE, AppConst::STORAGE_TYPE_BINS),
+                          required: true,
+                          prompt: true)
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+
+        r.post do
+          res = interactor.offload_bins_trip(params[:vehicle][:vehicle_job], params[:vehicle][:location])
+          if res.success
+            store_locally(:flash_notice, res.message)
+          else
+            store_locally(:error, res)
+          end
+          r.redirect('/rmd/rmt_deliveries/rmt_bins/offload_bins_trip')
         end
       end
 
@@ -1737,9 +1932,9 @@ class Nspack < Roda
 
   def new_bin_screen(delivery_id, action, notes = nil) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
     bin_delivery = RawMaterialsApp::RmtDeliveryRepo.new.get_bin_delivery(delivery_id)
-    bin_delivery = {} if !bin_delivery && AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+    bin_delivery ||= {}
     if bin_delivery
-      default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE)
+      default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DEFAULT_RMT_CONTAINER_TYPE)
       details = retrieve_from_local_store(:bin) || { bin_fullness: AppConst::BIN_FULL }
 
       capture_inner_bins = AppConst::DELIVERY_CAPTURE_INNER_BINS && !default_rmt_container_type[:id].nil? && !MasterfilesApp::RmtContainerTypeRepo.new.find_rmt_container_type(default_rmt_container_type[:id])&.rmt_inner_container_type_id
@@ -1804,5 +1999,80 @@ class Nspack < Roda
     else
       view(inline: rmd_warning_message('RMT Delivery not found'), layout: :layout_rmd)
     end
+  end
+
+  def fields_for_rmd_rmt_bin_display(form, rmt_bin) # rubocop:disable Metrics/AbcSize
+    form.add_label(:bin_asset_number, 'Bin Asset Number', rmt_bin[:bin_asset_number])
+    form.add_label(:bin_id, 'Bin Id', rmt_bin[:id])
+    form.add_label(:location, 'Location', rmt_bin[:location_long_code])
+    form.add_label(:status, 'Status', rmt_bin[:status])
+    form.add_label(:cultivar_group, 'Cultivar Group', rmt_bin[:cultivar_group_code])
+    form.add_label(:cultivar_name, 'Cultivar', rmt_bin[:cultivar_name])
+    form.add_label(:class_code, 'Class', rmt_bin[:class_code])
+    form.add_label(:size_code, 'Size', rmt_bin[:size_code])
+    form.add_label(:farm_code, 'Farm', rmt_bin[:farm_code])
+    form.add_label(:puc_code, 'Puc', rmt_bin[:puc_code])
+    form.add_label(:orchard_code, 'Orchard', rmt_bin[:orchard_code])
+    form.add_label(:rmt_delivery_id, 'Delivery', rmt_bin[:rmt_delivery_id])
+    form.add_label(:production_run_tipped_id, 'Tipped Run', rmt_bin[:production_run_tipped_id])
+    form.add_label(:production_run_rebin_id, 'Rebin Run', rmt_bin[:production_run_rebin_id])
+    form.add_label(:container_material_type_code, 'Container Material Type', rmt_bin[:container_material_type_code])
+    form.add_label(:container_material_owner_code, 'Container Material Owner', rmt_bin[:material_owner])
+    form.add_label(:qty_inner_bins, 'Qty Inner Bins', rmt_bin[:qty_inner_bins]) unless rmt_bin[:rmt_inner_container_type_id].nil?
+    form.add_label(:gross_weight, 'Gross Weight', rmt_bin[:gross_weight])
+    form.add_label(:nett_weight, 'Nett Weight', rmt_bin[:nett_weight])
+    form.add_label(:bin_fullness, 'Bin Fullness', rmt_bin[:bin_fullness])
+    form.add_label(:bin_received_date_time, 'Received At', rmt_bin[:bin_received_date_time])
+    form.add_label(:bin_load, 'Load Id', rmt_bin[:bin_load_id])
+    form.add_label(:converted_from_pallet, 'Converted_from_pallet?', rmt_bin[:converted_from_pallet_sequence_id].nil?)
+    form.add_label(:exit_ref, 'Exit Ref', rmt_bin[:exit_ref])
+  end
+
+  def fields_for_rmd_rmt_bin_presort_staging_run_display(form, rmt_bin)
+    form.add_section_header('PRESORT STAGING INFO')
+    form.add_label(:staged_for_presorting_at, 'Staged For Presorted At', rmt_bin[:staged_for_presorting_at])
+    form.add_label(:presort_staging_run_child_id, 'Presort Staging Run Child Id', rmt_bin[:presort_staging_run_child_id])
+    form.add_label(:presort_tip_lot_number, 'Presort Tip Lot Number', rmt_bin[:presort_tip_lot_number])
+    form.add_label(:tipped_in_presort_at, 'Tipped In presort At', rmt_bin[:tipped_in_presort_at])
+    form.add_label(:presort_unit, 'Presort Unit', rmt_bin[:presort_unit])
+  end
+
+  def fields_for_rmd_presort_bin_info_display(form, rmt_bin) # rubocop:disable Metrics/AbcSize
+    form.add_section_header('PRESORT BIN INFO')
+    form.add_label(:main_presort_run_lot_number, 'Main Presort Run Lot Number', rmt_bin[:main_presort_run_lot_number])
+    unless rmt_bin[:legacy_data].nil?
+      form.add_label(:numero_lot_max, 'Numero Lot Max', rmt_bin[:legacy_data]['numero_lot_max'])
+      form.add_label(:code_cumul, 'Code Cumul', rmt_bin[:legacy_data]['code_cumul'])
+    end
+
+    bin_sequences = RawMaterialsApp::RmtDeliveryRepo.new.pallet_sequences_attrs_for_rmt_bin(rmt_bin[:id])
+    form.add_section_header('SEQUENCES')
+    bin_sequences.each do |seq|
+      form.add_label(:pallet_number, 'Pallet Number', seq[:pallet_number])
+      form.add_label(:pallet_sequence_number, 'Seq Number', seq[:pallet_sequence_number])
+      form.add_label(:farm_code, 'Farm', seq[:farm_code])
+      form.add_label(:orchard_code, 'Orchard', seq[:orchard_code])
+      form.add_label(:nett_weight, 'Nett weight', seq[:nett_weight])
+    end
+  end
+
+  def fields_for_rmd_rmt_bin_other_info_display(form, rmt_bin)
+    form.add_section_header('OTHER INFO')
+    form.add_label(:cold_store_type, 'Cold Store Type', rmt_bin[:legacy_data]['cold_store_type'])
+    form.add_label(:treatment_code, 'Treatment Code', rmt_bin[:legacy_data]['treatment_code'])
+    form.add_label(:ripe_point_code, 'Ripe Point Code', rmt_bin[:legacy_data]['ripe_point_code'])
+    form.add_label(:track_slms_indicator_1_code, 'Track Indicator Code', rmt_bin[:legacy_data]['track_slms_indicator_1_code'])
+    form.add_label(:track_slms_indicator_2_code, 'Track Indicator Code 2', rmt_bin[:legacy_data]['track_slms_indicator_2_code'])
+  end
+
+  def fields_for_rmd_rmt_bin_tripsheet_info_display(form, rmt_bin_id)
+    tripsheet = RawMaterialsApp::RmtDeliveryRepo.new.most_recent_tripsheet_for_rmt_bin(rmt_bin_id)
+    return if tripsheet.nil?
+
+    form.add_section_header('TRIPSHEET INFO')
+    form.add_label(:tripsheet_number, 'Tripsheet Number', tripsheet[:id])
+    form.add_label(:location, 'Location', tripsheet[:location_long_code])
+    form.add_label(:loaded_at, 'Loaded At', tripsheet[:loaded_at])
+    form.add_label(:offloaded_at, 'Offloaded At', tripsheet[:offloaded_at])
   end
 end

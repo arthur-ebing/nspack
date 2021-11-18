@@ -37,9 +37,6 @@ module MesscadaApp
     end
 
     def valid_bin_for_kromco_rmt_system?
-      res = repo.can_bin_be_tipped?(bin_number)
-      return res unless res.success
-
       bintip_criteria_passed?
     end
 
@@ -48,7 +45,7 @@ module MesscadaApp
       return res unless res.success
 
       bin_attrs = { bin_asset_number: res.instance['bin_number'], nett_weight: res.instance['weight'], bin_fullness: AppConst::BIN_FULL, qty_bins: 1,
-                    bin_received_date_time: res.instance['bin_receive_date_time'], rmt_container_type_id: repo.get_value(:rmt_container_types, :id, container_type_code: 'BIN') }
+                    bin_received_date_time: res.instance['bin_receive_date_time'], rmt_container_type_id: repo.get_value(:rmt_container_types, :id, container_type_code: AppConst::DEFAULT_RMT_CONTAINER_TYPE) }
 
       fields = %i[farm_code orchard_code product_class_code size_code rmt_variety_code season_code location_code commodity_code puc_code]
       hash = Hash[fields.zip(fields.map { |f| res.instance[f.to_s] })]
@@ -59,6 +56,9 @@ module MesscadaApp
       bin_attrs.merge!(mf_res.instance)
 
       bin_columns = %w[bin_number weight is_half_bin bin_receive_date_time orchard_code farm_code product_class_code rmt_variety_code season_code size_code location_code commodity_id]
+      res.instance.delete('treatment_code')
+      res.instance.delete('color')
+      res.instance['colour'] = res.instance.delete('rmtp_treatment_code')
       bin_attrs[:legacy_data] = res.instance.delete_if { |k, _v| bin_columns.include?(k) }.to_json
       success_response('ok', { bin_attrs: bin_attrs, delivery_number: res.instance['delivery_number'] })
     end
@@ -94,7 +94,7 @@ module MesscadaApp
                                  else
                                    run_legacy_data[c[0]]
                                  end
-          return failed_response("Tipping Criteria Fails. Bin #{c[0]}: '#{mf_keys.include?(c[0]) ? res.instance[c[0]] : bin_legacy_data[c[0]]}'. Run requires #{c[0]}: '#{run_legacy_data_code}'")
+          return failed_response("Tipping Criteria Fails. Bin #{c[0]}: #{mf_keys.include?(c[0]) ? res.instance[c[0]] : bin_legacy_data[c[0]]}. Run requires #{c[0]}: #{run_legacy_data_code}.")
         end
       end
 

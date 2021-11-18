@@ -2,6 +2,7 @@
 
 class Nspack < Roda
   route 'admin', 'dataminer' do |r|
+    check_auth!('manage', 'edit')
     context = { for_grid_queries: session[:dm_admin_path] == :grids, route_url: request.path, request_ip: request.ip }
     interactor = DataminerApp::DataminerInteractor.new(current_user, {}, context, {})
 

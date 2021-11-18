@@ -83,10 +83,20 @@ module FinishedGoodsApp
     end
 
     def send_hcs_edi(load_id)
-      EdiApp::SendEdiOut.call(AppConst::EDI_FLOW_HCS, nil, @user.user_name, load_id)
+      load_entity = load_entity(load_id)
+      if load_entity.rmt_load # OR BOTH????
+        # EdiApp::SendEdiOut.call(AppConst::EDI_FLOW_HBS, nil, @user.user_name, bin_load_id, context: { fg_load: true }) # OR could we send both????
+      else
+        EdiApp::SendEdiOut.call(AppConst::EDI_FLOW_HCS, nil, @user.user_name, load_id)
+      end
     end
 
-    def allocate_multiselect(load_id, pallet_numbers, initial_pallet_numbers = nil) # rubocop:disable Metrics/AbcSize
+    def send_hbs_edi(load_id)
+      load_entity = load_entity(load_id)
+      EdiApp::SendEdiOut.call(AppConst::EDI_FLOW_HBS, nil, @user.user_name, bin_load_id, context: { fg_load: true }) if load_entity.rmt_load
+    end
+
+    def allocate_multiselect(load_id, pallet_numbers, initial_pallet_numbers = nil) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       check_pallets!(:allocate, pallet_numbers, load_id) unless pallet_numbers.empty?
       new_allocation = pallet_numbers
       current_allocation = repo.select_values(:pallets, :pallet_number, load_id: load_id)
@@ -95,10 +105,19 @@ module FinishedGoodsApp
         return failed_response('Allocation mismatch') unless current_allocation.sort == initial_pallet_numbers.sort
       end
 
+      pallet_numbers = new_allocation - current_allocation
+      res = validate_wip_pallet_numbers(pallet_numbers)
+      raise Crossbeams::InfoError, unwrap_error_set(res.messages) unless res.success
+
       repo.transaction do
         repo.unallocate_pallets(current_allocation - new_allocation, @user)
-        repo.allocate_pallets(load_id, new_allocation - current_allocation, @user)
+        repo.allocate_pallets(load_id, pallet_numbers, @user)
         FinishedGoodsApp::ProcessOrderLines.call(@user, load_id: load_id)
+
+        if AppConst::CR_FG.lookup_extended_fg_code?
+          pallet_ids = repo.select_values(:pallets, :id, pallet_number: pallet_numbers)
+          FinishedGoodsApp::Job::CalculateExtendedFgCodesFromSeqs.enqueue(pallet_ids)
+        end
 
         log_transaction
       end
@@ -107,21 +126,42 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def allocate_list(load_id, pallets_string)
+    def allocate_list(load_id, pallets_string) # rubocop:disable Metrics/AbcSize
       res = MesscadaApp::ParseString.call(pallets_string)
       return res unless res.success
 
       pallet_numbers = res.instance
       check_pallets!(:allocate, pallet_numbers, load_id)
 
+      res = validate_wip_pallet_numbers(pallet_numbers)
+      return validation_failed_response(res) unless res.success
+
       repo.transaction do
         repo.allocate_pallets(load_id, pallet_numbers, @user)
+        FinishedGoodsApp::ProcessOrderLines.call(@user, load_id: load_id)
+
+        if AppConst::CR_FG.lookup_extended_fg_code?
+          pallet_ids = repo.select_values(:pallets, :id, pallet_number: pallet_numbers)
+          FinishedGoodsApp::Job::CalculateExtendedFgCodesFromSeqs.enqueue(pallet_ids)
+        end
 
         log_transaction
       end
       success_response("Allocation applied to load: #{load_id}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    end
+
+    def validate_wip_pallet_numbers(pallet_numbers)
+      pallet_ids = repo.select_values(:pallets, :id, pallet_number: pallet_numbers)
+      res = reworks_repo.are_pallets_out_of_wip?(pallet_ids)
+
+      unless res.success
+        msg = "Pallets: #{repo.select_values(:pallets, :pallet_number, id: res.instance).join(', ')} are works in progress"
+        return OpenStruct.new(success: false, messages: { pallet_list: [msg] }, pallet_list: pallet_numbers)
+      end
+
+      ok_response
     end
 
     def allocate_grid(load_id)
@@ -226,14 +266,15 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def ship_load(id)
+    def ship_load(id) # rubocop:disable Metrics/AbcSize
       res = nil
       repo.transaction do
         res = ShipLoad.call(id, @user)
         raise Crossbeams::InfoError, res.message unless res.success
 
-        send_edi(id)
+        send_edi(id) unless repo.get(:loads, id, :truck_must_be_weighed)
         send_hcs_edi(id) if repo.load_is_on_order?(id)
+        send_hbs_edi(id)
 
         log_transaction
       end
@@ -382,7 +423,37 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
+    def apply_container_weights(id, params) # rubocop:disable Metrics/AbcSize
+      check!(:change_container_weights, id)
+
+      res = LoadContainerWeightSchema.call(params)
+      return validation_failed_response(res) if res.failure?
+
+      load_container_id = repo.get_id(:load_containers, load_id: id)
+      changed_weights = weights_changed?(load_container_id, res)
+      return success_response('Nothing to update - weights were not changed') unless changed_weights
+
+      send_for_weight = repo.get(:loads, id, :truck_must_be_weighed)
+      repo.transaction do
+        repo.update(:load_containers, load_container_id, res)
+        send_edi(id) if send_for_weight
+
+        log_status(:loads, id, 'CONTAINER WEIGHTS SET')
+      end
+
+      success_response(send_for_weight ? 'Weights applied to container and EDI has been queued' : 'Weights applied to container')
+    end
+
     private
+
+    def weights_changed?(load_container_id, res)
+      rec = repo.where_hash(:load_containers, id: load_container_id)
+      change = false
+      res.to_h.each do |k, v|
+        change = true if rec[k] != v
+      end
+      change
+    end
 
     def check!(task, id = nil, pallet_number = nil)
       res = TaskPermissionCheck::Load.call(task, id, pallet_number)
@@ -396,6 +467,10 @@ module FinishedGoodsApp
 
     def repo
       @repo ||= LoadRepo.new
+    end
+
+    def reworks_repo
+      @reworks_repo ||= ProductionApp::ReworksRepo.new
     end
   end
 end

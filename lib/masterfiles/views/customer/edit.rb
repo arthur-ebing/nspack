@@ -8,7 +8,7 @@ module Masterfiles
           ui_rule = UiRules::Compiler.new(:customer, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page|
+          Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
@@ -22,12 +22,11 @@ module Masterfiles
               form.add_field :financial_account_code
               form.add_field :fruit_industry_levy_id
               form.add_field :default_currency_id
+              form.add_field :bin_asset_trading_partner
               form.add_field :currency_ids
               form.add_field :contact_person_ids
             end
           end
-
-          layout
         end
       end
     end

@@ -70,6 +70,12 @@ class CreateJasperReport < BaseService # rubocop:disable Metrics/ClassLength
   def handle_failure(output)
     send_error_mail(output)
     log_report_result(output)
+    # msg = if output[:msg] == 'Java::JavaLang::IllegalArgumentException: Null range specified'
+    #         'Nothing to print'
+    #       else
+    #         output[:msg]
+    #       end
+    # failed_response("Jasper printing error: <br>#{msg}")
     failed_response("Jasper printing error: <br>#{output[:msg]}")
   end
 

@@ -198,7 +198,7 @@ module Crossbeams
       [uri, http]
     end
 
-    def format_response(response, context)
+    def format_response(response, context) # rubocop:disable Metrics/AbcSize
       return @responder.format_response(response, context) if @responder
 
       case response.code
@@ -209,7 +209,11 @@ module Crossbeams
       else
         msg = response.code.start_with?('5') ? 'The destination server encountered an error.' : 'The request was not successful.'
         send_error_email(response, context)
-        failed_response("#{msg} The response code is #{response.code}", response.code)
+        if response.body.encoding == Encoding::ASCII_8BIT # Do not return the body if it is something like an image
+          failed_response("#{msg} The response code is #{response.code}", response.code)
+        else
+          failed_response("#{msg} The response code is #{response.code}", response.body)
+        end
       end
     end
 

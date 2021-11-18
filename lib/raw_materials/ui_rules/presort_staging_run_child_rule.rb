@@ -7,6 +7,8 @@ module UiRules
       make_form_object
       apply_form_values
 
+      @rules[:parent_has_supplier] = !@repo.get_value(:presort_staging_runs, :supplier_id, id: @options[:staging_run_id]).nil?
+
       common_values_for_fields common_fields
 
       form_name 'presort_staging_run_child'
@@ -14,7 +16,7 @@ module UiRules
 
     def common_fields
       {
-        farm_id: { renderer: :select, options: MasterfilesApp::SupplierRepo.new.for_presort_staging_run_supplier_farms(@options[:staging_run_id]),
+        farm_id: { renderer: :select, options: rules[:parent_has_supplier] ? MasterfilesApp::SupplierRepo.new.for_presort_staging_run_supplier_farms(@options[:staging_run_id]) : MasterfilesApp::FarmRepo.new.for_select_farms,
                    caption: 'Farm',
                    prompt: true,
                    required: true }

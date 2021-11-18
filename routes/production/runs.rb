@@ -665,6 +665,42 @@ class Nspack < Roda
         show_partial { Production::Runs::ProductionRun::ShowBinTippingCriteria.call(id) }
       end
 
+      r.on 'print_rebin_labels' do
+        interactor = RawMaterialsApp::RmtBinInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+        r.on 'print_labels' do
+          res = interactor.print_run_rebin_labels(multiselect_grid_choices(params),
+                                                  retrieve_from_local_store(:print_rebin_labels_params))
+          if res.success
+            show_json_notice(res.message)
+          else
+            re_show_form(r, res) do
+              Production::Runs::Rebins::PrintRebinLabels.call(id,
+                                                              form_values: params[:rebin],
+                                                              form_errors: res.errors)
+            end
+          end
+        end
+
+        r.get do
+          show_partial_or_page(r) { Production::Runs::Rebins::PrintRebinLabels.call(id) }
+        end
+
+        r.patch do
+          res = interactor.validate_print_rebin_labels(params[:rebin])
+          if res.success
+            store_locally(:print_rebin_labels_params, res.instance)
+            r.redirect("/list/run_rebins/multi?key=print_rebin_labels&id=#{id}")
+          else
+            re_show_form(r, res) do
+              Production::Runs::Rebins::PrintRebinLabels.call(id,
+                                                              form_values: params[:rebin],
+                                                              form_errors: res.errors)
+            end
+          end
+        end
+      end
+
       r.is do
         r.get do       # SHOW
           check_auth!('runs', 'read')
@@ -713,7 +749,7 @@ class Nspack < Roda
                           line_code
                           status
                           allow_cultivar_group_mixing]
-            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message, grid_id: 'grid_production_runs')
           else
             re_show_form(r, res) { Production::Runs::ProductionRun::Edit.call(id, form_values: params[:production_run], form_errors: res.errors) }
           end

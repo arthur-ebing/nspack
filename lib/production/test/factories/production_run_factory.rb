@@ -35,7 +35,9 @@ module ProductionApp
         active: true,
         created_at: '2010-01-01 12:00',
         updated_at: '2010-01-01 12:00',
-        allow_cultivar_group_mixing: false
+        allow_cultivar_group_mixing: false,
+        legacy_bintip_criteria: nil,
+        legacy_data: nil
       }
       DB[:production_runs].insert(default.merge(opts))
     end

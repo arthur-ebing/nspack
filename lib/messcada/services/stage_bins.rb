@@ -13,14 +13,16 @@ module MesscadaApp
       active_presort_staging_run_child_id = repo.running_child_run_for_plant_resource(plant_resource_code)
       bin_ids = repo.select_values(:rmt_bins, :id, bin_asset_number: bins)
       location_to_id = repo.get_value(:plant_resources, :location_id, plant_resource_code: plant_resource_code)
-      delivery_repo.update_rmt_bin(bin_ids, presort_staging_run_child_id: active_presort_staging_run_child_id)
+      delivery_repo.update_rmt_bin(bin_ids, presort_staging_run_child_id: active_presort_staging_run_child_id, staged_for_presorting_at: Time.now, staged_for_presorting: true)
 
       bin_ids.each do |b|
-        res = FinishedGoodsApp::MoveStock.call(AppConst::BIN_STOCK_TYPE, b, location_to_id, AppConst::PRESORT_STAGING_BUSINESS_PROCESS, nil)
-        raise unwrap_failed_response(res) unless res.success
+        unless repo.exists?(:rmt_bins, id: b, location_id: location_to_id)
+          res = FinishedGoodsApp::MoveStock.call(AppConst::BIN_STOCK_TYPE, b, location_to_id, AppConst::PRESORT_STAGING_BUSINESS_PROCESS, nil)
+          raise unwrap_failed_response(res) unless res.success
+        end
       end
 
-      CreateApportBins.call(bin_ids, active_presort_staging_run_child_id)
+      CreateApportBins.call(bin_ids, active_presort_staging_run_child_id, plant_resource_code)
     end
 
     def self.result(bin_results)

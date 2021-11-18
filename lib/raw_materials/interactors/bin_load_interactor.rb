@@ -92,6 +92,7 @@ module RawMaterialsApp
         end
 
         repo.ship_bin_load(id, @user, 'SHIPPED')
+        send_hbs_edi(id)
         log_transaction
       end
       instance = bin_load(id)
@@ -119,6 +120,7 @@ module RawMaterialsApp
       check!(:ship, id)
       repo.transaction do
         repo.ship_bin_load(id, @user, 'SHIPPED MANUALLY')
+        send_hbs_edi(id)
         log_transaction
       end
       instance = bin_load(id)
@@ -150,6 +152,12 @@ module RawMaterialsApp
       failed_response(e.message)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    end
+
+    def send_hbs_edi(bin_load_id)
+      return ok_response unless AppConst::CR_EDI.send_hbs_edi
+
+      EdiApp::SendEdiOut.call(AppConst::EDI_FLOW_HBS, nil, @user.user_name, bin_load_id, context: { fg_load: false })
     end
 
     def scan_bin_load(params) # rubocop:disable Metrics/AbcSize

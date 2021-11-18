@@ -70,8 +70,9 @@ module MasterfilesApp
         city_id: destination_city_id,
         depot_code: Faker::Lorem.unique.word,
         description: 'ABC',
-        bin_depot: true,
-        active: true
+        bin_depot: false,
+        active: true,
+        magisterial_district: 'ABC'
       }
     end
 

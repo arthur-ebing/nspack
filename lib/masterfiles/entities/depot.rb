@@ -8,6 +8,7 @@ module MasterfilesApp
     attribute :description, Types::String
     attribute :bin_depot, Types::Bool
     attribute? :active, Types::Bool
+    attribute :magisterial_district, Types::String
   end
 
   class DepotFlat < Dry::Struct
@@ -18,5 +19,6 @@ module MasterfilesApp
     attribute :bin_depot, Types::Bool
     attribute :city_name, Types::String
     attribute? :active, Types::Bool
+    attribute :magisterial_district, Types::String
   end
 end

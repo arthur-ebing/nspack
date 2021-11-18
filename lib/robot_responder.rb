@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Crossbeams
-  class RobotResponder
+  class RobotResponder # rubocop:disable Metrics/ClassLength
     attr_accessor :display_lines, :extra_elements
     attr_reader :robot_feedback
 
@@ -22,6 +22,14 @@ module Crossbeams
         render_4_lines
       else
         render_6_lines
+      end
+    end
+
+    def to_s
+      if @display_lines == 4
+        show_4_lines
+      else
+        show_6_lines
       end
     end
 
@@ -99,6 +107,27 @@ module Crossbeams
           <lcd6>#{long_message(@robot_feedback.line6)}</lcd6>#{confirmation}#{extra_render}
         </robot_feedback>
       XML
+    end
+
+    def show_4_lines
+      line1, line2, line3, line4 = @robot_feedback.four_lines
+      cnt = 0
+      lines = [line1, line2, line3, line4].map do |l|
+        cnt += 1
+        txt = long_message(l)
+        txt.nil? ? nil : "line#{cnt}: #{txt}"
+      end.compact
+      "robot feedback - status: #{@robot_feedback.status}, msg: #{long_message(@robot_feedback.msg)} #{lines.join(' ')}#{confirmation}#{extra_render}"
+    end
+
+    def show_6_lines
+      cnt = 0
+      lines = [@robot_feedback.line1, @robot_feedback.line2, @robot_feedback.line3, @robot_feedback.line4, @robot_feedback.line5, @robot_feedback.line6].map do |l|
+        cnt += 1
+        txt = long_message(l)
+        txt.nil? ? nil : "line#{cnt}: #{txt}"
+      end.compact
+      "robot feedback - status: #{@robot_feedback.status}, msg: #{long_message(@robot_feedback.msg)} #{lines.join(' ')}#{confirmation}#{extra_render}"
     end
 
     def confirmation

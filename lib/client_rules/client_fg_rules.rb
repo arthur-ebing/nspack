@@ -11,6 +11,7 @@ module Crossbeams
       hb: { place_of_issue_for_addendum: 'PLZ',
             vgm_required: false,
             reporting_industry: { default: 'citrus', can_override: true },
+            default_depot_for_loads: nil,
             integrate_extended_fg: false,
             max_rmt_bins_on_load: 80,
             max_pallets_on_load: 96,
@@ -20,10 +21,12 @@ module Crossbeams
             pallet_weight_required_for_inspection: true,
             extra_barcode_scan_rules: [],
             titan_cold_store_fbo_code: nil,
-            valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } },
+            valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] },
+            wo_fulfillment_pallet_warning_level: 2 },
       hl: { place_of_issue_for_addendum: 'PLZ',
             vgm_required: false,
             reporting_industry: { default: 'melons', can_override: false },
+            default_depot_for_loads: nil,
             integrate_extended_fg: false,
             max_rmt_bins_on_load: 50,
             max_pallets_on_load: 120,
@@ -33,23 +36,28 @@ module Crossbeams
             pallet_weight_required_for_inspection: true,
             extra_barcode_scan_rules: [],
             titan_cold_store_fbo_code: nil,
-            valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } },
+            valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] },
+            wo_fulfillment_pallet_warning_level: 2 },
       kr: { place_of_issue_for_addendum: 'CPT',
             vgm_required: true,
-            reporting_industry: { default: nil, can_override: false },
+            reporting_industry: { default: 'apples', can_override: false },
+            default_depot_for_loads: nil,
             integrate_extended_fg: true,
-            max_rmt_bins_on_load: 50,
+            max_rmt_bins_on_load: 80,
             max_pallets_on_load: 50,
             use_inspection_destination_for_load_out: false,
-            use_continuous_govt_inspection_sheets: false,
+            use_continuous_govt_inspection_sheets: true,
             pallet_verification_required_for_inspection: false,
-            pallet_weight_required_for_inspection: true,
-            extra_barcode_scan_rules: [{ regex: '^(\\D\\D\\D)$', type: 'location', field: 'location_short_code' }],
+            pallet_weight_required_for_inspection: false,
+            extra_barcode_scan_rules: [{ regex: '^(\\D\\D\\D|01STG\\D\\D\\D|\\D\\D\\D16_\\d+)$', type: 'location', field: 'location_short_code' }],
+            # Matches: AAA  01STGAAA  AHY16_10
             titan_cold_store_fbo_code: 'E2064',
-            valid_pallet_destination: { failed: [/\AREWORKS$/], pending: [/\AREWORKS$/, /\ARA_10/, /\APACKHSE/], loaded: [/\APART_PALLETS/] } },
+            valid_pallet_destination: { failed: [/\AREWORKS$/], pending: [/\AREWORKS$/, /\ARA_10/, /\APACKHSE/], loaded: [/\APART_PALLETS/] },
+            wo_fulfillment_pallet_warning_level: 2 },
       um: { place_of_issue_for_addendum: nil,
             vgm_required: true,
             reporting_industry: { default: nil, can_override: false },
+            default_depot_for_loads: nil,
             integrate_extended_fg: false,
             max_rmt_bins_on_load: 78,
             max_pallets_on_load: 40,
@@ -59,10 +67,12 @@ module Crossbeams
             pallet_weight_required_for_inspection: true,
             extra_barcode_scan_rules: [],
             titan_cold_store_fbo_code: nil,
-            valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } },
+            valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] },
+            wo_fulfillment_pallet_warning_level: 2 },
       ud: { place_of_issue_for_addendum: 'PLZ',
             vgm_required: true,
             reporting_industry: { default: 'citrus', can_override: false },
+            default_depot_for_loads: nil,
             integrate_extended_fg: false,
             max_rmt_bins_on_load: 50,
             max_pallets_on_load: 50,
@@ -72,10 +82,12 @@ module Crossbeams
             pallet_weight_required_for_inspection: false,
             extra_barcode_scan_rules: [],
             titan_cold_store_fbo_code: 'L6875',
-            valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } },
+            valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] },
+            wo_fulfillment_pallet_warning_level: 2 },
       sr: { place_of_issue_for_addendum: 'PLZ',
             vgm_required: true,
             reporting_industry: { default: 'citrus', can_override: false },
+            default_depot_for_loads: 'PECSCGA',
             integrate_extended_fg: false,
             max_rmt_bins_on_load: 80,
             max_pallets_on_load: 80,
@@ -85,10 +97,12 @@ module Crossbeams
             pallet_weight_required_for_inspection: true,
             extra_barcode_scan_rules: [],
             titan_cold_store_fbo_code: nil,
-            valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } },
+            valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] },
+            wo_fulfillment_pallet_warning_level: 2 },
       sr2: { place_of_issue_for_addendum: 'PLZ',
              vgm_required: true,
              reporting_industry: { default: 'citrus', can_override: false },
+             default_depot_for_loads: 'SRW',
              integrate_extended_fg: false,
              max_rmt_bins_on_load: 80,
              max_pallets_on_load: 80,
@@ -98,12 +112,12 @@ module Crossbeams
              pallet_weight_required_for_inspection: true,
              extra_barcode_scan_rules: [],
              titan_cold_store_fbo_code: nil,
-             valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] } }
+             valid_pallet_destination: { failed: [/.+/], pending: [/.+/], loaded: [/.+/] },
+             wo_fulfillment_pallet_warning_level: 2 }
     }.freeze
     # ALLOW_EXPORT_PALLETS_TO_BYPASS_INSPECTION
     # CALCULATE_PALLET_DECK_POSITIONS
     # DEFAULT_CARGO_TEMP_ON_ARRIVAL
-    # DEFAULT_DEPOT
     # DEFAULT_EXPORTER
     # DEFAULT_FIRST_INTAKE_LOCATION
     # DEFAULT_INSPECTION_BILLING
@@ -217,6 +231,12 @@ module Crossbeams
       return 'Regular expression rules for capturing and identifying values from scanned input.' if explain
 
       AppConst::BARCODE_SCAN_RULES + setting(:extra_barcode_scan_rules)
+    end
+
+    def default_depot_for_loads(explain: false)
+      return 'The destination depot for most dispatch loads. Used to speed up the creation of new loads if most loads go to the same destination.' if explain
+
+      setting(:default_depot_for_loads)
     end
   end
 end

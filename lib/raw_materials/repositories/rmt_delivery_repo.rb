@@ -164,34 +164,7 @@ module RawMaterialsApp
     end
 
     def find_rmt_bin_flat(id)
-      hash = find_with_association(
-        :rmt_bins, id,
-        parent_tables: [{ parent_table: :orchards,
-                          flatten_columns: { orchard_code: :orchard_code } },
-                        { parent_table: :farms,
-                          flatten_columns: { farm_code: :farm_code, description: :farm_description, farm_group_id: :farm_group_id } },
-                        { parent_table: :rmt_sizes,
-                          flatten_columns: { size_code: :size_code } },
-                        { parent_table: :pucs,
-                          flatten_columns: { puc_code: :puc_code } },
-                        { parent_table: :seasons,
-                          flatten_columns: { season_code: :season_code, season_year: :season_year } },
-                        { parent_table: :rmt_classes,
-                          flatten_columns: { rmt_class_code: :class_code } },
-                        { parent_table: :locations,
-                          flatten_columns: { location_long_code: :location_long_code } },
-                        { parent_table: :rmt_container_types,
-                          flatten_columns: { container_type_code: :container_type_code } },
-                        { parent_table: :rmt_container_material_types,
-                          flatten_columns: { container_material_type_code: :container_material_type_code } },
-                        { parent_table: :cultivars, foreign_key: :cultivar_id,
-                          flatten_columns: { cultivar_code: :cultivar_code,  cultivar_name: :cultivar_name, cultivar_group_id: :cultivar_group_id } },
-                        { parent_table: :cultivar_groups, foreign_key: :cultivar_group_id,
-                          flatten_columns: { cultivar_group_code: :cultivar_group_code, commodity_id: :commodity_id } },
-                        { parent_table: :commodities, foreign_key: :commodity_id,
-                          flatten_columns: { code: :commodity_code, description: :commodity_description } }],
-        lookup_functions: [{ function: :fn_current_status, args: ['rmt_bins', :id], col_name: :status }]
-      )
+      hash = flat_bin_hash(id)
 
       return nil if hash.nil?
 
@@ -328,6 +301,12 @@ module RawMaterialsApp
         ).first
     end
 
+    def find_rmt_container_material_owner_by_container_material_type(rmt_container_material_type_id)
+      DB[:rmt_container_material_owners]
+        .where(rmt_container_material_type_id: rmt_container_material_type_id)
+        .get(:rmt_material_owner_party_role_id)
+    end
+
     def find_rmt_delivery_by_bin_id(id)
       OpenStruct.new DB[:rmt_deliveries].where(id: DB[:rmt_bins].where(id: id).select(:rmt_delivery_id)).first
     end
@@ -348,6 +327,44 @@ module RawMaterialsApp
       return rmt_bin unless rmt_bin.nil_or_empty?
 
       DB["SELECT * FROM rmt_bins WHERE (tipped_asset_number = '#{bin_asset_number}')"].first
+    end
+
+    def flat_bin_hash(id)
+      find_with_association(
+        :rmt_bins, id,
+        parent_tables: [{ parent_table: :orchards,
+                          flatten_columns: { orchard_code: :orchard_code } },
+                        { parent_table: :farms,
+                          flatten_columns: { farm_code: :farm_code, description: :farm_description, farm_group_id: :farm_group_id } },
+                        { parent_table: :rmt_sizes,
+                          flatten_columns: { size_code: :size_code } },
+                        { parent_table: :pucs,
+                          flatten_columns: { puc_code: :puc_code } },
+                        { parent_table: :seasons,
+                          flatten_columns: { season_code: :season_code, season_year: :season_year } },
+                        { parent_table: :rmt_classes,
+                          flatten_columns: { rmt_class_code: :class_code } },
+                        { parent_table: :locations,
+                          flatten_columns: { location_long_code: :location_long_code } },
+                        { parent_table: :rmt_container_types,
+                          flatten_columns: { container_type_code: :container_type_code } },
+                        { parent_table: :rmt_container_material_types,
+                          flatten_columns: { container_material_type_code: :container_material_type_code } },
+                        { parent_table: :cultivars, foreign_key: :cultivar_id,
+                          flatten_columns: { cultivar_code: :cultivar_code,  cultivar_name: :cultivar_name, cultivar_group_id: :cultivar_group_id } },
+                        # NOTE: Cultivar_group is read from rmt_bins.cultivars.cultivar_group_id - not rmt_bins.cultivar_group_id...
+                        #       (cultivar_group_id is optional on rmt_bins, but cultivar_id is not)
+                        { parent_table: :cultivar_groups, foreign_key: :cultivar_group_id,
+                          flatten_columns: { cultivar_group_code: :cultivar_group_code, commodity_id: :commodity_id } },
+                        { parent_table: :commodities, foreign_key: :commodity_id,
+                          flatten_columns: { code: :commodity_code, description: :commodity_description } }],
+        lookup_functions: [{ function: :fn_current_status, args: ['rmt_bins', :id], col_name: :status }]
+      )
+    end
+
+    def find_flat_bin_by_asset_number(bin_asset_number)
+      id = DB[:rmt_bins].where(bin_asset_number: bin_asset_number, exit_ref: nil).or(tipped_asset_number: bin_asset_number).reverse(:id).get(:id)
+      flat_bin_hash(id)
     end
 
     def find_rmt_bin_stock(bin_number)
@@ -586,18 +603,73 @@ module RawMaterialsApp
       DB[:bin_integration_queue].where(id: id).delete
     end
 
-    def log_bin_integration_queue_error(id, message, stacktrace = nil)
-      update(:bin_integration_queue, id, error: { err: message, stacktrace: stacktrace.to_s }.to_json)
+    def log_bin_integration_queue_error(id, message, is_delivery_error, is_bin_error, stacktrace = nil)
+      update(:bin_integration_queue, id, error: { err: message, stacktrace: stacktrace.to_s }.to_json, is_delivery_error: is_delivery_error, is_bin_error: is_bin_error)
     end
 
     def send_email_if_bin_errors(job_no)
-      return unless repo.exists?(:bin_integration_queue, Sequel.lit("job_no=#{job_no} and errors is not null"))
+      return unless exists?(:bin_integration_queue, Sequel.lit("job_no=#{job_no} and error is not null"))
 
       mail = <<~STR
         There were bin errors when executing job: #{job_no}
       STR
 
       ErrorMailer.send_error_email(subject: 'LEGACY BIN INTEGRATION FAIL', message: mail, append_recipients: AppConst::LEGACY_SYSTEM_ERROR_RECIPIENTS)
+    end
+
+    def container_material_owner_for(rmt_material_owner_party_role_id, rmt_container_material_type_id)
+      owner_id = DB[:rmt_container_material_owners]
+                 .where(rmt_material_owner_party_role_id: rmt_material_owner_party_role_id, rmt_container_material_type_id:  rmt_container_material_type_id)
+                 .get(:id)
+      DB.get(Sequel.function(:fn_party_role_name_with_role, owner_id))
+    end
+
+    def presort_unit_for(presort_staging_run_child_id)
+      presort_unit_id = DB[:presort_staging_run_children]
+                        .join(:presort_staging_runs, id: :presort_staging_run_id)
+                        .where(Sequel[:presort_staging_run_children][:id] => presort_staging_run_child_id)
+                        .get(:presort_unit_plant_resource_id)
+      DB[:plant_resources].where(id: presort_unit_id).get(:plant_resource_code)
+    end
+
+    def most_recent_tripsheet_for_rmt_bin(rmt_bin_id) # rubocop:disable Metrics/AbcSize
+      DB[:rmt_bins]
+        .join(:vehicle_job_units, stock_item_id: :id)
+        .join(:vehicle_jobs, id: :vehicle_job_id)
+        .join(:stock_types, id: :stock_type_id)
+        .join(:locations, id: Sequel[:vehicle_jobs][:planned_location_to_id])
+        .where(Sequel[:rmt_bins][:id] => rmt_bin_id)
+        .where(stock_type_code: AppConst::BIN_STOCK_TYPE)
+        .select(Sequel[:vehicle_jobs][:id],
+                Sequel[:vehicle_jobs][:loaded_at],
+                Sequel[:vehicle_jobs][:offloaded_at],
+                :location_long_code)
+        .order(Sequel.desc(Sequel[:vehicle_jobs][:id]))
+        .first
+    end
+
+    def pallet_sequences_attrs_for_rmt_bin(rmt_bin_id)
+      DB[:pallet_sequences]
+        .join(:farms, id: :farm_id)
+        .join(:orchards, id: Sequel[:pallet_sequences][:orchard_id])
+        .exclude(pallet_id: nil)
+        .where(source_bin_id: rmt_bin_id)
+        .order(Sequel[:pallet_sequences][:id])
+        .select(:pallet_number,
+                :pallet_sequence_number,
+                :farm_code,
+                :orchard_code,
+                :nett_weight)
+        .all
+    end
+
+    def tripsheet_bin_count(vehicle_job_id, stock_type_id)
+      DB[:vehicle_job_units].where(vehicle_job_id: vehicle_job_id, stock_type_id: stock_type_id).count
+    end
+
+    def maximum_units_exceeded_for_location?(location_id, scanned_bins_count)
+      units_in_location, maximum_units = get_value(:locations, %i[units_in_location maximum_units], id: location_id)
+      (units_in_location + scanned_bins_count) > maximum_units
     end
   end
 end

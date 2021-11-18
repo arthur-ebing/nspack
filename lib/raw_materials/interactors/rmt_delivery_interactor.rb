@@ -14,7 +14,7 @@ module RawMaterialsApp
         vehicle_job_id = insp_repo.create_vehicle_job(res)
         bins = repo.select_values(:rmt_bins, :id, rmt_delivery_id: delivery_id)
         bins.each do |bin_id|
-          if insp_repo.vehicle_job_unit_in_different_tripsheet?(bin_id, vehicle_job_id)
+          if insp_repo.vehicle_job_unit_in_different_tripsheet?(bin_id, vehicle_job_id, AppConst::BIN_STOCK_TYPE)
             error_bins << bin_id
           else
             res = validate_vehicle_job_unit_params(stock_item_id: bin_id, stock_type_id: stock_type_id,
@@ -74,7 +74,8 @@ module RawMaterialsApp
 
       repo.transaction do
         vehicle_job_id = repo.get_id(:vehicle_jobs, rmt_delivery_id: id)
-        bins = repo.select_values(:vehicle_job_units, :stock_item_id, vehicle_job_id: vehicle_job_id)
+        stock_type_id = repo.get_id(:stock_types, stock_type_code: AppConst::BIN_STOCK_TYPE)
+        bins = repo.select_values(:vehicle_job_units, :stock_item_id, stock_type_id: stock_type_id, vehicle_job_id: vehicle_job_id)
         repo.update(:rmt_deliveries, id, tripsheet_created: false, tripsheet_created_at: nil, tripsheet_loaded: false, tripsheet_loaded_at: nil)
         insp_repo.delete_vehicle_job(vehicle_job_id)
         log_multiple_statuses(:rmt_bins, bins, AppConst::DELIVERY_TRIPSHEET_CANCELED)
@@ -96,7 +97,8 @@ module RawMaterialsApp
         insp_repo.load_vehicle_job_units(vehicle_job_id)
 
         log_status(:rmt_deliveries, id, AppConst::RMT_BIN_LOADED_ON_VEHICLE)
-        log_multiple_statuses(:rmt_bins, repo.select_values(:vehicle_job_units, :stock_item_id, vehicle_job_id: vehicle_job_id), AppConst::RMT_BIN_LOADED_ON_VEHICLE)
+        stock_type_id = repo.get_id(:stock_types, stock_type_code: AppConst::BIN_STOCK_TYPE)
+        log_multiple_statuses(:rmt_bins, repo.select_values(:vehicle_job_units, :stock_item_id, stock_type_id: stock_type_id, vehicle_job_id: vehicle_job_id), AppConst::RMT_BIN_LOADED_ON_VEHICLE)
       end
 
       success_response('Vehicle Loaded')

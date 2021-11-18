@@ -18,12 +18,14 @@ module UiRules
       fields[:production_region_code] = { renderer: :label }
       fields[:description] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
+      fields[:inspection_region] = { renderer: :label }
     end
 
     def common_fields
       {
         production_region_code: { required: true },
-        description: {}
+        description: {},
+        inspection_region: {}
       }
     end
 
@@ -37,8 +39,7 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(production_region_code: nil,
-                                    description: nil)
+      @form_object = new_form_object_from_struct(MasterfilesApp::ProductionRegion)
     end
   end
 end

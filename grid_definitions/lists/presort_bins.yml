@@ -1,0 +1,108 @@
+---
+:dataminer_definition: rmt_bins_kr
+:actions:
+- :url: "/raw_materials/deliveries/rmt_bins/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/raw_materials/deliveries/rmt_bins/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+  :hide_if_true: bin_tipped
+- :url: "/raw_materials/deliveries/rmt_bins/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+  :hide_if_true: bin_tipped
+- :url: "/raw_materials/deliveries/rmt_bins/$:id$/print_barcode"
+  :text: print
+  :icon: printer
+  :title: Print
+  :popup: true
+  :hide_if_false: discrete_bin
+- :separator: true
+- :url: "/development/transactions/list/rmt_bins/$:id$"
+  :text: transactions
+  :icon: code
+  :title: Transactions
+  :popup: true
+:captions:
+  :conditions:
+    :location_bins: Location Bins
+    :production_run_bin: Bins for Production Run
+    :production_run_rebin: Rebins for Production Run
+:conditions:
+  :standard:
+    - :col: rmt_delivery_id
+      :op: =
+      :val: $:delivery_id$
+  :in_stock:
+    - :col: null_exit_ref
+      :op: =
+      :val: true
+  :tipped:
+    - :col: bin_tipped
+      :op: =
+      :val: $:tipped$
+  :shipped:
+    - :col: shipped
+      :op: =
+      :val: true
+  :location_bins:
+    - :col: null_exit_ref
+      :op: =
+      :val: true
+    - :col: location_id
+      :op: IN
+      :val: $:location_ids$
+  :production_run_bin:
+    - :col: production_run_tipped_id
+      :op: =
+      :val: $:id$
+  :production_run_rebin:
+    - :col: production_run_rebin_id
+      :op: =
+      :val: $:id$
+  :staged_presort_bins:
+    - :col: staged_for_presorting
+      :op: =
+      :val: true
+    - :col: tipped_in_presort_at
+      :op: is_null
+      :val: is_null
+  :tipped_presort_bins:
+    - :col: staged_for_presorting
+      :op: =
+      :val: true
+    - :col: tipped_in_presort_at
+      :op: not_null
+      :val: not_null
+  :presort_bin_stock:
+    - :col: staged_for_presorting
+      :op: =
+      :val: true
+    - :col: shipped_asset_number
+      :op: is_null
+      :val: is_null
+    - :col: tipped_asset_number
+      :op: is_null
+      :val: is_null
+  :shipped_presort_bins:
+    - :col: staged_for_presorting
+      :op: =
+      :val: true
+    - :col: shipped_asset_number
+      :op: not_null
+      :val: not_null
+:multiselect:
+  :allocate:
+    :url: "/raw_materials/dispatch/bin_load_products/$:id$/allocate_multiselect"
+    :preselect: "SELECT id FROM vw_rmt_bins_flat WHERE bin_load_product_id = $:id$"
+    :section_caption: 'Allocate Bins to load'
+    :multiselect_save_method: remote
+    :can_be_cleared: true
+    :conditions: available

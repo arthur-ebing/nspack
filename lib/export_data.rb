@@ -21,13 +21,18 @@ module Crossbeams
       @log_id = nil
     end
 
-    def run # rubocop:disable Metrics/AbcSize
+    def run # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       log('Starting export', start: true)
 
       validate
       set_defaults
       prepare
       run_report
+      if recs.empty?
+        log('Export completed - no data extracted', complete: true)
+        return
+      end
+
       write_csv_file if for_csv?
       write_xls_file if for_xls?
 

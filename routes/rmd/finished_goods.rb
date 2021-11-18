@@ -88,8 +88,16 @@ class Nspack < Roda
       r.post do
         repo = MesscadaApp::MesscadaRepo.new
         if FinishedGoodsApp::GovtInspectionRepo.new.find_vehicle_job(id).business_process_id == repo.find_business_process('FIRST_INTAKE')[:id]
-          seqs = repo.find_pallet_sequences_by_pallet_number(params[:pallet][:pallet_number]).all
-          form = Crossbeams::RMDForm.new({ pallet_number: params[:pallet][:pallet_number] },
+
+          res = MesscadaApp::ScanCartonLabelOrPallet.call(scanned_number: params[:pallet][:pallet_number], expect: :pallet_number)
+          unless res.success
+            store_locally(:error, res)
+            route.redirect("/rmd/finished_goods/scan_offload_vehicle_pallet/#{id}")
+          end
+          pallet_no = res.instance.pallet_number
+
+          seqs = repo.find_pallet_sequences_by_pallet_number(pallet_no).all
+          form = Crossbeams::RMDForm.new({ pallet_number: pallet_no },
                                          form_name: :pallet,
                                          notes: nil,
                                          scan_with_camera: @rmd_scan_with_camera,
@@ -98,7 +106,7 @@ class Nspack < Roda
                                          action: "/rmd/finished_goods/reject_vehicle_pallet/#{id}",
                                          button_caption: 'Reject Pallet')
 
-          form.add_label(:pallet_number, 'Pallet Number', params[:pallet][:pallet_number], params[:pallet][:pallet_number])
+          form.add_label(:pallet_number, 'Pallet Number', pallet_no, pallet_no)
           form.add_label(:pallet_sequences, 'Pallet Number Sequences', seqs.length)
           form.add_label(:pallet_sequences, 'Pallet Ctn Qty', seqs.empty? ? '-' : seqs[0][:pallet_carton_quantity])
           form.add_label(:packhouse, 'Packhouse', seqs.map { |s| s[:packhouse] }.uniq.join(','))
@@ -844,10 +852,10 @@ class Nspack < Roda
                                          action: '/rmd/finished_goods/pallet_movements/move_pallet',
                                          button_caption: 'Submit')
 
-          form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location, submit_form: false, required: true, lookup: true)
+          form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location, submit_form_set: true, required: true, lookup: true)
           form.add_label(:remaining_num_position, 'Remaining No Position', pallet[:remaining_num_position]) unless pallet[:remaining_num_position].nil_or_empty?
           form.add_label(:next_position, 'Next Position', pallet[:next_position]) unless pallet[:next_position].nil_or_empty?
-          form.add_field(:pallet_number, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: true, data_type: :number, required: true)
+          form.add_field(:pallet_number, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form_set: true, data_type: :number, required: true)
           form.add_csrf_tag csrf_tag
           view(inline: form.render, layout: :layout_rmd)
         end
@@ -1365,7 +1373,7 @@ class Nspack < Roda
     r.on 'cancel_pallet_tripsheet', Integer do |id|
       interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
-      res = interactor.cancel_manual_tripsheet(id)
+      res = interactor.cancel_manual_tripsheet(id, AppConst::PALLET_STOCK_TYPE)
       if res.success
         store_locally(:flash_notice, res.message)
         r.redirect('/rmd/finished_goods/create_pallet_tripsheet')
@@ -1378,8 +1386,21 @@ class Nspack < Roda
     r.on 'create_pallet_vehicle_job_unit', Integer do |id|
       interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
-      res = MesscadaApp::ScanCartonLabelOrPallet.call(scanned_number: params[:pallet][:carton_number])
-      params[:pallet][:carton_number] = res.instance.carton_label_id
+      unless params[:pallet][:carton_number].nil_or_empty?
+        res = MesscadaApp::ScanCartonLabelOrPallet.call(scanned_number: params[:pallet][:carton_number])
+        unless res.success
+          store_locally(:error, unwrap_failed_response(res))
+          r.redirect("/rmd/finished_goods/scan_tripsheet_pallet/#{id}")
+        end
+        params[:pallet][:carton_number] = res.instance.carton_label_id
+      end
+
+      res = MesscadaApp::ScanCartonLabelOrPallet.call(scanned_number: params[:pallet][:pallet_number], expect: :pallet_number)
+      unless res.success
+        store_locally(:error, unwrap_failed_response(res))
+        r.redirect("/rmd/finished_goods/scan_tripsheet_pallet/#{id}")
+      end
+      params[:pallet][:pallet_number] = res.instance.pallet_number
 
       res = interactor.create_pallet_vehicle_job_unit(id, params[:pallet][:pallet_number], params[:pallet][:carton_number])
 
@@ -1502,7 +1523,8 @@ class Nspack < Roda
   def offload_valid_vehicle_pallet(route, id) # rubocop:disable Metrics/AbcSize
     interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
-    res = interactor.offload_vehicle_pallet(params[:pallet][:pallet_number])
+    res = MesscadaApp::ScanCartonLabelOrPallet.call(scanned_number: params[:pallet][:pallet_number], expect: :pallet_number)
+    res = interactor.offload_vehicle_pallet(res.instance.pallet_number) if res.success
     if res.success
       store_locally(:flash_notice, res.message)
     else

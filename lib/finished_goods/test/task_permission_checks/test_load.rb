@@ -11,6 +11,7 @@ module FinishedGoodsApp
         id: 1,
         load_id: 1,
         rmt_load: false,
+        truck_must_be_weighed: false,
         customer_party_role_id: 1,
         customer: 'ABC',
         consignee_party_role_id: 1,

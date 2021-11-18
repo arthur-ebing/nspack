@@ -209,6 +209,8 @@ module ProductionApp
 
     def print_pallet_label(pallet_id, params)
       instance = get_pallet_label_data(pallet_id)
+      raise Crossbeams::InfoError, "Label data for pallet #{pallet_id} not found" if instance.nil?
+
       host = params[:robot_ip] # can be nil
       LabelPrintingApp::PrintLabel.call(params[:pallet_label_name], instance, params, host)
     rescue Crossbeams::InfoError => e
@@ -380,7 +382,8 @@ module ProductionApp
       end
       res.instance = { changes: { product_setup_id: res.instance[:product_setup_id],
                                   label_template_name: repo.resource_allocation_label_name(product_resource_allocation_id),
-                                  work_order_item_code: repo.work_order_item_code_for(product_resource_allocation_id) } }
+                                  work_order_item_code: repo.work_order_item_code_for(product_resource_allocation_id),
+                                  colour_rule: res.instance[:colour_rule] } }
       res
     end
 
@@ -392,7 +395,8 @@ module ProductionApp
       end
       res.instance = { changes: { packing_specification_item_code: res.instance[:packing_specification_item_code],
                                   label_template_name: repo.resource_allocation_label_name(product_resource_allocation_id),
-                                  work_order_item_code: repo.work_order_item_code_for(product_resource_allocation_id) } }
+                                  work_order_item_code: repo.work_order_item_code_for(product_resource_allocation_id),
+                                  colour_rule: res.instance[:colour_rule] } }
       res
     end
 
@@ -406,10 +410,21 @@ module ProductionApp
       res
     end
 
-    def update_product_resource_allocation(id, params)
-      params[:product_setup_id] = repo.find_packing_spec_item_setup_id(params[:packing_specification_item_id]) if AppConst::CR_PROD.use_packing_specifications?
+    def add_product_setup_from_pack_spec(params)
+      return params unless AppConst::CR_PROD.use_packing_specifications?
 
-      res = validate_product_resource_allocation(params)
+      product_setup_id = if params[:packing_specification_item_id].nil_or_empty?
+                           nil
+                         else
+                           repo.find_packing_spec_item_setup_id(params[:packing_specification_item_id])
+                         end
+      params.merge(product_setup_id: product_setup_id)
+    end
+
+    def update_product_resource_allocation(id, params)
+      attrs = add_product_setup_from_pack_spec(params)
+
+      res = validate_product_resource_allocation(attrs)
       return validation_failed_response(res) if res.failure?
 
       repo.transaction do
@@ -733,6 +748,71 @@ module ProductionApp
       else
         failed_response(%(There is no handler for changed column "#{params[:column_name]}"))
       end
+    end
+
+    def build_pallet_history(pallet_number)
+      success_response('ok', id: repo.get_id(:pallets, pallet_number: pallet_number), pallet_number: pallet_number)
+    end
+
+    def ext_fg_codes_for(pallet_id) # rubocop:disable Metrics/AbcSize
+      items = repo.select_values(:pallet_sequences, %i[id pallet_sequence_number packing_specification_item_id legacy_data], pallet_id: pallet_id)
+      fg_codes = {}
+      seq_nos = {}
+      items.each do |id, seq_no, spec_id, _|
+        seq_nos[id] = seq_no
+        fg_codes[spec_id] ||= product_setup_repo.calculate_extended_fg_code(spec_id)
+      end
+
+      seq_items = product_setup_repo.sequences_grouped_for_ext_fg(pallet_id)
+      sfg_codes = {}
+      seq_items.each do |seq|
+        fg_code = product_setup_repo.calculate_extended_fg_code_from_sequences(seq)
+        seq[:ids].each { |i| sfg_codes[seq_nos[i]] = fg_code }
+      end
+
+      seq_items2 = product_setup_repo.sequences_grouped_for_ext_fg(pallet_id)
+      sfg_codes2 = {}
+      seq_items2.each do |seq|
+        fg_code = product_setup_repo.calculate_extended_fg_code_from_sequences(seq, packaging_marks_join: '-')
+        seq[:ids].each { |i| sfg_codes2[seq_nos[i]] = fg_code }
+      end
+      success_response('ok',
+                       ['Current values:'] + items.sort.map { |_, seq, _, data| { seq => data['extended_fg_code'] } } +
+                       ['Spec values:'] + items.sort.map { |_, seq, spec_id, _| { seq => fg_codes[spec_id] } } +
+                       ['With -'] + sfg_codes.sort.map { |i, v| { i => v } } +
+                       ['With _'] + sfg_codes2.sort.map { |i, v| { i => v } })
+    end
+
+    def ext_fg_codes_with_lookup_for(pallet_id) # rubocop:disable Metrics/AbcSize
+      items = repo.select_values(:pallet_sequences, %i[id pallet_sequence_number packing_specification_item_id legacy_data], pallet_id: pallet_id)
+      fg_codes = {}
+      seq_nos = {}
+      items.each do |id, seq_no, spec_id, _|
+        seq_nos[id] = seq_no
+        fg_codes[spec_id] ||= product_setup_repo.calculate_extended_fg_code(spec_id)
+      end
+
+      seq_items = product_setup_repo.sequences_grouped_for_ext_fg(pallet_id)
+      sfg_codes = {}
+      seq_items.each do |seq|
+        fg_code = product_setup_repo.calculate_extended_fg_code_from_sequences(seq)
+        lkp = ProductionApp::LookupExtendedFgCodeId.call(fg_code)
+        if lkp.success
+          seq[:ids].each { |i| sfg_codes[seq_nos[i]] = { code: fg_code, id: lkp.instance } }
+        else
+          fg_code = product_setup_repo.calculate_extended_fg_code_from_sequences(seq, packaging_marks_join: '-')
+          lkp = ProductionApp::LookupExtendedFgCodeId.call(fg_code)
+          if lkp.success
+            seq[:ids].each { |i| sfg_codes[seq_nos[i]] = { code: fg_code, id: lkp.instance } }
+          else
+            seq[:ids].each { |i| sfg_codes[seq_nos[i]] = { code: fg_code, id: 'Neither FG code could be found' } }
+          end
+        end
+      end
+      success_response('ok',
+                       ['Current values:'] + items.sort.map { |_, seq, _, data| { seq => data['extended_fg_code'] } } +
+                       ['Spec values:'] + items.sort.map { |_, seq, spec_id, _| { seq => fg_codes[spec_id] } } +
+                       ['Lookups:'] + sfg_codes.sort.map { |i, v| { i => v } })
     end
 
     private

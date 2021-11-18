@@ -90,6 +90,7 @@ module MesscadaApp
                   login_at: Time.now,
                   identifier: identifier)
       end
+      AppConst.log_authentication("DB login - contract worker_id: #{system_resource[:contract_worker_id]}, system_resource_id: #{system_resource[:id]}")
 
       success_response('Logged on', contract_worker: name, identifier: identifier)
     end
@@ -97,6 +98,7 @@ module MesscadaApp
     def logout_worker(contract_worker_id)
       # 1. find the resource
       system_resource_id = DB[:system_resource_logins].where(contract_worker_id: contract_worker_id, active: true).get(:system_resource_id)
+      return ok_response if system_resource_id.nil?
 
       # 2. Logout
       DB[:system_resource_logins]
@@ -105,7 +107,8 @@ module MesscadaApp
                 from_external_system: false,
                 active: false)
 
-      logout_from_messcada(system_resource_id, contract_worker_id) unless system_resource_id.nil?
+      AppConst.log_authentication("DB logout contract_worker_id: #{contract_worker_id}, system_resource_id: #{system_resource_id}")
+      logout_from_messcada(system_resource_id, contract_worker_id) # unless system_resource_id.nil?
 
       ok_response
     end
@@ -122,17 +125,39 @@ module MesscadaApp
                 from_external_system: false,
                 active: false)
 
+      AppConst.log_authentication("DB logout device - contract worker_ids: #{contract_worker_ids.inspect}, system_resource_id: #{system_resource_id}")
       contract_worker_ids.each do |contract_worker_id|
-        logout_from_messcada(system_resource_id, contract_worker_id) unless system_resource_id.nil?
+        logout_from_messcada(system_resource_id, contract_worker_id) # unless system_resource_id.nil?
       end
 
       ok_response
     end
 
     def logout_from_messcada(system_resource_id, contract_worker_id)
+      # First queue a logout for individual
+      puts ">>> Logout INDIV - RES: #{system_resource_id} WRK: #{contract_worker_id}"
+      enqueue_logout_job(system_resource_id, contract_worker_id)
+
+      # Get the group id if the contract worker belongs to a group
+      group_id = contract_worker_active_group_incentive_id(contract_worker_id)
+      return if group_id.nil?
+
+      # Logout from the group if applicable
+      group_resource_id = DB[:group_incentives].where(id: group_id).get(:system_resource_id)
+      puts ">>> Logout GROUP - RES: #{group_resource_id} WRK: #{contract_worker_id}"
+      enqueue_logout_job(group_resource_id, contract_worker_id)
+    end
+
+    def enqueue_logout_job(system_resource_id, contract_worker_id)
+      return if system_resource_id.nil?
+
+      puts '>>> getting system resource data'
       opts = DB[:system_resources].where(id: system_resource_id).select(:system_resource_code, :ip_address, :legacy_messcada).first
+      puts '>>> not legacy messcada' unless opts[:legacy_messcada]
       return unless opts[:legacy_messcada]
 
+      puts '>>> enqueuing job to logoff messcada'
+      AppConst.log_authentication("DB enqueuing job to logoff messcada - contract_worker_id: #{contract_worker_id}, system_resource_id: #{system_resource_id} code: #{opts[:system_resource_code]} ip: #{opts[:ip_address]}")
       Job::LogoutFromMesScadaRobot.enqueue(system_resource_id, opts[:system_resource_code], opts[:ip_address], contract_worker_id)
     end
 
@@ -144,6 +169,13 @@ module MesscadaApp
       DB[:group_incentives]
         .where(system_resource_id: system_resource_id, active: true)
         .get(:id)
+    end
+
+    def group_has_incentive_workers?(group_incentive_id)
+      ar = DB[:group_incentives]
+           .where(id: group_incentive_id, active: true)
+           .get(:incentive_target_worker_ids) || []
+      ar.length.positive?
     end
 
     def packer_belongs_to_incentive_group?(group_incentive_id, contract_worker_id)
@@ -183,6 +215,7 @@ module MesscadaApp
       attrs = params.to_h
       append_worker_targets(attrs)
 
+      AppConst.log_authentication("DB create group - attributes: #{attrs.inspect}")
       create(:group_incentives, attrs)
     end
 
@@ -192,6 +225,7 @@ module MesscadaApp
       append_worker_targets(attrs) if attrs.key?(:active) && !attrs[:active]
 
       attrs[:from_external_system] = false
+      AppConst.log_authentication("DB update group - group incentive_id: #{group_incentive_id}, changes: #{attrs.inspect}")
       update(:group_incentives, group_incentive_id, attrs)
     end
 

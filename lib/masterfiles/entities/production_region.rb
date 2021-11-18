@@ -6,5 +6,6 @@ module MasterfilesApp
     attribute :production_region_code, Types::String
     attribute :description, Types::String
     attribute? :active, Types::Bool
+    attribute :inspection_region, Types::String
   end
 end

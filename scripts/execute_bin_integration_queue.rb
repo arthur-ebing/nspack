@@ -37,6 +37,7 @@ class ExecuteBinIntegrationQueue < BaseScript
       success_response('ok')
     end
   rescue StandardError => e
+    ErrorMailer.send_exception_email(e, subject: 'Bin integration queue failure')
     failed_response(e.message)
   end
 

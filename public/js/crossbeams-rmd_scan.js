@@ -12,7 +12,7 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
   const stdMsg = 'You are currently offline. Please check network settings and re-connect.';
   const subMsg = 'Attempting to process transation - waiting for connection. Please re-connect.';
   const menu = document.getElementById('rmd_menu');
-  const logout = document.getElementById('logout');
+  const logout = document.getElementById('logout') || document.createElement('div');
   const offlineStatus = document.getElementById('rmd-offline-status');
   const scannableInputs = document.querySelectorAll('[data-scanner]');
   const cameraScan = document.getElementById('cameraScan');
@@ -85,11 +85,14 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
     }).then((data) => {
       if (data.flash) {
         if (data.flash.type && data.flash.type === 'permission') {
+          crossbeamsAudio.beep();
           label.innerHTML = '<span class="light-red">Permission error</span>';
         } else {
+          crossbeamsAudio.beep();
           label.innerHTML = '<span class="light-red">Error</span>';
         }
         if (data.exception) {
+          crossbeamsAudio.beep();
           if (data.backtrace) {
             console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error); // eslint-disable-line no-console
             console.info('==Backend Backtrace=='); // eslint-disable-line no-console
@@ -100,8 +103,12 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
       } else {
         label.innerHTML = data.showField;
         hiddenVal.value = data.showField;
+        if (data.beep) {
+          crossbeamsAudio.beep();
+        }
       }
     }).catch((data) => {
+      crossbeamsAudio.beep();
       console.info('==ERROR==', data); // eslint-disable-line no-console
     });
     return null;
@@ -111,7 +118,6 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
    * Handle form submission, delaying if the connection is not available.
    * @returns {void}
    */
-
   const formSubmitter = () => {
     // Note this might not work if the OS does not trigger on/offline events in the browser...
     // In that case we will need to trigger fetch requests to check the connection.
@@ -134,6 +140,25 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
         formSubmitter();
       }, 500);
     }
+  };
+
+  /**
+   * isHiddenFromView - returns true if a node is hidden in the DOM.
+   */
+  const isHiddenFromView = elem => elem.getClientRects().length === 0;
+
+  /**
+   * Check if all scan fields that belong to a set have values.
+   */
+  const formSetIsFull = () => {
+    const set = document.querySelectorAll('[data-submit-form-set]');
+    let assigned = true;
+    set.forEach((node) => {
+      if ((!node.value || node.value === '') && !isHiddenFromView(node)) {
+        assigned = false;
+      }
+    });
+    return assigned;
   };
 
   /**
@@ -222,6 +247,23 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
     }
   };
 
+  const unpackLoginValue = (rawVal) => {
+    const val = rawVal.split(/\r\n|\r|\n/)[0]; // remove newlines
+    const res = { success: false };
+    res.success = true;
+    res.identifier = val;
+    res.readerId = '1';
+    return res;
+  };
+
+  const unpackScaleValue = (rawVal) => {
+    const val = rawVal.split(/\r\n|\r|\n/)[0]; // remove newlines
+    const res = { success: false };
+    res.success = true;
+    res.weight = val;
+    return res;
+  };
+
   /**
    * Apply scan rules to the scanned value
    * to dig out the actual value and type.
@@ -253,6 +295,7 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
         }
       });
     if (matches.length !== 1) {
+      crossbeamsAudio.beep();
       res.error = matches.length === 0 ? `${val} does not match any scannable rules` : 'Too many rules match';
     } else {
       res.success = true;
@@ -265,6 +308,7 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
    */
   const startScanner = () => {
     const wsUrl = 'ws://127.0.0.1:2115';
+    // const wsUrl = 'ws://192.168.50.228:2115';
     // const wsUrl = 'ws://192.168.50.10:2115';
     let connectedState = false;
 
@@ -285,20 +329,49 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
 
     webSocket.onerror = function onerror(event) {
       if (connectedState) { // Ignore websocket errors if we are not connected.
+        crossbeamsAudio.beep();
         publicAPIs.logit('Connection ERROR', event);
       }
     };
 
     webSocket.onmessage = function onmessage(event) {
+      if (event.data.includes('[LOGIN]')) {
+        const loginPack = unpackLoginValue(event.data.split(',')[0].replace('[LOGIN]', ''));
+        if (!loginPack.success) {
+          publicAPIs.logit(loginPack.error);
+          return;
+        }
+        if (publicAPIs.loginFunc) {
+          publicAPIs.loginFunc(loginPack.readerId, loginPack.identifier);
+        } else {
+          publicAPIs.logit('Login not enabled.');
+        }
+      }
+      if (event.data.includes('[SCALE]')) {
+        const scalePack = unpackScaleValue(event.data.split(',')[0].replace('[SCALE]', ''));
+        if (!scalePack.success) {
+          publicAPIs.logit(scalePack.error);
+          return;
+        }
+        if (publicAPIs.weightFunc) {
+          publicAPIs.weightFunc(scalePack.weight);
+        } else {
+          publicAPIs.logit('Scale weighing not enabled.');
+        }
+      }
       if (event.data.includes('[SCAN]')) {
+        if (publicAPIs.debug) {
+          publicAPIs.logit(`RAW SCAN GOT: ${event.data}`);
+        }
         const scanPack = unpackScanValue(event.data.split(',')[0].replace('[SCAN]', ''));
         if (!scanPack.success) {
           publicAPIs.logit(scanPack.error);
+          crossbeamsAudio.beep();
           return;
         }
         let cnt = 0;
         scannableInputs.forEach((e) => {
-          if (e.value === '' && cnt === 0 && (publicAPIs.bypassRules || e.dataset.scanRule === scanPack.scanType)) {
+          if (e.value === '' && cnt === 0 && (publicAPIs.bypassRules || e.dataset.scanRule === scanPack.scanType) && !isHiddenFromView(e)) {
             e.value = scanPack.value;
             const evt = new Event('change', {
               bubbles: true,
@@ -315,6 +388,10 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
             }
             cnt += 1;
             if (e.dataset.submitForm) {
+              subCount = 0;
+              formSubmitter();
+            }
+            if (e.dataset.submitFormSet && formSetIsFull()) {
               subCount = 0;
               formSubmitter();
             }
@@ -337,7 +414,8 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
   publicAPIs.logit = (...args) => {
     console.info(...args); // eslint-disable-line no-console
     if (txtShow !== null) {
-      txtShow.insertAdjacentHTML('beforeend', `${Array.from(args).map(a => (typeof (a) === 'string' ? a : JSON.stringify(a))).join(' ')}<br>`);
+      // txtShow.insertAdjacentHTML('beforeend', `${Array.from(args).map(a => (typeof (a) === 'string' ? a : JSON.stringify(a))).join(' ')}<br>`);
+      txtShow.insertAdjacentHTML('afterbegin', `${Array.from(args).map(a => (typeof (a) === 'string' ? a : JSON.stringify(a))).join(' ')}<br>`);
     }
   };
 
@@ -360,9 +438,12 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
    * @param {object} rules - the rules for identifying scan values.
    * @param {boolean} bypassRules - should the rules be ignored (scan any barcode).
    */
-  publicAPIs.init = (rules, bypassRules) => {
+  publicAPIs.init = (rules, bypassRules, debug, loginFunc, weightFunc) => {
     publicAPIs.rules = rules;
     publicAPIs.bypassRules = bypassRules;
+    publicAPIs.debug = debug;
+    publicAPIs.loginFunc = loginFunc;
+    publicAPIs.weightFunc = weightFunc;
     publicAPIs.expectedScanTypes = Array.from(document.querySelectorAll('[data-scan-rule]')).map(a => a.dataset.scanRule);
     publicAPIs.expectedScanTypes = publicAPIs.expectedScanTypes.filter((it, i, ar) => ar.indexOf(it) === i);
 

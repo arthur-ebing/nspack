@@ -652,6 +652,19 @@ module ProductionApp
 
     def create_reworks_run(reworks_run_type_id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       reworks_run_type = reworks_run_type(reworks_run_type_id)
+
+      if AppConst::RUN_TYPE_WEIGH_RMT_BINS == reworks_run_type
+        res = ReworksWeighRmtBinsContract.new.call(params.merge(pallets_selected: Array(params[:pallets_selected]).reject(&:empty?)))
+        return validation_failed_response(res) if res.failure?
+
+        if res[:pallets_selected].nil_or_empty?
+          rmt_bin_id = repo.get_id(:rmt_bins, bin_asset_number: res[:bin_asset_number])
+          return validation_failed_response(OpenStruct.new(success: false, messages: { bin_asset_number: ["#{res[:bin_asset_number]} doesn't exist"] }, bin_asset_number: res[:bin_asset_number])) if rmt_bin_id.nil_or_empty?
+
+          params[:pallets_selected] = rmt_bin_id.to_s
+        end
+      end
+
       res = validate_pallets_selected_input(reworks_run_type, params)
       return validation_failed_response(res) unless res.success
 
@@ -832,6 +845,28 @@ module ProductionApp
         log_transaction
       end
       success_response('Carton Label printed successfully')
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def print_reworks_carton_label_for_sequence(sequence_id, params) # rubocop:disable Metrics/AbcSize
+      res = validate_print_params(params)
+      return validation_failed_response(res) if res.failure?
+
+      labels = reworks_run_carton_print_data_for_sequence(sequence_id)
+      label_name = label_template_name(res[:label_template_id])
+
+      repo.transaction do
+        labels.each do |label|
+          LabelPrintingApp::PrintLabel.call(label_name,
+                                            label,
+                                            no_of_prints: 1,
+                                            printer: res[:printer],
+                                            supporting_data: { packed_date: label[:packed_date] })
+        end
+        log_transaction
+      end
+      success_response("#{labels.length} Carton Labels on sequence printed successfully")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -1028,7 +1063,7 @@ module ProductionApp
 
         if AppConst::CR_FG.lookup_extended_fg_code?
           pallet_ids = repo.select_values(:pallet_sequences, :pallet_id, id: sequences)
-          FinishedGoodsApp::Job::CalculateExtendedFgCodes.enqueue(pallet_ids)
+          FinishedGoodsApp::Job::CalculateExtendedFgCodesFromSeqs.enqueue(pallet_ids)
         end
       end
       instance = { pallet_number: pallet_sequence_pallet_number(sequence_id).first,
@@ -1293,14 +1328,15 @@ module ProductionApp
       defaults
     end
 
-    def manually_tip_bin_before_state(attrs, avg_gross_weight = false) # rubocop:disable Metrics/AbcSize
+    def manually_tip_bin_before_state(attrs, avg_gross_weight = false)
       defaults = { bin_tipped_date_time: nil,
                    production_run_tipped_id: nil,
+                   tipped_asset_number: nil,
+                   bin_asset_number: attrs[:pallets_selected].first,
                    exit_ref_date_time: nil,
                    bin_tipped: false,
                    exit_ref: nil,
                    tipped_manually: false }
-      defaults = defaults.merge(tipped_asset_number: nil, bin_asset_number: attrs[:pallets_selected].first) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
       defaults = defaults.merge(allow_cultivar_mixing: production_run_allow_cultivar_mixing(attrs[:production_run_id])) if attrs[:allow_cultivar_mixing]
       defaults = defaults.merge(manually_weigh_rmt_bin_state(attrs[:pallets_selected].first)) if avg_gross_weight
       if attrs[:tip_orchard_mixing]
@@ -1310,14 +1346,15 @@ module ProductionApp
       defaults
     end
 
-    def manually_tip_bin_after_state(attrs, avg_gross_weight = false) # rubocop:disable Metrics/AbcSize
+    def manually_tip_bin_after_state(attrs, avg_gross_weight = false)
       defaults = { bin_tipped_date_time: Time.now,
                    production_run_tipped_id: attrs[:production_run_id],
+                   tipped_asset_number: attrs[:pallets_selected].first,
+                   bin_asset_number: nil,
                    exit_ref_date_time: Time.now,
                    bin_tipped: true,
                    exit_ref: 'TIPPED',
                    tipped_manually: true }
-      defaults = defaults.merge(tipped_asset_number: attrs[:pallets_selected].first, bin_asset_number: nil) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
       defaults = defaults.merge(allow_cultivar_mixing: attrs[:allow_cultivar_mixing]) if attrs[:allow_cultivar_mixing]
       defaults = defaults.merge(manually_weigh_rmt_bin_state(attrs[:pallets_selected].first)) if avg_gross_weight
       if attrs[:tip_orchard_mixing]
@@ -1337,7 +1374,7 @@ module ProductionApp
                        bin_tipped: false,
                        exit_ref: nil,
                        tipped_manually: false }
-      change_attrs = change_attrs.merge(asset_number_attrs(res)) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+      change_attrs = change_attrs.merge(asset_number_attrs(res))
 
       rw_res = nil
       repo.transaction do
@@ -1375,17 +1412,14 @@ module ProductionApp
     end
 
     def manually_untip_bin_before_state(res)
-      attrs = { bin_tipped_date_time: res[:bin_tipped_date_time],
-                production_run_tipped_id: res[:production_run_tipped_id],
-                exit_ref_date_time: res[:exit_ref_date_time],
-                bin_tipped: true,
-                exit_ref: 'TIPPED',
-                tipped_manually: true }
-      if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
-        attrs = attrs.merge({ tipped_asset_number: res[:tipped_asset_number],
-                              bin_asset_number: res[:bin_asset_number] })
-      end
-      attrs
+      { bin_tipped_date_time: res[:bin_tipped_date_time],
+        production_run_tipped_id: res[:production_run_tipped_id],
+        tipped_asset_number: res[:tipped_asset_number],
+        bin_asset_number: res[:bin_asset_number],
+        exit_ref_date_time: res[:exit_ref_date_time],
+        bin_tipped: true,
+        exit_ref: 'TIPPED',
+        tipped_manually: true }
     end
 
     def bulk_weigh_bins(attrs) # rubocop:disable Metrics/AbcSize
@@ -1751,6 +1785,104 @@ module ProductionApp
       failed_response(e.message)
     end
 
+    def resolve_work_in_progress_attrs(reworks_run_type_id)
+      reworks_run_type = reworks_run_type(reworks_run_type_id)
+      attrs = case reworks_run_type
+              when AppConst::RUN_TYPE_WIP_PALLETS
+                { grid: 'pallets_view', wip_ids: repo.select_values(:wip_pallets, :pallet_id).uniq }
+              when AppConst::RUN_TYPE_WIP_BINS
+                { grid: 'rmt_bins_reworks', wip_ids: repo.select_values(:wip_bins, :rmt_bin_id).uniq }
+              end
+
+      success_response('ok', attrs)
+    end
+
+    def create_work_in_progress_lock(reworks_run_type_id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      reworks_run_type = reworks_run_type(reworks_run_type_id)
+      res = validate_pallets_selected_input(reworks_run_type, params)
+      return validation_failed_response(res) unless res.success
+
+      wip_ids = if reworks_run_type == AppConst::RUN_TYPE_WIP_PALLETS
+                  repo.select_values(:pallets, :id, pallet_number: res.instance[:pallet_numbers])
+                else
+                  res.instance[:pallet_numbers]
+                end
+      res = validate_wip_objects(reworks_run_type, wip_ids, res.instance[:pallet_numbers])
+      return validation_failed_response(res) unless res.success
+
+      repo.transaction do
+        res =  case reworks_run_type
+               when AppConst::RUN_TYPE_WIP_PALLETS
+                 repo.add_pallets_to_wip(wip_ids, params[:context], @user.user_name)
+               when AppConst::RUN_TYPE_WIP_BINS
+                 repo.add_bins_to_wip(wip_ids, params[:context], @user.user_name)
+               end
+        raise Crossbeams::InfoError, res.message unless res.success
+      end
+      success_response('Work In Progress Lock created successfully.')
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def validate_wip_objects(reworks_run_type, wip_ids, pallet_numbers)
+      res = case reworks_run_type
+            when AppConst::RUN_TYPE_WIP_PALLETS
+              repo.are_pallets_out_of_wip?(wip_ids)
+            when AppConst::RUN_TYPE_WIP_BINS
+              repo.are_bins_out_of_wip?(wip_ids)
+            end
+      unless res.success
+        in_wip_ids = reworks_run_type == AppConst::RUN_TYPE_WIP_PALLETS ? repo.select_values(:pallets, :pallet_number, id: res.instance) : res.instance
+        msg = "#{reworks_run_type}: #{in_wip_ids.join(', ')} are works in progress"
+        return OpenStruct.new(success: false, messages: { pallets_selected: [msg] }, pallets_selected: pallet_numbers)
+      end
+
+      ok_response
+    end
+
+    def remove_work_in_progress_lock(reworks_run_type_id, multiselect_list) # rubocop:disable Metrics/AbcSize
+      reworks_run_type = reworks_run_type(reworks_run_type_id)
+      return failed_response('WIP id selection cannot be empty') if multiselect_list.nil_or_empty?
+
+      repo.transaction do
+        res =  case reworks_run_type
+               when AppConst::RUN_TYPE_WIP_PALLETS
+                 repo.remove_pallets_from_wip(multiselect_list, @user.user_name)
+               when AppConst::RUN_TYPE_WIP_BINS
+                 repo.remove_bins_from_wip(multiselect_list, @user.user_name)
+               end
+        raise Crossbeams::InfoError, res.message unless res.success
+      end
+      success_response('Work In Progress Lock released successfully.')
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def validate_pallet_reprint_carton_labels(pallet_number, params)
+      params[:pallet_id] = repo.get_id(:pallets, pallet_number: pallet_number)
+      res = validate_pallet_reprint_carton_labels_params(params)
+      return validation_failed_response(res) if res.failure?
+
+      success_response('ok', res.to_h)
+    end
+
+    def reprint_pallet_carton_labels(carton_ids, params)
+      return failed_response('Carton selection cannot be empty') if carton_ids.nil_or_empty?
+
+      label_name = repo.get(:label_templates, params[:label_template_id], :label_template_name)
+      labels = repo.reworks_run_pallet_seq_print_data_for_cartons(carton_ids)
+      labels.each do |label|
+        LabelPrintingApp::PrintLabel.call(label_name,
+                                          label,
+                                          no_of_prints: 1,
+                                          printer: params[:printer],
+                                          supporting_data: { packed_date: label[:packed_date] })
+      end
+      success_response("#{labels.length} Pallet Carton Labels printed successfully")
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     private
 
     def repo
@@ -1830,8 +1962,6 @@ module ProductionApp
     end
 
     def find_rmt_bin(bin_number)
-      # return repo.rmt_bin_from_asset_number(bin_number) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
-
       repo.find_rmt_bin(bin_number.to_i)
     end
 
@@ -1872,6 +2002,10 @@ module ProductionApp
 
     def reworks_run_carton_print_data(sequence_id)
       repo.reworks_run_pallet_seq_print_data(sequence_id)
+    end
+
+    def reworks_run_carton_print_data_for_sequence(sequence_id)
+      repo.reworks_run_pallet_seq_print_data_for_sequence(sequence_id)
     end
 
     def vw_flat_sequence_data(sequence_id)
@@ -2042,11 +2176,8 @@ module ProductionApp
       rmt_bins = rmt_bins.split(/\n|,/).map(&:strip).reject(&:empty?)
       rmt_bins = rmt_bins.map { |x| x.gsub(/['"]/, '') }
 
-      # unless AppConst::USE_PERMANENT_RMT_BIN_BARCODES
       invalid_rmt_bins = rmt_bins.reject { |x| x.match(/\A\d+\Z/) }
       return OpenStruct.new(success: false, messages: { pallets_selected: ["#{invalid_rmt_bins.join(', ')} must be numeric"] }, pallets_selected: rmt_bins) unless invalid_rmt_bins.nil_or_empty?
-
-      # end
 
       existing_rmt_bins = repo.rmt_bins_exists?(rmt_bins)
       missing_rmt_bins = (rmt_bins - existing_rmt_bins.map(&:to_s))
@@ -2231,6 +2362,10 @@ module ProductionApp
 
     def validate_edit_rmt_bin_params(params)
       EditRmtBinSchema.call(params)
+    end
+
+    def validate_pallet_reprint_carton_labels_params(params)
+      ReprintPalletCartonLabelsSchema.call(params)
     end
   end
 end

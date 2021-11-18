@@ -19,6 +19,8 @@ module MasterfilesApp
     optional(:contact_person_ids).maybe(:array).each(:integer)
     required(:financial_account_code).maybe(Types::StrippedString)
     required(:fruit_industry_levy_id).maybe(:integer)
+    required(:rmt_customer).maybe(:bool)
+    required(:bin_asset_trading_partner).maybe(:bool)
   end
 
   CustomerSchema = Dry::Schema.Params do
@@ -29,6 +31,9 @@ module MasterfilesApp
     optional(:currency_ids).maybe(:array).each(:integer)
     required(:financial_account_code).maybe(Types::StrippedString)
     required(:fruit_industry_levy_id).maybe(:integer)
+    required(:rmt_customer).maybe(:bool)
+    required(:bin_asset_trading_partner).maybe(:bool)
+    optional(:location_id).maybe(:integer)
   end
 
   DealTypeSchema = Dry::Schema.Params do

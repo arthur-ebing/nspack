@@ -10,7 +10,7 @@ module MesscadaApp
       @plant_resource_code = plant_resource_code
     end
 
-    def call
+    def call # rubocop:disable Metrics/AbcSize
       repo.transaction do
         stage_current_active_child_run
         new_active_child_run
@@ -20,6 +20,9 @@ module MesscadaApp
         success_response('staging result', res)
       end
     rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: "#{self.class.name} - #{e.message}", message: 'Staging Override')
+      puts e.message
+      puts e.backtrace.join("\n")
       failed_response('error', StageBins.error_xml(e.message))
     end
 

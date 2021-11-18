@@ -7,3 +7,14 @@
   - :url: "/list/pallet_sequences_audit/with_params?key=pallet_sequence&id=$:pallet_sequence_id$"
     :text: Sequence Audit
     :icon: list
+  - :separator: true
+  - :url: "/development/statuses/list/pallet_sequences/$:pallet_sequence_id$"
+    :text: status
+    :icon: information-solid
+    :title: Status
+    :popup: true
+  - :url: "/development/statuses/list/pallet_sequences/$:pallet_id$"
+    :text: Pallet status
+    :icon: information-solid
+    :title: Pallet Status
+    :popup: true

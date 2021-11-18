@@ -18,7 +18,7 @@
 class ClearMesScadaLogins < BaseScript
   def run
     puts 'RUNNING'
-    robots = DB[:system_resources].where(legacy_messcada: true, login: true).select_map(%i[id system_resource_code ip_address])
+    robots = DB[:system_resources].where(legacy_messcada: true, login: true, active: true).select_map(%i[id system_resource_code ip_address])
     if debug_mode
       puts "MesScada Robots to clear:\n-------------------------\n#{robots.map { |_, c, i| "#{c} (#{i})" }.join("\n")}"
     else

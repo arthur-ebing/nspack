@@ -10,8 +10,6 @@ module UiRules
       make_form_object
       apply_form_values
 
-      @rules[:scan_rmt_bin_asset_numbers] = AppConst::USE_PERMANENT_RMT_BIN_BARCODES
-
       if @mode == :set_rmt_bin_gross_weight
         make_reworks_run_rmt_bin_header_table(%i[farm_code puc_code orchard_code cultivar_name season_code container_type_code
                                                  container_material_type_code qty_bins exit_ref bin_asset_number tipped_asset_number
@@ -94,8 +92,6 @@ module UiRules
     end
 
     def find_rmt_bin(bin_number)
-      # return @repo.rmt_bin_from_asset_number(bin_number) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
-
       @repo.find_rmt_bin(bin_number.to_i)
     end
 

@@ -57,7 +57,7 @@ module EdiApp
 
     def create_edi_out_transaction(changeset)
       org_code = MasterfilesApp::PartyRepo.new.org_code_for_party_role(changeset[:party_role_id]) || 'N/A'
-      DB[:edi_out_transactions].insert(changeset.merge(org_code: org_code))
+      create(:edi_out_transactions, changeset.merge(org_code: org_code))
     end
 
     def log_edi_out_complete(id, edi_filename, message)
@@ -98,6 +98,14 @@ module EdiApp
       end
 
       formatted_targets
+    end
+
+    def existing_singleton?(flow_type, id)
+      !DB[:edi_out_rules].where(flow_type: flow_type).exclude(id: id).empty?
+    end
+
+    def can_transform_only_one_destination?(flow_type)
+      AppConst::EDI_OUT_RULES_TEMPLATE[flow_type][:singleton]
     end
 
     def can_transform_for_depot?(flow_type)

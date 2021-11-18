@@ -21,7 +21,11 @@ module MasterfilesApp
     attribute :financial_account_code, Types::String
     attribute :fruit_industry_levy_id, Types::Integer
     attribute :fruit_industry_levy, Types::String
+    attribute :rmt_customer, Types::Bool
     attribute? :active, Types::Bool
+    attribute :bin_asset_trading_partner, Types::Bool
+    attribute :location_id, Types::Integer
+    attribute :location_long_code, Types::String
   end
 
   class Incoterm < Dry::Struct

@@ -130,6 +130,7 @@ module MesscadaApp
         depot_pallet: false,
         edi_in_transaction_id: nil,
         edi_in_consignment_note_number: 'ABC',
+        edi_in_load_number: 'ABC',
         re_calculate_nett: false,
         edi_in_inspection_point: 'ABC',
         repacked: false,

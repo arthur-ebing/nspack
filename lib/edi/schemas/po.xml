@@ -341,8 +341,14 @@
                   <field name="weighing_location" size="7" required="false" default="$:INSTALL_LOCATION$" />
                   <field name="weighing_date" size="8" format="DATE" required="false"  />
                   <field name="weighing_time" size="5" format="HM" required="false" />
-                  <field name="new_fields" size="18" required="false" />
+                  <field name="main_area" size="2" required="false" />
+                  <field name="production_area" size="16" required="false" />
                   <field name="phyto_data" size="10" required="false"/>
+                  <field name="cust_ord" size="40" required="false"/>
+                  <field name="re_inspec_doc" size="10" required="false"/>
+                  <field name="elot_key" size="10" required="false"/>
+                  <field name="agreement_code" size="10" required="false"/>
+                  <field name="post_treetment" size="140" required="false"/>
                 </fields>
               </record>
             </child>

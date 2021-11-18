@@ -67,10 +67,38 @@ module MesscadaApp
       optional(:legacy_data).maybe(:hash)
       optional(:colour_percentage_id).maybe(:integer)
       optional(:work_order_item_id).maybe(:integer)
+      optional(:gross_weight).maybe(:decimal)
     end
 
     rule(:fruit_size_reference_id, :fruit_actual_counts_for_pack_id) do
       base.failure 'must provide either fruit_size_reference or fruit_actual_count' unless values[:fruit_size_reference_id] || values[:fruit_actual_counts_for_pack_id]
+    end
+  end
+
+  # Validate a carton label weight against the min and max weights for the Commdity/Pack combination.
+  class CartonLabelCheckWeightContract < Dry::Validation::Contract
+    params do
+      required(:pack_code).filled(:string)
+      required(:commodity_code).filled(:string)
+      required(:weight).filled(:decimal)
+      required(:min_gross_weight).maybe(:decimal)
+      required(:max_gross_weight).maybe(:decimal)
+    end
+
+    rule(:min_gross_weight) do
+      base.failure "There is no min weight for #{values[:commodity_code]}/#{values[:pack_code]}" unless values[:min_gross_weight]
+    end
+
+    rule(:max_gross_weight) do
+      base.failure "There is no max weight for #{values[:commodity_code]}/#{values[:pack_code]}" unless values[:max_gross_weight]
+    end
+
+    rule(:weight, :min_gross_weight) do
+      key.failure "#{value.round(2).to_digits} is less than #{values[:min_gross_weight].round(2).to_digits} (min for #{values[:commodity_code]}/#{values[:pack_code]})" if values[:min_gross_weight] && values[:weight] < values[:min_gross_weight]
+    end
+
+    rule(:weight, :max_gross_weight) do
+      key.failure "#{value.round(2).to_digits} is greater than #{values[:max_gross_weight].round(2).to_digits} (max for #{values[:commodity_code]}/#{values[:pack_code]})" if values[:max_gross_weight] && values[:weight] > values[:max_gross_weight]
     end
   end
 end

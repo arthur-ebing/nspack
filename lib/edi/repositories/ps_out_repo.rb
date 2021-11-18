@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module EdiApp
-  class PsOutRepo < BaseRepo
+  class PsOutRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     def ps_rows(party_role_id)
       party_role_condition = party_role_condition_for(party_role_id)
 
@@ -9,8 +9,8 @@ module EdiApp
         SELECT
           substring(pallet_sequences.pallet_number from '.........$') AS pallet_id,
           pallet_sequences.pallet_sequence_number AS sequence_number,
-          govt_inspection_sheets.consignment_note_number AS consignment_number,
-          govt_inspection_sheets.consignment_note_number AS original_cons_no,
+          COALESCE(govt_inspection_sheets.consignment_note_number, pallets.edi_in_consignment_note_number) AS consignment_number,
+          COALESCE(pallets.edi_in_consignment_note_number, govt_inspection_sheets.consignment_note_number) AS original_cons_no,
           marketing_org.short_description AS organisation,
           substring(commodity_groups.code FROM '..') AS commodity_group,
           commodities.code AS commodity,
@@ -27,7 +27,9 @@ module EdiApp
           COALESCE(inventory_codes.edi_out_inventory_code, inventory_codes.inventory_code) AS inventory_code,
           pallet_sequences.pick_ref AS picking_reference,
           pallet_sequences.product_chars AS product_characteristic_code,
-          COALESCE(target_markets.target_market_name, target_market_groups.target_market_group_name) AS target_market,
+          COALESCE(fn_party_role_org_code(pallet_sequences.target_customer_party_role_id),
+                   target_markets.target_market_name,
+                   target_market_groups.target_market_group_name) AS target_market,
           pucs.puc_code AS farm,
           pucs.gap_code AS global_gap_number,
           pallet_sequences.carton_quantity,
@@ -39,8 +41,9 @@ module EdiApp
           COALESCE(pallets.stock_created_at, pallets.created_at) AS transaction_date,
           COALESCE(pallets.stock_created_at, pallets.created_at) AS transaction_time,
           pallet_bases.edi_out_pallet_base AS pallet_base_type,
+          pallet_stack_types.stack_type_code AS stack_variance,
           pallets.pallet_number AS sscc,
-          govt_inspection_sheets.consignment_note_number AS waybill_no,
+          COALESCE(govt_inspection_sheets.consignment_note_number, pallets.edi_in_consignment_note_number) AS waybill_no,
           pallet_sequences.sell_by_code AS sellbycode,
           pallets.pallet_number AS combo_sscc,
           COALESCE(pallets.govt_reinspection_at, pallets.govt_first_inspection_at) AS inspec_date,
@@ -58,6 +61,7 @@ module EdiApp
           END AS substitute_for_original_account,
           SUBSTRING(location_types.location_type_code, 1, 16) AS substitute_for_saftbin1,
           SUBSTRING(locations.location_long_code, 1, 16) AS substitute_for_saftbin2,
+          #{AppConst::CR_EDI.orig_account} AS original_account,
           (SELECT t.treatment_code
             FROM treatments t
             JOIN treatment_types y ON y.id = t.treatment_type_id
@@ -87,8 +91,12 @@ module EdiApp
         JOIN orchards ON orchards.id = pallet_sequences.orchard_id
         LEFT JOIN pallet_formats ON pallet_formats.id = pallets.pallet_format_id
         LEFT JOIN pallet_bases ON pallet_bases.id = pallet_formats.pallet_base_id
+        LEFT JOIN pallet_stack_types ON pallet_stack_types.id = pallet_formats.pallet_stack_type_id
         WHERE pallets.in_stock
+          AND pallets.palletized -- Build status is full
+          AND NOT pallets.partially_palletized -- Build status is full
           AND #{party_role_condition} = ?
+          AND NOT EXISTS(SELECT id FROM wip_pallets WHERE pallet_id = pallets.id)
         ORDER BY pallet_sequences.pallet_number, pallet_sequences.pallet_sequence_number
       SQL
       DB[query, party_role_id].all

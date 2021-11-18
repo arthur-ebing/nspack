@@ -259,4 +259,34 @@ module ProductionApp # rubocop:disable Metrics/ModuleLength
     required(:rmt_container_material_type_id).maybe(:integer)
     required(:rmt_material_owner_party_role_id).maybe(:integer)
   end
+
+  class ReworksWeighRmtBinsContract < Dry::Validation::Contract
+    params do
+      required(:reworks_run_type_id).filled(:integer)
+      required(:pallets_selected).maybe(:array).each(:string)
+      optional(:make_changes).maybe(:bool)
+      required(:bin_asset_number).maybe(Types::StrippedString)
+    end
+
+    rule(:pallets_selected, :bin_asset_number) do
+      key.failure 'Bin Id and Bin Asset Number are both empty. Please choose either a Bin Id or Bin Asset Number' if values[:pallets_selected].nil_or_empty? && values[:bin_asset_number].nil_or_empty?
+    end
+
+    rule(:pallets_selected, :bin_asset_number) do
+      key.failure 'Bin Id and Bin Asset Number are both filled. Please choose either a Bin Id or Bin Asset Number' if !values[:pallets_selected].nil_or_empty? && !values[:bin_asset_number].nil_or_empty?
+    end
+  end
+
+  ReworksRunWipSchema = Dry::Schema.Params do
+    required(:reworks_run_type_id).filled(:integer)
+    required(:pallets_selected).filled(:array).each(:string)
+    required(:context).filled(Types::StrippedString)
+  end
+
+  ReprintPalletCartonLabelsSchema = Dry::Schema.Params do
+    required(:pallet_number).maybe(Types::StrippedString)
+    required(:pallet_id).filled(:integer)
+    required(:printer).filled(:integer)
+    required(:label_template_id).filled(:integer)
+  end
 end

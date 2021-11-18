@@ -30,14 +30,17 @@
   AS has_bins,\r\n    EXISTS(select id from rmt_bins where production_run_rebin_id
   = production_runs.id) AS has_rebins,\r\n    EXISTS(select cartons.id from cartons
   join carton_labels on carton_labels.id = cartons.carton_label_id where production_run_id
-  = production_runs.id) AS has_cartons,\r\n    CASE\r\n        WHEN production_runs.reconfiguring
-  THEN 'inprogress'\r\n        WHEN production_runs.running THEN 'ok'\r\n        END
-  AS colour_rule\r\n\r\nFROM production_runs\r\nLEFT JOIN cultivar_groups ON cultivar_groups.id
-  = production_runs.cultivar_group_id\r\nLEFT JOIN commodities ON commodities.id =
-  cultivar_groups.commodity_id\r\nLEFT JOIN cultivars ON cultivars.id = production_runs.cultivar_id\r\nJOIN
-  farms ON farms.id = production_runs.farm_id\r\nLEFT JOIN orchards ON orchards.id
-  = production_runs.orchard_id\r\nJOIN plant_resources ON plant_resources.id = production_runs.packhouse_resource_id\r\nLEFT
-  JOIN product_setup_templates ON product_setup_templates.id = production_runs.product_setup_template_id\r\nJOIN
+  = production_runs.id) AS has_cartons,\r\n    production_runs.legacy_data ->> 'rmt_size'
+  AS rmt_size,\r\n    production_runs.legacy_data ->> 'treatment_code' AS treatment_code,\r\n
+  \   production_runs.legacy_data ->> 'product_class_code' AS product_class_code,\r\n
+  \   CASE\r\n        WHEN production_runs.reconfiguring THEN 'inprogress'\r\n        WHEN
+  production_runs.running THEN 'ok'\r\n        END AS colour_rule\r\n\r\nFROM production_runs\r\nLEFT
+  JOIN cultivar_groups ON cultivar_groups.id = production_runs.cultivar_group_id\r\nLEFT
+  JOIN commodities ON commodities.id = cultivar_groups.commodity_id\r\nLEFT JOIN cultivars
+  ON cultivars.id = production_runs.cultivar_id\r\nJOIN farms ON farms.id = production_runs.farm_id\r\nLEFT
+  JOIN orchards ON orchards.id = production_runs.orchard_id\r\nJOIN plant_resources
+  ON plant_resources.id = production_runs.packhouse_resource_id\r\nLEFT JOIN product_setup_templates
+  ON product_setup_templates.id = production_runs.product_setup_template_id\r\nJOIN
   plant_resources plant_resources2 ON plant_resources2.id = production_runs.production_line_id\r\nJOIN
   pucs ON pucs.id = production_runs.puc_id\r\nJOIN seasons ON seasons.id = production_runs.season_id\r\n\r\nORDER
   BY production_runs.id DESC"
@@ -864,9 +867,57 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  rmt_size:
+    :name: rmt_size
+    :sequence_no: 52
+    :caption: Rmt size
+    :namespaced_name: 
+    :data_type: :string
+    :width: 70
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  treatment_code:
+    :name: treatment_code
+    :sequence_no: 53
+    :caption: Colour
+    :namespaced_name: 
+    :data_type: :string
+    :width: 70
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  product_class_code:
+    :name: product_class_code
+    :sequence_no: 54
+    :caption: Class
+    :namespaced_name: 
+    :data_type: :string
+    :width: 70
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 52
+    :sequence_no: 55
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

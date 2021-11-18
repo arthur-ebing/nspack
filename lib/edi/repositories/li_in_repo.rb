@@ -79,5 +79,19 @@ module EdiApp
     def find_variant_id(table_name, code)
       DB[:masterfile_variants].where(masterfile_table: table_name.to_s, variant_code: code).get(:masterfile_id)
     end
+
+    def delete_order(order_id, file_name)
+      ids = select_values(:order_items, :id, order_id: order_id)
+      ps_ids = select_values(:pallet_sequences, :id, order_item_id: ids)
+      DB[:pallet_sequences].where(id: ps_ids).update(order_item_id: nil)
+      delete(:order_items, ids)
+
+      DB[:orders_loads].where(order_id: order_id).delete
+      delete(:orders, order_id)
+      log_status(:orders, order_id, 'DELETED FROM LI', comment: file_name, user_name: 'System')
+      log_multiple_statuses(:order_items, ids, 'DELETED FROM LI', comment: file_name, user_name: 'System')
+      log_multiple_statuses(:pallet_sequences, ps_ids, 'REMOVED FROM ORDER VIA LI', comment: file_name, user_name: 'System') unless ps_ids.empty?
+      log_action(user_name: 'System', context: 'EDI', route_url: 'LI EDI IN')
+    end
   end
 end

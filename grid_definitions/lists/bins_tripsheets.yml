@@ -7,6 +7,17 @@
   :hide_if_true: offloaded
   :title: Print
   :loading_window: true
+- :url: "/finished_goods/interwarehouse_transfers/open_bin_tripsheet/$:id$"
+  :text: open
+  :icon: toggle-off
+  :hide_if_false: can_open
+- :url: "/finished_goods/interwarehouse_transfers/force_bin_tripsheet_offload/$:id$"
+  :text: force_offload
+  :icon: toggle-off
+  :hide_if_true: offloaded
+  :has_permission:
+    - tripsheet
+    - can_force_offload
 :conditions:
   :standard:
     - :col: vehicle_jobs.stock_type_id

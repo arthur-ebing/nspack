@@ -2,8 +2,8 @@
 :caption: Grades
 :sql: "SELECT\r\n    grades.id,\r\n    grades.grade_code,\r\n    grades.description,\r\n
   \   fn_masterfile_variants('grades', grades.id) AS variant_codes,\r\n    rmt_grade,\r\n
-  \   grades.qa_level,\r\n    grades.active,\r\n    grades.created_at,\r\n    grades.updated_at\r\nFROM
-  grades\r\n"
+  \   grades.qa_level,\r\n    grades.inspection_class,\r\n    grades.active,\r\n    grades.created_at,\r\n
+  \   grades.updated_at\r\nFROM grades\r\n"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -104,9 +104,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  inspection_class:
+    :name: inspection_class
+    :sequence_no: 7
+    :caption: Inspection class
+    :namespaced_name: grades.inspection_class
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   active:
     :name: active
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Active
     :namespaced_name: grades.active
     :data_type: :boolean
@@ -122,7 +138,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Created at
     :namespaced_name: grades.created_at
     :data_type: :datetime
@@ -138,7 +154,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Updated at
     :namespaced_name: grades.updated_at
     :data_type: :datetime

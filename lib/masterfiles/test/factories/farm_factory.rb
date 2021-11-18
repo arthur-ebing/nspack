@@ -9,7 +9,8 @@ module MasterfilesApp
       default = {
         production_region_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
-        active: true
+        active: true,
+        inspection_region: Faker::Lorem.word
       }
       DB[:production_regions].insert(default.merge(opts))
     end

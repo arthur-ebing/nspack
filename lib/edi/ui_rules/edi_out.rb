@@ -71,10 +71,17 @@ module UiRules
 
     private
 
-    def add_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
-      rules[:hide_destination_type] = @form_object.flow_type && (destinations = @repo.destinations_for_flow(@form_object.flow_type)) && (destinations.size == 1 && destinations[0] == AppConst::PARTY_ROLE_DESTINATION_TYPE)
-      rules[:hide_depot_id] = (@mode == :edit && @form_object.depot_id.nil_or_empty?) || @form_object.destination_type == AppConst::PARTY_ROLE_DESTINATION_TYPE || (!@form_object.flow_type.nil_or_empty? && !AppConst::EDI_OUT_RULES_TEMPLATE[@form_object.flow_type][:depot])
-      rules[:hide_role_id] = (@mode == :edit && !@form_object.depot_id.nil_or_empty?) || @form_object.destination_type == AppConst::DEPOT_DESTINATION_TYPE
+    def add_rules # rubocop:disable Metrics/AbcSize
+      if @form_object.flow_type
+        destinations = @repo.destinations_for_flow(@form_object.flow_type)
+        rules[:hide_depot_id] = !@repo.can_transform_for_depot?(@form_object.flow_type)
+        rules[:hide_role_id] = !@repo.can_transform_for_party?(@form_object.flow_type)
+        rules[:hide_destination_type] = @repo.can_transform_only_one_destination?(@form_object.flow_type) || destinations.size == 1
+      else
+        rules[:hide_depot_id] = true
+        rules[:hide_role_id] = true
+        rules[:hide_destination_type] = false
+      end
     end
 
     def add_behaviours

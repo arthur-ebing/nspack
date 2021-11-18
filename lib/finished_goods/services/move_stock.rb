@@ -136,20 +136,29 @@ module FinishedGoodsApp
 
     def validate_stock_item # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       @stock_item = repo.find_stock_item(stock_item_id, stock_type)
+      stock_item_code = if stock_type == AppConst::PALLET_STOCK_TYPE
+                          stock_item[:pallet_number]
+                        elsif stock_type == AppConst::BIN_STOCK_TYPE
+                          stock_item[:bin_asset_number]
+                        end
 
-      return failed_response("#{stock_type} does not exist") unless @stock_item
+      return failed_response("#{stock_type}:#{stock_item_code} does not exist") unless @stock_item
+      return failed_response("Cannot move #{stock_type}:#{stock_item_code}. It is on a tripsheet") if repo.exists?(:vehicle_job_units, stock_type_id: stock_type_id, stock_item_id: stock_item_id, offloaded_at: nil)
+
+      units_in_location, maximum_units = repo.get_value(:locations, %i[units_in_location maximum_units], id: location_to_id)
+      return failed_response("Cannot move #{stock_type}:#{stock_item_code}. Maximun units in location have been reached.") if maximum_units.positive? && (units_in_location + 1) > maximum_units
 
       unless business_process == AppConst::REWORKS_MOVE_PALLET_BUSINESS_PROCESS
-        return failed_response("#{stock_type} has been scrapped") if @stock_item[:scrapped]
+        return failed_response("#{stock_type}:#{stock_item_code} has been scrapped") if @stock_item[:scrapped]
       end
 
       unless business_process == AppConst::REWORKS_MOVE_BIN_BUSINESS_PROCESS
-        return failed_response("#{stock_type} has been shipped") if stock_type != AppConst::BIN_STOCK_TYPE && @stock_item[:shipped]
-        return failed_response("#{stock_type} has been tipped") if stock_type == AppConst::BIN_STOCK_TYPE && @stock_item[:bin_tipped]
-        return failed_response("#{stock_type} is already in this location") if @stock_item[:location_id].to_i == location_to_id.to_i
+        return failed_response("#{stock_type}:#{stock_item_code} has been shipped") if stock_type != AppConst::BIN_STOCK_TYPE && @stock_item[:shipped]
+        return failed_response("#{stock_type}:#{stock_item_code} has been tipped") if stock_type == AppConst::BIN_STOCK_TYPE && @stock_item[:bin_tipped]
+        return failed_response("#{stock_type}:#{stock_item_code} is already in this location") if @stock_item[:location_id].to_i == location_to_id.to_i
       end
 
-      return failed_response("#{stock_type} current location has not been set") unless @stock_item[:location_id]
+      return failed_response("#{stock_type}:#{stock_item_code} current location has not been set") unless @stock_item[:location_id]
 
       @location_from_id = @stock_item[:location_id]
       @stock_item_number = stock_type == AppConst::PALLET_STOCK_TYPE ? @stock_item[:pallet_number] : @stock_item[:id]

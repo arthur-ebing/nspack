@@ -4,6 +4,7 @@ module UiRules
   class LoadRule < Base # rubocop:disable Metrics/ClassLength
     def generate_rules
       make_form_object
+      add_container_specifics_to_form if @mode == :container_weights
       apply_form_values
 
       add_progress_step
@@ -13,6 +14,7 @@ module UiRules
       common_values_for_fields common_fields
       set_show_fields if %i[show allocate].include? @mode
       set_force_shipped_date_fields if @mode == :force_shipped_date
+      set_container_weight_fields if @mode == :container_weights
       form_name 'load'
     end
 
@@ -23,6 +25,20 @@ module UiRules
       fields[:shipped_at] = { renderer: :datetime,
                               maxvalue_date: Time.now.strftime('%Y-%m-%d'),
                               required: true }
+    end
+
+    def set_container_weight_fields
+      compact_header(columns: %i[load_id order_number customer_order_number customer_reference location_of_issue
+                                 shipped_at requires_temp_tail rmt_load],
+                     display_columns: 2)
+      fields[:container_code] = { renderer: :label }
+      fields[:container_seal_code] = { renderer: :label }
+      fields[:internal_container_code] = { renderer: :label }
+      fields[:verified_gross_weight] = { renderer: :label, css_class: 'tr', with_value: UtilityFunctions.delimited_number(container_weight_vgm) }
+      fields[:max_gross_weight] = { renderer: :number }
+      fields[:tare_weight] = { renderer: :number }
+      fields[:max_payload] = { renderer: :number }
+      fields[:actual_payload] = { renderer: :number }
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
@@ -41,6 +57,7 @@ module UiRules
       fields[:voyage_code] = { renderer: :label, with_value: voyage_code_label, caption: 'Voyage Code' }
       fields[:depot_id] = { renderer: :label, with_value: depot_label, caption: 'Depot' }
       fields[:rmt_load] = { renderer: :label, as_boolean: true, caption: 'RMT Load' }
+      fields[:truck_must_be_weighed] = { renderer: :label, as_boolean: true, invisible: !AppConst::CR_PROD.derive_nett_weight? }
       fields[:order_id] = { renderer: :label, caption: 'Order', hide_on_load: @form_object.order_id.nil?  }
       fields[:order_number] = { renderer: :label, caption: 'Internal Order Number' }
       fields[:customer_order_number] = { renderer: :label }
@@ -202,8 +219,9 @@ module UiRules
                     required: true },
         rmt_load: { renderer: :checkbox,
                     caption: 'RMT Load',
-                    hide_on_load: @form_object.allocated || on_order,
-                    as_boolean: true },
+                    hide_on_load: @form_object.allocated || on_order },
+        truck_must_be_weighed: { renderer: :checkbox,
+                                 invisible: !AppConst::CR_PROD.derive_nett_weight? },
         exporter_certificate_code: {},
         edi_file_name: { renderer: :label },
         shipped_at: { renderer: rules[:can_unship] ? :datetime : :label,
@@ -284,6 +302,22 @@ module UiRules
       }
     end
 
+    def add_container_specifics_to_form
+      load_container_id = @repo.get_id(:load_containers, load_id: @form_object.id)
+      container = FinishedGoodsApp::LoadContainerRepo.new.find_load_container(load_container_id)
+      cont_hash = {
+        container_code: container&.container_code,
+        container_seal_code: container&.container_seal_code,
+        internal_container_code: container&.internal_container_code,
+        verified_gross_weight: container&.verified_gross_weight,
+        max_gross_weight: container&.max_gross_weight,
+        tare_weight: container&.tare_weight,
+        max_payload: container&.max_payload,
+        actual_payload: container&.actual_payload
+      }
+      @form_object = OpenStruct.new(@form_object.to_h.merge(cont_hash))
+    end
+
     def make_form_object
       @repo = FinishedGoodsApp::LoadRepo.new
       @party_repo = MasterfilesApp::PartyRepo.new
@@ -299,8 +333,9 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(depot_id: @repo.get_id(:depots, depot_code: AppConst::DEFAULT_DEPOT),
+      @form_object = OpenStruct.new(depot_id: @repo.get_id(:depots, depot_code: AppConst::CR_FG.default_depot_for_loads),
                                     rmt_load: false,
+                                    truck_must_be_weighed: false,
                                     customer_party_role_id: nil,
                                     consignee_party_role_id: nil,
                                     billing_client_party_role_id: nil,
@@ -326,12 +361,18 @@ module UiRules
 
     private
 
+    def container_weight_vgm
+      return @form_object.verified_gross_weight if AppConst::CR_PROD.are_pallets_weighed?
+
+      (@form_object.actual_payload || 0) + (@form_object.tare_weight || 0)
+    end
+
     def add_progress_step
       steps = ['Allocate Pallets', 'Truck Arrival', 'Load Truck', 'Ship', 'Finished']
       step = 0
       step = 1 if @form_object.allocated
       step = 2 if @form_object.vehicle
-      step = 3 if @form_object.loaded || @form_object.temp_tail
+      step = 3 if @form_object.loaded
       step = 4 if @form_object.shipped
 
       @form_object = OpenStruct.new(@form_object.to_h.merge(steps: steps, step: step))
@@ -407,7 +448,7 @@ module UiRules
                       url: "/finished_goods/dispatch/loads/#{id}/delete_temp_tail",
                       prompt: 'Are you sure, you want to delete the temp tail on this load?',
                       visible: @form_object.temp_tail,
-                      icon: :back }
+                      icon: :minus }
       ship = { control_type: :link,
                style: :action_button,
                text: 'Ship',
@@ -471,11 +512,17 @@ module UiRules
                    url: "/finished_goods/reports/dispatch_note_summarised/#{id}",
                    loading_window: true,
                    style: :button }
-      reports << { control_type: :link,
+      picklist_items = [
+        { url: "/finished_goods/reports/picklist/#{id}",
+          text: 'Portrait',
+          loading_window: true },
+        { url: "/finished_goods/reports/dispatch_picklist/#{id}",
+          text: 'Landscape',
+          loading_window: true }
+      ]
+      reports << { control_type: :dropdown_button,
                    text: 'Dispatch Picklist',
-                   url: "/finished_goods/reports/picklist/#{id}",
-                   loading_window: true,
-                   style: :button }
+                   items: picklist_items }
 
       items = []
       AppConst::ADDENDUM_PLACE_OF_ISSUE.split(',').each do |place|

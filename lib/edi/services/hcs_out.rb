@@ -14,6 +14,8 @@ module EdiApp
       prepare_data
       return success_response('No data for HCS') if record_entries.length.zero?
 
+      @mail_tokens[:load_id] = record_id
+
       fname = create_csv_file
       hcs_repo.log_hcs_success(fname, record_id)
       log('Ending transform...')
@@ -28,7 +30,15 @@ module EdiApp
 
     def prepare_data
       hcs_repo.prepare_depot_pallet_cartons(record_id)
-      hcs_repo.hcs_rows(record_id).each { |row| add_csv_record(row) }
+      first = true
+      hcs_repo.hcs_rows(record_id).each do |row|
+        if first
+          @mail_tokens[:customer_order_no] = row[:customerpono]
+          @mail_tokens[:container_code] = row[:container]
+        end
+        first = false
+        add_csv_record(row)
+      end
     end
   end
 end

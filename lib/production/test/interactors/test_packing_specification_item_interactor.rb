@@ -57,10 +57,10 @@ module ProductionApp
 
     def test_update_packing_specification_item_fail
       id = create_packing_specification_item
-      attrs = interactor.send(:repo).find_hash(:packing_specification_items, id).reject { |k, _| %i[id pm_bom_id].include?(k) }
+      attrs = interactor.send(:repo).find_hash(:packing_specification_items, id).reject { |k, _| %i[id product_setup_id].include?(k) }
       res = interactor.update_packing_specification_item(id, attrs)
       refute res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_equal ['is missing'], res.errors[:pm_bom_id]
+      assert_equal ['is missing'], res.errors[:product_setup_id]
     end
 
     def test_delete_packing_specification_item

@@ -190,9 +190,15 @@ module FinishedGoodsApp
       return failed_response('Pallet does not exist') unless pallet
       return failed_response('Pallet has been scrapped') if pallet[:scrapped]
       return failed_response('Pallet has been shipped') if pallet[:shipped]
-      return failed_response("Pallet:#{pallet_number} belongs to another tripsheet") if repo.vehicle_job_unit_in_different_tripsheet?(pallet[:id], id)
+      return failed_response("Pallet:#{pallet_number} belongs to another tripsheet") if repo.vehicle_job_unit_in_different_tripsheet?(pallet[:id], id, AppConst::PALLET_STOCK_TYPE)
       return failed_response("Cannot add:#{pallet_number}. Tripsheet has already been offloaded") if repo.get(:vehicle_jobs, id, :offloaded_at)
       return failed_response("Pallet is still on bay: #{repo.palletizing_bay_for_pallet(pallet_number)}") if pallet[:has_individual_cartons] && !pallet[:palletized]
+
+      res = ProductionApp::ReworksRepo.new.are_pallets_out_of_wip?(pallet[:id])
+      unless res.success
+        context = repo.get_value(:wip_pallets, :context, pallet_id: pallet[:id])
+        return failed_response("Pallet: #{pallet_number} has a Work-in-progess lock. Reason is:#{context}")
+      end
 
       pallet_stock_type_id = MesscadaApp::MesscadaRepo.new.find_stock_type('PALLET')[:id]
       res = validate_vehicle_job_unit_params(stock_item_id: pallet[:id], stock_type_id: pallet_stock_type_id, vehicle_job_id: id)
@@ -245,7 +251,7 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def cancel_manual_tripsheet(vehicle_job_id) # rubocop:disable Metrics/AbcSize
+    def cancel_manual_tripsheet(vehicle_job_id, stock_type_code) # rubocop:disable Metrics/AbcSize
       return failed_response('Cannot cancel. Tripsheet has already been offloaded') if repo.get(:vehicle_jobs, vehicle_job_id, :offloaded_at)
       return failed_response('Cannot cancel. Tripsheet has been completed') if repo.get(:vehicle_jobs, vehicle_job_id, :loaded_at)
 
@@ -255,19 +261,21 @@ module FinishedGoodsApp
         log_multiple_statuses(:pallets, tripsheet_pallets, 'MANUAL SHEET CANCELLED')
       end
 
-      success_response "Tripsheet:#{vehicle_job_id} cancelled successfully"
+      stock_type_id = MesscadaApp::MesscadaRepo.new.get_value(:stock_types, :id, stock_type_code: stock_type_code)
+      success_response("Tripsheet:#{vehicle_job_id} cancelled successfully", stock_type_id)
     rescue StandardError => e
       failed_response(e.message)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
-    def open_manual_tripsheet(vehicle_job_id)
+    def open_tripsheet(vehicle_job_id, stock_type_code)
       repo.transaction do
         repo.update(:vehicle_jobs, vehicle_job_id, loaded_at: nil)
       end
 
-      success_response "Tripsheet:#{vehicle_job_id} is now open"
+      stock_type_id = MesscadaApp::MesscadaRepo.new.get_value(:stock_types, :id, stock_type_code: stock_type_code)
+      success_response("Tripsheet:#{vehicle_job_id} is now open", stock_type_id)
     rescue StandardError => e
       failed_response(e.message)
     rescue Crossbeams::InfoError => e
@@ -392,6 +400,21 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
+    def force_pallet_tripsheet_offload(vehicle_job_id) # rubocop:disable Metrics/AbcSize
+      stock_type_id = MesscadaApp::MesscadaRepo.new.get_value(:stock_types, :id, stock_type_code: AppConst::PALLET_STOCK_TYPE)
+      repo.transaction do
+        pallet_ids = repo.select_values(:vehicle_job_units, :id, vehicle_job_id: vehicle_job_id)
+        repo.update(:vehicle_job_units, pallet_ids, offloaded_at: Time.now)
+        location_id = complete_offload_vehicle(vehicle_job_id)
+        log_status(:vehicle_jobs, vehicle_job_id, 'OFFLOAD_FORCED')
+        success_response("Tipsheet: #{vehicle_job_id} offloaded at #{repo.get_value(:locations, :location_long_code, id: location_id)}", stock_type_id)
+      end
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message, stock_type_id)
+    rescue StandardError => e
+      failed_response(e.message, stock_type_id)
+    end
+
     def offload_vehicle_pallet(pallet_number) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       pallet = ProductionApp::ProductionRunRepo.new.find_pallet_by_pallet_number(pallet_number)
       return failed_response('Pallet does not exist') unless pallet
@@ -435,6 +458,7 @@ module FinishedGoodsApp
       end
       repo.update(:pallets, tripsheet_pallets.map { |p| p[:stock_item_id] }, in_stock: true, stock_created_at: Time.now) if AppConst::CREATE_STOCK_AT_FIRST_INTAKE
       log_status(:govt_inspection_sheets, govt_inspection_sheet_id, 'TRIPSHEET OFFLOADED')
+      log_status(:vehicle_jobs, vehicle_job_id, 'TRIPSHEET_OFFLOADED')
 
       location_to_id
     end

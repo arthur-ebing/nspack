@@ -64,8 +64,6 @@ module ProductionApp
     end
 
     def rmt_bins_exists?(rmt_bins)
-      # return rmt_bin_asset_number_exists?(rmt_bins) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
-
       DB[:rmt_bins].where(id: rmt_bins).select_map(:id)
     end
 
@@ -137,8 +135,6 @@ module ProductionApp
     end
 
     def tipped_bins?(rmt_bins)
-      # return rmt_bin_asset_number_tipped?(rmt_bins) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
-
       DB[:rmt_bins].where(id: rmt_bins, bin_tipped: true).select_map(:id)
     end
 
@@ -181,8 +177,6 @@ module ProductionApp
     end
 
     def selected_rmt_bins(rmt_bin_ids)
-      # return selected_rmt_bin_asset_numbers?(rmt_bin_ids) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
-
       select_values(:rmt_bins, :id, id: rmt_bin_ids, bin_tipped: false)
     end
 
@@ -257,7 +251,7 @@ module ProductionApp
     end
 
     def repack_pallet(pallet_id, user_name)
-      pallet = pallet(pallet_id)
+      pallet = get_pallet(pallet_id)
       sequence_ids = pallet_sequence_ids(pallet_id)
       return failed_response("Pallet number #{pallet[:pallet_number]} is missing sequences") if sequence_ids.empty?
 
@@ -292,7 +286,7 @@ module ProductionApp
     end
 
     def clone_pallet_sequences(old_pallet_id, pallet_id, sequence_ids, user_name) # rubocop:disable Metrics/AbcSize
-      pallet = pallet(pallet_id)
+      pallet = get_pallet(pallet_id)
       repack_attrs = { pallet_id: pallet[:id], pallet_number: pallet[:pallet_number], repacked_from_pallet_id: old_pallet_id,
                        repacked_at: Time.now, created_at: Time.now, updated_at: Time.now, created_by: user_name }
       ps_rejected_fields = %i[id pallet_id pallet_number pallet_sequence_number depot_pallet verified verification_passed
@@ -328,12 +322,12 @@ module ProductionApp
       DB[upd].update
     end
 
-    def pallet(id)
+    def get_pallet(id)
       find_hash(:pallets, id)
     end
 
     # def pallet_sequence_pallet_params(new_pallet_id)
-    #   pallet = pallet(new_pallet_id)
+    #   pallet = get_pallet(new_pallet_id)
     #   {
     #     pallet_id: pallet[:pallet_id],
     #     pallet_number: pallet[:pallet_number]
@@ -361,6 +355,16 @@ module ProductionApp
         WHERE id = ?
       SQL
       DB[qry, id].first
+    end
+
+    def reworks_run_pallet_seq_print_data_for_sequence(id)
+      ids = DB[:cartons].where(pallet_sequence_id: id).select_map(:carton_label_id)
+      DB[:vw_carton_label_pseq].where(carton_label_id: ids).all
+    end
+
+    def reworks_run_pallet_seq_print_data_for_cartons(carton_ids)
+      ids = DB[:cartons].where(id: carton_ids).select_map(:carton_label_id)
+      DB[:vw_carton_label_pseq].where(carton_label_id: ids).all
     end
 
     def reworks_run_pallet_seq_data(id)
@@ -1199,6 +1203,77 @@ module ProductionApp
           AND (cultivar_id IS NULL OR cultivar_id != #{args[:cultivar_id]})
       SQL
       DB[query].select_map(:id)
+    end
+
+    def add_bins_to_wip(bin_ids, context, user_name) # rubocop:disable Metrics/AbcSize
+      res = validate_wip_bins_or_pallets(bin_ids, user_name, context)
+      return validation_failed_response(res) if res.failure?
+      return failed_response('Some bins are already works in progress') if DB[:wip_bins].where(rmt_bin_id: res[:ids]).count.positive?
+
+      DB[:wip_bins].multi_insert(res[:ids].map { |id| { rmt_bin_id: id, context: context } })
+      log_multiple_statuses(:rmt_bins, res[:ids], 'WIP', comment: context, user_name: user_name)
+      ok_response
+    rescue Sequel::ForeignKeyConstraintViolation
+      failed_response('Not all ids are valid bin ids')
+    end
+
+    def remove_bins_from_wip(bin_ids, user_name)
+      res = validate_wip_bins_or_pallets(bin_ids, user_name, out: true)
+      return validation_failed_response(res) if res.failure?
+      return failed_response('None of these bins are works in progress') if DB[:wip_bins].where(rmt_bin_id: bin_ids).count.zero?
+
+      DB[:wip_bins].where(rmt_bin_id: bin_ids).delete
+      log_multiple_statuses(:rmt_bins, bin_ids, 'WIP_RELEASED', user_name: user_name)
+      ok_response
+    end
+
+    def add_pallets_to_wip(pallet_ids, context, user_name) # rubocop:disable Metrics/AbcSize
+      res = validate_wip_bins_or_pallets(pallet_ids, user_name, context)
+      return validation_failed_response(res) if res.failure?
+      return failed_response('Some pallets are already works in progress') if DB[:wip_pallets].where(pallet_id: res[:ids]).count.positive?
+
+      DB[:wip_pallets].multi_insert(res[:ids].map { |id| { pallet_id: id, context: context } })
+      log_multiple_statuses(:pallets, res[:ids], 'WIP', comment: context, user_name: user_name)
+      ok_response
+    rescue Sequel::ForeignKeyConstraintViolation
+      failed_response('Not all ids are valid pallet ids')
+    end
+
+    def remove_pallets_from_wip(pallet_ids, user_name)
+      res = validate_wip_bins_or_pallets(pallet_ids, user_name, out: true)
+      return validation_failed_response(res) if res.failure?
+      return failed_response('None of these pallets are works in progress') if DB[:wip_pallets].where(pallet_id: pallet_ids).count.zero?
+
+      DB[:wip_pallets].where(pallet_id: pallet_ids).delete
+      log_multiple_statuses(:pallets, pallet_ids, 'WIP_RELEASED', user_name: user_name)
+      ok_response
+    end
+
+    def are_bins_out_of_wip?(bin_ids)
+      wip_ids = DB[:wip_bins].where(rmt_bin_id: bin_ids).select_map(:rmt_bin_id)
+      return failed_response("Bin id: #{wip_ids.join(', ')} are works in progress", wip_ids) unless wip_ids.empty?
+
+      success_response('None of the bins are WIP')
+    end
+
+    def are_pallets_out_of_wip?(pallet_ids)
+      wip_ids = DB[:wip_pallets].where(pallet_id: pallet_ids).select_map(:pallet_id)
+      return failed_response("Pallet id: #{wip_ids.join(', ')} are works in progress", wip_ids) unless wip_ids.empty?
+
+      success_response('None of the pallets are WIP')
+    end
+
+    private
+
+    def validate_wip_bins_or_pallets(ids, user_name, context = nil, out: false)
+      params = { ids: ids&.uniq,
+                 user_name: user_name }
+      params[:context] = context unless out
+      Dry::Schema.Params do
+        required(:ids).filled(:array).each(:integer)
+        optional(:context).filled(:string)
+        required(:user_name).filled(:string)
+      end.call(params)
     end
   end
 end

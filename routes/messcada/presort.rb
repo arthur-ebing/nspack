@@ -10,6 +10,10 @@ class Nspack < Roda
     r.on 'staging' do
       res = interactor.stage_bins(params, request.path)
       res.instance
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: "Presort staging - #{e.message}", message: 'Presort staging route.')
+      puts e.message
+      "<result><error msg=\"#{e.message}\" /></result>"
     end
 
     # STAGE BINS OVERRIDE
@@ -18,6 +22,34 @@ class Nspack < Roda
     r.on 'staging_override_provided' do
       res = interactor.staging_override_provided(params, request.path)
       res.instance
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: "Presort staging override - #{e.message}", message: 'Presort staging override route.')
+      puts e.message
+      "<result><error msg=\"#{e.message}\" /></result>"
+    end
+
+    # Bin Tipped
+    # view-source:http://192.168.43.148:9296/messcada/presort/bin_tipped?bin=704&unit=PST-01
+    # --------------------------------------------------------------------------
+    r.on 'bin_tipped' do
+      res = interactor.maf_bin_tipped(params, request.path)
+      res.instance
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: "PresortBinTipped - #{e.message}", message: 'PresortBinTipped Service.')
+      puts e.message
+      "<result><error msg=\"#{e.message}\" /></result>"
+    end
+
+    # Bin Created
+    # view-source:http://192.168.43.148:9296/messcada/presort/created?bin=704&unit=PST-02
+    # --------------------------------------------------------------------------
+    r.on 'bin_created' do
+      res = interactor.bin_created(params, request.path)
+      res.instance
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: "PresortBinCreated - #{e.message}", message: 'PresortBinCreated Service.')
+      puts e.message
+      "<result><error msg=\"#{e.message}\" /></result>"
     end
   end
 end

@@ -18,11 +18,11 @@ class Nspack < Roda
             else
               %(<ContainerMove PID="200" Mode="5" Status="false" RunNumber="" Red="true" Yellow="false" Green="false" Msg="#{unwrap_failed_response(res)}" />)
             end
-        puts "MESSCADA XML - response: #{s}"
+        puts "#{Time.now.strftime('%Y-%m-%d %H:%M:%S')} MESSCADA XML - response: #{s}"
         s
       rescue Crossbeams::FrameworkError => e
         s = %(<ContainerMove PID="200" Mode="5" Status="false" RunNumber="" Red="true" Yellow="false" Green="false" Msg="#{e.message}" />)
-        puts "MESSCADA XML - response: #{s}"
+        puts "#{Time.now.strftime('%Y-%m-%d %H:%M:%S')} MESSCADA XML - response: #{s}"
         s
       end
 
@@ -34,11 +34,11 @@ class Nspack < Roda
             else
               %(<ContainerMove PID="200" Mode="6" Status="false" RunNumber="" Red="true" Yellow="false" Green="false" Msg="#{unwrap_failed_response(res)}" />)
             end
-        puts "MESSCADA XML - response: #{s}"
+        puts "#{Time.now.strftime('%Y-%m-%d %H:%M:%S')} MESSCADA XML - response: #{s}"
         s
       rescue Crossbeams::FrameworkError => e
         s = %(<ContainerMove PID="200" Mode="6" Status="false" RunNumber="" Red="true" Yellow="false" Green="false" Msg="#{e.message}" />)
-        puts "MESSCADA XML - response: #{s}"
+        puts "#{Time.now.strftime('%Y-%m-%d %H:%M:%S')} MESSCADA XML - response: #{s}"
         s
       end
     end
@@ -56,12 +56,12 @@ class Nspack < Roda
             res.instance
           else
             s = %(<ProductLabel PID="223" Status="false" Threading="true" LabelRenderAmount="0" Msg="#{res.message}" />)
-            puts "MESSCADA XML - response: #{s}"
+            puts "#{Time.now.strftime('%Y-%m-%d %H:%M:%S')} MESSCADA XML - response: #{s}"
             s
           end
         rescue Crossbeams::FrameworkError => e
           s = %(<ProductLabel PID="223" Status="false" Threading="true" LabelRenderAmount="0" Msg="#{e.message}" />)
-          puts "MESSCADA XML - response: #{s}"
+          puts "#{Time.now.strftime('%Y-%m-%d %H:%M:%S')} MESSCADA XML - response: #{s}"
           s
         end
       end
@@ -73,6 +73,7 @@ class Nspack < Roda
       hr_interactor = MesscadaApp::HrInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       params = xml_interpreter.params_for_login_mode_switch
       r.on 'change_to_group_login' do
+        AppConst.log_authentication("MesScada change to group mode params: #{params.inspect}")
         res = hr_interactor.change_resource_to_group_login_mode(params)
 
         feedback = if res.success
@@ -85,12 +86,14 @@ class Nspack < Roda
                                                     line1: 'Cannot change to group mode',
                                                     line4: res.message)
                    end
+        AppConst.log_authentication("MesScada change to group mode result: #{Crossbeams::RobotResponder.new(feedback)}")
         Crossbeams::RobotResponder.new(feedback).render
       end
 
       # CHANGE DEVICE TO INDIVIDUAL LOGIN MODE
       # --------------------------------------------------------------------------
       r.on 'change_to_individual_login' do
+        AppConst.log_authentication("MesScada change to individual mode params: #{params.inspect}")
         res = hr_interactor.change_resource_to_individual_login_mode(params)
 
         feedback = if res.success
@@ -103,6 +106,7 @@ class Nspack < Roda
                                                     line1: 'Cannot change to individual mode',
                                                     line4: res.message)
                    end
+        AppConst.log_authentication("MesScada change to individual mode result: #{Crossbeams::RobotResponder.new(feedback)}")
         Crossbeams::RobotResponder.new(feedback).render
       end
     end

@@ -24,6 +24,7 @@ module FinishedGoodsApp
       return validation_failed_response(res) if res.failure?
 
       pallets = res.to_h.select { |k, v| (k.to_s.match(/^p\d+$/) || (k == :pallet_number)) && !v.to_s.empty? }.values.compact
+
       non_existing = pallets - repo.get_pallets(pallets)
       return validation_failed_response(messages: error_messages(res.to_h, non_existing, "doesn't exist")) unless non_existing.empty?
 
@@ -62,7 +63,7 @@ module FinishedGoodsApp
       return validation_failed_response(messages: { carton_number: ['field cannot be empty'] }) if params[:carton_number].nil_or_empty?
 
       res = MesscadaApp::ScanCartonLabelOrPallet.call(params[:carton_number])
-      return res unless res.success
+      return validation_failed_message_response(res.message) unless res.success
 
       params[:carton_number] = res.instance.carton_label_id
       carton = ProductionApp::ProductionRunRepo.new.find_carton_by_carton_label_id(params[:carton_number])
@@ -122,17 +123,21 @@ module FinishedGoodsApp
           pallet_buildup.cartons_moved.each do |_k, v|
             v.each do |cl_id|
               unless cl_id == creator_ctn_label
-                res = MesscadaApp::TransferCarton.call(prod_run_repo.find_carton_by_carton_label_id(cl_id)[:id], dest_pallet_id)
+                orig_seq = repo.get_value(:cartons, :pallet_sequence_id, carton_label_id: cl_id)
+                res = MesscadaApp::TransferCarton.call(prod_run_repo.find_carton_by_carton_label_id(cl_id)[:id], dest_pallet_id, @user.user_name)
                 raise Crossbeams::InfoError, res.message unless res.success
               end
+
+              remove_sequence_from_pallet(orig_seq) if repo.get_value(:pallet_sequences, :carton_quantity, id: orig_seq).zero?
             end
           end
+
           repo.update(:pallet_buildups, id, updates)
         end
 
         if AppConst::CR_FG.lookup_extended_fg_code?
           pallet_ids = repo.select_values(:pallets, :id, pallet_number: [pallet_buildup.destination_pallet_number] + pallet_buildup.source_pallets)
-          FinishedGoodsApp::Job::CalculateExtendedFgCodes.enqueue(pallet_ids)
+          FinishedGoodsApp::Job::CalculateExtendedFgCodesFromSeqs.enqueue(pallet_ids)
         end
 
         success_response("Pallet buildup:#{id} has been completed successfully")
@@ -149,8 +154,55 @@ module FinishedGoodsApp
 
     private
 
+    def remove_sequence_from_pallet(src_seq_id)
+      src_pallet_id = repo.get_value(:pallet_sequences, :pallet_id, id: src_seq_id)
+      src_pallet_ctn_qty = repo.get_value(:pallets, :carton_quantity, id: src_pallet_id)
+      attrs = { removed_from_pallet: true,
+                removed_from_pallet_at: Time.now,
+                pallet_id: nil,
+                removed_from_pallet_id: src_pallet_id,
+                exit_ref: AppConst::SEQ_REMOVED_BY_CTN_TRANSFER }
+
+      reworks_repo.update_pallet_sequence(src_seq_id, attrs)
+      repo.log_status('pallets', src_pallet_id, AppConst::SEQ_REMOVED_BY_CTN_TRANSFER)
+      repo.log_status('pallet_sequences', src_seq_id, AppConst::SEQ_REMOVED_BY_CTN_TRANSFER)
+      scrap_src_pallet(src_pallet_id) if src_pallet_ctn_qty.zero?
+    end
+
+    def scrap_src_pallet(src_pallet_id)
+      attrs = { scrapped: true,
+                scrapped_at: Time.now,
+                exit_ref: AppConst::PALLET_EXIT_REF_SCRAPPED }
+      reworks_repo.update_pallet(src_pallet_id, attrs)
+      repo.log_status('pallets', src_pallet_id, AppConst::PALLET_SCRAPPED_BY_CTN_TRANSFER)
+    end
+
     def validate_pallet_buildup_params(params)
-      PalletBuildupContract.new.call(params)
+      res = PalletBuildupContract.new.call(params)
+      return res if res.failure?
+
+      # Resolve the scanned pallets (remove "00" prefix etc.)
+      invalid_pallets, new_params = build_new_params_with_scanned_pallet_nos(params)
+
+      raise Crossbeams::InfoError, invalid_pallets.join("\n") unless invalid_pallets.empty?
+
+      PalletBuildupContract.new.call(new_params)
+    end
+
+    def build_new_params_with_scanned_pallet_nos(params)
+      new_params = {}
+      invalid_pallets = []
+      params.each do |k, v|
+        if (k.to_s.match(/^p\d+$/) || (k == :pallet_number)) && !v.to_s.empty?
+          scan_res = MesscadaApp::ScanCartonLabelOrPallet.call(scanned_number: v, expect: :pallet_number)
+          p scan_res
+          invalid_pallets << scan_res.message unless scan_res.success
+          new_params[k] = scan_res.success ? scan_res.instance.pallet_number : v
+        else
+          new_params[k] = v
+        end
+      end
+      [invalid_pallets, new_params]
     end
 
     def validate_shipped(pallets)
@@ -189,6 +241,10 @@ module FinishedGoodsApp
 
     def prod_run_repo
       ProductionApp::ProductionRunRepo.new
+    end
+
+    def reworks_repo
+      ProductionApp::ReworksRepo.new
     end
   end
 end

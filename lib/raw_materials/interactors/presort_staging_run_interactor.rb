@@ -90,13 +90,16 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def complete_staging(id)
+    def complete_staging(id) # rubocop:disable Metrics/AbcSize
       res = TaskPermissionCheck::PresortStagingRun.call(:complete_staging, id)
       return res unless res.success
 
       repo.transaction do
+        active_child_id = repo.get_value(:presort_staging_run_children, :id, presort_staging_run_id: id, running: true)
         repo.update_presort_staging_run(id, running: false, staged: true, staged_at: Time.now)
         log_status(:presort_staging_runs, id, 'STAGED')
+        repo.update_presort_staging_run_child(active_child_id, staged: true, running: false, staged_at: Time.now)
+        log_status(:presort_staging_run_children, active_child_id, 'STAGED')
         log_transaction
       end
       instance = presort_staging_run(id)
@@ -207,6 +210,17 @@ module RawMaterialsApp
         res = MesscadaApp::StageBins.result(bin_results)
         success_response('Override Cancelled', res)
       end
+    end
+
+    def maf_bin_tipped(params, request_path)
+      AppConst::PRESORT_BIN_TIPPED_LOG.info("#{request_path}&bin=#{params[:bin]}")
+      plant_resource = params[:unit]
+      MesscadaApp::PresortBinTipped.call(params[:bin], plant_resource)
+    end
+
+    def bin_created(params, request_path)
+      AppConst::PRESORT_BIN_CREATED_LOG.info("#{request_path}&bin=#{params[:bin]}&unit=#{params[:unit]}")
+      MesscadaApp::PresortBinCreated.call(params[:bin], params[:unit])
     end
 
     def log_request(params, msq)

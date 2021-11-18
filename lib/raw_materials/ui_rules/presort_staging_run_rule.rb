@@ -37,7 +37,6 @@ module UiRules
         fields[:supplier_id] = { renderer: :select, options: @supplier_repo.for_select_suppliers,
                                  disabled_options: @supplier_repo.for_select_inactive_suppliers,
                                  caption: 'Supplier',
-                                 required: true,
                                  prompt: true }
       end
     end
@@ -49,6 +48,7 @@ module UiRules
       rmt_class_id_label = repo.get(:rmt_classes, @form_object.rmt_class_id, :rmt_class_code)
       rmt_size_id_label = repo.get(:rmt_sizes, @form_object.rmt_size_id, :size_code)
       season_id_label = repo.get(:seasons, @form_object.season_id, :season_code)
+      fields[:id] = { renderer: :label, with_value: @form_object.id, caption: 'Run Id' }
       fields[:setup_uncompleted_at] = { renderer: :label, format: :without_timezone_or_seconds }
       fields[:setup_completed] = { renderer: :label, as_boolean: true }
       fields[:presort_unit_plant_resource_id] = { renderer: :label, with_value: presort_unit_plant_resource_id_label, caption: 'Line Plant Resource' }
@@ -72,7 +72,8 @@ module UiRules
 
     def common_fields # rubocop:disable Metrics/AbcSize
       season_id_label = repo.get(:seasons, @form_object.season_id, :season_code)
-      fields = { presort_unit_plant_resource_id: { renderer: :select,
+      fields = { id: { renderer: :label, with_value: @form_object.id, caption: 'Run Id' },
+                 presort_unit_plant_resource_id: { renderer: :select,
                                                    options: @resource_repo.for_select_plant_resources_of_type(Crossbeams::Config::ResourceDefinitions::PRESORTING_UNIT),
                                                    caption: 'Line Plant Resource',
                                                    required: true,
@@ -84,11 +85,11 @@ module UiRules
                  rmt_class_id: { renderer: :select, options: @fruit_repo.for_select_rmt_classes,
                                  disabled_options: @fruit_repo.for_select_inactive_rmt_classes,
                                  caption: 'Rmt Class',
-                                 required: true,
+                                 required: false,
                                  prompt: true },
                  rmt_size_id: { renderer: :select, options: @size_repo.for_select_rmt_sizes,
                                 caption: 'Rmt Size',
-                                required: true,
+                                required: false,
                                 prompt: true },
                  season_id: { renderer: :label, with_value: season_id_label, caption: 'Season' } }
 
@@ -96,9 +97,9 @@ module UiRules
 
       cultivar_name = repo.get(:cultivars, @form_object.cultivar_id, :cultivar_name)
       track_indicator_codes = messcada_repo.track_indicator_codes(cultivar_name).uniq if cultivar_name
-      fields[:treatment_code] = { renderer: :select, options: messcada_repo.presort_staging_run_treatment_codes.uniq, required: true, prompt: true }
-      fields[:ripe_point_code] = { renderer: :select, options: messcada_repo.ripe_point_codes.map { |s| s[0] }.uniq, required: true, prompt: true }
-      fields[:track_indicator_code] = { renderer: :select, options: track_indicator_codes, required: true, prompt: true }
+      fields[:treatment_code] = { renderer: :select, options: messcada_repo.presort_staging_run_treatment_codes.uniq, prompt: true }
+      fields[:ripe_point_code] = { renderer: :select, options: messcada_repo.ripe_point_codes.map { |s| s[0] }.uniq, prompt: true }
+      fields[:track_indicator_code] = { renderer: :select, options: track_indicator_codes, prompt: true }
       fields
     end
 

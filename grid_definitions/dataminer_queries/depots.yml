@@ -1,10 +1,11 @@
 ---
 :caption: Depots
 :sql: "SELECT\r\n    depots.id,\r\n    depots.depot_code,\r\n    depots.description,\r\n
-  \   depots.city_id,\r\n    destination_cities.city_name,\r\n    depots.bin_depot,\r\n
-  \   fn_masterfile_variants('depots', depots.id) AS variant_codes,\r\n    depots.active,\r\n
-  \   depots.created_at,\r\n    depots.updated_at\r\n\r\nFROM depots\r\nLEFT JOIN
-  destination_cities ON destination_cities.id = city_id\r\nORDER BY depots.depot_code"
+  \   depots.city_id,\r\n    destination_cities.city_name,\r\n    depots.magisterial_district,\r\n
+  \   depots.bin_depot,\r\n    fn_masterfile_variants('depots', depots.id) AS variant_codes,\r\n
+  \   depots.active,\r\n    depots.created_at,\r\n    depots.updated_at\r\n\r\nFROM
+  depots\r\nLEFT JOIN destination_cities ON destination_cities.id = city_id\r\nORDER
+  BY depots.depot_code"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -89,13 +90,29 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  magisterial_district:
+    :name: magisterial_district
+    :sequence_no: 6
+    :caption: Magisterial district
+    :namespaced_name: depots.magisterial_district
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   bin_depot:
     :name: bin_depot
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Bin depot
     :namespaced_name: depots.bin_depot
     :data_type: :boolean
-    :width: 70
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -107,7 +124,7 @@
     :group_max: false
   variant_codes:
     :name: variant_codes
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Variant codes
     :namespaced_name: 
     :data_type: :string
@@ -123,7 +140,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Active
     :namespaced_name: depots.active
     :data_type: :boolean
@@ -139,7 +156,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Created at
     :namespaced_name: depots.created_at
     :data_type: :datetime
@@ -155,7 +172,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Updated at
     :namespaced_name: depots.updated_at
     :data_type: :datetime

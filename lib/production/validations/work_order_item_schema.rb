@@ -9,5 +9,6 @@ module ProductionApp
     optional(:carton_qty_produced).maybe(:integer)
     optional(:completed).maybe(:bool)
     optional(:completed_at).maybe(:time)
+    optional(:pallet_fulfillment_warning_level).maybe(:integer)
   end
 end

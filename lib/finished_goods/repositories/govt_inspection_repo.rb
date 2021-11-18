@@ -58,14 +58,17 @@ module FinishedGoodsApp
       GovtInspectionSheet.new(hash)
     end
 
-    def vehicle_job_unit_in_different_tripsheet?(vehicle_job_unit_id, vehicle_job_id)
+    def vehicle_job_unit_in_different_tripsheet?(stock_item_id, vehicle_job_id, stock_type)
       query = <<~SQL
         SELECT u.id
-        FROM  vehicle_job_units u
-        JOIN vehicle_jobs j on j.id=u.vehicle_job_id
-        WHERE u.stock_item_id = ? and u.vehicle_job_id <> ? and j.offloaded_at is null
+        FROM vehicle_job_units u
+        JOIN vehicle_jobs j ON j.id = u.vehicle_job_id
+        WHERE u.stock_item_id = ?
+        AND u.vehicle_job_id <> ?
+        AND j.offloaded_at IS NULL
+        AND u.stock_type_id = (SELECT id FROM stock_types WHERE stock_type_code = ?)
       SQL
-      !DB[query, vehicle_job_unit_id, vehicle_job_id].empty?
+      !DB[query, stock_item_id, vehicle_job_id, stock_type].empty?
     end
 
     def clone_govt_inspection_sheet(id, user)
@@ -111,12 +114,12 @@ module FinishedGoodsApp
 
       all_hash(:govt_inspection_pallets, govt_inspection_sheet_id: id).each do |govt_inspection_pallet|
         pallet_id = govt_inspection_pallet[:pallet_id]
-        pallet = find_hash(:pallets, pallet_id)
+        # pallet = find_hash(:pallets, pallet_id)
 
         params = { inspected: true,
                    govt_inspection_passed: govt_inspection_pallet[:passed],
                    last_govt_inspection_pallet_id: govt_inspection_pallet[:id] }
-        params[:govt_first_inspection_at] = Time.now if pallet[:govt_first_inspection_at].nil?
+        params[:govt_first_inspection_at] = Time.now unless reinspection # if pallet[:govt_first_inspection_at].nil?
         params[:govt_reinspection_at] = Time.now if reinspection
         if govt_inspection_pallet[:passed] && !AppConst::CREATE_STOCK_AT_FIRST_INTAKE
           params[:in_stock] = true

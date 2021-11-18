@@ -89,7 +89,9 @@ module EdiApp
     def process_delete(existing_id)
       return success_response('LI delete ignored - no matching order') if existing_id.nil?
 
-      delete_order(existing_id)
+      li_repo.transaction do
+        li_repo.delete_order(existing_id, file_name)
+      end
       success_response("LI delete processed. Order with id #{existing_id} deleted.")
     end
 
@@ -98,8 +100,24 @@ module EdiApp
       attrs[:exporter_party_role_id] = get_party_role_id(order_head[:sender], AppConst::ROLE_EXPORTER)
       attrs[:marketing_org_party_role_id] = get_party_role_id(order_head[:sender], AppConst::ROLE_MARKETER)
 
+      # T-Cust / TM / packed
       attrs[:packed_tm_group_id] = po_repo.find_packed_tm_group_id(order_head[:target_market])
       missing_masterfiles << "Packed TM Group: #{order_head[:target_market]}" if attrs[:packed_tm_group_id].nil?
+
+      # # --------------------- TARGET MARKET RELATED
+      # targets = po_repo.find_targets(seq[:targ_mkt], seq[:target_region], seq[:target_country]) # (target_market) (?) (LD.country)
+      # rec[:lookup_data][:packed_tm_group_id] = targets.instance[:packed_tm_group_id]
+      # rec[:missing_mf][:packed_tm_group_id] = { mode: :direct, raise: false, keys: { targ_mkt: seq[:targ_mkt] }, msg: "Target Market Group: #{seq[:targ_mkt]}" } if targets.instance[:packed_tm_group_id].nil?
+      # rec[:lookup_data][:target_market_id] = targets.instance[:target_market_id] unless targets.instance[:single]
+      #
+      # # The EDI targ_mkt has not been applied as a packed tm grp or target market, so we expect it to be a target customer:
+      # if targets.instance[:check_customer]
+      #   target_customer_party_role_id = MasterfilesApp::PartyRepo.new.find_party_role_from_org_code_for_role(seq[:targ_mkt], AppConst::ROLE_TARGET_CUSTOMER)
+      #   target_customer_party_role_id = po_repo.find_variant_id(:target_customer_party_roles, seq[:targ_mkt]) if target_customer_party_role_id.nil?
+      #   rec[:lookup_data][:target_customer_party_role_id] = target_customer_party_role_id
+      #   rec[:missing_mf][:target_customer_party_role_id] = { mode: :direct, keys: { targ_mkt: seq[:targ_mkt], role: AppConst::ROLE_TARGET_CUSTOMER }, msg: "Organization: #{seq[:targ_mkt]} with role: #{AppConst::ROLE_TARGET_CUSTOMER}" } if target_customer_party_role_id.nil?
+      # end
+      # # ---------------------
 
       attrs[:customer_order_number] = order_head[:order_number]
       attrs[:remarks] = remarks.join("\n")
@@ -176,18 +194,6 @@ module EdiApp
 
         li_repo.log_status(:orders, order_id, 'CREATED FROM LI', comment: file_name, user_name: 'System')
         li_repo.log_multiple_statuses(:order_items, item_ids, 'CREATED FROM LI', comment: file_name, user_name: 'System')
-        li_repo.log_action(user_name: 'System', context: 'EDI', route_url: 'LI EDI IN')
-      end
-    end
-
-    def delete_order(order_id)
-      li_repo.transaction do
-        ids = li_repo.select_values(:order_items, :id, order_id: order_id)
-        li_repo.delete(:order_items, ids)
-
-        li_repo.delete(:orders, order_id)
-        li_repo.log_status(:orders, order_id, 'DELETED FROM LI', comment: file_name, user_name: 'System')
-        li_repo.log_multiple_statuses(:order_items, ids, 'DELETED FROM LI', comment: file_name, user_name: 'System')
         li_repo.log_action(user_name: 'System', context: 'EDI', route_url: 'LI EDI IN')
       end
     end

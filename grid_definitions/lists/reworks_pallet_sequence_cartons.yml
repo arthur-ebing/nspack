@@ -28,6 +28,15 @@
   - :col: cartons.pallet_sequence_id
     :op: "="
     :val: "$:pallet_sequence_id$"
+  :reprint_pallet_carton_labels:
+    - :col: pallet_sequences.pallet_id
+      :op: "="
+      :val: "$:pallet_id$"
+:multiselect:
+  :reprint_pallet_carton_labels:
+    :url: "/production/reworks/pallets/$:pallet_id$/reprint_pallet_carton_labels/reprint_pallet_carton_labels"
+    :conditions: reprint_pallet_carton_labels
+    :multiselect_save_method: remote
 :hide_for_client:
   hb:
   - gtin_code

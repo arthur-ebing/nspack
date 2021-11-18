@@ -68,7 +68,7 @@ module ProductionApp
 
         setups_to_be_created.each do |p|
           current_product_setup = p
-          id = repo.create_work_order_item(work_order_id: work_order_id, product_setup_id: p)
+          id = repo.create_work_order_item(work_order_id: work_order_id, product_setup_id: p, pallet_fulfillment_warning_level: AppConst::CR_FG.wo_fulfillment_pallet_warning_level)
           log_status(:work_order_items, id, 'CREATED')
           log_transaction
 

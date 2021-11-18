@@ -1,5 +1,8 @@
 ---
 :dataminer_definition: customers
+:captions:
+  :conditions:
+    :rmt: RMT Customers
 :actions:
 - :url: "/masterfiles/finance/customers/$:id$"
   :text: view
@@ -21,6 +24,7 @@
   :text: Payment Term Sets
   :icon: list
   :popup: true
+  :hide_if_true: rmt_customer
 - :separator: true
 - :url: "/development/statuses/list/customers/$:id$"
   :text: status
@@ -29,7 +33,25 @@
   :popup: true
 :page_controls:
 - :control_type: :link
-  :url: "/masterfiles/finance/customers/new"
+  :url: "/masterfiles/finance/customers/new?rmt=false"
   :text: New Customer
   :style: :button
   :behaviour: :popup
+  :hide_for_key:
+  - rmt
+- :control_type: :link
+  :url: "/masterfiles/finance/customers/new?rmt=true"
+  :text: New RMT Customer
+  :style: :button
+  :behaviour: :popup
+  :hide_for_key:
+  - standard
+:conditions:
+  :standard:
+    - :col: customers.rmt_customer
+      :op: =
+      :val: false
+  :rmt:
+    - :col: customers.rmt_customer
+      :op: =
+      :val: true

@@ -55,14 +55,14 @@
   \   vw_loads.customer_reference,\r\n    vw_loads.depot,\r\n    vw_loads.edi_file_name
   AS po_file_name,\r\n    vw_pallet_sequences.colour_percentage_id,\r\n    vw_pallet_sequences.colour_percentage,\r\n
   \   vw_pallet_sequences.colour_description,\r\n    vw_pallet_sequences.work_order_item_id,\r\n
-  \   vw_pallet_sequences.work_order_item_code,\r\n    CASE\r\n        WHEN vw_pallets.scrapped
-  THEN 'warning'\r\n        WHEN vw_pallets.shipped THEN 'inactive'\r\n        WHEN
-  vw_pallets.allocated THEN 'ready'\r\n        WHEN vw_pallets.in_stock THEN 'ok'\r\n
-  \       WHEN vw_pallets.palletized OR vw_pallets.partially_palletized THEN 'inprogress'\r\n
-  \       WHEN vw_pallets.inspected AND NOT vw_pallets.govt_inspection_passed THEN
-  'error'\r\n        WHEN fn_pallet_verification_failed(vw_pallets.pallet_id) THEN
-  'error'\r\n        END AS colour_rule\r\n\r\nFROM vw_pallets\r\n         LEFT JOIN
-  vw_pallet_sequences ON vw_pallets.pallet_id = vw_pallet_sequences.pallet_id\r\n
+  \   vw_pallet_sequences.work_order_item_code,\r\n    vw_pallets.edi_in_load_number,\r\n
+  \   CASE\r\n        WHEN vw_pallets.scrapped THEN 'warning'\r\n        WHEN vw_pallets.shipped
+  THEN 'inactive'\r\n        WHEN vw_pallets.allocated THEN 'ready'\r\n        WHEN
+  vw_pallets.in_stock THEN 'ok'\r\n        WHEN vw_pallets.palletized OR vw_pallets.partially_palletized
+  THEN 'inprogress'\r\n        WHEN vw_pallets.inspected AND NOT vw_pallets.govt_inspection_passed
+  THEN 'error'\r\n        WHEN fn_pallet_verification_failed(vw_pallets.pallet_id)
+  THEN 'error'\r\n        END AS colour_rule\r\n\r\nFROM vw_pallets\r\n         LEFT
+  JOIN vw_pallet_sequences ON vw_pallets.pallet_id = vw_pallet_sequences.pallet_id\r\n
   \        LEFT JOIN vw_pallet_sequences_aggregated aggregated ON aggregated.pallet_id
   = vw_pallets.pallet_id\r\n         LEFT JOIN vw_loads ON vw_loads.id = vw_pallets.load_id\r\nORDER
   BY pallet_id DESC;\r\n"
@@ -2606,9 +2606,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  edi_in_load_number:
+    :name: edi_in_load_number
+    :sequence_no: 159
+    :caption: Edi in load number
+    :namespaced_name: vw_pallets.edi_in_load_number
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 159
+    :sequence_no: 160
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

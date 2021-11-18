@@ -35,7 +35,12 @@ class Nspack < Roda
 
       r.is do
         r.get do       # TIP BIN
-          res = interactor.tip_rmt_bin(params)
+          if AppConst::CR_PROD.full_bin_tip_criteria_check?
+            res = interactor.can_tip_bin?(params)
+            res = interactor.tip_rmt_bin(params) if res.success
+          else
+            res = interactor.tip_rmt_bin(params)
+          end
           feedback = interactor.bin_tipping_response(res, params)
           Crossbeams::RobotResponder.new(feedback).render
         end

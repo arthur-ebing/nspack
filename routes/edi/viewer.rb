@@ -49,10 +49,6 @@ class Nspack < Roda
     end
 
     r.on 'display_edi_file' do
-      r.on 'csv_grid' do
-        interactor.csv_grid(params[:file_path])
-      end
-
       if UtilityFunctions.xml_file?(params[:file_path])
         show_partial_or_page(r) { Edi::Viewer::File::XML.call(params[:flow_type], params[:file_path]) }
       elsif params[:file_path].match(/.csv$/i)

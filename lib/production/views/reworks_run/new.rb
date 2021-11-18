@@ -65,6 +65,7 @@ module Production
                   col.add_field :scrap_reason_id
                   col.add_field :remarks
                   col.add_field :pallets_selected
+                  col.add_field :bin_asset_number
                 end
                 if rules[:single_edit] || rules[:bulk_production_run_update]
                   row.blank_column

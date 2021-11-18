@@ -26,7 +26,10 @@ module ProductionApp
                              col_name: :shift_type_code },
                            { function: :fn_current_status,
                              args: ['shifts', :id],
-                             col_name: :status }]
+                             col_name: :status },
+                           { function: :fn_party_role_name,
+                             args: [:foreman_party_role_id],
+                             col_name: :foreman }]
       )
       return nil if hash.nil?
 
@@ -62,17 +65,19 @@ module ProductionApp
       end
     end
 
-    def create_shift(attrs)
+    def create_shift(attrs) # rubocop:disable Metrics/AbcSize
       attrs = attrs.to_h
       date = attrs.delete(:date)
 
       shift_type = DB[:shift_types].where(id: attrs[:shift_type_id])
       start_hr = shift_type.get(:start_hour)
       end_hr = shift_type.get(:end_hour)
+      starting_quarter = shift_type.get(:starting_quarter)
+      ending_quarter = shift_type.get(:ending_quarter)
 
-      attrs[:start_date_time] = Time.parse("#{date} #{start_hr}")
+      attrs[:start_date_time] = Time.parse("#{date} #{start_hr} : #{starting_quarter}")
       end_date = end_hr < start_hr ? date + 1 : date
-      attrs[:end_date_time] = Time.parse("#{end_date} #{end_hr}") - 59
+      attrs[:end_date_time] = Time.parse("#{end_date} #{end_hr} : #{ending_quarter}") - 59
 
       check_if_shift_overlap!(attrs)
       DB[:shifts].insert(attrs)

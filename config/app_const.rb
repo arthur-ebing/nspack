@@ -12,6 +12,31 @@ class AppConst # rubocop:disable Metrics/ClassLength
     ENV['RACK_ENV'] == 'test'
   end
 
+  def self.mssql_staging_interface(plant)
+    name = "PRESORT#{plant[-1]}_STAGING_MSSQL_SERVER_INTERFACE"
+    raise Crossbeams::FrameworkError, "Plant #{plant} is not a valid name for mapping to a SQL server interface (#{name})." unless const_defined?(name)
+
+    val = const_get(name)
+    raise Crossbeams::FrameworkError, "Client setting \"#{name}\" has not been set." if val.nil?
+
+    val
+  end
+
+  def self.mssql_production_interface(plant)
+    name = "PRESORT#{plant[-1]}_PRODUCTION_MSSQL_SERVER_INTERFACE"
+    raise Crossbeams::FrameworkError, "Plant #{plant} is not a valid name for mapping to a SQL server interface (#{name})." unless const_defined?(name)
+
+    val = const_get(name)
+    raise Crossbeams::FrameworkError, "Client setting \"#{name}\" has not been set." if val.nil?
+
+    val
+  end
+
+  # Conditional logging of login/logout events
+  def self.log_authentication(str)
+    AUTH_LOG.info(str) if ENV['LOG_ALL_LOGIN_ACTIVITY']
+  end
+
   # Client-specific code
   CLIENT_SET = {
     'hb' => 'Habata (Badlands)',
@@ -49,9 +74,20 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # Log for errors experienced by robot calls (Keep history: 10 files of up to 1Mb each):
   ROBOT_LOG = Logger.new('log/robot.log', 10, 1_024_000)
 
+  # Log all login/logout events
+  AUTH_LOG = Logger.new('log/robot_authorization.log', 10, 1_024_000)
+
   # Logs requests, responses and errors for bin staging execution services (Keep history: 10 files of up to 1Mb each)
   BIN_STAGING_LOG_FILE = 'log/bin_staging_execution.log'
   BIN_STAGING_LOG = Logger.new(BIN_STAGING_LOG_FILE, 10, 1_024_000)
+
+  # Logs requests, responses and errors for tipped bin service (Keep history: 10 files of up to 1Mb each)
+  PRESORT_BIN_TIPPED_LOG_FILE = 'log/presort_bin_tipped.log'
+  PRESORT_BIN_TIPPED_LOG = Logger.new(PRESORT_BIN_TIPPED_LOG_FILE, 10, 1_024_000)
+
+  # Logs requests, responses and errors for create bin service (Keep history: 10 files of up to 1Mb each)
+  PRESORT_BIN_CREATED_LOG_FILE = 'log/presort_bin_created.log'
+  PRESORT_BIN_CREATED_LOG = Logger.new(PRESORT_BIN_CREATED_LOG_FILE, 10, 1_024_000)
 
   # labeling cached setup data path
   LABELING_CACHED_DATA_FILEPATH = File.expand_path('../tmp/run_cache', __dir__)
@@ -88,6 +124,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   REPACKED = 'REPACKED'
   CREATED_FROM_BIN = 'CREATED_FROM_BIN'
   CONVERTED_TO_REBIN = 'CONVERTED_TO_REBIN'
+  EXTENDED_FG_CODE_RECALCULATED = 'EXTENDED_FG_CODE_RECALCULATED'
 
   # Constants for bin_scan_mode:
   SCAN_BINS_INDIVIDUALLY = 1
@@ -132,6 +169,8 @@ class AppConst # rubocop:disable Metrics/ClassLength
   CONVERTED_TO_PALLET = 'CONVERTED_TO_PALLET'
   CONVERTED_FROM_PALLET = 'CONVERTED_FROM_PALLET'
   REWORKS_ORCHARD_MIX = 'REWORKS ORCHARD MIX'
+  VERIFIED_FROM_BIN_LABEL = 'VERIFIED_FROM_BIN_LABEL'
+  VERIFIED_AS_REBIN = 'VERIFIED_AS_REBIN'
 
   # Constants for PKG Types
   PM_TYPE_STICKER = 'STICKER'
@@ -188,6 +227,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   ROLE_TARGET_CUSTOMER = 'TARGET CUSTOMER'
   ROLE_TRANSPORTER = 'TRANSPORTER'
   ROLE_FARM_MANAGER = 'FARM_MANAGER'
+  ROLE_FOREMAN = 'FOREMAN'
 
   PARTY_ROLE_REGISTRATION_TYPES = { 'LSP' => ROLE_SHIPPER,
                                     'CF' => ROLE_SHIPPER,
@@ -203,6 +243,9 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # Default UOM TYPE
   UOM_TYPE = 'INVENTORY'
   DEFAULT_UOM_CODE = 'EACH'
+
+  # Orchard code to be used for creating unknown orchards
+  UNKNOWN_ORCHARD = 'UN'
 
   # Constants for Reworks run types:
   RUN_TYPE_SINGLE_PALLET_EDIT = 'SINGLE PALLET EDIT'
@@ -235,6 +278,8 @@ class AppConst # rubocop:disable Metrics/ClassLength
   RUN_TYPE_SINGLE_BIN_EDIT = 'SINGLE BIN EDIT'
   RUN_TYPE_SCRAP_CARTON = 'SCRAP CARTON'
   RUN_TYPE_UNSCRAP_CARTON = 'UNSCRAP CARTON'
+  RUN_TYPE_WIP_PALLETS = 'WIP PALLETS'
+  RUN_TYPE_WIP_BINS = 'WIP BINS'
 
   # Constants for Reworks run actions:
   REWORKS_ACTION_SINGLE_EDIT = 'SINGLE EDIT'
@@ -281,6 +326,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
     RUN_TYPE_TIP_MIXED_ORCHARDS => :bin,
     RUN_TYPE_SINGLE_BIN_EDIT => :bin,
     RUN_TYPE_CHANGE_BIN_DELIVERY => :bin,
+    RUN_TYPE_WIP_BINS => :bin,
     RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE => :prodrun,
     RUN_TYPE_BULK_BIN_RUN_UPDATE => :prodrun,
     RUN_TYPE_SCRAP_CARTON => :carton,
@@ -347,7 +393,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
     # { regex: '^SK(\\d+)', type: 'sku', field: 'sku_number' },
     { regex: '^DN(\\d+)', type: 'delivery', field: 'delivery_number' },
     { regex: '^BN(\\d+)', type: 'bin', field: 'id' },
-    { regex: '^(\\d+)', type: 'pallet_number', field: 'pallet_number' },
+    { regex: '^(\\d+)$', type: 'pallet_number', field: 'pallet_number' },
     { regex: '^(\\d+)', type: 'carton_label_id', field: 'id' },
     # { regex: '^SK(\\d+)', type: 'bin_asset', field: 'bin_asset_number' }, # asset no should change to string and this should not require SK.
     { regex: '^([A-Z0-9]+)', type: 'bin_asset', field: 'bin_asset_number' }, # asset no should change to string and this should not require SK.
@@ -378,12 +424,18 @@ class AppConst # rubocop:disable Metrics/ClassLength
   EMAIL_GROUP_LABEL_APPROVERS = 'label_approvers'
   EMAIL_GROUP_LABEL_PUBLISHERS = 'label_publishers'
   EMAIL_GROUP_EDI_NOTIFIERS = 'edi_notifiers'
-  USER_EMAIL_GROUPS = [EMAIL_GROUP_LABEL_APPROVERS, EMAIL_GROUP_LABEL_PUBLISHERS, EMAIL_GROUP_EDI_NOTIFIERS].freeze
+  EMAIL_WORK_ORDER_MANAGERS = 'work_order_managers'
+  USER_EMAIL_GROUPS = [EMAIL_GROUP_LABEL_APPROVERS, EMAIL_GROUP_LABEL_PUBLISHERS, EMAIL_GROUP_EDI_NOTIFIERS, EMAIL_WORK_ORDER_MANAGERS].freeze
 
   # Business Processes
   PROCESS_ADHOC_TRANSACTIONS = 'ADHOC_TRANSACTIONS'
   PROCESS_RECEIVE_EMPTY_BINS = 'RECEIVE_EMPTY_BINS'
   PROCESS_ISSUE_EMPTY_BINS = 'ISSUE_EMPTY_BINS'
+  PROCESS_BIN_ASSET_CONTROL = 'BIN_ASSET_CONTROL'
+
+  # Asset_transaction_types
+  BIN_TIP_ASSET_TRANSACTION_TYPE = 'BIN_TIP'
+  REBIN_ASSET_TRANSACTION_TYPE = 'REBIN'
 
   # Storage Types
   STORAGE_TYPE_PALLETS = 'PALLETS'
@@ -396,11 +448,25 @@ class AppConst # rubocop:disable Metrics/ClassLength
   LOCATION_TYPES_RECEIVING_BAY = 'RECEIVING BAY'
   LOCATION_TYPES_BIN_ASSET = 'BIN_ASSET'
   LOCATION_TYPES_FARM = 'FARM'
+  LOCATION_TYPES_BIN_ASSET_TRADING_PARTNER = 'BIN_ASSET_TRADING_PARTNER'
 
   ONSITE_EMPTY_BIN_LOCATION = 'ONSITE_EMPTY_BIN'
   ONSITE_FULL_BIN_LOCATION = 'ONSITE_FULL_BIN'
 
   PENDING_LOCATION = 'PENDING_LOCATION'
+
+  CA_TREATMENT_LOCATION_STATUSES = %w[
+    EMPTY
+    GAS
+    LOADING_CA
+    LOADING_RA_SMARTFRESH
+    OPEN
+    SEALED_CA
+    SEALED_CA_SMARTFRESH
+    SEALED_RA_SMARTFRESH
+    SHORT_CA
+    TEMPORARY
+  ].freeze
 
   # Loads:
   IN_TRANSIT_LOCATION = 'IN_TRANSIT_EX_PACKHSE'
@@ -468,26 +534,32 @@ class AppConst # rubocop:disable Metrics/ClassLength
   DESTINATION_TYPES = [DEPOT_DESTINATION_TYPE, PARTY_ROLE_DESTINATION_TYPE].freeze
   EDI_OUT_RULES_TEMPLATE = {
     EDI_FLOW_PS => {
+      singleton: false,
       depot: false,
       roles: [ROLE_MARKETER, ROLE_TARGET_CUSTOMER]
     },
     EDI_FLOW_PO => {
+      singleton: false,
       depot: true,
       roles: [ROLE_CUSTOMER, ROLE_SHIPPER, ROLE_EXPORTER]
     },
     EDI_FLOW_HBS => {
+      singleton: true,
       depot: false,
-      roles: [ROLE_EXPORTER]
+      roles: []
     },
     EDI_FLOW_HCS => {
+      singleton: false,
       depot: false,
-      roles: [ROLE_EXPORTER]
+      roles: [ROLE_MARKETER]
     },
     EDI_FLOW_UISTK => {
+      singleton: false,
       depot: false,
       roles: [ROLE_MARKETER]
     },
     EDI_FLOW_PALBIN => {
+      singleton: false,
       depot: true,
       roles: [ROLE_CUSTOMER, ROLE_EXPORTER]
     }
@@ -595,5 +667,5 @@ class AppConst # rubocop:disable Metrics/ClassLength
 
   # Refresh pallet data
   REFRESH_PALLET_DATA_TABLES = %w[carton_labels pallet_sequences].freeze
-  REFRESH_PALLET_DATA_COLUMNS = %w[fruit_actual_counts_for_pack_id fruit_size_reference_id].freeze
+  REFRESH_PALLET_DATA_COLUMNS = %w[fruit_actual_counts_for_pack_id fruit_size_reference_id sell_by_code].freeze
 end

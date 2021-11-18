@@ -27,27 +27,33 @@ module FinishedGoodsApp
     optional(:load_id).maybe(:integer)
   end
 
-  OrderItemSchema = Dry::Schema.Params do
-    optional(:id).filled(:integer)
-    required(:order_id).filled(:integer)
-    required(:commodity_id).filled(:integer)
-    required(:basic_pack_id).filled(:integer)
-    required(:standard_pack_id).filled(:integer)
-    required(:actual_count_id).filled(:integer)
-    required(:size_reference_id).maybe(:integer)
-    required(:grade_id).filled(:integer)
-    required(:mark_id).filled(:integer)
-    required(:marketing_variety_id).filled(:integer)
-    required(:inventory_id).maybe(:integer)
-    required(:carton_quantity).filled(:integer)
-    required(:price_per_carton).maybe(:decimal)
-    required(:price_per_kg).maybe(:decimal)
-    required(:sell_by_code).maybe(Types::StrippedString)
-    required(:pallet_format_id).maybe(:integer)
-    required(:pm_mark_id).maybe(:integer)
-    required(:pm_bom_id).maybe(:integer)
-    required(:rmt_class_id).maybe(:integer)
-    # required(:treatment_id).maybe(:integer)
+  class OrderItemContract < Dry::Validation::Contract
+    params do
+      optional(:id).filled(:integer)
+      required(:order_id).filled(:integer)
+      required(:commodity_id).filled(:integer)
+      required(:basic_pack_id).filled(:integer)
+      required(:standard_pack_id).filled(:integer)
+      required(:actual_count_id).maybe(:integer)
+      required(:size_reference_id).maybe(:integer)
+      required(:grade_id).filled(:integer)
+      required(:mark_id).filled(:integer)
+      required(:marketing_variety_id).filled(:integer)
+      required(:inventory_id).maybe(:integer)
+      required(:carton_quantity).filled(:integer)
+      required(:price_per_carton).maybe(:decimal)
+      required(:price_per_kg).maybe(:decimal)
+      required(:sell_by_code).maybe(Types::StrippedString)
+      required(:pallet_format_id).maybe(:integer)
+      required(:pm_mark_id).maybe(:integer)
+      required(:pm_bom_id).maybe(:integer)
+      required(:rmt_class_id).maybe(:integer)
+      # required(:treatment_id).maybe(:integer)
+    end
+
+    rule(:actual_count_id) do
+      key.failure('must be filled or size reference must be filled') if values[:actual_count_id].nil_or_empty? && values[:size_reference_id].nil_or_empty?
+    end
   end
 
   OrdersLoadsSchema = Dry::Schema.Params do

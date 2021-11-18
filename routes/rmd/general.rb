@@ -16,14 +16,18 @@ class Nspack < Roda
       scan_rule = AppConst::BARCODE_LOOKUP_RULES[scan_type.to_sym]
       rule = scan_rule[scan_field.to_sym] unless scan_rule.nil?
       if rule.nil?
-        { showField: 'There is no lookup' }.to_json
+        { showField: 'There is no lookup', beep: true }.to_json
       else
         show_field = if rule[:join]
                        DB[rule[:table]].join(rule[:join], rule[:on]).where(rule[:field] => scan_value).get(rule[:show_field])
                      else
                        DB[rule[:table]].where(rule[:field] => scan_value).get(rule[:show_field])
                      end
-        { showField: show_field || 'Not found' }.to_json
+        if show_field.nil?
+          { showField: 'Not found', beep: true }.to_json
+        else
+          { showField: show_field }.to_json
+        end
       end
     end
 
@@ -38,6 +42,7 @@ class Nspack < Roda
                                        caption: 'Barcode check',
                                        action: '/rmd/utilities/check_barcode',
                                        button_caption: 'Show')
+        # form.image
         form.add_field(:barcode_1, 'Barcode one', scan: 'key248_all', required: false)
         form.add_field(:barcode_2, 'Barcode two', scan: 'key248_all', required: false)
         form.add_field(:barcode_3, 'Barcode three', scan: 'key248_all', required: false)
@@ -50,6 +55,16 @@ class Nspack < Roda
       r.post do
         tr_cls = 'striped--light-gray'
         td_cls = 'pv2 ph3'
+        # tempfile = params[:the_image][:tempfile]
+        # filename = params[:the_image][:filename]
+        # filepath = Tempfile.open([filename, '.jpg'], 'public/tempfiles') do |f|
+        #   f.write(File.read(tempfile.path))
+        #   f.path
+        # end
+        # File.chmod(0o644, filepath) # Ensure web app can read the image.
+        # `convert #{filepath} -resize 10% #{filepath}`
+        # res = <<~HTML
+        #   <img src='/#{File.join('tempfiles', File.basename(filepath))}'>
         res = <<~HTML
           <table class="collapse ba br2 b--black-10 pv2 ph3">
           <tbody>

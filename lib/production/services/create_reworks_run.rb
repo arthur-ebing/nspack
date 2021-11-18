@@ -36,7 +36,7 @@ module ProductionApp
         res = move_stock_pallet
         return res unless res.success
 
-        FinishedGoodsApp::Job::CalculateExtendedFgCodes.enqueue(pallet_ids) if AppConst::CR_FG.lookup_extended_fg_code?
+        FinishedGoodsApp::Job::CalculateExtendedFgCodesFromSeqs.enqueue(pallet_ids) if AppConst::CR_FG.lookup_extended_fg_code?
       end
       success_response('ok', reworks_run_id: res.instance[:reworks_run_id])
     end

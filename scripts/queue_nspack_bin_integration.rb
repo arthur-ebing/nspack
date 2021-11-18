@@ -82,12 +82,33 @@ class QueueNspackBinIntegration < BaseScript
     @db_conn[:bin_nspack_integration_queue].select(:bin_id, :id).all
   end
 
-  def bin_data(id)
-    @db_conn[:vwbins]
-      .join(:farms, farm_code: Sequel[:vwbins][:farm_code])
-      .select(Sequel[:vwbins].*, Sequel[:farms][:remark1_ptlocation].as(:puc_code))
-      .where(Sequel[:vwbins][:id] => id)
-      .first
+  def bin_data(id) # rubocop:disable Metrics/AbcSize
+    hash = @db_conn[:vwbins]
+           .join(:farms, farm_code: Sequel[:vwbins][:farm_code])
+           .select(Sequel[:vwbins].*, Sequel[:farms][:remark1_ptlocation].as(:puc_code))
+           .where(Sequel[:vwbins][:id] => id)
+           .first
+    return if hash.nil?
+
+    hash.delete(:treatment_code)
+    hash.delete(:color)
+    hash[:colour] = hash.delete(:rmtp_treatment_code)
+    hash
+  end
+
+  def delivery_data(id)
+    query = <<~SQL
+      select o.orchard_code
+      ,d.farm_code,d.puc_code,d.rmt_variety_code,d.commodity_code,d.delivery_number_preprinted,d.delivery_number,d.delivery_description
+      ,d.pack_material_product_code,d.date_delivered,d.date_time_picked,d.quantity_full_bins,d.quantity_empty_units,d.quantity_damaged_units
+      ,d.drench_delivery,d.sample_bins,d.mrl_required,d.truck_registration_number,d.delivery_status,d.season_code,d.residue_free
+      ,d.mrl_result_type,d.rmt_product_id,d.destination_complex, f.remark1_ptlocation as puc_code
+      from deliveries d
+      join orchards o on o.id=d.orchard_id
+      join farms f on f.id=d.farm_id
+      where d.id = ?
+    SQL
+    @db_conn[query, id].first
   end
 
   def insert_bin_integration_queue(bin_id)
@@ -97,8 +118,9 @@ class QueueNspackBinIntegration < BaseScript
       return
     end
 
+    delivery_data = delivery_data(bin_data[:delivery_id])
     DB[:bin_integration_queue].where(bin_id: bin_id).delete
-    DB[:bin_integration_queue].insert(bin_id: bin_id, bin_data: bin_data.to_json)
+    DB[:bin_integration_queue].insert(bin_id: bin_id, bin_data: bin_data.to_json, delivery_data: delivery_data.to_json)
     @queued_bins << bin_id
   end
 

@@ -1,13 +1,15 @@
 module MesscadaApp
   class CreateApportBins < BaseService
-    attr_reader :repo, :delivery_repo, :bins, :presort_staging_child_run_id, :http
+    attr_reader :repo, :delivery_repo, :bins, :presort_staging_child_run_id, :http, :plant_resource_code, :mssql_server_uri_for_presort_unit
 
-    def initialize(bins, presort_staging_child_run_id)
+    def initialize(bins, presort_staging_child_run_id, plant_resource_code)
       @bins = bins
       @presort_staging_child_run_id = presort_staging_child_run_id
       @repo = RawMaterialsApp::PresortStagingRunRepo.new
       @delivery_repo = RawMaterialsApp::RmtDeliveryRepo.new
+      @plant_resource_code = plant_resource_code
       @http = Crossbeams::HTTPCalls.new(use_ssl: false, call_logger: call_logger)
+      @mssql_server_uri_for_presort_unit = AppConst.mssql_staging_interface(plant_resource_code)
     end
 
     def call # rubocop:disable Metrics/AbcSize
@@ -63,31 +65,27 @@ module MesscadaApp
     def find_stale_staged_untipped_apport_bin(bin_asset_number)
       sql = "select * from Apport where NumPalox = '#{bin_asset_number}' and LotMAF is null and DateLecture is null and StatusMAF is null"
       parameters = { method: 'select', statement: Base64.encode64(sql) }
-      http.request_post("#{AppConst::MSSQL_SERVER_INTERFACE_URI}/select", parameters)
+      http.request_post("#{mssql_server_uri_for_presort_unit}/select", parameters)
     end
 
     def delete_stale_staged_untipped_apport_bin(bin_asset_number)
       sql = "delete from Apport where NumPalox = '#{bin_asset_number}' and LotMAF is null and DateLecture is null and StatusMAF is null"
       parameters = { method: 'delete', statement: Base64.encode64(sql) }
-      http.request_post("#{AppConst::MSSQL_SERVER_INTERFACE_URI}/exec", parameters)
+      http.request_post("#{mssql_server_uri_for_presort_unit}/exec", parameters)
     end
 
     def calc_code_apporteur_and_code_parcelle_and_nom_parcelle(bin) # rubocop:disable Metrics/AbcSize
       child_run_farm_code = repo.child_run_farm(presort_staging_child_run_id)
-      season_year = repo.get_value(:seasons, :season_year, id: bin[:season_id])
       if child_run_farm_code.upcase == '0P'
         code_apporteur = '0P'
         code_parcelle = "0P_#{bin[:legacy_data]['track_slms_indicator_1_code']}"
         nom_parcelle = "0P_#{bin[:legacy_data]['track_slms_indicator_1_code']}"
       else
         code_apporteur = bin[:farm_code]
-        if season_year == 2014
-          nom_parcelle = "#{bin[:farm_code]}_#{bin[:legacy_data]['track_slms_indicator_1_code']}"
-          code_parcelle = "#{bin[:farm_code]}_#{bin[:legacy_data]['track_slms_indicator_1_code']}"
-        else
-          nom_parcelle = "#{bin[:orchard_code]}_#{bin[:farm_code]}_#{bin[:legacy_data]['track_slms_indicator_1_code']}"
-          code_parcelle = "#{bin[:orchard_code]}_#{bin[:farm_code]}_#{bin[:legacy_data]['track_slms_indicator_1_code']}"
-        end
+        registered_orchard_code = repo.get_value(:registered_orchards, :orchard_code, puc_code: bin[:puc_code], cultivar_code: bin[:cultivar_code], marketing_orchard: true)
+        orchard_code = registered_orchard_code.nil? ? bin[:orchard_code] : registered_orchard_code
+        nom_parcelle = "#{orchard_code}_#{bin[:farm_code]}_#{bin[:legacy_data]['track_slms_indicator_1_code']}"
+        code_parcelle = "#{orchard_code}_#{bin[:farm_code]}_#{bin[:legacy_data]['track_slms_indicator_1_code']}"
       end
       [code_apporteur, code_parcelle, nom_parcelle]
     end
@@ -95,7 +93,7 @@ module MesscadaApp
     def create_apport_bin(inserts)
       insert_ql = "BEGIN TRANSACTION\n #{inserts.join} COMMIT TRANSACTION"
       parameters = { method: 'insert', statement: Base64.encode64(insert_ql) }
-      http.request_post("#{AppConst::MSSQL_SERVER_INTERFACE_URI}/exec", parameters)
+      http.request_post("#{mssql_server_uri_for_presort_unit}/exec", parameters)
     end
 
     def call_logger

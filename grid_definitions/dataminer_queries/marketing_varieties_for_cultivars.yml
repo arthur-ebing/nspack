@@ -2,7 +2,8 @@
 :caption: Marketing Varieties For Cultivars
 :sql: "SELECT \"commodities\".\"code\" AS commodity_code, \"cultivar_groups\".\"cultivar_group_code\",
   \"marketing_varieties\".\"marketing_variety_code\",\r\n\"cultivars\".\"cultivar_name\"
-  AS cultivar_code,  \"marketing_varieties\".\"description\" AS marketing_variety_description,\r\n\"cultivars\".\"description\"
+  AS cultivar_code,  \"marketing_varieties\".\"description\" AS marketing_variety_description,
+  \ \"marketing_varieties\".\"inspection_variety\" ,\r\n\"cultivars\".\"description\"
   AS cultivar_description\r\nFROM \"marketing_varieties_for_cultivars\" \r\nJOIN \"marketing_varieties\"
   ON \"marketing_varieties\".\"id\" = \"marketing_varieties_for_cultivars\".\"marketing_variety_id\"\r\nJOIN
   \"cultivars\" ON \"cultivars\".\"id\" = \"marketing_varieties_for_cultivars\".\"cultivar_id\"
@@ -92,9 +93,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  inspection_variety:
+    :name: inspection_variety
+    :sequence_no: 6
+    :caption: Inspection variety
+    :namespaced_name: marketing_varieties.inspection_variety
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   cultivar_description:
     :name: cultivar_description
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Cultivar description
     :namespaced_name: cultivars.description
     :data_type: :string

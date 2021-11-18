@@ -285,6 +285,22 @@ module ProductionApp
       find_gtin_code(gtin_id)
     end
 
+    def check_weights_for_product_setup(product_setup_id)
+      query = <<~SQL
+        SELECT standard_product_weights.min_gross_weight, standard_product_weights.max_gross_weight,
+        standard_pack_codes.standard_pack_code AS pack_code, commodities.code AS commodity_code
+        FROM product_setups
+        JOIN product_setup_templates ON product_setup_templates.id = product_setups.product_setup_template_id
+        JOIN cultivar_groups ON cultivar_groups.id = product_setup_templates.cultivar_group_id
+        JOIN commodities ON commodities.id = cultivar_groups.commodity_id
+        JOIN standard_pack_codes ON standard_pack_codes.id = product_setups.standard_pack_code_id
+        LEFT JOIN standard_product_weights ON standard_product_weights.commodity_id = cultivar_groups.commodity_id
+          AND standard_product_weights.standard_pack_id = product_setups.standard_pack_code_id
+        WHERE product_setups.id = ?
+      SQL
+      DB[query, product_setup_id].first
+    end
+
     def resolve_gtin_attrs(attrs)
       std_fruit_size_count_id = attrs[:std_fruit_size_count_id].nil_or_empty? ? find_setup_std_fruit_size_count_id(attrs[:fruit_size_reference_id], attrs[:fruit_actual_counts_for_pack_id]) : attrs[:std_fruit_size_count_id]
       commodity_id = attrs[:commodity_id].nil_or_empty? ? find_size_count_commodity(std_fruit_size_count_id) : attrs[:commodity_id]
@@ -376,6 +392,24 @@ module ProductionApp
       "#{quantity}#{code}"
     end
 
+    def packing_specification_item_unit_pack_product_for_seq(pm_bom_id) # rubocop:disable Metrics/AbcSize
+      hash = DB[:pm_boms_products]
+             .join(:pm_products, id: :pm_product_id)
+             .join(:pm_subtypes, id: :pm_subtype_id)
+             .join(:pm_types, id: :pm_type_id)
+             .where(pm_bom_id: pm_bom_id,
+                    pm_composition_level_id: 2)
+             .select(Sequel[:pm_products][:id],
+                     Sequel[:pm_boms_products][:quantity]).first
+      return "Product code and quantity not found for pm_bom: #{pm_bom_id}" if hash.nil_or_empty?
+
+      quantity = hash[:quantity].to_i
+      quantity = '*' if [0, 1].include? quantity
+      code = get_kromco_mes_value(:pm_products, hash[:id], :product_code)
+
+      "#{quantity}#{code}"
+    end
+
     def packing_specification_item_carton_pack_product(packing_specification_item_id) # rubocop:disable Metrics/AbcSize
       hash = DB[:packing_specification_items]
              .join(:pm_boms_products, pm_bom_id: :pm_bom_id)
@@ -393,6 +427,29 @@ module ProductionApp
              ).first
       return nil if hash.nil?
 
+      item_carton_pack_product_string(hash)
+    end
+
+    def packing_specification_item_carton_pack_product_for_seq(pm_bom_id) # rubocop:disable Metrics/AbcSize
+      hash = DB[:pm_boms_products]
+             .join(:pm_products, id: :pm_product_id)
+             .join(:basic_pack_codes, id: :basic_pack_id)
+             .join(:pm_subtypes, id: Sequel[:pm_products][:pm_subtype_id])
+             .join(:pm_types, id: :pm_type_id)
+             .where(pm_bom_id: pm_bom_id,
+                    pm_composition_level_id: 1)
+             .select(
+               Sequel[:pm_types][:short_code].as(:pm_type_short_code),
+               Sequel[:basic_pack_codes][:footprint_code],
+               Sequel[:pm_subtypes][:short_code].as(:pm_subtype_short_code),
+               Sequel[:basic_pack_codes][:height_mm]
+             ).first
+      return nil if hash.nil?
+
+      item_carton_pack_product_string(hash)
+    end
+
+    def item_carton_pack_product_string(hash)
       unless hash[:height_mm] && hash[:footprint_code]
         mail = <<~STR
           Extended FG for packing specification item:#{packing_specification_item_id} could not be fetched.
@@ -424,6 +481,10 @@ module ProductionApp
                         .get(:packaging_marks)
       return ['No packaging marks found'] unless packaging_marks
 
+      translate_pm_marks(packaging_marks)
+    end
+
+    def translate_pm_marks(packaging_marks)
       marks = []
       packaging_marks.each do |inner_pm_mark_code|
         id = get_id(:inner_pm_marks, inner_pm_mark_code: inner_pm_mark_code)
@@ -435,6 +496,14 @@ module ProductionApp
     def cosmetic_code(packing_specification_item_id)
       fruit_mark = packing_specification_item_fg_marks(packing_specification_item_id).last
       return 'UL' if fruit_mark == 'NONE'
+
+      'LB'
+    end
+
+    def cosmetic_code_for_seq(pm_mark_id)
+      fruit_mark = (get(:pm_marks, pm_mark_id, :packaging_marks) || []).last
+      return 'No packaging marks found' unless fruit_mark
+      return 'UL' if translate_pm_marks(Array(fruit_mark)).first == 'NONE'
 
       'LB'
     end
@@ -463,6 +532,66 @@ module ProductionApp
       fg_code_components << carton_pack_product
       fg_code_components << prod_setup_organisation(prod_setup[:id])
       fg_code_components << packing_specification_item_fg_marks(packing_specification_item_id).reverse.join(packaging_marks_join)
+      fg_code_components.join('_')
+    end
+
+    def sequences_grouped_for_ext_fg(pallet_ids)
+      query = <<~SQL
+        SELECT
+          cultivar_groups.commodity_id,
+          marketing_variety_id,
+          rmt_class_id,
+          grade_id,
+          fruit_actual_counts_for_pack_id,
+          basic_pack_code_id,
+          fruit_size_reference_id,
+          pm_mark_id,
+          pm_bom_id,
+          party_roles.organization_id,
+          ARRAY_AGG(pallet_sequences.id) AS ids
+        FROM
+          pallet_sequences
+          JOIN cultivar_groups ON cultivar_groups.id = pallet_sequences.cultivar_group_id
+          LEFT JOIN party_roles ON party_roles.id = pallet_sequences.marketing_org_party_role_id
+          JOIN pallets ON pallets.id = pallet_sequences.pallet_id
+        WHERE
+          pallet_id IN ?
+          AND NOT pallets.depot_pallet
+        GROUP BY
+          cultivar_groups.commodity_id,
+          marketing_variety_id,
+          rmt_class_id,
+          grade_id,
+          fruit_actual_counts_for_pack_id,
+          basic_pack_code_id,
+          fruit_size_reference_id,
+          pm_mark_id,
+          pm_bom_id,
+          party_roles.organization_id
+      SQL
+      DB[query, Array(pallet_ids)].all
+    end
+
+    def calculate_extended_fg_code_from_sequences(seq, packaging_marks_join: '_') # rubocop:disable Metrics/AbcSize
+      fg_code_components = []
+      fg_code_components << get_kromco_mes_value(:commodities, seq[:commodity_id], :code)
+      fg_code_components << get_kromco_mes_value(:marketing_varieties, seq[:marketing_variety_id], :marketing_variety_code)
+      fg_code_components << get_kromco_mes_value(:rmt_classes, seq[:rmt_class_id], :rmt_class_code)
+      fg_code_components << get_kromco_mes_value(:grades, seq[:grade_id], :grade_code)
+      fg_code_components << get_kromco_mes_value(:fruit_actual_counts_for_packs, seq[:fruit_actual_counts_for_pack_id], :actual_count_for_pack)
+      fg_code_components << get_kromco_mes_value(:basic_pack_codes, seq[:basic_pack_code_id], :footprint_code)
+      fg_code_components << cosmetic_code_for_seq(seq[:pm_mark_id])
+      fg_code_components << (get_kromco_mes_value(:fruit_size_references, seq[:fruit_size_reference_id], :size_reference) || 'NOS')
+      fg_code_components << packing_specification_item_unit_pack_product_for_seq(seq[:pm_bom_id])
+      carton_pack_product = packing_specification_item_carton_pack_product_for_seq(seq[:pm_bom_id])
+      return nil unless carton_pack_product
+
+      fg_code_components << carton_pack_product
+
+      fg_code_components << get_kromco_mes_value(:organizations, seq[:organization_id], :short_description)
+      marks_set = get(:pm_marks, seq[:pm_mark_id], :packaging_marks)
+      marks_set = translate_pm_marks(marks_set || ['No packaging marks found'])
+      fg_code_components << marks_set.reverse.join(packaging_marks_join)
       fg_code_components.join('_')
     end
 

@@ -52,6 +52,7 @@ module FinishedGoods
                     col.add_field :edi_file_name
                     col.add_field :requires_temp_tail
                     col.add_field :rmt_load
+                    col.add_field :truck_must_be_weighed
                   end
                 end
               end

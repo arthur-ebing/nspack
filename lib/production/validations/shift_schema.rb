@@ -16,5 +16,6 @@ module ProductionApp
     required(:running_hours).maybe(:decimal)
     required(:start_date_time).maybe(:time)
     required(:end_date_time).maybe(:time)
+    required(:foreman_party_role_id).maybe(:integer)
   end
 end

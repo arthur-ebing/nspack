@@ -21,7 +21,11 @@ module MasterfilesApp
         financial_account_code: Faker::Lorem.word,
         active: true,
         fruit_industry_levy_id: 1,
-        fruit_industry_levy: 'ABC'
+        fruit_industry_levy: 'ABC',
+        rmt_customer: false,
+        bin_asset_trading_partner: false,
+        location_id: 1,
+        location_long_code: 'ABC'
       }
       MasterfilesApp::Customer.new(base_attrs.merge(attrs))
     end

@@ -183,12 +183,18 @@ module EdiApp
       rec[:lookup_data][:pallet_format_id] = pallet_format_id
       rec[:missing_mf][:pallet_format_id] = { mode: :direct, raise: true, keys: { pallet_btype: seq[:pallet_btype], cartons: tot_cartons, basic_pack_code_id: basic_pack_code_id }, msg: "Pallet format for pallet base: #{seq[:pallet_btype]}"  } if pallet_format_id.nil?
       rec[:lookup_data][:cartons_per_pallet_id] = cartons_per_pallet_id
-      rec[:missing_mf][:cartons_per_pallet_id] = { mode: :direct, raise: true, keys: { pallet_btype: seq[:pallet_btype], cartons: tot_cartons, basic_pack_code_id: basic_pack_code_id }, msg: "Cartons Per Pallet for pallet base: #{seq[:pallet_btype]} and pack: #{seq[:pack]}" } if cartons_per_pallet_id.nil?
+      rec[:missing_mf][:cartons_per_pallet_id] = { mode: :direct, raise: true, keys: { pallet_btype: seq[:pallet_btype], cartons: tot_cartons, basic_pack_code_id: basic_pack_code_id }, msg: "Cartons Per Pallet for pallet #{pallet_number}, pallet base: #{seq[:pallet_btype]}, pack: #{seq[:pack]} and CCP: #{tot_cartons}" } if cartons_per_pallet_id.nil?
 
+      gross_weight = if AppConst::CR_PROD.derive_nett_weight?
+                       nil
+                     else
+                       seq[:pallet_gross_mass].nil? || seq[:pallet_gross_mass].to_f.zero? ? nil : seq[:pallet_gross_mass]
+                     end
       # pallet_format_id: 0, # lookup
       rec[:record] = {
         depot_pallet: true,
-        edi_in_consignment_note_number: seq[:cons_no],
+        edi_in_consignment_note_number: seq[:orig_cons], # orig_cons is the consignment number
+        edi_in_load_number: seq[:cons_no],               # cons_no   is the load number
         edi_in_transaction_id: edi_in_transaction.id,
         pallet_number: pallet_number,
         location_id: location_id,
@@ -197,10 +203,11 @@ module EdiApp
         govt_first_inspection_at: orig_inspec_date || inspec_date,
         govt_reinspection_at: reinspect_at,
         stock_created_at: intake_date || inspec_date || Time.now,
-        phc: seq[:packh_code],
+        phc: seq[:packh_code] || AppConst::CR_EDI.edi_in_default_phc,
         intake_created_at: intake_date,
-        gross_weight: seq[:pallet_gross_mass].nil? || seq[:pallet_gross_mass].to_f.zero? ? nil : seq[:pallet_gross_mass],
-        gross_weight_measured_at: weighed_date,
+        gross_weight: gross_weight,
+        gross_weight_measured_at: AppConst::CR_PROD.derive_nett_weight ? nil : weighed_date,
+        derived_weight: AppConst::CR_PROD.derive_nett_weight?,
         palletized: true,
         palletized_at: intake_date,
         created_at: intake_date,
@@ -236,9 +243,14 @@ module EdiApp
                          end
       rec[:lookup_data][:farm_id] = farm_id
       rec[:missing_mf][:farm_id] = { mode: :indirect, raise: true, keys: { puc_id: puc_id }, msg: "Farm for PUC: #{seq[:farm]}" } if farm_id.nil?
-      orchard_id = po_repo.find_orchard_id(farm_id, seq[:orchard])
+      orchard_id = if seq[:orchard].nil_or_empty? && AppConst::CR_EDI.create_unknown_orchard?
+                     po_repo.find_unknown_orchard_id(farm_id, puc_id)
+                   else
+                     po_repo.find_orchard_id(farm_id, seq[:orchard])
+                   end
       rec[:lookup_data][:orchard_id] = orchard_id
       rec[:missing_mf][:orchard_id] = { mode: :direct, raise: false, keys: { farm_id: farm_id, orchard: seq[:orchard] }, msg: "Orchard: #{seq[:orchard]} for #{farm_or_puc_desc}" } if orchard_id.nil?
+
       marketing_variety_id = po_repo.find_marketing_variety_id(seq[:variety])
       rec[:lookup_data][:marketing_variety_id] = marketing_variety_id
       rec[:missing_mf][:marketing_variety_id] = { mode: :direct, raise: true, keys: { variety: seq[:variety] }, msg: "Marketing variety: #{seq[:variety]}" } if marketing_variety_id.nil?
@@ -260,13 +272,26 @@ module EdiApp
       marketing_org_party_role_id = po_repo.find_variant_id(:marketing_party_roles, seq[:orgzn]) if marketing_org_party_role_id.nil?
       rec[:lookup_data][:marketing_org_party_role_id] = marketing_org_party_role_id
       rec[:missing_mf][:marketing_org_party_role_id] = { mode: :direct, keys: { orgzn: seq[:orgzn], role: AppConst::ROLE_MARKETER }, msg: "Organization: #{seq[:orgzn]} with role: #{AppConst::ROLE_MARKETER}" } if marketing_org_party_role_id.nil?
-      packed_tm_group_id = po_repo.find_packed_tm_group_id(seq[:targ_mkt])
-      rec[:lookup_data][:packed_tm_group_id] = packed_tm_group_id
-      rec[:missing_mf][:packed_tm_group_id] = { mode: :direct, raise: false, keys: { targ_mkt: seq[:targ_mkt] }, msg: "Target Market Group: #{seq[:targ_mkt]}" } if packed_tm_group_id.nil?
+
+      # --------------------- TARGET MARKET RELATED
+      targets = po_repo.find_targets(seq[:targ_mkt], seq[:target_region], seq[:target_country])
+      rec[:lookup_data][:packed_tm_group_id] = targets.instance[:packed_tm_group_id]
+      rec[:missing_mf][:packed_tm_group_id] = { mode: :direct, raise: false, keys: { targ_mkt: seq[:targ_mkt] }, msg: "Target Market Group: #{seq[:targ_mkt]}" } if targets.instance[:packed_tm_group_id].nil?
+      rec[:lookup_data][:target_market_id] = targets.instance[:target_market_id] unless targets.instance[:single]
+
+      # The EDI targ_mkt has not been applied as a packed tm grp or target market, so we expect it to be a target customer:
+      if targets.instance[:check_customer]
+        target_customer_party_role_id = MasterfilesApp::PartyRepo.new.find_party_role_from_org_code_for_role(seq[:targ_mkt], AppConst::ROLE_TARGET_CUSTOMER)
+        target_customer_party_role_id = po_repo.find_variant_id(:target_customer_party_roles, seq[:targ_mkt]) if target_customer_party_role_id.nil?
+        rec[:lookup_data][:target_customer_party_role_id] = target_customer_party_role_id
+        rec[:missing_mf][:target_customer_party_role_id] = { mode: :direct, keys: { targ_mkt: seq[:targ_mkt], role: AppConst::ROLE_TARGET_CUSTOMER }, msg: "Organization: #{seq[:targ_mkt]} with role: #{AppConst::ROLE_TARGET_CUSTOMER}" } if target_customer_party_role_id.nil?
+      end
+      # ---------------------
+
       mark_id = po_repo.find_mark_id(seq[:mark])
       rec[:lookup_data][:mark_id] = mark_id
       rec[:missing_mf][:mark_id] = { mode: :direct, raise: false, keys: { mark: seq[:mark] }, msg: "Mark: #{seq[:mark]}" } if mark_id.nil?
-      inventory_code_id = po_repo.find_inventory_code_id(seq[:inv_code])
+      inventory_code_id = po_repo.find_inventory_code_id(seq[:inv_code] || AppConst::CR_EDI.default_edi_in_inv_code)
       rec[:lookup_data][:inventory_code_id] = inventory_code_id
       rec[:missing_mf][:inventory_code_id] = { mode: :direct, raise: false, keys: { inv_code: seq[:inv_code] }, msg: "Inventory code: #{seq[:inv_code]}" } if inventory_code_id.nil?
       grade_id = po_repo.find_grade_id(seq[:grade])

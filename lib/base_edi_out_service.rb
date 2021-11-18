@@ -2,13 +2,14 @@
 
 class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
   attr_reader :flow_type, :hub_address, :record_id, :seq_no, :schema, :record_definitions,
-              :record_entries, :edi_out_rule_id, :party_role_id, :logger
+              :record_entries, :edi_out_rule_id, :party_role_id, :logger, :out_context
 
   def initialize(flow_type, id, logger) # rubocop:disable Metrics/AbcSize
     raise ArgumentError, "#{self.class.name}: flow type must be provided" if flow_type.nil?
 
     @repo = EdiApp::EdiOutRepo.new
     edi_out_transaction = @repo.find_edi_out_transaction(id)
+    @out_context = edi_out_transaction.context || {}
     @flow_type = edi_out_transaction.flow_type
     @logger = logger
     @party_role_id = edi_out_transaction.party_role_id
@@ -26,11 +27,16 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
 
     @record_definitions = Hash.new { |h, k| h[k] = {} } # Hash.new { |h, k| h[k] = [] }
     @record_entries = Hash.new { |h, k| h[k] = [] }
-    @output_filename = "#{@flow_type.upcase}#{AppConst::EDI_NETWORK_ADDRESS}#{@formatted_seq}.#{hub_address}"
+    @output_filename = "#{output_file_prefix}#{AppConst::EDI_NETWORK_ADDRESS}#{@formatted_seq}.#{hub_address}"
     @mail_keys = []
+    @mail_tokens = {}
 
     load_output_paths
     load_schema
+  end
+
+  def output_file_prefix
+    @flow_type.upcase
   end
 
   # Reads an XML schema and compares each record size attribute against the sum of its field sizes.
@@ -221,11 +227,30 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
     out_dest.sub('$ROOT', base_path)
   end
 
-  def send_emails
+  def add_tokens_to_subject(subject)
+    new_subject = subject.dup
+    @mail_tokens.each do |k, v|
+      new_subject.gsub!("$:#{k}$", v.to_s)
+    end
+    new_subject
+  end
+
+  def send_emails # rubocop:disable Metrics/AbcSize
     config = @repo.load_config
     @mail_keys.each do |key|
       email_settings = config[:mail_recipients][key]
-      email_settings[:subject] = "#{flow_type} file attached" unless email_settings[:subject]
+      default_subject = "#{flow_type} file attached"
+      email_settings[:subject] = case email_settings[:subject]
+                                 when nil
+                                   default_subject
+                                 when String
+                                   add_tokens_to_subject(email_settings[:subject])
+                                 when Hash
+                                   add_tokens_to_subject(email_settings[:subject][flow_type] || default_subject)
+                                 else
+                                   default_subject
+                                 end
+
       email_settings[:body] = "Attached please find #{flow_type} EDI file." unless email_settings[:body]
       path = build_edi_mail_out_path(config[:root], config[:email_dir])
       # p "Sending - #{key} from #{File.join(path, @output_filename)} to #{email_settings.inspect}"
@@ -282,7 +307,7 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
 
   def csv_value_for(name, value)
     data_type = record_definitions[flow_type][name][:type]
-    return value.to_s('F') if data_type == :decimal
+    return value.to_s('F') if data_type == :decimal && !value.nil?
     return "'#{value}" if data_type == :text
 
     value

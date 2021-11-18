@@ -260,6 +260,13 @@ a|String:
 |Boolean
 |`false`
 
+|options - :submit_form_set
+a|Submit the form automatically after a scan if all other fields with the same `submit_form_set` value have been filled-in/scanned.
+
+Use this if the form requires more than one scan, but also needs to auto-submit as soon as all fields have been scanned.
+|String
+|None.
+
 |options - :hide_on_load
 a|Should the field be hidden when the form loads - typically to be shown later via a behaviour.
 

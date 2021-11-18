@@ -18,7 +18,13 @@ module RawMaterialsApp
                           label: :id,
                           value: :id,
                           order_by: :id
+    build_for_select :bin_sequences,
+                     label: :presort_run_lot_number,
+                     value: :id,
+                     no_active_check: true,
+                     order_by: :presort_run_lot_number
 
+    crud_calls_for :bin_sequences, name: :bin_sequence, wrapper: BinSequence
     crud_calls_for :presort_staging_runs, name: :presort_staging_run, wrapper: PresortStagingRun
     crud_calls_for :presort_staging_run_children, name: :presort_staging_run_child, wrapper: PresortStagingRunChild
 
@@ -115,6 +121,28 @@ module RawMaterialsApp
       RmtDeliveryRepo.new.find_rmt_bin_flat(id)
     end
 
+    def validate_bin_exists(asset_number)
+      id, tipped, shipped_asset_number = DB[:rmt_bins]
+                                         .where(bin_asset_number: asset_number)
+                                         .or(shipped_asset_number: asset_number)
+                                         .or(tipped_asset_number: asset_number)
+                                         .get(%i[id bin_tipped shipped_asset_number])
+
+      raise Crossbeams::InfoError, "Bin:#{asset_number} does not exist" unless id
+      raise Crossbeams::InfoError, "Bin:#{asset_number} already tipped" if tipped
+      raise Crossbeams::InfoError, "Bin:#{asset_number} has been shipped" if shipped_asset_number
+
+      id
+    end
+
+    def find_tipped_apport_bin(bin_asset_number, plant_resource_code)
+      sql = "select Apport.* from Apport where Apport.NumPalox='#{bin_asset_number}'"
+      parameters = { method: 'select', statement: Base64.encode64(sql) }
+      call_logger = Crossbeams::HTTPTextCallLogger.new('APPORT-BIN-TIPPED', log_path: AppConst::PRESORT_BIN_TIPPED_LOG_FILE)
+      http = Crossbeams::HTTPCalls.new(use_ssl: false, call_logger: call_logger)
+      http.request_post("#{AppConst.mssql_staging_interface(plant_resource_code)}/select", parameters)
+    end
+
     def bin_mrl_failed?(bin_number)
       url = "#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/pre_sorting/legacy_bin_mrl_failed?bin_number=#{bin_number}"
       http = Crossbeams::HTTPCalls.new
@@ -139,6 +167,47 @@ module RawMaterialsApp
         .join(:farms, id: :farm_id)
         .select(:farm_code)
         .get(:farm_code)
+    end
+
+    def child_run_parent(presort_staging_run_child_id)
+      DB[:presort_staging_runs]
+        .select(Sequel.lit('presort_staging_runs.*'))
+        .join(:presort_staging_run_children, presort_staging_run_id: :id)
+        .where(Sequel[:presort_staging_run_children][:id] => presort_staging_run_child_id)
+        .first
+    end
+
+    def cultivar_commodity(cultivar_id)
+      DB[:cultivar_groups]
+        .join(:cultivars, cultivar_group_id: :id)
+        .join(:commodities, id: Sequel[:cultivar_groups][:commodity_id])
+        .where(Sequel[:cultivars][:id] => cultivar_id)
+        .get(:code)
+    end
+
+    def find_container_material_owner_by_container_material_type_and_org_code(container_material_type_id, long_description)
+      DB[:rmt_container_material_owners]
+        .join(:party_roles, id: :rmt_material_owner_party_role_id)
+        .join(:organizations, id: Sequel[:party_roles][:organization_id])
+        .where(rmt_container_material_type_id: container_material_type_id, long_description: long_description)
+        .get(Sequel[:party_roles][:id])
+    end
+
+    def puc_code_for_farm(farm_code)
+      DB[:farms]
+        .join(:farms_pucs, farm_id: :id)
+        .join(:pucs, id: Sequel[:farms_pucs][:puc_id])
+        .where(farm_code: farm_code)
+        .get(:puc_code)
+    end
+
+    def legacy_pc_code(ripe_point_code)
+      url = "#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/get_legacy_pc_code?ripe_point_code=#{ripe_point_code}"
+      http = Crossbeams::HTTPCalls.new
+      res = http.request_get(url)
+      raise res.message unless res.success
+
+      JSON.parse(res.instance.body)
     end
   end
 end

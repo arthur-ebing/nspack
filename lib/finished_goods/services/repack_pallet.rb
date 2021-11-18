@@ -28,7 +28,7 @@ module FinishedGoodsApp
     private
 
     def find_pallet
-      repo.pallet(pallet_id)
+      repo.get_pallet(pallet_id)
     end
 
     def repack_pallet # rubocop:disable Metrics/AbcSize

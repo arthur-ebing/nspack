@@ -3,7 +3,8 @@
 :sql: "SELECT\r\n    shifts.id,\r\n    shifts.shift_type_id,\r\n    fn_shift_type_code
   (shifts.shift_type_id) AS shift_type_code,\r\n    employment_types.employment_type_code,\r\n
   \   shifts.running_hours,\r\n    shifts.start_date_time,\r\n    shifts.end_date_time,\r\n
-  \   fn_current_status ('shifts', shifts.id) AS status,\r\n    shifts.created_at,\r\n
+  \   shifts.foreman_party_role_id,\r\n    fn_party_role_name(shifts.foreman_party_role_id)
+  AS foreman,\r\n    fn_current_status ('shifts', shifts.id) AS status,\r\n    shifts.created_at,\r\n
   \   shifts.updated_at,\r\n    shifts.active,\r\n    (employment_types.employment_type_code
   = 'PACKERS' ) AS packer,\r\n    extended_columns ->> 'people_working_on_shift' AS
   people_working_on_shift,\r\n    extended_columns ->> 'machine_minutes' AS machine_minutes,\r\n
@@ -102,7 +103,7 @@
     :caption: Start at
     :namespaced_name: shifts.start_date_time
     :data_type: :datetime
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -118,7 +119,39 @@
     :caption: End at
     :namespaced_name: shifts.end_date_time
     :data_type: :datetime
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  foreman_party_role_id:
+    :name: foreman_party_role_id
+    :sequence_no: 8
+    :caption: Foreman party role
+    :namespaced_name: shifts.foreman_party_role_id
+    :data_type: :integer
     :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  foreman:
+    :name: foreman
+    :sequence_no: 9
+    :caption: Foreman
+    :namespaced_name: 
+    :data_type: :string
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -130,7 +163,7 @@
     :group_max: false
   status:
     :name: status
-    :sequence_no: 8
+    :sequence_no: 10
     :caption: Status
     :namespaced_name: 
     :data_type: :string
@@ -146,7 +179,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 9
+    :sequence_no: 11
     :caption: Created at
     :namespaced_name: shifts.created_at
     :data_type: :datetime
@@ -162,7 +195,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 10
+    :sequence_no: 12
     :caption: Updated at
     :namespaced_name: shifts.updated_at
     :data_type: :datetime
@@ -178,7 +211,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 11
+    :sequence_no: 13
     :caption: Active
     :namespaced_name: shifts.active
     :data_type: :boolean
@@ -194,7 +227,7 @@
     :group_max: false
   packer:
     :name: packer
-    :sequence_no: 12
+    :sequence_no: 14
     :caption: Packer
     :namespaced_name: 
     :data_type: :boolean
@@ -210,7 +243,7 @@
     :group_max: false
   people_working_on_shift:
     :name: people_working_on_shift
-    :sequence_no: 13
+    :sequence_no: 15
     :caption: People working on shift
     :namespaced_name: 
     :data_type: :string
@@ -226,7 +259,7 @@
     :group_max: false
   machine_minutes:
     :name: machine_minutes
-    :sequence_no: 14
+    :sequence_no: 16
     :caption: Machine minutes
     :namespaced_name: 
     :data_type: :integer
@@ -242,7 +275,7 @@
     :group_max: false
   people_absent:
     :name: people_absent
-    :sequence_no: 15
+    :sequence_no: 17
     :caption: People absent
     :namespaced_name: 
     :data_type: :string
@@ -258,7 +291,7 @@
     :group_max: false
   people_off_sick:
     :name: people_off_sick
-    :sequence_no: 16
+    :sequence_no: 18
     :caption: People off sick
     :namespaced_name: 
     :data_type: :string
@@ -274,7 +307,7 @@
     :group_max: false
   people_on_leave:
     :name: people_on_leave
-    :sequence_no: 17
+    :sequence_no: 19
     :caption: People on leave
     :namespaced_name: 
     :data_type: :string

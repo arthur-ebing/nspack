@@ -58,6 +58,7 @@ module Crossbeams
     # @option options [Integer] :width the input with in rem. Defaults to 12.
     # @option options [Boolean] :allow_decimals can a data_type="number" input accept decimals?
     # @option options [Boolean] :submit_form Should the form be submitted automatically after a scan result is placed in this field?
+    # @option options [Boolean] :submit_form_set Should the form be submitted automatically after a scan result is placed in the last of the set of fields with this option?
     # @option options [String] :scan The type of barcode symbology to accept. e.g. 'key248_all' for any symbology. Omit for input that does not receive a scan result.
     # Possible values are: key248_all (any symbology), key249_3o9 (309), key250_upc (UPC), key251_ean (EAN), key252_2d (2D - QR etc)
     # @option options [Symbol] :scan_type the type of barcode to expect in the field. This must have a matching entry in AppConst::BARCODE_PRINT_RULES.
@@ -97,6 +98,11 @@ module Crossbeams
           </label>
         </td></tr>
       HTML
+    end
+
+    def image
+      @fields << '<input id="myFileInput" name="the_image" type="file" accept="image/*;capture=camera">'
+      @multipart = true
     end
 
     # TODO: Add disabled_items to select
@@ -220,7 +226,7 @@ module Crossbeams
 
       <<~HTML
         <h2>#{caption}#{page_number_and_page_count}</h2>
-        <form action="#{action}" method="POST">
+        <form action="#{action}" method="POST" #{@multipart ? "enctype='multipart/form-data'" : ''}>
           #{error_section}
           #{notes_section}
           #{camera_section}
@@ -364,6 +370,7 @@ module Crossbeams
 
     def field_value(value)
       return value.to_s('F') if value.is_a?(BigDecimal)
+      return value.strftime('%Y-%m-%d %H:%M') if value.is_a?(Time) || value.is_a?(DateTime)
 
       value
     end
@@ -412,9 +419,13 @@ module Crossbeams
     end
 
     def submit_form(options)
-      return '' unless options[:submit_form]
+      return '' unless options[:submit_form] || options[:submit_form_set]
 
-      ' data-submit-form="Y"'
+      if options[:submit_form]
+        ' data-submit-form="Y"'
+      else
+        ' data-submit-form-set="Y"'
+      end
     end
 
     def clear_button(for_scan)

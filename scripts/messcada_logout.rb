@@ -11,9 +11,9 @@
 #
 # To run:
 # -------
-# Debug : DEBUG=y RACK_ENV=production ruby scripts/base_script.rb ClearMesScadaLogins
-# Live  : RACK_ENV=production ruby scripts/base_script.rb ClearMesScadaLogins
-# Dev   : ruby scripts/base_script.rb ClearMesScadaLogins
+# Debug : DEBUG=y RACK_ENV=production ruby scripts/base_script.rb MesScadaLogout
+# Live  : RACK_ENV=production ruby scripts/base_script.rb MesScadaLogout
+# Dev   : ruby scripts/base_script.rb MesScadaLogout
 #
 class MesScadaLogout < BaseScript
   def run # rubocop:disable Metrics/AbcSize

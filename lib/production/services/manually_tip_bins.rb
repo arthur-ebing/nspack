@@ -43,8 +43,6 @@ module ProductionApp
     end
 
     def find_rmt_bin
-      # return repo.rmt_bin_from_asset_number(bin_number) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
-
       repo.find_rmt_bin(bin_number.to_i)
     end
 
@@ -65,8 +63,10 @@ module ProductionApp
     end
 
     def validate_setup_requirements # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
-      return "INVALID FARM: Run requires: #{run_attrs[:farm_code]}. Bin is: #{bin_attrs[:farm_code]}" unless bin_attrs[:farm_id] == run_attrs[:farm_id]
-      return "INVALID ORCHARD: Run requires: #{run_attrs[:orchard_code]}. Bin is: #{bin_attrs[:orchard_code]}" if !run_attrs[:allow_orchard_mixing] && (bin_attrs[:orchard_id] != run_attrs[:orchard_id])
+      unless AppConst::CR_PROD.allow_reworks_mixed_tipping?
+        return "INVALID FARM: Run requires: #{run_attrs[:farm_code]}. Bin is: #{bin_attrs[:farm_code]}" unless bin_attrs[:farm_id] == run_attrs[:farm_id]
+        return "INVALID ORCHARD: Run requires: #{run_attrs[:orchard_code]}. Bin is: #{bin_attrs[:orchard_code]}" if !run_attrs[:allow_orchard_mixing] && (bin_attrs[:orchard_id] != run_attrs[:orchard_id])
+      end
       return "INVALID CULTIVAR GROUP: Run requires: #{run_attrs[:cultivar_group_code]}. Bin is: #{bin_attrs[:cultivar_group_code]}" if !run_attrs[:allow_cultivar_group_mixing] && (bin_attrs[:cultivar_group_id] != run_attrs[:cultivar_group_id])
       return "INVALID CULTIVAR: Run requires: #{run_attrs[:cultivar_name]}. Bin is: #{bin_attrs[:cultivar_name]}" if !run_attrs[:allow_cultivar_mixing] && (bin_attrs[:cultivar_id] != run_attrs[:cultivar_id])
     end
@@ -92,19 +92,14 @@ module ProductionApp
     end
 
     def rmt_bin_updates
-      defaults = { bin_tipped_date_time: Time.now,
-                   production_run_tipped_id: production_run_id,
-                   exit_ref_date_time: Time.now,
-                   bin_tipped: true,
-                   exit_ref: 'TIPPED',
-                   tipped_manually: true }
-      defaults = defaults.merge!(rmt_bin_asset_number_updates) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
-      defaults
-    end
-
-    def rmt_bin_asset_number_updates
-      { tipped_asset_number: rmt_bin_asset_number,
-        bin_asset_number: nil }
+      { bin_tipped_date_time: Time.now,
+        production_run_tipped_id: production_run_id,
+        tipped_asset_number: rmt_bin_asset_number,
+        bin_asset_number: nil,
+        exit_ref_date_time: Time.now,
+        bin_tipped: true,
+        exit_ref: 'TIPPED',
+        tipped_manually: true }
     end
 
     def rmt_bin_asset_number

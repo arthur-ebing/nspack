@@ -10,7 +10,6 @@ module UiRules
 
       @rules[:show_changes_made] = !@form_object.changes_made.nil_or_empty?
       @rules[:single_pallet_selected] = @form_object.pallets_selected.split("\n").length == 1 unless @form_object.pallets_selected.nil_or_empty?
-      @rules[:scan_rmt_bin_asset_numbers] = AppConst::USE_PERMANENT_RMT_BIN_BARCODES
       @rules[:has_children] = @form_object.has_children
       @rules[:allow_cultivar_group_mixing] = AppConst::CR_PROD.can_mix_cultivar_groups?
 
@@ -152,11 +151,14 @@ module UiRules
       @rules[:carton_run_type] = carton_run_type?
       @rules[:show_allow_cultivar_group_mixing] = @rules[:allow_cultivar_group_mixing] && @rules[:bulk_production_run_update]
       @rules[:bulk_update_pallet_dates] = AppConst::RUN_TYPE_BULK_UPDATE_PALLET_DATES == reworks_run_type_id_label
+      @rules[:wip_pallets] = AppConst::RUN_TYPE_WIP_PALLETS == reworks_run_type_id_label
+      @rules[:wip_bins] = AppConst::RUN_TYPE_WIP_BINS == reworks_run_type_id_label
+      @rules[:wip_run_type] = wip_run_type?
 
       text_caption = if @rules[:single_pallet_edit]
                        'Pallet Number'
                      else
-                       'Bin' # @rules[:scan_rmt_bin_asset_numbers] ? 'Bin asset number' : 'Bin id'
+                       'Bin Id'
                      end
 
       where = if @rules[:scrap_bin]
@@ -217,7 +219,10 @@ module UiRules
         first_cold_storage_at: { renderer: :input,
                                  subtype: :date,
                                  required: true,
-                                 hide_on_load: @rules[:bulk_update_pallet_dates] ? false : true }
+                                 hide_on_load: @rules[:bulk_update_pallet_dates] ? false : true },
+        bin_asset_number: { hide_on_load: @rules[:weigh_rmt_bins] ? false : true },
+        context: { required: true,
+                   hide_on_load: @rules[:wip_run_type] ? false : true }
       }
     end
 
@@ -252,6 +257,10 @@ module UiRules
 
     def scrapping?
       @rules[:scrap_pallet] || @rules[:scrap_bin] || @rules[:scrap_carton]
+    end
+
+    def wip_run_type?
+      @rules[:wip_pallets] || @rules[:wip_bins]
     end
 
     def text_area_caption

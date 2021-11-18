@@ -20,6 +20,7 @@ module UiRules
       fields[:rmt_grade] = { renderer: :label, as_boolean: true }
       fields[:active] = { renderer: :label, as_boolean: true }
       fields[:qa_level] = { renderer: :label }
+      fields[:inspection_class] = { renderer: :label }
     end
 
     def common_fields
@@ -28,7 +29,8 @@ module UiRules
         description: {},
         rmt_grade: { renderer: :checkbox,
                      caption: 'RMT Grade?' },
-        qa_level: { renderer: :integer }
+        qa_level: { renderer: :integer },
+        inspection_class: { hint: '<p>RMT class to be shown on inspection documents.</p><p>Leave this blank if grades are acceptable for inspection.</p>' }
       }
     end
 
@@ -42,10 +44,7 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(grade_code: nil,
-                                    description: nil,
-                                    rmt_grade: nil,
-                                    qa_level: nil)
+      @form_object = new_form_object_from_struct(MasterfilesApp::Grade)
     end
   end
 end

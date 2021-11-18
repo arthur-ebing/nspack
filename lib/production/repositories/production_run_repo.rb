@@ -302,33 +302,33 @@ module ProductionApp
     def allocate_product_setup(product_resource_allocation_id, product_setup_code)
       run_id = DB[:product_resource_allocations].where(id: product_resource_allocation_id).get(:production_run_id)
       qry = <<~SQL
-        SELECT id, carton_label_template_id
+        SELECT id, carton_label_template_id, rebin
         FROM product_setups
         WHERE product_setup_template_id = (SELECT product_setup_template_id FROM production_runs WHERE id = #{run_id}) AND fn_product_setup_code(id) = '#{product_setup_code}'
       SQL
-      product_setup_id, label_template_id = DB[qry].get(%i[id carton_label_template_id])
+      product_setup_id, label_template_id, rebin = DB[qry].get(%i[id carton_label_template_id rebin])
       attrs = { product_setup_id: product_setup_id }
       attrs[:label_template_id] = label_template_id unless label_template_id.nil?
       update(:product_resource_allocations, product_resource_allocation_id, attrs)
 
-      success_response("Allocated #{product_setup_code}", product_setup_id: product_setup_id)
+      success_response("Allocated #{product_setup_code}", product_setup_id: product_setup_id, colour_rule: rebin ? 'orange' : nil)
     end
 
     def allocate_packing_specification(product_resource_allocation_id, packing_specification_item_code)
       run_id = DB[:product_resource_allocations].where(id: product_resource_allocation_id).get(:production_run_id)
       qry = <<~SQL
-        SELECT packing_specification_items.id, product_setup_id, product_setups.carton_label_template_id
+        SELECT packing_specification_items.id, product_setup_id, product_setups.carton_label_template_id, rebin
         FROM packing_specification_items
         JOIN product_setups ON product_setups.id = packing_specification_items.product_setup_id
         WHERE product_setup_template_id = (SELECT product_setup_template_id FROM production_runs WHERE id = #{run_id})
          AND fn_packing_specification_code(packing_specification_items.id) = '#{packing_specification_item_code}'
       SQL
-      spec_id, setup_id, label_template_id = DB[qry].get(%i[id product_setup_id carton_label_template_id])
+      spec_id, setup_id, label_template_id, rebin = DB[qry].get(%i[id product_setup_id carton_label_template_id rebin])
       attrs = { packing_specification_item_id: spec_id, product_setup_id: setup_id }
       attrs[:label_template_id] = label_template_id unless label_template_id.nil?
       update(:product_resource_allocations, product_resource_allocation_id, attrs)
 
-      success_response("Allocated #{packing_specification_item_code}", packing_specification_item_code: packing_specification_item_code)
+      success_response("Allocated #{packing_specification_item_code}", packing_specification_item_code: packing_specification_item_code, colour_rule: rebin ? 'orange' : nil)
     end
 
     def automatically_allocate_work_order_item(product_resource_allocation_id)
@@ -545,6 +545,19 @@ module ProductionApp
       DB[query, run_id].select_map(%i[code id])
     end
 
+    def allocation_for_button_code(system_resource_code) # rubocop:disable Metrics/AbcSize
+      line_res = ResourceRepo.new.plant_resource_parent_of_system_resource(Crossbeams::Config::ResourceDefinitions::LINE, system_resource_code)
+      raise Crossbeams::InfoError, "Button #{params[:device]} is not part of a LINE" unless line_res.success
+
+      run_id = labeling_run_for_line(line_res.instance)
+      raise Crossbeams::InfoError, "There is no active production run for #{params[:device]}" if run_id.nil?
+
+      plant_resource_id = DB[:plant_resources].where(system_resource_id: DB[:system_resources].where(system_resource_code: system_resource_code).get(:id)).get(:id)
+      DB[:product_resource_allocations]
+        .where(production_run_id: run_id, plant_resource_id: plant_resource_id)
+        .first
+    end
+
     # Is there an active tipping run on this line?
     def line_has_active_tipping_run?(production_line_id)
       DB[:production_runs].where(production_line_id: production_line_id, running: true, tipping: true).count.positive?
@@ -583,7 +596,8 @@ module ProductionApp
            "fruit_size_references"."size_reference"::text
          ELSE
           "fruit_actual_counts_for_packs"."actual_count_for_pack"::text
-         END AS size_ref_or_count
+         END AS size_ref_or_count,
+         "p"."id"
         FROM "production_runs" r
         JOIN "tree_plant_resources" t ON "t"."ancestor_plant_resource_id" = "r"."production_line_id"
         JOIN "plant_resources" p ON "p"."id" = "t"."descendant_plant_resource_id" AND "p"."plant_resource_type_id" = (SELECT

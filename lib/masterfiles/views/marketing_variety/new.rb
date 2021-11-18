@@ -17,6 +17,7 @@ module Masterfiles
               form.remote! if remote
               form.add_field :marketing_variety_code
               form.add_field :description
+              form.add_field :inspection_variety
             end
           end
 

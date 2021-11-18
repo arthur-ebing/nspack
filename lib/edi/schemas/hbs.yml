@@ -1,0 +1,55 @@
+---
+ :load_id:
+  :type: :string
+  :head: Load_ID
+ :weight:
+  :type: :decimal
+  :head: weight
+ :class:
+  :type: :string
+  :head: Class
+ :fruit_type:
+  :type: :string
+  :head: Fruit_Type
+ :bin_size:
+  :type: :string
+  :head: BIN_SIZE
+ :bin_id:
+  :type: :string
+  :head: Bin_ID
+ :exit_ref:
+  :type: :string
+  :head: Exit_Reference
+ :exit_date:
+  :type: :string
+  :head: Exit_Date
+ :hw_customer_code:
+  :type: :string
+  :head: HansaWorld_Customer_code
+ :trading_partner:
+  :type: :string
+  :head: TradingPartner
+ :line_of_business:
+  :type: :string
+  :head: LineOfBusiness
+ :current_rmt_type:
+  :type: :string
+  :head: Current_Raw_Material_Type
+ :cultivar:
+  :type: :string
+  :head: Cultivar
+ :qty:
+  :type: :string
+  :head: qty
+ :season:
+  :type: :string
+  :head: Season
+ :farm_id:
+  :type: :string
+  :head: Farm_ID
+ :farm_sub_group:
+  :type: :string
+  :head: FarmSubGroup
+ :product_code:
+  :type: :string
+  :head: Product_Code

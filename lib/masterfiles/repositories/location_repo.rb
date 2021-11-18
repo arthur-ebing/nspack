@@ -67,10 +67,10 @@ module MasterfilesApp
         .join(:location_types, id: :location_type_id)
         .join(:location_storage_types_locations, location_id: Sequel[:locations][:id])
         .join(:location_storage_types, id: Sequel[:location_storage_types_locations][:location_storage_type_id])
-        .select(Sequel[:locations][:id], :location_short_code)
+        .select(Sequel[:locations][:id], :location_long_code)
         .where(location_type_code: location_type_code)
         .where(storage_type_code: storage_type_code)
-        .map(%i[location_short_code id])
+        .map(%i[location_long_code id])
     end
 
     def find_location(id)
@@ -410,12 +410,26 @@ module MasterfilesApp
       DB[:locations]
         .join(:location_assignments, id: :primary_assignment_id)
         .where(assignment_code: assignment_code)
-        .select(Sequel[:locations][:id], :location_short_code)
-        .map(%i[location_short_code id])
+        .select(Sequel[:locations][:id], :location_long_code)
+        .map(%i[location_long_code id])
     end
 
-    def location_pallets_count(location_id)
-      DB[:pallets].where(location_id: location_id).count
+    # Get the count of all pallets in a location.
+    # If recursive is true, get the count of pallets in the location and all its sub-locations.
+    def location_pallets_count(location_id, recursive: false)
+      return DB[:pallets].where(location_id: location_id).count unless recursive
+
+      location_ids = DB[:tree_locations].where(ancestor_location_id: location_id).select_map(:descendant_location_id)
+      DB[:pallets].where(location_id: location_ids).count
+    end
+
+    # Get the ids of all pallets in a location.
+    # If recursive is true, get pallet ids in the location and all its sub-locations.
+    def location_pallet_ids(location_id, recursive: false)
+      return select_values(:pallets, :id, location_id: location_id) unless recursive
+
+      location_ids = DB[:tree_locations].where(ancestor_location_id: location_id).select_map(:descendant_location_id)
+      select_values(:pallets, :id, location_id: location_ids)
     end
 
     def belongs_to_parent?(child_location_id, parent_location_id)

@@ -11,5 +11,6 @@ module EdiApp
     required(:edi_out_filename).maybe(Types::StrippedString)
     required(:record_id).maybe(:integer)
     required(:error_message).maybe(Types::StrippedString)
+    required(:context).maybe(:hash)
   end
 end

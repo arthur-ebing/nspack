@@ -15,6 +15,19 @@ module UiRules
       actual_count = @fruit_size_repo.find_fruit_actual_counts_for_pack(@form_object.fruit_actual_counts_for_pack_id)
       actual_count ||= OpenStruct.new(standard_pack_code_ids: @repo.select_values(:standard_pack_codes, :id),
                                       size_reference_ids: @repo.select_values(:fruit_size_references, :id))
+
+      basic_pack_codes = if @form_object.rebin
+                           @fruit_size_repo.for_select_basic_packs(where: { bin: true })
+                         else
+                           @fruit_size_repo.for_select_basic_packs
+                         end
+      standard_packs = if @form_object.rebin
+                         @fruit_size_repo.for_select_standard_packs(where: { id: actual_count.standard_pack_code_ids, bin: true })
+                       else
+                         @fruit_size_repo.for_select_standard_packs(
+                           where: { id: actual_count.standard_pack_code_ids }
+                         )
+                       end
       {
         product_setup_template_id: { renderer: :hidden },
         commodity_id: { renderer: :select,
@@ -45,15 +58,13 @@ module UiRules
                                    prompt: true,
                                    caption: 'Std Size Count' },
         basic_pack_code_id: { renderer: :select,
-                              options: @fruit_size_repo.for_select_basic_packs,
+                              options: basic_pack_codes,
                               disabled_options: @fruit_size_repo.for_select_inactive_basic_packs,
                               prompt: true,
                               required: true,
                               caption: 'Basic Pack' },
         standard_pack_code_id: { renderer: :select,
-                                 options: @fruit_size_repo.for_select_standard_packs(
-                                   where: { id: actual_count.standard_pack_code_ids }
-                                 ),
+                                 options: standard_packs,
                                  disabled_options: @fruit_size_repo.for_select_inactive_standard_packs,
                                  prompt: true,
                                  required: !@basic_equals_standard_pack,

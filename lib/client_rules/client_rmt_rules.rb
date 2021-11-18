@@ -9,28 +9,42 @@ module Crossbeams
             delivery_capture_inner_bins: false,
             use_delivery_destination: false,
             bin_valid_for_external_integration: false,
+            default_container_material_owner: nil,
+            default_rmt_container_type: 'BIN',
             delivery_capture_container_material: false,
             delivery_capture_container_material_owner: false,
             set_defaults_for_new_rmt_delivery: true,
             convert_carton_to_rebins: false,
             create_farm_location: false,
+            maintain_legacy_columns: false,
             pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
             default_delivery_location: 'FRUIT_RECEPTION_1',
             use_bin_asset_control: false,
-            presort_legacy_data_fields: [] },
+            presort_legacy_data_fields: [],
+            presort_plant_integration: false,
+            show_kromco_attributes: false,
+            create_depot_location: false,
+            create_bin_asset_trading_partner_location: false  },
       hl: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             use_delivery_destination: false,
             bin_valid_for_external_integration: false,
+            default_container_material_owner: nil,
+            default_rmt_container_type: 'BIN',
             delivery_capture_container_material: false,
             delivery_capture_container_material_owner: false,
             set_defaults_for_new_rmt_delivery: true,
             convert_carton_to_rebins: false,
             create_farm_location: false,
+            maintain_legacy_columns: false,
             pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
             default_delivery_location: 'FRUIT_RECEPTION_1',
             use_bin_asset_control: false,
-            presort_legacy_data_fields: []  },
+            presort_legacy_data_fields: [],
+            presort_plant_integration: false,
+            show_kromco_attributes: false,
+            create_depot_location: false,
+            create_bin_asset_trading_partner_location: false  },
       kr: { bin_pallet_conversion_defaults: { pallet_format: { stack_type: 'BIN', pallet_base: 'S' },
                                               basic_pack: 'BX750',
                                               grade: 'SA',
@@ -43,67 +57,102 @@ module Crossbeams
             delivery_capture_inner_bins: false,
             use_delivery_destination: true,
             bin_valid_for_external_integration: true,
+            default_container_material_owner: 'KROMCO',
+            default_rmt_container_type: 'BIN',
             delivery_capture_container_material: true,
             delivery_capture_container_material_owner: true,
             set_defaults_for_new_rmt_delivery: true,
             convert_carton_to_rebins: false,
-            create_farm_location: false,
+            create_farm_location: true,
+            maintain_legacy_columns: true,
             pending_delivery_location: nil,
             default_delivery_location: nil,
-            use_bin_asset_control: false,
-            presort_legacy_data_fields: %i[treatment_code ripe_point_code track_indicator_code]  },
+            use_bin_asset_control: true,
+            presort_legacy_data_fields: %i[treatment_code ripe_point_code track_indicator_code],
+            presort_plant_integration: true,
+            show_kromco_attributes: true,
+            create_depot_location: true,
+            create_bin_asset_trading_partner_location: true  },
       um: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             use_delivery_destination: false,
             bin_valid_for_external_integration: false,
+            default_container_material_owner: nil,
+            default_rmt_container_type: 'BIN',
             delivery_capture_container_material: false,
             delivery_capture_container_material_owner: false,
             set_defaults_for_new_rmt_delivery: true,
             convert_carton_to_rebins: false,
             create_farm_location: false,
+            maintain_legacy_columns: false,
             pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
             default_delivery_location: 'FRUIT RECEPTION',
             use_bin_asset_control: false,
-            presort_legacy_data_fields: []  },
+            presort_legacy_data_fields: [],
+            presort_plant_integration: false,
+            show_kromco_attributes: false,
+            create_depot_location: false,
+            create_bin_asset_trading_partner_location: false  },
       ud: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             use_delivery_destination: true,
             bin_valid_for_external_integration: false,
+            default_container_material_owner: nil,
+            default_rmt_container_type: 'BIN',
             delivery_capture_container_material: true,
             delivery_capture_container_material_owner: true,
             set_defaults_for_new_rmt_delivery: false,
             convert_carton_to_rebins: false,
             create_farm_location: true,
+            maintain_legacy_columns: false,
             pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
             default_delivery_location: 'FRUIT_RECEPTION_1',
             use_bin_asset_control: false,
-            presort_legacy_data_fields: []  },
+            presort_legacy_data_fields: [],
+            presort_plant_integration: false,
+            show_kromco_attributes: false,
+            create_depot_location: false,
+            create_bin_asset_trading_partner_location: false  },
       sr: { bin_pallet_conversion_defaults: {},
             delivery_capture_inner_bins: false,
             use_delivery_destination: true,
             bin_valid_for_external_integration: false,
+            default_container_material_owner: nil,
+            default_rmt_container_type: 'BIN',
             delivery_capture_container_material: true,
             delivery_capture_container_material_owner: true,
             set_defaults_for_new_rmt_delivery: true,
             convert_carton_to_rebins: false,
             create_farm_location: false,
+            maintain_legacy_columns: false,
             pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
             default_delivery_location: 'FRUIT_RECEPTION_1',
             use_bin_asset_control: false,
-            presort_legacy_data_fields: []  },
+            presort_legacy_data_fields: [],
+            presort_plant_integration: false,
+            show_kromco_attributes: false,
+            create_depot_location: false,
+            create_bin_asset_trading_partner_location: false   },
       sr2: { bin_pallet_conversion_defaults: {},
              delivery_capture_inner_bins: false,
              use_delivery_destination: true,
              bin_valid_for_external_integration: false,
+             default_container_material_owner: nil,
+             default_rmt_container_type: 'BIN',
              delivery_capture_container_material: true,
              delivery_capture_container_material_owner: true,
              set_defaults_for_new_rmt_delivery: true,
              convert_carton_to_rebins: true,
              create_farm_location: true,
+             maintain_legacy_columns: false,
              pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
              default_delivery_location: 'FRUIT_RECEPTION_1',
              use_bin_asset_control: false,
-             presort_legacy_data_fields: []  }
+             presort_legacy_data_fields: [],
+             presort_plant_integration: false,
+             show_kromco_attributes: false,
+             create_depot_location: false,
+             create_bin_asset_trading_partner_location: false  }
     }.freeze
 
     def initialize(client_code)
@@ -171,6 +220,12 @@ module Crossbeams
       setting(:create_farm_location)
     end
 
+    def maintain_legacy_columns?(explain: false)
+      return 'Maintain legacy columns for rebins.' if explain
+
+      setting(:maintain_legacy_columns)
+    end
+
     def pending_delivery_location(explain: false)
       return 'Default location_id for pending PALBIN edi bin receiving.' if explain
 
@@ -215,10 +270,46 @@ module Crossbeams
       repo.create(:locations, args)
     end
 
+    def default_container_material_owner(explain: false)
+      return 'Org long_description used in presort bin_created integration service as the container_material_owner.' if explain
+
+      setting(:default_container_material_owner)
+    end
+
+    def default_rmt_container_type(explain: false)
+      return 'Container type used in presort bin_created integration service.' if explain
+
+      setting(:default_rmt_container_type)
+    end
+
     def use_bin_asset_control?(explain: false)
       return 'Use bin asset control to manage bin movements.' if explain
 
       setting(:use_bin_asset_control)
+    end
+
+    def presort_plant_integration?(explain: false)
+      return 'Does bin carry attributes originating from external presort system' if explain
+
+      setting(:presort_plant_integration)
+    end
+
+    def show_kromco_attributes?(explain: false)
+      return 'Display attributes unique to Kromco - typically originating from legacy Kromco system' if explain
+
+      setting(:show_kromco_attributes)
+    end
+
+    def create_depot_location?(explain: false)
+      return 'Create a location record for depot.' if explain
+
+      setting(:create_depot_location)
+    end
+
+    def create_bin_asset_trading_partner_location?(explain: false)
+      return 'Create a location record for depot.' if explain
+
+      setting(:create_bin_asset_trading_partner_location)
     end
   end
 end

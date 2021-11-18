@@ -14,7 +14,8 @@ module MasterfilesApp
         depot_code: Faker::Lorem.unique.word,
         description: 'ABC',
         bin_depot: true,
-        active: true
+        active: true,
+        magisterial_district: 'ABC'
       }
       MasterfilesApp::Depot.new(base_attrs.merge(attrs))
     end

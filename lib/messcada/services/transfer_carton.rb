@@ -2,11 +2,12 @@
 
 module MesscadaApp
   class TransferCarton < BaseService
-    attr_reader :repo, :prod_repo, :carton_id, :pallet_id, :pallet_sequence_id
+    attr_reader :repo, :prod_repo, :carton_id, :pallet_id, :pallet_sequence_id, :user_name
 
-    def initialize(carton_id, pallet_id)
+    def initialize(carton_id, pallet_id, user_name = nil)
       @carton_id = carton_id
       @pallet_id = pallet_id
+      @user_name = user_name
       @repo = MesscadaApp::MesscadaRepo.new
       @prod_repo = ProductionApp::ProductionRunRepo.new
     end
@@ -34,6 +35,7 @@ module MesscadaApp
 
     def transfer_carton # rubocop:disable Metrics/AbcSize
       orig_seq = repo.get_value(:cartons, :pallet_sequence_id, id: carton_id)
+      pallet_number = repo.get_value(:pallet_sequences, :pallet_number, id: orig_seq)
       new_sequence = NewSequence.new(pallet_id, carton_id).call
       if new_sequence
         res = NewPalletSequence.call(@user_name, carton_id, pallet_id, 1, true, AppConst::BUILDUP_PALLET_MIX)
@@ -48,19 +50,8 @@ module MesscadaApp
       repo.update_carton(carton_id, { pallet_sequence_id: pallet_sequence_id })
       prod_repo.decrement_sequence(orig_seq)
 
-      unless repo.sequence_has_cartons?(orig_seq)
-        src_pallet_id = repo.get_value(:pallet_sequences, :pallet_id, id: orig_seq)
-        ProductionApp::ReworksRepo.new.update_pallet_sequence(orig_seq, { pallet_id: nil, exit_ref: AppConst::PALLET_EXIT_REF_SCRAPPED })
-        repo.log_status('pallets', src_pallet_id, AppConst::SEQUENCE_REMOVED_BY_CTN_TRANSFER)
-
-        if ProductionApp::ReworksRepo.new.unscrapped_sequences_count(src_pallet_id) <= 0
-          ProductionApp::ReworksRepo.new.update_pallet(src_pallet_id, { scrapped_at: Time.now, scrapped: true, exit_ref: AppConst::PALLET_EXIT_REF_SCRAPPED_BY_BUILDUP })
-          repo.log_status('pallets', src_pallet_id, AppConst::SCRAPPED_BY_BUILDUP)
-        end
-      end
-
       repo.log_status('pallets', pallet_id, AppConst::CARTON_TRANSFER)
-      repo.log_status('cartons', carton_id, AppConst::CARTON_TRANSFER)
+      repo.log_status('cartons', carton_id, AppConst::CARTON_TRANSFER, comment: "CTN #{carton_id} RECEIVED FROM #{pallet_number}", user_name: @user_name)
       ok_response
     rescue Crossbeams::InfoError => e
       failed_response(e.message)

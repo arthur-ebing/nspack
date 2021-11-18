@@ -11,7 +11,8 @@ module MasterfilesApp
         description: Faker::Lorem.word,
         rmt_grade: false,
         active: true,
-        qa_level: Faker::Number.number(digits: 4)
+        qa_level: Faker::Number.number(digits: 4),
+        inspection_class: Faker::Lorem.word
       }
       DB[:grades].insert(default.merge(opts))
     end

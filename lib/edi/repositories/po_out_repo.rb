@@ -58,7 +58,6 @@ module EdiApp
           cargo_temperatures.set_point_temperature AS temp_set,
           pod_ports.port_code AS disch_port,
           voyages.voyage_number AS ship_number,
-          pallet_bases.edi_out_pallet_base AS pallet_btype,
           vessels.vessel_code AS ship_name,
           fn_party_role_org_code(load_voyages.shipping_line_party_role_id) AS ship_line,
           #{load_code} AS doc_no,
@@ -76,7 +75,8 @@ module EdiApp
           0 AS consec_no,
           0 AS cto_no,
           load_containers.tare_weight AS container_tare_weight,
-          load_containers.verified_gross_weight AS container_gross_mass,
+          -- load_containers.verified_gross_weight AS container_gross_mass,
+          load_containers.actual_payload + load_containers.tare_weight AS container_gross_mass,
           fn_party_role_org_code(loads.exporter_party_role_id) AS responsible_party,
           CASE WHEN destination_countries.iso_country_code = 'ZA' THEN 'L' ELSE 'E' END AS channel,
           #{load_code} AS cons_no,
@@ -89,6 +89,7 @@ module EdiApp
           ph_resource.resource_properties ->> 'edi_out_value' AS prod_grp,
           depots.depot_code AS dest_locn,
           depots.depot_code AS orig_depot,
+          #{AppConst::CR_EDI.orig_account} AS orig_account,
           CASE WHEN govt_inspection_sheets.use_inspection_destination_for_load_out THEN
             (SELECT destination_regions.destination_region_name
               FROM destination_regions_tm_groups
@@ -105,7 +106,7 @@ module EdiApp
           END AS target_country,
           substring(pallet_sequences.pallet_number from '.........$') AS pallet_id,
           pallet_sequences.pallet_sequence_number AS seq_no,
-          govt_inspection_sheets.consignment_note_number AS consignment_number,
+          COALESCE(govt_inspection_sheets.consignment_note_number, pallets.edi_in_consignment_note_number) AS consignment_number,
           COALESCE(pallets.intake_created_at, pallets.govt_reinspection_at, pallets.govt_first_inspection_at, current_timestamp) AS intake_date,
           COALESCE(pallets.intake_created_at, pallets.govt_first_inspection_at, current_timestamp) AS orig_intake,
           substring(commodity_groups.code FROM '..') AS comm_grp,
@@ -125,8 +126,10 @@ module EdiApp
           pallet_sequences.pick_ref,
           loads.shipped_at AS shipped_date,
           pallet_sequences.product_chars AS prod_char,
-          govt_inspection_sheets.consignment_note_number AS orig_cons,
-          COALESCE(target_markets.target_market_name, target_market_groups.target_market_group_name) AS targ_mkt,
+          COALESCE(govt_inspection_sheets.consignment_note_number, pallets.edi_in_consignment_note_number) AS orig_cons,
+          COALESCE(fn_party_role_org_code(pallet_sequences.target_customer_party_role_id),
+                   target_markets.target_market_name,
+                   target_market_groups.target_market_group_name) AS targ_mkt,
           pucs.puc_code AS farm,
           pallet_sequences.carton_quantity AS ctn_qty,
           (pallet_sequences.carton_quantity::numeric / pallets.carton_quantity::numeric)::numeric(8,2) AS plt_qty,
@@ -138,8 +141,9 @@ module EdiApp
           COALESCE(pallets.stock_created_at, pallets.created_at) AS transaction_date,
           COALESCE(pallets.stock_created_at, pallets.created_at) AS transaction_time,
           pallet_bases.edi_out_pallet_base AS pallet_btype,
+          pallet_stack_types.stack_type_code AS stack_variance,
           pallets.pallet_number AS sscc,
-          govt_inspection_sheets.consignment_note_number AS waybill_no,
+          COALESCE(govt_inspection_sheets.consignment_note_number, pallets.edi_in_consignment_note_number) AS waybill_no,
           pallet_sequences.sell_by_code AS sellbycode,
           pallets.pallet_number AS combo_sscc,
           pallets.phc AS packh_code,
@@ -153,7 +157,8 @@ module EdiApp
           pallets.gross_weight_measured_at AS weighing_time,
           pallet_sequences.nett_weight AS mass,
           pallets.temp_tail AS temp_device_id,
-          pallet_sequences.phyto_data
+          pallet_sequences.phyto_data,
+          production_regions.inspection_region AS production_area
 
         FROM loads
         JOIN pallets ON pallets.load_id = loads.id AND NOT scrapped
@@ -172,6 +177,7 @@ module EdiApp
         JOIN seasons ON seasons.id = pallet_sequences.season_id
         LEFT JOIN pallet_formats ON pallet_formats.id = pallets.pallet_format_id
         LEFT JOIN pallet_bases ON pallet_bases.id = pallet_formats.pallet_base_id
+        LEFT JOIN pallet_stack_types ON pallet_stack_types.id = pallet_formats.pallet_stack_type_id
         JOIN party_roles mpr ON mpr.id = pallet_sequences.marketing_org_party_role_id
         JOIN organizations marketing_org ON marketing_org.party_id = mpr.party_id
         LEFT OUTER JOIN govt_inspection_pallets ON govt_inspection_pallets.id = pallets.last_govt_inspection_pallet_id
@@ -196,6 +202,8 @@ module EdiApp
         JOIN pucs ON pucs.id = pallet_sequences.puc_id
         JOIN orchards ON orchards.id = pallet_sequences.orchard_id
         LEFT JOIN plant_resources ph_resource ON ph_resource.id = pallet_sequences.packhouse_resource_id
+        JOIN farms ON farms.id = pallet_sequences.farm_id
+        JOIN production_regions ON production_regions.id = farms.pdn_region_id
         WHERE loads.id = ?
         ORDER BY pallet_sequences.pallet_number, pallet_sequences.pallet_sequence_number
       SQL

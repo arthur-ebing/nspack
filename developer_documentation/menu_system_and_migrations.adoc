@@ -301,7 +301,7 @@ Run menu migrations using `rake`:
 
 == Menu permissions
 
-A user can be given permission to see a menu item in one of to ways:
+A user can be given permission to see a menu item in one of two ways:
 
 1. The user has been given access to a program (via a record in the `programs_users` table)
 2. The program function has `restricted_user_access` set to true and the user has been given that access (via a record in `program_functions_users` table). Note that the user must also have access to the program this item belongs to.

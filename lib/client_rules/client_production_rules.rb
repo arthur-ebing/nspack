@@ -15,6 +15,7 @@ module Crossbeams
             group_incentive_packer_roles: false,
             integrate_with_external_rmt_system: false,
             bin_tip_match_farm_on_group: false,
+            full_bin_tip_criteria_checked: false,
             default_marketing_org: 'HABATA',
             allow_cultivar_group_mix: true,
             use_packing_specifications: false,
@@ -27,7 +28,8 @@ module Crossbeams
             derive_nett_weight: false,
             require_extended_packaging: false,
             run_cache_legacy_data_fields: [],
-            use_work_orders: false },
+            use_work_orders: false,
+            allow_reworks_mixed_tipping: false },
       hl: { run_allocations: true,
             pallet_label_seqs_sql: nil,
             use_gtins: false,
@@ -38,6 +40,7 @@ module Crossbeams
             group_incentive_packer_roles: false,
             integrate_with_external_rmt_system: false,
             bin_tip_match_farm_on_group: false,
+            full_bin_tip_criteria_checked: false,
             default_marketing_org: 'HABATA',
             allow_cultivar_group_mix: true,
             use_packing_specifications: false,
@@ -50,17 +53,20 @@ module Crossbeams
             derive_nett_weight: false,
             require_extended_packaging: false,
             run_cache_legacy_data_fields: [],
-            use_work_orders: false },
+            use_work_orders: false,
+            allow_reworks_mixed_tipping: false },
       kr: { run_allocations: true,
             pallet_label_seqs_sql: 'SELECT p.puc_code, p.gap_code, ps.gtin_code, ps.carton_quantity FROM pallet_sequences ps JOIN pucs p ON p.id = ps.puc_id WHERE ps.pallet_id = ? ORDER BY ps.pallet_sequence_number',
             use_gtins: true,
             print_from_line_scanning: true,
             incentive_palletizing: false,
             clm_button_caption_format: nil,
+            # clm_button_caption_format: '$:size_ref_or_count$ $:product_chars$ $:target_market_group_name$',
             provide_pack_type_at_verification: false,
             group_incentive_packer_roles: true,
             integrate_with_external_rmt_system: true,
             bin_tip_match_farm_on_group: true,
+            full_bin_tip_criteria_checked: true,
             default_marketing_org: 'KR',
             allow_cultivar_group_mix: false,
             use_packing_specifications: true,
@@ -73,7 +79,8 @@ module Crossbeams
             derive_nett_weight: true,
             require_extended_packaging: true,
             run_cache_legacy_data_fields: %i[pc_code track_indicator_code],
-            use_work_orders: true },
+            use_work_orders: true,
+            allow_reworks_mixed_tipping: true },
       um: { run_allocations: true,
             pallet_label_seqs_sql: 'SELECT o.orchard_code, m.marketing_variety_code, s.size_reference, ps.carton_quantity FROM pallet_sequences ps JOIN orchards o ON o.id = ps.orchard_id JOIN marketing_varieties m ON m.id = ps.marketing_variety_id JOIN fruit_size_references s ON s.id = ps.fruit_size_reference_id WHERE ps.pallet_id = ? ORDER BY ps.pallet_sequence_number',
             use_gtins: false,
@@ -84,6 +91,7 @@ module Crossbeams
             group_incentive_packer_roles: false,
             integrate_with_external_rmt_system: false,
             bin_tip_match_farm_on_group: false,
+            full_bin_tip_criteria_checked: false,
             default_marketing_org: 'UI',
             allow_cultivar_group_mix: false,
             use_packing_specifications: false,
@@ -96,7 +104,8 @@ module Crossbeams
             derive_nett_weight: false,
             require_extended_packaging: false,
             run_cache_legacy_data_fields: [],
-            use_work_orders: false },
+            use_work_orders: false,
+            allow_reworks_mixed_tipping: false },
       ud: { run_allocations: true,
             pallet_label_seqs_sql: nil,
             use_gtins: false,
@@ -107,6 +116,7 @@ module Crossbeams
             group_incentive_packer_roles: false,
             integrate_with_external_rmt_system: false,
             bin_tip_match_farm_on_group: false,
+            full_bin_tip_criteria_checked: false,
             default_marketing_org: 'UI',
             allow_cultivar_group_mix: true,
             use_packing_specifications: false,
@@ -119,7 +129,8 @@ module Crossbeams
             derive_nett_weight: false,
             require_extended_packaging: false,
             run_cache_legacy_data_fields: [],
-            use_work_orders: false },
+            use_work_orders: false,
+            allow_reworks_mixed_tipping: false },
       sr: { run_allocations: true,
             pallet_label_seqs_sql: nil,
             use_gtins: false,
@@ -130,6 +141,7 @@ module Crossbeams
             group_incentive_packer_roles: false,
             integrate_with_external_rmt_system: false,
             bin_tip_match_farm_on_group: false,
+            full_bin_tip_criteria_checked: false,
             default_marketing_org: 'SY',
             allow_cultivar_group_mix: false,
             use_packing_specifications: false,
@@ -142,7 +154,8 @@ module Crossbeams
             derive_nett_weight: false,
             require_extended_packaging: false,
             run_cache_legacy_data_fields: [],
-            use_work_orders: false },
+            use_work_orders: false,
+            allow_reworks_mixed_tipping: false },
       sr2: { run_allocations: true,
              pallet_label_seqs_sql: nil,
              use_gtins: false,
@@ -153,6 +166,7 @@ module Crossbeams
              group_incentive_packer_roles: false,
              integrate_with_external_rmt_system: false,
              bin_tip_match_farm_on_group: false,
+             full_bin_tip_criteria_checked: false,
              default_marketing_org: 'SY',
              allow_cultivar_group_mix: false,
              use_packing_specifications: false,
@@ -165,7 +179,8 @@ module Crossbeams
              derive_nett_weight: false,
              require_extended_packaging: false,
              run_cache_legacy_data_fields: [],
-             use_work_orders: false }
+             use_work_orders: false,
+             allow_reworks_mixed_tipping: false }
     }.freeze
     # ALLOW_OVERFULL_REWORKS_PALLETIZING
     # BYPASS_QUALITY_TEST_LOAD_CHECK
@@ -266,7 +281,7 @@ module Crossbeams
       # * size_ref_or_count
       # * standard_pack_code
       # * target_market_group_name
-      setting(:clm_button_caption_format)
+      setting(:clm_button_caption_format) || ''
     end
 
     def provide_pack_type_at_carton_verification?(explain: false)
@@ -340,6 +355,12 @@ module Crossbeams
       setting(:capture_batch_number_for_pallets)
     end
 
+    def are_pallets_weighed?(explain: false)
+      return 'Are pallets weighed or are weights derived_from masterfiles.' if explain
+
+      !setting(:derive_nett_weight)
+    end
+
     def derive_nett_weight?(explain: false)
       return 'Set derived_weight on pallets.' if explain
 
@@ -356,6 +377,18 @@ module Crossbeams
       return 'Allocate work order items to product_resource_allocations.' if explain
 
       setting(:use_work_orders)
+    end
+
+    def full_bin_tip_criteria_check?(explain: false)
+      return 'Should the full set of bin criteria be checked before tipping a bin.' if explain
+
+      setting(:full_bin_tip_criteria_checked)
+    end
+
+    def allow_reworks_mixed_tipping?(explain: false)
+      return 'Ignore farm, orchard and puc validations when tipping bins in reworks.' if explain
+
+      setting(:allow_reworks_mixed_tipping)
     end
   end
 end

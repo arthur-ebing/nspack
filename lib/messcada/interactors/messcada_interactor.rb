@@ -179,7 +179,7 @@ module MesscadaApp
       return validation_failed_response(res) if res.failure?
 
       repo.transaction do
-        res = MesscadaApp::TipBin.new(res).call
+        res = MesscadaApp::TipBin.call(res)
 
         if res.success
           log_status(:rmt_bins, res.instance[:rmt_bin_id], 'TIPPED')
@@ -201,7 +201,7 @@ module MesscadaApp
       res = validate_tip_rmt_bin_params(params)
       return validation_failed_response(res) if res.failure?
 
-      MesscadaApp::TipBin.new(res).can_tip_bin?
+      MesscadaApp::CanTipBin.call(res[:bin_number], res[:device])
     rescue Crossbeams::InfoError => e
       ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message(__method__))
       failed_response(e.message)
@@ -253,6 +253,61 @@ module MesscadaApp
       puts e
       puts e.backtrace.join("\n")
       failed_response(e.message)
+    end
+
+    def check_weights(params)
+      p params
+      alloc_hash = production_run_repo.allocation_for_button_code(params[:device])
+      raise Crossbeams::InfoError, "There is no allocation for #{params[:device]}" if alloc_hash.nil?
+
+      check_weights = product_setup_repo.check_weights_for_product_setup(alloc_hash[:product_setup_id])
+      raise Crossbeams::InfoError, 'No check weights set up for product' if check_weights.nil?
+
+      # Get fruitspec from button (running run)
+      # get line from resource
+      # labeling_run_for_line(line_id)
+      # get alloc for run & resource
+      # none: raise InfoError
+      # Get STD pack weights
+      # { pack_code: 'A123', min_gross_weight: 12, max_gross_weight: 20, commodity_code: 'AP' }
+      check_weights
+    end
+
+    def check_carton_label_weight(params)
+      check_weights = check_weights(params)
+      check_weights[:weight] = params[:weight]
+      contract = CartonLabelCheckWeightContract.new
+      res = contract.call(check_weights)
+      return failed_response(unwrap_error_set(res.errors)) if res.failure?
+
+      success_response('ok', params)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def send_label_to_printer(params) # rubocop:disable Metrics/AbcSize
+      # Change ctn labeling to handle a gross weight param
+      res = carton_labeling(params)
+      return res unless res.success
+
+      schema = Nokogiri::XML(res.instance)
+      label_name = schema.xpath('.//label/template').text
+      quantity = schema.xpath('.//label/quantity').text
+      printer = printer_for_robot(params[:system_resource].id)
+      vars = {}
+      schema.xpath('.//label/fvalue').each_with_index { |node, i| vars["F#{i + 1}".to_sym] = node.text }
+
+      # call messerver to print
+      res = MesserverApp::MesserverRepo.new.print_published_label(label_name, vars, quantity, printer)
+      # res = success_response('a dummy test')
+      # res = failed_response('Pretend fail print...')
+      # PRN-01
+      # "<label><status>true</status><template>JS_TEST</template><quantity>1</quantity><fvalue>4265559</fvalue><fvalue>41</fvalue><fvalue>PEARS</fvalue><fvalue>PACKHAM'S TRIUMPH</fvalue><fvalue>1A</fvalue><fvalue>A1-2</fvalue><fvalue>E0351</fvalue><fvalue>6113</fvalue><fvalue>V1044</fvalue><fvalue>45</fvalue><fvalue>PR</fvalue><fvalue></fvalue><fvalue>GGN 4050373704834</fvalue><fvalue></fvalue><lcd1>Label JS_TEST</lcd1><lcd2>Label printed...</lcd2><lcd3></lcd3><lcd4></lcd4><lcd5></lcd5><lcd6></lcd6><msg>Carton Label printed successfully</msg></label>"
+      return res unless res.success
+
+      log = "Printed (#{label_name}): #{vars.values.join(', ')}"
+      success_response(log)
+      # success_response(res.message, printer: printer, vars: vars.inspect) # change this to a string rep of lbl, prn & vars
     end
 
     def carton_verification(scanned_number)  # rubocop:disable Metrics/AbcSize
@@ -410,7 +465,7 @@ module MesscadaApp
     end
 
     def repack_pallet(pallet_id) # rubocop:disable Metrics/AbcSize
-      pallet = reworks_repo.pallet(pallet_id)
+      pallet = reworks_repo.get_pallet(pallet_id)
       return validation_failed_response(messages: { pallet_number: ['Pallet does not exist'] }) unless pallet
 
       res = nil
@@ -431,6 +486,57 @@ module MesscadaApp
       failed_response(e.message)
     end
 
+    def rebin_verification(scanned_number)  # rubocop:disable Metrics/AbcSize
+      res = nil
+      repo.transaction do
+        res = MesscadaApp::RebinVerification.call(@user, scanned_number)
+        log_transaction
+      end
+      res
+    rescue Crossbeams::InfoError => e
+      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message(__method__))
+      puts e.message
+      puts e.backtrace.join("\n")
+      failed_response(e.message)
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
+      puts e
+      puts e.backtrace.join("\n")
+      failed_response(e.message)
+    end
+
+    def rebin_verification_and_weighing(params) # rubocop:disable Metrics/AbcSize
+      res = CartonVerificationAndWeighingSchema.call(params)
+      return validation_failed_response(res) if res.failure?
+
+      check_res = validate_device_and_label_exist(res[:device], res[:carton_number])
+      return check_res unless check_res.success
+
+      cvl_res = nil
+      repo.transaction do
+        cvl_res = MesscadaApp::RebinVerification.call(@user, res[:carton_number])
+        return cvl_res unless cvl_res.success
+
+        attrs = res.to_h
+        attrs[:bin_number] = cvl_res.instance[:rebin_id]
+        options = { force_find_by_id: false, weighed_manually: true, avg_gross_weight: false }
+        cvl_res = MesscadaApp::UpdateBinWeights.call(attrs, options)
+
+        log_transaction
+      end
+      cvl_res
+    rescue Crossbeams::InfoError => e
+      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message(__method__))
+      puts e.message
+      puts e.backtrace.join("\n")
+      failed_response(e.message)
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
+      puts e.message
+      puts e.backtrace.join("\n")
+      failed_response(e.message)
+    end
+
     def pallet_sequence_ids(pallet_id)
       reworks_repo.pallet_sequence_ids(pallet_id)
     end
@@ -443,6 +549,100 @@ module MesscadaApp
     def assert_permission!(task, pallet_number)
       res = TaskPermissionCheck::Pallet.call(task, pallet_number: pallet_number)
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
+    end
+
+    # Get the device code from system resources that matches an ip address.
+    # Returns nil if not found/not a MODULE.
+    # When running in development mode, a passed-in device parameter will be used when present.
+    def device_code_from_ip_address(ip_address, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      device = if params[:device] && AppConst.development?
+                 params[:device]
+               else
+                 resource_repo.device_code_from_ip_address(ip_address)
+               end
+
+      return failed_response("There is no device configured for #{ip_address}") if device.nil?
+
+      sysres_id = resource_repo.get_id(:system_resources, system_resource_code: device)
+      return failed_response("#{device} does not exist") if sysres_id.nil?
+      return failed_response("#{device} is not a robot") unless resource_repo.system_resource_type_from_resource(sysres_id) == Crossbeams::Config::ResourceDefinitions::MODULE
+
+      # Check to see that device has a printer associated.
+      printer_list = resource_repo.linked_printer_for_device(device)
+      return failed_response("#{device} does not have a linked printer") if printer_list.empty?
+      return failed_response("#{device} has more than one linked printer") if printer_list.length > 1
+
+      success_response('ok', device)
+    end
+
+    # build_robot called with ip address / device name?
+    def build_robot(device) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      # !------- code to be converted and moved to repo...
+      sysres_robot = DB[:system_resources].where(system_resource_code: device).first
+      return failed_response("#{device} does not exist") if sysres_robot.nil?
+
+      plantres_robot = DB[:plant_resources].where(system_resource_id: sysres_robot[:id]).first
+      line = resource_repo.plant_resource_parent_of_system_resource(Crossbeams::Config::ResourceDefinitions::LINE, sysres_robot[:system_resource_code])
+      res = production_run_repo.find_production_runs_for_line_in_state(line.instance, running: true, labeling: true)
+      run_id = res.success ? res.instance.first : nil
+
+      buttons = resource_repo.robot_buttons(plantres_robot[:id]).map do |button_plant_id|
+        plnt = resource_repo.find_plant_resource_flat(button_plant_id)
+        sys = resource_repo.find_system_resource(plnt.system_resource_id)
+        # Lookup if btn alloc - enable or not & set button caption
+        # What line?
+        # What labeling run?
+        # What alloc prod + label?
+        if run_id.nil?
+          enabled = false
+        else
+          lbl_modules = production_run_repo.button_allocations(run_id)
+          # lbl_modules.group_by { |r| [r[:module], r[:alias]] }
+          rec = lbl_modules.find { |a| a[:module] == sysres_robot[:system_resource_code] && a[:button] == sys.system_resource_code[/.\d+$/] } # .first
+          # p rec
+          ar = AppConst::CR_PROD.button_caption_spec.split('$')
+          button_caption = ar.map { |s| s.start_with?(':') ? rec[s.delete_prefix(':').to_sym] : s }.compact.join
+          # p button_caption
+          if button_caption.strip.empty?
+            enabled = false
+            button_caption = 'Not allocated'
+          else
+            enabled = true
+          end
+        end
+        # NB. may need client setting to show button name? Or just A/B/C...
+        OpenStruct.new(plant_resource_id: plnt.id,
+                       button_name: plnt.plant_resource_code,
+                       enabled: enabled,
+                       button_caption: button_caption,
+                       system_name: sys[:system_resource_code],
+                       # url: "/messcada/browser/carton_labeling?device=#{sys[:system_resource_code]}&card_reader=$:card_reader$&identifier=$:identifier$",
+                       url: "/messcada/browser/carton_labeling/weighing?device=#{sys[:system_resource_code]}&card_reader=$:card_reader$&identifier=$:identifier$&weight=$:weight$",
+                       # params: %w[device card_reader identifier]) # Might include scale weight / bin_number ...
+                       params: %w[device card_reader identifier weight])
+      end
+      login_state = login_state(sysres_robot[:system_resource_code])
+      # Read res & get login/out/group etc., robot buttons
+      success_response('build', { device: sysres_robot[:system_resource_code],
+                                  name: plantres_robot[:plant_resource_code],
+                                  run_id: run_id,
+                                  users: login_state.instance[:users],
+                                  login_key: login_state.instance[:login_key],
+                                  buttons: buttons })
+    end
+
+    def login_state(device) # rubocop:disable Metrics/AbcSize
+      sysres_robot = DB[:system_resources].where(system_resource_code: device).first
+      if sysres_robot[:group_incentive]
+        users = ProductionApp::DashboardRepo.new.robot_group_incentive_details(sysres_robot[:id]).map { |r| "#{r[:first_name]} #{r[:surname]}" }
+        login_type = 'group'
+        login_key = "group_#{resource_repo.active_group_incentive_id_for(sysres_robot[:id])}"
+      else
+        users = ProductionApp::DashboardRepo.new.robot_logon_details(sysres_robot[:id]).map { |r| "#{r[:first_name]} #{r[:surname]}" }
+        login_type = 'individual'
+        login_key = "individual_#{resource_repo.active_individual_incentive_id_for(sysres_robot[:id])}"
+      end
+      success_response('OK', login_key: login_key, login_type: login_type, users: users)
     end
 
     private
@@ -508,10 +708,7 @@ module MesscadaApp
       UpdateRmtBinWeightsSchema.call(params)
     end
 
-    # TODO: split validation if using asset no or not (string asset vs int id)
     def validate_tip_rmt_bin_params(params)
-      # For now: bin asset is integer, so strip Habata's SK prefix. LATER make this a string.
-      # TipRmtBinSchema.call(params.transform_values { |v| v.match?(/SK/) ? v.sub('SK', '') : v })
       TipRmtBinSchema.call(params)
     end
 

@@ -90,14 +90,14 @@ class Nspack < Roda
       end
 
       r.on 'edit' do   # EDIT
-        check_auth!('finance', 'edit')
+        check_auth!(%w[finance parties], 'edit')
         interactor.assert_permission!(:edit, id)
         show_partial { Masterfiles::Finance::Customer::Edit.call(id) }
       end
 
       r.is do
         r.get do       # SHOW
-          check_auth!('finance', 'read')
+          check_auth!(%w[finance parties], 'read')
           show_partial { Masterfiles::Finance::Customer::Show.call(id) }
         end
         r.patch do     # UPDATE
@@ -115,6 +115,8 @@ class Nspack < Roda
               active
               fruit_industry_levy_id
               fruit_industry_levy
+              rmt_customer
+              bin_asset_trading_partner
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys),
                                 notice: res.message)
@@ -124,7 +126,7 @@ class Nspack < Roda
         end
 
         r.delete do    # DELETE
-          check_auth!('finance', 'delete')
+          check_auth!(%w[finance parties], 'delete')
           interactor.assert_permission!(:delete, id)
           res = interactor.delete_customer(id)
           if res.success
@@ -167,8 +169,9 @@ class Nspack < Roda
       end
 
       r.on 'new' do    # NEW
-        check_auth!('finance', 'new')
-        show_partial_or_page(r) { Masterfiles::Finance::Customer::New.call(remote: fetch?(r)) }
+        check_auth!(%w[finance parties], 'new')
+        for_rmt = params[:rmt] == 'true'
+        show_partial_or_page(r) { Masterfiles::Finance::Customer::New.call(for_rmt, remote: fetch?(r)) }
       end
       r.post do        # CREATE
         res = interactor.create_customer(params[:customer])
@@ -186,12 +189,15 @@ class Nspack < Roda
             active
             fruit_industry_levy_id
             fruit_industry_levy
+            rmt_customer
+            bin_asset_trading_partner
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)
         else
           re_show_form(r, res, url: '/masterfiles/finance/customers/new') do
-            Masterfiles::Finance::Customer::New.call(form_values: params[:customer],
+            Masterfiles::Finance::Customer::New.call(params[:rmt_customer],
+                                                     form_values: params[:customer],
                                                      form_errors: res.errors,
                                                      remote: fetch?(r))
           end

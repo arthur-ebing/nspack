@@ -741,17 +741,12 @@ class Nspack < Roda
         check_auth!('deliveries', 'new')
         id = interactor.find_current_delivery
         if id.nil_or_empty?
-          r.redirect('/rmd/rmt_deliveries/rmt_bins/new') if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
-
-          flash[:error] = 'Error: There Is No Current Delivery To Add Bins To'
-          r.redirect('/list/rmt_deliveries')
+          r.redirect('/rmd/rmt_deliveries/rmt_bins/new')
         elsif RawMaterialsApp::RmtDeliveryInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {}).delivery_tipped?(id)
           flash[:error] = 'Cannot Add Bin To Current Delivery. Delivery Has Been Tipped'
           r.redirect("/raw_materials/deliveries/rmt_deliveries/#{id}")
-        elsif AppConst::USE_PERMANENT_RMT_BIN_BARCODES
-          r.redirect("/rmd/rmt_deliveries/rmt_bins/#{id}/new")
         else
-          show_partial_or_page(r) { RawMaterials::Deliveries::RmtBin::New.call(id, is_direct_create: true, remote: fetch?(r)) }
+          r.redirect("/rmd/rmt_deliveries/rmt_bins/#{id}/new")
         end
       end
 

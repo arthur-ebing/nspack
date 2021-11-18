@@ -20,6 +20,7 @@ module Masterfiles
               form.add_field :location_description
               form.add_field :location_short_code
               form.add_field :print_code
+              form.add_field :maximum_units
               form.add_field :has_single_container
               form.add_field :virtual_location
               form.add_field :consumption_area

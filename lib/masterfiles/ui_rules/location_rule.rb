@@ -43,6 +43,7 @@ module UiRules
       fields[:assignments] = { renderer: :list, items: location_assignments }
       fields[:can_be_moved] = { renderer: :label, as_boolean: true }
       fields[:can_store_stock] = { renderer: :label, as_boolean: true }
+      fields[:maximum_units] = { renderer: :label }
     end
 
     def set_print_fields
@@ -75,7 +76,10 @@ module UiRules
         virtual_location: { renderer: :checkbox },
         consumption_area: { renderer: :checkbox },
         can_be_moved: { renderer: :checkbox },
-        can_store_stock: { renderer: :checkbox }
+        can_store_stock: { renderer: :checkbox },
+        maximum_units: { renderer: :integer,
+                         caption: 'Maximum Units',
+                         required: true }
       }
     end
 

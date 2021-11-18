@@ -57,11 +57,11 @@ module UiRules
       fields = {
         business_process_id: { renderer: :hidden, value: receive_process_id },
         bin_asset_from_location_id: { renderer: :select,
-                                      options: @repo.for_select_available_bin_asset_locations,
+                                      options: @repo.for_select_available_farm_bin_asset_locations,
                                       caption: 'From Location',
                                       required: true },
         bin_asset_to_location_id: { renderer: :select,
-                                    options: @repo.for_select_bin_asset_locations,
+                                    options: @repo.for_select_onsite_bin_asset_locations,
                                     selected: onsite_empty_bin_asset_location_id,
                                     caption: 'To Location',
                                     required: true },
@@ -77,6 +77,9 @@ module UiRules
     def issue_bin_assets_fields
       fields = {
         business_process_id: { renderer: :hidden, value: issue_process_id },
+        bin_asset_from_location: { renderer: :label,
+                                   with_value: AppConst::ONSITE_EMPTY_BIN_LOCATION,
+                                   caption: 'From Location' },
         bin_asset_from_location_id: { renderer: :hidden, value: onsite_empty_bin_asset_location_id },
         bin_asset_to_location_id: { renderer: :select,
                                     options: @repo.for_select_bin_asset_locations.reject { |r| r[1] == onsite_empty_bin_asset_location_id },

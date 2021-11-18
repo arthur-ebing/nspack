@@ -48,7 +48,7 @@
             <field name="target_market" size="2" />
             <field name="farm" size="7" map_to="puc"/>
             <field name="carton_quantity" size="7" format="ZEROES" />
-            <field name="pallet_quantity" size="8" format="ZEROES" />
+            <field name="pallet_quantity" size="8" format="DECIMAL" />
             <field name="remarks" size="8" required="false" />
             <field name="mixed_indicator" size="1" default="N" />
             <field name="intake_date" size="8" format="DATE" />

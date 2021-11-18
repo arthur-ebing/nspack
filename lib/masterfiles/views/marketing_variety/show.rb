@@ -14,6 +14,7 @@ module Masterfiles
               form.view_only!
               form.add_field :marketing_variety_code
               form.add_field :description
+              form.add_field :inspection_variety
               form.add_field :active
             end
           end

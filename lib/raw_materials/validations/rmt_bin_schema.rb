@@ -58,6 +58,7 @@ module RawMaterialsApp
     optional(:cultivar_group_id).maybe(:integer)
     optional(:rmt_size_id).maybe(:integer)
     optional(:scrapped_rmt_delivery_id).maybe(:integer)
+    optional(:legacy_data).maybe(:hash)
   end
 
   UpdateRmtRebinBinSchema = Dry::Schema.Params do # rubocop:disable Metrics/BlockLength

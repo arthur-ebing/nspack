@@ -40,7 +40,9 @@ module RawMaterialsApp
       stock_type_id = repo.get_value(:stock_types, :id, stock_type_code: AppConst::BIN_STOCK_TYPE)
       bin_id = repo.get_value(:rmt_bins, :id, bin_asset_number: bin_number)
       return failed_response("Bin:#{bin_number} not found") unless bin_id
-      return failed_response("Bin:#{bin_number} belongs to another tripsheet") if insp_repo.vehicle_job_unit_in_different_tripsheet?(bin_id, vehicle_job_id) && repo.get_value(:vehicle_job_units, :vehicle_job_id, stock_item_id: bin_id, offloaded_at: nil) != vehicle_job[:items_moved_from_job_id]
+
+      stock_type_id = repo.get_id(:stock_types, stock_type_code: AppConst::BIN_STOCK_TYPE)
+      return failed_response("Bin:#{bin_number} belongs to another tripsheet") if insp_repo.vehicle_job_unit_in_different_tripsheet?(bin_id, vehicle_job_id, AppConst::BIN_STOCK_TYPE) && repo.get_value(:vehicle_job_units, :vehicle_job_id, stock_type_id: stock_type_id, stock_item_id: bin_id, offloaded_at: nil) != vehicle_job[:items_moved_from_job_id]
 
       res = validate_vehicle_job_unit_params(stock_item_id: bin_id, stock_type_id: stock_type_id, vehicle_job_id: vehicle_job_id)
       return failed_response(unwrap_failed_response(validation_failed_response(res))) if res.failure?
@@ -56,7 +58,7 @@ module RawMaterialsApp
           log_status(:rmt_bins, bin_id, "BIN_MOVED_FROM_SHEET(#{from_vehicle_job[:id]})_TO_SHEET(#{vehicle_job_id})")
         end
 
-        vehicle_job_unit_id = repo.get_value(:vehicle_job_units, :id, stock_item_id: bin_id, vehicle_job_id: vehicle_job_id)
+        vehicle_job_unit_id = repo.get_value(:vehicle_job_units, :id, stock_type_id: stock_type_id, stock_item_id: bin_id, vehicle_job_id: vehicle_job_id)
         if vehicle_job_unit_id
           insp_repo.delete_vehicle_job_unit(vehicle_job_unit_id)
           log_status(:rmt_bins, bin_id, AppConst::RMT_BIN_REMOVED_FROM_BINS_TRIPSHEET)
@@ -74,12 +76,13 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def cancel_bins_tripheet(vehicle_job_id)
+    def cancel_bins_tripheet(vehicle_job_id) # rubocop:disable Metrics/AbcSize
       offloaded_bins = insp_repo.offloaded_vehicle_job_units_size(vehicle_job_id)
       return failed_response("Couldn't cancel tripsheet: #{offloaded_bins} bins have already been offloaded") unless offloaded_bins.zero?
 
       repo.transaction do
-        bins = repo.select_values(:vehicle_job_units, :stock_item_id, vehicle_job_id: vehicle_job_id)
+        stock_type_id = repo.get_id(:stock_types, stock_type_code: AppConst::BIN_STOCK_TYPE)
+        bins = repo.select_values(:vehicle_job_units, :stock_item_id, stock_type_id: stock_type_id, vehicle_job_id: vehicle_job_id)
         insp_repo.delete_vehicle_job(vehicle_job_id)
         log_multiple_statuses(:rmt_bins, bins, AppConst::BIN_TRIPSHEET_CANCELED)
       end
@@ -91,11 +94,15 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def complete_bins_tripsheet(vehicle_job_id)
+    def complete_bins_tripsheet(vehicle_job_id) # rubocop:disable Metrics/AbcSize
+      unit1 = insp_repo.find_vehicle_job_unit_by(:vehicle_job_id, vehicle_job_id)
+      return failed_response('Cannot complete: No bins on tripsheet') if unit1.nil?
+
       repo.transaction do
+        stock_type_id = repo.get_id(:stock_types, stock_type_code: AppConst::BIN_STOCK_TYPE)
         repo.update(:vehicle_jobs, vehicle_job_id, loaded_at: Time.now)
         insp_repo.load_vehicle_job_units(vehicle_job_id)
-        log_multiple_statuses(:rmt_bins, repo.select_values(:vehicle_job_units, :stock_item_id, vehicle_job_id: vehicle_job_id), AppConst::RMT_BIN_LOADED_ON_VEHICLE)
+        log_multiple_statuses(:rmt_bins, repo.select_values(:vehicle_job_units, :stock_item_id, stock_type_id: stock_type_id, vehicle_job_id: vehicle_job_id), AppConst::RMT_BIN_LOADED_ON_VEHICLE)
       end
 
       success_response 'Tripsheet completed successfully'
@@ -106,6 +113,9 @@ module RawMaterialsApp
     end
 
     def can_continue_bin_tripsheet(vehicle_job_id)
+      res = UtilityFunctions.validate_integer_length(:tripsheet, vehicle_job_id)
+      return failed_response("Bin Tripsheet: #{unwrap_error_set(res.errors)}") if res.failure?
+
       repo.can_continue_bin_tripsheet(vehicle_job_id)
     end
 
@@ -147,6 +157,46 @@ module RawMaterialsApp
       return failed_response("Bin: #{bin_asset_number} has already been offloaded") if vju_offloaded_at
 
       success_response('ok', bin_id)
+    end
+
+    def force_bin_tripsheet_offload(vehicle_job_id) # rubocop:disable Metrics/AbcSize
+      stock_type_id = MesscadaApp::MesscadaRepo.new.get_value(:stock_types, :id, stock_type_code: AppConst::BIN_STOCK_TYPE)
+      repo.transaction do
+        vehicle_job_units = repo.select_values(:vehicle_job_units, :id, vehicle_job_id: vehicle_job_id, offloaded_at: nil)
+        bin_ids = repo.select_values(:vehicle_job_units, :stock_item_id, vehicle_job_id: vehicle_job_id, offloaded_at: nil)
+        repo.update(:vehicle_job_units, vehicle_job_units, offloaded_at: Time.now)
+        location_to_id = complete_bins_offload_vehicle(vehicle_job_id, bin_ids)
+        log_status(:vehicle_jobs, vehicle_job_id, 'OFFLOAD_FORCED')
+        success_response("Tipsheet: #{vehicle_job_id} offloaded at #{repo.get_value(:locations, :location_long_code, id: location_to_id)}", stock_type_id)
+      end
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message, stock_type_id)
+    rescue StandardError => e
+      failed_response(e.message, stock_type_id)
+    end
+
+    def offload_bins_trip(vehicle_job_id, location_id) # rubocop:disable Metrics/AbcSize
+      res = validate_bins_tripsheet_to_offload_(vehicle_job_id, location_id)
+      return res unless res.success
+
+      repo.transaction do
+        stock_type_id = MesscadaApp::MesscadaRepo.new.get_value(:stock_types, :id, stock_type_code: AppConst::BIN_STOCK_TYPE)
+        ids = repo.select_values(:vehicle_job_units, %i[id stock_item_id], vehicle_job_id: vehicle_job_id, stock_type_id: stock_type_id)
+        unit_ids = ids.map(&:first)
+        bin_ids = ids.map(&:last)
+        repo.update(:vehicle_job_units, unit_ids, offloaded_at: Time.now)
+        complete_bins_offload_vehicle(vehicle_job_id, bin_ids)
+        govt_inspection_sheet_id = repo.get(:vehicle_jobs, vehicle_job_id, :govt_inspection_sheet_id)
+        log_status(:vehicle_jobs, vehicle_job_id, 'BIN TRIP OFFLOADED')
+        log_status(:govt_inspection_sheets, govt_inspection_sheet_id, 'BIN TRIP OFFLOADED')
+        bins_moved = repo.tripsheet_bin_count(vehicle_job_id, stock_type_id)
+        location_code = repo.get(:locations, location_id, :location_long_code)
+        success_response("moved #{bins_moved} bins to location #{location_code}")
+      end
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      failed_response(e.message)
     end
 
     def offload_bin(vehicle_job_id, bin_id) # rubocop:disable Metrics/AbcSize
@@ -247,9 +297,15 @@ module RawMaterialsApp
 
     def create_rebin_groups(production_run_id, params) # rubocop:disable Metrics/AbcSize
       params = params.merge(production_run_rebin_id: production_run_id)
+      legacy_data = repo.get_value(:production_runs, :legacy_data, id: production_run_id)
+
+      if AppConst::CR_RMT.maintain_legacy_columns?
+        params[:legacy_data] = { colour: legacy_data['treatment_code'], pc_code: legacy_data['pc_code'],
+                                 cold_store_type: legacy_data['cold_store_type'], track_slms_indicator_1_code: legacy_data['track_indicator_code'],
+                                 ripe_point_code: legacy_data['ripe_point_code'] }
+      end
 
       params = calc_rebin_params(params)
-
       res = validate_rmt_rebin_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -260,10 +316,8 @@ module RawMaterialsApp
 
       created_rebins = []
       repo.transaction do
-        params.delete(:qty_bins_to_create)
         bin_asset_numbers.map(&:last).each do |bin_asset_number|
-          params[:bin_asset_number] = bin_asset_number
-          id = repo.create_rmt_bin(params)
+          id = repo.create_rmt_bin(res.to_h.merge(bin_asset_number: bin_asset_number))
           log_status(:rmt_bins, id, 'REBIN_CREATED')
           created_rebins << rmt_bin(id)
         end
@@ -276,7 +330,7 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def create_rebin(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+    def create_rebin(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       bin_asset = repo.get_available_bin_asset_numbers(1)
       bin_asset_id = bin_asset.map(&:last).last
       params[:bin_asset_number] = bin_asset.map(&:last).first
@@ -284,7 +338,7 @@ module RawMaterialsApp
 
       vres = validate_bin_asset_no_format(params)
       return vres unless vres.success
-      return failed_response("Scanned Bin Number:#{params[:bin_asset_number]} is already in stock") if AppConst::USE_PERMANENT_RMT_BIN_BARCODES && !bin_asset_number_available?(params[:bin_asset_number])
+      return failed_response("Scanned Bin Number:#{params[:bin_asset_number]} is already in stock") unless bin_asset_number_available?(params[:bin_asset_number])
 
       params = calc_rebin_params(params)
 
@@ -327,10 +381,10 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def create_rmt_bin(delivery_id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity,  Metrics/PerceivedComplexity
+    def create_rmt_bin(delivery_id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       vres = validate_bin_asset_no_format(params)
       return vres unless vres.success
-      return failed_response("Scanned Bin Number:#{params[:bin_asset_number]} is already in stock") if AppConst::USE_PERMANENT_RMT_BIN_BARCODES && !bin_asset_number_available?(params[:bin_asset_number])
+      return failed_response("Scanned Bin Number:#{params[:bin_asset_number]} is already in stock") unless bin_asset_number_available?(params[:bin_asset_number])
 
       delivery = find_rmt_delivery(delivery_id)
       params = params.merge(get_header_inherited_field(delivery, params[:rmt_container_type_id]))
@@ -344,7 +398,7 @@ module RawMaterialsApp
 
         unless params[:gross_weight].nil_or_empty?
           options = { force_find_by_id: false, weighed_manually: true, avg_gross_weight: false }
-          bin_number = (AppConst::USE_PERMANENT_RMT_BIN_BARCODES ? res.to_h[:bin_asset_number] : id)
+          bin_number = res.to_h[:bin_asset_number]
           attrs = { bin_number: bin_number, gross_weight: params[:gross_weight].to_i }
           rw_res = MesscadaApp::UpdateBinWeights.call(attrs, options)
           raise rw_res.message unless rw_res.success
@@ -364,7 +418,6 @@ module RawMaterialsApp
     end
 
     def validate_bin_asset_no_format(params)
-      return ok_response unless AppConst::USE_PERMANENT_RMT_BIN_BARCODES
       return validation_failed_response(OpenStruct.new(messages: { bin_asset_number: ['is not in a valid format'] })) unless bin_asset_regex_check_ok?(params[:bin_asset_number])
 
       ok_response
@@ -571,6 +624,9 @@ module RawMaterialsApp
       return failed_response("Scanned Bin:#{bin_number} is not in stock") unless bin
       return failed_response("Scanned Bin:#{bin_number} has been tipped") if bin[:bin_tipped]
 
+      stock_type_id = repo.get_id(:stock_types, stock_type_code: AppConst::BIN_STOCK_TYPE)
+      return failed_response("Cannot move bin: #{bin_number}. Bin is on a tripsheet") if repo.exists?(:vehicle_job_units, stock_type_id: stock_type_id, stock_item_id: bin[:id], offloaded_at: nil)
+
       success_response('Valid Bin Scanned',
                        bin)
     rescue Crossbeams::InfoError => e
@@ -604,9 +660,7 @@ module RawMaterialsApp
     end
 
     def find_rmt_bin_by_id_or_asset_number(bin_number)
-      return repo.find_bin_by_asset_number(bin_number) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
-
-      repo.find_rmt_bin_stock(bin_number)
+      repo.find_bin_by_asset_number(bin_number)
     end
 
     def find_container_material_owners_by_container_material_type(container_material_type_id)
@@ -779,16 +833,71 @@ module RawMaterialsApp
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("#{__method__} #{bin_number}, Loc: #{location}"))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("#{__method__} #{bin_number}, Loc: #{location_id}"))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
     end
 
+    def rmt_bin_attrs_for_display(rmt_bin_id)
+      bin = repo.find_rmt_bin_flat(rmt_bin_id).to_h
+      bin[:bin_load_id] = repo.get(:bin_load_products, bin[:bin_load_product_id], :bin_load_id)
+      bin[:material_owner] = repo.container_material_owner_for(bin[:rmt_material_owner_party_role_id], bin[:rmt_container_material_type_id])
+      bin[:presort_unit] = repo.presort_unit_for(bin[:presort_staging_run_child_id])
+      bin
+    end
+
+    def move_forklift_bins(bin_numbers, location_id) # rubocop:disable Metrics/AbcSize
+      location_code = location_short_code_for(location_id)
+      return failed_response("Maximum units for location :#{location_code} has been exceeded") if repo.maximum_units_exceeded_for_location?(location_id, bin_numbers.length)
+
+      location_bin_numbers = repo.select_values(:rmt_bins, :bin_asset_number, bin_asset_number: bin_numbers, location_id: location_id)
+      return failed_response("Following bins are already at this location: \n #{location_bin_numbers.join(', ')}") unless location_bin_numbers.nil_or_empty?
+
+      repo.transaction do
+        bin_numbers.each do |bin_number|
+          bin = find_rmt_bin_by_id_or_asset_number(bin_number)
+
+          res = FinishedGoodsApp::MoveStock.call(AppConst::BIN_STOCK_TYPE, bin[:id], location_id, 'MOVE_BIN', nil)
+          raise Crossbeams::InfoError, res.message unless res.success
+        end
+      end
+      success_response("#{bin_numbers.length} bins have been moved to location #{location_code}")
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("#{__method__} #{bin_numbers.join(',')}, Loc: #{location_code}"))
+      puts e.message
+      puts e.backtrace.join("\n")
+      failed_response(e.message)
+    end
+
+    def validate_print_rebin_labels(params)
+      res = validate_print_rebin_labels_params(params)
+      return validation_failed_response(res) if res.failure?
+
+      success_response('ok', res.to_h)
+    end
+
+    def print_run_rebin_labels(rebin_ids, params)
+      return failed_response('Rebin selection cannot be empty') if rebin_ids.nil_or_empty?
+
+      label_name = repo.get(:label_templates, params[:label_template_id], :label_template_name)
+      print_params = { no_of_prints: 1, printer: params[:printer] }
+
+      res = nil
+      rebin_ids.each do |rebin_id|
+        instance = repo.rebin_label_printing_instance(rebin_id)
+        res = LabelPrintingApp::PrintLabel.call(label_name, instance, print_params)
+        return res unless res.success
+      end
+      success_response('Rebin Labels Printed Successfully', rebin_ids.join(','))
+    end
+
     private
 
     def calc_rebin_params(params) # rubocop:disable Metrics/AbcSize
-      default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE)
+      default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DEFAULT_RMT_CONTAINER_TYPE)
       if default_rmt_container_type
         params[:rmt_container_type_id] = default_rmt_container_type[:id]
         params[:rmt_inner_container_type_id] = default_rmt_container_type[:rmt_inner_container_type_id]
@@ -881,6 +990,13 @@ module RawMaterialsApp
 
     def validate_vehicle_job_unit_params(params)
       FinishedGoodsApp::VehicleJobUnitSchema.call(params)
+    end
+
+    def validate_print_rebin_labels_params(params)
+      Dry::Schema.Params do
+        optional(:printer).filled(:integer)
+        required(:label_template_id).filled(:integer)
+      end.call(params)
     end
   end
 end

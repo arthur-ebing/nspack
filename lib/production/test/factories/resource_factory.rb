@@ -13,7 +13,7 @@ module ProductionApp
       packhouse_no = opts.delete(:packhouse_no) || 1
       gln = opts.delete(:gln) || '11111111'
       phc = opts.delete(:phc) || '1111'
-      DB["create sequence public.gln_seq_for_#{gln}"].first
+      DB.run("CREATE SEQUENCE IF NOT EXISTS public.gln_seq_for_#{gln};")
 
       default = {
         plant_resource_code: Faker::Lorem.unique.word,

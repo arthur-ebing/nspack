@@ -42,17 +42,25 @@ module MasterfilesApp
 
     def delete_farm(id) # rubocop:disable Metrics/AbcSize
       name = farm(id).farm_code
+      location_id = farm_location_id(id)
       repo.transaction do
         repo.delete_farm(id)
-        location_repo.delete_location(farm_location_id(id)) if AppConst::CR_RMT.create_farm_location?
         log_status(:farms, id, 'DELETED')
         log_transaction
       end
+      delete_farm_location(location_id) if AppConst::CR_RMT.create_farm_location?
       success_response("Deleted farm #{name}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue Sequel::ForeignKeyConstraintViolation => e
       failed_response("Unable to delete farm. It is still referenced#{e.message.partition('referenced').last}")
+    end
+
+    def delete_farm_location(location_id)
+      location_repo.delete_location(location_id)
+      ok_response
+    rescue Sequel::ForeignKeyConstraintViolation => e
+      puts e.message
     end
 
     def create_farm_section(farm_id, params) # rubocop:disable Metrics/AbcSize

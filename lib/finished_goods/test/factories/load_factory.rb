@@ -35,6 +35,7 @@ module FinishedGoodsApp
         shipped: false,
         transfer_load: false,
         active: true,
+        truck_must_be_weighed: false,
         created_at: '2010-01-01 12:00',
         updated_at: '2010-01-01 12:00'
       }

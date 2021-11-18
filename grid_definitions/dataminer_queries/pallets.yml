@@ -585,7 +585,7 @@
   marketing_variety:
     :name: marketing_variety
     :sequence_no: 35
-    :caption: Mkt Var
+    :caption: Marketing Variety
     :namespaced_name: marketing_variety
     :data_type: :string
     :width: 80

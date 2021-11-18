@@ -31,6 +31,7 @@ module Production
                     col.add_field :shift_type_code
                     col.add_field :running_hours
                     col.add_field :id
+                    col.add_field :foreman_party_role_id
                   end
                   row.column do |col|
                     col.add_field :start_date_time

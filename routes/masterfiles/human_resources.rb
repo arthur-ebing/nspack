@@ -419,6 +419,8 @@ class Nspack < Roda
               day_night_or_custom
               shift_type_code
               plant_resource_code
+              starting_quarter
+              ending_quarter
             ]
             add_grid_row(attrs: select_attributes(res.instance, row_keys),
                          notice: res.message)

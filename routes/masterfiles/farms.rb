@@ -26,7 +26,13 @@ class Nspack < Roda
         r.patch do     # UPDATE
           res = interactor.update_production_region(id, params[:production_region])
           if res.success
-            update_grid_row(id, changes: { production_region_code: res.instance[:production_region_code], description: res.instance[:description] }, notice: res.message)
+            row_keys = %i[
+              id
+              production_region_code
+              description
+              inspection_region
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::Farms::ProductionRegion::Edit.call(id, form_values: params[:production_region], form_errors: res.errors) }
           end
@@ -57,6 +63,7 @@ class Nspack < Roda
             id
             production_region_code
             description
+            inspection_region
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)
