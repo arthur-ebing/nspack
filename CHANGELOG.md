@@ -8,9 +8,25 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Added
 ### Changed
+### Fixed
+
+## [1.0.3] - 2021-11-18
+### Added
+- Changes for Kromco go-live (Presort, staging runs, MAF integration, HW integration, RMT legacy data
+- Pallet weights can use derived masterfile weights
+- Bin asset control
+- FG Orders
+- Beep sound in RMD forms when validation etc fails
+- RMF forms can be submitted automatically once a set of inputs have all received values
+- CA treatment locations - set status of location and bins in location
+- Move stock service
+- Depot pallet buildups
+- Lock pallets via WIP status
+- Reporting industry setting "apples"
+- Reprint carton labels from a sequence/pallet when pallet has individual cartons
+### Changed
 - Dataminer admin menu options moved to a separate `Manage` program.
 - RMD forms emit a beep when errors occur.
-### Fixed
 
 ## [1.0.2] - 2021-10-05
 ### Added
