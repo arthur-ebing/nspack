@@ -985,11 +985,10 @@ module ProductionApp
         params[:standard_pack_code_id] = standard_pack_id
       end
 
-      res = validate_reworks_run_pallet_sequence_params(params)
+      params[:fruit_actual_counts_for_pack_id] = find_fruit_actual_counts_for_pack_id(params[:basic_pack_code_id].to_i, params[:std_fruit_size_count_id].to_i)
+      res = SequenceSetupDataContract.new.call(params)
       return validation_failed_response(res) if res.failure?
-      return failed_response('You did not choose a Size Reference or Actual Count') if params[:fruit_size_reference_id].to_i.nonzero?.nil? && params[:fruit_actual_counts_for_pack_id].to_i.nonzero?.nil?
 
-      res = res.to_h.merge(fruit_actual_counts_for_pack_id: find_fruit_actual_counts_for_pack_id(res[:basic_pack_code_id], res[:std_fruit_size_count_id]))
       rejected_fields = %i[id product_setup_template_id pallet_label_name]
       attrs = res.to_h.reject { |k, _| rejected_fields.include?(k) }
 
@@ -2306,10 +2305,6 @@ module ProductionApp
 
     def validate_update_pallet_params(params)
       ReworksRunUpdatePalletSchema.call(params)
-    end
-
-    def validate_reworks_run_pallet_sequence_params(params)
-      SequenceSetupDataSchema.call(params)
     end
 
     def validate_update_reworks_production_run_params(params)

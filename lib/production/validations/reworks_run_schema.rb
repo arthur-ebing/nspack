@@ -90,44 +90,6 @@ module ProductionApp # rubocop:disable Metrics/ModuleLength
     required(:gross_weight).filled(:decimal)
   end
 
-  SequenceSetupDataSchema = Dry::Schema.Params do # rubocop:disable Metrics/BlockLength
-    optional(:id).filled(:integer)
-    required(:marketing_variety_id).filled(:integer)
-    required(:customer_variety_id).maybe(:integer)
-    required(:std_fruit_size_count_id).maybe(:integer)
-    required(:basic_pack_code_id).filled(:integer)
-    required(:standard_pack_code_id).filled(:integer)
-    required(:fruit_size_reference_id).maybe(:integer)
-    required(:marketing_org_party_role_id).filled(:integer)
-    required(:packed_tm_group_id).filled(:integer)
-    required(:mark_id).filled(:integer)
-    required(:inventory_code_id).maybe(:integer)
-    required(:pallet_format_id).filled(:integer)
-    required(:cartons_per_pallet_id).filled(:integer)
-    optional(:pm_bom_id).maybe(:integer)
-    # required(:extended_columns).maybe(:hash)
-    required(:client_size_reference).maybe(Types::StrippedString)
-    required(:client_product_code).maybe(Types::StrippedString)
-    optional(:treatment_ids).maybe(:array).maybe { each(:integer) }
-    required(:marketing_order_number).maybe(Types::StrippedString)
-    required(:sell_by_code).maybe(Types::StrippedString)
-    required(:pallet_label_name).maybe(Types::StrippedString)
-    required(:grade_id).maybe(:integer)
-    required(:product_chars).maybe(Types::StrippedString)
-    optional(:pm_type_id).maybe(:integer)
-    optional(:pm_subtype_id).maybe(:integer)
-    required(:target_market_id).maybe(:integer)
-    optional(:pm_mark_id).maybe(:integer)
-    optional(:rmt_class_id).maybe(:integer)
-    optional(:packing_specification_item_id).maybe(:integer)
-    optional(:tu_labour_product_id).maybe(:integer)
-    optional(:ru_labour_product_id).maybe(:integer)
-    optional(:fruit_sticker_ids).maybe(:array).maybe { each(:integer) }
-    optional(:tu_sticker_ids).maybe(:array).maybe { each(:integer) }
-    optional(:target_customer_party_role_id).maybe(:integer)
-    optional(:colour_percentage_id).maybe(:integer)
-  end
-
   ReworksRunUpdatePalletSchema = Dry::Schema.Params do
     required(:reworks_run_type_id).filled(:integer)
     required(:pallet_number).maybe(Types::StrippedString)
@@ -288,5 +250,50 @@ module ProductionApp # rubocop:disable Metrics/ModuleLength
     required(:pallet_id).filled(:integer)
     required(:printer).filled(:integer)
     required(:label_template_id).filled(:integer)
+  end
+
+  class SequenceSetupDataContract < Dry::Validation::Contract
+    params do # rubocop:disable Metrics/BlockLength
+      optional(:id).filled(:integer)
+      required(:marketing_variety_id).filled(:integer)
+      required(:customer_variety_id).maybe(:integer)
+      required(:std_fruit_size_count_id).maybe(:integer)
+      required(:basic_pack_code_id).filled(:integer)
+      required(:standard_pack_code_id).filled(:integer)
+      required(:fruit_size_reference_id).maybe(:integer)
+      required(:marketing_org_party_role_id).filled(:integer)
+      required(:packed_tm_group_id).filled(:integer)
+      required(:mark_id).filled(:integer)
+      required(:inventory_code_id).maybe(:integer)
+      required(:pallet_format_id).filled(:integer)
+      required(:cartons_per_pallet_id).filled(:integer)
+      optional(:pm_bom_id).maybe(:integer)
+      # required(:extended_columns).maybe(:hash)
+      required(:client_size_reference).maybe(Types::StrippedString)
+      required(:client_product_code).maybe(Types::StrippedString)
+      optional(:treatment_ids).maybe(:array).maybe { each(:integer) }
+      required(:marketing_order_number).maybe(Types::StrippedString)
+      required(:sell_by_code).maybe(Types::StrippedString)
+      required(:pallet_label_name).maybe(Types::StrippedString)
+      required(:grade_id).maybe(:integer)
+      required(:product_chars).maybe(Types::StrippedString)
+      optional(:pm_type_id).maybe(:integer)
+      optional(:pm_subtype_id).maybe(:integer)
+      required(:target_market_id).maybe(:integer)
+      optional(:pm_mark_id).maybe(:integer)
+      optional(:rmt_class_id).maybe(:integer)
+      optional(:packing_specification_item_id).maybe(:integer)
+      optional(:tu_labour_product_id).maybe(:integer)
+      optional(:ru_labour_product_id).maybe(:integer)
+      optional(:fruit_sticker_ids).maybe(:array).maybe { each(:integer) }
+      optional(:tu_sticker_ids).maybe(:array).maybe { each(:integer) }
+      optional(:target_customer_party_role_id).maybe(:integer)
+      optional(:colour_percentage_id).maybe(:integer)
+      required(:fruit_actual_counts_for_pack_id).maybe(:integer)
+    end
+
+    rule(:fruit_size_reference_id, :fruit_actual_counts_for_pack_id) do
+      key.failure 'Please choose either an Actual Count or Size Reference' if values[:fruit_size_reference_id].nil_or_empty? && values[:fruit_actual_counts_for_pack_id].nil_or_empty?
+    end
   end
 end
