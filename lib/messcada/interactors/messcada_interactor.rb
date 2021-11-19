@@ -338,8 +338,14 @@ module MesscadaApp
 
       cvl_res = nil
       repo.transaction do
-        cvl_res = MesscadaApp::CartonVerification.call(@user, res)
-        cvl_res = MesscadaApp::CartonWeighing.call(res)
+        cvl_res = MesscadaApp::CartonVerification.call(@user, res[:carton_number])
+        raise Crossbeams::InfoError, cvl_res.message unless cvl_res.success
+
+        attrs = res.to_h
+        attrs[:carton_number] = cvl_res.instance[:carton_label_id]
+        cvl_res = MesscadaApp::CartonWeighing.call(attrs)
+        raise Crossbeams::InfoError, cvl_res.message unless cvl_res.success
+
         log_transaction
       end
       cvl_res
@@ -355,7 +361,7 @@ module MesscadaApp
       failed_response(e.message)
     end
 
-    def carton_verification_and_weighing_and_labeling(params, request_ip) # rubocop:disable Metrics/AbcSize
+    def carton_verification_and_weighing_and_labeling(params, request_ip) # rubocop:disable Metrics/AbcSize,  Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       res = CartonVerificationAndWeighingSchema.call(params)
       return validation_failed_response(res) if res.failure?
 
@@ -364,9 +370,17 @@ module MesscadaApp
 
       cvl_res = nil
       repo.transaction do
-        cvl_res = MesscadaApp::CartonVerification.call(@user, res)
-        cvl_res = MesscadaApp::CartonWeighing.call(res)
-        cvl_res = MesscadaApp::CartonLabelPrinting.call(res, request_ip)
+        cvl_res = MesscadaApp::CartonVerification.call(@user, res[:carton_number])
+        raise Crossbeams::InfoError, cvl_res.message unless cvl_res.success
+
+        attrs = res.to_h
+        attrs[:carton_number] = cvl_res.instance[:carton_label_id]
+        cvl_res = MesscadaApp::CartonWeighing.call(attrs)
+        raise Crossbeams::InfoError, cvl_res.message unless cvl_res.success
+
+        cvl_res = MesscadaApp::CartonLabelPrinting.call(attrs, request_ip)
+        raise Crossbeams::InfoError, cvl_res.message unless cvl_res.success
+
         log_transaction
       end
       cvl_res
