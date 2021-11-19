@@ -58,7 +58,7 @@ module UiRules
         fruit_sticker_ids: { renderer: :multi,
                              caption: 'Fruit Stickers',
                              options: @bom_repo.for_select_pm_products(
-                               where: { subtype_code: AppConst::PM_SUBTYPE_FRUIT_STICKER }
+                               where: { pm_type_code: AppConst::PM_TYPE_STICKER }
                              ),
                              selected: @form_object.fruit_sticker_ids,
                              required: false },
