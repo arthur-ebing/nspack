@@ -584,6 +584,40 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
     [dataset.columns, dataset.all]
   end
 
+  # Move a node from one position in a tree hierarchy to another.
+  # Note: you cannot move a node lower down the hierarchy.
+  #
+  # @param tree_table [symbol] the name of the table that defines the hierarchy.
+  # @param descendant_col [symbol] the name of the descendant column in the tree table.
+  # @param ancestor_col [symbol] the name of the ancestor column in the tree table.
+  # @param node_id [integer] the id of the row in the associated table.
+  # @param new_parent_id [integer] the id of the node that will become the new parent of the node.
+  # @return [void]
+  def move_tree_node(tree_table, descendant_col, ancestor_col, node_id, new_parent_id)
+    raise Crossbeams::InfoError, 'This node cannot be moved to its own descendant' unless DB[:tree_plant_resources].where(ancestor_plant_resource_id: node_id, descendant_plant_resource_id: new_parent_id).first.nil?
+
+    del_query = <<~SQL
+      DELETE FROM #{tree_table}
+      WHERE #{descendant_col} IN (SELECT #{descendant_col}
+                                  FROM #{tree_table}
+                                  WHERE #{ancestor_col} = ?)
+      AND #{ancestor_col} IN (SELECT #{ancestor_col}
+                              FROM #{tree_table}
+                              WHERE #{descendant_col} = ?
+                              AND #{ancestor_col} != #{descendant_col})
+    SQL
+    ins_query = <<~SQL
+      INSERT INTO #{tree_table} (#{ancestor_col}, #{descendant_col}, path_length)
+      SELECT supertree.#{ancestor_col}, subtree.#{descendant_col}, supertree.path_length + 1
+      FROM #{tree_table} AS supertree
+      CROSS JOIN #{tree_table} AS subtree
+      WHERE supertree.#{descendant_col} = ?
+        AND subtree.#{ancestor_col} = ?
+    SQL
+    DB[del_query, node_id, node_id].delete
+    DB[ins_query, new_parent_id, node_id].insert
+  end
+
   def self.inherited(klass)
     klass.extend(MethodBuilder)
   end
