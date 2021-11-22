@@ -35,6 +35,8 @@ class Nspack < Roda
       redirect_to_last_grid(r)
     end
 
+    # MANUAL INTAKES (POs)
+    # --------------------------------------------------------------------------
     r.on 'create_manual_intake' do
       id = interactor.create_manual_intake
       r.redirect "/edi/actions/edit_manual_intake/#{id}"
@@ -57,19 +59,6 @@ class Nspack < Roda
         res = interactor.add_manual_intake_row(id)
         if res.success
           r.redirect "/edi/actions/edit_manual_intake/#{id}"
-          # row_keys = %i[
-          #   id
-          #   record_type
-          #   sscc
-          #   seq_no
-          #   farm
-          #   mark
-          #   pack
-          #   grade
-          #   orgzn
-          # ]
-          # add_grid_row(attrs: select_attributes(res.instance, row_keys),
-          #              notice: res.message)
         else
           show_json_error(res.message)
         end
@@ -82,7 +71,8 @@ class Nspack < Roda
       r.patch do
         res = interactor.update_edi_manual_intake_header(id, params[:manual_intake])
         if res.success
-          redirect_to_last_grid(r)
+          flash[:notice] = res.message
+          r.redirect "/edi/actions/edit_manual_intake/#{id}"
         else
           re_show_form(r, res) { Edi::Actions::Edit::ManualIntake.call(id, form_values: params[:manual_intake], form_errors: res.errors) }
         end
