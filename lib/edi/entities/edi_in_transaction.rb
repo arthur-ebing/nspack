@@ -16,5 +16,8 @@ module EdiApp
     attribute :reprocessed, Types::Bool
     attribute :notes, Types::String
     attribute :match_data, Types::String
+    attribute :recordset, Types::Hash.optional
+    attribute :manual_process, Types::Bool
+    attribute :manual_header, Types::Hash.optional
   end
 end

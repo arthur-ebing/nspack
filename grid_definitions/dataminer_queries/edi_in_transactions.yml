@@ -1,13 +1,13 @@
 ---
 :caption: EDI In Transactions
 :sql: "SELECT\r\n    id,\r\n    flow_type,\r\n    file_name,\r\n    created_at,\r\n
-  \   complete,\r\n    schema_valid,\r\n    valid,\r\n    reprocessed,\r\n    newer_edi_received,\r\n
-  \   has_missing_master_files AS missing_master_files,\r\n    has_discrepancies AS
-  discrepancies,\r\n    error_message,\r\n    notes,\r\n    match_data,\r\n    backtrace,\r\n
-  \   updated_at,\r\n    CASE\r\n        WHEN complete THEN 'green'\r\n        WHEN
-  newer_edi_received THEN 'gray'\r\n        WHEN has_missing_master_files THEN 'orange'\r\n
-  \       WHEN has_discrepancies THEN 'orange'\r\n    END AS colour_rule\r\nFROM\r\n
-  \   edi_in_transactions\r\nORDER BY id DESC"
+  \   complete,\r\n    manual_process,\r\n    schema_valid,\r\n    valid,\r\n    reprocessed,\r\n
+  \   newer_edi_received,\r\n    has_missing_master_files AS missing_master_files,\r\n
+  \   has_discrepancies AS discrepancies,\r\n    error_message,\r\n    notes,\r\n
+  \   match_data,\r\n    backtrace,\r\n    updated_at,\r\n    CASE\r\n        WHEN
+  complete THEN 'green'\r\n        WHEN newer_edi_received THEN 'gray'\r\n        WHEN
+  has_missing_master_files THEN 'orange'\r\n        WHEN has_discrepancies THEN 'orange'\r\n
+  \   END AS colour_rule\r\nFROM\r\n    edi_in_transactions\r\nORDER BY id DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -96,9 +96,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  manual_process:
+    :name: manual_process
+    :sequence_no: 6
+    :caption: Manual process
+    :namespaced_name: manual_process
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   schema_valid:
     :name: schema_valid
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Schema valid
     :namespaced_name: schema_valid
     :data_type: :boolean
@@ -114,7 +130,7 @@
     :group_max: false
   valid:
     :name: valid
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Valid
     :namespaced_name: valid
     :data_type: :boolean
@@ -130,7 +146,7 @@
     :group_max: false
   reprocessed:
     :name: reprocessed
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Reprocessed
     :namespaced_name: reprocessed
     :data_type: :boolean
@@ -146,7 +162,7 @@
     :group_max: false
   newer_edi_received:
     :name: newer_edi_received
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Newer EDI received
     :namespaced_name: newer_edi_received
     :data_type: :boolean
@@ -162,7 +178,7 @@
     :group_max: false
   missing_master_files:
     :name: missing_master_files
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Missing master files
     :namespaced_name: has_missing_master_files
     :data_type: :boolean
@@ -178,7 +194,7 @@
     :group_max: false
   discrepancies:
     :name: discrepancies
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Discrepancies
     :namespaced_name: has_discrepancies
     :data_type: :boolean
@@ -194,7 +210,7 @@
     :group_max: false
   error_message:
     :name: error_message
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Error message
     :namespaced_name: error_message
     :data_type: :string
@@ -210,7 +226,7 @@
     :group_max: false
   notes:
     :name: notes
-    :sequence_no: 13
+    :sequence_no: 14
     :caption: Notes
     :namespaced_name: notes
     :data_type: :string
@@ -226,7 +242,7 @@
     :group_max: false
   match_data:
     :name: match_data
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: Match data
     :namespaced_name: match_data
     :data_type: :string
@@ -242,7 +258,7 @@
     :group_max: false
   backtrace:
     :name: backtrace
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Backtrace
     :namespaced_name: backtrace
     :data_type: :string
@@ -258,7 +274,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 16
+    :sequence_no: 17
     :caption: Updated at
     :namespaced_name: updated_at
     :data_type: :datetime
@@ -274,7 +290,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 17
+    :sequence_no: 18
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
@@ -316,19 +332,23 @@
 - :column: edi_in_transactions.complete
   :caption: Complete
   :data_type: :boolean
-  :control_type: :text
+  :control_type: :list
   :default_value: 
   :ordered_list: false
   :ui_priority: 1
   :list_def: 
+  - true
+  - false
 - :column: edi_in_transactions.reprocessed
   :caption: Reprocessed
   :data_type: :boolean
-  :control_type: :text
+  :control_type: :list
   :default_value: 
   :ordered_list: false
   :ui_priority: 1
   :list_def: 
+  - true
+  - false
 - :column: edi_in_transactions.created_at
   :caption: Date created
   :data_type: :datetime
@@ -337,3 +357,13 @@
   :ordered_list: false
   :ui_priority: 1
   :list_def: 
+- :column: edi_in_transactions.manual_process
+  :caption: Manual process
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+  - true
+  - false

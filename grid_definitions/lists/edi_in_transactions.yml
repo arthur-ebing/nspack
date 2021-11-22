@@ -4,6 +4,7 @@
   :conditions:
     :errors: EDI IN errors
     :today: EDI IN transactions for today
+    :manual_intakes: Manual Intakes
 :actions:
 - :url: "/edi/receipts/edi_in_transactions/$:id$"
   :text: view
@@ -15,11 +16,32 @@
   :text: view file
   :icon: document-add
   :title: View file
+  :hide_if_true: manual_process
 - :url: "/edi/actions/re_receive_in_transaction/$:id$"
   :text: re-process this file
   :icon: play
   :hide_if_true: complete,reprocessed
   :prompt: Are you sure?
+  :hide_if_true: manual_process
+- :url: "/edi/actions/edit_manual_intake/$:id$"
+  :text: Edit manual intake
+  :icon: edit
+  :hide_if_true: complete,reprocessed
+  :hide_if_false: manual_process
+- :separator: true
+- :url: "/edi/actions/process_manual_transaction/$:id$"
+  :text: Process manual transaction
+  :icon: play
+  :hide_if_true: complete,reprocessed
+  :prompt: Are you sure?
+  :hide_if_false: manual_process
+:page_controls:
+- :control_type: :link
+  :url: "/edi/actions/create_manual_intake"
+  :text: New manual intake
+  :style: :button
+  :show_for_key:
+    - manual_intakes
 :conditions:
   :errors:
     - :col: edi_in_transactions.complete
@@ -35,3 +57,10 @@
     - :col: edi_in_transactions.created_at
       :op: '<='
       :val: $:END_OF_DAY$
+  :manual_intakes:
+    - :col: edi_in_transactions.manual_process
+      :op: '='
+      :val: true
+    - :col: edi_in_transactions.complete
+      :op: '='
+      :val: false

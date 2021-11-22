@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-class BaseEdiInService < BaseService
-  attr_reader :flow_type, :edi_in_transaction, :edi_records, :file_name, :logger
+class BaseEdiInService < BaseService # rubocop:disable Metrics/ClassLength
+  attr_reader :flow_type, :edi_in_transaction, :edi_records, :file_name, :logger, :process_from_recordset
 
   def initialize(id, file_path, logger, edi_result)
     @logger = logger
@@ -10,10 +10,19 @@ class BaseEdiInService < BaseService
     @_edi_in_repo = EdiApp::EdiInRepo.new
     @edi_in_transaction = @_edi_in_repo.find_edi_in_transaction(id)
     @flow_type = edi_in_transaction.flow_type
-    build_records(file_path)
+    if @edi_in_transaction.manual_process
+      @process_from_recordset = true
+      @edi_records = @edi_in_transaction.recordset.map { |rec| UtilityFunctions.symbolize_keys(rec) }
+      @edi_result[:recordset] = @edi_records
+    else
+      @process_from_recordset = false
+      build_records(file_path)
+    end
   end
 
   def missing_required_fields(only_rows: nil)
+    return if process_from_recordset
+
     @flat_file_repo.missing_required_fields(only_rows: Array(only_rows))
   rescue Crossbeams::InfoError => e
     @edi_result.schema_valid = false
