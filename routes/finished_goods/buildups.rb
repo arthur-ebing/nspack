@@ -9,40 +9,7 @@ class Nspack < Roda
     # --------------------------------------------------------------------------
     r.on 'pallet_buildup' do
       r.get do
-        form_state = {}
-        if (error = retrieve_from_local_store(:error))
-          form_state.merge!(error_message: error.message)
-          form_state.merge!(errors: error.errors) unless error.errors.nil_or_empty?
-        end
-
-        form = Crossbeams::RMDForm.new(form_state,
-                                       form_name: :buildup,
-                                       notes: nil,
-                                       scan_with_camera: @rmd_scan_with_camera,
-                                       caption: 'Pallet Buildup',
-                                       action: '/rmd/buildups/pallet_buildup',
-                                       button_caption: 'Next')
-
-        form.behaviours do |behaviour|
-          behaviour.input_change :auto_create_destination_pallet,
-                                 notify: [{ url: '/rmd/buildups/auto_create_destination_pallet_clicked' }]
-        end
-
-        form.add_field(:pallet_number, 'Destination Pallet', scan: 'key248_all', scan_type: :pallet_number, submit_form: false, data_type: :number, required: false)
-        form.add_toggle(:auto_create_destination_pallet, 'Auto Create Destination Pallet')
-        form.add_field(:qty_to_move, 'Qty Cartons To Move', data_type: :number, required: true)
-        form.add_field(:p1, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: false, data_type: :number, required: true)
-        form.add_field(:p2, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: false, data_type: :number, required: false)
-        form.add_field(:p3, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: false, data_type: :number, required: false)
-        form.add_field(:p4, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: false, data_type: :number, required: false)
-        form.add_field(:p5, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: false, data_type: :number, required: false)
-        form.add_field(:p6, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: false, data_type: :number, required: false)
-        form.add_field(:p7, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: false, data_type: :number, required: false)
-        form.add_field(:p8, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: false, data_type: :number, required: false)
-        form.add_field(:p9, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: false, data_type: :number, required: false)
-        form.add_field(:p10, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: false, data_type: :number, required: false)
-        form.add_csrf_tag csrf_tag
-        view(inline: form.render, layout: :layout_rmd)
+        plan_pallet_buildup_form('/rmd/buildups/pallet_buildup')
       end
 
       r.post do
@@ -272,6 +239,43 @@ class Nspack < Roda
       form.add_button('Rejoin', "/rmd/buildups/rejoin/#{id}")
     end
     form.add_section_header("Do you want to #{rejoin_label} Cancel this process?")
+    form.add_csrf_tag csrf_tag
+    view(inline: form.render, layout: :layout_rmd)
+  end
+
+  def plan_pallet_buildup_form(submit_action) # rubocop:disable Metrics/AbcSize
+    form_state = {}
+    if (error = retrieve_from_local_store(:error))
+      form_state.merge!(error_message: error.message)
+      form_state.merge!(errors: error.errors) unless error.errors.nil_or_empty?
+    end
+
+    form = Crossbeams::RMDForm.new(form_state,
+                                   form_name: :buildup,
+                                   notes: nil,
+                                   scan_with_camera: @rmd_scan_with_camera,
+                                   caption: 'Pallet Buildup',
+                                   action: submit_action,
+                                   button_caption: 'Next')
+
+    form.behaviours do |behaviour|
+      behaviour.input_change :auto_create_destination_pallet,
+                             notify: [{ url: '/rmd/buildups/auto_create_destination_pallet_clicked' }]
+    end
+
+    form.add_field(:pallet_number, 'Destination Pallet', scan: 'key248_all', scan_type: :pallet_number, submit_form: false, data_type: :number, required: false)
+    form.add_toggle(:auto_create_destination_pallet, 'Auto Create Destination Pallet')
+    form.add_field(:qty_to_move, 'Qty Cartons To Move', data_type: :number, required: true)
+    form.add_field(:p1, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: false, data_type: :number, required: true)
+    form.add_field(:p2, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: false, data_type: :number, required: false)
+    form.add_field(:p3, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: false, data_type: :number, required: false)
+    form.add_field(:p4, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: false, data_type: :number, required: false)
+    form.add_field(:p5, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: false, data_type: :number, required: false)
+    form.add_field(:p6, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: false, data_type: :number, required: false)
+    form.add_field(:p7, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: false, data_type: :number, required: false)
+    form.add_field(:p8, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: false, data_type: :number, required: false)
+    form.add_field(:p9, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: false, data_type: :number, required: false)
+    form.add_field(:p10, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: false, data_type: :number, required: false)
     form.add_csrf_tag csrf_tag
     view(inline: form.render, layout: :layout_rmd)
   end

@@ -483,6 +483,23 @@ module MesscadaApp
       DB[:pallet_sequences].where(attrs).get(:id)
     end
 
+    def contains_sequence?(pallet_id, sequence_id)
+      !matching_sequence(pallet_id, sequence_id).nil?
+    end
+
+    def matching_sequence(pallet_id, sequence_id)
+      attrs = DB[:pallet_sequences].where(id: sequence_id).first
+      return nil unless attrs
+
+      attrs[:pallet_id] = pallet_id
+      res = SequencesMatchSchema.call(attrs)
+      raise Crossbeams::FrameworkError, %("sequences_match" Schema failed with errors #{validation_failed_response(res).errors}) if res.failure?
+
+      attrs = res.to_h
+      %i[treatment_ids fruit_sticker_ids tu_sticker_ids].each { |col| attrs[col] = array_for_db_col(attrs[col]) }
+      DB[:pallet_sequences].where(attrs).get(:id)
+    end
+
     def sequence_has_cartons?(id)
       !DB[:cartons].where(pallet_sequence_id: id).count.zero?
     end
