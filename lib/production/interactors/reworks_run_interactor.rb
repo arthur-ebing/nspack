@@ -1516,17 +1516,25 @@ module ProductionApp
     end
 
     def update_rmt_bin_record(params) # rubocop:disable Metrics/AbcSize
+      arr = %i[rmt_class_id rmt_size_id rmt_container_material_type_id rmt_material_owner_party_role_id]
+      if AppConst::CR_RMT.maintain_legacy_columns?
+        params[:legacy_data] = { colour: params[:colour], pc_code: params[:pc_code],
+                                 cold_store_type: params[:cold_store_type], track_slms_indicator_1_code: params[:track_slms_indicator_1_code],
+                                 ripe_point_code: params[:ripe_point_code] }
+        arr << :legacy_data
+      end
+
       res = validate_edit_rmt_bin_params(params)
       return validation_failed_response(res) if res.failure?
 
-      arr = %i[rmt_class_id rmt_size_id rmt_container_material_type_id rmt_material_owner_party_role_id]
       before_state = rmt_bin(res[:bin_number]).slice(*arr)
       after_state = res.to_h.slice(*arr)
       changed_attrs = after_state.reject { |k, v|  before_state.key?(k) && before_state[k] == v }
       return failed_response('INVALID CHANGES: There are no changes made.', after_state) if changed_attrs.empty?
 
       repo.transaction do
-        repo.update_rmt_bin(res[:bin_number], after_state)
+        # repo.update_rmt_bin(res[:bin_number], after_state)
+        repo.update(:rmt_bins, res[:bin_number], after_state)
         reworks_run_id = repo.create_reworks_run({ user: @user.user_name,
                                                    reworks_run_type_id: res[:reworks_run_type_id],
                                                    pallets_selected: Array(res[:bin_number]),

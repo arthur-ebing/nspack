@@ -220,6 +220,7 @@ module ProductionApp # rubocop:disable Metrics/ModuleLength
     required(:rmt_size_id).maybe(:integer)
     required(:rmt_container_material_type_id).maybe(:integer)
     required(:rmt_material_owner_party_role_id).maybe(:integer)
+    optional(:legacy_data).maybe(:hash)
   end
 
   class ReworksWeighRmtBinsContract < Dry::Validation::Contract
