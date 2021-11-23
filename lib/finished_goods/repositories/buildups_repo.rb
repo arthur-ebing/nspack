@@ -8,6 +8,13 @@ module FinishedGoodsApp
                      no_active_check: true,
                      order_by: :destination_pallet_number
 
+    build_for_select :depot_pallet_buildups,
+                     label: :destination_pallet_number,
+                     value: :id,
+                     no_active_check: true,
+                     order_by: :destination_pallet_number
+
+    crud_calls_for :depot_pallet_buildups, name: :depot_pallet_buildup, wrapper: DepotPalletBuildup
     crud_calls_for :pallet_buildups, name: :pallet_buildup, wrapper: PalletBuildup
 
     def get_shipped(pallets)
@@ -22,6 +29,10 @@ module FinishedGoodsApp
       DB[:pallets].where(pallet_number: pallets, has_individual_cartons: false).select_map(:pallet_number)
     end
 
+    def get_has_individual_cartons(pallets)
+      DB[:pallets].where(pallet_number: pallets, has_individual_cartons: true).select_map(:pallet_number)
+    end
+
     def get_zero_qty_pallets(pallets)
       DB[:pallets].where(pallet_number: pallets, carton_quantity: 0).select_map(:pallet_number)
     end
@@ -30,6 +41,15 @@ module FinishedGoodsApp
       cond = pallets.map { |p| "'#{p}' = ANY (b.source_pallets)" }.join(' or ')
       query = "SELECT *
                FROM pallet_buildups b
+               WHERE b.completed is false AND (b.destination_pallet_number IN ('#{pallets.join("','")}') OR #{cond})"
+      buildups = DB[query].all
+      (buildups.map { |r| r[:source_pallets] }.flatten.uniq + buildups.map { |r| r[:destination_pallet_number] }.flatten.uniq) & pallets
+    end
+
+    def get_depot_build_up_pallets(pallets)
+      cond = pallets.map { |p| "'#{p}' = ANY (b.source_pallets)" }.join(' or ')
+      query = "SELECT *
+               FROM depot_pallet_buildups b
                WHERE b.completed is false AND (b.destination_pallet_number IN ('#{pallets.join("','")}') OR #{cond})"
       buildups = DB[query].all
       (buildups.map { |r| r[:source_pallets] }.flatten.uniq + buildups.map { |r| r[:destination_pallet_number] }.flatten.uniq) & pallets
@@ -85,6 +105,19 @@ module FinishedGoodsApp
                FROM pallet_buildups b
                WHERE b.completed is false AND created_by = '#{user}' AND (b.destination_pallet_number IN ('#{pallets.join("','")}') OR #{cond})"
       DB[query].first
+    end
+
+    def depot_buildup_pallet_sequences(pallet_number)
+      query = MesscadaApp::DatasetPalletSequence.call('WHERE pallet_sequences.pallet_number = ?')
+      DB[query, pallet_number].all
+    end
+
+    def depot_pallet_sequence_carton_quantity(pallet_number, pallet_sequence_number)
+      get_value(:pallet_sequences, %i[id carton_quantity], pallet_number: pallet_number, pallet_sequence_number: pallet_sequence_number)
+    end
+
+    def depot_pallet_sequence(id)
+      get(:pallet_sequences, id, %i[pallet_number pallet_sequence_number])
     end
   end
 end

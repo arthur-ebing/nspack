@@ -2,6 +2,116 @@
 
 module FinishedGoodsApp
   class BuildupsInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+    def buildup_depot_pallet(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      res = validate_pallet_buildup_params(params)
+      return validation_failed_response(res) if res.failure?
+
+      pallets = res.to_h.select { |k, v| (k.to_s.match(/^p\d+$/) || (k == :pallet_number)) && !v.to_s.empty? }.values.compact
+
+      err = validate_pallets_exist(pallets)
+      return validation_failed_response(messages: error_messages(res.to_h, err, "doesn't exist")) unless err.empty?
+
+      err = validate_duplicate_scans(pallets)
+      return validation_failed_response(messages: error_messages(res.to_h, err, 'is duplicate scan')) unless err.empty?
+
+      err = validate_depot_pallets_not_busy(pallets)
+      return validation_failed_response(messages: error_messages(res.to_h, err, 'is busy')) unless err.empty?
+
+      err = validate_shipped(pallets)
+      return validation_failed_response(messages: error_messages(res.to_h, err, 'is shipped')) unless err.empty?
+
+      err = validate_scrapped(pallets)
+      return validation_failed_response(messages: error_messages(res.to_h, err, 'is scrapped')) unless err.empty?
+
+      err = validate_zero_qty(pallets)
+      return validation_failed_response(messages: error_messages(res.to_h, err, 'has 0 ctn_qty')) unless err.empty?
+
+      src_plts = res.to_h.select { |k, v| k.to_s.match(/^p\d+$/) && !v.to_s.empty? }.values.compact
+      return failed_response("There's not enough cartons to move") unless src_pallets_have_enough_cartons?(src_plts, res[:qty_to_move])
+
+      err = validate_has_no_individual_cartons(pallets)
+      return validation_failed_response(messages: error_messages(res.to_h, err, 'has individuals ctns')) unless err.empty?
+
+      id = nil
+      repo.transaction do
+        id = repo.create_depot_pallet_buildup(auto_create_destination_pallet: res[:auto_create_destination_pallet],
+                                              destination_pallet_number: res[:pallet_number], source_pallets: "{#{src_plts.join(',')}}",
+                                              qty_cartons_to_move: res[:qty_to_move], created_by: @user.user_name, sequence_cartons_moved: {})
+        log_status(:depot_pallet_buildups, id, 'CREATED')
+        log_transaction
+      end
+      destination_pallet_number = repo.get_value(:depot_pallet_buildups, :destination_pallet_number, id: id)
+      success_response("Created depot pallet buildup #{destination_pallet_number}", id)
+    rescue Sequel::UniqueConstraintViolation
+      validation_failed_response(OpenStruct.new(messages: { destination_pallet_number: ['This depot pallet buildup already exists'] }))
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def move_sequence_cartons(depot_pallet_buildup_id, params) # rubocop:disable Metrics/AbcSize
+      error_msgs = {}
+      sequence_cartons_moved = {}
+      params.each do |k, v|
+        pallet_number, pallet_sequence_number = k.to_s.split('_')
+        id, seq_ctn_qty = repo.depot_pallet_sequence_carton_quantity(pallet_number, pallet_sequence_number)
+        error_msgs.store(k, ["qty to move(#{v}) exceeds seq ctn qty"]) unless v.to_i <= seq_ctn_qty
+        sequence_cartons_moved.store(id, v.to_i)
+      end
+      return validation_failed_response(messages: error_msgs) unless error_msgs.empty?
+
+      ctns_to_move = repo.get_value(:depot_pallet_buildups, :qty_cartons_to_move, id: depot_pallet_buildup_id)
+      ctns_scanned = sequence_cartons_moved.values.sum
+      return failed_response("You have scanned more cartons: #{ctns_scanned} than you planned to move: #{ctns_to_move}") unless ctns_scanned <= ctns_to_move
+
+      repo.transaction do
+        repo.update(:depot_pallet_buildups, depot_pallet_buildup_id, sequence_cartons_moved: sequence_cartons_moved)
+        success_response('ok')
+      end
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def complete_depot_buildup_message(depot_pallet_buildup_id)
+      depot_pallet_buildup = repo.find_depot_pallet_buildup(depot_pallet_buildup_id)
+      ctns_scanned = depot_pallet_buildup.sequence_cartons_moved.values.sum
+      "#{ctns_scanned} cartons scanned, #{depot_pallet_buildup.qty_cartons_to_move - ctns_scanned} remaining. Complete?"
+    end
+
+    def complete_depot_pallet_buildup(id) # rubocop:disable Metrics/AbcSize
+      repo.transaction do
+        res = CompleteDepotPalletBuildup.call(id, @user.user_name)
+        res.instance.each do |zero_seq|
+          remove_sequence_from_pallet(zero_seq)
+        end
+
+        depot_pallet_buildup = repo.find_depot_pallet_buildup(id)
+        if AppConst::CR_FG.lookup_extended_fg_code?
+          pallet_ids = repo.select_values(:pallets, :id, pallet_number: [depot_pallet_buildup.destination_pallet_number] + depot_pallet_buildup.source_pallets)
+          FinishedGoodsApp::Job::CalculateExtendedFgCodesFromSeqs.enqueue(pallet_ids)
+        end
+        res
+      end
+    rescue StandardError => e
+      failed_response(e.message)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue Crossbeams::FrameworkError => e
+      failed_response(e.message)
+    end
+
+    def delete_depot_pallet_buildup(id)
+      repo.transaction do
+        repo.delete_depot_pallet_buildup(id)
+        log_status(:depot_pallet_buildups, id, 'DELETED')
+        log_transaction
+      end
+      success_response("Deleted depot pallet buildup #{id}")
+    rescue StandardError => e
+      failed_response(e.message)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def process_to_rejoin(params)
       dest = params[:pallet_number]
       pallet_keys = (1..10).map { |n| "p#{n}".to_sym }
@@ -25,31 +135,33 @@ module FinishedGoodsApp
 
       pallets = res.to_h.select { |k, v| (k.to_s.match(/^p\d+$/) || (k == :pallet_number)) && !v.to_s.empty? }.values.compact
 
-      non_existing = pallets - repo.get_pallets(pallets)
-      return validation_failed_response(messages: error_messages(res.to_h, non_existing, "doesn't exist")) unless non_existing.empty?
+      err = validate_pallets_exist(pallets)
+      return validation_failed_response(messages: error_messages(res.to_h, err, "doesn't exist")) unless err.empty?
 
-      duplicates = pallets.find_all { |e| pallets.count(e) > 1 }.uniq
-      return validation_failed_response(messages: error_messages(res.to_h, duplicates, 'is duplicate scan')) unless duplicates.empty?
+      err = validate_duplicate_scans(pallets)
+      return validation_failed_response(messages: error_messages(res.to_h, err, 'is duplicate scan')) unless err.empty?
 
-      error_msgs = !(err = validate_shipped(pallets)).empty? ? error_messages(res.to_h, err, 'is shipped') : {}
-      error_msgs.merge!(!(err = validate_scrapped(pallets)).empty? ? error_messages(res.to_h, err, 'is scrapped') : {})
-      return validation_failed_response(messages: error_msgs) unless error_msgs.empty?
+      err = validate_shipped(pallets)
+      return validation_failed_response(messages: error_messages(res.to_h, err, 'is shipped')) unless err.empty?
 
-      error_msgs = !(err = validate_has_individual_cartons(pallets)).empty? ? error_messages(res.to_h, err, 'has no individuals ctns') : {}
-      return validation_failed_response(messages: error_msgs) unless error_msgs.empty?
+      err = validate_scrapped(pallets)
+      return validation_failed_response(messages: error_messages(res.to_h, err, 'is scrapped')) unless err.empty?
 
-      error_msgs = !(err = validate_zero_qty(pallets)).empty? ? error_messages(res.to_h, err, 'has 0 ctn_qty') : {}
-      return validation_failed_response(messages: error_msgs) unless error_msgs.empty?
+      err = validate_has_individual_cartons(pallets)
+      return validation_failed_response(messages: error_messages(res.to_h, err, 'has no individuals ctns')) unless err.empty?
 
-      error_msgs = !(err = validate_pallets_not_busy(pallets)).empty? ? error_messages(res.to_h, err, 'is busy') : {}
-      return validation_failed_response(messages: error_msgs) unless error_msgs.empty?
+      err = validate_zero_qty(pallets)
+      return validation_failed_response(messages: error_messages(res.to_h, err, 'has 0 ctn_qty')) unless err.empty?
+
+      err = validate_pallets_not_busy(pallets)
+      return validation_failed_response(messages: error_messages(res.to_h, err, 'is busy')) unless err.empty?
 
       src_plts = res.to_h.select { |k, v| k.to_s.match(/^p\d+$/) && !v.to_s.empty? }.values.compact
-      return failed_response("There's not enough cartons to move") if repo.pallets_ctn_qty_sum(src_plts) < res[:qty_to_move]
+      return failed_response("There's not enough cartons to move") unless src_pallets_have_enough_cartons?(src_plts, res[:qty_to_move])
 
       id = nil
       repo.transaction do
-        id = repo.create_pallet_buildup(auto_create_destination_pallet: res[:auto_create_destination_pallet], destination_pallet_number: res[:pallet_number], source_pallets: "{#{src_plts.join(',')}}", qty_cartons_to_move: res[:qty_to_move], created_by: @user.user_name, cartons_moved: {}.to_json)
+        id = repo.create_pallet_buildup(auto_create_destination_pallet: res[:auto_create_destination_pallet], destination_pallet_number: res[:pallet_number], source_pallets: "{#{src_plts.join(',')}}", qty_cartons_to_move: res[:qty_to_move], created_by: @user.user_name, cartons_moved: {})
         log_transaction
       end
       instance = pallet_buildup(id)
@@ -152,6 +264,14 @@ module FinishedGoodsApp
       repo.find_pallet_buildup(id)
     end
 
+    def depot_pallet_buildup(id)
+      repo.find_depot_pallet_buildup(id)
+    end
+
+    def depot_buildup_pallet_sequences(pallet_number)
+      repo.depot_buildup_pallet_sequences(pallet_number)
+    end
+
     private
 
     def remove_sequence_from_pallet(src_seq_id)
@@ -217,12 +337,32 @@ module FinishedGoodsApp
       repo.get_has_no_individual_cartons(pallets)
     end
 
+    def validate_has_no_individual_cartons(pallets)
+      repo.get_has_individual_cartons(pallets)
+    end
+
     def validate_zero_qty(pallets)
       repo.get_zero_qty_pallets(pallets)
     end
 
     def validate_pallets_not_busy(pallets)
       repo.get_build_up_pallets(pallets)
+    end
+
+    def validate_depot_pallets_not_busy(pallets)
+      repo.get_depot_build_up_pallets(pallets)
+    end
+
+    def validate_pallets_exist(pallets)
+      pallets - repo.get_pallets(pallets)
+    end
+
+    def validate_duplicate_scans(pallets)
+      pallets.find_all { |e| pallets.count(e) > 1 }.uniq
+    end
+
+    def src_pallets_have_enough_cartons?(src_plts, qty_to_move)
+      repo.pallets_ctn_qty_sum(src_plts) >= qty_to_move
     end
 
     def error_messages(params, pallets, status)

@@ -153,6 +153,14 @@ module ProductionApp
       DB.execute(query)
     end
 
+    def increment_sequence_by(increment, pallet_sequence_id)
+      DB[:pallet_sequences].where(id: pallet_sequence_id).update(carton_quantity: Sequel.lit('carton_quantity + ?', increment))
+    end
+
+    def decrement_sequence_by(decrement, pallet_sequence_id)
+      DB[:pallet_sequences].where(id: pallet_sequence_id).update(carton_quantity: Sequel.lit('carton_quantity - ?', decrement))
+    end
+
     def create_production_run(params)
       attrs = params.to_h
       # NOTE: The NO_RUN_ALLOCATION should be changed to come from the LINE
