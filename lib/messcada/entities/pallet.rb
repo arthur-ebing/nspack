@@ -122,8 +122,8 @@ module MesscadaApp
         # Valid pallet numbers have 9 or 18 digits.
         scanned_pallet_number
       when 11
-        # Last 9 digits. Number is prefixed with "46", "47", "48" or "49".
-        raise Crossbeams::InfoError, "Pallet #{scanned_pallet_number} is not a recognised format for 11 digits." unless %w[46 47 48 49].include?(scanned_pallet_number[0, 2])
+        # Last 9 digits. Number is prefixed with "46", "47", "48", "49" or "23".
+        raise Crossbeams::InfoError, "Pallet #{scanned_pallet_number} is not a recognised format for 11 digits." unless %w[46 47 48 49 23].include?(scanned_pallet_number[0, 2])
 
         scanned_pallet_number[-9, 9]
       when 15
