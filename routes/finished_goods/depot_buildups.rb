@@ -35,7 +35,7 @@ class Nspack < Roda
               form.add_label(:production_run, 'Production Run Id', "#{seq[:production_run_id]}:#{seq[:created_at].to_datetime.strftime('%Y-%m-%d %H:%M')}")
               form.add_label(:product, 'Product', "#{seq[:commodity]}_#{seq[:marketing_variety]}_#{seq[:actual_count]}_#{seq[:size_ref]}_#{seq[:grade]}_#{seq[:rmt_class_code]}_#{seq[:basic_pack]}_#{seq[:std_pack]}_#{seq[:sell_by_code]}_#{seq[:inventory_code]}")
               form.add_label(:cnt_qty, 'Sequence Carton Quantity', seq[:carton_quantity])
-              form.add_field("#{pallet_number}_#{seq[:pallet_sequence_number]}".to_sym, 'Quantity Cartons To Move', data_type: :number, required: true)
+              form.add_field("#{pallet_number}_#{seq[:pallet_sequence_number]}".to_sym, 'Quantity Cartons To Move', data_type: :number, required: false)
             end
             form.add_section_header('&nbsp;')
           end
