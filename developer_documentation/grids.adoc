@@ -139,11 +139,15 @@ NOTE: The underscore is important: `_limit` and `_offset`.
 
 Links can be specified to appear at the top of the page. Typically they will be styled as buttons.
 
-This uses the same options as for link:/developer_documentation/non_field_renderers.adoc#_link[Link], but has the extra option `:hide_if_sql_returns_true`, `:hide_for_key` and `hide_for_client_rule`.
+This uses the same options as for link:/developer_documentation/non_field_renderers.adoc#_link[Link], but has the extra options `:hide_if_sql_returns_true`, `:hide_for_key`, `hide_for_client_rule` and `show_for_key`.
 
 The value of `:hide_if_sql_returns_true` **must** be a valid snippet of SQL that returns `true` or `false`. Typical is to return the result of an `EXISTS` query.
 
 The value of `:hide_for_key` **must** be an array of one or more strings. If any string matches the value of the `key=` parameter of the URL that loaded the page, the control will be hidden.
+
+The value of `:show_for_key` **must** be an array of one or more strings. If any string matches the value of the `key=` parameter of the URL that loaded the page, the control will be shown (it will be hidden for _any_ non-matching key).
+
+NOTE: If both `:show_for_key` and `:hide_for_key` are set for the same key, the action will be hidden.
 
 The value of `:hide_for_client_rule` **must** be a semicolon-separated list of AppConst client rules. If any client rule returns true, the control will be hidden.
 This works similarly for `:show_for_client_rule`, but the control will be hidden _unless_ all client rules return `true`.
@@ -165,6 +169,8 @@ NOTE: The `grid_id` option will need to match the id of your grid if your action
   :hide_for_key:
     - inactive
     - someotherkey
+  :show_for_key:
+    - special_case
   :hide_for_client_rule: CR_PROD.some_check?;CR_FG.another_check
 ----
 

@@ -30,6 +30,7 @@ module Edi
                                   # behaviour: :popup,
                                   grid_id: 'manual_intake_items',
                                   url: "/edi/actions/edit_manual_intake/#{id}/add_row",
+                                  visible: !rules[:new_edi],
                                   style: :button)
             end
 

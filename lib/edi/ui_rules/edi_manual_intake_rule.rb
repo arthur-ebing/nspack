@@ -8,6 +8,7 @@ module UiRules
       apply_form_values
 
       common_values_for_fields common_fields
+      rules[:new_edi] = @form_object.depot_id.nil?
 
       form_name 'manual_intake'
     end

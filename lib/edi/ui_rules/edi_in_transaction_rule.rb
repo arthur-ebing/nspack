@@ -28,6 +28,15 @@ module UiRules
       fields[:reprocessed] = { renderer: :label, as_boolean: true }
       fields[:notes] = { renderer: :label, format: :preformat, invisible: @form_object.notes.nil? }
       fields[:match_data] = { renderer: :label }
+      if @form_object.manual_header.nil?
+        fields[:depot_id] = { invisible: true }
+        fields[:edi_in_inspection_point] = { invisible: true }
+        fields[:edi_in_load_number] = { invisible: true }
+      else
+        fields[:depot_id] = { renderer: :label, with_value: @repo.get(:depots, @form_object.manual_header['depot_id'], :depot_code) }
+        fields[:edi_in_inspection_point] = { renderer: :label, with_value: @form_object.manual_header['edi_in_inspection_point'] }
+        fields[:edi_in_load_number] = { renderer: :label, with_value: @form_object.manual_header['edi_in_load_number'] }
+      end
     end
 
     def common_fields
