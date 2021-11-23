@@ -6,9 +6,12 @@ module UiRules
       @repo = ProductionApp::ReworksRepo.new
       @delivery_repo = RawMaterialsApp::RmtDeliveryRepo.new
       @container_repo = MasterfilesApp::RmtContainerMaterialTypeRepo.new
+      @messcada_repo = MesscadaApp::MesscadaRepo.new
 
       make_form_object
       apply_form_values
+
+      @rules[:maintain_legacy_columns] = AppConst::CR_RMT.maintain_legacy_columns?
 
       if @mode == :set_rmt_bin_gross_weight
         make_reworks_run_rmt_bin_header_table(%i[farm_code puc_code orchard_code cultivar_name season_code container_type_code
@@ -23,6 +26,8 @@ module UiRules
         edit_rmt_bin_fields
         edit_rmt_bin_behaviours
       end
+
+      set_rmt_bin_legacy_fields
 
       form_name 'reworks_run_rmt_bin'
     end
@@ -79,11 +84,25 @@ module UiRules
                                                     prompt: true }
     end
 
-    def make_form_object
+    def set_rmt_bin_legacy_fields # rubocop:disable Metrics/AbcSize
+      bin_cultivar = @repo.get(:cultivars, @form_object.cultivar_id, :cultivar_name)
+      fields[:colour] = { renderer: :select, options: @messcada_repo.run_treatment_codes, required: true, prompt: true }
+      fields[:ripe_point_code] = { renderer: :select, options: @messcada_repo.ripe_point_codes.map { |s| s[0] }.uniq, required: true, prompt: true }
+      fields[:pc_code] = { renderer: :select, options: @form_object.pc_code ? [@form_object.pc_code] : [], required: true, prompt: true }
+      fields[:cold_store_type] = { renderer: :select, options: %w[CA RA KT NO], required: true, prompt: true }
+      fields[:track_slms_indicator_1_code] = { renderer: :select, options: @messcada_repo.track_indicator_codes(bin_cultivar).uniq, required: true, prompt: true }
+    end
+
+    def make_form_object # rubocop:disable Metrics/AbcSize
       defaults = { reworks_run_type_id: @options[:reworks_run_type_id],
                    bin_number: @options[:bin_number],
                    measurement_unit: 'KG' }
-      @form_object = OpenStruct.new(rmt_bin(@options[:bin_number]).to_h.merge(defaults))
+      bin = rmt_bin(@options[:bin_number]).to_h
+      legacy_data = { colour: bin[:legacy_data]['colour'], pc_code: bin[:legacy_data]['pc_code'],
+                      cold_store_type: bin[:legacy_data]['cold_store_type'], track_slms_indicator_1_code: bin[:legacy_data]['track_slms_indicator_1_code'],
+                      ripe_point_code: bin[:legacy_data]['ripe_point_code'] }
+      attrs = bin.merge(legacy_data).merge(defaults)
+      @form_object = OpenStruct.new(attrs)
     end
 
     def rmt_bin(bin_number)
@@ -99,6 +118,8 @@ module UiRules
       case @mode
       when :rmt_container_material_type
         rmt_container_material_type_change
+      when :ripe_point_code
+        ripe_point_code_change
       else
         unhandled_behaviour!
       end
@@ -110,6 +131,7 @@ module UiRules
       behaviours do |behaviour|
         behaviour.dropdown_change :rmt_container_material_type_id,
                                   notify: [{ url: "/production/reworks/reworks_run_types/#{@options[:reworks_run_type_id]}/reworks_runs/rmt_container_material_type_changed" }]
+        behaviour.dropdown_change :ripe_point_code, notify: [{ url: "/production/reworks/reworks_run_types/#{@options[:reworks_run_type_id]}/reworks_runs/ripe_point_code_combo_changed" }]
       end
     end
 
@@ -121,6 +143,11 @@ module UiRules
                                    delivery_repo.find_container_material_owners_by_container_material_type(params[:changed_value])
                                  end
       json_replace_select_options('reworks_run_rmt_bin_rmt_material_owner_party_role_id', container_material_types)
+    end
+
+    def ripe_point_code_change
+      pc_codes = params[:changed_value].to_s.empty? ? [] : MesscadaApp::MesscadaRepo.new.ripe_point_codes(ripe_point_code: params[:changed_value]).map { |s| s[1] }.uniq
+      json_replace_select_options('reworks_run_rmt_bin_pc_code', pc_codes)
     end
   end
 end

@@ -615,6 +615,10 @@ class Nspack < Roda
           handle_ui_change(:reworks_run_rmt_bin, :rmt_container_material_type, params)
         end
 
+        r.on 'ripe_point_code_combo_changed' do
+          handle_ui_change(:reworks_run_rmt_bin, :ripe_point_code, params)
+        end
+
         r.on 'work_in_progress' do
           r.on 'multiselect_wip_submit' do
             res = interactor.remove_work_in_progress_lock(id, multiselect_grid_choices(params))
