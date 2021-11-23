@@ -6,6 +6,7 @@ module Crossbeams
 
     CLIENT_SETTINGS = {
       hb: { bin_pallet_conversion_defaults: {},
+            presort_staging_target_location: {},
             delivery_capture_inner_bins: false,
             use_delivery_destination: false,
             bin_valid_for_external_integration: false,
@@ -26,6 +27,7 @@ module Crossbeams
             create_depot_location: false,
             create_bin_asset_trading_partner_location: false  },
       hl: { bin_pallet_conversion_defaults: {},
+            presort_staging_target_location: {},
             delivery_capture_inner_bins: false,
             use_delivery_destination: false,
             bin_valid_for_external_integration: false,
@@ -54,6 +56,7 @@ module Crossbeams
                                               mark: 'GEN',
                                               inventory_code: 'UL',
                                               sell_by_code: nil },
+            presort_staging_target_location: { PRESORT_STAGING_1: 'PRESORT_1', PRESORT_STAGING_2: 'PRESORT_2' },
             delivery_capture_inner_bins: false,
             use_delivery_destination: true,
             bin_valid_for_external_integration: true,
@@ -74,6 +77,7 @@ module Crossbeams
             create_depot_location: true,
             create_bin_asset_trading_partner_location: true  },
       um: { bin_pallet_conversion_defaults: {},
+            presort_staging_target_location: {},
             delivery_capture_inner_bins: false,
             use_delivery_destination: false,
             bin_valid_for_external_integration: false,
@@ -94,6 +98,7 @@ module Crossbeams
             create_depot_location: false,
             create_bin_asset_trading_partner_location: false  },
       ud: { bin_pallet_conversion_defaults: {},
+            presort_staging_target_location: {},
             delivery_capture_inner_bins: false,
             use_delivery_destination: true,
             bin_valid_for_external_integration: false,
@@ -114,6 +119,7 @@ module Crossbeams
             create_depot_location: false,
             create_bin_asset_trading_partner_location: false  },
       sr: { bin_pallet_conversion_defaults: {},
+            presort_staging_target_location: {},
             delivery_capture_inner_bins: false,
             use_delivery_destination: true,
             bin_valid_for_external_integration: false,
@@ -134,6 +140,7 @@ module Crossbeams
             create_depot_location: false,
             create_bin_asset_trading_partner_location: false   },
       sr2: { bin_pallet_conversion_defaults: {},
+             presort_staging_target_location: {},
              delivery_capture_inner_bins: false,
              use_delivery_destination: true,
              bin_valid_for_external_integration: false,
@@ -182,6 +189,12 @@ module Crossbeams
       return 'Default value for a pallet attribute when converting a bin to a pallet.' if explain
 
       setting(:bin_pallet_conversion_defaults)[code]
+    end
+
+    def presort_staging_target_location(plant, explain: false)
+      return 'Location of the newly created presorted bin.' if explain
+
+      setting(:presort_staging_target_location)["PRESORT_STAGING_#{plant[-1]}".to_sym]
     end
 
     def capture_inner_bins?(explain: false)
