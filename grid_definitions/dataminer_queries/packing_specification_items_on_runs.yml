@@ -19,20 +19,28 @@
   = ru_sticker_ids[2] ) AS ru_sticker_2,\r\n\r\n    packing_specification_items.active,\r\n
   \   packing_specification_items.created_at,\r\n    packing_specification_items.updated_at,\r\n
   \   fn_current_status('packing_specification_items', packing_specification_items.id)
-  AS status\r\n\r\nFROM packing_specification_items\r\nJOIN product_setups ON packing_specification_items.product_setup_id
-  = product_setups.id\r\nJOIN product_setup_templates ON product_setup_templates.id
-  = product_setups.product_setup_template_id \r\nJOIN production_runs ON production_runs.product_setup_template_id
-  = product_setups.product_setup_template_id\r\nLEFT JOIN pm_boms ON pm_boms.id =
-  packing_specification_items.pm_bom_id\r\nLEFT JOIN pm_marks ON pm_marks.id = packing_specification_items.pm_mark_id\r\nLEFT
-  JOIN marks ON marks.id = pm_marks.mark_id\r\nLEFT JOIN pm_products pm_products_tu
-  ON pm_products_tu.id = packing_specification_items.tu_labour_product_id\r\nLEFT
-  JOIN pm_products pm_products_ru ON pm_products_ru.id = packing_specification_items.ru_labour_product_id\r\nLEFT
+  AS status,\r\n    CASE WHEN fn_product_setup_in_production (product_setups.id) THEN
+  'warning'\r\n             WHEN NOT product_setups.active THEN 'inactive'\r\n             WHEN
+  product_setups.rebin THEN 'inprogress'\r\n             ELSE NULL\r\n             END
+  AS colour_rule\r\n\r\nFROM packing_specification_items\r\nJOIN product_setups ON
+  packing_specification_items.product_setup_id = product_setups.id\r\nJOIN product_setup_templates
+  ON product_setup_templates.id = product_setups.product_setup_template_id \r\nJOIN
+  production_runs ON production_runs.product_setup_template_id = product_setups.product_setup_template_id\r\nLEFT
+  JOIN pm_boms ON pm_boms.id = packing_specification_items.pm_bom_id\r\nLEFT JOIN
+  pm_marks ON pm_marks.id = packing_specification_items.pm_mark_id\r\nLEFT JOIN marks
+  ON marks.id = pm_marks.mark_id\r\nLEFT JOIN pm_products pm_products_tu ON pm_products_tu.id
+  = packing_specification_items.tu_labour_product_id\r\nLEFT JOIN pm_products pm_products_ru
+  ON pm_products_ru.id = packing_specification_items.ru_labour_product_id\r\nLEFT
   JOIN pm_products pm_products_ri ON pm_products_ri.id = packing_specification_items.ri_labour_product_id\r\nORDER
   BY packing_specification_items.updated_at DESC"
 :limit: 
 :offset: 
 :external_settings:
   :render_url: 
+  :colour_key:
+    warning: Active on run
+    inactive: De-activated
+    inprogress: Rebin
 :columns:
   id:
     :name: id
@@ -406,6 +414,22 @@
     :name: status
     :sequence_no: 24
     :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  colour_rule:
+    :name: colour_rule
+    :sequence_no: 25
+    :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
     :width: 

@@ -86,7 +86,7 @@
     :permission: edit
 :captions:
   :conditions:
-    :active: Active Product Setups
+    :active: Available Product Setups
     :in_production: Product Setups in production
 :conditions:
   :standard:
