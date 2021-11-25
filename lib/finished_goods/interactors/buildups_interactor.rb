@@ -52,6 +52,8 @@ module FinishedGoodsApp
       error_msgs = {}
       sequence_cartons_moved = {}
       params.each do |k, v|
+        next if v.to_i.zero?
+
         pallet_number, pallet_sequence_number = k.to_s.split('_')
         id, seq_ctn_qty = repo.depot_pallet_sequence_carton_quantity(pallet_number, pallet_sequence_number)
         error_msgs.store(k, ["qty to move(#{v}) exceeds seq ctn qty"]) unless v.to_i <= seq_ctn_qty
@@ -78,6 +80,13 @@ module FinishedGoodsApp
     end
 
     def complete_depot_pallet_buildup(id) # rubocop:disable Metrics/AbcSize
+      depot_pallet_buildup = repo.find_depot_pallet_buildup(id)
+      ctns_scanned = depot_pallet_buildup.sequence_cartons_moved.values.sum
+      if ctns_scanned.zero?
+        delete_depot_pallet_buildup(id)
+        return success_response("#{ctns_scanned} cartons scanned. Depot pallet buildup #{id} has been cancelled")
+      end
+
       repo.transaction do
         res = CompleteDepotPalletBuildup.call(id, @user.user_name)
         res.instance.each do |zero_seq|
