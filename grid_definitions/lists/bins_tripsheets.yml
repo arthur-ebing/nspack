@@ -11,6 +11,10 @@
   :text: open
   :icon: toggle-off
   :hide_if_false: can_open
+- :url: "/list/bin_vehicle_job_units/with_params?key=standard&vehicle_job_id=$:id$"
+  :text: tripsheet log
+  :popup: true
+  :icon: list
 - :url: "/finished_goods/interwarehouse_transfers/force_bin_tripsheet_offload/$:id$"
   :text: force_offload
   :icon: toggle-off
