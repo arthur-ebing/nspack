@@ -641,6 +641,9 @@ class AppConst # rubocop:disable Metrics/ClassLength
     ['9 - CFM & CBS', '9']
   ].freeze
 
+  # PPECB: Govt Inspections
+  GOVT_INSPECTION_AGENCY = 'PPECB'
+
   # QUALITY APP result types
   PASS_FAIL = 'Pass/Fail'
   CLASSIFICATION = 'Classification'

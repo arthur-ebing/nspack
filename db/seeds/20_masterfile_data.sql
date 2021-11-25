@@ -216,6 +216,11 @@ INSERT INTO stock_types(stock_type_code, description) VALUES('BIN', 'RMT BINS') 
 
 INSERT INTO inspection_failure_types (failure_type_code) VALUES('GOVERNMENT') ON CONFLICT DO NOTHING;
 
+-- INSPECTION TYPES --
+INSERT INTO inspection_types (inspection_type_code, description, inspection_failure_type_id)
+VALUES ('PPECB', 'PPECB', (SELECT id FROM inspection_failure_types WHERE failure_type_code = 'GOVERNMENT'))
+ON CONFLICT DO NOTHING;
+
 -- USER_EMAIL_GROUPS --
 INSERT INTO user_email_groups (mail_group) VALUES('label_approvers') ON CONFLICT DO NOTHING;
 INSERT INTO user_email_groups (mail_group) VALUES('label_publishers') ON CONFLICT DO NOTHING;

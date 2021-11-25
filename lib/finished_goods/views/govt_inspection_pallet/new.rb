@@ -22,7 +22,6 @@ module FinishedGoods
               form.add_field :marketing_varieties
               form.add_field :packed_tm_groups
 
-              form.add_field :inspected
               form.add_field :inspected_at
               form.add_field :failure_reason_id
               form.add_field :failure_remarks
