@@ -517,7 +517,7 @@ module ProductionApp
         WHERE production_runs.id NOT IN (#{production_run_id})
         #{conditions}
         ORDER BY id DESC
-        LIMIT 500
+        LIMIT 1000
       SQL
       DB[query].all.map { |r| [r[:production_run_code], r[:id]] }
     end
