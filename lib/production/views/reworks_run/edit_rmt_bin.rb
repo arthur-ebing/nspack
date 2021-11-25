@@ -20,6 +20,7 @@ module Production
             end
             page.add_text rules[:compact_header]
             page.form do |form|
+              form.caption "Edit bin #{bin_number}"
               form.action "/production/reworks/reworks_run_types/#{reworks_run_type_id}/pallets/#{bin_number}/edit_rmt_bin"
               form.row do |row|
                 row.column do |col|

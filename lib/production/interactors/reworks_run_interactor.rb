@@ -1518,9 +1518,9 @@ module ProductionApp
     def update_rmt_bin_record(params) # rubocop:disable Metrics/AbcSize
       arr = %i[rmt_class_id rmt_size_id rmt_container_material_type_id rmt_material_owner_party_role_id]
       if AppConst::CR_RMT.maintain_legacy_columns?
-        params[:legacy_data] = { colour: params[:colour], pc_code: params[:pc_code],
-                                 cold_store_type: params[:cold_store_type], track_slms_indicator_1_code: params[:track_slms_indicator_1_code],
-                                 ripe_point_code: params[:ripe_point_code] }
+        params[:legacy_data] = { 'colour' => params[:colour], 'pc_code' => params[:pc_code],
+                                 'cold_store_type' => params[:cold_store_type], 'track_slms_indicator_1_code' => params[:track_slms_indicator_1_code],
+                                 'ripe_point_code' => params[:ripe_point_code] }
         arr << :legacy_data
       end
 
@@ -1549,14 +1549,23 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def rmt_bin_state(attrs)
+    def rmt_bin_state(attrs) # rubocop:disable Metrics/AbcSize
       owner_id = repo.get_value(:rmt_container_material_owners,
                                 :id,
                                 attrs.slice(:rmt_container_material_type_id, :rmt_material_owner_party_role_id))
-      { rmt_class: repo.get(:rmt_classes, attrs[:rmt_class_id], :rmt_class_code),
-        rmt_size: repo.get(:rmt_sizes, attrs[:rmt_size_id], :size_code),
-        rmt_container_material_type: repo.get(:rmt_container_material_types, attrs[:rmt_container_material_type_id], :container_material_type_code),
-        rmt_material_owner: prod_setup_repo.rmt_container_material_owner_for(owner_id) }
+      hash = { rmt_class: repo.get(:rmt_classes, attrs[:rmt_class_id], :rmt_class_code),
+               rmt_size: repo.get(:rmt_sizes, attrs[:rmt_size_id], :size_code),
+               rmt_container_material_type: repo.get(:rmt_container_material_types, attrs[:rmt_container_material_type_id], :container_material_type_code),
+               rmt_material_owner: prod_setup_repo.rmt_container_material_owner_for(owner_id) }
+
+      if AppConst::CR_RMT.maintain_legacy_columns?
+        hash[:colour] = attrs[:legacy_data]['colour']
+        hash[:pc_code] = attrs[:legacy_data]['pc_code']
+        hash[:cold_store_type] = attrs[:legacy_data]['cold_store_type']
+        hash[:track_slms_indicator_1_code] = attrs[:legacy_data]['track_slms_indicator_1_code']
+        hash[:ripe_point_code] = attrs[:legacy_data]['ripe_point_code']
+      end
+      hash
     end
 
     def clone_carton(params)

@@ -17,7 +17,7 @@ module UiRules
         make_reworks_run_rmt_bin_header_table(%i[farm_code puc_code orchard_code cultivar_name season_code container_type_code
                                                  container_material_type_code qty_bins exit_ref bin_asset_number tipped_asset_number
                                                  qty_inner_bins bin_fullness nett_weight gross_weight bin_tipped bin_received_date_time
-                                                 bin_tipped_date_time exit_ref_date_time rebin_created_at scrapped_at scrapped active])
+                                                 bin_tipped_date_time exit_ref_date_time rebin_created_at scrapped_at scrapped active shipped_asset_number])
         set_rmt_bin_gross_weight_fields
       end
 
@@ -36,7 +36,7 @@ module UiRules
       compact_header(columns: columns || %i[ farm_code puc_code orchard_code cultivar_name season_code class_code size_code container_type_code
                                              container_material_type_code qty_bins exit_ref bin_asset_number tipped_asset_number
                                              qty_inner_bins bin_fullness nett_weight gross_weight bin_tipped bin_received_date_time
-                                             bin_tipped_date_time exit_ref_date_time rebin_created_at scrapped_at scrapped],
+                                             bin_tipped_date_time exit_ref_date_time rebin_created_at scrapped_at scrapped shipped_asset_number],
                      display_columns: display_columns,
                      header_captions: {
                        farm_code: 'Farm',
