@@ -21,6 +21,8 @@ require 'benchmark'
 require 'pstore'
 require 'net/http'
 require 'net/ping'
+require 'net/scp'
+require 'net/ssh'
 require 'uri'
 require 'pry' if ENV.fetch('RACK_ENV') == 'development'
 

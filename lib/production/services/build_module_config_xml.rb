@@ -2,29 +2,32 @@
 
 module ProductionApp
   class BuildModuleConfigXml < BaseService # rubocop:disable Metrics/ClassLength
-    attr_reader :id, :repo
+    attr_reader :id, :repo, :alternate_ip, :netmask
 
-    def initialize(id)
+    def initialize(id, alternate_ip: nil)
       @id = id
+      @alternate_ip = alternate_ip
       @repo = ResourceRepo.new
     end
 
     def call
       sys_mod = repo.find_system_resource_flat(id)
       server = repo.find_mes_server
-      no_buttons = repo.no_of_direct_descendants(sys_mod.plant_resource_id)
-      xml = build_xml(sys_mod, no_buttons, server)
+      raise Crossbeams::InfoError, 'There is no plant resource defined as a MesServer' if server.nil?
+
+      @netmask = server.extended_config['netmask'] || '255.255.255.0'
+      buttons = repo.robot_button_system_resources(sys_mod.plant_resource_id)
+      xml = build_xml(sys_mod, buttons, server)
       success_response('BuildModuleConfigXml was successful', xml: xml, module: sys_mod.system_resource_code)
     end
 
-    def build_xml(sys_mod, no_buttons, server) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
+    def build_xml(sys_mod, buttons, server) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
       return 'No module action defined' if sys_mod.module_action.nil?
 
       action = Crossbeams::Config::ResourceDefinitions::MODULE_ACTIONS[sys_mod.module_action.to_sym]
-      builder = Nokogiri::XML::Builder.new do |xml| # rubocop:disable Metrics/BlockLength
+      builder = Nokogiri::XML::Builder.new(encoding: 'UTF-8') do |xml| # rubocop:disable Metrics/BlockLength
+        xml.comment "\n  (C) #{Time.now.year}, NoSoft MesServer XML Setup File\n  "
         xml.SystemSchema do # rubocop:disable Metrics/BlockLength
-          xml.comment "\n  (C) #{Time.now.year}, NoSoft MesServer XML Setup File\n  "
-
           xml.Messages do
             xml.MsgQueLength 3500
           end
@@ -35,15 +38,14 @@ module ProductionApp
           end
           xml.System do
             xml.Company AppConst::IMPLEMENTATION_OWNER
-            xml.LocalInterface sys_mod.ip_address
+            xml.LocalInterface alternate_ip || sys_mod.ip_address
             xml.ServerInterface server.ip_address
-            xml.ServerPort 2080
-            xml.NetMask '255.255.255.0'
-            xml.comment 'Need ip address for Gateway (store on server system resource? or could it differ for some robots - separate VLANs)'
-            # xml.Gateway '255.255.255.0'
+            xml.ServerPort server.port
+            xml.NetMask netmask
+            xml.Gateway server.ip_address
             xml.comment "\n        When to use true for lbl store (nspi CLM?)\n        LineProdUnit???\n        Why sys pwd?\n    "
-            xml.CentralLableStore false # nspi CLM
-            xml.LineProductionUnit false # ??? CLM?
+            xml.CentralLabelStore false # nspi CLM
+            xml.LineProductionUnit true # ??? CLM?
             xml.SystemPassword 'e=mc22' # ????
             xml.Cms false
             xml.Mqtt false
@@ -55,10 +57,13 @@ module ProductionApp
             xml.Cpu(Name: 'Cpu', Driver: '', Function: 'Temperature', FanOn: 72, FanOff: 35)
             xml.Clock(Name: 'Clock', Driver: '', Function: 'Clock', NetworkInterface: 0, Port: 0)
             xml.Rs232(Name: '/dev/ttyS0', Driver: 'jssc', Function: 'RS232', NetworkInterface: 0, Port: 0)
-            xml.Ethernet(Name: 'Eth01', Function: 'tcpserver', NetworkInterface: '', Port: 2000, NetMask: '255.255.255.0', GateWay: '', TTL: 10_000)
-            xml.Ethernet(Name: 'Eth02', Function: 'tcpserver', NetworkInterface: '', Port: 2091, NetMask: '255.255.255.0', GateWay: '', TTL: 10_000)
-            xml.Ethernet(Name: 'Eth03', Function: 'tcpserver', NetworkInterface: '', Port: 2095, NetMask: '255.255.255.0', GateWay: '', TTL: 10_000)
-            xml.Ethernet(Name: 'Eth04', Function: 'httpserver', NetworkInterface: '', Port: 2080, NetMask: '255.255.255.0', GateWay: '', TTL: 15_000)
+            xml.Rs232(Name: '/dev/ttyUSB1', Driver: 'jssc', Function: 'RS232', NetworkInterface: 0, Port: 0)
+            xml.Usb(Name: '/dev/ttyACM_DEVICE0', Driver: 'usbcom', Function: 'USBIO', NetworkInterface: 0, Port: 0)
+            xml.Usb(Name: '/dev/ttyACM_DEVICE1', Driver: 'usbcom', Function: 'USBIO', NetworkInterface: 0, Port: 0)
+            xml.Ethernet(Name: 'Eth01', Function: 'tcpserver', NetworkInterface: '', Port: 2000, NetMask: netmask, GateWay: '', TTL: 10_000)
+            xml.Ethernet(Name: 'Eth02', Function: 'tcpserver', NetworkInterface: '', Port: 2091, NetMask: netmask, GateWay: '', TTL: 10_000)
+            xml.Ethernet(Name: 'Eth03', Function: 'tcpserver', NetworkInterface: '', Port: 2095, NetMask: netmask, GateWay: '', TTL: 10_000)
+            xml.Ethernet(Name: 'Eth04', Function: 'httpserver', NetworkInterface: '', Port: 2080, NetMask: netmask, GateWay: '', TTL: 15_000)
           end
 
           xml.Peripherals do # rubocop:disable Metrics/BlockLength
@@ -80,7 +85,7 @@ module ProductionApp
                         StartOfInput: 'STX',
                         EndOfInput: 'ETX',
                         StripStartOfInput: false,
-                        StripEndOfInput: true)
+                        StripEndOfInput: false) # ???
             peripherals.each do |p|
               if p.plant_resource_type_code == 'PRINTER'
                 xml.Printer(Name: p.system_resource_code,
@@ -88,7 +93,7 @@ module ProductionApp
                             Model: p.peripheral_model,
                             DeviceName: '',
                             ConnectionType: p.connection_type,
-                            NetworkInterface: p.ip_address,
+                            NetworkInterface: alternate_ip || p.ip_address,
                             Port: p.port,
                             Language: p.printer_language,
                             Alias: p.plant_resource_code,
@@ -123,20 +128,22 @@ module ProductionApp
                       Alias: sys_mod.plant_resource_code,
                       Function: sys_mod.robot_function,
                       ServerInterface: '',
-                      Port: sys_mod.port,
-                      RFID: '',
-                      AccessControl: '',
-                      TCP: '',
+                      Port: 80, # 9296, # --> Webapp port
+                      RFID: 'RID-01', # (if sys_mod.login? && not T200?)
+                      AccessControl: sys_mod.login,
+                      TCP: '', # ???
                       Scanner: '',
                       Scale: '',
                       Printer: '',
-                      TransactionTrigger: '') do
+                      LabelQuantity: buttons.map { |a| (a.extended_config || {})['no_of_labels_to_print'] }.compact.max || 1,
+                      TransactionTrigger: 'Button') do
               if sys_mod.module_action == 'carton_labeling'
-                no_buttons.times do |index|
+                buttons.each_with_index do |button, index|
                   hs = {
                     Name: "B#{index + 1}",
                     Enable: true,
                     Caption: "Button #{index + 1}",
+                    LabelQuantity: (button.extended_config || {})['no_of_labels_to_print'] || 1,
                     URL: action[:url],
                     Par1: action[:Par1]
                   }

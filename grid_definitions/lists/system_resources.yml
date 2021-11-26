@@ -12,6 +12,19 @@
   :title: Module settings
   :popup: true
   :hide_if_true: peripheral
+  :hide_if_false: module_type
+- :url: "/production/resources/system_resources/$:id$/set_server"
+  :text: edit server
+  :icon: edit
+  :title: Server settings
+  :popup: true
+  :hide_if_false: server_type
+- :url: "/production/resources/system_resources/$:id$/set_button"
+  :text: edit button
+  :icon: edit
+  :title: Button settings
+  :popup: true
+  :hide_if_false: button_type
 - :url: "/production/resources/system_resources/$:id$/set_peripheral"
   :text: edit peripheral
   :icon: edit
@@ -22,6 +35,18 @@
   :text: view XML config
   :icon: code
   :hide_if_true: peripheral
+  :hide_if_false: module_type
+- :separator: true
+- :url: "/production/resources/system_resources/$:id$/provision_device"
+  :text: provision device
+  :icon: play
+  :popup: true
+  :hide_if_false: module_type
+- :url: "/production/resources/system_resources/$:id$/deploy_config"
+  :text: deploy configuration
+  :icon: download
+  :popup: true
+  :hide_if_false: module_type
 :page_controls:
 - :control_type: :link
   :url: "/production/resources/system_resources"

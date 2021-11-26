@@ -348,6 +348,36 @@ class Nspack < Roda
         show_page { Production::Resources::SystemResource::ShowXml.call(res, id) }
       end
 
+      r.on 'provision_device' do
+        check_auth!('resources', 'edit')
+        r.get do
+          show_partial { Production::Resources::SystemResource::ProvisionDevice.call(id) }
+        end
+
+        r.post do
+          res = interactor.provision_device(id, params[:system_resource])
+          if res.success
+            update_dialog_content(content: "<pre>#{res.instance.join('<br>')}</pre>", notice: res.message)
+          else
+            update_dialog_content(content: "<pre>#{res.instance.join('<br>')}</pre>", error: res.message)
+          end
+        rescue Crossbeams::InfoError => e
+          show_json_error(e.message, status: 200)
+        end
+      end
+
+      r.on 'deploy_config' do
+        check_auth!('resources', 'edit')
+        r.get do
+          show_partial { Production::Resources::SystemResource::DeployConfig.call(id) }
+        end
+
+        r.post do
+          out = interactor.deploy_system_config(id, params[:system_resource])
+          update_dialog_content(content: "<pre>#{out.join('<br>')}</pre>") # , notice: notice, error: error)
+        end
+      end
+
       r.on 'download_xml_config' do
         check_auth!('resources', 'read')
         res = interactor.system_resource_xml_for(id)
@@ -357,9 +387,35 @@ class Nspack < Roda
         response.write(res.instance[:config][:xml])
       end
 
+      r.on 'set_server' do
+        r.get do
+          check_auth!('resources', 'edit')
+          show_partial { Production::Resources::SystemResource::SetServer.call(id) }
+        end
+        r.post do
+          res = interactor.set_server_resource(id, params[:system_resource])
+          if res.success
+            row_keys = %i[
+              equipment_type
+              module_function
+              mac_address
+              ip_address
+              port
+              ttl
+              cycle_time
+              publishing
+              module_action
+              robot_function
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+          else
+            re_show_form(r, res) { Production::Resources::SystemResource::SetServer.call(id, form_values: params[:system_resource], form_errors: res.errors) }
+          end
+        end
+      end
+
       r.on 'set_module' do
         r.get do
-          # TODO: fail for robot buttons
           check_auth!('resources', 'edit')
           show_partial { Production::Resources::SystemResource::SetModule.call(id) }
         end
@@ -384,6 +440,21 @@ class Nspack < Roda
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
             re_show_form(r, res) { Production::Resources::SystemResource::SetModule.call(id, form_values: params[:system_resource], form_errors: res.errors) }
+          end
+        end
+      end
+
+      r.on 'set_button' do
+        r.get do
+          check_auth!('resources', 'edit')
+          show_partial { Production::Resources::SystemResource::SetButton.call(id) }
+        end
+        r.post do
+          res = interactor.set_button_resource(id, params[:system_resource])
+          if res.success
+            update_grid_row(id, changes: { no_of_labels_to_print: res.instance }, notice: res.message)
+          else
+            re_show_form(r, res) { Production::Resources::SystemResource::SetButton.call(id, form_values: params[:system_resource], form_errors: res.errors) }
           end
         end
       end

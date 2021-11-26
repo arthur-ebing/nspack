@@ -284,6 +284,7 @@ DEPENDENCIES
   minitest-test_profile
   mocha (~> 1.5)
   net-ping
+  net-ssh
   nokogiri
   pg
   pry

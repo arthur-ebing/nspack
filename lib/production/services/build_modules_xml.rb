@@ -66,6 +66,7 @@ module ProductionApp
                                Printer: mod[:printer],
                                PrinterTypes: mod[:printer_types])
                   else
+                    # Include a set of button specs for no of labels per button?
                     xml.Module(Name: mod[:name],
                                Type: mod[:module_type],
                                Function: mod[:function],

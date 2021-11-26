@@ -8,7 +8,9 @@ module UiRules
       apply_form_values
 
       common_values_for_fields common_fields
-      set_show_fields if @mode == :show
+      extended_config_fields
+      set_show_fields if %i[show deploy_config].include?(@mode)
+      set_deploy_fields if @mode == :deploy_config
 
       form_name 'system_resource'
     end
@@ -23,19 +25,19 @@ module UiRules
       fields[:represents_plant_resource_code] = { renderer: :label, invisible: @form_object.represents_plant_resource_code.nil?, caption: 'Represents' }
       fields[:active] = { renderer: :label, as_boolean: true }
 
-      fields[:equipment_type] = { renderer: :label }
-      fields[:module_function] = { renderer: :label }
-      fields[:robot_function] = { renderer: :label }
-      fields[:mac_address] = { renderer: :label }
-      fields[:ip_address] = { renderer: :label }
-      fields[:port] = { renderer: :label }
-      fields[:ttl] = { renderer: :label }
-      fields[:cycle_time] = { renderer: :label }
-      fields[:publishing] = { renderer: :label, as_boolean: true }
-      fields[:login] = { renderer: :label, as_boolean: true }
-      fields[:logoff] = { renderer: :label, as_boolean: true }
-      fields[:group_incentive] = { renderer: :label, as_boolean: true }
-      fields[:legacy_messcada] = { renderer: :label, as_boolean: true }
+      fields[:equipment_type] = { renderer: :label, invisible: @form_object.system_resource_type_code == Crossbeams::Config::ResourceDefinitions::MODULE_BUTTON }
+      fields[:module_function] = { renderer: :label, invisible: @form_object.system_resource_type_code == Crossbeams::Config::ResourceDefinitions::MODULE_BUTTON }
+      fields[:robot_function] = { renderer: :label, invisible: @form_object.system_resource_type_code == Crossbeams::Config::ResourceDefinitions::MODULE_BUTTON }
+      fields[:mac_address] = { renderer: :label, invisible: @form_object.system_resource_type_code == Crossbeams::Config::ResourceDefinitions::MODULE_BUTTON }
+      fields[:ip_address] = { renderer: :label, invisible: @form_object.system_resource_type_code == Crossbeams::Config::ResourceDefinitions::MODULE_BUTTON }
+      fields[:port] = { renderer: :label, invisible: @form_object.system_resource_type_code == Crossbeams::Config::ResourceDefinitions::MODULE_BUTTON }
+      fields[:ttl] = { renderer: :label, invisible: @form_object.system_resource_type_code == Crossbeams::Config::ResourceDefinitions::MODULE_BUTTON }
+      fields[:cycle_time] = { renderer: :label, invisible: @form_object.system_resource_type_code == Crossbeams::Config::ResourceDefinitions::MODULE_BUTTON }
+      fields[:publishing] = { renderer: :label, as_boolean: true, invisible: @form_object.system_resource_type_code == Crossbeams::Config::ResourceDefinitions::MODULE_BUTTON }
+      fields[:login] = { renderer: :label, as_boolean: true, invisible: @form_object.system_resource_type_code == Crossbeams::Config::ResourceDefinitions::MODULE_BUTTON }
+      fields[:logoff] = { renderer: :label, as_boolean: true, invisible: @form_object.system_resource_type_code == Crossbeams::Config::ResourceDefinitions::MODULE_BUTTON }
+      fields[:group_incentive] = { renderer: :label, as_boolean: true, invisible: @form_object.system_resource_type_code == Crossbeams::Config::ResourceDefinitions::MODULE_BUTTON }
+      fields[:legacy_messcada] = { renderer: :label, as_boolean: true, invisible: @form_object.system_resource_type_code == Crossbeams::Config::ResourceDefinitions::MODULE_BUTTON }
       fields[:module_action] = { renderer: :label }
       fields[:peripheral_model] = { renderer: :label }
       fields[:connection_type] = { renderer: :label }
@@ -43,11 +45,20 @@ module UiRules
       fields[:print_username] = { renderer: :label }
       fields[:print_password] = { renderer: :label }
       fields[:pixels_mm] = { renderer: :label }
+      fields[:no_of_labels_to_print] = { renderer: :label,
+                                         parent_field: :extended_config,
+                                         invisible: @form_object.system_resource_type_code != Crossbeams::Config::ResourceDefinitions::MODULE_BUTTON }
+    end
+
+    def set_deploy_fields
+      @form_object = OpenStruct.new(@form_object.to_h.merge(network_ip: nil, use_network_ip: false))
+      fields[:network_ip] = {}
+      fields[:use_network_ip] = { renderer: :checkbox }
     end
 
     def common_fields
       plant_resource_type_id_label = @repo.get_value(:plant_resource_types, :plant_resource_type_code, id: @form_object.plant_resource_type_id)
-      equipment_types = if @mode == :set_module
+      equipment_types = if %i[set_module set_server].include?(@mode)
                           module_types
                         else
                           peripheral_types
@@ -79,8 +90,16 @@ module UiRules
       }
     end
 
+    def extended_config_fields
+      fields[:no_of_labels_to_print] = { renderer: :integer,
+                                         parent_field: :extended_config,
+                                         invisible: @mode != :set_button }
+      fields[:netmask] = { parent_field: :extended_config,
+                           invisible: @mode != :set_server }
+    end
+
     def make_form_object
-      @form_object = if @mode == :show
+      @form_object = if %i[show deploy_config].include?(@mode)
                        sysres = @repo.find_system_resource_flat(@options[:id])
                        represents = @repo.packpoint_for_button(sysres.plant_resource_code)
                        OpenStruct.new(sysres.to_h.merge(represents_plant_resource_code: represents))

@@ -92,6 +92,20 @@ module ProductionApp
       failed_response(e.message)
     end
 
+    def set_server_resource(id, params)
+      res = validate_system_resource_server_params(params)
+      return validation_failed_response(res) if res.failure?
+
+      repo.transaction do
+        repo.update_system_resource(id, res)
+        log_transaction
+      end
+      instance = system_resource(id)
+      success_response("Updated system resource #{instance.system_resource_code}", instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def set_module_resource(id, params)
       res = validate_system_resource_module_params(params)
       return validation_failed_response(res) if res.failure?
@@ -102,6 +116,20 @@ module ProductionApp
       end
       instance = system_resource(id)
       success_response("Updated system resource #{instance.system_resource_code}", instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def set_button_resource(id, params)
+      res = SystemResourceButtonSchema.call(params)
+      return validation_failed_response(res) if res.failure?
+
+      repo.transaction do
+        repo.update_system_resource(id, res)
+        log_transaction
+      end
+      instance = system_resource(id)
+      success_response("Updated system resource #{instance.system_resource_code}", res[:extended_config][:no_of_labels_to_print])
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -193,6 +221,29 @@ module ProductionApp
       srv_res
     end
 
+    def provision_device(id, params)
+      ProvisionDevice.call(id, params[:network_ip], params[:use_network_ip] == 't')
+    end
+
+    def deploy_system_config(id, params)
+      ip = params[:network_ip]
+      usr = 'nspi'
+      pw = 'e=mc22'
+      out = []
+      res = if params[:use_network_ip]
+              ProductionApp::BuildModuleConfigXml.call(id, alternate_ip: params[:network_ip])
+            else
+              ProductionApp::BuildModuleConfigXml.call(id)
+            end
+      Net::SCP.start(ip, usr, password: pw) do |scp|
+        # upload from an in-memory buffer
+        scp.upload! StringIO.new(res.instance[:xml]), '/home/nspi/nosoft/messerver/config/config.xml'
+        out << 'Config.xml copied to device'
+      end
+
+      out
+    end
+
     private
 
     def repo
@@ -221,6 +272,10 @@ module ProductionApp
 
     def validate_plant_resource_clm_params(params)
       PlantResourceBulkClmSchema.call(params)
+    end
+
+    def validate_system_resource_server_params(params)
+      SystemResourceServerSchema.call(params)
     end
 
     def validate_system_resource_module_params(params)
