@@ -188,6 +188,15 @@ module ProductionApp
       new_id
     end
 
+    def inactive_labels_on_run(production_run_id)
+      DB[:label_templates].where(id: DB[:product_resource_allocations]
+                                       .where(production_run_id: production_run_id)
+                                       .exclude(label_template_id: nil)
+                                       .select_map(:label_template_id),
+                                 active: false)
+                          .select_map(:label_template_name).uniq
+    end
+
     def create_production_run_stats(id)
       create(:production_run_stats, production_run_id: id)
     end

@@ -652,6 +652,17 @@ module ProductionApp
       end
     end
 
+    def pre_execute_checks(id)
+      # see if any templates are inactive
+      inactive_labels = repo.inactive_labels_on_run(id)
+      return nil if inactive_labels.empty?
+
+      <<~STR
+        This run has products allocated to inactive label: #{inactive_labels.join(', ')}.
+        You should select a different label template before you execute the run.
+      STR
+    end
+
     def execute_run(id)
       ExecuteRun.call(id, @user.user_name)
     end
