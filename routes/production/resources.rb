@@ -350,31 +350,33 @@ class Nspack < Roda
 
       r.on 'provision_device' do
         check_auth!('resources', 'edit')
-        r.get do
-          show_partial { Production::Resources::SystemResource::ProvisionDevice.call(id) }
-        end
-
-        r.post do
+        r.on 'loading' do
           res = interactor.provision_device(id, params[:system_resource])
           if res.success
-            update_dialog_content(content: "<pre>#{res.instance.join('<br>')}</pre>", notice: res.message)
+            { content: "<pre>#{res.instance.join('<br>')}</pre>", notice: res.message }.to_json
           else
-            update_dialog_content(content: "<pre>#{res.instance.join('<br>')}</pre>", error: res.message)
+            { content: "<pre>#{res.instance.join('<br>')}</pre>", error: res.message }.to_json
           end
         rescue Crossbeams::InfoError => e
           show_json_error(e.message, status: 200)
+        end
+
+        r.get do
+          show_partial { Production::Resources::SystemResource::ProvisionDevice.call(id) }
         end
       end
 
       r.on 'deploy_config' do
         check_auth!('resources', 'edit')
-        r.get do
-          show_partial { Production::Resources::SystemResource::DeployConfig.call(id) }
+        r.on 'loading' do
+          out = interactor.deploy_system_config(id, params[:system_resource])
+          { content: "<pre>#{out.join('<br>')}</pre>", notice: 'Deployed...' }.to_json
+        rescue Crossbeams::InfoError => e
+          show_json_error(e.message, status: 200)
         end
 
-        r.post do
-          out = interactor.deploy_system_config(id, params[:system_resource])
-          update_dialog_content(content: "<pre>#{out.join('<br>')}</pre>") # , notice: notice, error: error)
+        r.get do
+          show_partial { Production::Resources::SystemResource::DeployConfig.call(id) }
         end
       end
 

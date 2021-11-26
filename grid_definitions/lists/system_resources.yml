@@ -40,11 +40,13 @@
 - :url: "/production/resources/system_resources/$:id$/provision_device"
   :text: provision device
   :icon: play
+  :title: Provision Device
   :popup: true
   :hide_if_false: module_type
 - :url: "/production/resources/system_resources/$:id$/deploy_config"
   :text: deploy configuration
   :icon: download
+  :title: Deploy Configuration
   :popup: true
   :hide_if_false: module_type
 :page_controls:

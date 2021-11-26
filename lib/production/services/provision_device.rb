@@ -2,7 +2,7 @@
 
 module ProductionApp
   class ProvisionDevice < BaseService # rubocop:disable Metrics/ClassLength
-    attr_reader :id, :repo, :network_ip, :usr, :pw, :out
+    attr_reader :id, :repo, :network_ip, :usr, :pw, :out, :use_network_ip
 
     def initialize(id, network_ip, use_network_ip)
       @id = id
@@ -14,9 +14,14 @@ module ProductionApp
       @out = []
     end
 
-    def call
-      # Logging...
+    def call # rubocop:disable Metrics/AbcSize
+      sys_mod = repo.find_system_resource_flat(id)
+      out << "PROVISIONING #{sys_mod.system_resource_code} ip: #{sys_mod.ip_address}"
+      out << "---------------------------------------\n"
+      AppConst::ROBOT_LOG.info('Starting provisioning of a device')
+      AppConst::ROBOT_LOG.info("PROVISIONING #{sys_mod.system_resource_code} ip: #{sys_mod.ip_address}")
       res = check_for_previously_provisioned
+      AppConst::ROBOT_LOG.info('Provisioning aborted - already run for this device') unless res.success
       return res unless res.success
 
       add_user
@@ -28,6 +33,7 @@ module ProductionApp
       copy_robot_config
       reboot
 
+      AppConst::ROBOT_LOG.info('Provisioning complete.')
       success_response('Device has been provisioned and is rebooting', out)
     end
 
@@ -40,33 +46,33 @@ module ProductionApp
               ProductionApp::BuildModuleConfigXml.call(id)
             end
 
-      Net::SCP.start(ip, usr, password: pw) do |scp|
+      Net::SCP.start(network_ip, usr, password: pw) do |scp|
         scp.upload! StringIO.new(res.instance[:xml]), '/home/nspi/nosoft/messerver/config/config.xml'
         out << 'Config.xml copied to device'
       end
     end
 
     def reboot
-      Net::SSH.start(ip, usr, password: pw) do |ssh|
+      Net::SSH.start(network_ip, usr, password: pw) do |ssh|
         out << 'Reboot...'
         ssh.exec!('sudo reboot')
       end
     end
 
-    def add_user
-      Net::SSH.start(ip, 'pi', password: 'raspberry') do |ssh|
+    def add_user # rubocop:disable Metrics/AbcSize
+      Net::SSH.start(network_ip, 'pi', password: 'raspberry') do |ssh|
         out << "Add nspi user and change the pi user's password"
-        ssh.exec!(%(sudo useradd -s /bin/bash -d /home/nspi/ -m -G sudo,adm,lpadmin,gpio,dialout,cdrom,audio,video,input,netdev,i2c,spi nspi))
-        ssh.exec!(%(sudo usermod --password $(openssl passwd -1 '#{pw}') nspi))
-        ssh.exec!(%(echo 'nspi ALL=(ALL) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/010_nspi-nopasswd))
-        ssh.exec!(%(sudo sed -i "s/autologin-user=pi/autologin-user=nspi/" /etc/lightdm/lightdm.conf))
-        ssh.exec!(%(sudo usermod --password $(openssl passwd -1 '#{pw}') pi))
+        out << ssh.exec!(%(sudo useradd -s /bin/bash -d /home/nspi/ -m -G sudo,adm,lpadmin,gpio,dialout,cdrom,audio,video,input,netdev,i2c,spi nspi))
+        out << ssh.exec!(%(sudo usermod --password $(openssl passwd -1 '#{pw}') nspi))
+        out << ssh.exec!(%(echo 'nspi ALL=(ALL) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/010_nspi-nopasswd))
+        out << ssh.exec!(%(sudo sed -i "s/autologin-user=pi/autologin-user=nspi/" /etc/lightdm/lightdm.conf))
+        out << ssh.exec!(%(sudo usermod --password $(openssl passwd -1 '#{pw}') pi))
       end
       # Thread.new { send_bus_message_to_page([], 'list/system_resources', message: out.last) }
     end
 
     def show_mac # rubocop:disable Metrics/AbcSize
-      Net::SSH.start(ip, usr, password: pw) do |ssh|
+      Net::SSH.start(network_ip, usr, password: pw) do |ssh|
         result = ssh.exec!(%(cat /sys/class/net/$(ip route show default | awk '/default/ {print $5}')/address))
         out << 'MAC address:'
         out << '-----------------'
@@ -85,7 +91,7 @@ module ProductionApp
     end
 
     def copy_splash
-      Net::SCP.start(ip, usr, password: pw) do |scp|
+      Net::SCP.start(network_ip, usr, password: pw) do |scp|
         out << 'Copy NoSoft splash screen to device'
         # if seeed / pi... [SYS: add hardware_device (rpi, radUDP, reterm, radJSON, ITPC, browser, android)
         scp.upload! "#{ENV['ROOT']}/device_provisioning/ns_splash.png", '/home/nspi/ns_splash.png'
@@ -94,7 +100,7 @@ module ProductionApp
     end
 
     def config_splash_locale_autostart # rubocop:disable Metrics/AbcSize
-      Net::SSH.start(ip, usr, password: pw) do |ssh| # rubocop:disable Metrics/BlockLength
+      Net::SSH.start(network_ip, usr, password: pw) do |ssh| # rubocop:disable Metrics/BlockLength
         out << 'Set up splash screen'
         # For pi
         ssh.exec!(%(cd /usr/share/plymouth/themes/pix/))
@@ -141,7 +147,7 @@ module ProductionApp
         out << 'Disable ipv6'
         ssh.exec!(%(echo 'net.ipv6.conf.all.disable_ipv6 = 0' | sudo tee -a /etc/sysctl.conf))
 
-        out << 'Disable WiFi && BT'
+        out << 'Disable WiFi && Bluetooth'
         ssh.exec!(%(echo 'dtoverlay=disable-wifi' | sudo tee -a /boot/config.txt))
         ssh.exec!(%(echo 'dtoverlay=disable-bt' | sudo tee -a /boot/config.txt))
 
@@ -190,22 +196,22 @@ module ProductionApp
     end
 
     def copy_messerver_set_host # rubocop:disable Metrics/AbcSize
-      Net::SCP.start(ip, usr, password: pw) do |scp|
+      Net::SCP.start(network_ip, usr, password: pw) do |scp|
         out << 'Copy MesServer zip file to device'
         scp.upload! "#{ENV['ROOT']}/device_provisioning/nosoft_messerver.zip", '/home/nspi/nosoft_messerver.zip'
       end
 
-      Net::SSH.start(ip, usr, password: pw) do |ssh|
+      Net::SSH.start(network_ip, usr, password: pw) do |ssh|
         out << 'Unzip messerver'
-        ssh.exec!(%(unzip nosoft_messerver.zip))
-        ssh.exec!(%(rm nosoft_messerver.zip))
-        ssh.exec!(%(sed -i "s/^java /# java /" /home/nspi/nososft/messerver/startMesServer.sh)) # if for_virtual_pi
-        ssh.exec!(%(sed -i "s/^# JAVA 11: //g" /home/nspi/nososft/messerver/startMesServer.sh)) # if for_virtual_pi
+        out << ssh.exec!(%(unzip nosoft_messerver.zip))
+        out << ssh.exec!(%(rm nosoft_messerver.zip))
+        out << ssh.exec!(%(sed -i "s/^java /# java /" /home/nspi/nosoft/messerver/startMesServer.sh)) # if for_virtual_pi
+        out << ssh.exec!(%(sed -i "s/^# JAVA 11: //g" /home/nspi/nosoft/messerver/startMesServer.sh)) # if for_virtual_pi
 
         out << 'Change the hostname and static ip address'
-        ssh.exec!(%(sudo sed -i "s/raspberry/ns-#{ip.tr('.', '')}/g" /etc/hostname))
-        ssh.exec!(%(sudo sed -i "s/raspberrypi/ns-#{ip.tr('.', '')}/g" /etc/hostname))
-        ssh.exec!(%(sudo sed -i "s/raspberrypi/ns-#{ip.tr('.', '')}/g" /etc/hosts))
+        out << ssh.exec!(%(sudo sed -i "s/raspberry/ns-#{network_ip.tr('.', '')}/g" /etc/hostname))
+        out << ssh.exec!(%(sudo sed -i "s/raspberrypi/ns-#{network_ip.tr('.', '')}/g" /etc/hostname))
+        out << ssh.exec!(%(sudo sed -i "s/raspberrypi/ns-#{network_ip.tr('.', '')}/g" /etc/hosts))
       end
     end
 
