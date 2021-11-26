@@ -225,10 +225,12 @@ class Nspack < Roda
         r.get do
           check_auth!('runs', 'edit')
           interactor.assert_permission!(:execute_run, id)
+          error = interactor.pre_execute_checks(id)
           show_partial do
             Production::Runs::ProductionRun::Confirm.call(id,
                                                           url: "/production/runs/production_runs/#{id}/execute_run",
                                                           notice: 'Press the button to start tipping the run',
+                                                          error: error,
                                                           button_captions: ['Execute', 'Executing...'])
           end
         end
@@ -264,10 +266,12 @@ class Nspack < Roda
         r.get do
           check_auth!('runs', 'edit')
           interactor.assert_permission!(:re_execute_run, id)
+          error = interactor.pre_execute_checks(id)
           show_partial do
             Production::Runs::ProductionRun::Confirm.call(id,
                                                           url: "/production/runs/production_runs/#{id}/re_execute_run",
                                                           notice: 'Press the button to continue executing the run',
+                                                          error: error,
                                                           button_captions: ['Re-execute', 'Executing...'])
           end
         end
