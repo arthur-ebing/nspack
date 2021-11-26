@@ -78,7 +78,7 @@ module Crossbeams
             ps_apply_substitutes: false },
       cfg: { install_location: 'CFG',
              install_depot: 'CFG',
-             sender: 'CFG',
+             sender: 'CF',
              load_id_prefix: '',
              default_edi_in_inv_code: 'UL',
              li_default_pallet_base: 'S',
