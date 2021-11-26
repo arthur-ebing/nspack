@@ -153,6 +153,11 @@ module ProductionApp
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 
+    def assert_system_permission!(task, id = nil)
+      res = TaskPermissionCheck::SystemResource.call(task, id)
+      raise Crossbeams::TaskNotPermittedError, res.message unless res.success
+    end
+
     def next_peripheral_code(plant_resource_type_id)
       return success_response('ok', next_code: '', readonly: false) if plant_resource_type_id.blank?
 

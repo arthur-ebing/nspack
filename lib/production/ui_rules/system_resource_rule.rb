@@ -112,15 +112,7 @@ module UiRules
     private
 
     def module_types
-      [
-        ['MES Server', 'messerver'],
-        ['CMS Server', 'cmsserver'],
-        ['Standard NoSoft RPi robot (robot-nspi)', 'robot-nspi'],
-        ['Client-built  RPi robot (robot-rpi)', 'robot-rpi'],
-        ['Radical T200/T201 robot - Requires a MAC Address (robot-T200)', 'robot-T200'],
-        ['Radical T210 Java robot (robot-T210)', 'robot-T210'],
-        ['ITPC server', 'ITPC']
-      ]
+      Crossbeams::Config::ResourceDefinitions::MODULE_EQUIPMENT_TYPES
     end
 
     def peripheral_types
@@ -154,7 +146,7 @@ module UiRules
     end
 
     def robot_functions
-      %w[Server HTTP-CartonLabel HTTP-BinTip HTTP-RmtBinWeighing HTTP-PalletBuildup HTTP-PalletBuildup-SplitScreen]
+      Crossbeams::Config::ResourceDefinitions::MODULE_ROBOT_FUNCTIONS
     end
 
     def peripheral_models

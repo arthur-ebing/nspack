@@ -350,6 +350,8 @@ class Nspack < Roda
 
       r.on 'provision_device' do
         check_auth!('resources', 'edit')
+        interactor.assert_system_permission!(:provision, id)
+
         r.on 'loading' do
           res = interactor.provision_device(id, params[:system_resource])
           if res.success
@@ -368,6 +370,8 @@ class Nspack < Roda
 
       r.on 'deploy_config' do
         check_auth!('resources', 'edit')
+        interactor.assert_system_permission!(:deploy_config, id)
+
         r.on 'loading' do
           out = interactor.deploy_system_config(id, params[:system_resource])
           { content: "<pre>#{out.join('<br>')}</pre>", notice: 'Deployed...' }.to_json
