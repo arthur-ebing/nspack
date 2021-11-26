@@ -45,7 +45,9 @@ class AppConst # rubocop:disable Metrics/ClassLength
     'ud' => 'Unifrutti Dunbrody',
     'sr' => 'Sitrusrand Kirkwood',
     'sr2' => 'Sitrusrand Addo',
-    'kr' => 'Kromco'
+    'kr' => 'Kromco',
+    'cfg' => 'Ceres Fruit Growers',
+    'ghs' => 'Goede Hoop Sitrus'
   }.freeze
 
   # Load the client settings from ENV:
