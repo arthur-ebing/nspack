@@ -40,7 +40,7 @@
       :editor: :search_select
       :width: 300
       :value_sql: SELECT '' AS label_template_name, NULL AS id UNION SELECT label_template_name,
-        id FROM label_templates WHERE application = 'Carton'
+        id FROM label_templates WHERE application = 'Carton' AND active
     packing_method_code:
       :editor: :select
       :width: 300
