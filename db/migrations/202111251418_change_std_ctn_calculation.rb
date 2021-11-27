@@ -110,7 +110,6 @@ Sequel.migration do
         ps.grade_id,
         grades.grade_code AS grade,
         grades.rmt_grade,
-        grades.inspection_class,
         ps.scrapped_from_pallet_id,
         ps.removed_from_pallet,
         ps.removed_from_pallet_id,
