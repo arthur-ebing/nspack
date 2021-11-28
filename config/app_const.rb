@@ -58,6 +58,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   raise "Unknown CLIENT_CODE - #{CLIENT_CODE}" unless CLIENT_SET.keys.include?(CLIENT_CODE)
 
   SHOW_DB_NAME = ENV.fetch('DATABASE_URL').rpartition('@').last
+  PROVISION_PW = ENV['PROVISION_PW']
 
   # A struct that can be used to alter the client code while tests are running.
   # All the CB_ classes will use this value as the client_code, which allows

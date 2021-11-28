@@ -84,7 +84,7 @@ class BuildCfgResourceTree < BaseScript
   end
 
   def create_modules_and_printers # rubocop:disable Metrics/AbcSize
-    clm_attrs = { port: 2000, group_incentive: true, login: true, logoff: false, equipment_type: 'robot-nsre', robot_function: 'HTTP-CartonLabel', module_function: 'carton_labelling', ttl: 10_000, cycle_time: 9000, module_action: 'carton-labeling', publishing: true }
+    clm_attrs = { port: 2000, group_incentive: true, login: true, logoff: false, equipment_type: 'robot-nspi', robot_function: 'HTTP-CartonLabel', module_function: 'carton_labelling', ttl: 10_000, cycle_time: 9000, module_action: 'carton-labeling', publishing: true, extended_config: { distro_type: 'seeed_reterm' } }
 
     130.times do |n|
       seq = n + 1

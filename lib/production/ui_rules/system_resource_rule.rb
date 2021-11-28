@@ -94,6 +94,11 @@ module UiRules
       fields[:no_of_labels_to_print] = { renderer: :integer,
                                          parent_field: :extended_config,
                                          invisible: @mode != :set_button }
+      fields[:distro_type] = { renderer: :select,
+                               options: Crossbeams::Config::ResourceDefinitions::MODULE_DISTRO_TYPES,
+                               parent_field: :extended_config,
+                               prompt: true,
+                               invisible: @mode != :set_module }
       fields[:netmask] = { parent_field: :extended_config,
                            invisible: @mode != :set_server }
     end

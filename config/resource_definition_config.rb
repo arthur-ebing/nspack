@@ -554,8 +554,6 @@ module Crossbeams
       MODULE_EQUIPMENT_TYPE_MESSERVER = 'messerver'
       MODULE_EQUIPMENT_TYPE_CMSSERVER = 'cmsserver'
       MODULE_EQUIPMENT_TYPE_NSPI = 'robot-nspi'
-      MODULE_EQUIPMENT_TYPE_NSRE = 'robot-nsre'
-      MODULE_EQUIPMENT_TYPE_NSPI_V = 'robot-nspi-v'
       MODULE_EQUIPMENT_TYPE_RPI = 'robot-rpi'
       MODULE_EQUIPMENT_TYPE_RT200 = 'robot-T200'
       MODULE_EQUIPMENT_TYPE_RT210 = 'robot-T210'
@@ -565,12 +563,18 @@ module Crossbeams
         ['MES Server', MODULE_EQUIPMENT_TYPE_MESSERVER],
         ['CMS Server', MODULE_EQUIPMENT_TYPE_CMSSERVER],
         ['Standard NoSoft RPi robot (robot-nspi)', MODULE_EQUIPMENT_TYPE_NSPI],
-        ['Seeed reTerminal NoSoft robot (robot-nsre)', MODULE_EQUIPMENT_TYPE_NSRE],
-        ['VM NoSoft RPi robot (robot-nspi-v)', MODULE_EQUIPMENT_TYPE_NSPI_V],
         ['Client-built  RPi robot (robot-rpi)', MODULE_EQUIPMENT_TYPE_RPI],
         ['Radical T200/T201 robot - Requires a MAC Address (robot-T200)', MODULE_EQUIPMENT_TYPE_RT200],
         ['Radical T210 Java robot (robot-T210)', MODULE_EQUIPMENT_TYPE_RT210],
         ['ITPC server', MODULE_EQUIPMENT_TYPE_ITPC]
+      ].freeze
+
+      MODULE_DISTRO_TYPES = [
+        ['Virtual Raspbian', 'rpi_vm'],
+        ['Raspberry pi 3B+', 'rpi_3b+'],
+        ['Seeed reTerminal', 'seeed_reterm'],
+        %w[ITPC itpc],
+        %w[Radical radical]
       ].freeze
 
       MODULE_ROBOT_FUNCTIONS = %w[
@@ -732,6 +736,10 @@ module Crossbeams
 
       def self.peripheral_type_codes
         PLANT_RESOURCE_RULES.select { |_, v| v[:create_with_system_resource] == PERIPHERAL }.keys
+      end
+
+      def self.can_be_provisioned?(distro_type)
+        %w[rpi_vm rpi_3b+ seeed_reterm].include?(distro_type)
       end
     end
   end

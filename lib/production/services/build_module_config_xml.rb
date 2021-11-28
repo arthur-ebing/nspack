@@ -43,10 +43,10 @@ module ProductionApp
             xml.ServerPort server.port
             xml.NetMask netmask
             xml.Gateway server.ip_address
-            xml.comment "\n        When to use true for lbl store (nspi CLM?)\n        LineProdUnit???\n        Why sys pwd?\n    "
-            xml.CentralLabelStore false # nspi CLM
+            xml.comment "\n        When to use true for lbl store (nspi CLM && publishing?)\n        When true for LineProdUnit???\n        Why do we need sys pwd?\n    "
+            xml.CentralLabelStore sys_mod.publishing # nspi CLM
             xml.LineProductionUnit true # ??? CLM?
-            xml.SystemPassword 'e=mc22' # ????
+            xml.SystemPassword AppConst::PROVISION_PW # ????
             xml.Cms false
             xml.Mqtt false
             xml.Debug false

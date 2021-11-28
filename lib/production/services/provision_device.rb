@@ -10,7 +10,7 @@ module ProductionApp
       @use_network_ip = use_network_ip
       @repo = ResourceRepo.new
       @usr = 'nspi'
-      @pw = 'e=mc22'
+      @pw = AppConst::PROVISION_PW
       @out = []
     end
 

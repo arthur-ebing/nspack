@@ -29,26 +29,31 @@ module ProductionApp
       private
 
       def provision_check
+        return failed_response 'No password set for provisioning' unless AppConst::PROVISION_PW
+
         if configurable_device?
           all_ok
         else
-          failed_response 'This system resource is of the wrong type to be provisioned.'
+          failed_response "This system resource is of the wrong distro type to be provisioned. (#{distro})"
         end
       end
 
       def deploy_config_check
+        return failed_response 'No password set for provisioning' unless AppConst::PROVISION_PW
+
         if configurable_device?
           all_ok
         else
-          failed_response 'This system resource is of the wrong type to be configured.'
+          failed_response "This system resource is of the wrong distro type to be configured. (#{distro})"
         end
       end
 
+      def distro
+        (entity.extended_config || {})['distro_type']
+      end
+
       def configurable_device?
-        [Crossbeams::Config::ResourceDefinitions::MODULE_EQUIPMENT_TYPE_NSPI,
-         Crossbeams::Config::ResourceDefinitions::MODULE_EQUIPMENT_TYPE_NSRE,
-         Crossbeams::Config::ResourceDefinitions::MODULE_EQUIPMENT_TYPE_NSPI_V,
-         Crossbeams::Config::ResourceDefinitions::MODULE_EQUIPMENT_TYPE_RPI].include?(entity.equipment_type)
+        Crossbeams::Config::ResourceDefinitions.can_be_provisioned?(distro)
       end
     end
   end

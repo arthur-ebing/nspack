@@ -232,15 +232,13 @@ module ProductionApp
 
     def deploy_system_config(id, params)
       ip = params[:network_ip]
-      usr = 'nspi'
-      pw = 'e=mc22'
       out = []
       res = if params[:use_network_ip]
               ProductionApp::BuildModuleConfigXml.call(id, alternate_ip: params[:network_ip])
             else
               ProductionApp::BuildModuleConfigXml.call(id)
             end
-      Net::SCP.start(ip, usr, password: pw) do |scp|
+      Net::SCP.start(ip, 'nspi', password: AppConst::PROVISION_PW) do |scp|
         # upload from an in-memory buffer
         scp.upload! StringIO.new(res.instance[:xml]), '/home/nspi/nosoft/messerver/config/config.xml'
         out << 'Config.xml copied to device'

@@ -34,6 +34,9 @@ module ProductionApp
     required(:legacy_messcada).maybe(:bool)
     required(:module_action).maybe(Types::StrippedString)
     required(:robot_function).maybe(Types::StrippedString)
+    optional(:extended_config).hash do
+      optional(:distro_type).maybe(Types::StrippedString)
+    end
   end
 
   SystemResourcePeripheralSchema = Dry::Schema.Params do
