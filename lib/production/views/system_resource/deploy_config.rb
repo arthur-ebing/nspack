@@ -19,6 +19,7 @@ module Production
                   col.add_field :system_resource_code
                   col.add_field :network_ip
                   col.add_field :use_network_ip
+                  col.add_field :distro_type
                   # webserver - host/port from BASE_IP as default
                   # MesServer: choose VLAN ip if required... (on MES SERVER, allow setting of VLAN ip addresses)
                 end

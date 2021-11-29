@@ -54,6 +54,8 @@ module UiRules
       @form_object = OpenStruct.new(@form_object.to_h.merge(network_ip: nil, use_network_ip: false))
       fields[:network_ip] = {}
       fields[:use_network_ip] = { renderer: :checkbox }
+      fields[:distro_type] = { renderer: :label,
+                               with_value: Crossbeams::Config::ResourceDefinitions::MODULE_DISTRO_TYPES.rassoc((@form_object.extended_config || {})['distro_type']).first }
     end
 
     def common_fields

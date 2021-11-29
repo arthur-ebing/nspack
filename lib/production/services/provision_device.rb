@@ -2,7 +2,7 @@
 
 module ProductionApp
   class ProvisionDevice < BaseService # rubocop:disable Metrics/ClassLength
-    attr_reader :id, :repo, :network_ip, :usr, :pw, :out, :use_network_ip
+    attr_reader :id, :repo, :network_ip, :usr, :pw, :out, :use_network_ip, :sys_mod
 
     def initialize(id, network_ip, use_network_ip)
       @id = id
@@ -15,7 +15,7 @@ module ProductionApp
     end
 
     def call # rubocop:disable Metrics/AbcSize
-      sys_mod = repo.find_system_resource_flat(id)
+      @sys_mod = repo.find_system_resource_flat(id)
       out << "PROVISIONING #{sys_mod.system_resource_code} ip: #{sys_mod.ip_address}"
       out << "---------------------------------------\n"
       AppConst::ROBOT_LOG.info('Starting provisioning of a device')
@@ -28,6 +28,9 @@ module ProductionApp
       show_mac
       copy_splash
       config_splash_locale_autostart
+      # TODO: USB files
+      # TODO: trim rightclick menu
+      # TODO: see if any other configs required from rPi doc.
       copy_messerver_set_host
 
       copy_robot_config
@@ -38,6 +41,14 @@ module ProductionApp
     end
 
     private
+
+    def for_virtual_pi
+      @for_virtual_pi ||= sys_mod.extended_config['distro_type'] == Crossbeams::Config::ResourceDefinitions::MODULE_DISTRO_TYPE_VM
+    end
+
+    def for_reterm
+      @for_reterm ||= sys_mod.extended_config['distro_type'] == Crossbeams::Config::ResourceDefinitions::MODULE_DISTRO_TYPE_RETERM
+    end
 
     def copy_robot_config
       res = if use_network_ip
@@ -85,7 +96,7 @@ module ProductionApp
         # Thread.new { send_bus_message_to_page([], 'list/system_resources', message: out.last) }
 
         out << 'Remove the default pi startup script'
-        ssh.exec!(%(sudo rm /etc/xdg/autostart/piwiz.desktop))
+        ssh.exec!(%(sudo rm /etc/xdg/autostart/piwiz.desktop)) # TODO: check if the name is the same on seeed & pi...
         # Thread.new { send_bus_message_to_page([], 'list/system_resources', message: out.last) }
       end
     end
@@ -93,25 +104,30 @@ module ProductionApp
     def copy_splash
       Net::SCP.start(network_ip, usr, password: pw) do |scp|
         out << 'Copy NoSoft splash screen to device'
-        # if seeed / pi... [SYS: add hardware_device (rpi, radUDP, reterm, radJSON, ITPC, browser, android)
-        scp.upload! "#{ENV['ROOT']}/device_provisioning/ns_splash.png", '/home/nspi/ns_splash.png'
-        # scp.upload! "#{ENV['ROOT']}/device_provisioning/ns_splash_vert.png", '/home/nspi/ns_splash.png'
+        if for_reterm
+          scp.upload! "#{ENV['ROOT']}/device_provisioning/ns_splash_vert.png", '/home/nspi/ns_splash.png'
+        else
+          scp.upload! "#{ENV['ROOT']}/device_provisioning/ns_splash.png", '/home/nspi/ns_splash.png'
+        end
       end
     end
 
     def config_splash_locale_autostart # rubocop:disable Metrics/AbcSize
       Net::SSH.start(network_ip, usr, password: pw) do |ssh| # rubocop:disable Metrics/BlockLength
         out << 'Set up splash screen'
-        # For pi
-        ssh.exec!(%(cd /usr/share/plymouth/themes/pix/))
-        ssh.exec!(%(sudo mv splash.png splash.png.bk))
-        ssh.exec!(%(sudo mv /home/nspi/ns_splash.png /usr/share/plymouth/themes/pix/splash.png))
 
-        # For reTerm
-        # ssh.exec!(%(cd /usr/share/plymouth/themes/seeed/))
-        # ssh.exec!(%(sudo mv splash_v.png splash_v.png.bk))
-        # ssh.exec!(%(sudo mv /home/nspi/ns_splash_vert.png /usr/share/plymouth/themes/seeed/splash_v.png))
-        # convert tty1 to tty3?
+        if for_reterm
+          # For reTerm
+          ssh.exec!(%(cd /usr/share/plymouth/themes/seeed/))
+          ssh.exec!(%(sudo mv splash_v.png splash_v.png.bk))
+          ssh.exec!(%(sudo mv /home/nspi/ns_splash_vert.png /usr/share/plymouth/themes/seeed/splash_v.png))
+        else
+          # For pi
+          ssh.exec!(%(cd /usr/share/plymouth/themes/pix/))
+          ssh.exec!(%(sudo mv splash.png splash.png.bk))
+          ssh.exec!(%(sudo mv /home/nspi/ns_splash.png /usr/share/plymouth/themes/pix/splash.png))
+        end
+        # TODO: convert tty1 to tty3?
         out << 'Update apt'
         ssh.exec!(%(sudo apt-get update -y))
 
@@ -128,6 +144,7 @@ module ProductionApp
         ssh.exec!(%(sudo sed -i -e "/XKBLAYOUT=/s/gb/us/" /etc/default/keyboard))
         ssh.exec!(%(sudo service keyboard-setup restart))
 
+        # TODO: run installs in parallel...
         # out << 'Install vim'
         # result = ssh.exec!(%(sudo apt-get install vim -y))
         # out << result
@@ -205,8 +222,8 @@ module ProductionApp
         out << 'Unzip messerver'
         out << ssh.exec!(%(unzip nosoft_messerver.zip))
         out << ssh.exec!(%(rm nosoft_messerver.zip))
-        out << ssh.exec!(%(sed -i "s/^java /# java /" /home/nspi/nosoft/messerver/startMesServer.sh)) # if for_virtual_pi
-        out << ssh.exec!(%(sed -i "s/^# JAVA 11: //g" /home/nspi/nosoft/messerver/startMesServer.sh)) # if for_virtual_pi
+        out << ssh.exec!(%(sed -i "s/^java /# java /" /home/nspi/nosoft/messerver/startMesServer.sh)) if for_virtual_pi
+        out << ssh.exec!(%(sed -i "s/^# JAVA 11: //g" /home/nspi/nosoft/messerver/startMesServer.sh)) if for_virtual_pi
 
         out << 'Change the hostname and static ip address'
         out << ssh.exec!(%(sudo sed -i "s/raspberry/ns-#{network_ip.tr('.', '')}/g" /etc/hostname))

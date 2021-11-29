@@ -569,12 +569,19 @@ module Crossbeams
         ['ITPC server', MODULE_EQUIPMENT_TYPE_ITPC]
       ].freeze
 
+      MODULE_DISTRO_TYPE_VM = 'rpi_vm'
+      MODULE_DISTRO_TYPE_PI = 'rpi_3b+'
+      MODULE_DISTRO_TYPE_RETERM = 'seeed_reterm'
+      MODULE_DISTRO_TYPE_ITPC = 'itpc'
+      MODULE_DISTRO_TYPE_RAD = 'radical'
+      # radUDP, radJSON, browser?, android
+
       MODULE_DISTRO_TYPES = [
-        ['Virtual Raspbian', 'rpi_vm'],
-        ['Raspberry pi 3B+', 'rpi_3b+'],
-        ['Seeed reTerminal', 'seeed_reterm'],
-        %w[ITPC itpc],
-        %w[Radical radical]
+        ['Virtual Raspbian', MODULE_DISTRO_TYPE_VM],
+        ['Raspberry pi 3B+', MODULE_DISTRO_TYPE_PI],
+        ['Seeed reTerminal', MODULE_DISTRO_TYPE_RETERM],
+        ['ITPC', MODULE_DISTRO_TYPE_ITPC],
+        ['Radical', MODULE_DISTRO_TYPE_RAD]
       ].freeze
 
       MODULE_ROBOT_FUNCTIONS = %w[
