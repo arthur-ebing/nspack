@@ -253,21 +253,19 @@
   - :column: transaction_type_code
     :caption: transaction_type_code
     :data_type: :string
-    :control_type: :list
+    :control_type: :text
     :default_value:
-    :ordered_list: true
+    :ordered_list: false
     :ui_priority: 1
-    :list_def: SELECT DISTINCT transaction_type_code FROM vw_offsite_bin_asset_transactions
-      ORDER BY transaction_type_code
+    :list_def:
   - :column: process
     :caption: process
     :data_type: :string
-    :control_type: :list
+    :control_type: :text
     :default_value:
-    :ordered_list: true
+    :ordered_list: false
     :ui_priority: 1
-    :list_def: SELECT DISTINCT process FROM vw_offsite_bin_asset_transactions ORDER
-      BY process
+    :list_def:
   - :column: created_at
     :caption: created at
     :data_type: :datetime
@@ -279,45 +277,40 @@
   - :column: material_owner
     :caption: bin owner
     :data_type: :string
-    :control_type: :list
+    :control_type: :text
     :default_value:
-    :ordered_list: true
+    :ordered_list: false
     :ui_priority: 1
-    :list_def: SELECT DISTINCT material_owner FROM vw_offsite_bin_asset_transactions
-      ORDER BY material_owner
+    :list_def:
   - :column: container_material_type_code
     :caption: bin type
     :data_type: :string
-    :control_type: :list
+    :control_type: :text
     :default_value:
-    :ordered_list: true
+    :ordered_list: false
     :ui_priority: 1
-    :list_def: SELECT DISTINCT container_material_type_code FROM vw_offsite_bin_asset_transactions
-      ORDER BY container_material_type_code
+    :list_def:
   - :column: reference_number
     :caption: ref number
     :data_type: :string
-    :control_type: :list
+    :control_type: :text
     :default_value:
-    :ordered_list: true
+    :ordered_list: false
     :ui_priority: 1
-    :list_def: SELECT DISTINCT reference_number FROM vw_offsite_bin_asset_transactions
-      ORDER BY reference_number
+    :list_def:
   - :column: from_location
     :caption: from location
     :data_type: :string
-    :control_type: :list
+    :control_type: :text
     :default_value:
-    :ordered_list: true
+    :ordered_list: false
     :ui_priority: 1
-    :list_def: SELECT DISTINCT from_location FROM vw_offsite_bin_asset_transactions
-      ORDER BY from_location
+    :list_def:
   - :column: to_location
     :caption: to location
     :data_type: :string
-    :control_type: :list
+    :control_type: :text
     :default_value:
-    :ordered_list: true
+    :ordered_list: false
     :ui_priority: 1
-    :list_def: SELECT DISTINCT to_location FROM vw_offsite_bin_asset_transactions ORDER
-      BY to_location
+    :list_def:
