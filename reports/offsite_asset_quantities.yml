@@ -7,19 +7,19 @@
   0) + SUM(quantity_bins) - COALESCE(returned_bins.total_received, 0)) AS qty_at_site\r\nFROM
   vw_offsite_bin_asset_transactions\r\nLEFT JOIN (SELECT material_owner, container_material_type_code,\r\n\t\t
   \  from_location, SUM(quantity_bins) AS total_received FROM vw_offsite_bin_asset_transactions\r\n\t\t
-  \  WHERE transaction_type_code NOT IN ('ISSUE_BINS')\r\n\t\t   GROUP BY material_owner,
+  \  WHERE transaction_type_code NOT IN ('BIN SALES')\r\n\t\t   GROUP BY material_owner,
   container_material_type_code, from_location) returned_bins \r\n\t\t   ON returned_bins.material_owner
   = vw_offsite_bin_asset_transactions.material_owner\r\n\t       AND returned_bins.container_material_type_code
   = vw_offsite_bin_asset_transactions.container_material_type_code\r\n\t       AND
   returned_bins.from_location = vw_offsite_bin_asset_transactions.to_location\r\nLEFT
   JOIN (SELECT material_owner, container_material_type_code,\r\n\t\t   to_location,
   SUM(quantity_bins) AS total_issued FROM vw_offsite_bin_asset_transactions\r\n\t\t
-  \  WHERE transaction_type_code = 'ISSUE_BINS'\r\n\t\t   GROUP BY material_owner,
+  \  WHERE transaction_type_code = 'BIN SALES'\r\n\t\t   GROUP BY material_owner,
   container_material_type_code, to_location) issued_bins \r\n\t\t   ON issued_bins.material_owner
   = vw_offsite_bin_asset_transactions.material_owner\r\n\t       AND issued_bins.container_material_type_code
   = vw_offsite_bin_asset_transactions.container_material_type_code\r\n\t       AND
   issued_bins.to_location = vw_offsite_bin_asset_transactions.to_location\r\nWHERE
-  transaction_type_code NOT IN ('ISSUE_BINS')\r\nGROUP BY vw_offsite_bin_asset_transactions.material_owner,
+  transaction_type_code NOT IN ('BIN SALES')\r\nGROUP BY vw_offsite_bin_asset_transactions.material_owner,
   vw_offsite_bin_asset_transactions.container_material_type_code, \r\n         vw_offsite_bin_asset_transactions.to_location,
   5, 6"
 :limit: 
