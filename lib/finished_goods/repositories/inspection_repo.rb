@@ -108,7 +108,8 @@ module FinishedGoodsApp
     def govt_inspection_type_check_attrs
       DB[:inspection_types]
         .where(inspection_type_code: AppConst::GOVT_INSPECTION_AGENCY)
-        .select(:applies_to_all_tms, :applies_to_all_grades, :applicable_tm_ids, :applicable_grade_ids)
+        .select(:applies_to_all_tms, :applies_to_all_grades, :applies_to_all_packed_tm_groups,
+                :applicable_tm_ids, :applicable_grade_ids, :applicable_packed_tm_group_ids)
         .first
     end
   end

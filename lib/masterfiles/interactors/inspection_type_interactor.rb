@@ -65,6 +65,7 @@ module MasterfilesApp
     end
 
     def validate_inspection_type_params(params)
+      params[:applicable_packed_tm_group_ids] = nil if params[:applicable_packed_tm_group_ids].nil_or_empty?
       params[:applicable_tm_ids] = nil if params[:applicable_tm_ids].nil_or_empty?
       params[:applicable_tm_customer_ids] = nil if params[:applicable_tm_customer_ids].nil_or_empty?
       params[:applicable_grade_ids] = nil if params[:applicable_grade_ids].nil_or_empty?

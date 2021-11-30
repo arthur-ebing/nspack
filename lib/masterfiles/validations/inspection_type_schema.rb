@@ -15,5 +15,7 @@ module MasterfilesApp
     required(:applicable_grade_ids).maybe(:array).maybe { each(:integer) }
     required(:applies_to_all_marketing_org_party_roles).maybe(:bool)
     required(:applicable_marketing_org_party_role_ids).maybe(:array).maybe { each(:integer) }
+    required(:applies_to_all_packed_tm_groups).maybe(:bool)
+    required(:applicable_packed_tm_group_ids).maybe(:array).maybe { each(:integer) }
   end
 end

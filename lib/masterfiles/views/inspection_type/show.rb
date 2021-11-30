@@ -22,6 +22,9 @@ module Masterfiles
                   col.add_field :active
                 end
                 row.column do |col|
+                  col.add_field :applies_to_all_packed_tm_groups
+                  col.add_field :applicable_packed_tm_group_ids
+
                   col.add_field :applies_to_all_tms
                   col.add_field :applicable_tms
 

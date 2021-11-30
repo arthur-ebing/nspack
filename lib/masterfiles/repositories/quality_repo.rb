@@ -62,7 +62,7 @@ module MasterfilesApp
                           order_by: :inspection_type_code
     crud_calls_for :inspection_types, name: :inspection_type
 
-    def find_inspection_type(id) # rubocop:disable Metrics/AbcSize
+    def find_inspection_type(id) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       hash = find_with_association(:inspection_types,
                                    id,
                                    parent_tables: [{ parent_table: :inspection_failure_types,
@@ -89,6 +89,11 @@ module MasterfilesApp
       hash[:applicable_marketing_org_party_role_ids] ||= []
       hash[:applicable_marketing_org_party_role_ids] = select_values(:party_roles, :id, role_id: role_id) if hash[:applies_to_all_marketing_org_party_roles]
       hash[:applicable_marketing_org_party_roles] = hash[:applicable_marketing_org_party_role_ids].to_a.map { |i| DB.get(Sequel.function(:fn_party_role_name, i)) }
+
+      target_market_group_type_id = get_id(:target_market_group_types, target_market_group_type_code: AppConst::PACKED_TM_GROUP)
+      hash[:applicable_packed_tm_group_ids] ||= []
+      hash[:applicable_packed_tm_group_ids] = select_values(:target_market_groups, :id, target_market_group_type_id: target_market_group_type_id) if hash[:applies_to_all_packed_tm_groups]
+      hash[:applicable_packed_tm_groups] = select_values(:target_market_groups, :target_market_group_name, id: hash[:applicable_packed_tm_group_ids].to_a)
 
       InspectionType.new(hash)
     end
