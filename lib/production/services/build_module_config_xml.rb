@@ -2,7 +2,7 @@
 
 module ProductionApp
   class BuildModuleConfigXml < BaseService # rubocop:disable Metrics/ClassLength
-    attr_reader :id, :repo, :alternate_ip, :netmask
+    attr_reader :id, :repo, :alternate_ip, :sys_mod, :netmask, :gateway
 
     def initialize(id, alternate_ip: nil)
       @id = id
@@ -10,12 +10,13 @@ module ProductionApp
       @repo = ResourceRepo.new
     end
 
-    def call
-      sys_mod = repo.find_system_resource_flat(id)
+    def call # rubocop:disable Metrics/AbcSize
+      @sys_mod = repo.find_system_resource_flat(id)
       server = repo.find_mes_server
       raise Crossbeams::InfoError, 'There is no plant resource defined as a MesServer' if server.nil?
 
       @netmask = server.extended_config['netmask'] || '255.255.255.0'
+      @gateway = server.extended_config['gateway'] # TODO: set to vlan gateway if applicable
       buttons = repo.robot_button_system_resources(sys_mod.plant_resource_id)
       xml = build_xml(sys_mod, buttons, server)
       success_response('BuildModuleConfigXml was successful', xml: xml, module: sys_mod.system_resource_code)
@@ -42,7 +43,7 @@ module ProductionApp
             xml.ServerInterface server.ip_address
             xml.ServerPort server.port
             xml.NetMask netmask
-            xml.Gateway server.ip_address
+            xml.Gateway gateway
             xml.comment "\n        When to use true for lbl store (nspi CLM && publishing?)\n        When true for LineProdUnit???\n        Why do we need sys pwd?\n    "
             xml.CentralLabelStore sys_mod.publishing # nspi CLM
             xml.LineProductionUnit true # ??? CLM?
@@ -56,11 +57,15 @@ module ProductionApp
             xml.comment 'Which of these are ALWAYS present, and which are OPTIONAL?'
             xml.Cpu(Name: 'Cpu', Driver: '', Function: 'Temperature', FanOn: 72, FanOff: 35)
             xml.Clock(Name: 'Clock', Driver: '', Function: 'Clock', NetworkInterface: 0, Port: 0)
-            xml.Rs232(Name: '/dev/ttyS0', Driver: 'jssc', Function: 'RS232', NetworkInterface: 0, Port: 0)
+            if for_reterm
+              xml.Rs232(Name: '/dev/ttyAMA0', Driver: 'jssc', Function: 'RS232', NetworkInterface: 0, Port: 0)
+            else # pi3
+              xml.Rs232(Name: '/dev/ttyS0', Driver: 'jssc', Function: 'RS232', NetworkInterface: 0, Port: 0)
+            end
             xml.Rs232(Name: '/dev/ttyUSB1', Driver: 'jssc', Function: 'RS232', NetworkInterface: 0, Port: 0)
             xml.Usb(Name: '/dev/ttyACM_DEVICE0', Driver: 'usbcom', Function: 'USBIO', NetworkInterface: 0, Port: 0)
             xml.Usb(Name: '/dev/ttyACM_DEVICE1', Driver: 'usbcom', Function: 'USBIO', NetworkInterface: 0, Port: 0)
-            xml.Ethernet(Name: 'Eth01', Function: 'tcpserver', NetworkInterface: '', Port: 2000, NetMask: netmask, GateWay: '', TTL: 10_000)
+            xml.Ethernet(Name: 'Eth01', Function: 'tcpserver', NetworkInterface: '', Port: 2000, NetMask: netmask, GateWay: '', TTL: 10_000) # FIXME: gateways may need to be set for vlan?
             xml.Ethernet(Name: 'Eth02', Function: 'tcpserver', NetworkInterface: '', Port: 2091, NetMask: netmask, GateWay: '', TTL: 10_000)
             xml.Ethernet(Name: 'Eth03', Function: 'tcpserver', NetworkInterface: '', Port: 2095, NetMask: netmask, GateWay: '', TTL: 10_000)
             xml.Ethernet(Name: 'Eth04', Function: 'httpserver', NetworkInterface: '', Port: 2080, NetMask: netmask, GateWay: '', TTL: 15_000)
@@ -73,7 +78,7 @@ module ProductionApp
             xml.Scanner(Name: 'RID-01',
                         Type: 'RDM630',
                         Model: 'RDM630',
-                        DeviceName: '/dev/ttyS0',
+                        DeviceName: for_reterm ? '/dev/ttyAMA0' : '/dev/ttyS0',
                         ReaderId: 1,
                         ConnectionType: 'RS232',
                         BaudRate: '9600',
@@ -171,6 +176,10 @@ module ProductionApp
       return [] if ids.empty?
 
       ids.map { |s_id| repo.find_system_resource_flat(s_id) }
+    end
+
+    def for_reterm
+      @for_reterm ||= sys_mod.extended_config['distro_type'] == Crossbeams::Config::ResourceDefinitions::MODULE_DISTRO_TYPE_RETERM
     end
   end
 end

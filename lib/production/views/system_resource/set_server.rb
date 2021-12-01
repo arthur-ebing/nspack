@@ -38,6 +38,7 @@ module Production
                   col.add_field :cycle_time
                   col.add_field :publishing
                   col.add_field :netmask
+                  col.add_field :gateway
                 end
               end
             end

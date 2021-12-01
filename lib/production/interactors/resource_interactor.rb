@@ -185,8 +185,11 @@ module ProductionApp
     end
 
     def system_resource_xml_for(id)
-      success_response('ok',
-                       config: ProductionApp::BuildModuleConfigXml.call(id).instance)
+      if repo.system_resource_type_from_resource(id) == Crossbeams::Config::ResourceDefinitions::SERVER
+        success_response('ok', config: ProductionApp::BuildServerConfigXml.call(id).instance)
+      else
+        success_response('ok', config: ProductionApp::BuildModuleConfigXml.call(id).instance)
+      end
     end
 
     def system_resource_xml

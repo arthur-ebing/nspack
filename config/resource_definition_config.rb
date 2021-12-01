@@ -198,6 +198,7 @@ module Crossbeams
       CMS_SERVER = 'CMS_SERVER'
       ITPC = 'ITPC'
       SUB_LINE = 'SUB_LINE'
+      VLAN = 'VLAN'
 
       # Peripherals
       SCALE = 'SCALE'
@@ -210,6 +211,7 @@ module Crossbeams
       MODULE = 'MODULE'
       MODULE_BUTTON = 'MODULE_BUTTON'
       PERIPHERAL = 'PERIPHERAL'
+      NETWORK = 'NETWORK'
 
       ROOT_PLANT_RESOURCE_TYPES = [SITE, BIN_FORKLIFT, PALLET_FORKLIFT, ROOM].freeze
 
@@ -218,6 +220,10 @@ module Crossbeams
                     computing_device: true,
                     attributes: { ip_address: :string,
                                   sub_types: [MES_SERVER, CMS_SERVER] } },
+        NETWORK => { description: 'Network',
+                     computing_device: true,
+                     attributes: { ip_address: :string,
+                                   sub_types: [VLAN] } },
         MODULE => { description: 'Module',
                     computing_device: true,
                     attributes: { ip_address: :string,
@@ -249,7 +255,7 @@ module Crossbeams
                   allowed_children: [PACKHOUSE, ROOM, MES_SERVER, CMS_SERVER, PRESORTING_UNIT],
                   icon: { file: 'globe', colour: CLR_H } },
         MES_SERVER => { description: 'MES Server',
-                        allowed_children: [],
+                        allowed_children: [VLAN],
                         icon: { file: 'servers', colour: CLR_J },
                         create_with_system_resource: SERVER,
                         code_prefix: 'SRV-' },
@@ -258,6 +264,11 @@ module Crossbeams
                         icon: { file: 'servers', colour: CLR_P },
                         create_with_system_resource: SERVER,
                         code_prefix: 'SRV-' },
+        VLAN => { description: 'VLAN',
+                  allowed_children: [],
+                  icon: { file: 'load-balancer', colour: CLR_F },
+                  create_with_system_resource: NETWORK,
+                  code_prefix: 'VLAN-' },
         PACKHOUSE => { description: 'Packhouse',
                        allowed_children: [ROOM,
                                           LINE,

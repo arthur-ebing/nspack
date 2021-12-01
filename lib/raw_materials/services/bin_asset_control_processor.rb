@@ -12,6 +12,8 @@ module RawMaterialsApp
       res = process_bin_asset_control_que
       raise Crossbeams::InfoError, unwrap_failed_response(res) unless res.success
 
+      # FIXME: What happens when an exception is raised? no feedback/email/log
+
       success_response('ok')
     end
 

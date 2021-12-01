@@ -103,6 +103,8 @@ module UiRules
                                invisible: @mode != :set_module }
       fields[:netmask] = { parent_field: :extended_config,
                            invisible: @mode != :set_server }
+      fields[:gateway] = { parent_field: :extended_config,
+                           invisible: @mode != :set_server }
     end
 
     def make_form_object

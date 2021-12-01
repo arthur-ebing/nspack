@@ -15,6 +15,7 @@ module ProductionApp
     required(:robot_function).maybe(Types::StrippedString)
     optional(:extended_config).hash do
       optional(:netmask).maybe(Types::StrippedString)
+      optional(:gateway).maybe(Types::StrippedString)
     end
   end
 

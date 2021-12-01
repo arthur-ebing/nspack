@@ -25,9 +25,10 @@
   \   TRUE\r\n  ELSE\r\n    FALSE\r\n  END AS module_type,\r\n  CASE WHEN system_resource_types.system_resource_type_code
   = 'SERVER' THEN\r\n    TRUE\r\n  ELSE\r\n    FALSE\r\n  END AS server_type,\r\n
   \ CASE WHEN system_resource_types.system_resource_type_code = 'MODULE_BUTTON' THEN\r\n
-  \   TRUE\r\n  ELSE\r\n    FALSE\r\n  END AS button_type,\r\n  extended_config ->>
-  'no_of_labels_to_print' AS no_of_labels_to_print\r\nFROM\r\n  plant_resources\r\n
-  \ JOIN plant_resource_types ON plant_resource_types.id = plant_resources.plant_resource_type_id\r\n
+  \   TRUE\r\n  ELSE\r\n    FALSE\r\n  END AS button_type,\r\n  CASE WHEN system_resource_types.system_resource_type_code
+  = 'NETWORK' THEN\r\n    TRUE\r\n  ELSE\r\n    FALSE\r\n  END AS network_type,\r\n
+  \ extended_config ->> 'no_of_labels_to_print' AS no_of_labels_to_print\r\nFROM\r\n
+  \ plant_resources\r\n  JOIN plant_resource_types ON plant_resource_types.id = plant_resources.plant_resource_type_id\r\n
   \ JOIN system_resources ON system_resources.id = plant_resources.system_resource_id\r\n
   \ JOIN system_resource_types ON system_resource_types.id = system_resources.system_resource_type_id\r\nWHERE\r\n
   \ EXISTS (\r\n    SELECT\r\n      ancestor_plant_resource_id\r\n    FROM\r\n      tree_plant_resources\r\n
@@ -602,9 +603,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  network_type:
+    :name: network_type
+    :sequence_no: 36
+    :caption: Network type
+    :namespaced_name: 
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   no_of_labels_to_print:
     :name: no_of_labels_to_print
-    :sequence_no: 36
+    :sequence_no: 37
     :caption: "#Labels"
     :namespaced_name: 
     :data_type: :integer

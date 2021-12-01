@@ -34,8 +34,7 @@
 - :url: "/production/resources/system_resources/$:id$/view_xml_config"
   :text: view XML config
   :icon: code
-  :hide_if_true: peripheral
-  :hide_if_false: module_type
+  :hide_if_true: peripheral,button_type,network_type
 - :separator: true
 - :url: "/production/resources/system_resources/$:id$/provision_device"
   :text: provision device
