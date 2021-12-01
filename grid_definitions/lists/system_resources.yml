@@ -19,6 +19,12 @@
   :title: Server settings
   :popup: true
   :hide_if_false: server_type
+- :url: "/production/resources/system_resources/$:id$/set_network"
+  :text: edit network
+  :icon: edit
+  :title: Network settings
+  :popup: true
+  :hide_if_false: network_type
 - :url: "/production/resources/system_resources/$:id$/set_button"
   :text: edit button
   :icon: edit

@@ -106,6 +106,20 @@ module ProductionApp
       failed_response(e.message)
     end
 
+    def set_network_resource(id, params)
+      res = validate_system_resource_network_params(params)
+      return validation_failed_response(res) if res.failure?
+
+      repo.transaction do
+        repo.update_system_resource(id, res)
+        log_transaction
+      end
+      instance = system_resource(id)
+      success_response("Updated system resource #{instance.system_resource_code}", instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def set_module_resource(id, params)
       res = validate_system_resource_module_params(params)
       return validation_failed_response(res) if res.failure?
@@ -282,6 +296,10 @@ module ProductionApp
 
     def validate_system_resource_server_params(params)
       SystemResourceServerSchema.call(params)
+    end
+
+    def validate_system_resource_network_params(params)
+      SystemResourceNetworkSchema.call(params)
     end
 
     def validate_system_resource_module_params(params)

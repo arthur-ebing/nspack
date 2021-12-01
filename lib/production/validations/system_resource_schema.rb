@@ -19,6 +19,16 @@ module ProductionApp
     end
   end
 
+  SystemResourceNetworkSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:mac_address).maybe(Types::StrippedString)
+    required(:ip_address).maybe(Types::StrippedString)
+    optional(:extended_config).hash do
+      optional(:netmask).maybe(Types::StrippedString)
+      optional(:gateway).maybe(Types::StrippedString)
+    end
+  end
+
   SystemResourceModuleSchema = Dry::Schema.Params do
     optional(:id).filled(:integer)
     required(:equipment_type).maybe(Types::StrippedString)

@@ -420,6 +420,25 @@ class Nspack < Roda
         end
       end
 
+      r.on 'set_network' do
+        r.get do
+          check_auth!('resources', 'edit')
+          show_partial { Production::Resources::SystemResource::SetNetwork.call(id) }
+        end
+        r.post do
+          res = interactor.set_network_resource(id, params[:system_resource])
+          if res.success
+            row_keys = %i[
+              mac_address
+              ip_address
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+          else
+            re_show_form(r, res) { Production::Resources::SystemResource::SetNetwork.call(id, form_values: params[:system_resource], form_errors: res.errors) }
+          end
+        end
+      end
+
       r.on 'set_module' do
         r.get do
           check_auth!('resources', 'edit')
