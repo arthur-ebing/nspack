@@ -1,27 +1,34 @@
 ---
 :caption: Offsite Asset Quantities
 :sql: "SELECT vw_offsite_bin_asset_transactions.material_owner,\r\n\t   vw_offsite_bin_asset_transactions.container_material_type_code,\r\n\t
-  \  vw_offsite_bin_asset_transactions.to_location,\r\n\t   SUM(quantity_bins) AS
-  total_issued,\r\n\t   COALESCE(returned_bins.total_received, 0) AS total_received,\r\n\t
-  \  COALESCE(issued_bins.total_issued, 0) AS total_issued_by_bin_sales,\r\n\t   (COALESCE(issued_bins.total_issued,
-  0) + SUM(quantity_bins) - COALESCE(returned_bins.total_received, 0)) AS qty_at_site\r\nFROM
-  vw_offsite_bin_asset_transactions\r\nLEFT JOIN (SELECT material_owner, container_material_type_code,\r\n\t\t
-  \  from_location, SUM(quantity_bins) AS total_received FROM vw_offsite_bin_asset_transactions\r\n\t\t
+  \  vw_offsite_bin_asset_transactions.to_location,\r\n\t   COALESCE(issued_bins.total_issued,
+  0) AS total_issued,\r\n\t   COALESCE(returned_bins.total_received, 0) AS total_received,\r\n\t
+  \  COALESCE(issued_by_bin_sales.total_issued, 0) AS total_issued_by_bin_sales,\r\n\t
+  \  (COALESCE(issued_by_bin_sales.total_issued, 0) + COALESCE(issued_bins.total_issued,
+  0) - COALESCE(returned_bins.total_received, 0)) AS qty_at_site\r\nFROM vw_offsite_bin_asset_transactions\r\nLEFT
+  JOIN (SELECT material_owner, container_material_type_code,\r\n\t\t   to_location,
+  SUM(quantity_bins) AS total_issued FROM vw_offsite_bin_asset_transactions\r\n\t\t
   \  WHERE transaction_type_code NOT IN ('BIN SALES')\r\n\t\t   GROUP BY material_owner,
-  container_material_type_code, from_location) returned_bins \r\n\t\t   ON returned_bins.material_owner
-  = vw_offsite_bin_asset_transactions.material_owner\r\n\t       AND returned_bins.container_material_type_code
+  container_material_type_code, to_location) issued_bins\r\n\t\t   ON issued_bins.material_owner
+  = vw_offsite_bin_asset_transactions.material_owner\r\n\t       AND issued_bins.container_material_type_code
   = vw_offsite_bin_asset_transactions.container_material_type_code\r\n\t       AND
-  returned_bins.from_location = vw_offsite_bin_asset_transactions.to_location\r\nLEFT
+  issued_bins.to_location = vw_offsite_bin_asset_transactions.to_location\r\nLEFT
+  JOIN (SELECT material_owner, container_material_type_code,\r\n\t\t   from_location,
+  SUM(quantity_bins) AS total_received FROM vw_offsite_bin_asset_transactions\r\n\t\t
+  \  GROUP BY material_owner, container_material_type_code, from_location) returned_bins
+  \r\n\t\t   ON returned_bins.material_owner = vw_offsite_bin_asset_transactions.material_owner\r\n\t
+  \      AND returned_bins.container_material_type_code = vw_offsite_bin_asset_transactions.container_material_type_code\r\n\t
+  \      AND returned_bins.from_location = vw_offsite_bin_asset_transactions.to_location\r\nLEFT
   JOIN (SELECT material_owner, container_material_type_code,\r\n\t\t   to_location,
   SUM(quantity_bins) AS total_issued FROM vw_offsite_bin_asset_transactions\r\n\t\t
   \  WHERE transaction_type_code = 'BIN SALES'\r\n\t\t   GROUP BY material_owner,
-  container_material_type_code, to_location) issued_bins \r\n\t\t   ON issued_bins.material_owner
-  = vw_offsite_bin_asset_transactions.material_owner\r\n\t       AND issued_bins.container_material_type_code
+  container_material_type_code, to_location) issued_by_bin_sales \r\n\t\t   ON issued_by_bin_sales.material_owner
+  = vw_offsite_bin_asset_transactions.material_owner\r\n\t       AND issued_by_bin_sales.container_material_type_code
   = vw_offsite_bin_asset_transactions.container_material_type_code\r\n\t       AND
-  issued_bins.to_location = vw_offsite_bin_asset_transactions.to_location\r\nWHERE
-  transaction_type_code NOT IN ('BIN SALES')\r\nGROUP BY vw_offsite_bin_asset_transactions.material_owner,
-  vw_offsite_bin_asset_transactions.container_material_type_code, \r\n         vw_offsite_bin_asset_transactions.to_location,
-  5, 6"
+  issued_by_bin_sales.to_location = vw_offsite_bin_asset_transactions.to_location\r\nGROUP
+  BY vw_offsite_bin_asset_transactions.material_owner, vw_offsite_bin_asset_transactions.container_material_type_code,
+  \r\n         vw_offsite_bin_asset_transactions.to_location, issued_bins.total_issued,
+  returned_bins.total_received, issued_by_bin_sales.total_issued"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -138,4 +145,28 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-:query_parameter_definitions: []
+:query_parameter_definitions:
+  - :column: vw_offsite_bin_asset_transactions.material_owner
+    :caption: bin owner
+    :data_type: :string
+    :control_type: :text
+    :default_value:
+    :ordered_list: false
+    :ui_priority: 1
+    :list_def:
+  - :column: vw_offsite_bin_asset_transactions.container_material_type_code
+    :caption: bin type
+    :data_type: :string
+    :control_type: :text
+    :default_value:
+    :ordered_list: false
+    :ui_priority: 1
+    :list_def:
+  - :column: vw_offsite_bin_asset_transactions.to_location
+    :caption: to location
+    :data_type: :string
+    :control_type: :text
+    :default_value:
+    :ordered_list: false
+    :ui_priority: 1
+    :list_def:
