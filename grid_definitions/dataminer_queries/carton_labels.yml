@@ -36,11 +36,11 @@
   \ fn_party_role_name (carton_labels.target_customer_party_role_id) AS target_customer,\r\n
   \ carton_labels.colour_percentage_id,\r\n  colour_percentages.colour_percentage,\r\n
   \ colour_percentages.description AS colour_description \r\nFROM\r\n  carton_labels\r\n
-  \ LEFT JOIN cartons ON carton_labels.id = cartons.carton_label_id\r\n  JOIN production_runs
-  ON production_runs.id = carton_labels.production_run_id\r\n  JOIN product_setup_templates
-  ON product_setup_templates.id = production_runs.product_setup_template_id\r\n  JOIN
-  plant_resources packhouses ON packhouses.id = carton_labels.packhouse_resource_id\r\n
-  \ JOIN plant_resources lines ON lines.id = carton_labels.production_line_id\r\n
+  \ LEFT JOIN cartons ON carton_labels.id = cartons.carton_label_id\r\n  LEFT JOIN
+  production_runs ON production_runs.id = carton_labels.production_run_id\r\n  LEFT
+  JOIN product_setup_templates ON product_setup_templates.id = production_runs.product_setup_template_id\r\n
+  \ LEFT JOIN plant_resources packhouses ON packhouses.id = carton_labels.packhouse_resource_id\r\n
+  \ LEFT JOIN plant_resources lines ON lines.id = carton_labels.production_line_id\r\n
   \ LEFT JOIN plant_resources packpoints ON packpoints.id = carton_labels.resource_id\r\n
   \ LEFT JOIN plant_resources palletizing_bays ON palletizing_bays.id = cartons.palletizing_bay_resource_id\r\n
   \ LEFT JOIN system_resources ON packpoints.system_resource_id = system_resources.id\r\n

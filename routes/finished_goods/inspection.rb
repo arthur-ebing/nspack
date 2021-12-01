@@ -484,6 +484,27 @@ class Nspack < Roda
     r.on 'inspections' do
       interactor = FinishedGoodsApp::InspectionInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
+      r.on 'pallet_inspection_status' do
+        r.get do
+          show_partial_or_page(r) { FinishedGoods::Inspection::Inspection::ShowInspectionStatus.call(remote: fetch?(r)) }
+        end
+
+        r.post do
+          res = interactor.pallet_inspection_status(params[:inspection])
+          if res.success
+            flash[:notice] = res.message
+            r.redirect '/finished_goods/inspection/inspections/pallet_inspection_status'
+          else
+            re_show_form(r, res, url: '/finished_goods/inspection/inspections/pallet_inspection_status') do
+              FinishedGoods::Inspection::Inspection::ShowInspectionStatus.call(res.instance,
+                                                                               form_values: params[:inspection],
+                                                                               form_errors: res.errors,
+                                                                               remote: fetch?(r))
+            end
+          end
+        end
+      end
+
       r.on 'passed_changed' do
         passed = params[:changed_value] == 'f'
         json_actions([
