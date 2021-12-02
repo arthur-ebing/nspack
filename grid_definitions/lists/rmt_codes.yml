@@ -1,0 +1,58 @@
+---
+:dataminer_definition: rmt_codes
+:actions:
+- :url: "/masterfiles/raw_materials/rmt_codes/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/masterfiles/raw_materials/rmt_codes/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/raw_materials/rmt_codes/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :url: "/masterfiles/raw_materials/rmt_codes/$:id$/complete"
+  :text: Complete
+  :icon: toggle-on
+  :popup: true
+  :hide_if_true: completed
+  :auth:
+    :function: Masterfiles
+    :program: raw materials
+    :permission: edit
+- :url: "/masterfiles/raw_materials/rmt_codes/$:id$/approve"
+  :text: Approve/Reject
+  :icon: gavel
+  :popup: true
+  :hide_if_false: completed
+  :hide_if_true: approved
+  :auth:
+    :function: Masterfiles
+    :program: raw materials
+    :permission: approve
+- :url: "/masterfiles/raw_materials/rmt_codes/$:id$/reopen"
+  :text: Re-open for editing
+  :icon: toggle-off
+  :popup: true
+  :hide_if_false: approved
+  :auth:
+    :function: Masterfiles
+    :program: raw materials
+    :permission: edit
+- :separator: true
+- :url: "/development/statuses/list/rmt_codes/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/raw_materials/rmt_codes/new"
+  :text: New Rmt Code
+  :style: :button
+  :behaviour: :popup

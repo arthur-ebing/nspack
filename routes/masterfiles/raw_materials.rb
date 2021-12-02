@@ -213,5 +213,153 @@ class Nspack < Roda
         end
       end
     end
+
+    # RIPENESS CODES
+    # --------------------------------------------------------------------------
+    r.on 'ripeness_codes', Integer do |id|
+      interactor = MasterfilesApp::AdvancedClassificationsInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:ripeness_codes, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('raw materials', 'edit')
+        interactor.assert_ripeness_code_permission!(:edit, id)
+        show_partial { Masterfiles::RawMaterials::RipenessCode::Edit.call(id) }
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('raw materials', 'read')
+          show_partial { Masterfiles::RawMaterials::RipenessCode::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_ripeness_code(id, params[:ripeness_code])
+          if res.success
+            update_grid_row(id, changes: { ripeness_code: res.instance[:ripeness_code], description: res.instance[:description], legacy_code: res.instance[:legacy_code] },
+                            notice: res.message)
+          else
+            re_show_form(r, res) { Masterfiles::RawMaterials::RipenessCode::Edit.call(id, form_values: params[:ripeness_code], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('raw materials', 'delete')
+          interactor.assert_ripeness_code_permission!(:delete, id)
+          res = interactor.delete_ripeness_code(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+
+    r.on 'ripeness_codes' do
+      interactor = MasterfilesApp::AdvancedClassificationsInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      # r.on 'ui_change', String do |change_type| # Handle UI behaviours
+      #   handle_ui_change(:ripeness_code, change_type.to_sym, params)
+      # end
+      r.on 'new' do    # NEW
+        check_auth!('raw materials', 'new')
+        show_partial_or_page(r) { Masterfiles::RawMaterials::RipenessCode::New.call(remote: fetch?(r)) }
+      end
+      r.post do        # CREATE
+        res = interactor.create_ripeness_code(params[:ripeness_code])
+        if res.success
+          row_keys = %i[
+            id
+            ripeness_code
+            description
+            legacy_code
+            status
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
+        else
+          re_show_form(r, res, url: '/masterfiles/raw_materials/ripeness_codes/new') do
+            Masterfiles::RawMaterials::RipenessCode::New.call(form_values: params[:ripeness_code],
+                                                              form_errors: res.errors,
+                                                              remote: fetch?(r))
+          end
+        end
+      end
+    end
+
+    # RMT HANDLING REGIMES
+    # --------------------------------------------------------------------------
+    r.on 'rmt_handling_regimes', Integer do |id|
+      interactor = MasterfilesApp::AdvancedClassificationsInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:rmt_handling_regimes, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('raw materials', 'edit')
+        interactor.assert_handling_regime_permission!(:edit, id)
+        show_partial { Masterfiles::RawMaterials::RmtHandlingRegime::Edit.call(id) }
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('raw materials', 'read')
+          show_partial { Masterfiles::RawMaterials::RmtHandlingRegime::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_rmt_handling_regime(id, params[:rmt_handling_regime])
+          if res.success
+            update_grid_row(id, changes: { regime_code: res.instance[:regime_code], description: res.instance[:description], for_packing: res.instance[:for_packing] },
+                            notice: res.message)
+          else
+            re_show_form(r, res) { Masterfiles::RawMaterials::RmtHandlingRegime::Edit.call(id, form_values: params[:rmt_handling_regime], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('raw materials', 'delete')
+          interactor.assert_handling_regime_permission!(:delete, id)
+          res = interactor.delete_rmt_handling_regime(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+
+    r.on 'rmt_handling_regimes' do
+      interactor = MasterfilesApp::AdvancedClassificationsInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      # r.on 'ui_change', String do |change_type| # Handle UI behaviours
+      #   handle_ui_change(:rmt_handling_regime, change_type.to_sym, params)
+      # end
+      r.on 'new' do    # NEW
+        check_auth!('raw materials', 'new')
+        show_partial_or_page(r) { Masterfiles::RawMaterials::RmtHandlingRegime::New.call(remote: fetch?(r)) }
+      end
+      r.post do        # CREATE
+        res = interactor.create_rmt_handling_regime(params[:rmt_handling_regime])
+        if res.success
+          row_keys = %i[
+            id
+            regime_code
+            description
+            for_packing
+            status
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
+        else
+          re_show_form(r, res, url: '/masterfiles/raw_materials/rmt_handling_regimes/new') do
+            Masterfiles::RawMaterials::RmtHandlingRegime::New.call(form_values: params[:rmt_handling_regime],
+                                                                   form_errors: res.errors,
+                                                                   remote: fetch?(r))
+          end
+        end
+      end
+    end
   end
 end
