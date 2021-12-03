@@ -63,7 +63,7 @@ module FinishedGoodsApp
 
       insp_res = nil
       repo.transaction do
-        insp_res = FinishedGoodsApp::FailedAndPendingPalletInspections.call(pallet_number)
+        insp_res = FinishedGoodsApp::FailedAndPendingPalletInspections.call(pallet_number, check_status: true)
         unless insp_res.success
           instance = OpenStruct.new(failed_inspections: insp_res[:errors][:failed].join(','),
                                     pending_inspections: insp_res[:errors][:pending].join(','))

@@ -999,9 +999,10 @@ module ProductionApp
       DB[query].single_value
     end
 
-    def rmt_bins_for_nett_recalculation
+    def rmt_bins_for_nett_recalculation(where: {})
       DB[:rmt_bins]
         .exclude(gross_weight: nil)
+        .where(where)
         .select(:id,
                 :qty_inner_bins,
                 :rmt_inner_container_material_id,

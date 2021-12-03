@@ -1515,7 +1515,7 @@ module ProductionApp
         avg_gross_weight: instance[:avg_gross_weight] }
     end
 
-    def update_rmt_bin_record(params) # rubocop:disable Metrics/AbcSize
+    def update_rmt_bin_record(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       arr = %i[rmt_class_id rmt_size_id rmt_container_material_type_id rmt_material_owner_party_role_id]
       if AppConst::CR_RMT.maintain_legacy_columns?
         params[:legacy_data] = { 'colour' => params[:colour], 'pc_code' => params[:pc_code],
@@ -1543,10 +1543,22 @@ module ProductionApp
                                                                                       after: after_state,
                                                                                       change_descriptions: { before: rmt_bin_state(before_state), after: rmt_bin_state(after_state) }) })
         log_reworks_rmt_bin_status_and_transaction(reworks_run_id, res[:bin_number], AppConst::REWORKS_ACTION_SINGLE_BIN_EDIT)
+
+        if changed_attrs.include?(:rmt_container_material_type_id)
+          res = ProductionApp::RecalcBinsNettWeight.call(recalc_bin_nett_weight_reworks_run_attrs, Array(res[:bin_number]))
+          raise Crossbeams::InfoError, res.message unless res.success
+        end
       end
       success_response('RMT Bin updated successfully', pallet_number: res[:bin_number])
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    end
+
+    def recalc_bin_nett_weight_reworks_run_attrs
+      { user: @user.user_name,
+        reworks_run_type_id: repo.get_reworks_run_type_id(AppConst::RUN_TYPE_RECALC_BIN_NETT_WEIGHT),
+        pallets_selected: '{ }',
+        pallets_affected: '{ }' }
     end
 
     def rmt_bin_state(attrs) # rubocop:disable Metrics/AbcSize
@@ -1787,12 +1799,7 @@ module ProductionApp
     end
 
     def recalc_bins_nett_weight
-      reworks_run_type_id = repo.get_reworks_run_type_id(AppConst::RUN_TYPE_RECALC_BIN_NETT_WEIGHT)
-      reworks_run_attrs = { user: @user.user_name,
-                            reworks_run_type_id: reworks_run_type_id,
-                            pallets_selected: '{ }',
-                            pallets_affected: '{ }' }
-      Job::RecalculateBinNettWeight.enqueue(reworks_run_attrs)
+      Job::RecalculateBinNettWeight.enqueue(recalc_bin_nett_weight_reworks_run_attrs)
       success_response('Recalculate bin nett_weight has been enqued.')
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
