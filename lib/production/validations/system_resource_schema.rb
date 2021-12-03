@@ -60,7 +60,6 @@ module ProductionApp
     required(:cycle_time).maybe(:integer)
     required(:peripheral_model).maybe(Types::StrippedString)
     required(:connection_type).maybe(Types::StrippedString)
-    required(:printer_language).maybe(Types::StrippedString)
     required(:print_username).maybe(Types::StrippedString)
     required(:print_password).maybe(Types::StrippedString)
     required(:pixels_mm).maybe(:integer)

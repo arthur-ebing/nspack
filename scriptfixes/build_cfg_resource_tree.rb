@@ -103,7 +103,7 @@ class BuildCfgResourceTree < BaseScript
         repo.create_child_plant_resource(clm_id, res, sys_code: "CLM-#{seq_str}-B#{no}")
       end
       sysres_id = repo.get(:plant_resources, printer_id, :system_resource_id)
-      attrs = { ip_address: "192.168.13.#{seq + 150}", connection_type: 'TCP', port: 9100, equipment_type: 'zebra', printer_language: 'zpl', pixels_mm: 8, peripheral_model: 'GK420d', module_function: 'NSLD-Printing', ttl: 9000, cycle_time: 9000 }
+      attrs = { ip_address: "192.168.13.#{seq + 150}", connection_type: 'USB', port: 9100, equipment_type: 'zebra', printer_language: 'zpl', pixels_mm: 8, peripheral_model: 'GK420d', module_function: 'NSLD-Printing', ttl: 9000, cycle_time: 9000 }
       repo.update_system_resource(sysres_id, attrs)
       # link printer
       repo.link_a_peripheral(clm_id, sysres_id)

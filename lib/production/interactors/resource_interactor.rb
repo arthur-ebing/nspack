@@ -153,7 +153,7 @@ module ProductionApp
       return validation_failed_response(res) if res.failure?
 
       repo.transaction do
-        repo.update_system_resource(id, res)
+        repo.update_system_resource(id, add_peripheral_lookups(res))
         log_transaction
       end
       instance = system_resource(id)
@@ -308,6 +308,14 @@ module ProductionApp
 
     def validate_system_resource_peripheral_params(params)
       SystemResourcePeripheralSchema.call(params)
+    end
+
+    def add_peripheral_lookups(res)
+      type = res[:equipment_type]
+      model = res[:peripheral_model]
+      print_key = Crossbeams::Config::ResourceDefinitions::REMOTE_PRINTER_SET[type] || type
+      print_set = Crossbeams::Config::ResourceDefinitions::PRINTER_SET[print_key][model]
+      res.to_h.merge(printer_language: print_set[:lang])
     end
   end
 end

@@ -17,6 +17,7 @@ module ProductionApp
 
       @netmask = server.extended_config['netmask'] || '255.255.255.0'
       @gateway = server.extended_config['gateway'] # TODO: set to vlan gateway if applicable
+      # Check if CLM has a vlan set & get mask + gateway from there...
       buttons = repo.robot_button_system_resources(sys_mod.plant_resource_id)
       xml = build_xml(sys_mod, buttons, server)
       success_response('BuildModuleConfigXml was successful', xml: xml, module: sys_mod.system_resource_code)
@@ -93,6 +94,8 @@ module ProductionApp
                         StripEndOfInput: false) # ???
             peripherals.each do |p|
               if p.plant_resource_type_code == 'PRINTER'
+                print_key = Crossbeams::Config::ResourceDefinitions::REMOTE_PRINTER_SET[p.equipment_type] || p.equipment_type
+                print_set = Crossbeams::Config::ResourceDefinitions::PRINTER_SET[print_key][p.peripheral_model]
                 xml.Printer(Name: p.system_resource_code,
                             Type: p.equipment_type,
                             Model: p.peripheral_model,
@@ -100,7 +103,9 @@ module ProductionApp
                             ConnectionType: p.connection_type,
                             NetworkInterface: alternate_ip || p.ip_address,
                             Port: p.port,
-                            Language: p.printer_language,
+                            Language: print_set[:lang],
+                            VendorID: p.connection_type == 'USB' ? print_set[:usb_vendor] : '',
+                            ProductID: p.connection_type == 'USB' ? print_set[:usb_product] : '',
                             Alias: p.plant_resource_code,
                             Function: p.module_function,
                             TTL: p.ttl,

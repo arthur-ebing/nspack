@@ -12,6 +12,8 @@ module UiRules
       set_show_fields if %i[show deploy_config].include?(@mode)
       set_deploy_fields if @mode == :deploy_config
 
+      add_peripheral_behaviours if @mode == :set_peripheral
+
       form_name 'system_resource'
     end
 
@@ -118,6 +120,15 @@ module UiRules
       set_module_function
     end
 
+    def handle_behaviour
+      case @mode
+      when :peripheral_type
+        peripheral_type_change
+      else
+        unhandled_behaviour!
+      end
+    end
+
     private
 
     def module_types
@@ -125,7 +136,8 @@ module UiRules
     end
 
     def peripheral_types
-      %w[argox zebra datamax remote-argox remote-zebra remote-datamax USBCOM]
+      # USBCOM - non-rs232 USB device (e.g. scanner for pltz)
+      Crossbeams::Config::ResourceDefinitions::PRINTER_SET.keys + Crossbeams::Config::ResourceDefinitions::REMOTE_PRINTER_SET.keys << 'USBCOM'
     end
 
     def set_module_function # rubocop:disable Metrics/CyclomaticComplexity
@@ -159,7 +171,12 @@ module UiRules
     end
 
     def peripheral_models
-      %w[GK420d gk420d argox datamax Unknown]
+      if @form_object.equipment_type
+        print_key = Crossbeams::Config::ResourceDefinitions::REMOTE_PRINTER_SET[@form_object.equipment_type] || @form_object.equipment_type
+        Crossbeams::Config::ResourceDefinitions::PRINTER_SET[print_key].keys
+      else
+        []
+      end
     end
 
     def connection_types
@@ -168,6 +185,23 @@ module UiRules
 
     def printer_languages
       %w[pplz zpl]
+    end
+
+    def add_peripheral_behaviours
+      behaviours do |behaviour|
+        behaviour.dropdown_change :equipment_type,
+                                  notify: [{ url: "/production/resources/system_resources/#{@options[:id]}/system_resource_element_changed/peripheral_type" }]
+      end
+    end
+
+    def peripheral_type_change
+      if @params[:changed_value].empty?
+        sel = []
+      else
+        print_key = Crossbeams::Config::ResourceDefinitions::REMOTE_PRINTER_SET[@params[:changed_value]] || @params[:changed_value]
+        sel = Crossbeams::Config::ResourceDefinitions::PRINTER_SET[print_key].keys
+      end
+      json_replace_select_options('system_resource_peripheral_model', sel)
     end
   end
 end

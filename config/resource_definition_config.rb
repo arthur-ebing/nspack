@@ -573,8 +573,8 @@ module Crossbeams
       MODULE_EQUIPMENT_TYPES = [
         ['MES Server', MODULE_EQUIPMENT_TYPE_MESSERVER],
         ['CMS Server', MODULE_EQUIPMENT_TYPE_CMSSERVER],
-        ['Standard NoSoft RPi robot (robot-nspi)', MODULE_EQUIPMENT_TYPE_NSPI],
-        ['Client-built  RPi robot (robot-rpi)', MODULE_EQUIPMENT_TYPE_RPI],
+        ['Standard NoSoft RPi NTD (robot-nspi)', MODULE_EQUIPMENT_TYPE_NSPI],
+        ['Client-built  RPi device (robot-rpi)', MODULE_EQUIPMENT_TYPE_RPI],
         ['Radical T200/T201 robot - Requires a MAC Address (robot-T200)', MODULE_EQUIPMENT_TYPE_RT200],
         ['Radical T210 Java robot (robot-T210)', MODULE_EQUIPMENT_TYPE_RT210],
         ['ITPC server', MODULE_EQUIPMENT_TYPE_ITPC]
@@ -605,6 +605,22 @@ module Crossbeams
         HTTP-RmtBinWeighing
         Server
       ].freeze
+
+      REMOTE_PRINTER_SET = { 'remote-argox' => 'argox', 'remote-datamax' => 'datamax', 'remote-zebra' => 'zebra' }.freeze
+      PRINTER_SET = {
+        'argox' => {
+          'AR-O4-250' => { lang: 'pplz', usb_vendor: '1664', usb_product: '0D10' },
+          'AR-D4-250' => { lang: 'pplz', usb_vendor: '1664', usb_product: '0E10' }
+        },
+        'zebra' => {
+          'GK420d' => { lang: 'zpl', usb_vendor: '0a5f', usb_product: '0080' },
+          'ZD320' => { lang: 'zpl', usb_vendor: '0a5f', usb_product: '0166' },
+          'ZD420' => { lang: 'zpl', usb_vendor: '0a5f', usb_product: '0120' }
+        },
+        'datamax' => {
+          'datamax' => { lang: 'pplz', usb_vendor: '', usb_product: '' }
+        }
+      }.freeze
       # printer:
       # Labelling
       # carton_label

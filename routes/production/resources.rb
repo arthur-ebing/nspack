@@ -342,6 +342,11 @@ class Nspack < Roda
         show_partial { Production::Resources::SystemResource::Show.call(id) }
       end
 
+      r.on 'system_resource_element_changed', String do |change_type|
+        # /peripheral_type
+        handle_ui_change(:system_resource, change_type.to_sym, params)
+      end
+
       r.on 'view_xml_config' do
         check_auth!('resources', 'read')
         res = interactor.system_resource_xml_for(id)
