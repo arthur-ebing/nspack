@@ -40,6 +40,7 @@ module ProductionApp
           end
           xml.System do
             xml.Company AppConst::IMPLEMENTATION_OWNER
+            xml.AutoConfigure false
             xml.LocalInterface alternate_ip || sys_mod.ip_address
             xml.ServerInterface server.ip_address
             xml.ServerPort server.port
@@ -52,6 +53,7 @@ module ProductionApp
             xml.Cms false
             xml.Mqtt false
             xml.Debug false
+            # xml.SystemDebug false
           end
 
           xml.Devices do

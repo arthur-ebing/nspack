@@ -36,6 +36,7 @@ module ProductionApp
           end
           xml.System do
             xml.Company AppConst::IMPLEMENTATION_OWNER
+            xml.AutoConfigure false
             xml.LocalInterface alternate_ip || sys_mod.ip_address
             xml.ServerInterface sys_mod.ip_address
             # xml.ServerPort sys_mod.port # for server?

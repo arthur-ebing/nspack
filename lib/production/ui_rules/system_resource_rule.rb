@@ -173,7 +173,7 @@ module UiRules
     def peripheral_models
       if @form_object.equipment_type
         print_key = Crossbeams::Config::ResourceDefinitions::REMOTE_PRINTER_SET[@form_object.equipment_type] || @form_object.equipment_type
-        Crossbeams::Config::ResourceDefinitions::PRINTER_SET[print_key].keys
+        Crossbeams::Config::ResourceDefinitions::PRINTER_SET[print_key]&.keys
       else
         []
       end
