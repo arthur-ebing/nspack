@@ -330,9 +330,9 @@
     :sequence_no: 17
     :caption: Shipped at
     :namespaced_name: shipped_at
-    :data_type: :datetime
+    :data_type: :string
     :width: 
-    :format: :datetime_with_secs
+    :format: 
     :hide: false
     :pinned: 
     :groupable: false
@@ -362,9 +362,9 @@
     :sequence_no: 19
     :caption: Govt first inspection at
     :namespaced_name: govt_first_inspection_at
-    :data_type: :datetime
+    :data_type: :string
     :width: 
-    :format: :datetime_with_secs
+    :format: 
     :hide: false
     :pinned: 
     :groupable: false
@@ -378,9 +378,9 @@
     :sequence_no: 20
     :caption: Govt reinspection at
     :namespaced_name: govt_reinspection_at
-    :data_type: :datetime
+    :data_type: :string
     :width: 
-    :format: :datetime_with_secs
+    :format: 
     :hide: false
     :pinned: 
     :groupable: false
@@ -394,9 +394,9 @@
     :sequence_no: 21
     :caption: Stock created at
     :namespaced_name: stock_created_at
-    :data_type: :datetime
+    :data_type: :string
     :width: 
-    :format: :datetime_with_secs
+    :format: 
     :hide: false
     :pinned: 
     :groupable: false
@@ -410,9 +410,9 @@
     :sequence_no: 22
     :caption: First cold storage at
     :namespaced_name: first_cold_storage_at
-    :data_type: :datetime
+    :data_type: :string
     :width: 
-    :format: :datetime_with_secs
+    :format: 
     :hide: false
     :pinned: 
     :groupable: false
@@ -506,9 +506,9 @@
     :sequence_no: 28
     :caption: Palletized at
     :namespaced_name: palletized_at
-    :data_type: :datetime
+    :data_type: :string
     :width: 
-    :format: :datetime_with_secs
+    :format: 
     :hide: false
     :pinned: 
     :groupable: false
