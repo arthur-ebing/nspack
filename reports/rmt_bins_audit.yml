@@ -500,9 +500,9 @@
     :sequence_no: 27
     :caption: Bin received at
     :namespaced_name: bin_received_date_time
-    :data_type: :datetime
+    :data_type: :string
     :width: 
-    :format: :datetime_with_secs
+    :format: 
     :hide: false
     :pinned: 
     :groupable: false
@@ -532,9 +532,9 @@
     :sequence_no: 29
     :caption: Exit ref at
     :namespaced_name: exit_ref_date_time
-    :data_type: :datetime
+    :data_type: :string
     :width: 
-    :format: :datetime_with_secs
+    :format: 
     :hide: false
     :pinned: 
     :groupable: false
@@ -580,9 +580,9 @@
     :sequence_no: 32
     :caption: Scrapped at
     :namespaced_name: scrapped_at
-    :data_type: :datetime
+    :data_type: :string
     :width: 
-    :format: :datetime_with_secs
+    :format: 
     :hide: false
     :pinned: 
     :groupable: false
@@ -596,9 +596,9 @@
     :sequence_no: 33
     :caption: Unscrapped at
     :namespaced_name: unscrapped_at
-    :data_type: :datetime
+    :data_type: :string
     :width: 
-    :format: :datetime_with_secs
+    :format: 
     :hide: false
     :pinned: 
     :groupable: false
@@ -612,9 +612,9 @@
     :sequence_no: 34
     :caption: Created at
     :namespaced_name: sq.created_at
-    :data_type: :datetime
+    :data_type: :string
     :width: 
-    :format: :datetime_with_secs
+    :format: 
     :hide: false
     :pinned: 
     :groupable: false
