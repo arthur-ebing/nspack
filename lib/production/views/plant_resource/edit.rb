@@ -30,6 +30,7 @@ module Production
               form.add_field :carton_equals_pallet
               form.add_field :rmd_mode
               form.add_field :reporting_industry
+              form.add_field :do_run_allocations
             end
           end
 

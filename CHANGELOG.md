@@ -8,6 +8,7 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Added
 ### Changed
+- The client rule for allocating setups to runs can be overridden on a LINE resource.
 ### Fixed
 
 ## [1.0.4] - 2021-12-06

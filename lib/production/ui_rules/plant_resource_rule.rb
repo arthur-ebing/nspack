@@ -79,6 +79,9 @@ module UiRules
       fields[:carton_equals_pallet] = { renderer: :checkbox,
                                         parent_field: :resource_properties,
                                         invisible: !at_button_level? }
+      fields[:do_run_allocations] = { renderer: :checkbox,
+                                      parent_field: :resource_properties,
+                                      invisible: !at_gln_level || !AppConst::CR_PROD.run_allocations[:can_override] }
       fields[:rmd_mode] = { renderer: :checkbox,
                             parent_field: :resource_properties,
                             invisible: !at_module_level?,
