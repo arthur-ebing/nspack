@@ -247,7 +247,7 @@ module ProductionApp
       ProvisionDevice.call(id, params[:network_ip], params[:use_network_ip] == 't')
     end
 
-    def deploy_system_config(id, params)
+    def deploy_system_config(id, params) # rubocop:disable Metrics/AbcSize
       ip = params[:network_ip]
       out = []
       res = if params[:use_network_ip]
@@ -255,6 +255,20 @@ module ProductionApp
             else
               ProductionApp::BuildModuleConfigXml.call(id)
             end
+
+      Net::SSH.start(network_ip, usr, password: pw) do |ssh|
+        result = ssh.exec!(%(cat /sys/class/net/$(ip route show default | awk '/default/ {print $5}')/address))
+        out << 'MAC address:'
+        log
+        out << '-----------------'
+        log
+        out << result.chomp
+        log
+        out << '-----------------'
+        log
+      end
+      # Should this also set the static ip and host? & reboot?
+
       Net::SCP.start(ip, 'nspi', password: AppConst::PROVISION_PW) do |scp|
         # upload from an in-memory buffer
         scp.upload! StringIO.new(res.instance[:xml]), '/home/nspi/nosoft/messerver/config/config.xml'

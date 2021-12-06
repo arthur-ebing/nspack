@@ -41,14 +41,14 @@ module ProductionApp
             xml.ServerInterface sys_mod.ip_address
             # xml.ServerPort sys_mod.port # for server?
             # xml.NetMask netmask # for server?
-            # xml.Gateway gateway # for server?
+            # xml.GateWay gateway # for server?
             xml.comment "\n        When to use true for lbl store (always false for server?)\n        When true for LineProdUnit???\n        Why do we need sys pwd?\n    "
             xml.CentralLabelStore sys_mod.publishing # false?
             xml.LineProductionUnit true # ??? CLM?
             # xml.SystemPassword AppConst::PROVISION_PW # ????
             xml.Cms false
             xml.Mqtt false
-            xml.Debug false
+            xml.SystemDebug false
           end
 
           xml.Devices do
