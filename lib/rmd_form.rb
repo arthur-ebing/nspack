@@ -448,7 +448,7 @@ module Crossbeams
     # Set autofocus on fields in error, or else on the first field.
     def autofocus_for_field(name)
       if @form_state[:errors]
-        if @form_state[:errors].key?(name)
+        if error_msg_for_field(name)
           ' autofocus'
         else
           ''
@@ -482,22 +482,28 @@ module Crossbeams
       end
     end
 
+    def error_msg_for_field(field = @current_field)
+      return nil unless form_state[:errors].respond_to?(:key?)
+
+      form_state[:errors][field]
+    end
+
     def field_error_state
-      val = form_state[:errors] && form_state[:errors][@current_field]
+      val = error_msg_for_field
       return '' unless val
 
       ' class="bg-washed-red"'
     end
 
     def field_error_message
-      val = form_state[:errors] && form_state[:errors][@current_field]
+      val = error_msg_for_field
       return '' unless val
 
       "<span class='brown'><br>#{val.compact.join('; ')}</span>"
     end
 
     def field_error_class
-      val = form_state[:errors] && form_state[:errors][@current_field]
+      val = error_msg_for_field
       return '' unless val
 
       ' bg-washed-red'
@@ -516,10 +522,11 @@ module Crossbeams
     end
 
     def error_section
+      base_err = (form_state.dig(:errors, :base) || []).join(', ')
       show_hide = form_state[:error_message] ? '' : ' hidden'
       <<~HTML
         <div id="rmd-error" class="brown bg-washed-red ba b--light-red pa3 mw6"#{show_hide}>
-          #{(form_state[:error_message] || '').gsub("\n", '<br>')}
+          #{(form_state[:error_message] || '').gsub("\n", '<br>')} #{(base_err || '').gsub("\n", '<br>')}
         </div>
       HTML
     end
