@@ -17,6 +17,10 @@
   :icon: edit-pencil
   :hide_if_false: can_cancel
   :prompt: 'Are you sure you want to cancel this Tripsheet Sheet?'
+- :url: "/list/vehicle_job_units/with_params?key=standard&vehicle_job_id=$:id$"
+  :text: tripsheet log
+  :popup: true
+  :icon: list
 - :url: "/finished_goods/interwarehouse_transfers/open_pallet_tripsheet/$:id$"
   :text: open
   :icon: toggle-off

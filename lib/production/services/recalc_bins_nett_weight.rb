@@ -8,7 +8,7 @@ module ProductionApp
       @reworks_run_attrs = params.dup
       @repo = ProductionApp::ReworksRepo.new
       @delivery_repo = RawMaterialsApp::RmtDeliveryRepo.new
-      @rmt_bins = rmt_bins.nil? ? find_bins_for_nett_recalculation : rmt_bins
+      @rmt_bins = find_bins_for_nett_recalculation(rmt_bins)
     end
 
     def call
@@ -20,11 +20,13 @@ module ProductionApp
 
     private
 
-    def find_bins_for_nett_recalculation
-      repo.rmt_bins_for_nett_recalculation
+    def find_bins_for_nett_recalculation(rmt_bins)
+      rmt_bins.nil? ? repo.rmt_bins_for_nett_recalculation : repo.rmt_bins_for_nett_recalculation(where: { id: rmt_bins })
     end
 
     def recalc_bins_nett_weight # rubocop:disable Metrics/AbcSize
+      return ok_response if rmt_bins.nil_or_empty?
+
       rmt_bin_ids = []
       rmt_bins.each  do |rmt_bin|
         tare_weight = @delivery_repo.get_rmt_bin_tare_weight(rmt_bin)

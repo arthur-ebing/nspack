@@ -2,12 +2,12 @@
 
 module RawMaterialsApp
   module RmtBinFactory
-    def create_rmt_bin(opts = {})
+    def create_rmt_bin(opts = {}) # rubocop:disable Metrics/CyclomaticComplexity
       id = get_available_factory_record(:rmt_bins, opts)
       return id unless id.nil?
 
-      opts[:rmt_delivery_id] ||= create_rmt_delivery
-      opts[:rmt_class_id] ||= create_rmt_class
+      opts[:rmt_delivery_id] ||= create_rmt_delivery unless opts.key?(:rmt_delivery_id)
+      opts[:rmt_class_id] ||= create_rmt_class unless opts.key?(:rmt_class_id)
       opts[:rmt_material_owner_party_role_id] ||= create_party_role(party_type: 'O', name: AppConst::ROLE_IMPLEMENTATION_OWNER)
       opts[:season_id] ||= create_season
       opts[:farm_id] ||= create_farm
@@ -15,11 +15,11 @@ module RawMaterialsApp
       opts[:orchard_id] ||= create_orchard
       opts[:cultivar_id] ||= create_cultivar
       opts[:rmt_container_type_id] ||= create_rmt_container_type
-      opts[:rmt_container_material_type_id] ||= create_rmt_container_material_type
+      opts[:rmt_container_material_type_id] ||= create_rmt_container_material_type unless opts.key?(:rmt_container_material_type_id)
       opts[:cultivar_group_id] ||= create_cultivar_group
       opts[:location_id] ||= create_location
-      opts[:production_run_rebin_id] ||= create_production_run
-      opts[:production_run_tipped_id] ||= create_production_run
+      opts[:production_run_rebin_id] ||= create_production_run unless opts.key?(:production_run_rebin_id)
+      opts[:production_run_tipped_id] ||= create_production_run unless opts.key?(:production_run_tipped_id)
 
       default = {
         exit_ref: Faker::Lorem.word,

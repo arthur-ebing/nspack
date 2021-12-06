@@ -1422,7 +1422,8 @@ module DevelopmentApp
           lkps = []
           fields.each do |field|
             lkps << "# #{opts.inflector.singularize(field[:ftbl])}_id = create_#{opts.inflector.singularize(field[:ftbl])}" if field[:ftbl]
-            lkps << "opts[:#{opts.inflector.singularize(field[:ftbl])}_id] ||= create_#{opts.inflector.singularize(field[:ftbl])}" if field[:ftbl]
+            lkps << "opts[:#{opts.inflector.singularize(field[:ftbl])}_id] ||= create_#{opts.inflector.singularize(field[:ftbl])}" if field[:ftbl] && !field[:allow_null]
+            lkps << "opts[:#{opts.inflector.singularize(field[:ftbl])}_id] ||= create_#{opts.inflector.singularize(field[:ftbl])} unless opts.key?(:#{opts.inflector.singularize(field[:ftbl])}_id)" if field[:ftbl] && field[:allow_null]
           end
           s = <<~RUBY
             def create_#{opts.inflector.singularize(table)}(opts = {})

@@ -8,7 +8,7 @@ module Production
           ui_rule = UiRules::Compiler.new(:system_resource, :set_peripheral, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page|
+          Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
@@ -35,7 +35,6 @@ module Production
                 row.column do |col|
                   col.add_field :module_function
                   col.add_field :connection_type
-                  col.add_field :printer_language
                   col.add_field :print_username
                   col.add_field :print_password
                   col.add_field :pixels_mm
@@ -43,8 +42,6 @@ module Production
               end
             end
           end
-
-          layout
         end
       end
     end

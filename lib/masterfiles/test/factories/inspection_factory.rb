@@ -17,6 +17,8 @@ module MasterfilesApp
         applicable_grade_ids: BaseRepo.new.array_for_db_col([1, 2, 3]),
         applies_to_all_marketing_org_party_roles: false,
         applicable_marketing_org_party_role_ids: BaseRepo.new.array_for_db_col([1, 2, 3]),
+        applies_to_all_packed_tm_groups: false,
+        applicable_packed_tm_group_ids: BaseRepo.new.array_for_db_col([1, 2, 3]),
         passed_default: false,
         active: true,
         created_at: '2010-01-01 12:00',

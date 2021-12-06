@@ -78,7 +78,7 @@ module MesscadaApp
       rmt_material_owner_party_role_id = repo.find_container_material_owner_by_container_material_type_and_org_code(rmt_container_material_type_id, AppConst::CR_RMT.default_container_material_owner)
       cultivar_group_id = repo.get_value(:cultivars, :cultivar_group_id, id: presorted_bin_staging_run[:cultivar_id])
       tare_weight = repo.get_value(:rmt_container_material_types, :tare_weight, id: rmt_container_material_type_id)
-      location_id = repo.get_value(:plant_resources, :location_id, id: presorted_bin_staging_run[:presort_unit_plant_resource_id])
+      location_id = repo.get_value(:locations, :id, location_long_code: AppConst::CR_RMT.presort_staging_target_location(plant_resource_code))
       bin_attrs = { season_id: presorted_bin_staging_run[:season_id],
                     presorted: true,
                     cultivar_id: presorted_bin_staging_run[:cultivar_id],

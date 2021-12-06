@@ -198,6 +198,7 @@ module Crossbeams
       CMS_SERVER = 'CMS_SERVER'
       ITPC = 'ITPC'
       SUB_LINE = 'SUB_LINE'
+      VLAN = 'VLAN'
 
       # Peripherals
       SCALE = 'SCALE'
@@ -210,6 +211,7 @@ module Crossbeams
       MODULE = 'MODULE'
       MODULE_BUTTON = 'MODULE_BUTTON'
       PERIPHERAL = 'PERIPHERAL'
+      NETWORK = 'NETWORK'
 
       ROOT_PLANT_RESOURCE_TYPES = [SITE, BIN_FORKLIFT, PALLET_FORKLIFT, ROOM].freeze
 
@@ -218,6 +220,10 @@ module Crossbeams
                     computing_device: true,
                     attributes: { ip_address: :string,
                                   sub_types: [MES_SERVER, CMS_SERVER] } },
+        NETWORK => { description: 'Network',
+                     computing_device: true,
+                     attributes: { ip_address: :string,
+                                   sub_types: [VLAN] } },
         MODULE => { description: 'Module',
                     computing_device: true,
                     attributes: { ip_address: :string,
@@ -249,7 +255,7 @@ module Crossbeams
                   allowed_children: [PACKHOUSE, ROOM, MES_SERVER, CMS_SERVER, PRESORTING_UNIT],
                   icon: { file: 'globe', colour: CLR_H } },
         MES_SERVER => { description: 'MES Server',
-                        allowed_children: [],
+                        allowed_children: [VLAN],
                         icon: { file: 'servers', colour: CLR_J },
                         create_with_system_resource: SERVER,
                         code_prefix: 'SRV-' },
@@ -258,6 +264,11 @@ module Crossbeams
                         icon: { file: 'servers', colour: CLR_P },
                         create_with_system_resource: SERVER,
                         code_prefix: 'SRV-' },
+        VLAN => { description: 'VLAN',
+                  allowed_children: [],
+                  icon: { file: 'load-balancer', colour: CLR_F },
+                  create_with_system_resource: NETWORK,
+                  code_prefix: 'VLAN-' },
         PACKHOUSE => { description: 'Packhouse',
                        allowed_children: [ROOM,
                                           LINE,
@@ -549,6 +560,71 @@ module Crossbeams
           WeightUnits: 'Kg'
         }
       }.freeze
+
+      # Change ROBOT to NTD? (NoSoft Terminal Device)
+      MODULE_EQUIPMENT_TYPE_MESSERVER = 'messerver'
+      MODULE_EQUIPMENT_TYPE_CMSSERVER = 'cmsserver'
+      MODULE_EQUIPMENT_TYPE_NSPI = 'robot-nspi'
+      MODULE_EQUIPMENT_TYPE_RPI = 'robot-rpi'
+      MODULE_EQUIPMENT_TYPE_RT200 = 'robot-T200'
+      MODULE_EQUIPMENT_TYPE_RT210 = 'robot-T210'
+      MODULE_EQUIPMENT_TYPE_ITPC = 'ITPC'
+
+      MODULE_EQUIPMENT_TYPES = [
+        ['MES Server', MODULE_EQUIPMENT_TYPE_MESSERVER],
+        ['CMS Server', MODULE_EQUIPMENT_TYPE_CMSSERVER],
+        ['Standard NoSoft RPi NTD (robot-nspi)', MODULE_EQUIPMENT_TYPE_NSPI],
+        ['Client-built  RPi device (robot-rpi)', MODULE_EQUIPMENT_TYPE_RPI],
+        ['Radical T200/T201 robot - Requires a MAC Address (robot-T200)', MODULE_EQUIPMENT_TYPE_RT200],
+        ['Radical T210 Java robot (robot-T210)', MODULE_EQUIPMENT_TYPE_RT210],
+        ['ITPC server', MODULE_EQUIPMENT_TYPE_ITPC]
+      ].freeze
+
+      MODULE_DISTRO_TYPE_VM = 'rpi_vm'
+      MODULE_DISTRO_TYPE_PI = 'rpi_3b+'
+      MODULE_DISTRO_TYPE_RETERM = 'seeed_reterm'
+      MODULE_DISTRO_TYPE_ITPC = 'itpc'
+      MODULE_DISTRO_TYPE_RAD = 'radical'
+      # radUDP, radJSON, browser?, android
+
+      MODULE_DISTRO_TYPES = [
+        ['Virtual Raspbian', MODULE_DISTRO_TYPE_VM],
+        ['Raspberry pi 3B+', MODULE_DISTRO_TYPE_PI],
+        ['Seeed reTerminal', MODULE_DISTRO_TYPE_RETERM],
+        ['ITPC', MODULE_DISTRO_TYPE_ITPC],
+        ['Radical', MODULE_DISTRO_TYPE_RAD]
+      ].freeze
+
+      MODULE_ROBOT_FUNCTIONS = %w[
+        HTTP-BinTip
+        HTTP-BinVerification
+        HTTP-CartonLabel
+        HTTP-PalletBuildup
+        HTTP-PalletBuildup-SplitScreen
+        HTTP-PalletWeighing
+        HTTP-RmtBinWeighing
+        Server
+      ].freeze
+
+      REMOTE_PRINTER_SET = { 'remote-argox' => 'argox', 'remote-datamax' => 'datamax', 'remote-zebra' => 'zebra' }.freeze
+      PRINTER_SET = {
+        'argox' => {
+          'AR-O4-250' => { lang: 'pplz', usb_vendor: '1664', usb_product: '0D10' },
+          'AR-D4-250' => { lang: 'pplz', usb_vendor: '1664', usb_product: '0E10' }
+        },
+        'zebra' => {
+          'GK420d' => { lang: 'zpl', usb_vendor: '0a5f', usb_product: '0080' },
+          'ZD320' => { lang: 'zpl', usb_vendor: '0a5f', usb_product: '0166' },
+          'ZD420' => { lang: 'zpl', usb_vendor: '0a5f', usb_product: '0120' }
+        },
+        'datamax' => {
+          'datamax' => { lang: 'pplz', usb_vendor: '', usb_product: '' }
+        }
+      }.freeze
+      # printer:
+      # Labelling
+      # carton_label
+
       #   {
       #     url: '/messcada/hr/register_id?',
       #     p1: 'device',
@@ -694,6 +770,10 @@ module Crossbeams
 
       def self.peripheral_type_codes
         PLANT_RESOURCE_RULES.select { |_, v| v[:create_with_system_resource] == PERIPHERAL }.keys
+      end
+
+      def self.can_be_provisioned?(distro_type)
+        %w[rpi_vm rpi_3b+ seeed_reterm].include?(distro_type)
       end
     end
   end

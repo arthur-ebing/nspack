@@ -11,6 +11,7 @@ module UiRules
 
       set_show_fields if %i[show].include? @mode
       set_new_fields if %i[new].include? @mode
+      set_status_fields if @mode == :show_status
       add_behaviours if %i[edit].include? @mode
 
       form_name 'inspection'
@@ -30,6 +31,12 @@ module UiRules
 
     def set_new_fields
       fields[:pallet_number] = { renderer: :select, options: @repo.for_select_pallets }
+    end
+
+    def set_status_fields
+      fields[:pallet_number] = { renderer: :input,
+                                 subtype: :integer,
+                                 required: true  }
     end
 
     def common_fields

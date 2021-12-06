@@ -92,6 +92,34 @@ module ProductionApp
       failed_response(e.message)
     end
 
+    def set_server_resource(id, params)
+      res = validate_system_resource_server_params(params)
+      return validation_failed_response(res) if res.failure?
+
+      repo.transaction do
+        repo.update_system_resource(id, res)
+        log_transaction
+      end
+      instance = system_resource(id)
+      success_response("Updated system resource #{instance.system_resource_code}", instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def set_network_resource(id, params)
+      res = validate_system_resource_network_params(params)
+      return validation_failed_response(res) if res.failure?
+
+      repo.transaction do
+        repo.update_system_resource(id, res)
+        log_transaction
+      end
+      instance = system_resource(id)
+      success_response("Updated system resource #{instance.system_resource_code}", instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def set_module_resource(id, params)
       res = validate_system_resource_module_params(params)
       return validation_failed_response(res) if res.failure?
@@ -106,12 +134,26 @@ module ProductionApp
       failed_response(e.message)
     end
 
+    def set_button_resource(id, params)
+      res = SystemResourceButtonSchema.call(params)
+      return validation_failed_response(res) if res.failure?
+
+      repo.transaction do
+        repo.update_system_resource(id, res)
+        log_transaction
+      end
+      instance = system_resource(id)
+      success_response("Updated system resource #{instance.system_resource_code}", res[:extended_config][:no_of_labels_to_print])
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def set_peripheral_resource(id, params)
       res = validate_system_resource_peripheral_params(params)
       return validation_failed_response(res) if res.failure?
 
       repo.transaction do
-        repo.update_system_resource(id, res)
+        repo.update_system_resource(id, add_peripheral_lookups(res))
         log_transaction
       end
       instance = system_resource(id)
@@ -122,6 +164,11 @@ module ProductionApp
 
     def assert_permission!(task, id = nil)
       res = TaskPermissionCheck::PlantResource.call(task, id)
+      raise Crossbeams::TaskNotPermittedError, res.message unless res.success
+    end
+
+    def assert_system_permission!(task, id = nil)
+      res = TaskPermissionCheck::SystemResource.call(task, id)
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 
@@ -152,8 +199,11 @@ module ProductionApp
     end
 
     def system_resource_xml_for(id)
-      success_response('ok',
-                       config: ProductionApp::BuildModuleConfigXml.call(id).instance)
+      if repo.system_resource_type_from_resource(id) == Crossbeams::Config::ResourceDefinitions::SERVER
+        success_response('ok', config: ProductionApp::BuildServerConfigXml.call(id).instance)
+      else
+        success_response('ok', config: ProductionApp::BuildModuleConfigXml.call(id).instance)
+      end
     end
 
     def system_resource_xml
@@ -193,6 +243,27 @@ module ProductionApp
       srv_res
     end
 
+    def provision_device(id, params)
+      ProvisionDevice.call(id, params[:network_ip], params[:use_network_ip] == 't')
+    end
+
+    def deploy_system_config(id, params)
+      ip = params[:network_ip]
+      out = []
+      res = if params[:use_network_ip]
+              ProductionApp::BuildModuleConfigXml.call(id, alternate_ip: params[:network_ip])
+            else
+              ProductionApp::BuildModuleConfigXml.call(id)
+            end
+      Net::SCP.start(ip, 'nspi', password: AppConst::PROVISION_PW) do |scp|
+        # upload from an in-memory buffer
+        scp.upload! StringIO.new(res.instance[:xml]), '/home/nspi/nosoft/messerver/config/config.xml'
+        out << 'Config.xml copied to device'
+      end
+
+      out
+    end
+
     private
 
     def repo
@@ -223,12 +294,28 @@ module ProductionApp
       PlantResourceBulkClmSchema.call(params)
     end
 
+    def validate_system_resource_server_params(params)
+      SystemResourceServerSchema.call(params)
+    end
+
+    def validate_system_resource_network_params(params)
+      SystemResourceNetworkSchema.call(params)
+    end
+
     def validate_system_resource_module_params(params)
       SystemResourceModuleSchema.call(params)
     end
 
     def validate_system_resource_peripheral_params(params)
       SystemResourcePeripheralSchema.call(params)
+    end
+
+    def add_peripheral_lookups(res)
+      type = res[:equipment_type]
+      model = res[:peripheral_model]
+      print_key = Crossbeams::Config::ResourceDefinitions::REMOTE_PRINTER_SET[type] || type
+      print_set = Crossbeams::Config::ResourceDefinitions::PRINTER_SET[print_key][model]
+      res.to_h.merge(printer_language: print_set[:lang])
     end
   end
 end

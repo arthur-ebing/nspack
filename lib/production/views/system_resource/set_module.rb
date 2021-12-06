@@ -32,6 +32,7 @@ module Production
                   col.add_field :mac_address
                   col.add_field :ip_address
                   col.add_field :port
+                  col.add_field :distro_type
                 end
                 row.column do |col|
                   col.add_field :ttl

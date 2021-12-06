@@ -592,6 +592,18 @@ module ProductionApp
         .select_map(Sequel[:plant_resources][:id])
     end
 
+    # All buttons of a robot plant resource
+    # - SystemResources
+    # - Order by button code
+    #
+    # @param robot_id [integer] the robot's plant resource id
+    # @return [array of SystemResource] - buttons in system_resource_code order
+    def robot_button_system_resources(robot_id)
+      plant_ids = robot_buttons(robot_id)
+      sys_ids = select_values(:plant_resources, :system_resource_id, id: plant_ids)
+      all(:system_resources, SystemResource, id: sys_ids).sort_by(&:system_resource_code)
+    end
+
     def update_bin_filler_role(plant_resource_id, label_to_print)
       attrs = resolve_resource_carton_equals_pallet(label_to_print)
       bin_filler = plant_resource_type_is_bin_filler?(plant_resource_id)

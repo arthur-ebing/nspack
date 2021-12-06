@@ -7,17 +7,16 @@ module UiRules
       @delivery_repo = RawMaterialsApp::RmtDeliveryRepo.new
       @container_repo = MasterfilesApp::RmtContainerMaterialTypeRepo.new
       @messcada_repo = MesscadaApp::MesscadaRepo.new
+      @rules[:maintain_legacy_columns] = AppConst::CR_RMT.maintain_legacy_columns?
 
       make_form_object
       apply_form_values
-
-      @rules[:maintain_legacy_columns] = AppConst::CR_RMT.maintain_legacy_columns?
 
       if @mode == :set_rmt_bin_gross_weight
         make_reworks_run_rmt_bin_header_table(%i[farm_code puc_code orchard_code cultivar_name season_code container_type_code
                                                  container_material_type_code qty_bins exit_ref bin_asset_number tipped_asset_number
                                                  qty_inner_bins bin_fullness nett_weight gross_weight bin_tipped bin_received_date_time
-                                                 bin_tipped_date_time exit_ref_date_time rebin_created_at scrapped_at scrapped active])
+                                                 bin_tipped_date_time exit_ref_date_time rebin_created_at scrapped_at scrapped active shipped_asset_number])
         set_rmt_bin_gross_weight_fields
       end
 
@@ -36,7 +35,7 @@ module UiRules
       compact_header(columns: columns || %i[ farm_code puc_code orchard_code cultivar_name season_code class_code size_code container_type_code
                                              container_material_type_code qty_bins exit_ref bin_asset_number tipped_asset_number
                                              qty_inner_bins bin_fullness nett_weight gross_weight bin_tipped bin_received_date_time
-                                             bin_tipped_date_time exit_ref_date_time rebin_created_at scrapped_at scrapped],
+                                             bin_tipped_date_time exit_ref_date_time rebin_created_at scrapped_at scrapped shipped_asset_number],
                      display_columns: display_columns,
                      header_captions: {
                        farm_code: 'Farm',
@@ -97,11 +96,16 @@ module UiRules
       defaults = { reworks_run_type_id: @options[:reworks_run_type_id],
                    bin_number: @options[:bin_number],
                    measurement_unit: 'KG' }
-      bin = rmt_bin(@options[:bin_number]).to_h
-      legacy_data = { colour: bin[:legacy_data]['colour'], pc_code: bin[:legacy_data]['pc_code'],
-                      cold_store_type: bin[:legacy_data]['cold_store_type'], track_slms_indicator_1_code: bin[:legacy_data]['track_slms_indicator_1_code'],
-                      ripe_point_code: bin[:legacy_data]['ripe_point_code'] }
-      attrs = bin.merge(legacy_data).merge(defaults)
+      attrs = rmt_bin(@options[:bin_number]).to_h.merge(defaults)
+
+      if rules[:maintain_legacy_columns]
+        bin_legacy_data = attrs[:legacy_data].to_h
+        legacy_data = { colour: bin_legacy_data['colour'], pc_code: bin_legacy_data['pc_code'],
+                        cold_store_type: bin_legacy_data['cold_store_type'], track_slms_indicator_1_code: bin_legacy_data['track_slms_indicator_1_code'],
+                        ripe_point_code: bin_legacy_data['ripe_point_code'] }
+        attrs = attrs.merge(legacy_data)
+      end
+
       @form_object = OpenStruct.new(attrs)
     end
 

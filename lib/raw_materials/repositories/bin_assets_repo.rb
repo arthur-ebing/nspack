@@ -244,6 +244,12 @@ module RawMaterialsApp
     def bin_asset_transactions_queue_records_for(queue_ids)
       return [] if queue_ids.nil_or_empty?
 
+      # What about pallet/changes in the array??? -- this should probably be:
+      # SELECT bin_event_type, pallet, changes_made, array_agg(DISTINCT rmt_bin_id) AS bins
+      # FROM bin_asset_transactions_queue
+      # WHERE id IN ?
+      # GROUP BY bin_event_type, pallet, changes_made
+      #
       query = <<~SQL
         SELECT bin_event_type, pallet, changes_made,
                array(SELECT DISTINCT rmt_bin_id

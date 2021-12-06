@@ -3,6 +3,7 @@
 module FinishedGoodsApp
   class GovtInspectionPalletInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_govt_inspection_pallet(params)
+      params[:inspected] = true
       res = CreateGovtInspectionPalletSchema.call(params)
       return validation_failed_response(res) if res.failure?
 

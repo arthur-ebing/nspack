@@ -25,8 +25,15 @@
   :text: New Rework Run
   :style: :button
 #  :behaviour: :popup
+:captions:
+  :conditions:
+    :single_bin_edit: Bin Changes
 :conditions:
   :standard:
+    - :col: reworks_runs.reworks_run_type_id
+      :op: =
+      :val: $:reworks_runs.reworks_run_type_id$
+  :single_bin_edit:
     - :col: reworks_runs.reworks_run_type_id
       :op: =
       :val: $:reworks_runs.reworks_run_type_id$

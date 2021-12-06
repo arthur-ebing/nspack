@@ -45,7 +45,9 @@ class AppConst # rubocop:disable Metrics/ClassLength
     'ud' => 'Unifrutti Dunbrody',
     'sr' => 'Sitrusrand Kirkwood',
     'sr2' => 'Sitrusrand Addo',
-    'kr' => 'Kromco'
+    'kr' => 'Kromco',
+    'cfg' => 'Ceres Fruit Growers',
+    'ghs' => 'Goede Hoop Sitrus'
   }.freeze
 
   # Load the client settings from ENV:
@@ -56,6 +58,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   raise "Unknown CLIENT_CODE - #{CLIENT_CODE}" unless CLIENT_SET.keys.include?(CLIENT_CODE)
 
   SHOW_DB_NAME = ENV.fetch('DATABASE_URL').rpartition('@').last
+  PROVISION_PW = ENV['PROVISION_PW']
 
   # A struct that can be used to alter the client code while tests are running.
   # All the CB_ classes will use this value as the client_code, which allows
@@ -640,6 +643,9 @@ class AppConst # rubocop:disable Metrics/ClassLength
     ['8 - CBS', '8'],
     ['9 - CFM & CBS', '9']
   ].freeze
+
+  # PPECB: Govt Inspections
+  GOVT_INSPECTION_AGENCY = 'PPECB'
 
   # QUALITY APP result types
   PASS_FAIL = 'Pass/Fail'

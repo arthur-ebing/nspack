@@ -71,3 +71,5 @@ pdf_documentation/*.png
 /edi/
 /.env.local*
 script_test.rb
+device_provisioning/*.zip
+device_provisioning/*.png

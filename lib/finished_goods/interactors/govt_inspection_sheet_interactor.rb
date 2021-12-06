@@ -421,7 +421,8 @@ module FinishedGoodsApp
       return failed_response('Pallet has been scrapped') if pallet[:scrapped]
       return failed_response('Pallet has been shipped') if pallet[:shipped]
 
-      vehicle_job_unit = repo.find_vehicle_job_unit_by(:stock_item_id, pallet[:id])
+      stock_type_id = repo.get_id(:stock_types, stock_type_code: AppConst::PALLET_STOCK_TYPE)
+      vehicle_job_unit = repo.find_vehicle_job_unit_by(:stock_item_id, pallet[:id], stock_type_id)
       return failed_response('Pallet is not on tripsheet') unless vehicle_job_unit
 
       instance = { vehicle_job_offloaded: false, vehicle_job_id: vehicle_job_unit[:vehicle_job_id] }

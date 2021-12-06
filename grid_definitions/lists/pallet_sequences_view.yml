@@ -1,6 +1,12 @@
 ---
 :dataminer_definition: pallet_sequences_view
 :actions:
+- :url: "/list/pallet_sequence_cartons/with_params?key=pallet_sequence_cartons&pallet_sequence_id=$:id$"
+  :text: cartons
+  :title: Cartons for Pallet No $:pallet_number$ Sequence $:pallet_sequence_number$
+  :icon: list
+  :popup: true
+- :separator: true
 - :url: "/list/pallets_audit/with_params?key=pallet&id=$:pallet_id$"
   :text: Pallet Audit
   :icon: list

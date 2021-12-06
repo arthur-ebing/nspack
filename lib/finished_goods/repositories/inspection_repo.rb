@@ -85,5 +85,32 @@ module FinishedGoodsApp
       end
       ids
     end
+
+    def open_ended_failed_inspections_for(pallet_id)
+      DB[:inspections]
+        .where(pallet_id: pallet_id, passed: false)
+        .exclude(inspector_id: nil)
+        .exclude(inspection_type_id: DB[:inspection_types]
+                                       .where(inspection_type_code: AppConst::GOVT_INSPECTION_AGENCY)
+                                       .get(:id))
+        .select_map(:inspection_type_id)
+    end
+
+    def open_ended_pending_inspections_for(pallet_id)
+      DB[:inspections]
+        .where(pallet_id: pallet_id, inspector_id: nil)
+        .exclude(inspection_type_id: DB[:inspection_types]
+                                       .where(inspection_type_code: AppConst::GOVT_INSPECTION_AGENCY)
+                                       .get(:id))
+        .select_map(:inspection_type_id)
+    end
+
+    def govt_inspection_type_check_attrs
+      DB[:inspection_types]
+        .where(inspection_type_code: AppConst::GOVT_INSPECTION_AGENCY)
+        .select(:applies_to_all_tms, :applies_to_all_grades, :applies_to_all_packed_tm_groups,
+                :applicable_tm_ids, :applicable_grade_ids, :applicable_packed_tm_group_ids)
+        .first
+    end
   end
 end

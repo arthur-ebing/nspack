@@ -38,9 +38,14 @@ module UiRules
       fields[:applies_to_all_marketing_org_party_roles] = { renderer: :label, caption: 'Applies To All Marketing ORGs',
                                                             as_boolean: true }
       fields[:applicable_marketing_org_party_roles] = { renderer: :label, caption: 'Applicable Marketing ORGs',
-                                                        with_value: @form_object.applicable_grades.join(', ') }
+                                                        with_value: @form_object.applicable_marketing_org_party_roles.join(', ') }
 
       fields[:active] = { renderer: :label, as_boolean: true }
+
+      fields[:applies_to_all_packed_tm_groups] = { renderer: :label, caption: 'Applies To All Target Regions',
+                                                   as_boolean: true }
+      fields[:applicable_packed_tm_groups] = { renderer: :label, caption: 'Applicable Target Regions',
+                                               with_value: @form_object.applicable_packed_tm_groups.join(', ') }
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize
@@ -75,7 +80,13 @@ module UiRules
         applicable_marketing_org_party_role_ids: { renderer: :multi, caption: 'Marketing ORGs',
                                                    options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_MARKETER),
                                                    selected: @form_object.applicable_marketing_org_party_role_ids,
-                                                   hide_on_load: @form_object.applies_to_all_marketing_org_party_roles }
+                                                   hide_on_load: @form_object.applies_to_all_marketing_org_party_roles },
+
+        applies_to_all_packed_tm_groups: { renderer: :checkbox, caption: 'Applies to all Target Regions' },
+        applicable_packed_tm_group_ids: { renderer: :multi, caption: 'Target Regions',
+                                          options: MasterfilesApp::TargetMarketRepo.new.for_select_packed_tm_groups,
+                                          selected: @form_object.applicable_packed_tm_group_ids,
+                                          hide_on_load: @form_object.applies_to_all_packed_tm_groups }
       }
     end
 
@@ -101,7 +112,9 @@ module UiRules
                                     applies_to_all_grades: true,
                                     applicable_grade_ids: nil,
                                     applies_to_all_marketing_org_party_roles: true,
-                                    applicable_marketing_org_party_role_ids: nil)
+                                    applicable_marketing_org_party_role_ids: nil,
+                                    applies_to_all_packed_tm_groups: true,
+                                    applicable_packed_tm_group_ids: nil)
     end
 
     def handle_behaviour
@@ -109,7 +122,8 @@ module UiRules
         applies_to_all_tms: :applies_to_all_tms,
         applies_to_all_tm_customers: :applies_to_all_tm_customers,
         applies_to_all_grades: :applies_to_all_grades,
-        applies_to_all_marketing_org_party_roles: :applies_to_all_marketing_org_party_roles
+        applies_to_all_marketing_org_party_roles: :applies_to_all_marketing_org_party_roles,
+        applies_to_all_packed_tm_groups: :applies_to_all_packed_tm_groups
 
       }
       changed = changed[@options[:field]]
@@ -127,6 +141,7 @@ module UiRules
         behaviour.input_change :applies_to_all_tm_customers, notify: [{ url: "#{url}/applies_to_all_tm_customers" }]
         behaviour.input_change :applies_to_all_grades, notify: [{ url: "#{url}/applies_to_all_grades" }]
         behaviour.input_change :applies_to_all_marketing_org_party_roles, notify: [{ url: "#{url}/applies_to_all_marketing_org_party_roles" }]
+        behaviour.input_change :applies_to_all_packed_tm_groups, notify: [{ url: "#{url}/applies_to_all_packed_tm_groups" }]
       end
     end
 
@@ -159,6 +174,14 @@ module UiRules
       actions << OpenStruct.new(type: params[:changed_value] == 'f' ? :show_element : :hide_element,
                                 dom_id: 'inspection_type_applicable_marketing_org_party_role_ids_field_wrapper')
       actions << OpenStruct.new(type: :replace_input_value, dom_id: 'inspection_type_applicable_marketing_org_party_role_ids', value: [])
+      json_actions(actions)
+    end
+
+    def applies_to_all_packed_tm_groups
+      actions = []
+      actions << OpenStruct.new(type: params[:changed_value] == 'f' ? :show_element : :hide_element,
+                                dom_id: 'inspection_type_applicable_packed_tm_group_ids_field_wrapper')
+      actions << OpenStruct.new(type: :replace_input_value, dom_id: 'inspection_type_applicable_packed_tm_group_ids', value: [])
       json_actions(actions)
     end
   end

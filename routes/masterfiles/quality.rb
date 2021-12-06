@@ -419,6 +419,8 @@ class Nspack < Roda
               applicable_grades
               applicable_marketing_org_party_role_ids
               applicable_marketing_org_party_roles
+              applicable_packed_tm_group_ids
+              applicable_packed_tm_groups
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
@@ -468,6 +470,8 @@ class Nspack < Roda
             applicable_grades
             applicable_marketing_org_party_role_ids
             applicable_marketing_org_party_roles
+            applicable_packed_tm_group_ids
+            applicable_packed_tm_groups
             active
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),

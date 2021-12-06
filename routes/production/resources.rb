@@ -342,10 +342,51 @@ class Nspack < Roda
         show_partial { Production::Resources::SystemResource::Show.call(id) }
       end
 
+      r.on 'system_resource_element_changed', String do |change_type|
+        # /peripheral_type
+        handle_ui_change(:system_resource, change_type.to_sym, params)
+      end
+
       r.on 'view_xml_config' do
         check_auth!('resources', 'read')
         res = interactor.system_resource_xml_for(id)
         show_page { Production::Resources::SystemResource::ShowXml.call(res, id) }
+      end
+
+      r.on 'provision_device' do
+        check_auth!('resources', 'edit')
+        interactor.assert_system_permission!(:provision, id)
+
+        r.on 'loading' do
+          res = interactor.provision_device(id, params[:system_resource])
+          if res.success
+            { content: "<pre>#{res.instance.join('<br>')}</pre>", notice: res.message }.to_json
+          else
+            { content: "<pre>#{res.instance.join('<br>')}</pre>", error: res.message }.to_json
+          end
+        rescue Crossbeams::InfoError => e
+          show_json_error(e.message, status: 200)
+        end
+
+        r.get do
+          show_partial { Production::Resources::SystemResource::ProvisionDevice.call(id) }
+        end
+      end
+
+      r.on 'deploy_config' do
+        check_auth!('resources', 'edit')
+        interactor.assert_system_permission!(:deploy_config, id)
+
+        r.on 'loading' do
+          out = interactor.deploy_system_config(id, params[:system_resource])
+          { content: "<pre>#{out.join('<br>')}</pre>", notice: 'Deployed...' }.to_json
+        rescue Crossbeams::InfoError => e
+          show_json_error(e.message, status: 200)
+        end
+
+        r.get do
+          show_partial { Production::Resources::SystemResource::DeployConfig.call(id) }
+        end
       end
 
       r.on 'download_xml_config' do
@@ -357,9 +398,54 @@ class Nspack < Roda
         response.write(res.instance[:config][:xml])
       end
 
+      r.on 'set_server' do
+        r.get do
+          check_auth!('resources', 'edit')
+          show_partial { Production::Resources::SystemResource::SetServer.call(id) }
+        end
+        r.post do
+          res = interactor.set_server_resource(id, params[:system_resource])
+          if res.success
+            row_keys = %i[
+              equipment_type
+              module_function
+              mac_address
+              ip_address
+              port
+              ttl
+              cycle_time
+              publishing
+              module_action
+              robot_function
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+          else
+            re_show_form(r, res) { Production::Resources::SystemResource::SetServer.call(id, form_values: params[:system_resource], form_errors: res.errors) }
+          end
+        end
+      end
+
+      r.on 'set_network' do
+        r.get do
+          check_auth!('resources', 'edit')
+          show_partial { Production::Resources::SystemResource::SetNetwork.call(id) }
+        end
+        r.post do
+          res = interactor.set_network_resource(id, params[:system_resource])
+          if res.success
+            row_keys = %i[
+              mac_address
+              ip_address
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+          else
+            re_show_form(r, res) { Production::Resources::SystemResource::SetNetwork.call(id, form_values: params[:system_resource], form_errors: res.errors) }
+          end
+        end
+      end
+
       r.on 'set_module' do
         r.get do
-          # TODO: fail for robot buttons
           check_auth!('resources', 'edit')
           show_partial { Production::Resources::SystemResource::SetModule.call(id) }
         end
@@ -384,6 +470,21 @@ class Nspack < Roda
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
             re_show_form(r, res) { Production::Resources::SystemResource::SetModule.call(id, form_values: params[:system_resource], form_errors: res.errors) }
+          end
+        end
+      end
+
+      r.on 'set_button' do
+        r.get do
+          check_auth!('resources', 'edit')
+          show_partial { Production::Resources::SystemResource::SetButton.call(id) }
+        end
+        r.post do
+          res = interactor.set_button_resource(id, params[:system_resource])
+          if res.success
+            update_grid_row(id, changes: { no_of_labels_to_print: res.instance }, notice: res.message)
+          else
+            re_show_form(r, res) { Production::Resources::SystemResource::SetButton.call(id, form_values: params[:system_resource], form_errors: res.errors) }
           end
         end
       end

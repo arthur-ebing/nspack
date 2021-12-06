@@ -27,6 +27,7 @@ module Production
               form.row do |row|
                 row.column do |col|
                   col.add_field :description
+                  col.add_field :no_of_labels_to_print
                 end
               end
               if ui_rule.form_object.system_resource_type_code == Crossbeams::Config::ResourceDefinitions::PERIPHERAL

@@ -434,13 +434,13 @@ class Nspack < Roda
         raise Crossbeams::FrameworkError, 'Run type does not exist. Perhaps required seeds were not run. Please contact support.' if id.nil?
       end
       store_locally(:reworks_run_type_id, id)
+      reworks_run_type = ProductionApp::ReworksRepo.new.find_reworks_run_type(id)[:run_type]
 
       r.on 'reworks_runs' do
         r.on 'new' do
           r.get do
             store_locally(:list_url, back_button_url)
             check_auth!('reworks', 'new')
-            reworks_run_type = ProductionApp::ReworksRepo.new.find_reworks_run_type(id)[:run_type]
             if reworks_run_type == AppConst::RUN_TYPE_CHANGE_DELIVERIES_ORCHARDS
               show_partial_or_page(r) { Production::Reworks::ChangeDeliveriesOrchard::SelectOrchards.call(remote: fetch?(r)) }
             elsif [AppConst::RUN_TYPE_CHANGE_RUN_ORCHARD, AppConst::RUN_TYPE_CHANGE_RUN_CULTIVAR].include?(reworks_run_type)
@@ -709,7 +709,7 @@ class Nspack < Roda
             res = interactor.update_rmt_bin_record(params[:reworks_run_rmt_bin])
             if res.success
               flash[:notice] = res.message
-              r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{id}"
+              r.redirect "/production/reworks/reworks_run_types/#{id}/pallets/#{bin_number}/edit_rmt_bin"
             else
               re_show_form(r, res, url: "/production/reworks/reworks_run_types/#{id}/pallets/#{bin_number}/edit_rmt_bin") do
                 Production::Reworks::ReworksRun::EditRmtBin.call(id,
@@ -745,6 +745,7 @@ class Nspack < Roda
         r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{id}"
       end
 
+      r.redirect "/list/reworks_runs/with_params?key=single_bin_edit&reworks_runs.reworks_run_type_id=#{id}" if reworks_run_type == AppConst::RUN_TYPE_SINGLE_BIN_EDIT
       r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{id}"
     end
 

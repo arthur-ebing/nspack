@@ -1,0 +1,204 @@
+---
+:caption: Vehicle Job Units
+:sql: SELECT "vehicle_job_units"."vehicle_job_id",
+   CASE WHEN "rmt_bins"."shipped_asset_number" IS NOT NULL THEN "rmt_bins"."shipped_asset_number"
+   WHEN "rmt_bins"."tipped_asset_number" IS NOT NULL THEN "rmt_bins"."tipped_asset_number"
+   ELSE "rmt_bins"."bin_asset_number"  END AS bin_asset_number,
+  "vehicle_job_units"."id", "vehicle_job_units"."stock_type_id",
+  "vehicle_job_units"."stock_item_id", "vehicle_job_units"."loaded_at", "vehicle_job_units"."offloaded_at",
+  "stock_types"."stock_type_code", "vehicle_jobs"."vehicle_number", fn_current_status('vehicle_job_units',
+  "vehicle_job_units"."id") AS status FROM "vehicle_job_units" JOIN "stock_types"
+  ON "stock_types"."id" = "vehicle_job_units"."stock_type_id" JOIN "vehicle_jobs"
+  ON "vehicle_jobs"."id" = "vehicle_job_units"."vehicle_job_id" JOIN "rmt_bins"
+  ON "vehicle_job_units"."stock_item_id" = "rmt_bins"."id"
+  WHERE "stock_types".stock_type_code='BIN'
+  ORDER BY id desc
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: vehicle_job_units.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  vehicle_job_id:
+    :name: vehicle_job_id
+    :sequence_no: 2
+    :caption: Vehicle job
+    :namespaced_name: vehicle_job_units.vehicle_job_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  bin_asset_number:
+    :name: bin_asset_number
+    :sequence_no: 3
+    :caption: Bin Number
+    :namespaced_name: rmt_bins.bin_asset_number
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  stock_type_id:
+    :name: stock_type_id
+    :sequence_no: 4
+    :caption: Stock type
+    :namespaced_name: vehicle_job_units.stock_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  stock_item_id:
+    :name: stock_item_id
+    :sequence_no: 5
+    :caption: Stock item
+    :namespaced_name: vehicle_job_units.stock_item_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  loaded_at:
+    :name: loaded_at
+    :sequence_no: 6
+    :caption: Loaded at
+    :namespaced_name: vehicle_job_units.loaded_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  offloaded_at:
+    :name: offloaded_at
+    :sequence_no: 7
+    :caption: Offloaded at
+    :namespaced_name: vehicle_job_units.offloaded_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  stock_type_code:
+    :name: stock_type_code
+    :sequence_no: 8
+    :caption: Stock type code
+    :namespaced_name: stock_types.stock_type_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  vehicle_number:
+    :name: vehicle_number
+    :sequence_no: 9
+    :caption: Vehicle number
+    :namespaced_name: vehicle_jobs.vehicle_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 10
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: vehicle_job_units.vehicle_job_id
+  :caption: Vehicle job
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT vehicle_number, id FROM vehicle_jobs ORDER BY vehicle_number
+- :column: vehicle_job_units.stock_type_id
+  :caption: Stock type
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT stock_type_code, id FROM stock_types ORDER BY stock_type_code
+- :column: vehicle_job_units.stock_item_id
+  :caption: Stock item
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

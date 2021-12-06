@@ -1,26 +1,44 @@
 ---
 :caption: System resources
-:sql: "SELECT \r\n(SELECT string_agg(cc.plant_resource_code, ' / ') as path\r\n  FROM
-  (SELECT c.plant_resource_code\r\n         FROM plant_resources AS c \r\n        JOIN
-  tree_plant_resources AS t1 ON t1.ancestor_plant_resource_id = c.id\r\n       WHERE
-  t1.descendant_plant_resource_id = plant_resources.id\r\n       ORDER BY t1.path_length
-  DESC) AS cc) AS hierarchy,\r\nplant_resource_types.icon,\r\nsystem_resources.system_resource_code,
-  \r\nplant_resources.plant_resource_code, plant_resources.description,\r\n(SELECT
-  string_agg(system_resource_code, '; ') FROM (SELECT pr.system_resource_code \r\n
-  \ FROM plant_resources_system_resources prs\r\n  JOIN system_resources pr ON pr.id
-  = prs.system_resource_id\r\n  WHERE prs.plant_resource_id = plant_resources.id)
-  sub) AS linked_resources,\r\nplant_resources.active,\r\nplant_resource_types.plant_resource_type_code,\r\nplant_resource_types.description
-  AS type_description,\r\nsystem_resource_types.peripheral,\r\nsystem_resources.equipment_type,\r\nsystem_resources.module_function,\r\nsystem_resources.robot_function,\r\nsystem_resources.mac_address,\r\nsystem_resources.ip_address,\r\nsystem_resources.port,\r\nsystem_resources.ttl,\r\nsystem_resources.cycle_time,\r\nsystem_resources.publishing,\r\nsystem_resources.login,\r\nsystem_resources.logoff,\r\nsystem_resources.group_incentive,\r\nsystem_resources.module_action,\r\nsystem_resources.peripheral_model,\r\nsystem_resources.connection_type,\r\nsystem_resources.printer_language,\r\nsystem_resources.print_username,\r\nsystem_resources.print_password,\r\nsystem_resources.pixels_mm,\r\nplant_resources.system_resource_id
-  AS id,\r\nplant_resources.id AS plant_resource_id,\r\nplant_resources.plant_resource_type_id\r\nFROM
-  plant_resources\r\nJOIN plant_resource_types ON plant_resource_types.id = plant_resources.plant_resource_type_id\r\nJOIN
-  system_resources ON system_resources.id = plant_resources.system_resource_id\r\nJOIN
-  system_resource_types ON system_resource_types.id = system_resources.system_resource_type_id\r\nWHERE
-  EXISTS(SELECT ancestor_plant_resource_id FROM tree_plant_resources WHERE descendant_plant_resource_id
-  = plant_resources.id)\r\nORDER BY (SELECT string_agg(\"cc\".\"plant_resource_code\",
-  ';') AS path \r\n    FROM (SELECT \"c\".\"plant_resource_code\" FROM \"plant_resources\"
-  c JOIN \"tree_plant_resources\" t1 ON \"t1\".\"ancestor_plant_resource_id\" = \"c\".\"id\"
-  \r\n    WHERE \"t1\".\"descendant_plant_resource_id\" = \"plant_resources\".\"id\"
-  \r\n    ORDER BY \"t1\".\"path_length\" DESC) cc)\r\n"
+:sql: "SELECT\r\n  (\r\n    SELECT\r\n      string_agg(cc.plant_resource_code, ' /
+  ') AS path\r\n    FROM (\r\n      SELECT\r\n        c.plant_resource_code\r\n      FROM\r\n
+  \       plant_resources AS c\r\n        JOIN tree_plant_resources AS t1 ON t1.ancestor_plant_resource_id
+  = c.id\r\n      WHERE\r\n        t1.descendant_plant_resource_id = plant_resources.id\r\n
+  \     ORDER BY\r\n        t1.path_length DESC) AS cc) AS hierarchy,\r\n  plant_resource_types.icon,\r\n
+  \ system_resources.system_resource_code,\r\n  plant_resources.plant_resource_code,\r\n
+  \ plant_resources.description,\r\n  (\r\n    SELECT\r\n      string_agg(system_resource_code,
+  '; ')\r\n    FROM (\r\n      SELECT\r\n        pr.system_resource_code\r\n      FROM\r\n
+  \       plant_resources_system_resources prs\r\n        JOIN system_resources pr
+  ON pr.id = prs.system_resource_id\r\n      WHERE\r\n        prs.plant_resource_id
+  = plant_resources.id) sub) AS linked_resources,\r\n  plant_resources.active,\r\n
+  \ plant_resource_types.plant_resource_type_code,\r\n  plant_resource_types.description
+  AS type_description,\r\n  system_resource_types.peripheral,\r\n  system_resources.equipment_type,\r\n
+  \ system_resources.module_function,\r\n  system_resources.robot_function,\r\n  system_resources.mac_address,\r\n
+  \ system_resources.ip_address,\r\n  system_resources.port,\r\n  system_resources.ttl,\r\n
+  \ system_resources.cycle_time,\r\n  system_resources.publishing,\r\n  system_resources.login,\r\n
+  \ system_resources.logoff,\r\n  system_resources.group_incentive,\r\n  system_resources.module_action,\r\n
+  \ system_resources.peripheral_model,\r\n  system_resources.connection_type,\r\n
+  \ system_resources.printer_language,\r\n  system_resources.print_username,\r\n  system_resources.print_password,\r\n
+  \ system_resources.pixels_mm,\r\n  plant_resources.system_resource_id AS id,\r\n
+  \ plant_resources.id AS plant_resource_id,\r\n  plant_resources.plant_resource_type_id,\r\n
+  \ CASE WHEN system_resource_types.system_resource_type_code = 'MODULE' THEN\r\n
+  \   TRUE\r\n  ELSE\r\n    FALSE\r\n  END AS module_type,\r\n  CASE WHEN system_resource_types.system_resource_type_code
+  = 'SERVER' THEN\r\n    TRUE\r\n  ELSE\r\n    FALSE\r\n  END AS server_type,\r\n
+  \ CASE WHEN system_resource_types.system_resource_type_code = 'MODULE_BUTTON' THEN\r\n
+  \   TRUE\r\n  ELSE\r\n    FALSE\r\n  END AS button_type,\r\n  CASE WHEN system_resource_types.system_resource_type_code
+  = 'NETWORK' THEN\r\n    TRUE\r\n  ELSE\r\n    FALSE\r\n  END AS network_type,\r\n
+  \ extended_config ->> 'no_of_labels_to_print' AS no_of_labels_to_print\r\nFROM\r\n
+  \ plant_resources\r\n  JOIN plant_resource_types ON plant_resource_types.id = plant_resources.plant_resource_type_id\r\n
+  \ JOIN system_resources ON system_resources.id = plant_resources.system_resource_id\r\n
+  \ JOIN system_resource_types ON system_resource_types.id = system_resources.system_resource_type_id\r\nWHERE\r\n
+  \ EXISTS (\r\n    SELECT\r\n      ancestor_plant_resource_id\r\n    FROM\r\n      tree_plant_resources\r\n
+  \   WHERE\r\n      descendant_plant_resource_id = plant_resources.id)\r\nORDER BY\r\n
+  \ (\r\n    SELECT\r\n      string_agg(\"cc\".\"plant_resource_code\", ';') AS path\r\n
+  \   FROM (\r\n      SELECT\r\n        \"c\".\"plant_resource_code\"\r\n      FROM\r\n
+  \       \"plant_resources\" c\r\n        JOIN \"tree_plant_resources\" t1 ON \"t1\".\"ancestor_plant_resource_id\"
+  = \"c\".\"id\"\r\n      WHERE\r\n        \"t1\".\"descendant_plant_resource_id\"
+  = \"plant_resources\".\"id\"\r\n      ORDER BY\r\n        \"t1\".\"path_length\"
+  DESC) cc)"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -530,6 +548,86 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  module_type:
+    :name: module_type
+    :sequence_no: 33
+    :caption: Module type
+    :namespaced_name: 
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  server_type:
+    :name: server_type
+    :sequence_no: 34
+    :caption: Server type
+    :namespaced_name: 
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  button_type:
+    :name: button_type
+    :sequence_no: 35
+    :caption: Button type
+    :namespaced_name: 
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  network_type:
+    :name: network_type
+    :sequence_no: 36
+    :caption: Network type
+    :namespaced_name: 
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  no_of_labels_to_print:
+    :name: no_of_labels_to_print
+    :sequence_no: 37
+    :caption: "#Labels"
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
     :pinned: 
     :groupable: false
     :group_by_seq: 

@@ -1,0 +1,7 @@
+---
+:dataminer_definition: vehicle_job_units
+:conditions:
+  :standard:
+    - :col: vehicle_job_units.vehicle_job_id
+      :op: =
+      :val: $:vehicle_job_id$

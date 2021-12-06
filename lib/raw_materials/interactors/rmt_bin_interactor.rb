@@ -95,11 +95,11 @@ module RawMaterialsApp
     end
 
     def complete_bins_tripsheet(vehicle_job_id) # rubocop:disable Metrics/AbcSize
-      unit1 = insp_repo.find_vehicle_job_unit_by(:vehicle_job_id, vehicle_job_id)
+      stock_type_id = repo.get_id(:stock_types, stock_type_code: AppConst::BIN_STOCK_TYPE)
+      unit1 = insp_repo.find_vehicle_job_unit_by(:vehicle_job_id, vehicle_job_id, stock_type_id)
       return failed_response('Cannot complete: No bins on tripsheet') if unit1.nil?
 
       repo.transaction do
-        stock_type_id = repo.get_id(:stock_types, stock_type_code: AppConst::BIN_STOCK_TYPE)
         repo.update(:vehicle_jobs, vehicle_job_id, loaded_at: Time.now)
         insp_repo.load_vehicle_job_units(vehicle_job_id)
         log_multiple_statuses(:rmt_bins, repo.select_values(:vehicle_job_units, :stock_item_id, stock_type_id: stock_type_id, vehicle_job_id: vehicle_job_id), AppConst::RMT_BIN_LOADED_ON_VEHICLE)

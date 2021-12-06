@@ -1,0 +1,172 @@
+---
+:caption: Offsite Asset Quantities
+:sql: "SELECT vw_offsite_bin_asset_transactions.material_owner,\r\n\t   vw_offsite_bin_asset_transactions.container_material_type_code,\r\n\t
+  \  vw_offsite_bin_asset_transactions.to_location,\r\n\t   COALESCE(issued_bins.total_issued,
+  0) AS total_issued,\r\n\t   COALESCE(returned_bins.total_received, 0) AS total_received,\r\n\t
+  \  COALESCE(issued_by_bin_sales.total_issued, 0) AS total_issued_by_bin_sales,\r\n\t
+  \  (COALESCE(issued_by_bin_sales.total_issued, 0) + COALESCE(issued_bins.total_issued,
+  0) - COALESCE(returned_bins.total_received, 0)) AS qty_at_site\r\nFROM vw_offsite_bin_asset_transactions\r\nLEFT
+  JOIN (SELECT material_owner, container_material_type_code,\r\n\t\t   to_location,
+  SUM(quantity_bins) AS total_issued FROM vw_offsite_bin_asset_transactions\r\n\t\t
+  \  WHERE transaction_type_code NOT IN ('BIN SALES')\r\n\t\t   GROUP BY material_owner,
+  container_material_type_code, to_location) issued_bins\r\n\t\t   ON issued_bins.material_owner
+  = vw_offsite_bin_asset_transactions.material_owner\r\n\t       AND issued_bins.container_material_type_code
+  = vw_offsite_bin_asset_transactions.container_material_type_code\r\n\t       AND
+  issued_bins.to_location = vw_offsite_bin_asset_transactions.to_location\r\nLEFT
+  JOIN (SELECT material_owner, container_material_type_code,\r\n\t\t   from_location,
+  SUM(quantity_bins) AS total_received FROM vw_offsite_bin_asset_transactions\r\n\t\t
+  \  GROUP BY material_owner, container_material_type_code, from_location) returned_bins
+  \r\n\t\t   ON returned_bins.material_owner = vw_offsite_bin_asset_transactions.material_owner\r\n\t
+  \      AND returned_bins.container_material_type_code = vw_offsite_bin_asset_transactions.container_material_type_code\r\n\t
+  \      AND returned_bins.from_location = vw_offsite_bin_asset_transactions.to_location\r\nLEFT
+  JOIN (SELECT material_owner, container_material_type_code,\r\n\t\t   to_location,
+  SUM(quantity_bins) AS total_issued FROM vw_offsite_bin_asset_transactions\r\n\t\t
+  \  WHERE transaction_type_code = 'BIN SALES'\r\n\t\t   GROUP BY material_owner,
+  container_material_type_code, to_location) issued_by_bin_sales \r\n\t\t   ON issued_by_bin_sales.material_owner
+  = vw_offsite_bin_asset_transactions.material_owner\r\n\t       AND issued_by_bin_sales.container_material_type_code
+  = vw_offsite_bin_asset_transactions.container_material_type_code\r\n\t       AND
+  issued_by_bin_sales.to_location = vw_offsite_bin_asset_transactions.to_location\r\nGROUP
+  BY vw_offsite_bin_asset_transactions.material_owner, vw_offsite_bin_asset_transactions.container_material_type_code,
+  \r\n         vw_offsite_bin_asset_transactions.to_location, issued_bins.total_issued,
+  returned_bins.total_received, issued_by_bin_sales.total_issued"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  material_owner:
+    :name: material_owner
+    :sequence_no: 1
+    :caption: Material owner
+    :namespaced_name: vw_offsite_bin_asset_transactions.material_owner
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  container_material_type_code:
+    :name: container_material_type_code
+    :sequence_no: 2
+    :caption: Material type
+    :namespaced_name: vw_offsite_bin_asset_transactions.container_material_type_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  to_location:
+    :name: to_location
+    :sequence_no: 3
+    :caption: To location
+    :namespaced_name: vw_offsite_bin_asset_transactions.to_location
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  total_issued:
+    :name: total_issued
+    :sequence_no: 4
+    :caption: Total issued
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  total_received:
+    :name: total_received
+    :sequence_no: 5
+    :caption: Total received
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  total_issued_by_bin_sales:
+    :name: total_issued_by_bin_sales
+    :sequence_no: 6
+    :caption: Issued by bin sales
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 110
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  qty_at_site:
+    :name: qty_at_site
+    :sequence_no: 7
+    :caption: Qty at site
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+  - :column: vw_offsite_bin_asset_transactions.material_owner
+    :caption: bin owner
+    :data_type: :string
+    :control_type: :text
+    :default_value:
+    :ordered_list: false
+    :ui_priority: 1
+    :list_def:
+  - :column: vw_offsite_bin_asset_transactions.container_material_type_code
+    :caption: bin type
+    :data_type: :string
+    :control_type: :text
+    :default_value:
+    :ordered_list: false
+    :ui_priority: 1
+    :list_def:
+  - :column: vw_offsite_bin_asset_transactions.to_location
+    :caption: to location
+    :data_type: :string
+    :control_type: :text
+    :default_value:
+    :ordered_list: false
+    :ui_priority: 1
+    :list_def:

@@ -274,7 +274,7 @@ module ProductionApp
     end
 
     def clone_pallet(pallet, sequence_ids, user_name)
-      pallet_rejected_fields = %i[id pallet_number build_status shipped in_stock inspected depot_pallet allocated
+      pallet_rejected_fields = %i[id pallet_number build_status shipped in_stock inspected allocated
                                   partially_palletized reinspected scrapped shipped_at scrapped_at govt_first_inspection_at
                                   govt_reinspection_at stock_created_at gross_weight_measured_at allocated_at intake_created_at
                                   first_cold_storage_at nett_weight gross_weight last_govt_inspection_pallet_id]
@@ -289,7 +289,7 @@ module ProductionApp
       pallet = get_pallet(pallet_id)
       repack_attrs = { pallet_id: pallet[:id], pallet_number: pallet[:pallet_number], repacked_from_pallet_id: old_pallet_id,
                        repacked_at: Time.now, created_at: Time.now, updated_at: Time.now, created_by: user_name }
-      ps_rejected_fields = %i[id pallet_id pallet_number pallet_sequence_number depot_pallet verified verification_passed
+      ps_rejected_fields = %i[id pallet_id pallet_number pallet_sequence_number verified verification_passed
                               removed_from_pallet verified_by scrapped_at verification_result verified_at
                               removed_from_pallet_at nett_weight]
       sequence_ids.each do |sequence_id|
@@ -517,7 +517,7 @@ module ProductionApp
         WHERE production_runs.id NOT IN (#{production_run_id})
         #{conditions}
         ORDER BY id DESC
-        LIMIT 500
+        LIMIT 1000
       SQL
       DB[query].all.map { |r| [r[:production_run_code], r[:id]] }
     end
@@ -999,9 +999,10 @@ module ProductionApp
       DB[query].single_value
     end
 
-    def rmt_bins_for_nett_recalculation
+    def rmt_bins_for_nett_recalculation(where: {})
       DB[:rmt_bins]
         .exclude(gross_weight: nil)
+        .where(where)
         .select(:id,
                 :qty_inner_bins,
                 :rmt_inner_container_material_id,

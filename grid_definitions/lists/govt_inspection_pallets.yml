@@ -5,6 +5,7 @@
   :text: edit
   :icon: edit
   :hide_if_false: inspected
+  :hide_if_true: sheet_inspected,results_captured
   :popup: true
 - :url: "/finished_goods/inspection/govt_inspection_pallets/$:id$/fail"
   :text: fail pallet

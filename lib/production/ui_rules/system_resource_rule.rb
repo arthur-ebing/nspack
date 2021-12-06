@@ -8,7 +8,11 @@ module UiRules
       apply_form_values
 
       common_values_for_fields common_fields
-      set_show_fields if @mode == :show
+      extended_config_fields
+      set_show_fields if %i[show deploy_config].include?(@mode)
+      set_deploy_fields if @mode == :deploy_config
+
+      add_peripheral_behaviours if @mode == :set_peripheral
 
       form_name 'system_resource'
     end
@@ -23,19 +27,19 @@ module UiRules
       fields[:represents_plant_resource_code] = { renderer: :label, invisible: @form_object.represents_plant_resource_code.nil?, caption: 'Represents' }
       fields[:active] = { renderer: :label, as_boolean: true }
 
-      fields[:equipment_type] = { renderer: :label }
-      fields[:module_function] = { renderer: :label }
-      fields[:robot_function] = { renderer: :label }
-      fields[:mac_address] = { renderer: :label }
-      fields[:ip_address] = { renderer: :label }
-      fields[:port] = { renderer: :label }
-      fields[:ttl] = { renderer: :label }
-      fields[:cycle_time] = { renderer: :label }
-      fields[:publishing] = { renderer: :label, as_boolean: true }
-      fields[:login] = { renderer: :label, as_boolean: true }
-      fields[:logoff] = { renderer: :label, as_boolean: true }
-      fields[:group_incentive] = { renderer: :label, as_boolean: true }
-      fields[:legacy_messcada] = { renderer: :label, as_boolean: true }
+      fields[:equipment_type] = { renderer: :label, invisible: @form_object.system_resource_type_code == Crossbeams::Config::ResourceDefinitions::MODULE_BUTTON }
+      fields[:module_function] = { renderer: :label, invisible: @form_object.system_resource_type_code == Crossbeams::Config::ResourceDefinitions::MODULE_BUTTON }
+      fields[:robot_function] = { renderer: :label, invisible: @form_object.system_resource_type_code == Crossbeams::Config::ResourceDefinitions::MODULE_BUTTON }
+      fields[:mac_address] = { renderer: :label, invisible: @form_object.system_resource_type_code == Crossbeams::Config::ResourceDefinitions::MODULE_BUTTON }
+      fields[:ip_address] = { renderer: :label, invisible: @form_object.system_resource_type_code == Crossbeams::Config::ResourceDefinitions::MODULE_BUTTON }
+      fields[:port] = { renderer: :label, invisible: @form_object.system_resource_type_code == Crossbeams::Config::ResourceDefinitions::MODULE_BUTTON }
+      fields[:ttl] = { renderer: :label, invisible: @form_object.system_resource_type_code == Crossbeams::Config::ResourceDefinitions::MODULE_BUTTON }
+      fields[:cycle_time] = { renderer: :label, invisible: @form_object.system_resource_type_code == Crossbeams::Config::ResourceDefinitions::MODULE_BUTTON }
+      fields[:publishing] = { renderer: :label, as_boolean: true, invisible: @form_object.system_resource_type_code == Crossbeams::Config::ResourceDefinitions::MODULE_BUTTON }
+      fields[:login] = { renderer: :label, as_boolean: true, invisible: @form_object.system_resource_type_code == Crossbeams::Config::ResourceDefinitions::MODULE_BUTTON }
+      fields[:logoff] = { renderer: :label, as_boolean: true, invisible: @form_object.system_resource_type_code == Crossbeams::Config::ResourceDefinitions::MODULE_BUTTON }
+      fields[:group_incentive] = { renderer: :label, as_boolean: true, invisible: @form_object.system_resource_type_code == Crossbeams::Config::ResourceDefinitions::MODULE_BUTTON }
+      fields[:legacy_messcada] = { renderer: :label, as_boolean: true, invisible: @form_object.system_resource_type_code == Crossbeams::Config::ResourceDefinitions::MODULE_BUTTON }
       fields[:module_action] = { renderer: :label }
       fields[:peripheral_model] = { renderer: :label }
       fields[:connection_type] = { renderer: :label }
@@ -43,11 +47,22 @@ module UiRules
       fields[:print_username] = { renderer: :label }
       fields[:print_password] = { renderer: :label }
       fields[:pixels_mm] = { renderer: :label }
+      fields[:no_of_labels_to_print] = { renderer: :label,
+                                         parent_field: :extended_config,
+                                         invisible: @form_object.system_resource_type_code != Crossbeams::Config::ResourceDefinitions::MODULE_BUTTON }
+    end
+
+    def set_deploy_fields
+      @form_object = OpenStruct.new(@form_object.to_h.merge(network_ip: nil, use_network_ip: false))
+      fields[:network_ip] = {}
+      fields[:use_network_ip] = { renderer: :checkbox }
+      fields[:distro_type] = { renderer: :label,
+                               with_value: Crossbeams::Config::ResourceDefinitions::MODULE_DISTRO_TYPES.rassoc((@form_object.extended_config || {})['distro_type']).first }
     end
 
     def common_fields
       plant_resource_type_id_label = @repo.get_value(:plant_resource_types, :plant_resource_type_code, id: @form_object.plant_resource_type_id)
-      equipment_types = if @mode == :set_module
+      equipment_types = if %i[set_module set_server].include?(@mode)
                           module_types
                         else
                           peripheral_types
@@ -79,8 +94,23 @@ module UiRules
       }
     end
 
+    def extended_config_fields
+      fields[:no_of_labels_to_print] = { renderer: :integer,
+                                         parent_field: :extended_config,
+                                         invisible: @mode != :set_button }
+      fields[:distro_type] = { renderer: :select,
+                               options: Crossbeams::Config::ResourceDefinitions::MODULE_DISTRO_TYPES,
+                               parent_field: :extended_config,
+                               prompt: true,
+                               invisible: @mode != :set_module }
+      fields[:netmask] = { parent_field: :extended_config,
+                           invisible: @mode != :set_server }
+      fields[:gateway] = { parent_field: :extended_config,
+                           invisible: @mode != :set_server }
+    end
+
     def make_form_object
-      @form_object = if @mode == :show
+      @form_object = if %i[show deploy_config].include?(@mode)
                        sysres = @repo.find_system_resource_flat(@options[:id])
                        represents = @repo.packpoint_for_button(sysres.plant_resource_code)
                        OpenStruct.new(sysres.to_h.merge(represents_plant_resource_code: represents))
@@ -90,22 +120,24 @@ module UiRules
       set_module_function
     end
 
+    def handle_behaviour
+      case @mode
+      when :peripheral_type
+        peripheral_type_change
+      else
+        unhandled_behaviour!
+      end
+    end
+
     private
 
     def module_types
-      [
-        ['MES Server', 'messerver'],
-        ['CMS Server', 'cmsserver'],
-        ['Standard NoSoft RPi robot (robot-nspi)', 'robot-nspi'],
-        ['Client-built  RPi robot (robot-rpi)', 'robot-rpi'],
-        ['Radical T200/T201 robot - Requires a MAC Address (robot-T200)', 'robot-T200'],
-        ['Radical T210 Java robot (robot-T210)', 'robot-T210'],
-        ['ITPC server', 'ITPC']
-      ]
+      Crossbeams::Config::ResourceDefinitions::MODULE_EQUIPMENT_TYPES
     end
 
     def peripheral_types
-      %w[argox zebra datamax remote-argox remote-zebra remote-datamax USBCOM]
+      # USBCOM - non-rs232 USB device (e.g. scanner for pltz)
+      Crossbeams::Config::ResourceDefinitions::PRINTER_SET.keys + Crossbeams::Config::ResourceDefinitions::REMOTE_PRINTER_SET.keys << 'USBCOM'
     end
 
     def set_module_function # rubocop:disable Metrics/CyclomaticComplexity
@@ -135,11 +167,16 @@ module UiRules
     end
 
     def robot_functions
-      %w[Server HTTP-CartonLabel HTTP-BinTip HTTP-RmtBinWeighing HTTP-PalletBuildup HTTP-PalletBuildup-SplitScreen]
+      Crossbeams::Config::ResourceDefinitions::MODULE_ROBOT_FUNCTIONS
     end
 
     def peripheral_models
-      %w[GK420d gk420d argox datamax Unknown]
+      if @form_object.equipment_type
+        print_key = Crossbeams::Config::ResourceDefinitions::REMOTE_PRINTER_SET[@form_object.equipment_type] || @form_object.equipment_type
+        Crossbeams::Config::ResourceDefinitions::PRINTER_SET[print_key]&.keys
+      else
+        []
+      end
     end
 
     def connection_types
@@ -148,6 +185,23 @@ module UiRules
 
     def printer_languages
       %w[pplz zpl]
+    end
+
+    def add_peripheral_behaviours
+      behaviours do |behaviour|
+        behaviour.dropdown_change :equipment_type,
+                                  notify: [{ url: "/production/resources/system_resources/#{@options[:id]}/system_resource_element_changed/peripheral_type" }]
+      end
+    end
+
+    def peripheral_type_change
+      if @params[:changed_value].empty?
+        sel = []
+      else
+        print_key = Crossbeams::Config::ResourceDefinitions::REMOTE_PRINTER_SET[@params[:changed_value]] || @params[:changed_value]
+        sel = Crossbeams::Config::ResourceDefinitions::PRINTER_SET[print_key].keys
+      end
+      json_replace_select_options('system_resource_peripheral_model', sel)
     end
   end
 end

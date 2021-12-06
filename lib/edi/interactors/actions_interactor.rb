@@ -135,20 +135,29 @@ module EdiApp
       end
     end
 
-    def update_op_recordset(id, index, params)
+    def update_op_recordset(id, index, params) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
       key = params[:column_name]
       new_val = params[:column_value]
       new_val = nil if new_val == 'undefined'
+      if !new_val.nil? && %w[tran_date inspec_date intake_date orig_inspec_date].include?(key)
+        return failed_response("#{key} must be in format YYYYMMDD") if new_val.length != 8
+        return failed_response("#{key} must be in format YYYYMMDD, #{new_val[4, 2]} is an invalid month") unless new_val[4, 2] =~ /(0[1-9]|1[0-2])/
+        return failed_response("#{key} must be in format YYYYMMDD, #{new_val[6, 2]} is an invalid day") unless new_val[6, 2] =~ /(0[1-9]|[12][0-9]|3[01])/
+      end
       instance = edi_in_transaction(id)
       pos = -1
+      do_update = true
       instance.recordset.each do |row|
         next unless row['record_type'] == 'OP'
 
         pos += 1
-        row[key] = new_val if pos == index
+        if pos == index
+          do_update = false if row[key] == new_val
+          row[key] = new_val
+        end
       end
-      in_repo.update(:edi_in_transactions, id, recordset: instance.recordset)
-      success_response("Updated #{key}")
+      in_repo.update(:edi_in_transactions, id, recordset: instance.recordset) if do_update
+      success_response(do_update ? "Updated #{key}" : 'no change')
     end
 
     def add_manual_intake_row(id) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity

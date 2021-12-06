@@ -213,14 +213,17 @@ module RawMaterialsApp
     end
 
     def maf_bin_tipped(params, request_path)
-      AppConst::PRESORT_BIN_TIPPED_LOG.info("#{request_path}&bin=#{params[:bin]}")
-      plant_resource = params[:unit]
-      MesscadaApp::PresortBinTipped.call(params[:bin], plant_resource)
+      RawMaterialsApp::Job::PresortIntegrationQueue.enqueue(params[:bin], params[:unit], request_path, 'tipped')
+      res = "<bins><bin result_status=\"OK\" msg=\"bin #{params[:bin]} has been queued up to be tipped\" /></bins>"
+      AppConst::PRESORT_BIN_TIPPED_LOG.info(res)
+      success_response('bin tipped result', res)
     end
 
     def bin_created(params, request_path)
-      AppConst::PRESORT_BIN_CREATED_LOG.info("#{request_path}&bin=#{params[:bin]}&unit=#{params[:unit]}")
-      MesscadaApp::PresortBinCreated.call(params[:bin], params[:unit])
+      RawMaterialsApp::Job::PresortIntegrationQueue.enqueue(params[:bin], params[:unit], request_path, 'create')
+      res = "<bins><bin result_status=\"OK\" msg=\"bin #{params[:bin]} has been queued up to be created\" /></bins>"
+      AppConst::PRESORT_BIN_CREATED_LOG.info(res)
+      success_response('bin created result', res)
     end
 
     def log_request(params, msq)

@@ -44,9 +44,16 @@ class Nspack < Roda
 
     r.on 'edit_manual_intake', Integer do |id|
       r.on 'inline_edit', Integer do |index|
-        p params
         res = interactor.update_op_recordset(id, index, params)
-        show_json_notice(res.message)
+        if res.success
+          if res.message == 'no change'
+            blank_json_response
+          else
+            show_json_notice(res.message)
+          end
+        else
+          show_json_warning(res.message)
+        end
       end
 
       r.on 'grid' do

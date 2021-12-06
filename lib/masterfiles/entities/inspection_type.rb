@@ -25,5 +25,9 @@ module MasterfilesApp
     attribute :applicable_marketing_org_party_role_ids, Types::Array
     attribute :applicable_marketing_org_party_roles, Types::Array
     attribute? :active, Types::Bool
+
+    attribute :applies_to_all_packed_tm_groups, Types::Bool
+    attribute :applicable_packed_tm_group_ids, Types::Array
+    attribute :applicable_packed_tm_groups, Types::Array
   end
 end

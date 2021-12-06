@@ -27,6 +27,9 @@ module MasterfilesApp
         applies_to_all_marketing_org_party_roles: false,
         applicable_marketing_org_party_role_ids: [1, 2, 3],
         applicable_marketing_org_party_roles: %w[A B C],
+        applies_to_all_packed_tm_groups: false,
+        applicable_packed_tm_group_ids: [1, 2, 3],
+        applicable_packed_tm_groups: %w[A B C],
         active: true
       }
       MasterfilesApp::InspectionType.new(base_attrs.merge(attrs))

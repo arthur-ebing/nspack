@@ -322,8 +322,8 @@ module FinishedGoodsApp
       DB[query, id].count
     end
 
-    def find_vehicle_job_unit_by(key, val)
-      hash = DB[:vehicle_job_units].where(Sequel[:vehicle_job_units][key] => val).first
+    def find_vehicle_job_unit_by(key, val, stock_type_id)
+      hash = DB[:vehicle_job_units].where(Sequel[:vehicle_job_units][key] => val, stock_type_id: stock_type_id).first
       return nil if hash.nil?
 
       VehicleJobUnit.new(hash)

@@ -56,6 +56,12 @@
   :title: Print barcode
   :popup: true
   :hide_if_false: packpoint
+- :url: "/production/resources/system_resources/$:system_resource_id$"
+  :text: view System Resource
+  :icon: view-show
+  :title: View System Resource
+  :popup: true
+  :hide_if_null: system_resource_id
 :page_controls:
 - :control_type: :link
   :url: "/production/resources/plant_resources/new"
