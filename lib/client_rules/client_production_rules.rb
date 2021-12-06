@@ -5,7 +5,7 @@ module Crossbeams
     include Crossbeams::AutoDocumentation
 
     CLIENT_SETTINGS = {
-      hb: { run_allocations: true,
+      hb: { run_allocations: { default: true, can_override: true },
             pallet_label_seqs_sql: 'SELECT ps.production_run_id, o.orchard_code, c.cultivar_code, ps.nett_weight FROM pallet_sequences ps JOIN orchards o ON o.id = ps.orchard_id JOIN cultivars c ON c.id = ps.cultivar_id WHERE ps.pallet_id = ? ORDER BY ps.pallet_sequence_number',
             use_gtins: false,
             print_from_line_scanning: false,
@@ -30,7 +30,7 @@ module Crossbeams
             run_cache_legacy_data_fields: [],
             use_work_orders: false,
             allow_reworks_mixed_tipping: false },
-      hl: { run_allocations: true,
+      hl: { run_allocations: { default: true, can_override: false },
             pallet_label_seqs_sql: nil,
             use_gtins: false,
             print_from_line_scanning: false,
@@ -55,7 +55,7 @@ module Crossbeams
             run_cache_legacy_data_fields: [],
             use_work_orders: false,
             allow_reworks_mixed_tipping: false },
-      kr: { run_allocations: true,
+      kr: { run_allocations: { default: true, can_override: false },
             pallet_label_seqs_sql: 'SELECT p.puc_code, p.gap_code, ps.gtin_code, ps.carton_quantity FROM pallet_sequences ps JOIN pucs p ON p.id = ps.puc_id WHERE ps.pallet_id = ? ORDER BY ps.pallet_sequence_number',
             use_gtins: true,
             print_from_line_scanning: true,
@@ -81,7 +81,7 @@ module Crossbeams
             run_cache_legacy_data_fields: %i[pc_code track_indicator_code],
             use_work_orders: true,
             allow_reworks_mixed_tipping: true },
-      um: { run_allocations: true,
+      um: { run_allocations: { default: true, can_override: false },
             pallet_label_seqs_sql: 'SELECT o.orchard_code, m.marketing_variety_code, s.size_reference, ps.carton_quantity FROM pallet_sequences ps JOIN orchards o ON o.id = ps.orchard_id JOIN marketing_varieties m ON m.id = ps.marketing_variety_id JOIN fruit_size_references s ON s.id = ps.fruit_size_reference_id WHERE ps.pallet_id = ? ORDER BY ps.pallet_sequence_number',
             use_gtins: false,
             print_from_line_scanning: false,
@@ -106,7 +106,7 @@ module Crossbeams
             run_cache_legacy_data_fields: [],
             use_work_orders: false,
             allow_reworks_mixed_tipping: false },
-      ud: { run_allocations: true,
+      ud: { run_allocations: { default: true, can_override: false },
             pallet_label_seqs_sql: nil,
             use_gtins: false,
             print_from_line_scanning: false,
@@ -131,7 +131,7 @@ module Crossbeams
             run_cache_legacy_data_fields: [],
             use_work_orders: false,
             allow_reworks_mixed_tipping: false },
-      cfg: { run_allocations: true,
+      cfg: { run_allocations: { default: true, can_override: false },
              pallet_label_seqs_sql: nil,
              use_gtins: false,
              print_from_line_scanning: false,
@@ -156,7 +156,7 @@ module Crossbeams
              run_cache_legacy_data_fields: [],
              use_work_orders: false,
              allow_reworks_mixed_tipping: false },
-      sr: { run_allocations: true,
+      sr: { run_allocations: { default: true, can_override: false },
             pallet_label_seqs_sql: nil,
             use_gtins: false,
             print_from_line_scanning: false,
@@ -181,7 +181,7 @@ module Crossbeams
             run_cache_legacy_data_fields: [],
             use_work_orders: false,
             allow_reworks_mixed_tipping: false },
-      sr2: { run_allocations: true,
+      sr2: { run_allocations: { default: true, can_override: false },
              pallet_label_seqs_sql: nil,
              use_gtins: false,
              print_from_line_scanning: false,
@@ -243,10 +243,17 @@ module Crossbeams
       @settings = CLIENT_SETTINGS.fetch(client_code.to_sym)
     end
 
-    def no_run_allocations?(explain: false)
-      return 'Does this client not do allocation of product setup to resource?' if explain
+    def no_run_allocations?(production_line_id: nil, explain: false)
+      return "Product setups are not allocated to production run resources. (Print labels for any setup of a run's template)" if explain
 
-      !setting(:run_allocations)
+      do_run_allocations = setting(:run_allocations)
+      return !do_run_allocations[:default] unless do_run_allocations[:can_override]
+      return !do_run_allocations[:default] if production_line_id.nil?
+
+      line_do_run_allocations = DB[:plant_resources]
+                                .where(id: production_line_id)
+                                .get(Sequel.lit("resource_properties ->> 'do_run_allocations'"))
+      line_do_run_allocations.nil_or_empty? ? !do_run_allocations[:default] : line_do_run_allocations == 'f'
     end
 
     def can_mix_cultivar_groups?(explain: false)

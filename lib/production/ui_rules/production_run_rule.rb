@@ -331,7 +331,7 @@ module UiRules
 
     def make_new_form_object
       packhouse_id = @resource_repo.for_select_plant_resources_of_type(Crossbeams::Config::ResourceDefinitions::PACKHOUSE)&.first&.last
-      line_id = @resource_repo.packhouse_lines(packhouse_id)&.first&.last if packhouse_id
+      line_id = @resource_repo.packhouse_lines(packhouse_id)&.sort&.first&.last if packhouse_id
       res = @delivery_repo.default_farm_puc
       @form_object = OpenStruct.new(farm_id: res[:farm_id],
                                     puc_id: res[:puc_id],
