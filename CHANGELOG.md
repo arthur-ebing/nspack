@@ -10,6 +10,24 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 ### Changed
 ### Fixed
 
+## [1.0.4] - 2021-12-06
+### Added
+- EDI in process: added manual intake flow to create a PO in without a file.
+- Tripsheet logs.
+- Provision and configure NTD devices from system resources grid.
+- Empty bin reports for tracking empty bin assets.
+### Changed
+- Rename `Active` setups/packspecs to `Available` setups/packspecs.
+- 9-digit pallet numbers - accept `23` as a valid prefix.
+- Presort integration events handled by singleton Que jobs.
+- Various changes to PPECB inspection related to failed state.
+- Single bin edit - edit legacy data attributes too.
+### Fixed
+- Pallets table - index on `load_id`.
+- Cloning pallets - retain the `depot_pallet` flag's value.
+- Standard cartons calculation.
+- Prevent run execution if any allocated label template is inactive.
+
 ## [1.0.3] - 2021-11-18
 ### Added
 - Changes for Kromco go-live (Presort, staging runs, MAF integration, HW integration, RMT legacy data
