@@ -36,10 +36,14 @@ module Crossbeams
     #
     # e.g. validation_failed_message_response(name: ['required', 'too short'], email: ['required'])
     #
-    # @param messages [Hash] the validation error messages.
+    # @param messages [Hash,String] the validation error messages.
     # @return [OpenStruct] the response object.
     def validation_failed_message_response(messages)
-      validation_failed_response(messages: messages)
+      if messages.is_a?(String)
+        validation_failed_response(messages: { base: [messages] })
+      else
+        validation_failed_response(messages: messages)
+      end
     end
 
     # Create a response object with validation errors from more than one source.
