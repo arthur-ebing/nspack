@@ -25,7 +25,7 @@ module ProductionApp
                 xml.comment "\n      Packhouse #{ph}\n    "
                 periphs.each do |prt|
                   print_key = Crossbeams::Config::ResourceDefinitions::REMOTE_PRINTER_SET[prt[:type]] || prt[:type]
-                  print_set = Crossbeams::Config::ResourceDefinitions::PRINTER_SET[print_key][prt[:model]]
+                  print_set = Crossbeams::Config::ResourceDefinitions::PRINTER_SET[print_key][prt[:model]] || {}
                   xml.Printer(Name: prt[:name],
                               Function: prt[:function],
                               Alias: prt[:alias],

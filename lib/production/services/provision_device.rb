@@ -47,6 +47,7 @@ module ProductionApp
       out << "* Took #{format('%.2f', duration / 60.0)} minutes to run." # rubocop:disable Style/FormatStringToken
       success_response("Device has been provisioned and is rebooting. Took #{format('%.2f', duration / 60.0)} minutes to run.", out) # rubocop:disable Style/FormatStringToken
     rescue StandardError => e
+      duration = Time.now - start_time
       out.unshift("This process failed after #{format('%.2f', duration / 60.0)} minutes - with error: #{e.message}") # rubocop:disable Style/FormatStringToken
       puts e.backtrace.join("\n")
       ErrorMailer.send_exception_email(e, subject: self.class.name, message: out.join("\n"))
@@ -352,7 +353,6 @@ module ProductionApp
         out << result
         log
 
-        # TODO: modify config constants to store these for applying to config.xml?
         # 50: List of usb devices vendor and product keys (run lsusb when device plugged in to find these codes)
         result = ssh.exec!(<<~STR)
           cat << EOF | sudo tee /etc/udev/rules.d/50-usb-permissions.rules
@@ -360,7 +360,7 @@ module ProductionApp
             SUBSYSTEM=="usb", ATTR{idVendor}=="0a5f",ATTR{idProduct}=="0080",MODE="0666",GROUP="users"
             # Zebra printer (zebra:zd420)
             SUBSYSTEM=="usb", ATTR{idVendor}=="0a5f",ATTR{idProduct}=="0120",MODE="0666",GROUP="users"
-            # Zebra printer (zebra:zd320)
+            # Zebra printer (zebra:zd230)
             SUBSYSTEM=="usb", ATTR{idVendor}=="0a5f",ATTR{idProduct}=="0166",MODE="0666",GROUP="users"
             # Argox printer (argox:ar-o4-250)
             SUBSYSTEM=="usb", ATTR{idVendor}=="1664",ATTR{idProduct}=="0d10",MODE="0666",GROUP="users"

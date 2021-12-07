@@ -427,6 +427,7 @@ module Crossbeams
                      icon: { file: 'printer', colour: CLR_A },
                      non_editable_code: true,
                      code_prefix: 'PRN-' },
+        # QC PERIPHERALS... FTA, RFM
         CARTON_VERIFICATION_STATION => { description: 'Carton-verification station',
                                          allowed_children: [CARTON_VERIFICATION_ROBOT, PRINTER],
                                          icon: { file: 'tag', colour: CLR_B } },
@@ -614,7 +615,7 @@ module Crossbeams
         },
         'zebra' => {
           'GK420d' => { lang: 'zpl', usb_vendor: '0a5f', usb_product: '0080' },
-          'ZD320' => { lang: 'zpl', usb_vendor: '0a5f', usb_product: '0166' },
+          'ZD230' => { lang: 'zpl', usb_vendor: '0a5f', usb_product: '0166' },
           'ZD420' => { lang: 'zpl', usb_vendor: '0a5f', usb_product: '0120' }
         },
         'datamax' => {
