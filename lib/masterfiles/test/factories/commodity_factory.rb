@@ -40,7 +40,7 @@ module MasterfilesApp
 
       default = {
 
-        colour_percentage: Faker::Number.number(digits: 2),
+        colour_percentage: Faker::Lorem.word,
         description: Faker::Lorem.unique.word,
         active: true,
         created_at: '2010-01-01 12:00',

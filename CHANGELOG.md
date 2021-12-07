@@ -9,6 +9,7 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 ### Added
 ### Changed
 - The client rule for allocating setups to runs can be overridden on a LINE resource.
+- Colour percentages changed to integer column to allow for expressing percentage as a range.
 ### Fixed
 
 ## [1.0.4] - 2021-12-06
