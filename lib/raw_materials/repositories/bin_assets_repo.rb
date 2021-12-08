@@ -153,12 +153,13 @@ module RawMaterialsApp
 
       existing_qty = location_ds.get(:quantity) || 0
       qty = add ? (existing_qty + quantity) : (existing_qty - quantity)
-      if qty.negative?
-        failed_response('can not update with negative amount', qty)
-      else
-        location_ds.update(quantity: qty)
-        success_response('updated successfully')
-      end
+      # FIXME: While triggers not being used...
+      # if qty.negative?
+      #   failed_response('can not update with negative amount', qty)
+      # else
+      location_ds.update(quantity: qty)
+      success_response('updated successfully')
+      # end
     end
 
     def ensure_bin_asset_location(owner_id, to_location_id)
@@ -327,12 +328,13 @@ module RawMaterialsApp
       existing_qty = get(:bin_asset_locations, bin_asset_location_id, :quantity) || 0
       qty = existing_qty - quantity
 
-      if qty.negative?
-        failed_response('can not update with negative amount', qty)
-      else
-        update(:bin_asset_locations, bin_asset_location_id, quantity: qty)
-        success_response('updated successfully')
-      end
+      # FIXME: While triggers not being used...
+      # if qty.negative?
+      #   failed_response('can not update with negative amount', qty)
+      # else
+      update(:bin_asset_locations, bin_asset_location_id, quantity: qty)
+      success_response('updated successfully')
+      # end
     end
 
     def update_error_logs_for_bin_asset_location(bin_asset_location_id, attrs)
