@@ -247,8 +247,22 @@ module ProductionApp
       ProvisionDevice.call(id, params[:network_ip], params[:use_network_ip] == 't')
     end
 
+    def show_mac_address(params)
+      network_ip = params[:network_ip]
+      out = []
+
+      Net::SSH.start(network_ip, 'nspi', password: AppConst::PROVISION_PW) do |ssh|
+        result = ssh.exec!(%(cat /sys/class/net/$(ip route show default | awk '/default/ {print $5}')/address))
+        out << 'MAC address:'
+        out << '-----------------'
+        out << result.chomp
+        out << '-----------------'
+      end
+      out
+    end
+
     def deploy_system_config(id, params) # rubocop:disable Metrics/AbcSize
-      ip = params[:network_ip]
+      network_ip = params[:network_ip]
       out = []
       res = if params[:use_network_ip]
               ProductionApp::BuildModuleConfigXml.call(id, alternate_ip: params[:network_ip])
@@ -256,20 +270,16 @@ module ProductionApp
               ProductionApp::BuildModuleConfigXml.call(id)
             end
 
-      Net::SSH.start(network_ip, usr, password: pw) do |ssh|
+      Net::SSH.start(network_ip, 'nspi', password: AppConst::PROVISION_PW) do |ssh|
         result = ssh.exec!(%(cat /sys/class/net/$(ip route show default | awk '/default/ {print $5}')/address))
         out << 'MAC address:'
-        log
         out << '-----------------'
-        log
         out << result.chomp
-        log
         out << '-----------------'
-        log
       end
       # Should this also set the static ip and host? & reboot?
 
-      Net::SCP.start(ip, 'nspi', password: AppConst::PROVISION_PW) do |scp|
+      Net::SCP.start(network_ip, 'nspi', password: AppConst::PROVISION_PW) do |scp|
         # upload from an in-memory buffer
         scp.upload! StringIO.new(res.instance[:xml]), '/home/nspi/nosoft/messerver/config/config.xml'
         out << 'Config.xml copied to device'

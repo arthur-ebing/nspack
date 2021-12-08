@@ -81,9 +81,9 @@ module ProductionApp
       Net::SSH.start(network_ip, usr, password: pw) do |ssh|
         out << '* Change the hostname and static ip address'
         log
-        out << ssh.exec!(%(echo 'ns-#{sys_mod.ip_address.tr('.', '')}' | sudo tee /etc/hostname))
-        log
         out << ssh.exec!(%(sudo sed -i "/127.0.1.1/c\\127.0.1.1\\tns-#{sys_mod.ip_address.tr('.', '')}" /etc/hosts))
+        log
+        out << ssh.exec!(%(echo 'ns-#{sys_mod.ip_address.tr('.', '')}' | sudo tee /etc/hostname))
         log
         out << ssh.exec!(%(sudo hostnamectl set-hostname ns-#{sys_mod.ip_address.tr('.', '')}))
         log
@@ -106,6 +106,10 @@ module ProductionApp
         out << ssh.exec!(%(echo #{pw} | sudo -S reboot))
         log
       end
+    rescue IOError => e
+      # : closed stream
+      out << "SSH connection failed: #{e.message}"
+      log
     end
 
     def add_user # rubocop:disable Metrics/AbcSize
@@ -234,7 +238,7 @@ module ProductionApp
 
         out << '* Install vim, minicom, losf and lshw'
         log
-        result = ssh.exec!(%(sudo apt-get install vim minicom lsof lshw -y))
+        result = ssh.exec!(%(DEBIAN_FRONTEND=noninteractive sudo apt-get install vim minicom lsof lshw -y))
         out << result
         log
         if for_virtual_pi
@@ -243,7 +247,7 @@ module ProductionApp
         else
           out << '* Install java'
           log
-          result = ssh.exec!(%(sudo apt-get install openjdk-8-jdk -y))
+          result = ssh.exec!(%(DEBIAN_FRONTEND=noninteractive sudo apt-get install openjdk-8-jdk -y))
           out << result
           log
         end

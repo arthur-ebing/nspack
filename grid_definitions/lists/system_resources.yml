@@ -54,6 +54,12 @@
   :title: Deploy Configuration
   :popup: true
   :hide_if_false: module_type
+- :url: "/production/resources/system_resources/$:id$/get_mac_address"
+  :text: get mac address
+  :icon: book-reference
+  :title: MAC Address
+  :popup: true
+  :hide_if_false: module_type
 :page_controls:
 - :control_type: :link
   :url: "/production/resources/system_resources"

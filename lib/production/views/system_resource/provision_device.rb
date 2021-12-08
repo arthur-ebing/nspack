@@ -17,6 +17,7 @@ module Production
                 row.column do |col|
                   col.add_field :plant_resource_code
                   col.add_field :system_resource_code
+                  col.add_field :ip_address
                   col.add_field :network_ip
                   col.add_field :use_network_ip
                   col.add_field :distro_type

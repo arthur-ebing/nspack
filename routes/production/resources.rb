@@ -389,6 +389,23 @@ class Nspack < Roda
         end
       end
 
+      r.on 'get_mac_address' do
+        check_auth!('resources', 'edit')
+        interactor.assert_system_permission!(:deploy_config, id)
+
+        r.on 'loading' do
+          out = interactor.show_mac_address(params[:system_resource])
+          # { content: "<pre>#{out.join('<br>')}</pre>", notice: 'MAC address...' }.to_json
+          update_dialog_content(content: "<pre>#{out.join('<br>')}</pre>", notice: 'MAC address...')
+        rescue Crossbeams::InfoError => e
+          show_json_error(e.message, status: 200)
+        end
+
+        r.get do
+          show_partial { Production::Resources::SystemResource::MacAddress.call(id) }
+        end
+      end
+
       r.on 'download_xml_config' do
         check_auth!('resources', 'read')
         res = interactor.system_resource_xml_for(id)
