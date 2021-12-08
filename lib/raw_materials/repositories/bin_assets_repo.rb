@@ -171,17 +171,18 @@ module RawMaterialsApp
       success_response('ok')
     end
 
-    def validate_bin_asset_location_quantities(from_location_id, bin_sets = []) # rubocop:disable Metrics/AbcSize
-      bin_sets.each do |set|
-        qty = bin_asset_location_qty(set[:rmt_material_owner_party_role_id], set[:rmt_container_material_type_id], from_location_id)
-        next if qty >= set[:quantity_bins].to_i
-
-        owner_bin_type = find_owner_bin_type(set[:rmt_material_owner_party_role_id], set[:rmt_container_material_type_id])
-        bin_type = owner_bin_type.container_material_type_code
-        location_code = DB[:locations].where(id: from_location_id).get(:location_long_code)
-        message = "Insufficient amount of #{bin_type} from #{owner_bin_type.owner_party_name} at #{location_code}: #{qty} Available"
-        return validation_failed_response(OpenStruct.new(messages: { base: [message] }, instance: hash))
-      end
+    def validate_bin_asset_location_quantities(_, _ = [])
+      # def validate_bin_asset_location_quantities(from_location_id, bin_sets = [])
+      # bin_sets.each do |set|
+      #   qty = bin_asset_location_qty(set[:rmt_material_owner_party_role_id], set[:rmt_container_material_type_id], from_location_id)
+      #   next if qty >= set[:quantity_bins].to_i
+      #
+      #   owner_bin_type = find_owner_bin_type(set[:rmt_material_owner_party_role_id], set[:rmt_container_material_type_id])
+      #   bin_type = owner_bin_type.container_material_type_code
+      #   location_code = DB[:locations].where(id: from_location_id).get(:location_long_code)
+      #   message = "Insufficient amount of #{bin_type} from #{owner_bin_type.owner_party_name} at #{location_code}: #{qty} Available"
+      #   return validation_failed_response(OpenStruct.new(messages: { base: [message] }, instance: hash))
+      # end
       success_response('ok')
     end
 
