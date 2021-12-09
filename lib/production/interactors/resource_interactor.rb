@@ -264,7 +264,7 @@ module ProductionApp
     def deploy_system_config(id, params) # rubocop:disable Metrics/AbcSize
       network_ip = params[:network_ip]
       out = []
-      res = if params[:use_network_ip]
+      res = if params[:use_network_ip] == 't'
               ProductionApp::BuildModuleConfigXml.call(id, alternate_ip: params[:network_ip])
             else
               ProductionApp::BuildModuleConfigXml.call(id)
