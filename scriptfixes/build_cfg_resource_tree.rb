@@ -70,7 +70,7 @@ class BuildCfgResourceTree < BaseScript
     130.times do |n|
       seq = n + 1
       seq_str = seq.to_s.rjust(3, '0')
-      6.times do |b|
+      4.times do |b|
         no = b + 1
         plant_id = repo.get_id(:plant_resources, plant_resource_code: "CLM-#{seq_str}-B#{no}")
         repo.delete_plant_resource(plant_id)
@@ -84,7 +84,7 @@ class BuildCfgResourceTree < BaseScript
   end
 
   def create_modules_and_printers # rubocop:disable Metrics/AbcSize
-    clm_attrs = { port: 2000, group_incentive: true, login: true, logoff: false, equipment_type: 'robot-nspi', robot_function: 'HTTP-CartonLabel', module_function: 'carton_labelling', ttl: 10_000, cycle_time: 9000, module_action: 'carton-labeling', publishing: true, extended_config: { distro_type: 'seeed_reterm' } }
+    clm_attrs = { port: 2000, group_incentive: true, login: true, logoff: false, equipment_type: 'robot-nspi', robot_function: 'HTTP-CartonLabel', module_function: 'carton_labelling', ttl: 10_000, cycle_time: 9000, module_action: 'carton_labeling', publishing: true, extended_config: { distro_type: 'seeed_reterm' } }
 
     130.times do |n|
       seq = n + 1
@@ -97,7 +97,7 @@ class BuildCfgResourceTree < BaseScript
       sysres_id = repo.get(:plant_resources, clm_id, :system_resource_id)
       repo.update_system_resource(sysres_id, clm_attrs.merge(ip_address: "192.168.13.#{seq + 10}"))
       # Add buttons (& link to packpoints...)
-      6.times do |b|
+      4.times do |b|
         no = b + 1
         res = plant_res(btn_type, "CLM-#{seq_str}-B#{no}", "NTD #{seq_str} Button B#{no}")
         repo.create_child_plant_resource(clm_id, res, sys_code: "CLM-#{seq_str}-B#{no}")
