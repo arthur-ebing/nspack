@@ -1,0 +1,631 @@
+---
+:caption: Grower Grading Pools
+:sql: "SELECT \"grower_grading_pools\".\"id\", \"grower_grading_pools\".\"grower_grading_rule_id\",\r\n\"grower_grading_pools\".\"production_run_id\",
+  \"grower_grading_pools\".\"season_id\",\r\n\"grower_grading_pools\".\"cultivar_group_id\",
+  \"grower_grading_pools\".\"cultivar_id\", \r\n\"grower_grading_pools\".\"commodity_id\",
+  \"grower_grading_pools\".\"farm_id\", \r\n\"grower_grading_pools\".\"inspection_type_id\",
+  \r\n\"grower_grading_pools\".\"pool_name\", \"grower_grading_pools\".\"description\",
+  \r\n\"grower_grading_rules\".\"rule_name\", \r\nfn_production_run_code (\"grower_grading_pools\".\"production_run_id\")
+  AS production_run_code,\r\n\"commodities\".\"code\" AS commodity_code, \"cultivar_groups\".\"cultivar_group_code\",
+  \r\n\"cultivars\".\"cultivar_name\", \"seasons\".\"season_code\", \"farms\".\"farm_code\",
+  \r\n\"inspection_types\".\"inspection_type_code\", \"grower_grading_pools\".\"legacy_data\",
+  \r\n\"grower_grading_pools\".\"bin_quantity\", \"grower_grading_pools\".\"gross_weight\",
+  \r\n\"grower_grading_pools\".\"nett_weight\", \"grower_grading_pools\".\"pro_rata_factor\",
+  \r\n\"grower_grading_pools\".\"completed\", \"grower_grading_pools\".\"rule_applied\",
+  \r\n\"grower_grading_pools\".\"active\", \r\n\"grower_grading_pools\".\"created_by\",
+  \"grower_grading_pools\".\"updated_by\", \r\n\"grower_grading_pools\".\"rule_applied_by\",
+  \r\n\"grower_grading_pools\".\"created_at\", \"grower_grading_pools\".\"updated_at\",
+  \r\n\"grower_grading_pools\".\"rule_applied_at\" \r\nFROM \"grower_grading_pools\"
+  \r\nLEFT JOIN \"grower_grading_rules\" ON \"grower_grading_rules\".\"id\" = \"grower_grading_pools\".\"grower_grading_rule_id\"\r\nLEFT
+  JOIN \"production_runs\" ON \"production_runs\".\"id\" = \"grower_grading_pools\".\"production_run_id\"
+  \r\nJOIN \"commodities\" ON \"commodities\".\"id\" = \"grower_grading_pools\".\"commodity_id\"
+  \r\nJOIN \"cultivar_groups\" ON \"cultivar_groups\".\"id\" = \"grower_grading_pools\".\"cultivar_group_id\"\r\nLEFT
+  JOIN \"cultivars\" ON \"cultivars\".\"id\" = \"grower_grading_pools\".\"cultivar_id\"\r\nLEFT
+  JOIN \"seasons\" ON \"seasons\".\"id\" = \"grower_grading_pools\".\"season_id\"\r\nJOIN
+  \"farms\" ON \"farms\".\"id\" = \"grower_grading_pools\".\"farm_id\" \r\nLEFT JOIN
+  \"inspection_types\" ON \"inspection_types\".\"id\" = \"grower_grading_pools\".\"inspection_type_id\" "
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: grower_grading_pools.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  grower_grading_rule_id:
+    :name: grower_grading_rule_id
+    :sequence_no: 2
+    :caption: Grower grading rule
+    :namespaced_name: grower_grading_pools.grower_grading_rule_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  production_run_id:
+    :name: production_run_id
+    :sequence_no: 3
+    :caption: Production run
+    :namespaced_name: grower_grading_pools.production_run_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  season_id:
+    :name: season_id
+    :sequence_no: 4
+    :caption: Season
+    :namespaced_name: grower_grading_pools.season_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_group_id:
+    :name: cultivar_group_id
+    :sequence_no: 5
+    :caption: Cultivar group
+    :namespaced_name: grower_grading_pools.cultivar_group_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_id:
+    :name: cultivar_id
+    :sequence_no: 6
+    :caption: Cultivar
+    :namespaced_name: grower_grading_pools.cultivar_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  commodity_id:
+    :name: commodity_id
+    :sequence_no: 7
+    :caption: Commodity
+    :namespaced_name: grower_grading_pools.commodity_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  farm_id:
+    :name: farm_id
+    :sequence_no: 8
+    :caption: Farm
+    :namespaced_name: grower_grading_pools.farm_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inspection_type_id:
+    :name: inspection_type_id
+    :sequence_no: 9
+    :caption: Inspection type
+    :namespaced_name: grower_grading_pools.inspection_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pool_name:
+    :name: pool_name
+    :sequence_no: 10
+    :caption: Pool name
+    :namespaced_name: grower_grading_pools.pool_name
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  description:
+    :name: description
+    :sequence_no: 11
+    :caption: Description
+    :namespaced_name: grower_grading_pools.description
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rule_name:
+    :name: rule_name
+    :sequence_no: 12
+    :caption: Rule name
+    :namespaced_name: grower_grading_rules.rule_name
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  production_run_code:
+    :name: production_run_code
+    :sequence_no: 13
+    :caption: Production run code
+    :namespaced_name: 
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  commodity_code:
+    :name: commodity_code
+    :sequence_no: 14
+    :caption: Commodity
+    :namespaced_name: commodities.code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_group_code:
+    :name: cultivar_group_code
+    :sequence_no: 15
+    :caption: Cultivar group
+    :namespaced_name: cultivar_groups.cultivar_group_code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_name:
+    :name: cultivar_name
+    :sequence_no: 16
+    :caption: Cultivar
+    :namespaced_name: cultivars.cultivar_name
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  season_code:
+    :name: season_code
+    :sequence_no: 17
+    :caption: Season
+    :namespaced_name: seasons.season_code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  farm_code:
+    :name: farm_code
+    :sequence_no: 18
+    :caption: Farm
+    :namespaced_name: farms.farm_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inspection_type_code:
+    :name: inspection_type_code
+    :sequence_no: 19
+    :caption: Inspection type
+    :namespaced_name: inspection_types.inspection_type_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  legacy_data:
+    :name: legacy_data
+    :sequence_no: 20
+    :caption: Legacy data
+    :namespaced_name: grower_grading_pools.legacy_data
+    :data_type: :jsonb
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  bin_quantity:
+    :name: bin_quantity
+    :sequence_no: 21
+    :caption: Bin quantity
+    :namespaced_name: grower_grading_pools.bin_quantity
+    :data_type: :integer
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  gross_weight:
+    :name: gross_weight
+    :sequence_no: 22
+    :caption: Gross weight
+    :namespaced_name: grower_grading_pools.gross_weight
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  nett_weight:
+    :name: nett_weight
+    :sequence_no: 23
+    :caption: Nett weight
+    :namespaced_name: grower_grading_pools.nett_weight
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pro_rata_factor:
+    :name: pro_rata_factor
+    :sequence_no: 24
+    :caption: Pro rata factor
+    :namespaced_name: grower_grading_pools.pro_rata_factor
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  completed:
+    :name: completed
+    :sequence_no: 25
+    :caption: Completed?
+    :namespaced_name: grower_grading_pools.completed
+    :data_type: :boolean
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rule_applied:
+    :name: rule_applied
+    :sequence_no: 26
+    :caption: Rule applied?
+    :namespaced_name: grower_grading_pools.rule_applied
+    :data_type: :boolean
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 27
+    :caption: Active?
+    :namespaced_name: grower_grading_pools.active
+    :data_type: :boolean
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_by:
+    :name: created_by
+    :sequence_no: 28
+    :caption: Created by
+    :namespaced_name: grower_grading_pools.created_by
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_by:
+    :name: updated_by
+    :sequence_no: 29
+    :caption: Updated by
+    :namespaced_name: grower_grading_pools.updated_by
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rule_applied_by:
+    :name: rule_applied_by
+    :sequence_no: 30
+    :caption: Rule applied by
+    :namespaced_name: grower_grading_pools.rule_applied_by
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 31
+    :caption: Created at
+    :namespaced_name: grower_grading_pools.created_at
+    :data_type: :datetime
+    :width: 120
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 32
+    :caption: Updated at
+    :namespaced_name: grower_grading_pools.updated_at
+    :data_type: :datetime
+    :width: 120
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rule_applied_at:
+    :name: rule_applied_at
+    :sequence_no: 33
+    :caption: Rule applied at
+    :namespaced_name: grower_grading_pools.rule_applied_at
+    :data_type: :datetime
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: grower_grading_pools.grower_grading_rule_id
+  :caption: Grower grading rule
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT rule_name, id FROM grower_grading_rules ORDER BY rule_name
+- :column: grower_grading_pools.pool_name
+  :caption: Pool name
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: grower_grading_pools.production_run_id
+  :caption: Production run
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT active_run_stage, id FROM production_runs ORDER BY active_run_stage
+- :column: grower_grading_pools.season_id
+  :caption: Season
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT season_code, id FROM seasons ORDER BY season_code
+- :column: grower_grading_pools.cultivar_group_id
+  :caption: Cultivar group
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT cultivar_group_code, id FROM cultivar_groups ORDER BY cultivar_group_code
+- :column: grower_grading_pools.cultivar_id
+  :caption: Cultivar
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT cultivar_name, id FROM cultivars ORDER BY cultivar_name
+- :column: grower_grading_pools.commodity_id
+  :caption: Commodity
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT code, id FROM commodities ORDER BY code
+- :column: grower_grading_pools.farm_id
+  :caption: Farm
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT farm_code, id FROM farms ORDER BY farm_code
+- :column: grower_grading_pools.inspection_type_id
+  :caption: Inspection type
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT inspection_type_code, id FROM inspection_types ORDER BY inspection_type_code

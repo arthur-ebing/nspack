@@ -1,0 +1,8 @@
+---
+:dataminer_definition: grower_grading_production_runs
+:multiselect:
+  :create_grading_pools:
+    :url: "/production/grower_grading/grower_grading_pools/multiselect_production_runs"
+    :section_caption: 'Select production runs'
+    :multiselect_save_method: remote
+    :can_be_cleared: false

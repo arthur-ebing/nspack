@@ -1,0 +1,28 @@
+---
+:dataminer_definition: grower_grading_rebins
+:conditions:
+  :standard:
+    - :col: grower_grading_pool_id
+      :op: "="
+      :val: "$:grower_grading_pool_id$"
+  :rule_item:
+    - :col: grower_grading_rule_item_id
+      :op: "="
+      :val: "$:grower_grading_rule_item_id$"
+:edit_rules:
+  :url: "/production/grower_grading/grower_grading_rebins/$:id$/inline_edit_rebin_fields"
+  :editable_fields:
+    graded_rmt_class_code:
+      :editor: :search_select
+      :width: 300
+      :value_sql: SELECT NULL UNION SELECT rmt_class_code FROM rmt_classes
+        ORDER BY 1 NULLS FIRST
+    graded_rmt_size_code:
+      :editor: :search_select
+      :width: 300
+      :value_sql: SELECT NULL UNION SELECT size_code FROM rmt_sizes
+        ORDER BY 1 NULLS FIRST
+    graded_gross_weight:
+      :editor: :numeric
+    graded_nett_weight:
+      :editor: :numeric

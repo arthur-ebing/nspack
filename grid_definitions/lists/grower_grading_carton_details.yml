@@ -1,0 +1,17 @@
+---
+:dataminer_definition: grower_grading_carton_details
+:actions:
+- :url: "/production/grower_grading/grower_grading_cartons/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+:conditions:
+  :standard:
+    - :col: grower_grading_pool_id
+      :op: "="
+      :val: "$:grower_grading_pool_id$"
+  :rule_item:
+    - :col: grower_grading_rule_item_id
+      :op: "="
+      :val: "$:grower_grading_rule_item_id$"

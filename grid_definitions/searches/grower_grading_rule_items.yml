@@ -1,0 +1,24 @@
+---
+:dataminer_definition: grower_grading_rule_items
+:actions:
+- :url: "/production/grower_grading/grower_grading_rule_items/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/production/grower_grading/grower_grading_rule_items/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/production/grower_grading/grower_grading_rule_items/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/production/grower_grading/grower_grading_rule_items/new"
+  :text: New Grower Grading Rule Item
+  :style: :button
+  :behaviour: :popup

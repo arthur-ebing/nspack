@@ -1,0 +1,296 @@
+---
+:caption: Grower Grading Production Runs
+:sql: "SELECT production_runs.id,\r\n\t    fn_production_run_code(production_runs.id)
+  AS production_run_code,\r\n            production_runs.legacy_bintip_criteria->>
+  'track_indicator_code' AS track_indicator_code,\r\n\t    production_runs.cultivar_group_id,
+  cultivar_groups.cultivar_group_code AS cultivar_group, \r\n\t    production_runs.cultivar_id,
+  cultivars.cultivar_name AS cultivar, \r\n\t    production_runs.farm_id, farms.farm_code,
+  \r\n\t    production_runs.season_id, seasons.season_code,\r\n\t    seasons.commodity_id,
+  commodities.code AS commodity_code,\r\n\t    SUM(rmt_bins.qty_bins) AS bin_quantity,
+  \r\n\t    SUM(rmt_bins.gross_weight) AS gross_weight, \r\n\t    SUM(rmt_bins.nett_weight)
+  AS nett_weight\r\nFROM production_runs\r\nJOIN cultivar_groups on production_runs.cultivar_group_id
+  = cultivar_groups.id\r\nLEFT JOIN cultivars on production_runs.cultivar_id = cultivars.id\r\nJOIN
+  farms on production_runs.farm_id = farms.id\r\nJOIN seasons on production_runs.season_id
+  = seasons.id\r\nJOIN commodities on seasons.commodity_id = commodities.id\r\nJOIN
+  rmt_bins on production_runs.id = rmt_bins.production_run_tipped_id\r\nWHERE production_runs.active
+  AND production_runs.completed\r\n    AND rmt_bins.active AND NOT rmt_bins.is_rebin
+  AND NOT rmt_bins.scrapped\r\n    AND production_runs.id NOT IN(SELECT production_run_id
+  FROM grower_grading_pools)\r\n    AND (\r\n\t    EXISTS(SELECT id FROM rmt_bins
+  \r\n\t\t        WHERE production_run_rebin_id = production_runs.id \r\n\t\t\tAND
+  rmt_bins.active AND NOT rmt_bins.scrapped) \r\n\t    OR\r\n            EXISTS(SELECT
+  cartons.id FROM cartons\r\n\t\t        JOIN carton_labels on carton_labels.id =
+  cartons.carton_label_id \r\n\t\t\tWHERE production_run_id = production_runs.id\r\n\t\t\tAND
+  cartons.active AND NOT cartons.scrapped)\r\n    )\r\nGROUP BY production_runs.id,
+  cultivar_groups.cultivar_group_code, cultivars.cultivar_name,\r\n\t         farms.farm_code,
+  seasons.season_code, seasons.commodity_id, commodities.code\r\nORDER BY production_runs.id
+  DESC"
+:limit: 
+:offset: 
+:external_settings:
+  :render_url: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: production_runs.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  production_run_code:
+    :name: production_run_code
+    :sequence_no: 2
+    :caption: Production run code
+    :namespaced_name: 
+    :data_type: :string
+    :width: 250
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  track_indicator_code:
+    :name: track_indicator_code
+    :sequence_no: 3
+    :caption: Track indicator code
+    :namespaced_name: 
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_group_id:
+    :name: cultivar_group_id
+    :sequence_no: 4
+    :caption: Cultivar group
+    :namespaced_name: production_runs.cultivar_group_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_group:
+    :name: cultivar_group
+    :sequence_no: 5
+    :caption: Cultivar group
+    :namespaced_name: cultivar_groups.cultivar_group_code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_id:
+    :name: cultivar_id
+    :sequence_no: 6
+    :caption: Cultivar
+    :namespaced_name: production_runs.cultivar_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar:
+    :name: cultivar
+    :sequence_no: 7
+    :caption: Cultivar
+    :namespaced_name: cultivars.cultivar_name
+    :data_type: :string
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  farm_id:
+    :name: farm_id
+    :sequence_no: 8
+    :caption: Farm
+    :namespaced_name: production_runs.farm_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  farm_code:
+    :name: farm_code
+    :sequence_no: 9
+    :caption: Farm
+    :namespaced_name: farms.farm_code
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  season_id:
+    :name: season_id
+    :sequence_no: 10
+    :caption: Season
+    :namespaced_name: production_runs.season_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  season_code:
+    :name: season_code
+    :sequence_no: 11
+    :caption: Season
+    :namespaced_name: seasons.season_code
+    :data_type: :string
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  commodity_id:
+    :name: commodity_id
+    :sequence_no: 12
+    :caption: Commodity
+    :namespaced_name: seasons.commodity_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  commodity_code:
+    :name: commodity_code
+    :sequence_no: 13
+    :caption: Commodity
+    :namespaced_name: commodities.code
+    :data_type: :string
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  bin_quantity:
+    :name: bin_quantity
+    :sequence_no: 14
+    :caption: Bin quantity
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 90
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  gross_weight:
+    :name: gross_weight
+    :sequence_no: 15
+    :caption: Gross weight
+    :namespaced_name: 
+    :data_type: :number
+    :width: 100
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  nett_weight:
+    :name: nett_weight
+    :sequence_no: 16
+    :caption: Nett weight
+    :namespaced_name: 
+    :data_type: :number
+    :width: 100
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: production_runs.id
+  :caption: Production Run
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
