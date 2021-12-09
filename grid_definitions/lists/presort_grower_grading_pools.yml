@@ -1,0 +1,68 @@
+---
+:dataminer_definition: presort_grower_grading_pools
+:actions:
+- :url: "/raw_materials/presort_grower_grading/presort_grower_grading_pools/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/raw_materials/presort_grower_grading/presort_grower_grading_pools/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/raw_materials/presort_grower_grading/presort_grower_grading_pools/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :separator: true
+- :url: "/raw_materials/presort_grower_grading/presort_grower_grading_pools/$:id$/import_maf_data"
+  :text: import maf data
+  :icon: play
+  :title: Import Maf Data
+  :popup: true
+  :hide_if_true: completed,has_grading_bins
+- :url: "/raw_materials/presort_grower_grading/presort_grower_grading_pools/$:id$/refresh_presort_grading"
+  :text: refresh
+  :icon: code
+  :title: Refresh
+  :popup: true
+  :hide_if_true: completed
+  :hide_if_false: has_grading_bins
+- :url: "/raw_materials/presort_grower_grading/presort_grower_grading_pools/$:id$/preview_presort_grading_report"
+  :text: preview
+  :icon: view-show
+  :title: Preview
+  :popup: true
+  :hide_if_false: completed
+- :separator: true
+- :url: "/raw_materials/presort_grower_grading/presort_grower_grading_pools/$:id$/complete_pool"
+  :text: complete pool
+  :icon: toggle-on
+  :title: Complete Pool
+  :popup: true
+  :hide_if_true: completed
+  :hide_if_false: has_grading_bins
+- :url: "/raw_materials/presort_grower_grading/presort_grower_grading_pools/$:id$/un_complete_pool"
+  :text: re-open pool
+  :icon: toggle-off
+  :title: Re-Open Pool
+  :popup: true
+  :hide_if_false: completed
+- :separator: true
+- :url: "/raw_materials/presort_grower_grading/presort_grower_grading_pools/$:id$/manage"
+  :text: bins
+  :icon: list
+  :title: Bins
+  :hide_if_false: has_grading_bins
+:page_controls:
+- :control_type: :link
+  :url: "/raw_materials/presort_grower_grading/presort_grower_grading_pools/new"
+  :text: New Presort Grading Pool
+  :style: :button
+  :behaviour: :popup
+- :control_type: :link
+  :url: "/raw_materials/presort_grower_grading/presort_grower_grading_pools/create_presort_grading_pools"
+  :text: Create Presort Grading Pools
+  :style: :button

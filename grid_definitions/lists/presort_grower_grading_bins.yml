@@ -1,0 +1,37 @@
+---
+:dataminer_definition: presort_grower_grading_bins
+:actions:
+- :url: "/raw_materials/presort_grower_grading/presort_grower_grading_bins/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/raw_materials/presort_grower_grading/presort_grower_grading_bins/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+  :hide_if_true: waste_maf_class
+- :url: "/raw_materials/presort_grower_grading/presort_grower_grading_bins/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:conditions:
+  :standard:
+    - :col: presort_grower_grading_bins.presort_grower_grading_pool_id
+      :op: "="
+      :val: "$:presort_grower_grading_pool_id$"
+:edit_rules:
+  :url: "/raw_materials/presort_grower_grading/presort_grower_grading_bins/$:id$/inline_edit_bin_fields"
+  :editable_fields:
+    rmt_class_code:
+      :editor: :search_select
+      :width: 300
+      :value_sql: SELECT NULL UNION SELECT rmt_class_code FROM rmt_classes
+        ORDER BY 1 NULLS FIRST
+    rmt_size_code:
+      :editor: :search_select
+      :width: 300
+      :value_sql: SELECT NULL UNION SELECT size_code FROM rmt_sizes
+        ORDER BY 1 NULLS FIRST

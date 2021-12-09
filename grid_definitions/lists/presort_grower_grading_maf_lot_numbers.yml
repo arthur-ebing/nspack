@@ -1,0 +1,8 @@
+---
+:dataminer_definition: presort_grower_grading_maf_lot_numbers
+:multiselect:
+  :create_presort_grading_pools:
+    :url: "/raw_materials/presort_grower_grading/presort_grower_grading_pools/multiselect_maf_lot_numbers"
+    :section_caption: 'Select maf lot numbers'
+    :multiselect_save_method: remote
+    :can_be_cleared: false

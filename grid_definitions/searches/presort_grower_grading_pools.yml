@@ -1,0 +1,24 @@
+---
+:dataminer_definition: presort_grower_grading_pools
+:actions:
+- :url: "/raw_materials/presort_grower_grading/presort_grower_grading_pools/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/raw_materials/presort_grower_grading/presort_grower_grading_pools/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/raw_materials/presort_grower_grading/presort_grower_grading_pools/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/raw_materials/presort_grower_grading/presort_grower_grading_pools/new"
+  :text: New Presort Grower Grading Pool
+  :style: :button
+  :behaviour: :popup
