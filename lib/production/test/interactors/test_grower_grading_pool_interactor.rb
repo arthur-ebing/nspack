@@ -21,6 +21,8 @@ module ProductionApp
     include MasterfilesApp::LocationFactory
     include MasterfilesApp::InspectionFactory
     include MasterfilesApp::FarmFactory
+    include MasterfilesApp::RmtContainerFactory
+    include RawMaterialsApp::RmtDeliveryFactory
 
     def test_repo
       repo = interactor.send(:repo)
@@ -87,6 +89,8 @@ module ProductionApp
       commodity_id = create_commodity
       farm_id = create_farm
       inspection_type_id = create_inspection_type
+
+      create_rmt_bin(production_run_rebin_id: production_run_id)
 
       {
         id: 1,
