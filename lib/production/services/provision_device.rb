@@ -177,10 +177,10 @@ module ProductionApp
         out << '* Tweak boot commandline (serial ports and tty)'
         log
         # Remove serial0 as a login shell:
-        out << ssh.exec!(%([ -f "/boot/cmdline.txt" ] && sudo sed -i "s/console=serial0,[0-9]\+ //" /boot/cmdline.txt))
+        out << ssh.exec!(%([ -f "/boot/cmdline.txt" ] && sudo sed -i "s/console=serial0,[0-9]\\+ //" /boot/cmdline.txt))
         log
         # Remove AMA0 as a login shell:
-        out << ssh.exec!(%([ -f "/boot/cmdline.txt" ] && sudo sed -i "s/console=ttyAMA0,[0-9]\+ //" /boot/cmdline.txt))
+        out << ssh.exec!(%([ -f "/boot/cmdline.txt" ] && sudo sed -i "s/console=ttyAMA0,[0-9]\\+ //" /boot/cmdline.txt))
         log
         # Remove usage of tty1:
         out << ssh.exec!(%([ -f "/boot/cmdline.txt" ] && sudo sed -i "s/console=tty1 //" /boot/cmdline.txt))
