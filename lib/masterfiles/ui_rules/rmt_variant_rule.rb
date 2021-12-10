@@ -25,9 +25,6 @@ module UiRules
 
     def common_fields
       {
-        cultivar_id: { renderer: :select, options: MasterfilesApp::CultivarRepo.new.for_select_cultivars,
-                       disabled_options: MasterfilesApp::CultivarRepo.new.for_select_inactive_cultivars,
-                       caption: 'Cultivar', required: true },
         rmt_variant_code: { required: true },
         description: {}
       }

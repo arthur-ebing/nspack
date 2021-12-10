@@ -16,7 +16,6 @@ module Masterfiles
               form.caption 'New Rmt Variant'
               form.action "/masterfiles/raw_materials/rmt_variants/new/#{cultivar_id}"
               form.remote! if remote
-              form.add_field :cultivar_id
               form.add_field :rmt_variant_code
               form.add_field :description
             end

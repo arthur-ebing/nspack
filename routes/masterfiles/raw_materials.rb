@@ -418,6 +418,12 @@ class Nspack < Roda
       end
     end
 
+    r.on 'rmt_codes' do
+      r.on 'ui_change', String do |change_type| # Handle UI behaviours
+        handle_ui_change(:rmt_code, change_type.to_sym, params)
+      end
+    end
+
     # RMT VARIANTS
     # --------------------------------------------------------------------------
     r.on 'rmt_variants', Integer do |id|
