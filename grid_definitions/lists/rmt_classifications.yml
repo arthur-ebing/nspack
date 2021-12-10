@@ -1,0 +1,54 @@
+---
+:dataminer_definition: rmt_classifications
+:actions:
+  - :submenu:
+      :text: Classification Types
+      :items:
+        - :url: /masterfiles/raw_materials/rmt_classification_types/new
+          :text: new
+          :icon: add-solid
+          :title: New
+          :popup: true
+        - :url: /masterfiles/raw_materials/rmt_classification_types/$:rmt_classification_type_id$
+          :text: view
+          :icon: view-show
+          :title: View
+          :popup: true
+        - :url: /masterfiles/raw_materials/rmt_classification_types/$:rmt_classification_type_id$/edit
+          :text: edit
+          :icon: edit
+          :title: Edit
+          :popup: true
+        - :url: /masterfiles/raw_materials/rmt_classification_types/$:rmt_classification_type_id$
+          :text: delete
+          :icon: delete
+          :is_delete: true
+          :title: Delete
+          :popup: true
+  - :submenu:
+      :text: Classifications
+      :items:
+        - :url: /masterfiles/raw_materials/rmt_classification_types/$:rmt_classification_type_id$/rmt_classifications
+          :text: new
+          :icon: add-solid
+          :title: New
+          :popup: true
+        - :url: /masterfiles/raw_materials/rmt_classifications/$:id$
+          :text: view
+          :icon: view-show
+          :title: View
+          :popup: true
+          :hide_if_null: :id
+        - :url: /masterfiles/raw_materials/rmt_classifications/$:id$/edit
+          :text: edit
+          :icon: edit
+          :title: Edit
+          :popup: true
+          :hide_if_null: :id
+        - :url: /masterfiles/raw_materials/rmt_classifications/$:id$
+          :text: delete
+          :icon: delete
+          :is_delete: true
+          :title: Delete
+          :popup: true
+          :hide_if_null: :id

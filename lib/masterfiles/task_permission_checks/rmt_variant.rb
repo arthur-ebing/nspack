@@ -2,13 +2,13 @@
 
 module MasterfilesApp
   module TaskPermissionCheck
-    class RmtCode < BaseService
+    class RmtVariant < BaseService
       attr_reader :task, :entity
-      def initialize(task, rmt_code_id = nil)
+      def initialize(task, rmt_variant_id = nil)
         @task = task
-        @repo = AdvancedClassificationsRepo.new
-        @id = rmt_code_id
-        @entity = @id ? @repo.find(:rmt_codes, MasterfilesApp::RmtCode, @id) : nil
+        @repo = MasterfilesApp::AdvancedClassificationsRepo.new
+        @id = rmt_variant_id
+        @entity = @id ? @repo.find(:rmt_variants, MasterfilesApp::RmtVariant, @id) : nil
       end
 
       CHECKS = {
@@ -18,7 +18,7 @@ module MasterfilesApp
       }.freeze
 
       def call
-        return failed_response 'Rmt Code record not found' unless @entity || task == :create
+        return failed_response 'Rmt Variant record not found' unless @entity || task == :create
 
         check = CHECKS[task]
         raise ArgumentError, "Task \"#{task}\" is unknown for #{self.class}" if check.nil?
@@ -33,13 +33,13 @@ module MasterfilesApp
       end
 
       def edit_check
-        # return failed_response 'RmtCode has been completed' if completed?
+        # return failed_response 'RmtVariant has been completed' if completed?
 
         all_ok
       end
 
       def delete_check
-        return failed_response("Rmt Code: #{entity.rmt_code} could not be deleted. It is referenced by rmt_bin records") if @repo.exists?(:rmt_bins, rmt_code_id: @id)
+        return failed_response "Rmt variant: #{entity.rmt_variant_code} could not be deleted. It has children" if @repo.exists?(:rmt_codes, rmt_variant_id: @id)
 
         all_ok
       end

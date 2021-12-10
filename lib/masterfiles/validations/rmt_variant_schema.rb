@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  RmtHandlingRegimeSchema = Dry::Schema.Params do
+  RmtVariantSchema = Dry::Schema.Params do
     optional(:id).filled(:integer)
-    required(:regime_code).filled(Types::StrippedString)
+    required(:cultivar_id).filled(:integer)
+    required(:rmt_variant_code).filled(Types::StrippedString)
     optional(:description).maybe(Types::StrippedString)
-    required(:for_packing).maybe(:bool)
   end
 end

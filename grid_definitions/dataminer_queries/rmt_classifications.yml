@@ -1,0 +1,132 @@
+---
+:caption: Rmt Classifications
+:sql: SELECT rmt_classifications.id, rmt_classifications.rmt_classification, rmt_classification_types.id as rmt_classification_type_id
+  , rmt_classification_types.rmt_classification_type_code, rmt_classification_types.description, rmt_classifications.created_at, rmt_classifications.updated_at,
+  fn_current_status('rmt_classifications', "rmt_classifications"."id") AS status FROM
+  "rmt_classification_types" LEFT OUTER JOIN "rmt_classifications" ON "rmt_classification_types"."id"
+  = "rmt_classifications"."rmt_classification_type_id"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: rmt_classifications.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_classification_type_id:
+    :name: rmt_classification_type_id
+    :sequence_no: 2
+    :caption: Rmt classification type
+    :namespaced_name: rmt_classification_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_classification:
+    :name: rmt_classification
+    :sequence_no: 3
+    :caption: Rmt classification
+    :namespaced_name: rmt_classifications.rmt_classification
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 4
+    :caption: Created at
+    :namespaced_name: rmt_classifications.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 5
+    :caption: Updated at
+    :namespaced_name: rmt_classifications.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_classification_type_code:
+    :name: rmt_classification_type_code
+    :sequence_no: 6
+    :caption: Rmt classification type code
+    :namespaced_name: rmt_classification_types.rmt_classification_type_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 1
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 7
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: rmt_classifications.rmt_classification
+  :caption: Rmt classification
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

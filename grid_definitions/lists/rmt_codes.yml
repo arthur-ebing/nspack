@@ -1,58 +1,54 @@
 ---
 :dataminer_definition: rmt_codes
 :actions:
-- :url: "/masterfiles/raw_materials/rmt_codes/$:id$"
-  :text: view
-  :icon: view-show
-  :title: View
-  :popup: true
-- :url: "/masterfiles/raw_materials/rmt_codes/$:id$/edit"
-  :text: edit
-  :icon: edit
-  :title: Edit
-  :popup: true
-- :url: "/masterfiles/raw_materials/rmt_codes/$:id$"
-  :text: delete
-  :icon: delete
-  :is_delete: true
-  :popup: true
-- :url: "/masterfiles/raw_materials/rmt_codes/$:id$/complete"
-  :text: Complete
-  :icon: toggle-on
-  :popup: true
-  :hide_if_true: completed
-  :auth:
-    :function: Masterfiles
-    :program: raw materials
-    :permission: edit
-- :url: "/masterfiles/raw_materials/rmt_codes/$:id$/approve"
-  :text: Approve/Reject
-  :icon: gavel
-  :popup: true
-  :hide_if_false: completed
-  :hide_if_true: approved
-  :auth:
-    :function: Masterfiles
-    :program: raw materials
-    :permission: approve
-- :url: "/masterfiles/raw_materials/rmt_codes/$:id$/reopen"
-  :text: Re-open for editing
-  :icon: toggle-off
-  :popup: true
-  :hide_if_false: approved
-  :auth:
-    :function: Masterfiles
-    :program: raw materials
-    :permission: edit
-- :separator: true
-- :url: "/development/statuses/list/rmt_codes/$:id$"
-  :text: status
-  :icon: information-solid
-  :title: Status
-  :popup: true
-:page_controls:
-- :control_type: :link
-  :url: "/masterfiles/raw_materials/rmt_codes/new"
-  :text: New Rmt Code
-  :style: :button
-  :behaviour: :popup
+  - :submenu:
+      :text: Variants
+      :items:
+        - :url: /masterfiles/raw_materials/rmt_variants/new/$:cultivar_id$
+          :text: new
+          :icon: add-solid
+          :title: New
+          :popup: true
+        - :url: /masterfiles/raw_materials/rmt_variants/$:rmt_variant_id$
+          :text: view
+          :icon: view-show
+          :title: View
+          :popup: true
+        - :url: /masterfiles/raw_materials/rmt_variants/$:rmt_variant_id$/edit
+          :text: edit
+          :icon: edit
+          :title: Edit
+          :popup: true
+        - :url: /masterfiles/raw_materials/rmt_variants/$:rmt_variant_id$
+          :text: delete
+          :icon: delete
+          :is_delete: true
+          :title: Delete
+          :popup: true
+  - :submenu:
+      :text: Rmt Codes
+      :items:
+        - :url: /masterfiles/raw_materials/rmt_variants/$:rmt_variant_id$/rmt_codes
+          :text: new variant
+          :icon: add-solid
+          :popup: true
+          :hide_if_null: :rmt_variant_id
+        - :url: /masterfiles/raw_materials/rmt_codes/$:id$
+          :text: view
+          :icon: view-show
+          :title: View
+          :popup: true
+          :hide_if_null: :id
+        - :url: /masterfiles/raw_materials/rmt_codes/$:id$/edit
+          :text: edit
+          :icon: edit
+          :hide_if_null: :id
+          :title: Edit
+          :popup: true
+        - :url: /masterfiles/raw_materials/rmt_codes/$:id$
+          :text: delete
+          :icon: delete
+          :is_delete: true
+          :hide_if_null: :id
+          :title: Delete
+          :popup: true

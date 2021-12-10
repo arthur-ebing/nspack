@@ -2,10 +2,10 @@
 
 module Masterfiles
   module RawMaterials
-    module RmtCode
+    module RmtVariant
       class New
-        def self.call(rmt_variant_id, form_values: nil, form_errors: nil, remote: true)
-          ui_rule = UiRules::Compiler.new(:rmt_code, :new, form_values: form_values)
+        def self.call(cultivar_id, form_values: nil, form_errors: nil, remote: true)
+          ui_rule = UiRules::Compiler.new(:rmt_variant, :new, form_values: form_values)
           rules   = ui_rule.compile
 
           Crossbeams::Layout::Page.build(rules) do |page|
@@ -13,11 +13,11 @@ module Masterfiles
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.caption 'New Rmt Code'
-              form.action "/masterfiles/raw_materials/rmt_variants/#{rmt_variant_id}/rmt_codes"
+              form.caption 'New Rmt Variant'
+              form.action "/masterfiles/raw_materials/rmt_variants/new/#{cultivar_id}"
               form.remote! if remote
-              form.add_field :rmt_handling_regime_id
-              form.add_field :rmt_code
+              form.add_field :cultivar_id
+              form.add_field :rmt_variant_code
               form.add_field :description
             end
           end
