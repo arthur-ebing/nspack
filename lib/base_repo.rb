@@ -596,6 +596,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   def move_tree_node(tree_table, descendant_col, ancestor_col, node_id, new_parent_id)
     raise Crossbeams::InfoError, 'This node cannot be moved to its own descendant' unless DB[:tree_plant_resources].where(ancestor_plant_resource_id: node_id, descendant_plant_resource_id: new_parent_id).first.nil?
 
+    # FIXME: sub nodes not moved with the node...
     del_query = <<~SQL
       DELETE FROM #{tree_table}
       WHERE #{descendant_col} IN (SELECT #{descendant_col}

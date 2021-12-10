@@ -330,6 +330,10 @@ module ProductionApp
       DB[:plant_resources_system_resources].where(plant_resource_id: plant_resource_id).select_map(:system_resource_id)
     end
 
+    def plant_resource_level(id)
+      DB[:tree_plant_resources].where(descendant_plant_resource_id: id).max(:path_length)
+    end
+
     # Given a device name (system resource code), return a list
     # of printer codes linked to it.
     def linked_printer_for_device(system_resource_code)
@@ -361,6 +365,15 @@ module ProductionApp
       return failed_response(%(No "#{plant_resource_type}" found for system resource "#{system_resource_code}")) if id.nil?
 
       success_response('ok', id)
+    end
+
+    # List the target nodes a plant resource can be moved to.
+    def move_targets_for(plant_resource_id)
+      type = plant_resource_type_code_for(plant_resource_id)
+      allowed_types = Crossbeams::Config::ResourceDefinitions.allowed_parent_types(type)
+      type_ids = select_values(:plant_resource_types, :id, plant_resource_type_code: allowed_types)
+      parent_id = DB[:tree_plant_resources].where(descendant_plant_resource_id: plant_resource_id, path_length: 1).get(:ancestor_plant_resource_id)
+      DB[:plant_resources].where(plant_resource_type_id: type_ids).exclude(id: parent_id).select_map { %i[plant_resource_code id] }
     end
 
     def system_servers

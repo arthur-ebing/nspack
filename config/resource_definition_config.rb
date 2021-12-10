@@ -769,6 +769,11 @@ module Crossbeams
         PLANT_RESOURCE_RULES[plant_resource_type_code][:allowed_children].include?(child_type)
       end
 
+      # Get a list of plant resource type codes that are allowed to serve as a parent of the given resource type.
+      def self.allowed_parent_types(plant_resource_type_code)
+        PLANT_RESOURCE_RULES.select { |_, v| v[:allowed_children].include?(plant_resource_type_code) }.map { |k, _| k }
+      end
+
       def self.peripheral_type_codes
         PLANT_RESOURCE_RULES.select { |_, v| v[:create_with_system_resource] == PERIPHERAL }.keys
       end
