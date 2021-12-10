@@ -84,9 +84,9 @@ module FinishedGoodsApp
         JOIN orders_loads ON orders.id = orders_loads.order_id
         JOIN loads ON loads.id = orders_loads.load_id
         JOIN pallets ON pallets.load_id = loads.id
-        LEFT JOIN pallet_sequences ON pallet_sequences.pallet_id = pallets.id
+        JOIN pallet_sequences ON pallet_sequences.pallet_id = pallets.id
+        JOIN cultivar_groups ON pallet_sequences.cultivar_group_id = cultivar_groups.id
         LEFT JOIN cultivars ON pallet_sequences.cultivar_id = cultivars.id
-        LEFT JOIN cultivar_groups ON cultivar_groups.id = cultivars.cultivar_group_id
 
         WHERE orders.id = ?
         GROUP BY
