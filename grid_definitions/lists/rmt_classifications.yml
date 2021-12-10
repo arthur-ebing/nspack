@@ -52,3 +52,10 @@
           :title: Delete
           :popup: true
           :hide_if_null: :id
+:page_controls:
+  - :control_type: :link
+    :url: /masterfiles/raw_materials/rmt_classification_types/new
+    :text: New Classification Type
+    :style: :button
+    :behaviour: :popup
+    :hide_if_sql_returns_true: SELECT EXISTS(SELECT id FROM rmt_classification_types)
