@@ -20,7 +20,7 @@ module Crossbeams
             allow_cultivar_group_mix: true,
             use_packing_specifications: false,
             use_marketing_puc: false,
-            carton_equals_pallet: { default: false, can_override: true },
+            carton_equals_pallet: { default: true, can_override: true },
             capture_product_setup_class: false,
             link_target_markets_to_target_customers: false,
             require_packaging_bom: false,
