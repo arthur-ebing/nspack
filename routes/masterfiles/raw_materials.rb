@@ -637,8 +637,17 @@ class Nspack < Roda
       r.post do        # CREATE
         res = interactor.create_rmt_classification_type(params[:rmt_classification_type])
         if res.success
-          flash[:notice] = res.message
-          redirect_to_last_grid(r)
+          if fetch?(r)
+            row_keys = %i[
+              rmt_classification_type_id
+              rmt_classification_type_code
+              description
+            ]
+            add_grid_row(attrs: select_attributes(res.instance, row_keys), notice: res.message)
+          else
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
+          end
         else
           re_show_form(r, res, url: '/masterfiles/raw_materials/rmt_classification_types/new') do
             Masterfiles::RawMaterials::RmtClassificationType::New.call(form_values: params[:rmt_classification_type],
