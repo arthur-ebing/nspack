@@ -1,0 +1,215 @@
+---
+:caption: Fruit Defects
+:sql: "SELECT\r\n  \"fruit_defects\".\"id\",\r\n  \"fruit_defects\".\"rmt_class_id\",\r\n
+  \ \"fruit_defects\".\"fruit_defect_type_id\",\r\n  \"fruit_defects\".\"fruit_defect_code\",\r\n
+  \ \"fruit_defects\".\"short_description\",\r\n  \"fruit_defects\".\"description\",\r\n
+  \ \"fruit_defect_types\".\"fruit_defect_type_name\",\r\n  \"rmt_classes\".\"rmt_class_code\",\r\n
+  \ \"fruit_defects\".\"internal\",\r\n  \"fruit_defects\".\"created_at\",\r\n  \"fruit_defects\".\"updated_at\"\r\nFROM\r\n
+  \ \"fruit_defects\"\r\n  JOIN \"fruit_defect_types\" ON \"fruit_defect_types\".\"id\"
+  = \"fruit_defects\".\"fruit_defect_type_id\"\r\n  JOIN \"rmt_classes\" ON \"rmt_classes\".\"id\"
+  = \"fruit_defects\".\"rmt_class_id\"\r\nORDER BY\r\n  \"fruit_defects\".\"fruit_defect_code\"\r\n"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: fruit_defects.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_class_id:
+    :name: rmt_class_id
+    :sequence_no: 2
+    :caption: Rmt class
+    :namespaced_name: fruit_defects.rmt_class_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  fruit_defect_type_id:
+    :name: fruit_defect_type_id
+    :sequence_no: 3
+    :caption: Fruit defect type
+    :namespaced_name: fruit_defects.fruit_defect_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  fruit_defect_code:
+    :name: fruit_defect_code
+    :sequence_no: 4
+    :caption: Fruit defect code
+    :namespaced_name: fruit_defects.fruit_defect_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  short_description:
+    :name: short_description
+    :sequence_no: 5
+    :caption: Short description
+    :namespaced_name: fruit_defects.short_description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  description:
+    :name: description
+    :sequence_no: 6
+    :caption: Description
+    :namespaced_name: fruit_defects.description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  fruit_defect_type_name:
+    :name: fruit_defect_type_name
+    :sequence_no: 7
+    :caption: Fruit defect type name
+    :namespaced_name: fruit_defect_types.fruit_defect_type_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_class_code:
+    :name: rmt_class_code
+    :sequence_no: 8
+    :caption: Rmt class code
+    :namespaced_name: rmt_classes.rmt_class_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  internal:
+    :name: internal
+    :sequence_no: 9
+    :caption: Internal
+    :namespaced_name: fruit_defects.internal
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 10
+    :caption: Created at
+    :namespaced_name: fruit_defects.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 11
+    :caption: Updated at
+    :namespaced_name: fruit_defects.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: fruit_defects.rmt_class_id
+  :caption: Rmt class
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT rmt_class_code, id FROM rmt_classes ORDER BY rmt_class_code
+- :column: fruit_defects.fruit_defect_type_id
+  :caption: Fruit defect type
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT fruit_defect_type_name, id FROM fruit_defect_types ORDER BY fruit_defect_type_name
+- :column: fruit_defects.fruit_defect_code
+  :caption: Fruit defect code
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
