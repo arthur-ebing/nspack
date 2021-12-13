@@ -19,14 +19,14 @@ class Nspack < Roda
       end
 
       r.on 'edit' do   # EDIT
-        check_auth!('test results', 'edit')
+        check_auth!('otmc', 'edit')
         interactor.assert_permission!(:edit, id)
         show_partial_or_page(r) { Quality::TestResults::OrchardTestResult::Edit.call(id) }
       end
 
       r.on 'bulk_edit' do
         r.get do       # EDIT
-          check_auth!('test results', 'edit')
+          check_auth!('otmc', 'edit')
           interactor.assert_permission!(:edit, id)
           show_partial_or_page(r) { Quality::TestResults::OrchardTestResult::BulkEdit.call(id) }
         end
@@ -47,7 +47,7 @@ class Nspack < Roda
 
       r.is do
         r.get do       # SHOW
-          check_auth!('test results', 'read')
+          check_auth!('otmc', 'read')
           show_partial_or_page(r) { Quality::TestResults::OrchardTestResult::Show.call(id) }
         end
         r.patch do     # UPDATE
@@ -65,7 +65,7 @@ class Nspack < Roda
         end
 
         r.delete do    # DELETE
-          check_auth!('test results', 'delete')
+          check_auth!('otmc', 'delete')
           interactor.assert_permission!(:delete, id)
           res = interactor.delete_orchard_test_result(id)
           if res.success
@@ -117,7 +117,7 @@ class Nspack < Roda
       end
 
       r.on 'multi_delete' do
-        check_auth!('test results', 'delete')
+        check_auth!('otmc', 'delete')
         res = nil
         multiselect_grid_choices(params).each do |id|
           interactor.assert_permission!(:delete, id)
@@ -132,14 +132,14 @@ class Nspack < Roda
       end
 
       r.on 'create' do    # REFRESH
-        check_auth!('test results', 'new')
+        check_auth!('otmc', 'new')
         res = interactor.create_orchard_test_results
         flash[res.success ? :notice : :error] = res.message
         r.redirect '/list/orchard_test_results'
       end
 
       r.on 'new' do    # NEW
-        check_auth!('test results', 'new')
+        check_auth!('otmc', 'new')
         show_partial_or_page(r) { Quality::TestResults::OrchardTestResult::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE

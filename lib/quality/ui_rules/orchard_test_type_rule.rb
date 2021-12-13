@@ -123,11 +123,11 @@ module UiRules
 
     def add_behaviours
       behaviours do |behaviour|
-        behaviour.dropdown_change :applicable_commodity_group_ids, notify: [{ url: '/quality/config/orchard_test_types/commodity_group_changed' }]
-        behaviour.dropdown_change :api_name, notify: [{ url: '/quality/config/orchard_test_types/api_name_changed' }]
-        behaviour.dropdown_change :result_type, notify: [{ url: '/quality/config/orchard_test_types/result_type_changed' }]
-        behaviour.input_change :applies_to_all_markets, notify: [{ url: '/quality/config/orchard_test_types/applies_to_all_markets' }]
-        behaviour.input_change :applies_to_all_cultivars, notify: [{ url: '/quality/config/orchard_test_types/applies_to_all_cultivars' }]
+        behaviour.dropdown_change :applicable_commodity_group_ids, notify: [{ url: '/masterfiles/quality/orchard_test_types/commodity_group_changed' }]
+        behaviour.dropdown_change :api_name, notify: [{ url: '/masterfiles/quality/orchard_test_types/api_name_changed' }]
+        behaviour.dropdown_change :result_type, notify: [{ url: '/masterfiles/quality/orchard_test_types/result_type_changed' }]
+        behaviour.input_change :applies_to_all_markets, notify: [{ url: '/masterfiles/quality/orchard_test_types/applies_to_all_markets' }]
+        behaviour.input_change :applies_to_all_cultivars, notify: [{ url: '/masterfiles/quality/orchard_test_types/applies_to_all_cultivars' }]
       end
     end
   end
