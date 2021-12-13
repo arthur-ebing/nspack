@@ -244,6 +244,7 @@ module UiRules
                                disabled_options: MasterfilesApp::BomRepo.new.for_select_inactive_pm_marks,
                                caption: 'PKG Mark',
                                prompt: 'Select PKG Mark',
+                               required: @rules[:use_packing_specifications],
                                searchable: true,
                                remove_search_for_small_list: false,
                                hide_on_load: !@rules[:require_packaging_bom] }
