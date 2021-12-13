@@ -296,5 +296,9 @@ module ProductionApp # rubocop:disable Metrics/ModuleLength
     rule(:fruit_size_reference_id, :fruit_actual_counts_for_pack_id) do
       key.failure 'Please choose either an Actual Count or Size Reference' if values[:fruit_size_reference_id].nil_or_empty? && values[:fruit_actual_counts_for_pack_id].nil_or_empty?
     end
+
+    rule(:pm_mark_id) do
+      key.failure 'must be filled' if values[:pm_mark_id].nil_or_empty? && AppConst::CR_PROD.use_packing_specifications?
+    end
   end
 end
