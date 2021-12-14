@@ -69,7 +69,7 @@ module Crossbeams
             create_farm_location: true,
             maintain_legacy_columns: true,
             pending_delivery_location: nil,
-            default_delivery_location: nil,
+            default_delivery_location: 'FRUIT RECEPTION',
             use_bin_asset_control: true,
             presort_legacy_data_fields: %i[treatment_code ripe_point_code track_indicator_code],
             presort_plant_integration: true,
