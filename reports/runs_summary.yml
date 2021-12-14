@@ -21,15 +21,15 @@
   \     JOIN cartons ON cartons.carton_label_id = carton_labels.id\r\n    WHERE\r\n
   \     carton_labels.rmt_class_id IS NOT NULL\r\n      AND NOT cartons.scrapped\r\n
   \   GROUP BY\r\n      carton_labels.production_run_id) rc ON rc.production_run_id
-  = r.id\r\n  JOIN cultivars ON r.cultivar_id = cultivars.id\r\n  LEFT JOIN cultivar_groups
-  ON cultivars.cultivar_group_id = cultivar_groups.id\r\n  JOIN orchards ON r.orchard_id
-  = orchards.id\r\n  LEFT JOIN seasons ON r.season_id = seasons.id\r\n  JOIN pucs
-  ON r.puc_id = pucs.id\r\n  LEFT JOIN plant_resources pr ON r.production_line_id
-  = pr.id\r\nGROUP BY\r\n  r.id,\r\n  r.allow_cultivar_mixing,\r\n  r.allow_orchard_mixing,\r\n
-  \ cultivar_group_code,\r\n  r.started_at,\r\n  r.completed_at,\r\n  cultivars.description,\r\n
-  \ orchards.orchard_code,\r\n  pucs.puc_code,\r\n  seasons.season_code,\r\n  packed_nett_weight,\r\n
-  \ tipped_nett_weight,\r\n  rebin_bin_wt,\r\n  rebin_ctn_wt,\r\n  tipped_qty,\r\n
-  \ packed_qty,\r\n  plant_resource_code\r\nORDER BY\r\n  r.started_at DESC\r\n"
+  = r.id\r\n  LEFT JOIN cultivars ON r.cultivar_id = cultivars.id\r\n  LEFT JOIN cultivar_groups
+  ON r.cultivar_group_id = cultivar_groups.id\r\n  JOIN orchards ON r.orchard_id =
+  orchards.id\r\n  LEFT JOIN seasons ON r.season_id = seasons.id\r\n  JOIN pucs ON
+  r.puc_id = pucs.id\r\n  LEFT JOIN plant_resources pr ON r.production_line_id = pr.id\r\nGROUP
+  BY\r\n  r.id,\r\n  r.allow_cultivar_mixing,\r\n  r.allow_orchard_mixing,\r\n  cultivar_group_code,\r\n
+  \ r.started_at,\r\n  r.completed_at,\r\n  cultivars.description,\r\n  orchards.orchard_code,\r\n
+  \ pucs.puc_code,\r\n  seasons.season_code,\r\n  packed_nett_weight,\r\n  tipped_nett_weight,\r\n
+  \ rebin_bin_wt,\r\n  rebin_ctn_wt,\r\n  tipped_qty,\r\n  packed_qty,\r\n  plant_resource_code\r\nORDER
+  BY\r\n  r.started_at DESC\r\n"
 :limit: 
 :offset: 
 :external_settings:
