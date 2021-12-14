@@ -8,6 +8,8 @@ module Crossbeams
       hb: { bin_pallet_conversion_defaults: {},
             presort_staging_target_location: {},
             delivery_capture_inner_bins: false,
+            use_raw_material_code: false,
+            classify_raw_material: false,
             use_delivery_destination: false,
             bin_valid_for_external_integration: false,
             default_container_material_owner: nil,
@@ -29,6 +31,8 @@ module Crossbeams
       hl: { bin_pallet_conversion_defaults: {},
             presort_staging_target_location: {},
             delivery_capture_inner_bins: false,
+            use_raw_material_code: false,
+            classify_raw_material: false,
             use_delivery_destination: false,
             bin_valid_for_external_integration: false,
             default_container_material_owner: nil,
@@ -58,6 +62,8 @@ module Crossbeams
                                               sell_by_code: nil },
             presort_staging_target_location: { PRESORT_STAGING_1: 'PRESORT_1', PRESORT_STAGING_2: 'PRESORT_2' },
             delivery_capture_inner_bins: false,
+            use_raw_material_code: true,
+            classify_raw_material: true,
             use_delivery_destination: true,
             bin_valid_for_external_integration: true,
             default_container_material_owner: 'KROMCO',
@@ -79,6 +85,8 @@ module Crossbeams
       um: { bin_pallet_conversion_defaults: {},
             presort_staging_target_location: {},
             delivery_capture_inner_bins: false,
+            use_raw_material_code: false,
+            classify_raw_material: false,
             use_delivery_destination: false,
             bin_valid_for_external_integration: false,
             default_container_material_owner: nil,
@@ -100,6 +108,8 @@ module Crossbeams
       ud: { bin_pallet_conversion_defaults: {},
             presort_staging_target_location: {},
             delivery_capture_inner_bins: false,
+            use_raw_material_code: false,
+            classify_raw_material: false,
             use_delivery_destination: true,
             bin_valid_for_external_integration: false,
             default_container_material_owner: nil,
@@ -121,6 +131,8 @@ module Crossbeams
       cfg: { bin_pallet_conversion_defaults: {},
              presort_staging_target_location: {},
              delivery_capture_inner_bins: false,
+             use_raw_material_code: false,
+             classify_raw_material: false,
              use_delivery_destination: false,
              bin_valid_for_external_integration: false,
              default_container_material_owner: nil,
@@ -142,6 +154,8 @@ module Crossbeams
       sr: { bin_pallet_conversion_defaults: {},
             presort_staging_target_location: {},
             delivery_capture_inner_bins: false,
+            use_raw_material_code: false,
+            classify_raw_material: false,
             use_delivery_destination: true,
             bin_valid_for_external_integration: false,
             default_container_material_owner: nil,
@@ -163,6 +177,8 @@ module Crossbeams
       sr2: { bin_pallet_conversion_defaults: {},
              presort_staging_target_location: {},
              delivery_capture_inner_bins: false,
+             use_raw_material_code: false,
+             classify_raw_material: false,
              use_delivery_destination: true,
              bin_valid_for_external_integration: false,
              default_container_material_owner: nil,
@@ -218,10 +234,22 @@ module Crossbeams
       setting(:presort_staging_target_location)["PRESORT_STAGING_#{plant[-1]}".to_sym]
     end
 
-    def capture_inner_bins?(explain: false)
-      return 'Do delivered bins contain inner bins (e.g. lugs within larger containers).' if explain
+    def use_raw_material_code?(explain: false)
+      return "Allows user to set a delivery's rmt_code." if explain
 
-      setting(:delivery_capture_inner_bins)
+      setting(:use_raw_material_code)
+    end
+
+    def classify_raw_material?(explain: false)
+      return "Allows user to set a delivery's rmt_classifications." if explain
+
+      setting(:classify_raw_material)
+    end
+
+    def show_classify_raw_material_form?(explain: false)
+      return 'Allows user to see the classify_raw_material form.' if explain
+
+      setting(:use_raw_material_code) || setting(:classify_raw_material)
     end
 
     def include_destination_in_delivery?(explain: false)

@@ -26,4 +26,15 @@ module RawMaterialsApp
     optional(:id).filled(:integer)
     required(:date_delivered).filled(:time)
   end
+
+  class ClassifyRawMaterialContract < Dry::Validation::Contract
+    params do
+      optional(:rmt_code_id).maybe(:integer)
+      optional(:rmt_classifications).maybe(:array)
+    end
+
+    rule(:rmt_code_id) do
+      key.failure 'must be filled in' if values.keys.include?(:rmt_code_id) && !values[:rmt_code_id]
+    end
+  end
 end

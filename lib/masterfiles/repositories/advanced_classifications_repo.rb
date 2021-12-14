@@ -122,5 +122,29 @@ module MasterfilesApp
 
       RmtVariantFlat.new(hash)
     end
+
+    def for_select_rmt_codes_for_delivery(delivery_id)
+      DB[:rmt_variants]
+        .join(:rmt_codes, rmt_variant_id: :id)
+        .join(:rmt_deliveries, cultivar_id: Sequel[:rmt_variants][:cultivar_id])
+        .where(Sequel[:rmt_deliveries][:id] => delivery_id)
+        .select(:rmt_code, Sequel[:rmt_codes][:id])
+        .map(%i[rmt_code id])
+    end
+
+    def for_select_rmt_classifications_for_type(rmt_classification_type_code)
+      DB[:rmt_classifications]
+        .join(:rmt_classification_types, id: :rmt_classification_type_id)
+        .where(rmt_classification_type_code: rmt_classification_type_code)
+        .select(:rmt_classification, Sequel[:rmt_classifications][:id])
+        .map(%i[rmt_classification id])
+    end
+
+    def type_code_for_classification(classification_id)
+      DB[:rmt_classifications]
+        .join(:rmt_classification_types, id: :rmt_classification_type_id)
+        .where(Sequel[:rmt_classifications][:id] => classification_id)
+        .get(:rmt_classification_type_code)
+    end
   end
 end

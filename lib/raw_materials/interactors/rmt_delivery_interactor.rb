@@ -2,6 +2,33 @@
 
 module RawMaterialsApp
   class RmtDeliveryInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+    def classify_raw_material(id, params) # rubocop:disable Metrics/AbcSize
+      params[:rmt_classifications] = params.find_all { |k, _v| k != :rmt_code_id }.map { |a| a[1] }.reject(&:blank?)
+      res = ClassifyRawMaterialContract.new.call(params)
+      return validation_failed_response(res) if res.failure?
+
+      repo.transaction do
+        repo.update_rmt_delivery(id, res)
+        bin_ids = repo.select_values(:rmt_bins, :id, rmt_delivery_id: id)
+        if res[:rmt_code_id]
+          log_status(:rmt_deliveries, id, AppConst::DELIVERY_RMT_CODE_ALLOCATED)
+          log_multiple_statuses(:rmt_bins, bin_ids, AppConst::DELIVERY_RMT_CODE_ALLOCATED)
+        end
+
+        unless res[:rmt_classifications].empty?
+          log_status(:rmt_deliveries, id, AppConst::DELIVERY_RMT_CLASSIFICATIONS_ADDED)
+          log_multiple_statuses(:rmt_bins, bin_ids, AppConst::DELIVERY_RMT_CLASSIFICATIONS_ADDED)
+        end
+
+        log_transaction
+      end
+      success_response("Delivery: #{id} has been classified successfully")
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      failed_response(e.message)
+    end
+
     def create_delivery_tripsheet(delivery_id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       stock_type_id = MesscadaApp::MesscadaRepo.new.get_value(:stock_types, :id, stock_type_code: AppConst::BIN_STOCK_TYPE)
       params.merge!(business_process_id: repo.get_value(:business_processes, :id, process: AppConst::DELIVERY_TRIPSHEET_BUSINESS_PROCESS),

@@ -118,6 +118,23 @@ class Nspack < Roda
         end
       end
 
+      r.on 'classify_raw_material' do
+        r.get do
+          show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::ClassifyRawMaterial.call(id) }
+        end
+
+        r.post do
+          res = interactor.classify_raw_material(id, params[:classify_raw_material])
+          if res.success
+            flash[:notice] = res.message
+            # show_json_notice(res.message)
+            redirect_to_last_grid(r)
+          else
+            re_show_form(r, res) { RawMaterials::Deliveries::RmtDelivery::ClassifyRawMaterial.call(id, form_values: params[:classify_raw_material], form_errors: res.errors) }
+          end
+        end
+      end
+
       r.on 'edit_ref_number' do
         r.get do
           show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::EditRefNumber.call(id) }
