@@ -117,6 +117,7 @@ module MasterfilesApp
     end
 
     def update_rmt_variant(id, params)
+      params[:cultivar_id] = repo.get(:rmt_variants, id, :cultivar_id)
       res = validate_rmt_variant_params(params)
       return validation_failed_response(res) if res.failure?
 
