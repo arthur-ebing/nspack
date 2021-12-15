@@ -141,7 +141,7 @@ module UiRules
                                   caption: 'Current Received date' },
         bin_scan_mode: { renderer: :select,
                          options: AppConst::BIN_SCAN_MODE_OPTIONS,
-                         required: true,
+                         caption: 'Web Bin Scan Mode',
                          prompt: true },
         current: { renderer: :checkbox,
                    caption: 'Set As Current' },

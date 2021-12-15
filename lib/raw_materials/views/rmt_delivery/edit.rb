@@ -141,13 +141,6 @@ module RawMaterials
                                       grid_id: 'rmt_bins_deliveries',
                                       behaviour: false)
                   bin_type = 'asset_number_'
-                else
-                  section.add_control(control_type: :link,
-                                      text: 'New RMT Bin',
-                                      url: "/raw_materials/deliveries/rmt_deliveries/#{id}/rmt_bins/new",
-                                      style: :button,
-                                      grid_id: 'rmt_bins_deliveries',
-                                      behaviour: :popup)
                 end
                 section.add_grid('rmt_bins_deliveries',
                                  "/list/#{bin_type}rmt_bins/grid?key=standard&delivery_id=#{id}",
