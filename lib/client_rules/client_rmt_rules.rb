@@ -304,7 +304,7 @@ module Crossbeams
         location_short_code: location_long_code,
         primary_storage_type_id: repo.get_id(:location_storage_types, storage_type_code: 'RMT_BINS'),
         location_type_id: repo.get_id(:location_types, location_type_code: 'FRUIT_RECEPTION'),
-        primary_assignment_id: repo.get_id(:location_assignments, assignment_code: 'RECEIVING'),
+        primary_assignment_id: repo.get_id(:location_assignments, assignment_code: 'FRUIT_RECEPTION'),
         can_store_stock: true
       }
       repo.create(:locations, args)
@@ -326,7 +326,7 @@ module Crossbeams
         location_short_code: location_long_code,
         primary_storage_type_id: repo.get_id(:location_storage_types, storage_type_code: 'RMT_BINS'),
         location_type_id: repo.get_id(:location_types, location_type_code: 'FRUIT_RECEPTION'),
-        primary_assignment_id: repo.get_id(:location_assignments, assignment_code: 'RECEIVING'),
+        primary_assignment_id: repo.get_id(:location_assignments, assignment_code: 'FRUIT_RECEPTION'),
         can_store_stock: true
       }
       repo.create(:locations, args)
