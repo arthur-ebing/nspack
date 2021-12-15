@@ -213,15 +213,23 @@ module RawMaterialsApp
     end
 
     def maf_bin_tipped(params, request_path)
-      RawMaterialsApp::Job::PresortIntegrationQueue.enqueue(params[:bin], params[:unit], request_path, 'tipped')
-      res = "<bins><bin result_status=\"OK\" msg=\"bin #{params[:bin]} has been queued up to be tipped\" /></bins>"
+      if RawMaterialsApp::Job::PresortIntegrationQueue.enqueued_with_exact_args?(params[:bin], params[:unit], request_path, 'tipped')
+        res = "<bins><bin result_status=\"OK\" msg=\"bin #{params[:bin]} has previously been queued up to be tipped. This call ignored\" /></bins>"
+      else
+        RawMaterialsApp::Job::PresortIntegrationQueue.enqueue(params[:bin], params[:unit], request_path, 'tipped')
+        res = "<bins><bin result_status=\"OK\" msg=\"bin #{params[:bin]} has been queued up to be tipped\" /></bins>"
+      end
       AppConst::PRESORT_BIN_TIPPED_LOG.info(res)
       success_response('bin tipped result', res)
     end
 
     def bin_created(params, request_path)
-      RawMaterialsApp::Job::PresortIntegrationQueue.enqueue(params[:bin], params[:unit], request_path, 'create')
-      res = "<bins><bin result_status=\"OK\" msg=\"bin #{params[:bin]} has been queued up to be created\" /></bins>"
+      if RawMaterialsApp::Job::PresortIntegrationQueue.enqueued_with_exact_args?(params[:bin], params[:unit], request_path, 'create')
+        res = "<bins><bin result_status=\"OK\" msg=\"bin #{params[:bin]} has previously been queued up to be created. This call ignored\" /></bins>"
+      else
+        RawMaterialsApp::Job::PresortIntegrationQueue.enqueue(params[:bin], params[:unit], request_path, 'create')
+        res = "<bins><bin result_status=\"OK\" msg=\"bin #{params[:bin]} has been queued up to be created\" /></bins>"
+      end
       AppConst::PRESORT_BIN_CREATED_LOG.info(res)
       success_response('bin created result', res)
     end

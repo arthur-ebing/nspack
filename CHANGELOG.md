@@ -7,10 +7,17 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
+- Grower grading
+- Presort grower grading
+- Classify raw materials on a delivery. (Ripeness codes, handling regimes, RMT codes and classifications)
+- Offsite bins report.
 ### Changed
 - The client rule for allocating setups to runs can be overridden on a LINE resource.
 - Colour percentages changed to integer column to allow for expressing percentage as a range.
+- Quality and Masterfiles/Quality menus rearranged to better subdivide features.
 ### Fixed
+- Runs summary report - cultivar join was not right.
+- Runs: cannot select inactive label templates.
 
 ## [1.0.4] - 2021-12-06
 ### Added
