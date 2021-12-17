@@ -41,7 +41,7 @@ module UiRules
         scan_bin_numbers: { required: true, renderer: :textarea }
       }
 
-      unless AppConst::CR_RMT.single_bin_type_for_rmt_delivery?
+      unless AppConst::CR_RMT.all_delivery_bins_of_same_type?
         fields[:rmt_container_type_id] = { renderer: :select, options: MasterfilesApp::RmtContainerTypeRepo.new.for_select_rmt_container_types, required: true, prompt: true }
         fields[:rmt_material_owner_party_role_id] = { renderer: :select, options: !@form_object.rmt_container_material_type_id.nil_or_empty? ? @repo.find_container_material_owners_by_container_material_type(@form_object.rmt_container_material_type_id) : [], caption: 'Container Material Owner', required: true, prompt: true }
       end
@@ -109,7 +109,7 @@ module UiRules
 
       behaviours do |behaviour|
         behaviour.dropdown_change :rmt_container_type_id, notify: [{ url: '/raw_materials/deliveries/rmt_bins/rmt_container_type_combo_changed' }]
-        behaviour.dropdown_change :rmt_container_material_type_id, notify: [{ url: '/raw_materials/deliveries/rmt_bins/container_material_type_combo_changed', param_keys: %i[rmt_bin_rmt_container_material_type_id] }] if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER && !AppConst::CR_RMT.single_bin_type_for_rmt_delivery?
+        behaviour.dropdown_change :rmt_container_material_type_id, notify: [{ url: '/raw_materials/deliveries/rmt_bins/container_material_type_combo_changed', param_keys: %i[rmt_bin_rmt_container_material_type_id] }] if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER && !AppConst::CR_RMT.all_delivery_bins_of_same_type?
       end
     end
   end

@@ -158,7 +158,7 @@ module UiRules
         batch_number: { renderer: :label },
         batch_number_updated_at: { renderer: :label }
       }
-      if AppConst::CR_RMT.single_bin_type_for_rmt_delivery?
+      if AppConst::CR_RMT.all_delivery_bins_of_same_type?
         fields[:rmt_container_type_id] = { renderer: :select, options: MasterfilesApp::RmtContainerTypeRepo.new.for_select_rmt_container_types, required: true, prompt: true }
         fields[:rmt_material_owner_party_role_id] = { renderer: :select, options: @repo.for_select_container_material_owners, caption: 'Container Material Owner', required: true, prompt: true }
       end

@@ -14,7 +14,7 @@ module Crossbeams
             bin_valid_for_external_integration: false,
             default_container_material_owner: nil,
             default_rmt_container_type: 'BIN',
-            single_bin_type_for_rmt_delivery: false,
+            all_delivery_bins_of_same_type: false,
             delivery_capture_container_material: false,
             delivery_capture_container_material_owner: false,
             set_defaults_for_new_rmt_delivery: true,
@@ -38,7 +38,7 @@ module Crossbeams
             bin_valid_for_external_integration: false,
             default_container_material_owner: nil,
             default_rmt_container_type: 'BIN',
-            single_bin_type_for_rmt_delivery: false,
+            all_delivery_bins_of_same_type: false,
             delivery_capture_container_material: false,
             delivery_capture_container_material_owner: false,
             set_defaults_for_new_rmt_delivery: true,
@@ -70,7 +70,7 @@ module Crossbeams
             bin_valid_for_external_integration: true,
             default_container_material_owner: 'KROMCO',
             default_rmt_container_type: 'BIN',
-            single_bin_type_for_rmt_delivery: true,
+            all_delivery_bins_of_same_type: true,
             delivery_capture_container_material: true,
             delivery_capture_container_material_owner: true,
             set_defaults_for_new_rmt_delivery: true,
@@ -94,7 +94,7 @@ module Crossbeams
             bin_valid_for_external_integration: false,
             default_container_material_owner: nil,
             default_rmt_container_type: 'BIN',
-            single_bin_type_for_rmt_delivery: false,
+            all_delivery_bins_of_same_type: false,
             delivery_capture_container_material: false,
             delivery_capture_container_material_owner: false,
             set_defaults_for_new_rmt_delivery: true,
@@ -118,7 +118,7 @@ module Crossbeams
             bin_valid_for_external_integration: false,
             default_container_material_owner: nil,
             default_rmt_container_type: 'BIN',
-            single_bin_type_for_rmt_delivery: false,
+            all_delivery_bins_of_same_type: false,
             delivery_capture_container_material: true,
             delivery_capture_container_material_owner: true,
             set_defaults_for_new_rmt_delivery: false,
@@ -142,7 +142,7 @@ module Crossbeams
              bin_valid_for_external_integration: false,
              default_container_material_owner: nil,
              default_rmt_container_type: 'BIN',
-             single_bin_type_for_rmt_delivery: false,
+             all_delivery_bins_of_same_type: false,
              delivery_capture_container_material: false,
              delivery_capture_container_material_owner: false,
              set_defaults_for_new_rmt_delivery: true,
@@ -166,7 +166,7 @@ module Crossbeams
             bin_valid_for_external_integration: false,
             default_container_material_owner: nil,
             default_rmt_container_type: 'BIN',
-            single_bin_type_for_rmt_delivery: false,
+            all_delivery_bins_of_same_type: false,
             delivery_capture_container_material: true,
             delivery_capture_container_material_owner: true,
             set_defaults_for_new_rmt_delivery: true,
@@ -190,7 +190,7 @@ module Crossbeams
              bin_valid_for_external_integration: false,
              default_container_material_owner: nil,
              default_rmt_container_type: 'BIN',
-             single_bin_type_for_rmt_delivery: false,
+             all_delivery_bins_of_same_type: false,
              delivery_capture_container_material: true,
              delivery_capture_container_material_owner: true,
              set_defaults_for_new_rmt_delivery: true,
@@ -352,10 +352,10 @@ module Crossbeams
       setting(:default_rmt_container_type)
     end
 
-    def single_bin_type_for_rmt_delivery?(explain: false)
-      return 'Determines if material_owner and container_type are set at delivery or bin level.' if explain
+    def all_delivery_bins_of_same_type?(explain: false)
+      return 'Are all bins on a delivery always of the same type. If true, bin type and owner can be set at delivery instead of for every bin individually.' if explain
 
-      setting(:single_bin_type_for_rmt_delivery)
+      setting(:all_delivery_bins_of_same_type)
     end
 
     def use_bin_asset_control?(explain: false)

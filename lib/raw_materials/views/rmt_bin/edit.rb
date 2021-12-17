@@ -19,13 +19,13 @@ module RawMaterials
               form.method :update
               form.add_field :bin_asset_number
               form.add_field :rmt_class_id
-              form.add_field :rmt_container_type_id unless AppConst::CR_RMT.single_bin_type_for_rmt_delivery?
+              form.add_field :rmt_container_type_id unless AppConst::CR_RMT.all_delivery_bins_of_same_type?
               form.add_field :qty_bins
               form.add_field :qty_inner_bins
               form.add_field :bin_fullness
               form.add_field :nett_weight if rules[:show_nett_weight]
-              form.add_field :rmt_container_material_type_id if rules[:capture_container_material]
-              form.add_field :rmt_material_owner_party_role_id if rules[:capture_container_material] && rules[:capture_container_material_owner] && !AppConst::CR_RMT.single_bin_type_for_rmt_delivery?
+              form.add_field :rmt_container_material_type_id if rules[:capture_container_material] && !AppConst::CR_RMT.all_delivery_bins_of_same_type?
+              form.add_field :rmt_material_owner_party_role_id if rules[:capture_container_material] && rules[:capture_container_material_owner] && !AppConst::CR_RMT.all_delivery_bins_of_same_type?
               form.add_field :bin_received_date_time if rules[:edit_bin_received_date_time]
             end
           end

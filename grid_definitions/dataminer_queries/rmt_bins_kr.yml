@@ -36,10 +36,12 @@
   ->> 'colour' AS colour,\r\n    legacy_data ->> 'track_slms_indicator_1_code' AS
   rmt_code,\r\n    legacy_data ->> 'pc_code' AS pc_code,\r\n    legacy_data ->> 'cold_store_type'
   AS regime_code,\r\n    fn_current_status('locations', vw_rmt_bins_flat.location_id)
-  AS location_status,\r\n    last_coldroom_event,\r\n    coldroom_events,\r\n    CASE
-  \r\n    WHEN bin_tipped THEN 'gray'\r\n    WHEN shipped THEN 'blue'\r\n    END AS
-  colour_rule\r\nFROM\r\n    vw_rmt_bins_flat\r\nWHERE\r\n    NOT scrapped\r\nORDER
-  BY\r\n    id DESC"
+  AS location_status,\r\n    last_coldroom_event,\r\n    coldroom_events,\r\n    classifications,\r\n
+  \   classifications[1] AS classification1,  \r\n    classifications[2] AS classification2,
+  \ \r\n    classifications[3] AS classification3,\r\n    main_ripeness_treatment,\r\n
+  \   main_cold_treatment,\r\n    treatments,\r\n    CASE \r\n    WHEN bin_tipped
+  THEN 'gray'\r\n    WHEN shipped THEN 'blue'\r\n    END AS colour_rule\r\nFROM\r\n
+  \   vw_rmt_bins_flat\r\nWHERE\r\n    NOT scrapped\r\nORDER BY\r\n    id DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -1606,7 +1608,119 @@
     :caption: Coldroom events
     :namespaced_name: coldroom_events
     :data_type: :string
-    :width: 
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  classifications:
+    :name: classifications
+    :sequence_no: 99
+    :caption: Classifications
+    :namespaced_name: classifications
+    :data_type: :string
+    :width: 200
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  classification1:
+    :name: classification1
+    :sequence_no: 100
+    :caption: Classification1
+    :namespaced_name: 
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  classification2:
+    :name: classification2
+    :sequence_no: 101
+    :caption: Classification2
+    :namespaced_name: 
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  classification3:
+    :name: classification3
+    :sequence_no: 102
+    :caption: Classification3
+    :namespaced_name: 
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  main_ripeness_treatment:
+    :name: main_ripeness_treatment
+    :sequence_no: 103
+    :caption: Main ripeness treatment
+    :namespaced_name: main_ripeness_treatment
+    :data_type: :string
+    :width: 130
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  main_cold_treatment:
+    :name: main_cold_treatment
+    :sequence_no: 104
+    :caption: Main cold treatment
+    :namespaced_name: main_cold_treatment
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  treatments:
+    :name: treatments
+    :sequence_no: 105
+    :caption: Treatments
+    :namespaced_name: treatments
+    :data_type: :string
+    :width: 200
     :format: 
     :hide: false
     :pinned: 
@@ -1618,7 +1732,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 99
+    :sequence_no: 106
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

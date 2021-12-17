@@ -582,7 +582,7 @@ module RawMaterialsApp
                 farm_id: delivery.farm_id,
                 puc_id: delivery.puc_id,
                 rmt_inner_container_type_id: rmt_inner_container_type_id }
-      if AppConst::CR_RMT.single_bin_type_for_rmt_delivery?
+      if AppConst::CR_RMT.all_delivery_bins_of_same_type?
         attrs[:rmt_container_type_id] = delivery.rmt_container_type_id
         attrs[:rmt_material_owner_party_role_id] = delivery.rmt_material_owner_party_role_id
         attrs[:rmt_code_id] = delivery.rmt_code_id
