@@ -59,5 +59,16 @@ module MasterfilesApp
     crud_calls_for :qc_sample_types, name: :qc_sample_type, wrapper: QcSampleType
     crud_calls_for :qc_measurement_types, name: :qc_measurement_type, wrapper: QcMeasurementType
     crud_calls_for :fruit_defects, name: :fruit_defect, wrapper: FruitDefect
+
+    def find_fruit_defect(id)
+      find_with_association(:fruit_defects, id,
+                            wrapper: FruitDefectFlat,
+                            parent_tables: [{ parent_table: :rmt_classes,
+                                              columns: [:rmt_class_code],
+                                              flatten_columns: { rmt_class_code: :rmt_class_code } },
+                                            { parent_table: :fruit_defect_types,
+                                              columns: [:fruit_defect_type_name],
+                                              flatten_columns: { fruit_defect_type_name: :fruit_defect_type_name } }])
+    end
   end
 end

@@ -923,6 +923,8 @@ class Nspack < Roda
               short_description
               description
               internal
+              rmt_class_code
+              fruit_defect_type_name
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
@@ -959,6 +961,8 @@ class Nspack < Roda
             short_description
             description
             internal
+            rmt_class_code
+            fruit_defect_type_name
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)
