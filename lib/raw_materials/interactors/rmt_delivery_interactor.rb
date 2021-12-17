@@ -11,11 +11,13 @@ module RawMaterialsApp
         repo.update_rmt_delivery(id, res)
         bin_ids = repo.select_values(:rmt_bins, :id, rmt_delivery_id: id)
         if res[:rmt_code_id]
+          repo.update_rmt_bin(bin_ids, rmt_code_id: res[:rmt_code_id])
           log_status(:rmt_deliveries, id, AppConst::DELIVERY_RMT_CODE_ALLOCATED)
           log_multiple_statuses(:rmt_bins, bin_ids, AppConst::DELIVERY_RMT_CODE_ALLOCATED)
         end
 
         unless res[:rmt_classifications].empty?
+          repo.update_rmt_bin(bin_ids, rmt_classifications: res[:rmt_classifications])
           log_status(:rmt_deliveries, id, AppConst::DELIVERY_RMT_CLASSIFICATIONS_ADDED)
           log_multiple_statuses(:rmt_bins, bin_ids, AppConst::DELIVERY_RMT_CLASSIFICATIONS_ADDED)
         end
@@ -153,13 +155,17 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def update_rmt_delivery(id, params) # rubocop:disable Metrics/AbcSize
+    def update_rmt_delivery(id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity:
       res = validate_rmt_delivery_params(params)
       return failed_response(unwrap_failed_response(validation_failed_response(res))) if res.failure? && res.errors.to_h.one? && res.errors.to_h.include?(:season_id)
       return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_rmt_delivery(id, res)
+        if AppConst::CR_RMT.single_bin_type_for_rmt_delivery?
+          bin_ids = repo.select_values(:rmt_bins, :id, rmt_delivery_id: id)
+          repo.update(:rmt_bins, bin_ids, rmt_container_type_id: res[:rmt_container_type_id], rmt_material_owner_party_role_id: res[:rmt_material_owner_party_role_id])
+        end
         log_transaction
       end
       instance = rmt_delivery(id)

@@ -12,6 +12,8 @@ module RawMaterialsApp
       season_id = create_season
       farm_id = create_farm
       puc_id = create_puc
+      rmt_container_type_id = create_rmt_container_type
+      rmt_material_owner_party_role_id = create_party_role
 
       default = {
         orchard_id: orchard_id,
@@ -20,6 +22,8 @@ module RawMaterialsApp
         season_id: season_id,
         farm_id: farm_id,
         puc_id: puc_id,
+        rmt_container_type_id: rmt_container_type_id,
+        rmt_material_owner_party_role_id: rmt_material_owner_party_role_id,
         truck_registration_number: Faker::Lorem.unique.word,
         reference_number: Faker::Lorem.unique.word,
         qty_damaged_bins: Faker::Number.number(digits: 4),

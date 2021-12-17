@@ -20,6 +20,8 @@ module RawMaterialsApp
     optional(:bin_scan_mode).maybe(:integer)
     optional(:quantity_bins_with_fruit).maybe(:integer)
     optional(:reference_number).maybe(Types::StrippedString)
+    optional(:rmt_container_type_id).filled(:integer)
+    optional(:rmt_material_owner_party_role_id).filled(:integer)
   end
 
   RmtDeliveryReceivedAtSchema = Dry::Schema.Params do

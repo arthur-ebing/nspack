@@ -1380,7 +1380,7 @@ class Nspack < Roda
 
         form.behaviours do |behaviour|
           behaviour.dropdown_change :rmt_container_type_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/bin_reception_rmt_container_type_combo_changed' }] if capture_container_material
-          behaviour.dropdown_change :rmt_container_material_type_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/bin_reception_container_material_type_combo_changed' }] if capture_container_material && capture_container_material_owner
+          behaviour.dropdown_change :rmt_container_material_type_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/bin_reception_container_material_type_combo_changed' }] if capture_container_material && capture_container_material_owner && !AppConst::CR_RMT.single_bin_type_for_rmt_delivery?
         end
 
         form.add_label(:delivery_number, 'Delivery Number', delivery[:id])
@@ -1391,7 +1391,7 @@ class Nspack < Roda
         form.add_label(:orchard_code, 'Orchard', delivery[:orchard_code])
         form.add_label(:bins_received, 'Bins Received', delivery[:bins_received])
         form.add_label(:qty_bins_remaining, 'Qty Bins Remaining', delivery[:qty_bins_remaining])
-        form.add_select(:rmt_container_type_id, 'Container Type', items: MasterfilesApp::RmtContainerTypeRepo.new.for_select_rmt_container_types, value: default_rmt_container_type[:id], required: true, prompt: true)
+        form.add_select(:rmt_container_type_id, 'Container Type', items: MasterfilesApp::RmtContainerTypeRepo.new.for_select_rmt_container_types, value: default_rmt_container_type[:id], required: true, prompt: true) unless AppConst::CR_RMT.single_bin_type_for_rmt_delivery?
         form.add_select(:rmt_class_id, 'RMT Class', items: MasterfilesApp::FruitRepo.new.for_select_rmt_classes, prompt: true, required: false)
 
         if capture_container_material
@@ -1400,7 +1400,7 @@ class Nspack < Roda
                           required: true, prompt: true)
         end
 
-        if capture_container_material && capture_container_material_owner
+        if capture_container_material && capture_container_material_owner && !AppConst::CR_RMT.single_bin_type_for_rmt_delivery?
           rmt_material_owner_party_role_ids = rmt_container_material_type_id ? RawMaterialsApp::RmtDeliveryRepo.new.find_container_material_owners_by_container_material_type(rmt_container_material_type_id) : []
           form.add_select(:rmt_material_owner_party_role_id, 'Container Material Owner',
                           items: rmt_material_owner_party_role_ids,
@@ -1952,7 +1952,7 @@ class Nspack < Roda
       form.behaviours do |behaviour|
         behaviour.dropdown_change :delivery_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/rmt_bin_delivery_id_combo_changed' }]
         behaviour.dropdown_change :rmt_container_type_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/rmt_bin_rmt_container_type_combo_changed' }] if capture_container_material
-        behaviour.dropdown_change :rmt_container_material_type_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/rmt_bin_container_material_type_combo_changed' }] if capture_container_material && capture_container_material_owner
+        behaviour.dropdown_change :rmt_container_material_type_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/rmt_bin_container_material_type_combo_changed' }] if capture_container_material && capture_container_material_owner && !AppConst::CR_RMT.single_bin_type_for_rmt_delivery?
       end
 
       form.add_label(:delivery_code, 'Delivery', bin_delivery[:id], nil, as_table_cell: true)
@@ -1970,8 +1970,10 @@ class Nspack < Roda
       delivery_codes.unshift(["#{bin_delivery[:id]}_#{bin_delivery[:puc_code]}_#{bin_delivery[:orchard_code]}_#{bin_delivery[:cultivar_code]}_#{bin_delivery[:date_delivered]}", bin_delivery[:id]]) unless bin_delivery.empty?
       form.add_select(:delivery_id, 'Delivery', items: delivery_codes.uniq, value: bin_delivery[:id], prompt: true, required: true)
       form.add_select(:rmt_class_id, 'RMT Class', items: MasterfilesApp::FruitRepo.new.for_select_rmt_classes, prompt: true, required: false)
-      form.add_select(:rmt_container_type_id, 'Container Type', items: MasterfilesApp::RmtContainerTypeRepo.new.for_select_rmt_container_types, value: default_rmt_container_type[:id],
-                                                                required: true, prompt: true)
+      unless AppConst::CR_RMT.single_bin_type_for_rmt_delivery?
+        form.add_select(:rmt_container_type_id, 'Container Type', items: MasterfilesApp::RmtContainerTypeRepo.new.for_select_rmt_container_types, value: default_rmt_container_type[:id],
+                                                                  required: true, prompt: true)
+      end
       form.add_label(:qty_bins, 'Qty Bins', 1, 1)
       if capture_inner_bins
         form.add_field(:qty_inner_bins, 'Qty Inner Bins', data_type: 'number')
@@ -1987,7 +1989,7 @@ class Nspack < Roda
                         required: true, prompt: true)
       end
 
-      if capture_container_material && capture_container_material_owner
+      if capture_container_material && capture_container_material_owner && !AppConst::CR_RMT.single_bin_type_for_rmt_delivery?
         form.add_select(:rmt_material_owner_party_role_id, 'Container Material Owner',
                         items: !details[:rmt_container_material_type_id].to_s.empty? ? RawMaterialsApp::RmtDeliveryRepo.new.find_container_material_owners_by_container_material_type(details[:rmt_container_material_type_id]) : [],
                         required: true, prompt: true)

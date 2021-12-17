@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RawMaterialsApp
-  RmtBinSchema = Dry::Schema.Params do
+  RmtBinSchema = Dry::Schema.Params do # rubocop:disable Metrics/BlockLength
     optional(:id).filled(:integer)
     required(:orchard_id).filled(:integer)
     required(:rmt_delivery_id).filled(:integer)
@@ -26,6 +26,8 @@ module RawMaterialsApp
     optional(:scrapped_at).maybe(:time)
     optional(:scrapped_bin_asset_number).maybe(Types::StrippedString)
     optional(:scrapped_rmt_delivery_id).maybe(:integer)
+    optional(:rmt_code_id).maybe(:integer)
+    optional(:rmt_classifications).maybe(:array)
   end
 
   RmtRebinBinSchema = Dry::Schema.Params do # rubocop:disable Metrics/BlockLength

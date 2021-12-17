@@ -14,6 +14,7 @@ module Crossbeams
             bin_valid_for_external_integration: false,
             default_container_material_owner: nil,
             default_rmt_container_type: 'BIN',
+            single_bin_type_for_rmt_delivery: false,
             delivery_capture_container_material: false,
             delivery_capture_container_material_owner: false,
             set_defaults_for_new_rmt_delivery: true,
@@ -37,6 +38,7 @@ module Crossbeams
             bin_valid_for_external_integration: false,
             default_container_material_owner: nil,
             default_rmt_container_type: 'BIN',
+            single_bin_type_for_rmt_delivery: false,
             delivery_capture_container_material: false,
             delivery_capture_container_material_owner: false,
             set_defaults_for_new_rmt_delivery: true,
@@ -68,6 +70,7 @@ module Crossbeams
             bin_valid_for_external_integration: true,
             default_container_material_owner: 'KROMCO',
             default_rmt_container_type: 'BIN',
+            single_bin_type_for_rmt_delivery: true,
             delivery_capture_container_material: true,
             delivery_capture_container_material_owner: true,
             set_defaults_for_new_rmt_delivery: true,
@@ -91,6 +94,7 @@ module Crossbeams
             bin_valid_for_external_integration: false,
             default_container_material_owner: nil,
             default_rmt_container_type: 'BIN',
+            single_bin_type_for_rmt_delivery: false,
             delivery_capture_container_material: false,
             delivery_capture_container_material_owner: false,
             set_defaults_for_new_rmt_delivery: true,
@@ -114,6 +118,7 @@ module Crossbeams
             bin_valid_for_external_integration: false,
             default_container_material_owner: nil,
             default_rmt_container_type: 'BIN',
+            single_bin_type_for_rmt_delivery: false,
             delivery_capture_container_material: true,
             delivery_capture_container_material_owner: true,
             set_defaults_for_new_rmt_delivery: false,
@@ -137,6 +142,7 @@ module Crossbeams
              bin_valid_for_external_integration: false,
              default_container_material_owner: nil,
              default_rmt_container_type: 'BIN',
+             single_bin_type_for_rmt_delivery: false,
              delivery_capture_container_material: false,
              delivery_capture_container_material_owner: false,
              set_defaults_for_new_rmt_delivery: true,
@@ -160,6 +166,7 @@ module Crossbeams
             bin_valid_for_external_integration: false,
             default_container_material_owner: nil,
             default_rmt_container_type: 'BIN',
+            single_bin_type_for_rmt_delivery: false,
             delivery_capture_container_material: true,
             delivery_capture_container_material_owner: true,
             set_defaults_for_new_rmt_delivery: true,
@@ -183,6 +190,7 @@ module Crossbeams
              bin_valid_for_external_integration: false,
              default_container_material_owner: nil,
              default_rmt_container_type: 'BIN',
+             single_bin_type_for_rmt_delivery: false,
              delivery_capture_container_material: true,
              delivery_capture_container_material_owner: true,
              set_defaults_for_new_rmt_delivery: true,
@@ -342,6 +350,12 @@ module Crossbeams
       return 'Container type used in presort bin_created integration service.' if explain
 
       setting(:default_rmt_container_type)
+    end
+
+    def single_bin_type_for_rmt_delivery?(explain: false)
+      return 'Determines if material_owner and container_type are set at delivery or bin level.' if explain
+
+      setting(:single_bin_type_for_rmt_delivery)
     end
 
     def use_bin_asset_control?(explain: false)

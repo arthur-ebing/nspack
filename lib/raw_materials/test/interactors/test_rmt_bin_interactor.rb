@@ -41,12 +41,12 @@ module RawMaterialsApp
 
     def test_create_rmt_bin_fail
       rmt_delivery_id = create_rmt_delivery
-      attrs = fake_rmt_bin(rmt_container_type_id: nil).to_h.reject { |k, _| k == :id }
+      attrs = fake_rmt_bin(bin_fullness: nil).to_h.reject { |k, _| k == :id }
       res = AppConst.stub_consts(BIN_ASSET_REGEX: '.+') do
         interactor.create_rmt_bin(rmt_delivery_id, attrs)
       end
       refute res.success, 'should fail validation'
-      assert_equal ['must be filled'], res.errors[:rmt_container_type_id]
+      assert_equal ['must be filled'], res.errors[:bin_fullness]
     end
 
     def test_update_rmt_bin
@@ -66,9 +66,10 @@ module RawMaterialsApp
       attrs = interactor.send(:repo).find_hash(:rmt_bins, id).reject { |k, _| %i[id rmt_container_type_id].include?(k) }
       value = attrs[:exit_ref]
       attrs[:exit_ref] = 'a_change'
+      attrs[:bin_fullness] = nil
       res = interactor.update_rmt_bin(id, attrs)
       refute res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_equal ['is missing'], res.errors[:rmt_container_type_id]
+      assert_equal ['must be filled'], res.errors[:bin_fullness]
       after = interactor.send(:repo).find_hash(:rmt_bins, id)
       refute_equal 'a_change', after[:exit_ref]
       assert_equal value, after[:exit_ref]
