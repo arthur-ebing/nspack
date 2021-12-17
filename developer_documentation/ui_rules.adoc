@@ -51,6 +51,7 @@ Parameters:
 columns:: Required. Array of symbols matching attributes in the `form_object`. The columns to display in the table in sequence.
 display_columns:: Optional. Integer - defaults to `2`. The number of columns (combination of `th` for label and `td` for value) to display in the table.
 header_captions:: Optional. Hash in the form `{ column_name: 'Header caption' }`. Only provide captions for columns where the default is not good enough.
+with_object:: Optional. Hash in the form `{ column_name: value }`. If present, the values will be built from this object instead of the `form_object`.
 
 e.g.
 [source, ruby]
