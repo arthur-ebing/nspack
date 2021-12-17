@@ -703,7 +703,9 @@ class Nspack < Roda
         r.patch do     # UPDATE
           res = interactor.update_qc_sample_type(id, params[:qc_sample_type])
           if res.success
-            update_grid_row(id, changes: { qc_sample_type_name: res.instance[:qc_sample_type_name], description: res.instance[:description] },
+            update_grid_row(id, changes: { qc_sample_type_name: res.instance[:qc_sample_type_name],
+                                           description: res.instance[:description],
+                                           default_sample_size: res.instance[:default_sample_size] },
                                 notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::Quality::QcSampleType::Edit.call(id, form_values: params[:qc_sample_type], form_errors: res.errors) }
@@ -735,6 +737,7 @@ class Nspack < Roda
             id
             qc_sample_type_name
             description
+            default_sample_size
             active
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),

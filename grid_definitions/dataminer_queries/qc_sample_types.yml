@@ -1,8 +1,8 @@
 ---
 :caption: Qc Sample Types
 :sql: "SELECT\r\n  \"qc_sample_types\".\"id\",\r\n  \"qc_sample_types\".\"qc_sample_type_name\",\r\n
-  \ \"qc_sample_types\".\"description\",\r\n  \"qc_sample_types\".\"active\",\r\n
-  \ \"qc_sample_types\".\"created_at\",\r\n  \"qc_sample_types\".\"updated_at\"\r\nFROM\r\n
+  \ \"qc_sample_types\".\"description\",\r\n  \"qc_sample_types\".\"default_sample_size\",\r\n
+  \ \"qc_sample_types\".\"active\",\r\n  \"qc_sample_types\".\"created_at\",\r\n  \"qc_sample_types\".\"updated_at\"\r\nFROM\r\n
   \ \"qc_sample_types\"\r\nORDER BY \"qc_sample_types\".\"qc_sample_type_name\""
 :limit: 
 :offset: 
@@ -56,9 +56,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  default_sample_size:
+    :name: default_sample_size
+    :sequence_no: 4
+    :caption: Default sample size
+    :namespaced_name: qc_sample_types.default_sample_size
+    :data_type: :integer
+    :width: 200
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   active:
     :name: active
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Active
     :namespaced_name: qc_sample_types.active
     :data_type: :boolean
@@ -74,7 +90,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Created at
     :namespaced_name: qc_sample_types.created_at
     :data_type: :datetime
@@ -90,7 +106,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Updated at
     :namespaced_name: qc_sample_types.updated_at
     :data_type: :datetime

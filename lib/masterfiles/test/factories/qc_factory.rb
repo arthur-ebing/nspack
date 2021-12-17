@@ -1,12 +1,5 @@
 # frozen_string_literal: true
 
-# ========================================================= #
-# NB. Scaffolds for test factories should be combined       #
-#     - Otherwise you'll have methods for the same table in #
-#       several factories.                                  #
-#     - Rather create a factory for several related tables  #
-# ========================================================= #
-
 module MasterfilesApp
   module QcFactory
     def create_qc_measurement_type(opts = {})
@@ -69,14 +62,10 @@ module MasterfilesApp
       id = get_available_factory_record(:fruit_defects, opts)
       return id unless id.nil?
 
-      # rmt_class_id = create_rmt_class
       opts[:rmt_class_id] ||= create_rmt_class
-      # fruit_defect_type_id = create_fruit_defect_type
       opts[:fruit_defect_type_id] ||= create_fruit_defect_type
 
       default = {
-        # rmt_class_id: rmt_class_id,
-        # fruit_defect_type_id: fruit_defect_type_id,
         fruit_defect_code: Faker::Lorem.unique.word,
         short_description: Faker::Lorem.word,
         description: Faker::Lorem.word,

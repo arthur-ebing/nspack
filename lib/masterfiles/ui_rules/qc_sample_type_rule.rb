@@ -10,10 +10,6 @@ module UiRules
       common_values_for_fields common_fields
 
       set_show_fields if %i[show reopen].include? @mode
-      # set_complete_fields if @mode == :complete
-      # set_approve_fields if @mode == :approve
-
-      # add_approve_behaviours if @mode == :approve
 
       form_name 'qc_sample_type'
     end
@@ -21,25 +17,15 @@ module UiRules
     def set_show_fields
       fields[:qc_sample_type_name] = { renderer: :label }
       fields[:description] = { renderer: :label }
+      fields[:default_sample_size] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
-
-    # def set_approve_fields
-    #   set_show_fields
-    #   fields[:approve_action] = { renderer: :select, options: [%w[Approve a], %w[Reject r]], required: true }
-    #   fields[:reject_reason] = { renderer: :textarea, disabled: true }
-    # end
-
-    # def set_complete_fields
-    #   set_show_fields
-    #   user_repo = DevelopmentApp::UserRepo.new
-    #   fields[:to] = { renderer: :select, options: user_repo.email_addresses(user_email_group: AppConst::EMAIL_GROUP_QC_SAMPLE_TYPE_APPROVERS), caption: 'Email address of person to notify', required: true }
-    # end
 
     def common_fields
       {
         qc_sample_type_name: { required: true },
-        description: {}
+        description: {},
+        default_sample_size: {}
       }
     end
 
@@ -54,35 +40,6 @@ module UiRules
 
     def make_new_form_object
       @form_object = new_form_object_from_struct(MasterfilesApp::QcSampleType)
-      # @form_object = new_form_object_from_struct(MasterfilesApp::QcSampleType, merge_hash: { some_column: 'some value' })
-      # @form_object = OpenStruct.new(qc_sample_type_name: nil,
-      #                               description: nil)
     end
-
-    # def handle_behaviour
-    #   case @mode
-    #   when :some_change_type
-    #     some_change_type_change
-    #   else
-    #     unhandled_behaviour!
-    #   end
-    # end
-
-    # private
-
-    # def add_approve_behaviours
-    #   behaviours do |behaviour|
-    #     behaviour.enable :reject_reason, when: :approve_action, changes_to: ['r']
-    #   end
-    # end
-
-    # def some_change_type_change
-    #   if @params[:changed_value].empty?
-    #     sel = []
-    #   else
-    #     sel = @repo.for_select_somethings(where: { an_id: @params[:changed_value] })
-    #   end
-    #   json_replace_select_options('qc_sample_type_an_id', sel)
-    # end
   end
 end

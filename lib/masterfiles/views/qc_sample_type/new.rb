@@ -18,6 +18,7 @@ module Masterfiles
               form.remote! if remote
               form.add_field :qc_sample_type_name
               form.add_field :description
+              form.add_field :default_sample_size
             end
           end
         end

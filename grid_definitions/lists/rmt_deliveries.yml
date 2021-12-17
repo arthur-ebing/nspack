@@ -37,6 +37,11 @@
   :text: recalc nett weight
   :icon: play
   :popup: false
+- :url: "/quality/qc/qc_samples/new_delivery_sample/$:id$"
+  :text: Create QC Sample
+  :text: New QC sample
+  :icon: add-solid
+  :popup: true
 - :url: "/raw_materials/deliveries/rmt_deliveries/$:id$/set_current_delivery"
   :text: set current
   :icon: play

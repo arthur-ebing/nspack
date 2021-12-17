@@ -1,0 +1,24 @@
+---
+:dataminer_definition: qc_samples
+:actions:
+- :url: "/quality/qc/qc_samples/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/quality/qc/qc_samples/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/quality/qc/qc_samples/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/quality/qc/qc_samples/new"
+  :text: New Qc Sample
+  :style: :button
+  :behaviour: :popup

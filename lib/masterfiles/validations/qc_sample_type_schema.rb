@@ -5,5 +5,6 @@ module MasterfilesApp
     optional(:id).filled(:integer)
     required(:qc_sample_type_name).filled(Types::StrippedString)
     required(:description).maybe(Types::StrippedString)
+    required(:default_sample_size).maybe(:integer)
   end
 end
