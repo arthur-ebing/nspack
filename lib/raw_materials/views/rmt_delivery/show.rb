@@ -8,7 +8,7 @@ module RawMaterials
           ui_rule = UiRules::Compiler.new(:rmt_delivery, :show, id: id)
           rules   = ui_rule.compile
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page|
+          Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.section do |section|
               section.add_control(control_type: :link,
@@ -110,6 +110,22 @@ module RawMaterials
                 end
               end
             end
+
+            if rules[:do_qc]
+              page.fold_up do |fold|
+                fold.caption 'QC'
+                fold.section do |section|
+                  section.add_control(control_type: :dropdown_button,
+                                      text: '100 Fruit Sample',
+                                      items: rules[:items_fruit])
+                  section.add_control(control_type: :dropdown_button,
+                                      text: 'Progressive defects',
+                                      items: rules[:items_defect])
+                  section.add_text 'QC summary here'
+                end
+              end
+            end
+
             if ui_rule.form_object.keep_open
               page.section do |section|
                 bin_type = nil
@@ -157,7 +173,6 @@ module RawMaterials
               end
             end
           end
-          layout
         end
       end
     end

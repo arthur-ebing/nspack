@@ -73,5 +73,9 @@ module QualityApp
 
       DB.get(Sequel.function(:fn_starch_percentages, test_id))
     end
+
+    def sample_id_for_type_and_context(sample_type_id, context, context_key)
+      DB[:qc_samples].where(qc_sample_type_id: sample_type_id, context => context_key).get(:id)
+    end
   end
 end

@@ -15,10 +15,13 @@ module UiRules
       @rules[:vehicle_job_id] = @repo.get_value(:vehicle_jobs, :id, rmt_delivery_id: @form_object.id) unless @form_object.id.nil?
       @rules[:refresh_tripsheet] = @form_object.tripsheet_created && !@form_object.tripsheet_offloaded && !@repo.delivery_tripsheet_discreps(@form_object.id).empty?
       @rules[:list_tripsheets] = !@form_object.tripsheet_offloaded && !@repo.delivery_tripsheets(@form_object.id).empty?
+      rules[:do_qc] = do_qc?
+      @qc_repo = QualityApp::QcRepo.new if rules[:do_qc]
 
       common_values_for_fields common_fields
 
       set_show_fields if %i[show reopen].include? @mode
+      build_qc if %i[show edit].include?(@mode) && rules[:do_qc]
       add_behaviours if %i[new edit].include? @mode
 
       form_name 'rmt_delivery'
@@ -315,6 +318,41 @@ module UiRules
                                     RawMaterialsApp::RmtDeliveryRepo.new.find_container_material_owners_by_container_material_type(params[:changed_value])
                                   end
       json_replace_select_options('rmt_delivery_rmt_material_owner_party_role_id', container_material_owners)
+    end
+
+    def do_qc?
+      @repo.exists?(:qc_sample_types, active: true)
+    end
+
+    def qc_sample_id(sample_type)
+      sample_type_id = @qc_repo.get_id(:qc_sample_types, qc_sample_type_name: sample_type)
+      @qc_repo.sample_id_for_type_and_context(sample_type_id, :rmt_delivery_id, @options[:id])
+    end
+
+    def build_qc
+      # { url: "/production/runs/production_runs/#{id}/packout_report_dispatched",
+      #   text: 'Standard report',
+      #   loading_window: true },
+      # { url: "/production/runs/production_runs/#{id}/detailed_packout_report_dispatched",
+      #   text: 'Detailed report',
+      #   loading_window: true }
+      items_fruit = []
+      fruit_id = qc_sample_id('100_fruit_sample')
+      if fruit_id
+        items_fruit << { url: "/quality/qc/qc_samples/#{fruit_id}/edit", text: 'Edit', behaviour: :popup }
+        items_fruit << { url: '/', text: 'Complete', popup: true }
+        items_fruit << { url: "/quality/qc/qc_samples/#{fruit_id}/print_barcode", text: 'Print', behaviour: :popup }
+        items_fruit << { url: "/quality/qc/qc_samples/#{fruit_id}/qc_test/starch", text: 'Starch test', behaviour: :popup }
+        # Edit
+        # Complete
+        # Print
+        # starch etc
+      else
+        items_fruit << { url: "/quality/qc/qc_samples/new_delivery_sample/#{@options[:id]}", text: 'Create', behaviour: :popup }
+      end
+      items_defect = [{ url: '/', text: 'Placeholder', popup: true }]
+      rules[:items_fruit] = items_fruit
+      rules[:items_defect] = items_defect
     end
   end
 end

@@ -14,7 +14,7 @@ class Nspack < Roda
 
       r.on 'print_barcode' do
         r.get do
-          show_partial { Quality::Qc::QcSample::PrintBarcode.call(id) }
+          show_partial_or_page(r) { Quality::Qc::QcSample::PrintBarcode.call(id) }
         end
         r.patch do
           res = interactor.print_sample_barcode(id, params[:qc_sample])
@@ -37,6 +37,13 @@ class Nspack < Roda
           redirect_to_last_grid(r)
         end
         # create test and redirect to edit.
+      end
+
+      r.on 'qc_test', String do |qc_test_type|
+        # Create if not exists and redirect to edit.
+        test_interactor = QualityApp::QcTestInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+        qc_test_id = test_interactor.find_or_create_test(id, qc_test_type)
+        r.redirect "/quality/qc/qc_tests/#{qc_test_id}/#{qc_test_type}"
       end
 
       r.on 'edit' do   # EDIT

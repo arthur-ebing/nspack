@@ -49,6 +49,14 @@ module QualityApp
       failed_response("Unable to delete qc test. It is still referenced#{e.message.partition('referenced').last}")
     end
 
+    def find_or_create_test(qc_sample_id, qc_test_type)
+      test_type_id = repo.get_id(:qc_test_types, qc_test_type_name: qc_test_type)
+      test_id = repo.find_sample_test_of_type(qc_sample_id, test_type_id)
+      return test_id unless test_id.nil?
+
+      repo.create_qc_test(qc_sample_id: qc_sample_id, qc_test_type_id: test_type_id, sample_size: 20) # Get size from default
+    end
+
     def save_starch_test(id, params) # rubocop:disable Metrics/AbcSize
       res = QcStarchTestContract.new.call(params)
       return validation_failed_response(res) if res.failure?

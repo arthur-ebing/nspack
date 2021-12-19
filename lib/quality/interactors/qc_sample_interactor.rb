@@ -6,6 +6,7 @@ module QualityApp
       res = validate_qc_sample_params(params)
       return validation_failed_response(res) if res.failure?
 
+      # Check that a sample does not already exist for same context and type
       id = nil
       repo.transaction do
         id = repo.create_qc_sample(res)
