@@ -1379,7 +1379,7 @@ class Nspack < Roda
                                        button_caption: 'Submit')
 
         form.behaviours do |behaviour|
-          behaviour.dropdown_change :rmt_container_type_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/bin_reception_rmt_container_type_combo_changed' }] if capture_container_material
+          behaviour.dropdown_change :rmt_container_type_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/bin_reception_rmt_container_type_combo_changed' }] if capture_container_material && !AppConst::CR_RMT.all_delivery_bins_of_same_type?
           behaviour.dropdown_change :rmt_container_material_type_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/bin_reception_container_material_type_combo_changed' }] if capture_container_material && capture_container_material_owner && !AppConst::CR_RMT.all_delivery_bins_of_same_type?
         end
 
@@ -1394,7 +1394,7 @@ class Nspack < Roda
         form.add_select(:rmt_container_type_id, 'Container Type', items: MasterfilesApp::RmtContainerTypeRepo.new.for_select_rmt_container_types, value: default_rmt_container_type[:id], required: true, prompt: true) unless AppConst::CR_RMT.all_delivery_bins_of_same_type?
         form.add_select(:rmt_class_id, 'RMT Class', items: MasterfilesApp::FruitRepo.new.for_select_rmt_classes, prompt: true, required: false)
 
-        if capture_container_material
+        if capture_container_material && !AppConst::CR_RMT.all_delivery_bins_of_same_type?
           form.add_select(:rmt_container_material_type_id, 'Container Material Type',
                           items: MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_rmt_container_material_types(where: { rmt_container_type_id: default_rmt_container_type[:id] }),
                           required: true, prompt: true)
@@ -1983,7 +1983,7 @@ class Nspack < Roda
       form.add_select(:bin_fullness, 'Bin Fullness', items: AppConst::BIN_FULLNESS_OPTIONS, prompt: true)
       form.add_field(:gross_weight, 'Gross Weight', required: false)
 
-      if capture_container_material
+      if capture_container_material && !AppConst::CR_RMT.all_delivery_bins_of_same_type?
         form.add_select(:rmt_container_material_type_id, 'Container Material Type',
                         items: MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_rmt_container_material_types(where: { rmt_container_type_id: default_rmt_container_type[:id] }),
                         required: true, prompt: true)
