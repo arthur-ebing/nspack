@@ -120,7 +120,7 @@ module RawMaterials
                                       items: rules[:items_fruit])
                   section.add_control(control_type: :dropdown_button,
                                       text: 'Progressive defects',
-                                      items: rules[:items_defect])
+                                      items: rules[:items_prog])
                   section.add_text 'QC summary here'
                 end
               end

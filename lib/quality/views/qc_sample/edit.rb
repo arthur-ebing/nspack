@@ -3,9 +3,9 @@
 module Quality
   module Qc
     module QcSample
-      class New
-        def self.call(qc_sample_type_id, context:, id:, form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/ParameterLists
-          ui_rule = UiRules::Compiler.new(:qc_sample, :new, qc_sample_type_id: qc_sample_type_id, context: context, context_key: id, form_values: form_values)
+      class Edit
+        def self.call(id, form_values: nil, form_errors: nil)
+          ui_rule = UiRules::Compiler.new(:qc_sample, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
           Crossbeams::Layout::Page.build(rules) do |page|
@@ -13,11 +13,11 @@ module Quality
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.caption 'New Qc Sample'
-              form.action '/quality/qc/qc_samples'
-              form.remote! if remote
-              form.add_field :context
-              form.add_field :context_key
+              form.caption 'Edit Qc Sample'
+              form.action "/quality/qc/qc_samples/#{id}"
+              form.remote!
+              form.method :update
+              form.add_field :id
               form.add_field :qc_sample_type_id
               form.add_field :rmt_delivery_id
               form.add_field :coldroom_location_id

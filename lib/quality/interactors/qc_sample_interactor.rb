@@ -14,7 +14,7 @@ module QualityApp
         log_transaction
       end
       instance = qc_sample(id)
-      success_response("Created qc sample #{instance.presort_run_lot_number}", instance)
+      success_response('Created qc sample', qc_sample_created_redirect(instance))
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { presort_run_lot_number: ['This qc sample already exists'] }))
     rescue Crossbeams::InfoError => e
@@ -136,6 +136,13 @@ module QualityApp
 
     def validate_qc_sample_params(params)
       QcSampleSchema.call(params)
+    end
+
+    # After creating a QC sample, calculate the route to be redirected.
+    def qc_sample_created_redirect(instance)
+      return "/raw_materials/deliveries/rmt_deliveries/#{instance.rmt_delivery_id}" if instance.rmt_delivery_id
+
+      '/'
     end
   end
 end

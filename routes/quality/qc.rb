@@ -96,22 +96,7 @@ class Nspack < Roda
         r.patch do     # UPDATE
           res = interactor.update_qc_sample(id, params[:qc_sample])
           if res.success
-            row_keys = %i[
-              qc_sample_type_id
-              rmt_delivery_id
-              coldroom_location_id
-              production_run_id
-              orchard_id
-              presort_run_lot_number
-              ref_number
-              short_description
-              sample_size
-              editing
-              completed
-              completed_at
-              rmt_bin_ids
-            ]
-            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+            show_json_notice(res.message)
           else
             re_show_form(r, res) { Quality::Qc::QcSample::Edit.call(id, form_values: params[:qc_sample], form_errors: res.errors) }
           end
@@ -172,48 +157,28 @@ class Nspack < Roda
         end
       end
 
-      r.on 'new_delivery_sample', Integer do |rmt_delivery_id|
+      r.on 'new_rmt_delivery_id_sample', Integer, Integer do |qc_sample_type_id, rmt_delivery_id|
         check_auth!('qc', 'new')
         set_last_grid_url('/list/qc_samples', r)
-        show_partial_or_page(r) { Quality::Qc::QcSample::New.call(context: :rmt_delivery_id, id: rmt_delivery_id, remote: fetch?(r)) }
+        show_partial_or_page(r) { Quality::Qc::QcSample::New.call(qc_sample_type_id, context: :rmt_delivery_id, id: rmt_delivery_id, remote: fetch?(r)) }
       end
 
-      # r.on 'new' do    # NEW
-      #   check_auth!('qc', 'new')
-      #   set_last_grid_url('/list/qc_samples', r)
-      #   show_partial_or_page(r) { Quality::Qc::QcSample::New.call(remote: fetch?(r)) }
-      # end
       r.post do        # CREATE
         res = interactor.create_qc_sample(params[:qc_sample])
         if res.success
-          # if fetch?(r)
-          #   row_keys = %i[
-          #     id
-          #     qc_sample_type_id
-          #     rmt_delivery_id
-          #     coldroom_location_id
-          #     production_run_id
-          #     orchard_id
-          #     presort_run_lot_number
-          #     ref_number
-          #     short_description
-          #     sample_size
-          #     editing
-          #     completed
-          #     completed_at
-          #     rmt_bin_ids
-          #   ]
-          #   add_grid_row(attrs: select_attributes(res.instance, row_keys),
-          #                notice: res.message)
-          # else
           flash[:notice] = res.message
-          redirect_to_last_grid(r)
-          # end
+          if fetch?(r)
+            redirect_via_json(res.instance)
+          else
+            r.redirect res.instance
+          end
         else
+          sample_type = params[:qc_sample][:qc_sample_type_id]
           context = params[:qc_sample][:context]
           context_key = params[:qc_sample][:context_key]
-          re_show_form(r, res, url: "/quality/qc/qc_samples/new_#{context}_sample") do
-            Quality::Qc::QcSample::New.call(context: context,
+          re_show_form(r, res, url: "/quality/qc/qc_samples/new_#{context}_sample/#{sample_type}/#{context_key}") do
+            Quality::Qc::QcSample::New.call(sample_type,
+                                            context: context,
                                             id: context_key,
                                             form_values: params[:qc_sample],
                                             form_errors: res.errors,
@@ -243,7 +208,7 @@ class Nspack < Roda
         r.patch do
           res = interactor.save_starch_test(id, params[:qc_test])
           if res.success
-            redirect_to_last_grid(r)
+            show_json_notice(res.message)
           else
             re_show_form(r, res, url: "/quality/qc/qc_tests/#{id}/starch") do
               Quality::Qc::QcTest::Starch.call(id, form_values: params[:qc_test],

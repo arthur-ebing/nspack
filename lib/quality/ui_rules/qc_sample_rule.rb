@@ -12,6 +12,7 @@ module UiRules
 
       set_show_fields if %i[show reopen print_barcode select_test].include? @mode
       set_print_fields if @mode == :print_barcode
+      fields[:id][:renderer] = :label if @mode == :edit
       rules[:existing_tests] = existing_tests
 
       form_name 'qc_sample'
@@ -61,17 +62,17 @@ module UiRules
                            disabled_options: MasterfilesApp::QcRepo.new.for_select_inactive_qc_test_types,
                            caption: 'QC Test Type',
                            required: true },
-        qc_sample_type_id: { renderer: :select,
-                             options: MasterfilesApp::QcRepo.new.for_select_qc_sample_types,
-                             disabled_options: MasterfilesApp::QcRepo.new.for_select_inactive_qc_sample_types,
+        qc_sample_type_id: { renderer: :label,
+                             with_value: sample_type_label,
+                             hidden_value: @options[:qc_sample_type_id] || @form_object.qc_sample_type_id,
                              caption: 'QC Sample Type',
-                             required: true },
+                             include_hidden_field: true },
         rmt_delivery_id: { renderer: :hidden },
         coldroom_location_id: { renderer: :hidden },
         production_run_id: { renderer: :hidden },
         orchard_id: { renderer: :hidden },
         presort_run_lot_number: { renderer: :hidden },
-        id: { renderer: :integer },
+        id: { renderer: :integer, caption: 'QC Sample id' },
         ref_number: { required: true },
         short_description: {},
         sample_size: { renderer: :integer, required: true },
@@ -98,18 +99,20 @@ module UiRules
     def make_new_form_object
       hash = { @options[:context] => @options[:context_key],
                drawn_at: Time.now,
+               sample_type_id: @options[:qc_sample_type_id],
+               sample_size: @repo.get(:qc_sample_types, @options[:qc_sample_type_id], :default_sample_size),
                context: @options[:context],
                context_key: @options[:context_key] }
-      qc_sample_type = case @options[:context]
-                       when :rmt_delivery_id
-                         '100_fruit_sample'
-                       when :coldroom_location_id
-                         'coldroom'
-                       end
-      # hash[:short_description] = send("desc_#{@options[:context]}".to_sym)
-      hash[:qc_sample_type_id] = @repo.get_id(:qc_sample_types, qc_sample_type_name: qc_sample_type) unless qc_sample_type.nil?
-      # @form_object = new_form_object_from_struct(QualityApp::QcSample, merge_hash: hash)
-      @form_object = new_form_object_from_struct(QualityApp::QcSample)
+      # qc_sample_type = case @options[:context]
+      #                  when :rmt_delivery_id
+      #                    '100_fruit_sample'
+      #                  when :coldroom_location_id
+      #                    'coldroom'
+      #                  end
+      hash[:short_description] = send("desc_#{@options[:context]}".to_sym)
+      # hash[:qc_sample_type_id] = @repo.get_id(:qc_sample_types, qc_sample_type_name: qc_sample_type) unless qc_sample_type.nil?
+      @form_object = new_form_object_from_struct(QualityApp::QcSample, merge_hash: hash)
+      # @form_object = new_form_object_from_struct(QualityApp::QcSample)
     end
 
     def desc_rmt_delivery_id
@@ -122,6 +125,10 @@ module UiRules
     end
 
     private
+
+    def sample_type_label
+      @repo.get(:qc_sample_types, @options[:qc_sample_type_id] || @form_object.qc_sample_type_id, :qc_sample_type_name)
+    end
 
     def existing_tests
       return [] unless @options[:id]

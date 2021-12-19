@@ -324,35 +324,33 @@ module UiRules
       @repo.exists?(:qc_sample_types, active: true)
     end
 
-    def qc_sample_id(sample_type)
+    def qc_sample_type_and_id(sample_type)
       sample_type_id = @qc_repo.get_id(:qc_sample_types, qc_sample_type_name: sample_type)
-      @qc_repo.sample_id_for_type_and_context(sample_type_id, :rmt_delivery_id, @options[:id])
+      sample_id = @qc_repo.sample_id_for_type_and_context(sample_type_id, :rmt_delivery_id, @options[:id])
+      [sample_type_id, sample_id]
     end
 
-    def build_qc
-      # { url: "/production/runs/production_runs/#{id}/packout_report_dispatched",
-      #   text: 'Standard report',
-      #   loading_window: true },
-      # { url: "/production/runs/production_runs/#{id}/detailed_packout_report_dispatched",
-      #   text: 'Detailed report',
-      #   loading_window: true }
+    def build_qc # rubocop:disable Metrics/AbcSize
       items_fruit = []
-      fruit_id = qc_sample_id('100_fruit_sample')
+      sample_type_id, fruit_id = qc_sample_type_and_id('100_fruit_sample')
       if fruit_id
         items_fruit << { url: "/quality/qc/qc_samples/#{fruit_id}/edit", text: 'Edit', behaviour: :popup }
         items_fruit << { url: '/', text: 'Complete', popup: true }
         items_fruit << { url: "/quality/qc/qc_samples/#{fruit_id}/print_barcode", text: 'Print', behaviour: :popup }
         items_fruit << { url: "/quality/qc/qc_samples/#{fruit_id}/qc_test/starch", text: 'Starch test', behaviour: :popup }
-        # Edit
-        # Complete
-        # Print
-        # starch etc
       else
-        items_fruit << { url: "/quality/qc/qc_samples/new_delivery_sample/#{@options[:id]}", text: 'Create', behaviour: :popup }
+        items_fruit << { url: "/quality/qc/qc_samples/new_rmt_delivery_id_sample/#{sample_type_id}/#{@options[:id]}", text: 'Create', behaviour: :popup }
       end
-      items_defect = [{ url: '/', text: 'Placeholder', popup: true }]
+      items_prog = []
+      sample_type_id, prog_id = qc_sample_type_and_id('delivery_progressive_tests')
+      if prog_id
+        items_prog << { url: "/quality/qc/qc_samples/#{prog_id}/edit", text: 'Edit', behaviour: :popup }
+        items_prog << { url: "/quality/qc/qc_samples/#{prog_id}/print_barcode", text: 'Print', behaviour: :popup }
+      else
+        items_prog << { url: "/quality/qc/qc_samples/new_rmt_delivery_id_sample/#{sample_type_id}/#{@options[:id]}", text: 'Create', behaviour: :popup }
+      end
       rules[:items_fruit] = items_fruit
-      rules[:items_defect] = items_defect
+      rules[:items_prog] = items_prog
     end
   end
 end
