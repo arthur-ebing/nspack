@@ -61,7 +61,7 @@ module RawMaterialsApp
                                                      flatten_columns: { treatment_code: :colour } }])
       return nil if hash.nil?
 
-      hash[:adjusted_weight] = hash[:maf_weight] - hash[:rmt_bin_weight]
+      hash[:adjusted_weight] = hash[:rmt_bin_weight] - hash[:maf_weight]
       PresortGrowerGradingBinFlat.new(hash)
     end
 

@@ -8,8 +8,8 @@
   \r\n\"rmt_classes\".\"rmt_class_code\",\r\n\"presort_grower_grading_bins\".\"maf_colour\",
   \r\n\"treatments\".\"treatment_code\" AS colour,\r\n\"presort_grower_grading_bins\".\"maf_count\",
   \r\n\"rmt_sizes\".\"size_code\" AS rmt_size_code, \r\n\"presort_grower_grading_bins\".\"maf_weight\",
-  \r\n\"presort_grower_grading_bins\".\"rmt_bin_weight\", \r\n(\"presort_grower_grading_bins\".\"maf_weight\"
-  - \"presort_grower_grading_bins\".\"rmt_bin_weight\" ) AS adjusted_weight,\r\n\"presort_grower_grading_bins\".\"maf_article_count\",
+  \r\n\"presort_grower_grading_bins\".\"rmt_bin_weight\", \r\n(\"presort_grower_grading_bins\".\"rmt_bin_weight\"
+  - \"presort_grower_grading_bins\".\"maf_weight\" ) AS adjusted_weight,\r\n\"presort_grower_grading_bins\".\"maf_article_count\",
   \r\n\"presort_grower_grading_bins\".\"maf_tipped_quantity\", \r\n\"presort_grower_grading_bins\".\"maf_total_lot_weight\",
   \r\n\"presort_grower_grading_bins\".\"graded\", \r\n\"presort_grower_grading_bins\".\"active\",
   \r\n\"presort_grower_grading_bins\".\"created_by\", \r\n\"presort_grower_grading_bins\".\"updated_by\",

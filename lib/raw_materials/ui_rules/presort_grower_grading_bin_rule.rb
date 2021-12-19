@@ -139,7 +139,9 @@ module UiRules
                                                  merge_hash: {
                                                    presort_grower_grading_pool_id: @options[:presort_grading_pool_id],
                                                    maf_lot_number: presort_pool[:maf_lot_number],
-                                                   farm_id: presort_pool[:farm_id]
+                                                   farm_id: presort_pool[:farm_id],
+                                                   maf_weight: 0,
+                                                   rmt_bin_weight: 0
                                                  })
     end
   end

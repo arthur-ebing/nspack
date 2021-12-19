@@ -10,14 +10,14 @@ module RawMaterialsApp
     required(:maf_colour).maybe(Types::StrippedString)
     required(:maf_count).maybe(Types::StrippedString)
     required(:maf_article_count).maybe(Types::StrippedString)
-    required(:maf_weight).maybe(:decimal)
+    required(:maf_weight).filled(:decimal)
     required(:maf_tipped_quantity).maybe(:integer)
     required(:maf_total_lot_weight).maybe(:decimal)
     required(:created_by).filled(Types::StrippedString)
     required(:rmt_class_id).maybe(:integer)
     required(:rmt_size_id).maybe(:integer)
     required(:treatment_id).maybe(:integer)
-    required(:rmt_bin_weight).maybe(:decimal)
+    required(:rmt_bin_weight).filled(:decimal)
   end
 
   EditPresortGrowerGradingBinSchema = Dry::Schema.Params do
