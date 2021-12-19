@@ -40,5 +40,6 @@ module RawMaterialsApp
     attribute :commodity_code, Types::String
     attribute :season_code, Types::String
     attribute :farm_code, Types::String
+    attribute :total_graded_weight, Types::Decimal
   end
 end

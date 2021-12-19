@@ -1,15 +1,10 @@
 ---
-:dataminer_definition: presort_grower_grading_bins
+:dataminer_definition: presort_grower_grading_bin_details
 :actions:
 - :url: "/raw_materials/presort_grower_grading/presort_grower_grading_bins/$:id$"
   :text: view
   :icon: view-show
   :title: View
-  :popup: true
-- :url: "/raw_materials/presort_grower_grading/presort_grower_grading_bins/$:id$/edit"
-  :text: edit
-  :icon: edit
-  :title: Edit
   :popup: true
 - :url: "/raw_materials/presort_grower_grading/presort_grower_grading_bins/$:id$"
   :text: delete

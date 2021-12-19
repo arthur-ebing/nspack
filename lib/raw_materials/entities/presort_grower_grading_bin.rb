@@ -18,6 +18,9 @@ module RawMaterialsApp
     attribute :maf_total_lot_weight, Types::Decimal
     attribute :created_by, Types::String
     attribute :updated_by, Types::String
+    attribute :treatment_id, Types::Integer
+    attribute :rmt_bin_weight, Types::Decimal
+    attribute? :graded, Types::Bool
     attribute? :active, Types::Bool
     attribute :created_at, Types::DateTime
     attribute :updated_at, Types::DateTime
@@ -40,6 +43,10 @@ module RawMaterialsApp
     attribute :maf_total_lot_weight, Types::Decimal
     attribute :created_by, Types::String
     attribute :updated_by, Types::String
+    attribute :treatment_id, Types::Integer
+    attribute :rmt_bin_weight, Types::Decimal
+    attribute :adjusted_weight, Types::Decimal
+    attribute? :graded, Types::Bool
     attribute? :active, Types::Bool
     attribute :created_at, Types::DateTime
     attribute :updated_at, Types::DateTime
@@ -47,5 +54,6 @@ module RawMaterialsApp
     attribute :farm_code, Types::String
     attribute :rmt_class_code, Types::String
     attribute :rmt_size_code, Types::String
+    attribute :colour, Types::String
   end
 end

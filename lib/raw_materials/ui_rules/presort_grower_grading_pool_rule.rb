@@ -80,7 +80,7 @@ module UiRules
 
     def set_manage_pool_details(columns = nil, display_columns = 3)
       compact_header(columns: columns || %i[maf_lot_number description track_slms_indicator_code season_code
-                                            commodity_code farm_code rmt_bin_count rmt_bin_weight pro_rata_factor
+                                            commodity_code farm_code rmt_bin_count rmt_bin_weight total_graded_weight
                                             active completed created_by updated_by created_at updated_at],
                      display_columns: display_columns,
                      header_captions: {

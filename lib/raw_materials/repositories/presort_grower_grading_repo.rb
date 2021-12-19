@@ -24,36 +24,45 @@ module RawMaterialsApp
     crud_calls_for :presort_grower_grading_bins, name: :presort_grower_grading_bin, wrapper: PresortGrowerGradingBin
 
     def find_presort_grower_grading_pool(id)
-      find_with_association(:presort_grower_grading_pools,
-                            id,
-                            parent_tables: [{ parent_table: :commodities,
-                                              columns: [:code],
-                                              flatten_columns: { code: :commodity_code } },
-                                            { parent_table: :seasons,
-                                              columns: [:season_code],
-                                              flatten_columns: { season_code: :season_code } },
-                                            { parent_table: :farms,
-                                              columns: [:farm_code],
-                                              flatten_columns: { farm_code: :farm_code } }],
-                            wrapper: PresortGrowerGradingPoolFlat)
+      hash = find_with_association(:presort_grower_grading_pools,
+                                   id,
+                                   parent_tables: [{ parent_table: :commodities,
+                                                     columns: [:code],
+                                                     flatten_columns: { code: :commodity_code } },
+                                                   { parent_table: :seasons,
+                                                     columns: [:season_code],
+                                                     flatten_columns: { season_code: :season_code } },
+                                                   { parent_table: :farms,
+                                                     columns: [:farm_code],
+                                                     flatten_columns: { farm_code: :farm_code } }])
+      return nil if hash.nil?
+
+      hash[:total_graded_weight] = select_values(:presort_grower_grading_bins, :rmt_bin_weight, presort_grower_grading_pool_id: id).sum
+      PresortGrowerGradingPoolFlat.new(hash)
     end
 
     def find_presort_grower_grading_bin(id)
-      find_with_association(:presort_grower_grading_bins,
-                            id,
-                            parent_tables: [{ parent_table: :presort_grower_grading_pools,
-                                              columns: [:maf_lot_number],
-                                              flatten_columns: { maf_lot_number: :maf_lot_number } },
-                                            { parent_table: :farms,
-                                              columns: [:farm_code],
-                                              flatten_columns: { farm_code: :farm_code } },
-                                            { parent_table: :rmt_classes,
-                                              columns: [:rmt_class_code],
-                                              flatten_columns: { rmt_class_code: :rmt_class_code } },
-                                            { parent_table: :rmt_sizes,
-                                              columns: [:size_code],
-                                              flatten_columns: { size_code: :rmt_size_code } }],
-                            wrapper: PresortGrowerGradingBinFlat)
+      hash = find_with_association(:presort_grower_grading_bins,
+                                   id,
+                                   parent_tables: [{ parent_table: :presort_grower_grading_pools,
+                                                     columns: [:maf_lot_number],
+                                                     flatten_columns: { maf_lot_number: :maf_lot_number } },
+                                                   { parent_table: :farms,
+                                                     columns: [:farm_code],
+                                                     flatten_columns: { farm_code: :farm_code } },
+                                                   { parent_table: :rmt_classes,
+                                                     columns: [:rmt_class_code],
+                                                     flatten_columns: { rmt_class_code: :rmt_class_code } },
+                                                   { parent_table: :rmt_sizes,
+                                                     columns: [:size_code],
+                                                     flatten_columns: { size_code: :rmt_size_code } },
+                                                   { parent_table: :treatments,
+                                                     columns: [:treatment_code],
+                                                     flatten_columns: { treatment_code: :colour } }])
+      return nil if hash.nil?
+
+      hash[:adjusted_weight] = hash[:maf_weight] - hash[:rmt_bin_weight]
+      PresortGrowerGradingBinFlat.new(hash)
     end
 
     def delete_presort_grower_grading_pool(id)
@@ -112,7 +121,7 @@ module RawMaterialsApp
     end
 
     def look_for_existing_grading_bin_id(res)
-      args = res.to_h.reject { |k, _| %i[id active created_by updated_by created_at updated_at].include?(k) }
+      args = res.to_h.reject { |k, _| %i[id active graded maf_weight rmt_bin_weight created_by updated_by created_at updated_at].include?(k) }
       id = get_id(:presort_grower_grading_bins, args)
       id
     end

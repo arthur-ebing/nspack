@@ -25,18 +25,20 @@ module RawMaterials
               form.row do |row|
                 row.column do |col|
                   col.add_field :farm_id
-                  col.add_field :rmt_size_id
                   col.add_field :maf_article
+                  col.add_field :maf_count
+                  col.add_field :rmt_size_id
                   col.add_field :maf_colour
-                  col.add_field :maf_article_count
+                  col.add_field :treatment_id
                   col.add_field :maf_tipped_quantity
                 end
                 row.column do |col|
-                  col.add_field :rmt_class_id
                   col.add_field :maf_rmt_code
+                  col.add_field :maf_article_count
                   col.add_field :maf_class
-                  col.add_field :maf_count
+                  col.add_field :rmt_class_id
                   col.add_field :maf_weight
+                  col.add_field :rmt_bin_weight
                   col.add_field :maf_total_lot_weight
                 end
               end

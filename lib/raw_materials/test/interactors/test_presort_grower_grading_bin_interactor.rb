@@ -10,6 +10,7 @@ module RawMaterialsApp
     include MasterfilesApp::PartyFactory
     include RawMaterialsApp::RmtBinFactory
     include MasterfilesApp::FarmFactory
+    include MasterfilesApp::FruitFactory
 
     def test_repo
       repo = interactor.send(:repo)
@@ -72,6 +73,7 @@ module RawMaterialsApp
       farm_id = create_farm
       rmt_class_id = create_rmt_class
       rmt_size_id = create_rmt_size
+      treatment_id = create_treatment
 
       {
         id: 1,
@@ -79,6 +81,7 @@ module RawMaterialsApp
         farm_id: farm_id,
         rmt_class_id: rmt_class_id,
         rmt_size_id: rmt_size_id,
+        treatment_id: treatment_id,
         maf_rmt_code: Faker::Lorem.unique.word,
         maf_article: 'ABC',
         maf_class: 'ABC',
@@ -92,7 +95,9 @@ module RawMaterialsApp
         updated_by: 'ABC',
         active: true,
         created_at: '2010-01-01 12:00',
-        updated_at: '2010-01-01 12:00'
+        updated_at: '2010-01-01 12:00',
+        graded: false,
+        rmt_bin_weight: 1.0
       }
     end
 

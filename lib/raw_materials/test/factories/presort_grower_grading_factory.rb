@@ -35,6 +35,7 @@ module RawMaterialsApp
       opts[:farm_id] ||= create_farm
       opts[:rmt_class_id] ||= create_rmt_class
       opts[:rmt_size_id] ||= create_rmt_size
+      opts[:treatment_id] ||= create_treatment
 
       default = {
         maf_rmt_code: Faker::Lorem.unique.word,
@@ -50,7 +51,9 @@ module RawMaterialsApp
         created_by: Faker::Lorem.word,
         updated_by: Faker::Lorem.word,
         created_at: '2010-01-01 12:00',
-        updated_at: '2010-01-01 12:00'
+        updated_at: '2010-01-01 12:00',
+        graded: false,
+        rmt_bin_weight: Faker::Number.decimal
       }
       DB[:presort_grower_grading_bins].insert(default.merge(opts))
     end

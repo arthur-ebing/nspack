@@ -42,6 +42,10 @@ class Nspack < Roda
               maf_total_lot_weight
               created_by
               updated_by
+              graded
+              colour
+              rmt_bin_weight
+              adjusted_weight
             ]
             add_grid_row(attrs: select_attributes(res.instance, row_keys),
                          notice: res.message)
@@ -269,11 +273,10 @@ class Nspack < Roda
       r.on 'inline_edit_bin_fields' do
         res = interactor.inline_edit_bin_fields(id, params)
         if res.success
-          row_keys = %i[
-            rmt_class_code
-            rmt_size_code
-          ]
-          update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+          json_actions([OpenStruct.new(type: :update_grid_row,
+                                       ids: id,
+                                       changes: res.instance[:changes])],
+                       res.message)
         else
           undo_grid_inline_edit(message: res.message, message_type: :error)
         end

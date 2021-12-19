@@ -130,7 +130,7 @@
     :data_type: :string
     :width: 100
     :format: 
-    :hide: true
+    :hide: false
     :pinned: 
     :groupable: true
     :group_by_seq: 
@@ -146,7 +146,7 @@
     :data_type: :string
     :width: 80
     :format: 
-    :hide: true
+    :hide: false
     :pinned: 
     :groupable: true
     :group_by_seq: 
@@ -304,7 +304,7 @@
     :caption: Rmt bin weight
     :namespaced_name: presort_grower_grading_bins.rmt_bin_weight
     :data_type: :number
-    :width: 120
+    :width: 100
     :format: :delimited_1000
     :hide: false
     :pinned: 
@@ -354,7 +354,7 @@
     :data_type: :integer
     :width: 120
     :format: 
-    :hide: true
+    :hide: false
     :pinned: 
     :groupable: true
     :group_by_seq: 
@@ -370,7 +370,7 @@
     :data_type: :number
     :width: 120
     :format: :delimited_1000
-    :hide: true
+    :hide: false
     :pinned: 
     :groupable: true
     :group_by_seq: 
@@ -402,7 +402,7 @@
     :data_type: :boolean
     :width: 80
     :format: 
-    :hide: true
+    :hide: false
     :pinned: 
     :groupable: true
     :group_by_seq: 
@@ -418,7 +418,7 @@
     :data_type: :string
     :width: 120
     :format: 
-    :hide: true
+    :hide: false
     :pinned: 
     :groupable: true
     :group_by_seq: 
@@ -434,7 +434,7 @@
     :data_type: :string
     :width: 120
     :format: 
-    :hide: true
+    :hide: false
     :pinned: 
     :groupable: true
     :group_by_seq: 
@@ -450,7 +450,7 @@
     :data_type: :datetime
     :width: 120
     :format: 
-    :hide: true
+    :hide: false
     :pinned: 
     :groupable: false
     :group_by_seq: 
@@ -466,7 +466,7 @@
     :data_type: :datetime
     :width: 120
     :format: 
-    :hide: true
+    :hide: false
     :pinned: 
     :groupable: false
     :group_by_seq: 

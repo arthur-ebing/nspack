@@ -14,6 +14,7 @@ module RawMaterialsApp
         farm_id: 1,
         rmt_class_id: 1,
         rmt_size_id: 1,
+        treatment_id: 1,
         maf_rmt_code: Faker::Lorem.unique.word,
         maf_article: 'ABC',
         maf_class: 'ABC',
@@ -27,7 +28,9 @@ module RawMaterialsApp
         updated_by: 'ABC',
         active: true,
         created_at: '2010-01-01 12:00',
-        updated_at: '2010-01-01 12:00'
+        updated_at: '2010-01-01 12:00',
+        graded: false,
+        rmt_bin_weight: 1.0
       }
       RawMaterialsApp::PresortGrowerGradingBin.new(base_attrs.merge(attrs))
     end

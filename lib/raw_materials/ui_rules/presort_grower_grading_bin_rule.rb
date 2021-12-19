@@ -4,6 +4,7 @@ module UiRules
   class PresortGrowerGradingBinRule < Base # rubocop:disable Metrics/ClassLength
     def generate_rules
       @repo = RawMaterialsApp::PresortGrowerGradingRepo.new
+      @fruit_repo = MasterfilesApp::FruitRepo.new
       make_form_object
       apply_form_values
 
@@ -19,6 +20,7 @@ module UiRules
       farm_id_label = @repo.get(:farms, @form_object.farm_id, :farm_code)
       rmt_class_id_label = @repo.get(:rmt_classes, @form_object.rmt_class_id, :rmt_class_code)
       rmt_size_id_label = @repo.get(:rmt_sizes, @form_object.rmt_size_id, :size_code)
+      treatment_id_label = @repo.get(:treatments, @form_object.treatment_id, :treatment_code)
       fields[:presort_grower_grading_pool_id] = { renderer: :label,
                                                   with_value: presort_grower_grading_pool_id_label,
                                                   caption: 'Maf Lot Number' }
@@ -47,6 +49,12 @@ module UiRules
                               format: :without_timezone_or_seconds }
       fields[:updated_at] = { renderer: :label,
                               format: :without_timezone_or_seconds }
+      fields[:graded] = { renderer: :label, as_boolean: true }
+      fields[:treatment_id] = { renderer: :label,
+                                with_value: treatment_id_label,
+                                caption: 'Colour' }
+      fields[:rmt_bin_weight] = { renderer: :label }
+      fields[:adjusted_weight] = { renderer: :label }
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize
@@ -57,8 +65,8 @@ module UiRules
                           disabled_options: MasterfilesApp::FarmRepo.new.for_select_inactive_farms,
                           caption: 'Farm' }
         rmt_class_renderer = { renderer: :select,
-                               options: MasterfilesApp::FruitRepo.new.for_select_rmt_classes,
-                               disabled_options: MasterfilesApp::FruitRepo.new.for_select_inactive_rmt_classes,
+                               options: @fruit_repo.for_select_rmt_classes,
+                               disabled_options: @fruit_repo.for_select_inactive_rmt_classes,
                                caption: 'Rmt Class',
                                prompt: 'Select Rmt Class',
                                searchable: true,
@@ -69,6 +77,13 @@ module UiRules
                               prompt: 'Select Rmt Class',
                               searchable: true,
                               remove_search_for_small_list: false }
+        colour_renderer = { renderer: :select,
+                            options: @fruit_repo.for_select_treatments,
+                            disabled_options: @fruit_repo.for_select_inactive_treatments,
+                            caption: 'Colour',
+                            prompt: 'Select Colour',
+                            searchable: true,
+                            remove_search_for_small_list: false }
       else
         farm_renderer = { renderer: :label,
                           with_value: @repo.get(:farms, @form_object.farm_id, :farm_code),
@@ -79,6 +94,9 @@ module UiRules
         rmt_size_renderer = { renderer: :label,
                               with_value: @repo.get(:rmt_sizes, @form_object.rmt_size_id, :size_code),
                               caption: 'Rmt Size' }
+        colour_renderer = { renderer: :label,
+                            with_value: @repo.get(:treatments, @form_object.treatment_id, :treatment_code),
+                            caption: 'Colour' }
       end
       {
         maf_lot_number: { renderer: :label,
@@ -89,6 +107,7 @@ module UiRules
         farm_id: farm_renderer,
         rmt_class_id: rmt_class_renderer,
         rmt_size_id: rmt_size_renderer,
+        treatment_id: colour_renderer,
         maf_rmt_code: {},
         maf_article: {},
         maf_class: {},
@@ -99,7 +118,9 @@ module UiRules
         maf_tipped_quantity: {},
         maf_total_lot_weight: {},
         created_by: {},
-        updated_by: {}
+        updated_by: {},
+        graded: { renderer: :checkbox },
+        rmt_bin_weight: { renderer: :numeric }
       }
     end
 

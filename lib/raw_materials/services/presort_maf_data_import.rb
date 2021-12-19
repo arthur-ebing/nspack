@@ -55,10 +55,11 @@ module RawMaterialsApp
     def maf_data_sql
       <<~SQL
         SELECT Numero_lot AS maf_lot_number, Code_adherent AS maf_farm_code, Code_clone AS maf_rmt_code,
-               Nom_article AS maf_article, Nom_calibre AS maf_count, Poids AS maf_weight,
+               Nom_article AS maf_article, Nom_calibre AS maf_count, SUM(Poids) AS maf_weight,
                Poids_total_calibre AS maf_lot_weight, Nb_palox AS maf_infeed_bin_qty
         FROM Viewlotapportresultat
         WHERE Numero_lot = '#{maf_lot_number}' AND Nom_article <> 'Recycling'
+        GROUP BY Numero_lot, Code_adherent, Code_clone, Nom_article, Nom_calibre, Num_couleur, Poids_total_calibre, Nb_palox, Num_calibre
         ORDER BY Numero_lot, Num_couleur, Num_calibre
       SQL
     end
@@ -91,19 +92,23 @@ module RawMaterialsApp
         res = validate_grading_bin_params(defaults.merge(resolve_maf_presort_bin_attrs(data)))
         return validation_failed_response(res) if res.failure?
 
-        repo.create_presort_grower_grading_bin(res) unless duplicate_grading_bin?(res)
+        grading_bin_id = repo.look_for_existing_grading_bin_id(res)
+        grading_bin_id.nil? ? repo.create_presort_grower_grading_bin(res) : repo.update_presort_grower_grading_bin(grading_bin_id, grading_bin_weight_attrs(grading_bin_id, res[:rmt_bin_weight]))
       end
       repo.log_multiple_statuses(:presort_grower_grading_bins, repo.presort_grower_grading_bin_ids(grading_pool_id), 'CREATED')
       ok_response
     end
 
-    def resolve_maf_presort_bin_attrs(maf_bin)
+    def resolve_maf_presort_bin_attrs(maf_bin) # rubocop:disable Metrics/AbcSize
       attrs = resolve_maf_bin_data(maf_bin['maf_article'], maf_bin['maf_count'])
-      attrs[:maf_rmt_code] = maf_bin['maf_rmt_code']
-      attrs[:maf_weight] = maf_bin['maf_weight']
-      attrs[:maf_tipped_quantity] = maf_bin['maf_infeed_bin_qty']
-      attrs[:maf_total_lot_weight] = maf_bin['maf_lot_weight']
-      attrs
+      attrs.merge({ maf_rmt_code: maf_bin['maf_rmt_code'],
+                    maf_weight: maf_bin['maf_weight'].to_f,
+                    rmt_bin_weight: maf_bin['maf_weight'].to_f,
+                    maf_tipped_quantity: maf_bin['maf_infeed_bin_qty'],
+                    maf_total_lot_weight: maf_bin['maf_lot_weight'],
+                    rmt_class_id: repo.get_id(:rmt_classes, rmt_class_code: attrs[:maf_class]),
+                    treatment_id: repo.get_id(:treatments, treatment_code: attrs[:maf_colour]),
+                    rmt_size_id: repo.get_id(:rmt_sizes, size_code: attrs[:maf_count]) })
     end
 
     def resolve_maf_bin_data(maf_article, maf_count)
@@ -137,6 +142,11 @@ module RawMaterialsApp
     def duplicate_grading_bin?(hash)
       attrs = hash.to_h.reject { |k, _| %i[id active created_by updated_by created_at updated_at].include?(k) }
       repo.exists?(:presort_grower_grading_bins, attrs)
+    end
+
+    def grading_bin_weight_attrs(grading_bin_id, rmt_bin_weight)
+      grading_bin_weight = (repo.get(:presort_grower_grading_bins, grading_bin_id, :maf_weight) + rmt_bin_weight)
+      { maf_weight: grading_bin_weight, rmt_bin_weight: grading_bin_weight }
     end
 
     def error_xml(message)
