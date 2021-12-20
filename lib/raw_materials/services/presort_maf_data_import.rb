@@ -126,7 +126,8 @@ module RawMaterialsApp
           maf_count: maf_count,
           maf_article_count: arr[2] }
       else
-        arr = [arr.delete_at(2)].push(maf_count)
+        arr.delete_at(2)
+        arr.push(maf_count)
         { maf_article: arr.join('_'),
           maf_class: arr[0],
           maf_colour: arr[1],
