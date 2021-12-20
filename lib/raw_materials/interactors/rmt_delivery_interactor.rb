@@ -164,7 +164,10 @@ module RawMaterialsApp
         repo.update_rmt_delivery(id, res)
         if AppConst::CR_RMT.all_delivery_bins_of_same_type?
           bin_ids = repo.select_values(:rmt_bins, :id, rmt_delivery_id: id)
-          repo.update(:rmt_bins, bin_ids, rmt_container_type_id: res[:rmt_container_type_id], rmt_material_owner_party_role_id: res[:rmt_material_owner_party_role_id])
+          attrs = { rmt_container_type_id: res[:rmt_container_type_id],
+                    rmt_material_owner_party_role_id: res[:rmt_material_owner_party_role_id],
+                    rmt_container_material_type_id: res[:rmt_container_material_type_id] }
+          repo.update(:rmt_bins, bin_ids, attrs)
         end
         log_transaction
       end

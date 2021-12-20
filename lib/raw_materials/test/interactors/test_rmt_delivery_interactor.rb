@@ -80,6 +80,7 @@ module RawMaterialsApp
       rmt_container_type_id = create_rmt_container_type
       rmt_material_owner_party_role_id = create_party_role
       rmt_code_id = create_rmt_code
+      rmt_container_material_type_id = create_rmt_container_material_type
 
       {
         id: 1,
@@ -108,7 +109,8 @@ module RawMaterialsApp
         tripsheet_offloaded_at: '2010-01-01 12:00',
         tripsheet_loaded_at: '2010-01-01 12:00',
         current: false,
-        active: true
+        active: true,
+        rmt_container_material_type_id: rmt_container_material_type_id
       }
     end
 

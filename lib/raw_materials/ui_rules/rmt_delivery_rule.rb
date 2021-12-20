@@ -161,6 +161,12 @@ module UiRules
       if AppConst::CR_RMT.all_delivery_bins_of_same_type?
         fields[:rmt_container_type_id] = { renderer: :select, options: MasterfilesApp::RmtContainerTypeRepo.new.for_select_rmt_container_types, required: true, prompt: true }
         fields[:rmt_material_owner_party_role_id] = { renderer: :select, options: @repo.for_select_container_material_owners, caption: 'Container Material Owner', required: true, prompt: true }
+        fields[:rmt_container_material_type_id] = { renderer: :select,
+                                                    options: MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_rmt_container_material_types(where: { rmt_container_type_id: @form_object.rmt_container_type_id }),
+                                                    disabled_options: MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_inactive_rmt_container_material_types,
+                                                    caption: 'Rmt Container Material Type',
+                                                    required: true,
+                                                    prompt: true }
       end
 
       fields
@@ -195,16 +201,120 @@ module UiRules
                                     bin_scan_mode: nil)
     end
 
+    def handle_behaviour
+      case @mode
+      when :farm
+        farm_change
+      when :puc
+        puc_change
+      when :orchard
+        orchard_change
+      when :rmt_container_type
+        rmt_container_type_change
+      when :rmt_container_material_type
+        rmt_container_material_type_change
+      else
+        unhandled_behaviour!
+      end
+    end
+
     private
 
     def add_behaviours
       behaviours do |behaviour|
-        behaviour.dropdown_change :farm_id, notify: [{ url: '/raw_materials/deliveries/rmt_deliveries/farm_combo_changed' }]
-        behaviour.dropdown_change :puc_id, notify: [{ url: '/raw_materials/deliveries/rmt_deliveries/puc_combo_changed',
-                                                      param_keys: %i[rmt_delivery_farm_id rmt_delivery_puc_id] }]
-        behaviour.dropdown_change :orchard_id, notify: [{ url: '/raw_materials/deliveries/rmt_deliveries/orchard_combo_changed',
-                                                          param_keys: %i[rmt_delivery_orchard_id] }]
+        behaviour.dropdown_change :farm_id,
+                                  notify: [{ url: '/raw_materials/deliveries/rmt_deliveries/ui_change/farm' }]
+        behaviour.dropdown_change :puc_id,
+                                  notify: [{ url: '/raw_materials/deliveries/rmt_deliveries/ui_change/puc',
+                                             param_keys: %i[rmt_delivery_farm_id] }]
+        behaviour.dropdown_change :orchard_id,
+                                  notify: [{ url: '/raw_materials/deliveries/rmt_deliveries/ui_change/orchard' }]
+        behaviour.dropdown_change :rmt_container_type_id,
+                                  notify: [{ url: '/raw_materials/deliveries/rmt_deliveries/ui_change/rmt_container_type' }]
+        behaviour.dropdown_change :rmt_container_material_type_id,
+                                  notify: [{ url: '/raw_materials/deliveries/rmt_deliveries/ui_change/rmt_container_material_type' }]
       end
+    end
+
+    def farm_change
+      pucs = if params[:changed_value].blank?
+               []
+             else
+               RawMaterialsApp::RmtDeliveryRepo.new.farm_pucs(params[:changed_value])
+             end
+      json_actions([OpenStruct.new(type: :replace_select_options,
+                                   dom_id: 'rmt_delivery_puc_id',
+                                   options_array: pucs),
+                    OpenStruct.new(type: :replace_select_options,
+                                   dom_id: 'rmt_delivery_orchard_id',
+                                   options_array: []),
+                    OpenStruct.new(type: :replace_select_options,
+                                   dom_id: 'rmt_delivery_cultivar_id',
+                                   options_array: [])])
+    end
+
+    def puc_change
+      farm_id = params[:rmt_delivery_farm_id]
+      orchards = if params[:changed_value].blank? || farm_id.blank?
+                   []
+                 else
+                   RawMaterialsApp::RmtDeliveryRepo.new.orchards(farm_id, params[:changed_value])
+                 end
+      json_actions([OpenStruct.new(type: :replace_select_options,
+                                   dom_id: 'rmt_delivery_orchard_id',
+                                   options_array: orchards),
+                    OpenStruct.new(type: :replace_select_options,
+                                   dom_id: 'rmt_delivery_cultivar_id',
+                                   options_array: [])])
+    end
+
+    def orchard_change
+      if params[:changed_value].blank?
+        farm_section = nil
+        cultivars = []
+      else
+        farm_section = MasterfilesApp::FarmRepo.new.find_orchard_farm_section(params[:changed_value])
+        cultivars = RawMaterialsApp::RmtDeliveryRepo.new.orchard_cultivars(params[:changed_value])
+      end
+      json_actions([OpenStruct.new(type: farm_section.nil_or_empty? ? :hide_element : :show_element,
+                                   dom_id: 'rmt_delivery_farm_section_field_wrapper'),
+                    OpenStruct.new(type: :replace_inner_html,
+                                   dom_id: 'rmt_delivery_farm_section',
+                                   value: farm_section),
+                    OpenStruct.new(type: :replace_select_options,
+                                   dom_id: 'rmt_delivery_cultivar_id',
+                                   options_array: cultivars)])
+    end
+
+    def rmt_container_type_change
+      actions = []
+      rmt_container_material_types = if params[:changed_value].blank?
+                                       []
+                                     else
+                                       MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_rmt_container_material_types(
+                                         where: { rmt_container_type_id: params[:changed_value] }
+                                       )
+                                     end
+      if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL
+        actions << OpenStruct.new(type: :replace_select_options,
+                                  dom_id: 'rmt_delivery_rmt_container_material_type_id',
+                                  options_array: rmt_container_material_types)
+      end
+      if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL && AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER
+        actions << OpenStruct.new(type: :replace_select_options,
+                                  dom_id: 'rmt_delivery_rmt_material_owner_party_role_id',
+                                  options_array: [])
+      end
+      json_actions(actions)
+    end
+
+    def rmt_container_material_type_change
+      container_material_owners = if params[:changed_value].blank?
+                                    []
+                                  else
+                                    RawMaterialsApp::RmtDeliveryRepo.new.find_container_material_owners_by_container_material_type(params[:changed_value])
+                                  end
+      json_replace_select_options('rmt_delivery_rmt_material_owner_party_role_id', container_material_owners)
     end
   end
 end

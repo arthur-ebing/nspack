@@ -14,6 +14,7 @@ module RawMaterialsApp
       puc_id = create_puc
       rmt_container_type_id = create_rmt_container_type
       rmt_material_owner_party_role_id = create_party_role
+      rmt_container_material_type_id ||= create_rmt_container_material_type
 
       default = {
         orchard_id: orchard_id,
@@ -35,7 +36,8 @@ module RawMaterialsApp
         date_delivered: '2010-01-01 12:00',
         tipping_complete_date_time: '2010-01-01 12:00',
         created_at: '2010-01-01 12:00',
-        updated_at: '2010-01-01 12:00'
+        updated_at: '2010-01-01 12:00',
+        rmt_container_material_type_id: rmt_container_material_type_id
       }
       DB[:rmt_deliveries].insert(default.merge(opts))
     end

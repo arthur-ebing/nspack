@@ -92,6 +92,7 @@ module RawMaterials
                     col.add_field :cultivar_id
                     if AppConst::CR_RMT.all_delivery_bins_of_same_type
                       col.add_field :rmt_container_type_id
+                      col.add_field :rmt_container_material_type_id
                       col.add_field :rmt_material_owner_party_role_id
                     end
                     col.add_field :rmt_delivery_destination_id

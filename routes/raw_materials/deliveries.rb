@@ -250,6 +250,8 @@ class Nspack < Roda
                 scrapped_at
                 status
                 asset_number
+                rmt_container_material_type_id
+                rmt_container_material_type
               ]
               actions = []
               res.instance.each do |instance|
@@ -316,6 +318,8 @@ class Nspack < Roda
                 scrapped_at
                 status
                 asset_number
+                rmt_container_material_type_id
+                rmt_container_material_type
               ]
               actions = []
               res.instance.each do |instance|
@@ -458,6 +462,11 @@ class Nspack < Roda
 
     r.on 'rmt_deliveries' do
       interactor = RawMaterialsApp::RmtDeliveryInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'ui_change', String do |change_type| # Handle UI behaviours
+        handle_ui_change(:rmt_delivery, change_type.to_sym, params)
+      end
+
       r.on 'new' do    # NEW
         check_auth!('deliveries', 'new')
         latest_delivery = RawMaterialsApp::RmtDeliveryRepo.new.latest_delivery&.merge!(date_picked: Time.now, date_delivered: Time.now) if AppConst::CR_RMT.defaults_for_new_rmt_delivery?

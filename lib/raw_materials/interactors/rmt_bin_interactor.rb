@@ -587,6 +587,7 @@ module RawMaterialsApp
         attrs[:rmt_material_owner_party_role_id] = delivery.rmt_material_owner_party_role_id
         attrs[:rmt_code_id] = delivery.rmt_code_id
         attrs[:rmt_classifications] = delivery.rmt_classifications.to_a
+        attrs[:rmt_container_material_type_id] = delivery.rmt_container_material_type_id
       end
       attrs
     end

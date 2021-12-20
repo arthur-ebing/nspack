@@ -36,5 +36,6 @@ module RawMaterialsApp
     attribute :rmt_material_owner_party_role_id, Types::Integer
     attribute :rmt_code_id, Types::Integer
     attribute :rmt_classifications, Types::Array
+    attribute :rmt_container_material_type_id, Types::Integer
   end
 end
