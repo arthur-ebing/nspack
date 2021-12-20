@@ -7,6 +7,11 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
+### Changed
+### Fixed
+
+## [1.0.5] - 2021-12-20
+### Added
 - Grower grading
 - Presort grower grading
 - Classify raw materials on a delivery. (Ripeness codes, handling regimes, RMT codes and classifications)
