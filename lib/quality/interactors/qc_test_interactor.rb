@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QualityApp
-  class QcTestInteractor < BaseInteractor
+  class QcTestInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_qc_test(params)
       res = validate_qc_test_params(params)
       return validation_failed_response(res) if res.failure?
@@ -22,6 +22,20 @@ module QualityApp
 
     def update_qc_test(id, params)
       res = validate_qc_test_params(params)
+      return validation_failed_response(res) if res.failure?
+
+      repo.transaction do
+        repo.update_qc_test(id, res)
+        log_transaction
+      end
+      instance = qc_test(id)
+      success_response("Updated qc test #{instance.id}", instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def update_qc_test_sample_size(id, params)
+      res = UtilityFunctions.validate_integer_length(:sample_size, params[:sample_size])
       return validation_failed_response(res) if res.failure?
 
       repo.transaction do
@@ -94,7 +108,29 @@ module QualityApp
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 
+    def defects_grid(qc_test_id)
+      # extraContext: { keyColumn: 'id' },
+      {
+        fieldUpdateUrl: "/quality/qc/qc_tests/#{qc_test_id}/inline_defect/$:id$",
+        columnDefs: col_defs_for_defects_grid,
+        rowDefs: repo.rows_for_defects_test(qc_test_id)
+      }.to_json
+    end
+
     private
+
+    def col_defs_for_defects_grid
+      classes = repo.select_values(:rmt_classes, :rmt_class_code, active: true)
+      Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
+        mk.integer :id, 'ID', hide: true
+        mk.col :fruit_defect_type_name, 'Type', groupable: true
+        mk.col :fruit_defect_code, 'Code'
+        mk.col :short_description, 'Description'
+        mk.boolean :internal, 'Int?', groupable: true
+        mk.col :rmt_class_code, 'Class', editable: true, cellEditor: 'search_select', cellEditorParams: { values: classes }
+        mk.integer :qty_fruit_with_percentage, 'Qty', editable: true
+      end
+    end
 
     def repo
       @repo ||= QcRepo.new

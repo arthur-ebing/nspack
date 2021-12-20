@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QualityApp
-  class QcRepo < BaseRepo
+  class QcRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     build_for_select :qc_samples,
                      label: :presort_run_lot_number,
                      value: :id,
@@ -112,6 +112,32 @@ module QualityApp
         ORDER BY y.qc_test_type_name
       SQL
       DB[query, qc_sample_id].all
+    end
+
+    def rows_for_defects_test(qc_test_id)
+      query = <<~SQL
+        SELECT
+          fruit_defects.id,
+          fruit_defect_types.fruit_defect_type_name,
+          fruit_defects.fruit_defect_code,
+          fruit_defects.short_description,
+          internal,
+          COALESCE(defect_classes.rmt_class_code, rmt_classes.rmt_class_code) AS rmt_class_code,
+          qc_defect_measurements.qty_fruit_with_percentage
+        FROM
+          fruit_defects
+          JOIN fruit_defect_types ON fruit_defect_types.id = fruit_defects.fruit_defect_type_id
+          LEFT JOIN rmt_classes ON rmt_classes.id = fruit_defects.rmt_class_id
+          LEFT JOIN qc_defect_measurements ON qc_defect_measurements.fruit_defect_id = fruit_defects.id
+            AND qc_defect_measurements.qc_test_id = ?
+          LEFT JOIN rmt_classes defect_classes ON defect_classes.id = qc_defect_measurements.rmt_class_id
+        WHERE
+          fruit_defect_types.active
+        ORDER BY
+          fruit_defect_types.fruit_defect_type_name,
+          fruit_defects.fruit_defect_code
+      SQL
+      DB[query, qc_test_id].all
     end
   end
 end

@@ -198,6 +198,34 @@ class Nspack < Roda
         handle_not_found(r)
       end
 
+      r.on 'defects' do
+        r.get do
+          show_partial_or_page(r) { Quality::Qc::QcTest::Defects.call(id) }
+        end
+
+        r.patch do
+          res = interactor.update_qc_test_sample_size(id, params[:qc_test])
+          if res.success
+            show_json_notice(res.message)
+          else
+            p res
+            show_json_warning(res.message) # ... display validation errs....
+          end
+        end
+      end
+
+      r.on 'defects_grid' do
+        interactor.defects_grid(id)
+      rescue StandardError => e
+        show_json_exception(e)
+      end
+
+      # r.on 'inline_defect', Integer do |fruit_defect_id|
+      r.on 'inline_defect', Integer do
+        undo_grid_inline_edit(message: 'Undoing while testing...')
+        # update qty / class
+      end
+
       r.on 'starch' do
         r.get do
           check_auth!('qc', 'edit')

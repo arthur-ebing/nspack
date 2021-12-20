@@ -338,6 +338,7 @@ module UiRules
         items_fruit << { url: '/', text: 'Complete', popup: true }
         items_fruit << { url: "/quality/qc/qc_samples/#{fruit_id}/print_barcode", text: 'Print', behaviour: :popup }
         items_fruit << { url: "/quality/qc/qc_samples/#{fruit_id}/qc_test/starch", text: 'Starch test', behaviour: :popup }
+        items_fruit << { url: "/quality/qc/qc_samples/#{fruit_id}/qc_test/defects", text: 'Defects test', behaviour: :direct }
       else
         items_fruit << { url: "/quality/qc/qc_samples/new_rmt_delivery_id_sample/#{sample_type_id}/#{@options[:id]}", text: 'Create', behaviour: :popup }
       end
@@ -347,6 +348,7 @@ module UiRules
       if prog_id
         items_prog << { url: "/quality/qc/qc_samples/#{prog_id}/edit", text: 'Edit', behaviour: :popup }
         items_prog << { url: "/quality/qc/qc_samples/#{prog_id}/print_barcode", text: 'Print', behaviour: :popup }
+        items_prog << { url: "/quality/qc/qc_samples/#{prog_id}/qc_test/defects", text: 'Defects test', behaviour: :direct }
       else
         items_prog << { url: "/quality/qc/qc_samples/new_rmt_delivery_id_sample/#{sample_type_id}/#{@options[:id]}", text: 'Create', behaviour: :popup }
       end
