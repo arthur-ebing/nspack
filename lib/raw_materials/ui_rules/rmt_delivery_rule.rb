@@ -341,6 +341,7 @@ module UiRules
       else
         items_fruit << { url: "/quality/qc/qc_samples/new_rmt_delivery_id_sample/#{sample_type_id}/#{@options[:id]}", text: 'Create', behaviour: :popup }
       end
+      build_qc_summary('100_fruit_sample', fruit_id)
       items_prog = []
       sample_type_id, prog_id = qc_sample_type_and_id('delivery_progressive_tests')
       if prog_id
@@ -351,6 +352,16 @@ module UiRules
       end
       rules[:items_fruit] = items_fruit
       rules[:items_prog] = items_prog
+      build_qc_summary('delivery_progressive_tests', prog_id)
+    end
+
+    def build_qc_summary(sample_type, sample_id)
+      items = []
+      unless sample_id.nil?
+        items << @qc_repo.sample_summary(sample_id)
+        @qc_repo.sample_test_summaries(sample_id).each { |s| items << s }
+      end
+      rules["qc_summary_#{sample_type}".to_sym] = items
     end
   end
 end

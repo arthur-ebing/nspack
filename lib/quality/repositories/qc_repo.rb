@@ -77,5 +77,41 @@ module QualityApp
     def sample_id_for_type_and_context(sample_type_id, context, context_key)
       DB[:qc_samples].where(qc_sample_type_id: sample_type_id, context => context_key).get(:id)
     end
+
+    def sample_summary(qc_sample_id)
+      query = <<~SQL
+        SELECT s.id AS key, s.sample_size,
+        CASE WHEN s.completed THEN
+          'Complete'
+        ELSE
+          'Editing'
+        END AS status,
+        s.ref_number AS summary
+        FROM qc_samples s
+        WHERE s.id = ?
+      SQL
+      DB[query, qc_sample_id].first
+    end
+
+    def sample_test_summaries(qc_sample_id)
+      query = <<~SQL
+        SELECT y.qc_test_type_name AS key, t.sample_size,
+        CASE WHEN t.completed THEN
+          'Complete'
+        ELSE
+          'Editing'
+        END AS status,
+        CASE WHEN y.qc_test_type_name = 'starch' THEN
+          fn_starch_percentages(t.id)
+        ELSE
+          NULL
+        END AS summary
+        FROM qc_tests t
+        JOIN qc_test_types y ON y.id = t.qc_test_type_id
+        WHERE t.qc_sample_id = ?
+        ORDER BY y.qc_test_type_name
+      SQL
+      DB[query, qc_sample_id].all
+    end
   end
 end

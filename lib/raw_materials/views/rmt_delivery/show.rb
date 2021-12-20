@@ -121,7 +121,28 @@ module RawMaterials
                   section.add_control(control_type: :dropdown_button,
                                       text: 'Progressive defects',
                                       items: rules[:items_prog])
-                  section.add_text 'QC summary here'
+                  section.row do |row|
+                    row.column do |col|
+                      col.add_text '100 Fruit Sample', wrapper: :h3, css_classes: 'mid-gray'
+                      if rules[:qc_summary_100_fruit_sample]
+                        col.add_table rules[:qc_summary_100_fruit_sample],
+                                      %i[key sample_size status summary],
+                                      alignment: { sample_size: :right }
+                      else
+                        col.add_text 'No sample', wrapper: :em
+                      end
+                    end
+                    row.column do |col|
+                      col.add_text 'Progressive Defects', wrapper: :h3, css_classes: 'mid-gray'
+                      if rules[:qc_summary_delivery_progressive_tests]
+                        col.add_table rules[:qc_summary_delivery_progressive_tests],
+                                      %i[key sample_size status summary],
+                                      alignment: { sample_size: :right }
+                      else
+                        col.add_text 'No sample', wrapper: :em
+                      end
+                    end
+                  end
                 end
               end
             end
