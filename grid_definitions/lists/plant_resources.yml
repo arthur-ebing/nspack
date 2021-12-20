@@ -28,6 +28,11 @@
   :title: New sub-resource
   :popup: true
   :hide_if_true: peripheral
+# - :url: "/production/resources/plant_resources/$:id$/move_node"
+#   :text: Move this resource
+#   :icon: arrow-left
+#   :title: Move this resource
+#   :popup: true
 # - :submenu:
 #     :text: Bulk add
 #     :items:

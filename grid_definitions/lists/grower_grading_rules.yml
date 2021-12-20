@@ -1,0 +1,60 @@
+---
+:dataminer_definition: grower_grading_rules
+:actions:
+- :url: "/production/grower_grading/grower_grading_rules/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/production/grower_grading/grower_grading_rules/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/production/grower_grading/grower_grading_rules/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :separator: true
+- :url: "/production/grower_grading/grower_grading_rules/$:id$/manage"
+  :text: Rule Items
+  :icon: list
+  :title: Rule Items
+- :separator: true
+- :url: "/production/grower_grading/grower_grading_rules/$:id$/clone_grower_grading_rule/clone"
+  :text: clone
+  :icon: copy
+  :title: Clone
+  :auth:
+    :function: production
+    :program: grower grading
+    :permission: edit
+- :url: "/production/grower_grading/grower_grading_rules/$:id$/activate"
+  :text: Activate
+  :icon: check-square
+  :prompt: Are you sure you want to Activate this Rule?
+  :hide_if_true: active
+  :auth:
+    :function: production
+    :program: grower grading
+    :permission: edit
+- :url: "/production/grower_grading/grower_grading_rules/$:id$/deactivate"
+  :text: De-activate
+  :icon: close-outline
+  :prompt: Are you sure you want to De-activate this Rule?
+  :hide_if_false: active
+  :auth:
+    :function: production
+    :program: grower grading
+    :permission: edit
+- :url: "/production/grower_grading/grower_grading_rules/$:id$/apply_rule"
+  :text: apply rule
+  :icon: play
+  :hide_if_false: active
+:page_controls:
+- :control_type: :link
+  :url: "/production/grower_grading/grower_grading_rules/new"
+  :text: New Grower Grading Rule
+  :style: :button
+  :behaviour: :popup

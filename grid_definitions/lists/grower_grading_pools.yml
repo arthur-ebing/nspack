@@ -1,0 +1,49 @@
+---
+:dataminer_definition: grower_grading_pools
+:actions:
+- :url: "/production/grower_grading/grower_grading_pools/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/production/grower_grading/grower_grading_pools/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/production/grower_grading/grower_grading_pools/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :separator: true
+- :url: "/production/grower_grading/grower_grading_pools/$:id$/complete_pool"
+  :text: complete pool
+  :icon: toggle-on
+  :title: Complete Pool
+  :popup: true
+  :hide_if_true: completed
+- :url: "/production/grower_grading/grower_grading_pools/$:id$/un_complete_pool"
+  :text: re-open pool
+  :icon: toggle-off
+  :title: Re-Open Pool
+  :popup: true
+  :hide_if_false: completed
+- :separator: true
+- :url: "/production/grower_grading/grower_grading_pools/$:id$/manage/cartons"
+  :text: cartons
+  :icon: list
+  :title: Cartons
+- :url: "/production/grower_grading/grower_grading_pools/$:id$/manage/rebins"
+  :text: rebins
+  :icon: list
+  :title: Rebins
+:page_controls:
+  - :control_type: :link
+    :url: "/production/grower_grading/grower_grading_pools/new"
+    :text: New Grading Pool
+    :style: :button
+  - :control_type: :link
+    :url: "/production/grower_grading/grower_grading_pools/create_grading_pools"
+    :text: Create Grading Pools
+    :style: :button

@@ -1,0 +1,19 @@
+---
+:dataminer_definition: presort_grower_grading_bin_details
+:actions:
+- :url: "/raw_materials/presort_grower_grading/presort_grower_grading_bins/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/raw_materials/presort_grower_grading/presort_grower_grading_bins/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/raw_materials/presort_grower_grading/presort_grower_grading_bins/new"
+  :text: New Presort Grower Grading Bin
+  :style: :button
+  :behaviour: :popup

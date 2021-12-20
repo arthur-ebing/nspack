@@ -8,10 +8,13 @@ module Crossbeams
       hb: { bin_pallet_conversion_defaults: {},
             presort_staging_target_location: {},
             delivery_capture_inner_bins: false,
+            use_raw_material_code: false,
+            classify_raw_material: false,
             use_delivery_destination: false,
             bin_valid_for_external_integration: false,
             default_container_material_owner: nil,
             default_rmt_container_type: 'BIN',
+            all_delivery_bins_of_same_type: false,
             delivery_capture_container_material: false,
             delivery_capture_container_material_owner: false,
             set_defaults_for_new_rmt_delivery: true,
@@ -29,10 +32,13 @@ module Crossbeams
       hl: { bin_pallet_conversion_defaults: {},
             presort_staging_target_location: {},
             delivery_capture_inner_bins: false,
+            use_raw_material_code: false,
+            classify_raw_material: false,
             use_delivery_destination: false,
             bin_valid_for_external_integration: false,
             default_container_material_owner: nil,
             default_rmt_container_type: 'BIN',
+            all_delivery_bins_of_same_type: false,
             delivery_capture_container_material: false,
             delivery_capture_container_material_owner: false,
             set_defaults_for_new_rmt_delivery: true,
@@ -58,10 +64,13 @@ module Crossbeams
                                               sell_by_code: nil },
             presort_staging_target_location: { PRESORT_STAGING_1: 'PRESORT_1', PRESORT_STAGING_2: 'PRESORT_2' },
             delivery_capture_inner_bins: false,
+            use_raw_material_code: true,
+            classify_raw_material: true,
             use_delivery_destination: true,
             bin_valid_for_external_integration: true,
             default_container_material_owner: 'KROMCO',
             default_rmt_container_type: 'BIN',
+            all_delivery_bins_of_same_type: true,
             delivery_capture_container_material: true,
             delivery_capture_container_material_owner: true,
             set_defaults_for_new_rmt_delivery: true,
@@ -69,7 +78,7 @@ module Crossbeams
             create_farm_location: true,
             maintain_legacy_columns: true,
             pending_delivery_location: nil,
-            default_delivery_location: nil,
+            default_delivery_location: 'FRUIT RECEPTION',
             use_bin_asset_control: true,
             presort_legacy_data_fields: %i[treatment_code ripe_point_code track_indicator_code],
             presort_plant_integration: true,
@@ -79,10 +88,13 @@ module Crossbeams
       um: { bin_pallet_conversion_defaults: {},
             presort_staging_target_location: {},
             delivery_capture_inner_bins: false,
+            use_raw_material_code: false,
+            classify_raw_material: false,
             use_delivery_destination: false,
             bin_valid_for_external_integration: false,
             default_container_material_owner: nil,
             default_rmt_container_type: 'BIN',
+            all_delivery_bins_of_same_type: false,
             delivery_capture_container_material: false,
             delivery_capture_container_material_owner: false,
             set_defaults_for_new_rmt_delivery: true,
@@ -100,10 +112,13 @@ module Crossbeams
       ud: { bin_pallet_conversion_defaults: {},
             presort_staging_target_location: {},
             delivery_capture_inner_bins: false,
+            use_raw_material_code: false,
+            classify_raw_material: false,
             use_delivery_destination: true,
             bin_valid_for_external_integration: false,
             default_container_material_owner: nil,
             default_rmt_container_type: 'BIN',
+            all_delivery_bins_of_same_type: false,
             delivery_capture_container_material: true,
             delivery_capture_container_material_owner: true,
             set_defaults_for_new_rmt_delivery: false,
@@ -121,13 +136,16 @@ module Crossbeams
       cfg: { bin_pallet_conversion_defaults: {},
              presort_staging_target_location: {},
              delivery_capture_inner_bins: false,
+             use_raw_material_code: false,
+             classify_raw_material: false,
              use_delivery_destination: false,
              bin_valid_for_external_integration: false,
-             default_container_material_owner: nil,
+             default_container_material_owner: 'CFG',
              default_rmt_container_type: 'BIN',
+             all_delivery_bins_of_same_type: false,
              delivery_capture_container_material: false,
              delivery_capture_container_material_owner: false,
-             set_defaults_for_new_rmt_delivery: true,
+             set_defaults_for_new_rmt_delivery: false,
              convert_carton_to_rebins: false,
              create_farm_location: false,
              maintain_legacy_columns: false,
@@ -138,14 +156,17 @@ module Crossbeams
              presort_plant_integration: false,
              show_kromco_attributes: false,
              create_depot_location: false,
-             create_bin_asset_trading_partner_location: false  },
+             create_bin_asset_trading_partner_location: false },
       sr: { bin_pallet_conversion_defaults: {},
             presort_staging_target_location: {},
             delivery_capture_inner_bins: false,
+            use_raw_material_code: false,
+            classify_raw_material: false,
             use_delivery_destination: true,
             bin_valid_for_external_integration: false,
             default_container_material_owner: nil,
             default_rmt_container_type: 'BIN',
+            all_delivery_bins_of_same_type: false,
             delivery_capture_container_material: true,
             delivery_capture_container_material_owner: true,
             set_defaults_for_new_rmt_delivery: true,
@@ -163,10 +184,13 @@ module Crossbeams
       sr2: { bin_pallet_conversion_defaults: {},
              presort_staging_target_location: {},
              delivery_capture_inner_bins: false,
+             use_raw_material_code: false,
+             classify_raw_material: false,
              use_delivery_destination: true,
              bin_valid_for_external_integration: false,
              default_container_material_owner: nil,
              default_rmt_container_type: 'BIN',
+             all_delivery_bins_of_same_type: false,
              delivery_capture_container_material: true,
              delivery_capture_container_material_owner: true,
              set_defaults_for_new_rmt_delivery: true,
@@ -218,10 +242,22 @@ module Crossbeams
       setting(:presort_staging_target_location)["PRESORT_STAGING_#{plant[-1]}".to_sym]
     end
 
-    def capture_inner_bins?(explain: false)
-      return 'Do delivered bins contain inner bins (e.g. lugs within larger containers).' if explain
+    def use_raw_material_code?(explain: false)
+      return "Allows user to set a delivery's rmt_code." if explain
 
-      setting(:delivery_capture_inner_bins)
+      setting(:use_raw_material_code)
+    end
+
+    def classify_raw_material?(explain: false)
+      return "Allows user to set a delivery's rmt_classifications." if explain
+
+      setting(:classify_raw_material)
+    end
+
+    def show_classify_raw_material_form?(explain: false)
+      return 'Allows user to see the classify_raw_material form.' if explain
+
+      setting(:use_raw_material_code) || setting(:classify_raw_material)
     end
 
     def include_destination_in_delivery?(explain: false)
@@ -276,7 +312,7 @@ module Crossbeams
         location_short_code: location_long_code,
         primary_storage_type_id: repo.get_id(:location_storage_types, storage_type_code: 'RMT_BINS'),
         location_type_id: repo.get_id(:location_types, location_type_code: 'FRUIT_RECEPTION'),
-        primary_assignment_id: repo.get_id(:location_assignments, assignment_code: 'RECEIVING'),
+        primary_assignment_id: repo.get_id(:location_assignments, assignment_code: 'FRUIT_RECEPTION'),
         can_store_stock: true
       }
       repo.create(:locations, args)
@@ -298,7 +334,7 @@ module Crossbeams
         location_short_code: location_long_code,
         primary_storage_type_id: repo.get_id(:location_storage_types, storage_type_code: 'RMT_BINS'),
         location_type_id: repo.get_id(:location_types, location_type_code: 'FRUIT_RECEPTION'),
-        primary_assignment_id: repo.get_id(:location_assignments, assignment_code: 'RECEIVING'),
+        primary_assignment_id: repo.get_id(:location_assignments, assignment_code: 'FRUIT_RECEPTION'),
         can_store_stock: true
       }
       repo.create(:locations, args)
@@ -314,6 +350,12 @@ module Crossbeams
       return 'Container type used in presort bin_created integration service.' if explain
 
       setting(:default_rmt_container_type)
+    end
+
+    def all_delivery_bins_of_same_type?(explain: false)
+      return 'Are all bins on a delivery always of the same type. If true, bin type and owner can be set at delivery instead of for every bin individually.' if explain
+
+      setting(:all_delivery_bins_of_same_type)
     end
 
     def use_bin_asset_control?(explain: false)

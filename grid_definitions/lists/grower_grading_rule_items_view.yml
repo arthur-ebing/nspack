@@ -1,0 +1,7 @@
+---
+:dataminer_definition: grower_grading_rule_items
+:conditions:
+  :standard:
+    - :col: grower_grading_rule_id
+      :op: "="
+      :val: "$:grower_grading_rule_id$"

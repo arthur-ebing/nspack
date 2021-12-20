@@ -572,16 +572,24 @@ module RawMaterialsApp
         puc_id: run.puc_id }
     end
 
-    def get_header_inherited_field(delivery, container_type_id)
+    def get_header_inherited_field(delivery, container_type_id) # rubocop:disable Metrics/AbcSize
       rmt_inner_container_type_id = repo.rmt_container_type_rmt_inner_container_type(container_type_id) unless container_type_id.nil_or_empty?
-      { rmt_delivery_id: delivery.id,
-        orchard_id: delivery.orchard_id,
-        cultivar_id: delivery.cultivar_id,
-        season_id: delivery.season_id,
-        bin_received_date_time: Time.now.to_s,
-        farm_id: delivery.farm_id,
-        puc_id: delivery.puc_id,
-        rmt_inner_container_type_id: rmt_inner_container_type_id }
+      attrs = { rmt_delivery_id: delivery.id,
+                orchard_id: delivery.orchard_id,
+                cultivar_id: delivery.cultivar_id,
+                season_id: delivery.season_id,
+                bin_received_date_time: Time.now.to_s,
+                farm_id: delivery.farm_id,
+                puc_id: delivery.puc_id,
+                rmt_inner_container_type_id: rmt_inner_container_type_id }
+      if AppConst::CR_RMT.all_delivery_bins_of_same_type?
+        attrs[:rmt_container_type_id] = delivery.rmt_container_type_id
+        attrs[:rmt_material_owner_party_role_id] = delivery.rmt_material_owner_party_role_id
+        attrs[:rmt_code_id] = delivery.rmt_code_id
+        attrs[:rmt_classifications] = delivery.rmt_classifications.to_a
+        attrs[:rmt_container_material_type_id] = delivery.rmt_container_material_type_id
+      end
+      attrs
     end
 
     def pdt_update_rmt_bin(id, params)

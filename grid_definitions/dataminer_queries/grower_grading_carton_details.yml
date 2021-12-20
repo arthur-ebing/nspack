@@ -1,0 +1,884 @@
+---
+:caption: Grower Grading Carton Details
+:sql: "SELECT \"grower_grading_cartons\".\"id\", \"grower_grading_cartons\".\"grower_grading_pool_id\",
+  \r\n\"grower_grading_cartons\".\"grower_grading_rule_item_id\", \r\n\"grower_grading_cartons\".\"product_resource_allocation_id\",
+  \"grower_grading_cartons\".\"pm_bom_id\", \r\n\"grower_grading_cartons\".\"std_fruit_size_count_id\",
+  \r\n\"grower_grading_cartons\".\"fruit_actual_counts_for_pack_id\", \r\n\"grower_grading_cartons\".\"marketing_org_party_role_id\",
+  \r\n\"grower_grading_cartons\".\"packed_tm_group_id\", \"grower_grading_cartons\".\"target_market_id\",
+  \r\n\"grower_grading_cartons\".\"inventory_code_id\", \"grower_grading_cartons\".\"rmt_class_id\",
+  \r\n\"grower_grading_cartons\".\"grade_id\", \"grower_grading_cartons\".\"marketing_variety_id\",
+  \r\n\"grower_grading_cartons\".\"fruit_size_reference_id\", \r\n\"grower_grading_pools\".\"pool_name\",
+  \r\nfn_party_role_name(\"grower_grading_cartons\".\"marketing_org_party_role_id\")
+  AS marketing_org, \r\n\"marketing_varieties\".\"marketing_variety_code\",\r\n\"target_market_groups\".\"target_market_group_name\"
+  AS packed_tm_group, \r\n\"target_markets\".\"target_market_name\", \"std_fruit_size_counts\".\"size_count_value\"
+  AS size_count,\r\n\"fruit_actual_counts_for_packs\".\"actual_count_for_pack\" AS
+  actual_count, \r\n\"fruit_size_references\".\"size_reference\",\"grades\".\"grade_code\",
+  \"rmt_classes\".\"rmt_class_code\",\r\n\"inventory_codes\".\"inventory_code\", \"pm_boms\".\"bom_code\",
+  \r\n\"grower_grading_cartons\".\"carton_quantity\", \"grower_grading_cartons\".\"inspected_quantity\",
+  \r\n\"grower_grading_cartons\".\"not_inspected_quantity\", \"grower_grading_cartons\".\"failed_quantity\",
+  \r\n\"grower_grading_cartons\".\"gross_weight\", \"grower_grading_cartons\".\"nett_weight\",
+  \r\n\"grower_grading_cartons\".\"changes_made\", \r\n\"grower_grading_cartons\".\"changes_made\"
+  ->> 'std_fruit_size_count_id'  AS graded_std_fruit_size_count_id, \r\n\"grower_grading_cartons\".\"changes_made\"
+  -> 'descriptions' ->> 'graded_size_count' AS graded_size_count,\r\n\"grower_grading_cartons\".\"changes_made\"
+  ->> 'grade_id'  AS graded_grade_id, \r\n\"grower_grading_cartons\".\"changes_made\"
+  -> 'descriptions' ->> 'graded_grade_code' AS graded_grade_code,\r\n\"grower_grading_cartons\".\"changes_made\"
+  ->> 'rmt_class_id'  AS graded_rmt_class_id, \r\n\"grower_grading_cartons\".\"changes_made\"
+  -> 'descriptions' ->> 'graded_rmt_class_code' AS graded_rmt_class_code,\r\n\"grower_grading_cartons\".\"completed\",
+  \"grower_grading_cartons\".\"active\", \r\n\"grower_grading_cartons\".\"updated_by\",
+  \"grower_grading_cartons\".\"updated_at\"\r\nFROM \"grower_grading_cartons\" \r\nJOIN
+  \"grower_grading_pools\" ON \"grower_grading_pools\".\"id\" = \"grower_grading_cartons\".\"grower_grading_pool_id\"
+  \r\nLEFT JOIN \"grower_grading_rule_items\" ON \"grower_grading_rule_items\".\"id\"
+  = \"grower_grading_cartons\".\"grower_grading_rule_item_id\" \r\nLEFT JOIN \"product_resource_allocations\"
+  ON \"product_resource_allocations\".\"id\" = \"grower_grading_cartons\".\"product_resource_allocation_id\"
+  \r\nJOIN \"marketing_varieties\" ON \"marketing_varieties\".\"id\" = \"grower_grading_cartons\".\"marketing_variety_id\"
+  \r\nJOIN \"target_market_groups\" ON \"target_market_groups\".\"id\" = \"grower_grading_cartons\".\"packed_tm_group_id\"
+  \r\nLEFT JOIN \"target_markets\" ON \"target_markets\".\"id\" = \"grower_grading_cartons\".\"target_market_id\"\r\nLEFT
+  JOIN \"std_fruit_size_counts\" ON \"std_fruit_size_counts\".\"id\" = \"grower_grading_cartons\".\"std_fruit_size_count_id\"
+  \r\nLEFT JOIN \"fruit_actual_counts_for_packs\" ON \"fruit_actual_counts_for_packs\".\"id\"
+  = \"grower_grading_cartons\".\"fruit_actual_counts_for_pack_id\" \r\nLEFT JOIN \"fruit_size_references\"
+  ON \"fruit_size_references\".\"id\" = \"grower_grading_cartons\".\"fruit_size_reference_id\"
+  \r\nJOIN \"grades\" ON \"grades\".\"id\" = \"grower_grading_cartons\".\"grade_id\"
+  \r\nLEFT JOIN \"rmt_classes\" ON \"rmt_classes\".\"id\" = \"grower_grading_cartons\".\"rmt_class_id\"\r\nLEFT
+  JOIN \"inventory_codes\" ON \"inventory_codes\".\"id\" = \"grower_grading_cartons\".\"inventory_code_id\"
+  \r\nLEFT JOIN \"pm_boms\" ON \"pm_boms\".\"id\" = \"grower_grading_cartons\".\"pm_bom_id\" "
+:limit: 
+:offset: 
+:external_settings:
+  :render_url: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: grower_grading_cartons.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  grower_grading_pool_id:
+    :name: grower_grading_pool_id
+    :sequence_no: 2
+    :caption: Grower grading pool
+    :namespaced_name: grower_grading_cartons.grower_grading_pool_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  grower_grading_rule_item_id:
+    :name: grower_grading_rule_item_id
+    :sequence_no: 3
+    :caption: Grower grading rule item
+    :namespaced_name: grower_grading_cartons.grower_grading_rule_item_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  product_resource_allocation_id:
+    :name: product_resource_allocation_id
+    :sequence_no: 4
+    :caption: Product resource allocation
+    :namespaced_name: grower_grading_cartons.product_resource_allocation_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pm_bom_id:
+    :name: pm_bom_id
+    :sequence_no: 5
+    :caption: Pm bom
+    :namespaced_name: grower_grading_cartons.pm_bom_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  std_fruit_size_count_id:
+    :name: std_fruit_size_count_id
+    :sequence_no: 6
+    :caption: Std fruit size count
+    :namespaced_name: grower_grading_cartons.std_fruit_size_count_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  fruit_actual_counts_for_pack_id:
+    :name: fruit_actual_counts_for_pack_id
+    :sequence_no: 7
+    :caption: Fruit actual counts for pack
+    :namespaced_name: grower_grading_cartons.fruit_actual_counts_for_pack_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marketing_org_party_role_id:
+    :name: marketing_org_party_role_id
+    :sequence_no: 8
+    :caption: Marketing org party role
+    :namespaced_name: grower_grading_cartons.marketing_org_party_role_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packed_tm_group_id:
+    :name: packed_tm_group_id
+    :sequence_no: 9
+    :caption: Packed tm group
+    :namespaced_name: grower_grading_cartons.packed_tm_group_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  target_market_id:
+    :name: target_market_id
+    :sequence_no: 10
+    :caption: Target market
+    :namespaced_name: grower_grading_cartons.target_market_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inventory_code_id:
+    :name: inventory_code_id
+    :sequence_no: 11
+    :caption: Inventory code
+    :namespaced_name: grower_grading_cartons.inventory_code_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_class_id:
+    :name: rmt_class_id
+    :sequence_no: 12
+    :caption: Rmt class
+    :namespaced_name: grower_grading_cartons.rmt_class_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  grade_id:
+    :name: grade_id
+    :sequence_no: 13
+    :caption: Grade
+    :namespaced_name: grower_grading_cartons.grade_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marketing_variety_id:
+    :name: marketing_variety_id
+    :sequence_no: 14
+    :caption: Marketing variety
+    :namespaced_name: grower_grading_cartons.marketing_variety_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  fruit_size_reference_id:
+    :name: fruit_size_reference_id
+    :sequence_no: 15
+    :caption: Fruit size reference
+    :namespaced_name: grower_grading_cartons.fruit_size_reference_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pool_name:
+    :name: pool_name
+    :sequence_no: 16
+    :caption: Pool name
+    :namespaced_name: grower_grading_pools.pool_name
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marketing_org:
+    :name: marketing_org
+    :sequence_no: 17
+    :caption: Marketing org
+    :namespaced_name: 
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marketing_variety_code:
+    :name: marketing_variety_code
+    :sequence_no: 18
+    :caption: Marketing variety
+    :namespaced_name: marketing_varieties.marketing_variety_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packed_tm_group:
+    :name: packed_tm_group
+    :sequence_no: 19
+    :caption: Packed tm group
+    :namespaced_name: target_market_groups.target_market_group_name
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  target_market_name:
+    :name: target_market_name
+    :sequence_no: 20
+    :caption: Target market
+    :namespaced_name: target_markets.target_market_name
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  size_count:
+    :name: size_count
+    :sequence_no: 21
+    :caption: Size count
+    :namespaced_name: std_fruit_size_counts.size_count_value
+    :data_type: :string
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  actual_count:
+    :name: actual_count
+    :sequence_no: 22
+    :caption: Actual count
+    :namespaced_name: fruit_actual_counts_for_packs.actual_count_for_pack
+    :data_type: :string
+    :width: 90
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  size_reference:
+    :name: size_reference
+    :sequence_no: 23
+    :caption: Size reference
+    :namespaced_name: fruit_size_references.size_reference
+    :data_type: :string
+    :width: 90
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  grade_code:
+    :name: grade_code
+    :sequence_no: 24
+    :caption: Grade
+    :namespaced_name: grades.grade_code
+    :data_type: :string
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_class_code:
+    :name: rmt_class_code
+    :sequence_no: 25
+    :caption: Rmt class
+    :namespaced_name: rmt_classes.rmt_class_code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inventory_code:
+    :name: inventory_code
+    :sequence_no: 26
+    :caption: Inventory
+    :namespaced_name: inventory_codes.inventory_code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  bom_code:
+    :name: bom_code
+    :sequence_no: 27
+    :caption: Pm Bom
+    :namespaced_name: pm_boms.bom_code
+    :data_type: :string
+    :width: 130
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  carton_quantity:
+    :name: carton_quantity
+    :sequence_no: 28
+    :caption: Carton quantity
+    :namespaced_name: grower_grading_cartons.carton_quantity
+    :data_type: :integer
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inspected_quantity:
+    :name: inspected_quantity
+    :sequence_no: 29
+    :caption: Inspected quantity
+    :namespaced_name: grower_grading_cartons.inspected_quantity
+    :data_type: :integer
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  not_inspected_quantity:
+    :name: not_inspected_quantity
+    :sequence_no: 30
+    :caption: Not inspected quantity
+    :namespaced_name: grower_grading_cartons.not_inspected_quantity
+    :data_type: :integer
+    :width: 130
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  failed_quantity:
+    :name: failed_quantity
+    :sequence_no: 31
+    :caption: Failed quantity
+    :namespaced_name: grower_grading_cartons.failed_quantity
+    :data_type: :integer
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  gross_weight:
+    :name: gross_weight
+    :sequence_no: 32
+    :caption: Gross weight
+    :namespaced_name: grower_grading_cartons.gross_weight
+    :data_type: :number
+    :width: 100
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  nett_weight:
+    :name: nett_weight
+    :sequence_no: 33
+    :caption: Nett weight
+    :namespaced_name: grower_grading_cartons.nett_weight
+    :data_type: :number
+    :width: 100
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  changes_made:
+    :name: changes_made
+    :sequence_no: 34
+    :caption: Changes made
+    :namespaced_name: grower_grading_cartons.changes_made
+    :data_type: :jsonb
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  graded_std_fruit_size_count_id:
+    :name: graded_std_fruit_size_count_id
+    :sequence_no: 35
+    :caption: Graded std fruit size count
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  graded_size_count:
+    :name: graded_size_count
+    :sequence_no: 36
+    :caption: Graded size count
+    :namespaced_name: 
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  graded_grade_id:
+    :name: graded_grade_id
+    :sequence_no: 37
+    :caption: Graded grade
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  graded_grade_code:
+    :name: graded_grade_code
+    :sequence_no: 38
+    :caption: Graded grade
+    :namespaced_name: 
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  graded_rmt_class_id:
+    :name: graded_rmt_class_id
+    :sequence_no: 39
+    :caption: Graded rmt class
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  graded_rmt_class_code:
+    :name: graded_rmt_class_code
+    :sequence_no: 40
+    :caption: Graded rmt class
+    :namespaced_name: 
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  completed:
+    :name: completed
+    :sequence_no: 41
+    :caption: Completed?
+    :namespaced_name: grower_grading_cartons.completed
+    :data_type: :boolean
+    :width: 90
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 42
+    :caption: Active?
+    :namespaced_name: grower_grading_cartons.active
+    :data_type: :boolean
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_by:
+    :name: updated_by
+    :sequence_no: 43
+    :caption: Updated by
+    :namespaced_name: grower_grading_cartons.updated_by
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 44
+    :caption: Updated at
+    :namespaced_name: grower_grading_cartons.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: grower_grading_pool_id
+  :caption: Grower grading pool
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT pool_name, id FROM grower_grading_pools ORDER BY pool_name
+- :column: grower_grading_rule_item_id
+  :caption: Grower grading rule item
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT created_by, id FROM grower_grading_rule_items ORDER BY created_by
+- :column: grower_grading_cartons.product_resource_allocation_id
+  :caption: Product resource allocation
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT id, id FROM product_resource_allocations ORDER BY id
+- :column: grower_grading_cartons.pm_bom_id
+  :caption: Pm bom
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT bom_code, id FROM pm_boms ORDER BY bom_code
+- :column: grower_grading_cartons.std_fruit_size_count_id
+  :caption: Std fruit size count
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT size_count_description, id FROM std_fruit_size_counts ORDER BY
+    size_count_description
+- :column: grower_grading_cartons.fruit_actual_counts_for_pack_id
+  :caption: Fruit actual counts for pack
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT id, id FROM fruit_actual_counts_for_packs ORDER BY id
+- :column: grower_grading_cartons.marketing_org_party_role_id
+  :caption: Marketing org party role
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: SELECT fn_party_role_name(id), id FROM party_roles WHERE role_id = (SELECT
+    id FROM roles WHERE name = 'ROLE_NAME_GOES_HERE')
+- :column: grower_grading_cartons.packed_tm_group_id
+  :caption: Packed tm group
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT target_market_group_name, id FROM target_market_groups ORDER BY
+    target_market_group_name
+- :column: grower_grading_cartons.target_market_id
+  :caption: Target market
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT target_market_name, id FROM target_markets ORDER BY target_market_name
+- :column: grower_grading_cartons.inventory_code_id
+  :caption: Inventory code
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT inventory_code, id FROM inventory_codes ORDER BY inventory_code
+- :column: grower_grading_cartons.rmt_class_id
+  :caption: Rmt class
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT rmt_class_code, id FROM rmt_classes ORDER BY rmt_class_code
+- :column: grower_grading_cartons.grade_id
+  :caption: Grade
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT grade_code, id FROM grades ORDER BY grade_code
+- :column: grower_grading_cartons.marketing_variety_id
+  :caption: Marketing variety
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT marketing_variety_code, id FROM marketing_varieties ORDER BY marketing_variety_code
+- :column: grower_grading_cartons.fruit_size_reference_id
+  :caption: Fruit size reference
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT size_reference, id FROM fruit_size_references ORDER BY size_reference
+- :column: fruit_actual_counts_for_packs.id
+  :caption: Fruit actual counts for packs
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: product_resource_allocations.id
+  :caption: Product resource allocations
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

@@ -32,5 +32,10 @@ module RawMaterialsApp
     attribute :reference_number, Types::String
     attribute :batch_number, Types::String
     attribute :batch_number_updated_at, Types::DateTime
+    attribute :rmt_container_type_id, Types::Integer
+    attribute :rmt_material_owner_party_role_id, Types::Integer
+    attribute :rmt_code_id, Types::Integer
+    attribute :rmt_classifications, Types::Array
+    attribute :rmt_container_material_type_id, Types::Integer
   end
 end

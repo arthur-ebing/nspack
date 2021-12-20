@@ -1,0 +1,51 @@
+---
+:dataminer_definition: grower_grading_rule_items
+:actions:
+- :url: "/production/grower_grading/grower_grading_rule_items/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/production/grower_grading/grower_grading_rule_items/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/production/grower_grading/grower_grading_rule_items/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :separator: true
+- :url: "/production/grower_grading/grower_grading_rule_items/$:id$/clone_grower_grading_rule_item/clone"
+  :text: clone
+  :icon: copy
+  :title: Clone
+  :popup: true
+  :auth:
+    :function: production
+    :program: grower grading
+    :permission: edit
+- :url: "/production/grower_grading/grower_grading_rule_items/$:id$/activate"
+  :text: Activate
+  :icon: check-square
+  :prompt: Are you sure you want to Activate this Rule?
+  :hide_if_true: active
+  :auth:
+    :function: production
+    :program: grower grading
+    :permission: edit
+- :url: "/production/grower_grading/grower_grading_rule_items/$:id$/deactivate"
+  :text: De-activate
+  :icon: close-outline
+  :prompt: Are you sure you want to De-activate this Rule?
+  :hide_if_false: active
+  :auth:
+    :function: production
+    :program: grower grading
+    :permission: edit
+:conditions:
+  :standard:
+    - :col: grower_grading_rule_id
+      :op: "="
+      :val: "$:grower_grading_rule_id$"

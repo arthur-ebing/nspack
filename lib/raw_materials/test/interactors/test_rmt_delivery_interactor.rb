@@ -10,6 +10,7 @@ module RawMaterialsApp
     include MasterfilesApp::CultivarFactory
     include MasterfilesApp::FarmFactory
     include MasterfilesApp::CalendarFactory
+    include MasterfilesApp::RmtContainerFactory
 
     def test_repo
       repo = interactor.send(:repo)
@@ -76,6 +77,10 @@ module RawMaterialsApp
       season_id = create_season
       farm_id = create_farm
       puc_id = create_puc
+      rmt_container_type_id = create_rmt_container_type
+      rmt_material_owner_party_role_id = create_party_role
+      rmt_code_id = create_rmt_code
+      rmt_container_material_type_id = create_rmt_container_material_type
 
       {
         id: 1,
@@ -85,6 +90,10 @@ module RawMaterialsApp
         season_id: season_id,
         farm_id: farm_id,
         puc_id: puc_id,
+        rmt_container_type_id: rmt_container_type_id,
+        rmt_material_owner_party_role_id: rmt_material_owner_party_role_id,
+        rmt_code_id: rmt_code_id,
+        rmt_classifications: [1],
         truck_registration_number: Faker::Lorem.unique.word,
         reference_number: Faker::Lorem.unique.word,
         batch_number: Faker::Lorem.unique.word,
@@ -100,7 +109,8 @@ module RawMaterialsApp
         tripsheet_offloaded_at: '2010-01-01 12:00',
         tripsheet_loaded_at: '2010-01-01 12:00',
         current: false,
-        active: true
+        active: true,
+        rmt_container_material_type_id: rmt_container_material_type_id
       }
     end
 

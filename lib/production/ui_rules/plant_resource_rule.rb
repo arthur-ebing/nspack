@@ -10,9 +10,10 @@ module UiRules
 
       common_values_for_fields common_fields
 
-      set_show_fields if %i[show reopen].include? @mode
+      set_show_fields if %i[show reopen move].include? @mode
       set_edit_fields if @mode == :edit
       set_print_fields if @mode == :print_barcode
+      set_move_fields if @mode == :move
 
       add_behaviours if @mode == :new
 
@@ -32,6 +33,10 @@ module UiRules
                                                   caption: 'Represents Resource' }
       fields[:active] = { renderer: :label,
                           as_boolean: true }
+    end
+
+    def set_move_fields
+      fields[:destination_node] = { renderer: :select, options: @repo.move_targets_for(@options[:id]) }
     end
 
     def set_edit_fields # rubocop:disable Metrics/AbcSize
@@ -134,6 +139,7 @@ module UiRules
       end
       @form_object = @repo.find_plant_resource_flat(@options[:id])
       @form_object = OpenStruct.new(@form_object.to_h.merge(printer: @print_repo.default_printer_for_application(AppConst::PRINT_APP_PACKPOINT), no_of_prints: 1)) if @mode == :print_barcode
+      @form_object = OpenStruct.new(@form_object.to_h.merge(destination_node: nil)) if @mode == :move
     end
 
     def make_new_form_object

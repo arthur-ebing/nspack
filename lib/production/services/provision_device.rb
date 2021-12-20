@@ -36,15 +36,22 @@ module ProductionApp
       config_splash_locale_autostart
       update_usb_files
       limit_gui_context_menu
-      copy_messerver_set_host
-
+      copy_messerver
       copy_robot_config
+      serial_and_wifi
+      hostname
       reboot
 
       AppConst::ROBOT_LOG.info('Provisioning complete.')
       duration = Time.now - start_time
       out << "* Took #{format('%.2f', duration / 60.0)} minutes to run." # rubocop:disable Style/FormatStringToken
       success_response("Device has been provisioned and is rebooting. Took #{format('%.2f', duration / 60.0)} minutes to run.", out) # rubocop:disable Style/FormatStringToken
+    rescue StandardError => e
+      duration = Time.now - start_time
+      out.unshift("This process failed after #{format('%.2f', duration / 60.0)} minutes - with error: #{e.message}") # rubocop:disable Style/FormatStringToken
+      puts e.backtrace.join("\n")
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: out.join("\n"))
+      failed_response("An error occurred: #{e.message}", out)
     end
 
     private
@@ -70,6 +77,24 @@ module ProductionApp
       end
     end
 
+    def hostname # rubocop:disable Metrics/AbcSize
+      Net::SSH.start(network_ip, usr, password: pw) do |ssh|
+        out << '* Change the hostname and static ip address'
+        log
+        out << ssh.exec!(%(sudo sed -i "/127.0.1.1/c\\127.0.1.1\\tns-#{sys_mod.ip_address.tr('.', '')}" /etc/hosts))
+        log
+        out << ssh.exec!(%(echo 'ns-#{sys_mod.ip_address.tr('.', '')}' | sudo tee /etc/hostname))
+        log
+        out << ssh.exec!(%(sudo hostnamectl set-hostname ns-#{sys_mod.ip_address.tr('.', '')}))
+        log
+        out << ssh.exec!(%(echo 'static ip_address=#{sys_mod.ip_address}/24' | sudo tee -a /etc/dhcpcd.conf))
+        log
+        out << ssh.exec!(%(echo 'static routers=#{server.extended_config['gateway']}' | sudo tee -a /etc/dhcpcd.conf))
+        log
+        # out << ssh.exec!(%(echo 'static domain_name_servers=#{server.extended_config['gateway']}' | sudo tee -a /etc/dhcpcd.conf)) # TODO: set static domain_name_servers= ??? - maybe doesn't matter for these devices operating on ip addresses... (and VLAN gateway?)
+      end
+    end
+
     def reboot # rubocop:disable Metrics/AbcSize
       Net::SSH.start(network_ip, usr, password: pw) do |ssh|
         out << "* Reset user's sudo permission..."
@@ -81,6 +106,10 @@ module ProductionApp
         out << ssh.exec!(%(echo #{pw} | sudo -S reboot))
         log
       end
+    rescue IOError => e
+      # : closed stream
+      out << "SSH connection failed: #{e.message}"
+      log
     end
 
     def add_user # rubocop:disable Metrics/AbcSize
@@ -135,15 +164,23 @@ module ProductionApp
       end
     end
 
-    def config_splash_locale_autostart # rubocop:disable Metrics/AbcSize
-      Net::SSH.start(network_ip, usr, password: pw) do |ssh| # rubocop:disable Metrics/BlockLength
+    def serial_and_wifi # rubocop:disable Metrics/AbcSize
+      Net::SSH.start(network_ip, usr, password: pw) do |ssh|
+        out << '* Enable serial port hardware:'
+        log
+        # 1. Set existing value if present to 1:
+        out << ssh.exec!(%(sudo sed -i "s/enable_uart=0/enable_uart=1/" /boot/config.txt))
+        log
+        # 2. Add the value if not currently present:
+        ssh.exec!(%(grep -qxF 'enable_uart=1' /boot/config.txt || echo 'enable_uart=1' | sudo tee -a /boot/config.txt))
+
         out << '* Tweak boot commandline (serial ports and tty)'
         log
         # Remove serial0 as a login shell:
-        out << ssh.exec!(%([ -f "/boot/cmdline.txt" ] && sudo sed -i "s/console=serial0,[0-9]\+ //" /boot/cmdline.txt))
+        out << ssh.exec!(%([ -f "/boot/cmdline.txt" ] && sudo sed -i "s/console=serial0,[0-9]\\+ //" /boot/cmdline.txt))
         log
         # Remove AMA0 as a login shell:
-        out << ssh.exec!(%([ -f "/boot/cmdline.txt" ] && sudo sed -i "s/console=ttyAMA0,[0-9]\+ //" /boot/cmdline.txt))
+        out << ssh.exec!(%([ -f "/boot/cmdline.txt" ] && sudo sed -i "s/console=ttyAMA0,[0-9]\\+ //" /boot/cmdline.txt))
         log
         # Remove usage of tty1:
         out << ssh.exec!(%([ -f "/boot/cmdline.txt" ] && sudo sed -i "s/console=tty1 //" /boot/cmdline.txt))
@@ -154,16 +191,12 @@ module ProductionApp
         ssh.exec!(%(echo 'dtoverlay=disable-wifi' | sudo tee -a /boot/config.txt))
         ssh.exec!(%(echo 'dtoverlay=disable-bt' | sudo tee -a /boot/config.txt))
 
-        out << '* Enable serial port hardware:'
-        log
-        # 1. Set existing value if present to 1:
-        out << ssh.exec!(%(sudo sed -i "s/enable_uart=0/enable_uart=1/" /boot/config.txt))
-        log
-        # 2. Add the value if not currently present:
-        ssh.exec!(%(grep -qxF 'enable_uart=1' /boot/config.txt || echo 'enable_uart=1' | sudo tee -a /boot/config.txt))
-
         # console=serial0,115200 console=tty1 root=PARTUUID=2bf9ad89-02 rootfstype=ext4 elevator=deadline fsck.repair=yes rootwait quiet splash plymouth.ignore-serial-consoles logo.nologo vt.global_cursor_default=0 console=tty3 loglevel=0
+      end
+    end
 
+    def config_splash_locale_autostart # rubocop:disable Metrics/AbcSize
+      Net::SSH.start(network_ip, usr, password: pw) do |ssh| # rubocop:disable Metrics/BlockLength
         out << '* Set up splash screen'
         log
         if for_reterm
@@ -205,7 +238,7 @@ module ProductionApp
 
         out << '* Install vim, minicom, losf and lshw'
         log
-        result = ssh.exec!(%(sudo apt-get install vim minicom lsof lshw -y))
+        result = ssh.exec!(%(DEBIAN_FRONTEND=noninteractive sudo apt-get install vim minicom lsof lshw -y))
         out << result
         log
         if for_virtual_pi
@@ -214,7 +247,7 @@ module ProductionApp
         else
           out << '* Install java'
           log
-          result = ssh.exec!(%(sudo apt-get install openjdk-8-jdk -y))
+          result = ssh.exec!(%(DEBIAN_FRONTEND=noninteractive sudo apt-get install openjdk-8-jdk -y))
           out << result
           log
         end
@@ -278,7 +311,7 @@ module ProductionApp
       end
     end
 
-    def copy_messerver_set_host # rubocop:disable Metrics/AbcSize
+    def copy_messerver # rubocop:disable Metrics/AbcSize
       Net::SCP.start(network_ip, usr, password: pw) do |scp|
         out << '* Copy MesServer zip file to device'
         log
@@ -296,20 +329,6 @@ module ProductionApp
         log
         out << ssh.exec!(%(sed -i "s/^# JAVA 11: //g" /home/nspi/nosoft/messerver/startMesServer.sh)) if for_virtual_pi
         log
-
-        out << '* Change the hostname and static ip address'
-        log
-        out << ssh.exec!(%(echo 'ns-#{sys_mod.ip_address.tr('.', '')}' | sudo tee /etc/hostname))
-        log
-        out << ssh.exec!(%(sudo sed -i "/127.0.1.1/c\\127.0.1.1\\tns-#{sys_mod.ip_address.tr('.', '')}" /etc/hosts))
-        log
-        out << ssh.exec!(%(sudo hostnamectl set-hostname ns-#{sys_mod.ip_address.tr('.', '')}))
-        log
-        out << ssh.exec!(%(echo 'static ip_address=#{sys_mod.ip_address}/24' | sudo tee -a /etc/dhcpcd.conf))
-        log
-        out << ssh.exec!(%(echo 'static routers=#{server.extended_config['gateway']}' | sudo tee -a /etc/dhcpcd.conf))
-        log
-        # out << ssh.exec!(%(echo 'static domain_name_servers=#{server.extended_config['gateway']}' | sudo tee -a /etc/dhcpcd.conf)) # TODO: set static domain_name_servers= ??? - maybe doesn't matter for these devices operating on ip addresses... (and VLAN gateway?)
       end
     end
 
@@ -338,7 +357,6 @@ module ProductionApp
         out << result
         log
 
-        # TODO: modify config constants to store these for applying to config.xml?
         # 50: List of usb devices vendor and product keys (run lsusb when device plugged in to find these codes)
         result = ssh.exec!(<<~STR)
           cat << EOF | sudo tee /etc/udev/rules.d/50-usb-permissions.rules
@@ -346,7 +364,7 @@ module ProductionApp
             SUBSYSTEM=="usb", ATTR{idVendor}=="0a5f",ATTR{idProduct}=="0080",MODE="0666",GROUP="users"
             # Zebra printer (zebra:zd420)
             SUBSYSTEM=="usb", ATTR{idVendor}=="0a5f",ATTR{idProduct}=="0120",MODE="0666",GROUP="users"
-            # Zebra printer (zebra:zd320)
+            # Zebra printer (zebra:zd230)
             SUBSYSTEM=="usb", ATTR{idVendor}=="0a5f",ATTR{idProduct}=="0166",MODE="0666",GROUP="users"
             # Argox printer (argox:ar-o4-250)
             SUBSYSTEM=="usb", ATTR{idVendor}=="1664",ATTR{idProduct}=="0d10",MODE="0666",GROUP="users"

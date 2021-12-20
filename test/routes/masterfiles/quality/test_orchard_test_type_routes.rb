@@ -10,7 +10,7 @@ class TestOrchardTestTypeRoutes < RouteTester
     authorise_pass! permission_check: QualityApp::TaskPermissionCheck::OrchardTestType
     ensure_exists!(INTERACTOR)
     Quality::Config::OrchardTestType::Edit.stub(:call, bland_page) do
-      get 'quality/config/orchard_test_types/1/edit', {}, 'rack.session' => { user_id: 1 }
+      get 'masterfiles/quality/orchard_test_types/1/edit', {}, 'rack.session' => { user_id: 1 }
     end
     expect_bland_page
   end
@@ -18,7 +18,7 @@ class TestOrchardTestTypeRoutes < RouteTester
   def test_edit_fail
     authorise_fail!
     ensure_exists!(INTERACTOR)
-    get 'quality/config/orchard_test_types/1/edit', {}, 'rack.session' => { user_id: 1 }
+    get 'masterfiles/quality/orchard_test_types/1/edit', {}, 'rack.session' => { user_id: 1 }
     expect_permission_error
   end
 
@@ -26,7 +26,7 @@ class TestOrchardTestTypeRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     Quality::Config::OrchardTestType::Show.stub(:call, bland_page) do
-      get 'quality/config/orchard_test_types/1', {}, 'rack.session' => { user_id: 1 }
+      get 'masterfiles/quality/orchard_test_types/1', {}, 'rack.session' => { user_id: 1 }
     end
     expect_bland_page
   end
@@ -34,7 +34,7 @@ class TestOrchardTestTypeRoutes < RouteTester
   def test_show_fail
     authorise_fail!
     ensure_exists!(INTERACTOR)
-    get 'quality/config/orchard_test_types/1', {}, 'rack.session' => { user_id: 1 }
+    get 'masterfiles/quality/orchard_test_types/1', {}, 'rack.session' => { user_id: 1 }
     expect_permission_error
   end
 
@@ -43,7 +43,7 @@ class TestOrchardTestTypeRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     row_vals = Hash.new(1)
     INTERACTOR.any_instance.stubs(:update_orchard_test_type).returns(ok_response(instance: row_vals))
-    patch_as_fetch 'quality/config/orchard_test_types/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    patch_as_fetch 'masterfiles/quality/orchard_test_types/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_ok_json_redirect
   end
 
@@ -52,7 +52,7 @@ class TestOrchardTestTypeRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     INTERACTOR.any_instance.stubs(:update_orchard_test_type).returns(bad_response)
     Quality::Config::OrchardTestType::Edit.stub(:call, bland_page) do
-      patch_as_fetch 'quality/config/orchard_test_types/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+      patch_as_fetch 'masterfiles/quality/orchard_test_types/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_json_replace_dialog(has_error: true)
   end
@@ -61,7 +61,7 @@ class TestOrchardTestTypeRoutes < RouteTester
     authorise_pass! permission_check: QualityApp::TaskPermissionCheck::OrchardTestType
     ensure_exists!(INTERACTOR)
     INTERACTOR.any_instance.stubs(:delete_orchard_test_type).returns(ok_response)
-    delete_as_fetch 'quality/config/orchard_test_types/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    delete_as_fetch 'masterfiles/quality/orchard_test_types/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_delete_from_grid
   end
 
@@ -69,7 +69,7 @@ class TestOrchardTestTypeRoutes < RouteTester
     authorise_pass! permission_check: QualityApp::TaskPermissionCheck::OrchardTestType
     ensure_exists!(INTERACTOR)
     INTERACTOR.any_instance.stubs(:delete_orchard_test_type).returns(bad_response)
-    delete_as_fetch 'quality/config/orchard_test_types/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    delete_as_fetch 'masterfiles/quality/orchard_test_types/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_error
   end
 
@@ -77,7 +77,7 @@ class TestOrchardTestTypeRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     Quality::Config::OrchardTestType::New.stub(:call, bland_page) do
-      get  'quality/config/orchard_test_types/new', {}, 'rack.session' => { user_id: 1 }
+      get  'masterfiles/quality/orchard_test_types/new', {}, 'rack.session' => { user_id: 1 }
     end
     expect_bland_page
   end
@@ -85,7 +85,7 @@ class TestOrchardTestTypeRoutes < RouteTester
   def test_new_fail
     authorise_fail!
     ensure_exists!(INTERACTOR)
-    get 'quality/config/orchard_test_types/new', {}, 'rack.session' => { user_id: 1 }
+    get 'masterfiles/quality/orchard_test_types/new', {}, 'rack.session' => { user_id: 1 }
     expect_permission_error
   end
 
@@ -94,7 +94,7 @@ class TestOrchardTestTypeRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     row_vals = Hash.new(1)
     INTERACTOR.any_instance.stubs(:create_orchard_test_type).returns(ok_response(instance: row_vals))
-    post_as_fetch 'quality/config/orchard_test_types', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    post_as_fetch 'masterfiles/quality/orchard_test_types', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_ok_redirect(url: '/list/orchard_test_results')
   end
 
@@ -103,7 +103,7 @@ class TestOrchardTestTypeRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     INTERACTOR.any_instance.stubs(:create_orchard_test_type).returns(bad_response)
     Quality::Config::OrchardTestType::New.stub(:call, bland_page) do
-      post_as_fetch 'quality/config/orchard_test_types', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+      post_as_fetch 'masterfiles/quality/orchard_test_types', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_json_replace_dialog
   end

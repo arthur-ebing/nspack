@@ -1,0 +1,551 @@
+---
+:caption: Presort Grower Grading Bins
+:sql: "SELECT \"presort_grower_grading_bins\".\"id\", \r\n\"presort_grower_grading_bins\".\"presort_grower_grading_pool_id\",
+  \r\n\"presort_grower_grading_bins\".\"farm_id\", \r\n\"presort_grower_grading_bins\".\"rmt_class_id\",
+  \r\n\"presort_grower_grading_bins\".\"rmt_size_id\", \r\n\"presort_grower_grading_bins\".\"treatment_id\",\r\n\"presort_grower_grading_pools\".\"maf_lot_number\",
+  \r\n\"farms\".\"farm_code\", \r\n\"presort_grower_grading_bins\".\"maf_rmt_code\",
+  \r\n\"presort_grower_grading_bins\".\"maf_article\", \r\n\"presort_grower_grading_bins\".\"maf_class\",
+  \r\n\"rmt_classes\".\"rmt_class_code\",\r\n\"presort_grower_grading_bins\".\"maf_colour\",
+  \r\n\"treatments\".\"treatment_code\" AS colour,\r\n\"presort_grower_grading_bins\".\"maf_count\",
+  \r\n\"rmt_sizes\".\"size_code\" AS rmt_size_code, \r\n\"presort_grower_grading_bins\".\"maf_weight\",
+  \r\n\"presort_grower_grading_bins\".\"rmt_bin_weight\", \r\n(\"presort_grower_grading_bins\".\"rmt_bin_weight\"
+  - \"presort_grower_grading_bins\".\"maf_weight\" ) AS adjusted_weight,\r\n\"presort_grower_grading_bins\".\"maf_article_count\",
+  \r\n\"presort_grower_grading_bins\".\"maf_tipped_quantity\", \r\n\"presort_grower_grading_bins\".\"maf_total_lot_weight\",
+  \r\n\"presort_grower_grading_bins\".\"graded\", \r\n\"presort_grower_grading_bins\".\"active\",
+  \r\n\"presort_grower_grading_bins\".\"created_by\", \r\n\"presort_grower_grading_bins\".\"updated_by\",
+  \r\n\"presort_grower_grading_bins\".\"created_at\", \r\n\"presort_grower_grading_bins\".\"updated_at\",
+  \r\nfn_current_status('presort_grower_grading_bins', \"presort_grower_grading_bins\".\"id\")
+  AS status,\r\n\"presort_grower_grading_bins\".\"maf_class\" = 'WASTE' AS waste_maf_class\r\nFROM
+  \"presort_grower_grading_bins\" \r\nJOIN \"farms\" ON \"farms\".\"id\" = \"presort_grower_grading_bins\".\"farm_id\"
+  \r\nJOIN \"presort_grower_grading_pools\" ON \"presort_grower_grading_pools\".\"id\"
+  = \"presort_grower_grading_bins\".\"presort_grower_grading_pool_id\" \r\nLEFT JOIN
+  \"rmt_classes\" ON \"rmt_classes\".\"id\" = \"presort_grower_grading_bins\".\"rmt_class_id\"
+  \r\nLEFT JOIN \"rmt_sizes\" ON \"rmt_sizes\".\"id\" = \"presort_grower_grading_bins\".\"rmt_size_id\"\r\nLEFT
+  JOIN \"treatments\" ON \"treatments\".\"id\" = \"presort_grower_grading_bins\".\"treatment_id\""
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: presort_grower_grading_bins.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  presort_grower_grading_pool_id:
+    :name: presort_grower_grading_pool_id
+    :sequence_no: 2
+    :caption: Presort grower grading pool
+    :namespaced_name: presort_grower_grading_bins.presort_grower_grading_pool_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  farm_id:
+    :name: farm_id
+    :sequence_no: 3
+    :caption: Farm
+    :namespaced_name: presort_grower_grading_bins.farm_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_class_id:
+    :name: rmt_class_id
+    :sequence_no: 4
+    :caption: Rmt class
+    :namespaced_name: presort_grower_grading_bins.rmt_class_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_size_id:
+    :name: rmt_size_id
+    :sequence_no: 5
+    :caption: Rmt size
+    :namespaced_name: presort_grower_grading_bins.rmt_size_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  treatment_id:
+    :name: treatment_id
+    :sequence_no: 6
+    :caption: Treatment
+    :namespaced_name: presort_grower_grading_bins.treatment_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  maf_lot_number:
+    :name: maf_lot_number
+    :sequence_no: 7
+    :caption: Maf lot number
+    :namespaced_name: presort_grower_grading_pools.maf_lot_number
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  farm_code:
+    :name: farm_code
+    :sequence_no: 8
+    :caption: Farm
+    :namespaced_name: farms.farm_code
+    :data_type: :string
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  maf_rmt_code:
+    :name: maf_rmt_code
+    :sequence_no: 9
+    :caption: Maf rmt code
+    :namespaced_name: presort_grower_grading_bins.maf_rmt_code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  maf_article:
+    :name: maf_article
+    :sequence_no: 10
+    :caption: Maf article
+    :namespaced_name: presort_grower_grading_bins.maf_article
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  maf_class:
+    :name: maf_class
+    :sequence_no: 11
+    :caption: Maf class
+    :namespaced_name: presort_grower_grading_bins.maf_class
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_class_code:
+    :name: rmt_class_code
+    :sequence_no: 12
+    :caption: Rmt class
+    :namespaced_name: rmt_classes.rmt_class_code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  maf_colour:
+    :name: maf_colour
+    :sequence_no: 13
+    :caption: Maf colour
+    :namespaced_name: presort_grower_grading_bins.maf_colour
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  colour:
+    :name: colour
+    :sequence_no: 14
+    :caption: Colour
+    :namespaced_name: treatments.treatment_code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  maf_count:
+    :name: maf_count
+    :sequence_no: 15
+    :caption: Maf count
+    :namespaced_name: presort_grower_grading_bins.maf_count
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_size_code:
+    :name: rmt_size_code
+    :sequence_no: 16
+    :caption: Rmt size
+    :namespaced_name: rmt_sizes.size_code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  maf_weight:
+    :name: maf_weight
+    :sequence_no: 17
+    :caption: Maf weight
+    :namespaced_name: presort_grower_grading_bins.maf_weight
+    :data_type: :number
+    :width: 100
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_bin_weight:
+    :name: rmt_bin_weight
+    :sequence_no: 18
+    :caption: Rmt bin weight
+    :namespaced_name: presort_grower_grading_bins.rmt_bin_weight
+    :data_type: :number
+    :width: 100
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  adjusted_weight:
+    :name: adjusted_weight
+    :sequence_no: 19
+    :caption: Adjusted weight
+    :namespaced_name: 
+    :data_type: :number
+    :width: 100
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  maf_article_count:
+    :name: maf_article_count
+    :sequence_no: 20
+    :caption: Maf article count
+    :namespaced_name: presort_grower_grading_bins.maf_article_count
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  maf_tipped_quantity:
+    :name: maf_tipped_quantity
+    :sequence_no: 21
+    :caption: Maf tipped quantity
+    :namespaced_name: presort_grower_grading_bins.maf_tipped_quantity
+    :data_type: :integer
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  maf_total_lot_weight:
+    :name: maf_total_lot_weight
+    :sequence_no: 22
+    :caption: Maf total lot weight
+    :namespaced_name: presort_grower_grading_bins.maf_total_lot_weight
+    :data_type: :number
+    :width: 120
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  graded:
+    :name: graded
+    :sequence_no: 23
+    :caption: Graded
+    :namespaced_name: presort_grower_grading_bins.graded
+    :data_type: :boolean
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 24
+    :caption: Active
+    :namespaced_name: presort_grower_grading_bins.active
+    :data_type: :boolean
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_by:
+    :name: created_by
+    :sequence_no: 25
+    :caption: Created by
+    :namespaced_name: presort_grower_grading_bins.created_by
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_by:
+    :name: updated_by
+    :sequence_no: 26
+    :caption: Updated by
+    :namespaced_name: presort_grower_grading_bins.updated_by
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 27
+    :caption: Created at
+    :namespaced_name: presort_grower_grading_bins.created_at
+    :data_type: :datetime
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 28
+    :caption: Updated at
+    :namespaced_name: presort_grower_grading_bins.updated_at
+    :data_type: :datetime
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 29
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  waste_maf_class:
+    :name: waste_maf_class
+    :sequence_no: 30
+    :caption: Waste maf class?
+    :namespaced_name: 
+    :data_type: :boolean
+    :width: 100
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: presort_grower_grading_bins.presort_grower_grading_pool_id
+  :caption: Presort grower grading pool
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT maf_lot_number, id FROM presort_grower_grading_pools ORDER BY
+    maf_lot_number
+- :column: presort_grower_grading_bins.farm_id
+  :caption: Farm
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT farm_code, id FROM farms ORDER BY farm_code
+- :column: presort_grower_grading_bins.rmt_class_id
+  :caption: Rmt class
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT rmt_class_code, id FROM rmt_classes ORDER BY rmt_class_code
+- :column: presort_grower_grading_bins.rmt_size_id
+  :caption: Rmt size
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT size_code, id FROM rmt_sizes ORDER BY size_code
+- :column: presort_grower_grading_bins.treatment_id
+  :caption: Colour
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT treatment_code, id FROM treatments WHERE treatment_type_id = (SELECT
+    id FROM treatment_types WHERE treatment_type_code = 'PRESORT') ORDER BY treatment_code

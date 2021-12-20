@@ -16,7 +16,7 @@ module Crossbeams
       ud: { calculate_basic_pack_code: false,
             basic_pack_equals_standard_pack: false },
       cfg: { calculate_basic_pack_code: false,
-             basic_pack_equals_standard_pack: false },
+             basic_pack_equals_standard_pack: true },
       sr: { calculate_basic_pack_code: false,
             basic_pack_equals_standard_pack: true },
       sr2: { calculate_basic_pack_code: false,

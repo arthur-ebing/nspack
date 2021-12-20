@@ -69,6 +69,12 @@
   :popup: false
   :hide_if_false: keep_open
   :prompt: 'You are about to close this delivery. Are you sure?'
+- :url: "/raw_materials/deliveries/rmt_deliveries/$:id$/classify_raw_material"
+  :text: classify raw material
+  :title: classify raw material
+  :icon: book-reference
+  :popup: true
+  :show_for_client_rule: CR_RMT.show_classify_raw_material_form?
 :page_controls:
   - :control_type: :link
     :url: '/raw_materials/deliveries/rmt_deliveries/new'

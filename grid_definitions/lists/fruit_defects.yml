@@ -1,0 +1,24 @@
+---
+:dataminer_definition: fruit_defects
+:actions:
+- :url: "/masterfiles/quality/fruit_defects/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/masterfiles/quality/fruit_defects/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/quality/fruit_defects/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/quality/fruit_defects/new"
+  :text: New Fruit Defect
+  :style: :button
+  :behaviour: :popup

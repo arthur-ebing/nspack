@@ -1,0 +1,11 @@
+---
+:dataminer_definition: grower_grading_rebins
+:conditions:
+  :standard:
+    - :col: grower_grading_pool_id
+      :op: "="
+      :val: "$:grower_grading_pool_id$"
+  :rule_item:
+    - :col: grower_grading_rule_item_id
+      :op: "="
+      :val: "$:grower_grading_rule_item_id$"

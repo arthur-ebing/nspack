@@ -119,6 +119,7 @@ INSERT INTO location_types (location_type_code, short_code, hierarchical) VALUES
 INSERT INTO location_types (location_type_code, short_code, hierarchical) VALUES('IN_TRANSIT', 'IN_TRANSIT', 'f') ON CONFLICT DO NOTHING;
 INSERT INTO location_types (location_type_code, short_code, hierarchical) VALUES('UNTIPPED_BIN', 'UNTIPPED_BIN', 'f') ON CONFLICT DO NOTHING;
 INSERT INTO location_types (location_type_code, short_code, hierarchical) VALUES('BIN_ASSET_TRADING_PARTNER', 'BIN_ASSET_TRADING_PARTNER', 'f') ON CONFLICT DO NOTHING;
+INSERT INTO location_types (location_type_code, short_code, hierarchical) VALUES('FRUIT_RECEPTION', 'FRUIT_RECEPTION', 'f') ON CONFLICT DO NOTHING;
 
 -- LOCATION STORAGE TYPES
 INSERT INTO location_storage_types (storage_type_code) VALUES('SITE') ON CONFLICT DO NOTHING;
@@ -129,6 +130,7 @@ INSERT INTO location_storage_types (storage_type_code) VALUES('BIN_ASSET') ON CO
 INSERT INTO location_storage_types (storage_type_code) VALUES('UNTIPPED_BIN') ON CONFLICT DO NOTHING;
 INSERT INTO location_storage_types (storage_type_code) VALUES('EMPTY_BINS') ON CONFLICT DO NOTHING;
 INSERT INTO location_storage_types (storage_type_code) VALUES('FULL_BINS') ON CONFLICT DO NOTHING;
+INSERT INTO location_storage_types (storage_type_code) VALUES('RMT_BINS') ON CONFLICT DO NOTHING;
 
 -- LOCATION ASSIGNMENTS
 INSERT INTO location_assignments (assignment_code) VALUES('SITE') ON CONFLICT DO NOTHING;
@@ -139,6 +141,7 @@ INSERT INTO location_assignments (assignment_code) VALUES('UNTIPPED_BIN') ON CON
 INSERT INTO location_assignments (assignment_code) VALUES('EMPTY_BIN_STORAGE') ON CONFLICT DO NOTHING;
 INSERT INTO location_assignments (assignment_code) VALUES('FULL_BIN_STORAGE') ON CONFLICT DO NOTHING;
 INSERT INTO location_assignments (assignment_code) VALUES('WAREHOUSE_RECEIVING_AREA') ON CONFLICT DO NOTHING;
+INSERT INTO location_assignments (assignment_code) VALUES('FRUIT_RECEPTION') ON CONFLICT DO NOTHING;
 
 -- IN-TRANSIT LOCATION (Not part of locations tree)
 INSERT INTO locations (primary_storage_type_id, location_type_id, primary_assignment_id, location_long_code, location_description, location_short_code, can_be_moved, can_store_stock)

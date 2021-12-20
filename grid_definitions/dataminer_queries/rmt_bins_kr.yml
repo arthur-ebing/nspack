@@ -33,12 +33,15 @@
   \   shipped_at,\r\n    bin_load_id,\r\n    bin_load_product_id,\r\n    scrapped_bin_asset_number,\r\n
   \   scrapped,\r\n    scrapped_at,\r\n    scrap_remarks,\r\n    unscrapped_at,\r\n
   \   production_run_rebin_id,\r\n    rebin_created_at,\r\n    age,\r\n    legacy_data
-  ->> 'colour' AS colour,\r\n    legacy_data ->> 'track_slms_indicator_1_code' AS
-  rmt_code,\r\n    legacy_data ->> 'pc_code' AS pc_code,\r\n    legacy_data ->> 'cold_store_type'
-  AS regime_code,\r\n    fn_current_status('locations', vw_rmt_bins_flat.location_id)
-  AS location_status,\r\n    last_coldroom_event,\r\n    coldroom_events,\r\n    CASE
-  \r\n    WHEN bin_tipped THEN 'gray'\r\n    WHEN shipped THEN 'blue'\r\n    END AS
-  colour_rule\r\nFROM\r\n    vw_rmt_bins_flat\r\nWHERE\r\n    NOT scrapped\r\nORDER
+  ->> 'colour' AS colour,\r\n    rmt_code,\r\n    legacy_data ->> 'track_slms_indicator_1_code'
+  AS legacy_rmt_code,\r\n    legacy_data ->> 'pc_code' AS pc_code,\r\n    legacy_data
+  ->> 'cold_store_type' AS regime_code,\r\n    fn_current_status('locations', vw_rmt_bins_flat.location_id)
+  AS location_status,\r\n    last_coldroom_event,\r\n    coldroom_events,\r\n    classifications,\r\n
+  \   classifications[1] AS classification1,  \r\n    classifications[2] AS classification2,
+  \ \r\n    classifications[3] AS classification3,\r\n    main_ripeness_treatment,\r\n
+  \   main_cold_treatment,\r\n    treatments,\r\n    presort_tip_lot_number,\r\n    main_presort_run_lot_number,\r\n
+  \   CASE \r\n    WHEN bin_tipped THEN 'gray'\r\n    WHEN shipped THEN 'blue'\r\n
+  \   END AS colour_rule\r\nFROM\r\n    vw_rmt_bins_flat\r\nWHERE\r\n    NOT scrapped\r\nORDER
   BY\r\n    id DESC"
 :limit: 
 :offset: 
@@ -1524,6 +1527,22 @@
     :name: rmt_code
     :sequence_no: 93
     :caption: Rmt code
+    :namespaced_name: rmt_code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  legacy_rmt_code:
+    :name: legacy_rmt_code
+    :sequence_no: 94
+    :caption: Legacy rmt code
     :namespaced_name: 
     :data_type: :string
     :width: 100
@@ -1538,7 +1557,7 @@
     :group_max: false
   pc_code:
     :name: pc_code
-    :sequence_no: 94
+    :sequence_no: 95
     :caption: Pc code
     :namespaced_name: 
     :data_type: :string
@@ -1554,7 +1573,7 @@
     :group_max: false
   regime_code:
     :name: regime_code
-    :sequence_no: 95
+    :sequence_no: 96
     :caption: Regime code
     :namespaced_name: 
     :data_type: :string
@@ -1570,7 +1589,7 @@
     :group_max: false
   location_status:
     :name: location_status
-    :sequence_no: 96
+    :sequence_no: 97
     :caption: Location status
     :namespaced_name: 
     :data_type: :string
@@ -1586,7 +1605,7 @@
     :group_max: false
   last_coldroom_event:
     :name: last_coldroom_event
-    :sequence_no: 97
+    :sequence_no: 98
     :caption: Last coldroom event
     :namespaced_name: last_coldroom_event
     :data_type: :string
@@ -1602,11 +1621,155 @@
     :group_max: false
   coldroom_events:
     :name: coldroom_events
-    :sequence_no: 98
+    :sequence_no: 99
     :caption: Coldroom events
     :namespaced_name: coldroom_events
     :data_type: :string
-    :width: 
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  classifications:
+    :name: classifications
+    :sequence_no: 100
+    :caption: Classifications
+    :namespaced_name: classifications
+    :data_type: :string
+    :width: 200
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  classification1:
+    :name: classification1
+    :sequence_no: 101
+    :caption: Classification1
+    :namespaced_name: 
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  classification2:
+    :name: classification2
+    :sequence_no: 102
+    :caption: Classification2
+    :namespaced_name: 
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  classification3:
+    :name: classification3
+    :sequence_no: 103
+    :caption: Classification3
+    :namespaced_name: 
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  main_ripeness_treatment:
+    :name: main_ripeness_treatment
+    :sequence_no: 104
+    :caption: Main ripeness treatment
+    :namespaced_name: main_ripeness_treatment
+    :data_type: :string
+    :width: 130
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  main_cold_treatment:
+    :name: main_cold_treatment
+    :sequence_no: 105
+    :caption: Main cold treatment
+    :namespaced_name: main_cold_treatment
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  treatments:
+    :name: treatments
+    :sequence_no: 106
+    :caption: Treatments
+    :namespaced_name: treatments
+    :data_type: :string
+    :width: 200
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  presort_tip_lot_number:
+    :name: presort_tip_lot_number
+    :sequence_no: 107
+    :caption: Presort tip lot number
+    :namespaced_name: presort_tip_lot_number
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  main_presort_run_lot_number:
+    :name: main_presort_run_lot_number
+    :sequence_no: 108
+    :caption: Main presort run lot number
+    :namespaced_name: main_presort_run_lot_number
+    :data_type: :string
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -1618,7 +1781,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 99
+    :sequence_no: 109
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

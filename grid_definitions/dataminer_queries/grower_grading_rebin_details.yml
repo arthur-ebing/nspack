@@ -1,0 +1,466 @@
+---
+:caption: Grower Grading Rebin Details
+:sql: "SELECT \"grower_grading_rebins\".\"id\", fn_grading_rebin_code(\"grower_grading_rebins\".\"id\")
+  AS grading_rebin_code, \"grower_grading_rebins\".\"grower_grading_pool_id\", \r\n\"grower_grading_rebins\".\"grower_grading_rule_item_id\",
+  \"grower_grading_rebins\".\"rmt_class_id\", \"grower_grading_rebins\".\"rmt_size_id\",
+  \ \r\n\"grower_grading_pools\".\"pool_name\", \"grower_grading_rebins\".\"rebins_quantity\",
+  \"grower_grading_rebins\".\"changes_made\", \r\n\"rmt_classes\".\"rmt_class_code\",
+  \"grower_grading_rebins\".\"changes_made\" ->> 'rmt_class_id' AS graded_rmt_class_id,
+  \r\n\"grower_grading_rebins\".\"changes_made\" -> 'descriptions' ->> 'graded_rmt_class_code'
+  AS graded_rmt_class_code,\r\n\"rmt_sizes\".\"size_code\" AS rmt_size_code, \"grower_grading_rebins\".\"changes_made\"
+  ->> 'rmt_size_id' AS graded_rmt_size_id,\r\n\"grower_grading_rebins\".\"changes_made\"
+  -> 'descriptions' ->> 'graded_rmt_size_code' AS graded_rmt_size_code,\r\n\"grower_grading_rebins\".\"gross_weight\",
+  \"grower_grading_rebins\".\"changes_made\" ->> 'gross_weight' AS graded_gross_weight,
+  \r\n\"grower_grading_rebins\".\"nett_weight\", \"grower_grading_rebins\".\"changes_made\"
+  ->> 'nett_weight' AS graded_nett_weight, \r\n\"grower_grading_rebins\".\"pallet_rebin\",
+  \"grower_grading_rebins\".\"completed\",\"grower_grading_rebins\".\"active\", \r\n\"grower_grading_rebins\".\"updated_by\",
+  \"grower_grading_rebins\".\"updated_at\"\r\nFROM \"grower_grading_rebins\" \r\nJOIN
+  \"grower_grading_pools\" ON \"grower_grading_pools\".\"id\" = \"grower_grading_rebins\".\"grower_grading_pool_id\"
+  \r\nLEFT JOIN \"rmt_classes\" ON \"rmt_classes\".\"id\" = \"grower_grading_rebins\".\"rmt_class_id\"
+  \r\nLEFT JOIN \"rmt_sizes\" ON \"rmt_sizes\".\"id\" = \"grower_grading_rebins\".\"rmt_size_id\" "
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: grower_grading_rebins.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  grading_rebin_code:
+    :name: grading_rebin_code
+    :sequence_no: 2
+    :caption: Grading rebin code
+    :namespaced_name: 
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  grower_grading_pool_id:
+    :name: grower_grading_pool_id
+    :sequence_no: 3
+    :caption: Grower grading pool
+    :namespaced_name: grower_grading_rebins.grower_grading_pool_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  grower_grading_rule_item_id:
+    :name: grower_grading_rule_item_id
+    :sequence_no: 4
+    :caption: Grower grading rule item
+    :namespaced_name: grower_grading_rebins.grower_grading_rule_item_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_class_id:
+    :name: rmt_class_id
+    :sequence_no: 5
+    :caption: Rmt class
+    :namespaced_name: grower_grading_rebins.rmt_class_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_size_id:
+    :name: rmt_size_id
+    :sequence_no: 6
+    :caption: Rmt size
+    :namespaced_name: grower_grading_rebins.rmt_size_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pool_name:
+    :name: pool_name
+    :sequence_no: 7
+    :caption: Pool name
+    :namespaced_name: grower_grading_pools.pool_name
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rebins_quantity:
+    :name: rebins_quantity
+    :sequence_no: 8
+    :caption: Rebin Qty
+    :namespaced_name: grower_grading_rebins.rebins_quantity
+    :data_type: :integer
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  changes_made:
+    :name: changes_made
+    :sequence_no: 9
+    :caption: Changes made
+    :namespaced_name: grower_grading_rebins.changes_made
+    :data_type: :jsonb
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_class_code:
+    :name: rmt_class_code
+    :sequence_no: 10
+    :caption: Rmt class
+    :namespaced_name: rmt_classes.rmt_class_code
+    :data_type: :string
+    :width: 90
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  graded_rmt_class_id:
+    :name: graded_rmt_class_id
+    :sequence_no: 11
+    :caption: Graded rmt class
+    :namespaced_name: 
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  graded_rmt_class_code:
+    :name: graded_rmt_class_code
+    :sequence_no: 12
+    :caption: Graded rmt class
+    :namespaced_name: 
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_size_code:
+    :name: rmt_size_code
+    :sequence_no: 13
+    :caption: Rmt size
+    :namespaced_name: rmt_sizes.size_code
+    :data_type: :string
+    :width: 90
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  graded_rmt_size_id:
+    :name: graded_rmt_size_id
+    :sequence_no: 14
+    :caption: Graded rmt size
+    :namespaced_name: 
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  graded_rmt_size_code:
+    :name: graded_rmt_size_code
+    :sequence_no: 15
+    :caption: Graded rmt size
+    :namespaced_name: 
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  gross_weight:
+    :name: gross_weight
+    :sequence_no: 16
+    :caption: Gross weight
+    :namespaced_name: grower_grading_rebins.gross_weight
+    :data_type: :number
+    :width: 100
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  graded_gross_weight:
+    :name: graded_gross_weight
+    :sequence_no: 17
+    :caption: Graded gross weight
+    :namespaced_name: 
+    :data_type: :number
+    :width: 120
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  nett_weight:
+    :name: nett_weight
+    :sequence_no: 18
+    :caption: Nett weight
+    :namespaced_name: grower_grading_rebins.nett_weight
+    :data_type: :number
+    :width: 100
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  graded_nett_weight:
+    :name: graded_nett_weight
+    :sequence_no: 19
+    :caption: Graded nett weight
+    :namespaced_name: 
+    :data_type: :number
+    :width: 120
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_rebin:
+    :name: pallet_rebin
+    :sequence_no: 20
+    :caption: Pallet rebin?
+    :namespaced_name: grower_grading_rebins.pallet_rebin
+    :data_type: :boolean
+    :width: 90
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  completed:
+    :name: completed
+    :sequence_no: 21
+    :caption: Completed?
+    :namespaced_name: grower_grading_rebins.completed
+    :data_type: :boolean
+    :width: 90
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 22
+    :caption: Active?
+    :namespaced_name: grower_grading_rebins.active
+    :data_type: :boolean
+    :width: 80
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_by:
+    :name: updated_by
+    :sequence_no: 23
+    :caption: Updated by
+    :namespaced_name: grower_grading_rebins.updated_by
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 24
+    :caption: Updated at
+    :namespaced_name: grower_grading_rebins.updated_at
+    :data_type: :datetime
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: grower_grading_pool_id
+  :caption: Grower grading pool
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT pool_name, id FROM grower_grading_pools ORDER BY pool_name
+- :column: grower_grading_rule_item_id
+  :caption: Grower grading rule item
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT created_by, id FROM grower_grading_rule_items ORDER BY created_by
+- :column: grower_grading_rebins.rmt_class_id
+  :caption: Rmt class
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT rmt_class_code, id FROM rmt_classes ORDER BY rmt_class_code
+- :column: grower_grading_rebins.std_fruit_size_count_id
+  :caption: Std fruit size count
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT size_count_description, id FROM std_fruit_size_counts ORDER BY
+    size_count_description
+- :column: grower_grading_rebins.fruit_actual_counts_for_pack_id
+  :caption: Fruit actual counts for pack
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT id, id FROM fruit_actual_counts_for_packs ORDER BY id
+- :column: grower_grading_rebins.fruit_size_reference_id
+  :caption: Fruit size reference
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT size_reference, id FROM fruit_size_references ORDER BY size_reference
+- :column: fruit_actual_counts_for_packs.id
+  :caption: Fruit actual counts for packs
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

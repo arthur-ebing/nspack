@@ -1,0 +1,30 @@
+---
+:dataminer_definition: rmt_handling_regimes
+:actions:
+- :url: "/masterfiles/raw_materials/rmt_handling_regimes/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/masterfiles/raw_materials/rmt_handling_regimes/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/raw_materials/rmt_handling_regimes/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :separator: true
+- :url: "/development/statuses/list/rmt_handling_regimes/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/raw_materials/rmt_handling_regimes/new"
+  :text: New Rmt Handling Regime
+  :style: :button
+  :behaviour: :popup

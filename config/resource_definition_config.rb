@@ -427,6 +427,7 @@ module Crossbeams
                      icon: { file: 'printer', colour: CLR_A },
                      non_editable_code: true,
                      code_prefix: 'PRN-' },
+        # QC PERIPHERALS... FTA, RFM
         CARTON_VERIFICATION_STATION => { description: 'Carton-verification station',
                                          allowed_children: [CARTON_VERIFICATION_ROBOT, PRINTER],
                                          icon: { file: 'tag', colour: CLR_B } },
@@ -614,7 +615,7 @@ module Crossbeams
         },
         'zebra' => {
           'GK420d' => { lang: 'zpl', usb_vendor: '0a5f', usb_product: '0080' },
-          'ZD320' => { lang: 'zpl', usb_vendor: '0a5f', usb_product: '0166' },
+          'ZD230' => { lang: 'zpl', usb_vendor: '0a5f', usb_product: '0166' },
           'ZD420' => { lang: 'zpl', usb_vendor: '0a5f', usb_product: '0120' }
         },
         'datamax' => {
@@ -766,6 +767,11 @@ module Crossbeams
 
       def self.can_have_children_of_type?(plant_resource_type_code, child_type)
         PLANT_RESOURCE_RULES[plant_resource_type_code][:allowed_children].include?(child_type)
+      end
+
+      # Get a list of plant resource type codes that are allowed to serve as a parent of the given resource type.
+      def self.allowed_parent_types(plant_resource_type_code)
+        PLANT_RESOURCE_RULES.select { |_, v| v[:allowed_children].include?(plant_resource_type_code) }.map { |k, _| k }
       end
 
       def self.peripheral_type_codes

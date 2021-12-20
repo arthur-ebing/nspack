@@ -68,7 +68,7 @@ module MasterfilesApp
       {
         id: 1,
         commodity_id: commodity_id,
-        colour_percentage: 1,
+        colour_percentage: 'ABC',
         description: Faker::Lorem.unique.word,
         active: true
       }

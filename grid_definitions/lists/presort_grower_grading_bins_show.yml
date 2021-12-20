@@ -1,0 +1,13 @@
+---
+:dataminer_definition: presort_grower_grading_bins
+:actions:
+- :url: "/raw_materials/presort_grower_grading/presort_grower_grading_bins/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+:conditions:
+  :standard:
+    - :col: presort_grower_grading_bins.presort_grower_grading_pool_id
+      :op: "="
+      :val: "$:presort_grower_grading_pool_id$"

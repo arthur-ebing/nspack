@@ -671,5 +671,11 @@ module RawMaterialsApp
       units_in_location, maximum_units = get_value(:locations, %i[units_in_location maximum_units], id: location_id)
       (units_in_location + scanned_bins_count) > maximum_units
     end
+
+    def for_select_container_material_owners
+      DB[:rmt_container_material_owners]
+        .select(Sequel.lit('distinct rmt_material_owner_party_role_id AS id, fn_party_role_name_with_role(rmt_material_owner_party_role_id) AS party_name'))
+        .map { |p| [p[:party_name], p[:id]] }
+    end
   end
 end

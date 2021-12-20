@@ -118,6 +118,23 @@ class Nspack < Roda
         end
       end
 
+      r.on 'classify_raw_material' do
+        r.get do
+          show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::ClassifyRawMaterial.call(id) }
+        end
+
+        r.post do
+          res = interactor.classify_raw_material(id, params[:classify_raw_material])
+          if res.success
+            flash[:notice] = res.message
+            # show_json_notice(res.message)
+            redirect_to_last_grid(r)
+          else
+            re_show_form(r, res) { RawMaterials::Deliveries::RmtDelivery::ClassifyRawMaterial.call(id, form_values: params[:classify_raw_material], form_errors: res.errors) }
+          end
+        end
+      end
+
       r.on 'edit_ref_number' do
         r.get do
           show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::EditRefNumber.call(id) }
@@ -233,6 +250,8 @@ class Nspack < Roda
                 scrapped_at
                 status
                 asset_number
+                rmt_container_material_type_id
+                rmt_container_material_type
               ]
               actions = []
               res.instance.each do |instance|
@@ -299,6 +318,8 @@ class Nspack < Roda
                 scrapped_at
                 status
                 asset_number
+                rmt_container_material_type_id
+                rmt_container_material_type
               ]
               actions = []
               res.instance.each do |instance|
@@ -441,6 +462,11 @@ class Nspack < Roda
 
     r.on 'rmt_deliveries' do
       interactor = RawMaterialsApp::RmtDeliveryInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'ui_change', String do |change_type| # Handle UI behaviours
+        handle_ui_change(:rmt_delivery, change_type.to_sym, params)
+      end
+
       r.on 'new' do    # NEW
         check_auth!('deliveries', 'new')
         latest_delivery = RawMaterialsApp::RmtDeliveryRepo.new.latest_delivery&.merge!(date_picked: Time.now, date_delivered: Time.now) if AppConst::CR_RMT.defaults_for_new_rmt_delivery?

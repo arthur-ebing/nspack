@@ -1,0 +1,244 @@
+---
+:caption: Presort Grading Maf Lot Numbers
+:sql: "SELECT rmt_bins.presort_tip_lot_number AS id,\r\nrmt_bins.presort_tip_lot_number
+  AS maf_lot_number,\r\nrmt_bins.legacy_data ->> 'track_indicator_code' AS track_slms_indicator_code,\r\nrmt_bins.farm_id,
+  farms.farm_code, \r\nrmt_bins.season_id, seasons.season_code,\r\nseasons.commodity_id,
+  commodities.code AS commodity_code,\r\nSUM(rmt_bins.qty_bins) AS bin_quantity, \r\nSUM(rmt_bins.gross_weight)
+  AS gross_weight, \r\nSUM(rmt_bins.nett_weight) AS nett_weight\r\nFROM rmt_bins \r\nJOIN
+  farms on rmt_bins.farm_id = farms.id\r\nJOIN seasons on rmt_bins.season_id = seasons.id\r\nJOIN
+  commodities on seasons.commodity_id = commodities.id\r\nWHERE rmt_bins.presort_tip_lot_number
+  IS NOT NULL\r\nAND rmt_bins.active\r\nAND rmt_bins.bin_tipped\r\nAND NOT rmt_bins.scrapped\r\nAND
+  rmt_bins.presort_tip_lot_number NOT IN(SELECT maf_lot_number FROM presort_grower_grading_pools)\r\nGROUP
+  BY rmt_bins.presort_tip_lot_number, track_slms_indicator_code, rmt_bins.farm_id,
+  farms.farm_code, \r\nrmt_bins.season_id, seasons.season_code, seasons.commodity_id,
+  commodities.code\r\nORDER BY rmt_bins.presort_tip_lot_number DESC"
+:limit: 
+:offset: 
+:external_settings:
+  :render_url: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: rmt_bins.presort_tip_lot_number
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  maf_lot_number:
+    :name: maf_lot_number
+    :sequence_no: 2
+    :caption: Maf lot number
+    :namespaced_name: rmt_bins.presort_tip_lot_number
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  track_slms_indicator_code:
+    :name: track_slms_indicator_code
+    :sequence_no: 3
+    :caption: Track slms indicator code
+    :namespaced_name: 
+    :data_type: :string
+    :width: 140
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  farm_id:
+    :name: farm_id
+    :sequence_no: 4
+    :caption: Farm
+    :namespaced_name: rmt_bins.farm_id
+    :data_type: :integer
+    :width: 100
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  farm_code:
+    :name: farm_code
+    :sequence_no: 5
+    :caption: Farm
+    :namespaced_name: farms.farm_code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  season_id:
+    :name: season_id
+    :sequence_no: 6
+    :caption: Season
+    :namespaced_name: rmt_bins.season_id
+    :data_type: :integer
+    :width: 100
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  season_code:
+    :name: season_code
+    :sequence_no: 7
+    :caption: Season
+    :namespaced_name: seasons.season_code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  commodity_id:
+    :name: commodity_id
+    :sequence_no: 8
+    :caption: Commodity
+    :namespaced_name: seasons.commodity_id
+    :data_type: :integer
+    :width: 100
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  commodity_code:
+    :name: commodity_code
+    :sequence_no: 9
+    :caption: Commodity
+    :namespaced_name: commodities.code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  bin_quantity:
+    :name: bin_quantity
+    :sequence_no: 10
+    :caption: Bin quantity
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  gross_weight:
+    :name: gross_weight
+    :sequence_no: 11
+    :caption: Gross weight
+    :namespaced_name: 
+    :data_type: :number
+    :width: 120
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  nett_weight:
+    :name: nett_weight
+    :sequence_no: 12
+    :caption: Nett weight
+    :namespaced_name: 
+    :data_type: :number
+    :width: 120
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: presort_grower_grading_pools.maf_lot_number
+  :caption: Maf lot number
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: presort_grower_grading_pools.season_id
+  :caption: Season
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT season_code, id FROM seasons ORDER BY season_code
+- :column: presort_grower_grading_pools.commodity_id
+  :caption: Commodity
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT code, id FROM commodities ORDER BY code
+- :column: presort_grower_grading_pools.farm_id
+  :caption: Farm
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT farm_code, id FROM farms ORDER BY farm_code

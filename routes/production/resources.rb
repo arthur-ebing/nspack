@@ -158,6 +158,28 @@ class Nspack < Roda
         end
       end
 
+      r.on 'move_node' do   # NEW CHILD
+        r.get do
+          check_auth!('resources', 'edit')
+          interactor.assert_permission!(:move_node, id) # check type & if root etc
+          show_partial { Production::Resources::PlantResource::Move.call(id: id) }
+        end
+        r.post do
+          res = interactor.move_plant_resource(id, params[:plant_resource])
+          if res.success
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
+          else
+            re_show_form(r, res, url: "/production/resources/plant_resources/#{id}/move_node") do
+              Production::Resources::PlantResource::Move.call(id: id,
+                                                              form_values: params[:plant_resource],
+                                                              form_errors: res.errors,
+                                                              remote: fetch?(r))
+            end
+          end
+        end
+      end
+
       r.on 'bulk_add' do
         r.on 'clm' do
           r.get do
@@ -386,6 +408,23 @@ class Nspack < Roda
 
         r.get do
           show_partial { Production::Resources::SystemResource::DeployConfig.call(id) }
+        end
+      end
+
+      r.on 'get_mac_address' do
+        check_auth!('resources', 'edit')
+        interactor.assert_system_permission!(:deploy_config, id)
+
+        r.on 'loading' do
+          out = interactor.show_mac_address(params[:system_resource])
+          # { content: "<pre>#{out.join('<br>')}</pre>", notice: 'MAC address...' }.to_json
+          update_dialog_content(content: "<pre>#{out.join('<br>')}</pre>", notice: 'MAC address...')
+        rescue Crossbeams::InfoError => e
+          show_json_error(e.message, status: 200)
+        end
+
+        r.get do
+          show_partial { Production::Resources::SystemResource::MacAddress.call(id) }
         end
       end
 

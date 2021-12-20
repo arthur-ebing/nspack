@@ -23,12 +23,15 @@ module RawMaterials
                   col.add_field :orchard_id
                   col.add_field :farm_section
                   col.add_field :cultivar_id
+                  if AppConst::CR_RMT.all_delivery_bins_of_same_type?
+                    col.add_field :rmt_container_type_id
+                    col.add_field :rmt_container_material_type_id
+                    col.add_field :rmt_material_owner_party_role_id
+                  end
                   col.add_field :rmt_delivery_destination_id
                   col.add_field :reference_number
                   col.add_field :truck_registration_number
                   col.add_field :qty_damaged_bins
-                  col.add_field :qty_empty_bins
-                  col.add_field :quantity_bins_with_fruit
                 end
                 row.column do |col|
                   col.add_field :bin_scan_mode
@@ -36,6 +39,8 @@ module RawMaterials
                   col.add_field :date_picked
                   col.add_field :received
                   col.add_field :date_delivered
+                  col.add_field :qty_empty_bins
+                  col.add_field :quantity_bins_with_fruit
                   # col.add_field :delivery_tipped
                   # col.add_field :tipping_complete_date_time
                   # col.add_field :keep_open

@@ -1,0 +1,389 @@
+---
+:caption: Presort Grower Grading Pools
+:sql: "SELECT \"presort_grower_grading_pools\".\"id\",\r\n \"presort_grower_grading_pools\".\"maf_lot_number\",
+  \r\n\"presort_grower_grading_pools\".\"description\",\r\n \"presort_grower_grading_pools\".\"track_slms_indicator_code\",
+  \r\n\"presort_grower_grading_pools\".\"season_id\", \r\n\"presort_grower_grading_pools\".\"commodity_id\",
+  \r\n\"presort_grower_grading_pools\".\"farm_id\", \r\n\"commodities\".\"code\" AS
+  commodity_code, \r\n\"farms\".\"farm_code\", \r\n\"seasons\".\"season_code\", \r\n\"presort_grower_grading_pools\".\"rmt_bin_count\",\r\n\"presort_grower_grading_pools\".\"rmt_bin_weight\",
+  \r\n\"presort_grower_grading_pools\".\"pro_rata_factor\", \r\n\"presort_grower_grading_pools\".\"completed\",
+  \r\n\"presort_grower_grading_pools\".\"active\", \r\n EXISTS(SELECT id FROM presort_grower_grading_bins
+  WHERE presort_grower_grading_pool_id = presort_grower_grading_pools.id) AS has_grading_bins,\r\n\"presort_grower_grading_pools\".\"created_by\",
+  \r\n\"presort_grower_grading_pools\".\"updated_by\", \r\n\"presort_grower_grading_pools\".\"created_at\",
+  \r\n\"presort_grower_grading_pools\".\"updated_at\", \r\nfn_current_status('presort_grower_grading_pools',
+  \"presort_grower_grading_pools\".\"id\") AS status \r\nFROM \"presort_grower_grading_pools\"
+  \r\nJOIN \"commodities\" ON \"commodities\".\"id\" = \"presort_grower_grading_pools\".\"commodity_id\"
+  \r\nJOIN \"farms\" ON \"farms\".\"id\" = \"presort_grower_grading_pools\".\"farm_id\"
+  \r\nLEFT JOIN \"seasons\" ON \"seasons\".\"id\" = \"presort_grower_grading_pools\".\"season_id\""
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: presort_grower_grading_pools.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  maf_lot_number:
+    :name: maf_lot_number
+    :sequence_no: 2
+    :caption: Maf lot number
+    :namespaced_name: presort_grower_grading_pools.maf_lot_number
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  description:
+    :name: description
+    :sequence_no: 3
+    :caption: Description
+    :namespaced_name: presort_grower_grading_pools.description
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  track_slms_indicator_code:
+    :name: track_slms_indicator_code
+    :sequence_no: 4
+    :caption: Track slms indicator code
+    :namespaced_name: presort_grower_grading_pools.track_slms_indicator_code
+    :data_type: :string
+    :width: 140
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  season_id:
+    :name: season_id
+    :sequence_no: 5
+    :caption: Season
+    :namespaced_name: presort_grower_grading_pools.season_id
+    :data_type: :integer
+    :width: 100
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  commodity_id:
+    :name: commodity_id
+    :sequence_no: 6
+    :caption: Commodity
+    :namespaced_name: presort_grower_grading_pools.commodity_id
+    :data_type: :integer
+    :width: 100
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  farm_id:
+    :name: farm_id
+    :sequence_no: 7
+    :caption: Farm
+    :namespaced_name: presort_grower_grading_pools.farm_id
+    :data_type: :integer
+    :width: 100
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  commodity_code:
+    :name: commodity_code
+    :sequence_no: 8
+    :caption: Commodity
+    :namespaced_name: commodities.code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  farm_code:
+    :name: farm_code
+    :sequence_no: 9
+    :caption: Farm
+    :namespaced_name: farms.farm_code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  season_code:
+    :name: season_code
+    :sequence_no: 10
+    :caption: Season
+    :namespaced_name: seasons.season_code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_bin_count:
+    :name: rmt_bin_count
+    :sequence_no: 11
+    :caption: Rmt bin count
+    :namespaced_name: presort_grower_grading_pools.rmt_bin_count
+    :data_type: :integer
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_bin_weight:
+    :name: rmt_bin_weight
+    :sequence_no: 12
+    :caption: Rmt bin weight
+    :namespaced_name: presort_grower_grading_pools.rmt_bin_weight
+    :data_type: :number
+    :width: 100
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pro_rata_factor:
+    :name: pro_rata_factor
+    :sequence_no: 13
+    :caption: Pro rata factor
+    :namespaced_name: presort_grower_grading_pools.pro_rata_factor
+    :data_type: :number
+    :width: 100
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  completed:
+    :name: completed
+    :sequence_no: 14
+    :caption: Completed
+    :namespaced_name: presort_grower_grading_pools.completed
+    :data_type: :boolean
+    :width: 80
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 15
+    :caption: Active
+    :namespaced_name: presort_grower_grading_pools.active
+    :data_type: :boolean
+    :width: 80
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  has_grading_bins:
+    :name: has_grading_bins
+    :sequence_no: 16
+    :caption: Has grading bins
+    :namespaced_name: 
+    :data_type: :boolean
+    :width: 80
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_by:
+    :name: created_by
+    :sequence_no: 17
+    :caption: Created by
+    :namespaced_name: presort_grower_grading_pools.created_by
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_by:
+    :name: updated_by
+    :sequence_no: 18
+    :caption: Updated by
+    :namespaced_name: presort_grower_grading_pools.updated_by
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 19
+    :caption: Created at
+    :namespaced_name: presort_grower_grading_pools.created_at
+    :data_type: :datetime
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 20
+    :caption: Updated at
+    :namespaced_name: presort_grower_grading_pools.updated_at
+    :data_type: :datetime
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 21
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: presort_grower_grading_pools.maf_lot_number
+  :caption: Maf lot number
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: presort_grower_grading_pools.season_id
+  :caption: Season
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT season_code, id FROM seasons ORDER BY season_code
+- :column: presort_grower_grading_pools.commodity_id
+  :caption: Commodity
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT code, id FROM commodities ORDER BY code
+- :column: presort_grower_grading_pools.farm_id
+  :caption: Farm
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT farm_code, id FROM farms ORDER BY farm_code

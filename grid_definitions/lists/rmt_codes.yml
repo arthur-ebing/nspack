@@ -1,0 +1,57 @@
+---
+:dataminer_definition: rmt_codes
+:actions:
+  - :submenu:
+      :text: Variants
+      :items:
+        - :url: /masterfiles/raw_materials/rmt_variants/new/$:cultivar_id$
+          :text: new
+          :icon: add-solid
+          :title: New
+          :popup: true
+        - :url: /masterfiles/raw_materials/rmt_variants/$:rmt_variant_id$
+          :text: view
+          :icon: view-show
+          :title: View
+          :popup: true
+          :hide_if_null: :rmt_variant_id
+        - :url: /masterfiles/raw_materials/rmt_variants/$:rmt_variant_id$/edit
+          :text: edit
+          :icon: edit
+          :title: Edit
+          :popup: true
+          :hide_if_null: :rmt_variant_id
+        - :url: /masterfiles/raw_materials/rmt_variants/$:rmt_variant_id$
+          :text: delete
+          :icon: delete
+          :is_delete: true
+          :title: Delete
+          :popup: true
+          :hide_if_null: :rmt_variant_id
+  - :submenu:
+      :text: Rmt Codes
+      :items:
+        - :url: /masterfiles/raw_materials/rmt_variants/$:rmt_variant_id$/rmt_codes
+          :text: new rmt code
+          :icon: add-solid
+          :popup: true
+          :hide_if_null: :rmt_variant_id
+        - :url: /masterfiles/raw_materials/rmt_codes/$:id$
+          :text: view
+          :icon: view-show
+          :title: View
+          :popup: true
+          :hide_if_null: :id
+        - :url: /masterfiles/raw_materials/rmt_codes/$:id$/edit
+          :text: edit
+          :icon: edit
+          :hide_if_null: :id
+          :title: Edit
+          :popup: true
+        - :url: /masterfiles/raw_materials/rmt_codes/$:id$
+          :text: delete
+          :icon: delete
+          :is_delete: true
+          :hide_if_null: :id
+          :title: Delete
+          :popup: true

@@ -14,6 +14,7 @@ module ProductionApp
       @sys_mod = repo.find_system_resource_flat(id)
       server = repo.find_mes_server
       raise Crossbeams::InfoError, 'There is no plant resource defined as a MesServer' if server.nil?
+      raise Crossbeams::InfoError, 'Distro type has not been set' unless (sys_mod.extended_config || {})['distro_type']
 
       @netmask = server.extended_config['netmask'] || '255.255.255.0'
       @gateway = server.extended_config['gateway'] # TODO: set to vlan gateway if applicable
@@ -45,15 +46,14 @@ module ProductionApp
             xml.ServerInterface server.ip_address
             xml.ServerPort server.port
             xml.NetMask netmask
-            xml.Gateway gateway
+            xml.GateWay gateway
             xml.comment "\n        When to use true for lbl store (nspi CLM && publishing?)\n        When true for LineProdUnit???\n        Why do we need sys pwd?\n    "
             xml.CentralLabelStore sys_mod.publishing # nspi CLM
             xml.LineProductionUnit true # ??? CLM?
             xml.SystemPassword AppConst::PROVISION_PW # ????
             xml.Cms false
             xml.Mqtt false
-            xml.Debug false
-            # xml.SystemDebug false
+            xml.SystemDebug false
           end
 
           xml.Devices do

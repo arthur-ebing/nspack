@@ -4,7 +4,7 @@ module RawMaterials
   module Deliveries
     module RmtDelivery
       class Show
-        def self.call(id, back_url:) # rubocop:disable Metrics/PerceivedComplexity
+        def self.call(id, back_url:) # rubocop:disable Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
           ui_rule = UiRules::Compiler.new(:rmt_delivery, :show, id: id)
           rules   = ui_rule.compile
 
@@ -81,16 +81,21 @@ module RawMaterials
                     col.add_field :orchard_id
                     col.add_field :farm_section
                     col.add_field :cultivar_id
+                    if AppConst::CR_RMT.all_delivery_bins_of_same_type?
+                      col.add_field :rmt_container_type_id
+                      col.add_field :rmt_container_material_type_id
+                      col.add_field :rmt_material_owner_party_role_id
+                    end
                     col.add_field :rmt_delivery_destination_id
                     col.add_field :reference_number
                     col.add_field :truck_registration_number
                     col.add_field :qty_damaged_bins
                     col.add_field :qty_empty_bins
-                    col.add_field :quantity_bins_with_fruit
-                    col.add_field :bin_scan_mode
                   end
 
                   row.column do |col|
+                    col.add_field :quantity_bins_with_fruit
+                    col.add_field :bin_scan_mode
                     col.add_field :current
                     col.add_field :date_picked
                     col.add_field :received

@@ -16,6 +16,10 @@ module RawMaterialsApp
         season_id: 1, # season_id,
         farm_id: 1, # farm_id,
         puc_id: 1, # puc_id,
+        rmt_container_type_id: 1,
+        rmt_material_owner_party_role_id: 1,
+        rmt_code_id: 1,
+        rmt_classifications: [1],
         truck_registration_number: Faker::Lorem.unique.word,
         reference_number: Faker::Lorem.unique.word,
         batch_number: Faker::Lorem.unique.word,
@@ -30,7 +34,8 @@ module RawMaterialsApp
         tripsheet_created_at: '2010-01-01 12:00',
         tripsheet_offloaded_at: '2010-01-01 12:00',
         tripsheet_loaded_at: '2010-01-01 12:00',
-        active: true
+        active: true,
+        rmt_container_material_type_id: 1
       }
       RawMaterialsApp::RmtDelivery.new(base_attrs.merge(attrs))
     end

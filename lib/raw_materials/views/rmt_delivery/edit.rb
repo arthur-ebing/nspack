@@ -4,7 +4,7 @@ module RawMaterials
   module Deliveries
     module RmtDelivery
       class Edit
-        def self.call(id, is_update: nil, form_values: nil, form_errors: nil)
+        def self.call(id, is_update: nil, form_values: nil, form_errors: nil) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
           ui_rule = UiRules::Compiler.new(:rmt_delivery, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -90,15 +90,20 @@ module RawMaterials
                     col.add_field :orchard_id
                     col.add_field :farm_section
                     col.add_field :cultivar_id
+                    if AppConst::CR_RMT.all_delivery_bins_of_same_type
+                      col.add_field :rmt_container_type_id
+                      col.add_field :rmt_container_material_type_id
+                      col.add_field :rmt_material_owner_party_role_id
+                    end
                     col.add_field :rmt_delivery_destination_id
                     col.add_field :reference_number
                     col.add_field :truck_registration_number
                     col.add_field :qty_damaged_bins
-                    col.add_field :qty_empty_bins
-                    col.add_field :quantity_bins_with_fruit
                   end
 
                   row.column do |col|
+                    col.add_field :qty_empty_bins
+                    col.add_field :quantity_bins_with_fruit
                     col.add_field :bin_scan_mode
                     col.add_field :current
                     col.add_field :date_picked
@@ -141,13 +146,6 @@ module RawMaterials
                                       grid_id: 'rmt_bins_deliveries',
                                       behaviour: false)
                   bin_type = 'asset_number_'
-                else
-                  section.add_control(control_type: :link,
-                                      text: 'New RMT Bin',
-                                      url: "/raw_materials/deliveries/rmt_deliveries/#{id}/rmt_bins/new",
-                                      style: :button,
-                                      grid_id: 'rmt_bins_deliveries',
-                                      behaviour: :popup)
                 end
                 section.add_grid('rmt_bins_deliveries',
                                  "/list/#{bin_type}rmt_bins/grid?key=standard&delivery_id=#{id}",

@@ -1,0 +1,561 @@
+---
+:caption: Grower Grading Rule Items
+:sql: "SELECT fn_grading_rule_item_code(\"grower_grading_rule_items\".\"id\") AS rule_item_code,
+  \"grower_grading_rule_items\".\"id\", \"grower_grading_rule_items\".\"grower_grading_rule_id\",
+  \"grower_grading_rule_items\".\"commodity_id\", \"grower_grading_rule_items\".\"grade_id\",
+  \"grower_grading_rule_items\".\"std_fruit_size_count_id\", \"grower_grading_rule_items\".\"fruit_actual_counts_for_pack_id\",
+  \"grower_grading_rule_items\".\"marketing_variety_id\", \"grower_grading_rule_items\".\"rmt_class_id\",
+  \"grower_grading_rule_items\".\"rmt_size_id\", \"grower_grading_rule_items\".\"fruit_size_reference_id\",
+  \"grower_grading_rule_items\".\"inspection_type_id\", \"commodities\".\"code\" AS
+  commodity_code, \"marketing_varieties\".\"marketing_variety_code\", \"grades\".\"grade_code\",
+  \"inspection_types\".\"inspection_type_code\", \"rmt_classes\".\"rmt_class_code\",
+  \"rmt_sizes\".\"size_code\" AS rmt_size_code, \"fruit_actual_counts_for_packs\".\"actual_count_for_pack\"
+  AS actual_count, \"std_fruit_size_counts\".\"size_count_value\" AS size_count, \"fruit_size_references\".\"size_reference\",
+  \"grower_grading_rule_items\".\"legacy_data\", \"grower_grading_rule_items\".\"changes\",
+  \"grower_grading_rule_items\".\"active\", \"grower_grading_rule_items\".\"created_by\",
+  \"grower_grading_rule_items\".\"updated_by\", \"grower_grading_rule_items\".\"created_at\",
+  \"grower_grading_rule_items\".\"updated_at\"\r\nFROM \"grower_grading_rule_items\"
+  \r\nJOIN \"commodities\" ON \"commodities\".\"id\" = \"grower_grading_rule_items\".\"commodity_id\"
+  \r\nJOIN \"marketing_varieties\" ON \"marketing_varieties\".\"id\" = \"grower_grading_rule_items\".\"marketing_variety_id\"
+  \r\nLEFT JOIN \"grades\" ON \"grades\".\"id\" = \"grower_grading_rule_items\".\"grade_id\"
+  \r\nLEFT JOIN \"inspection_types\" ON \"inspection_types\".\"id\" = \"grower_grading_rule_items\".\"inspection_type_id\"
+  \r\nLEFT JOIN \"rmt_classes\" ON \"rmt_classes\".\"id\" = \"grower_grading_rule_items\".\"rmt_class_id\"
+  \r\nLEFT JOIN \"rmt_sizes\" ON \"rmt_sizes\".\"id\" = \"grower_grading_rule_items\".\"rmt_size_id\"\r\nLEFT
+  JOIN \"fruit_actual_counts_for_packs\" ON \"fruit_actual_counts_for_packs\".\"id\"
+  = \"grower_grading_rule_items\".\"fruit_actual_counts_for_pack_id\" \r\nLEFT JOIN
+  \"fruit_size_references\" ON \"fruit_size_references\".\"id\" = \"grower_grading_rule_items\".\"fruit_size_reference_id\"\r\nLEFT
+  JOIN \"std_fruit_size_counts\" ON \"std_fruit_size_counts\".\"id\" = \"grower_grading_rule_items\".\"std_fruit_size_count_id\""
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  rule_item_code:
+    :name: rule_item_code
+    :sequence_no: 1
+    :caption: Rule item code
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  id:
+    :name: id
+    :sequence_no: 2
+    :caption: Id
+    :namespaced_name: grower_grading_rule_items.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  grower_grading_rule_id:
+    :name: grower_grading_rule_id
+    :sequence_no: 3
+    :caption: Grower grading rule
+    :namespaced_name: grower_grading_rule_items.grower_grading_rule_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  commodity_id:
+    :name: commodity_id
+    :sequence_no: 4
+    :caption: Commodity
+    :namespaced_name: grower_grading_rule_items.commodity_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  grade_id:
+    :name: grade_id
+    :sequence_no: 5
+    :caption: Grade
+    :namespaced_name: grower_grading_rule_items.grade_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  std_fruit_size_count_id:
+    :name: std_fruit_size_count_id
+    :sequence_no: 6
+    :caption: Std fruit size count
+    :namespaced_name: grower_grading_rule_items.std_fruit_size_count_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  fruit_actual_counts_for_pack_id:
+    :name: fruit_actual_counts_for_pack_id
+    :sequence_no: 7
+    :caption: Fruit actual counts for pack
+    :namespaced_name: grower_grading_rule_items.fruit_actual_counts_for_pack_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marketing_variety_id:
+    :name: marketing_variety_id
+    :sequence_no: 8
+    :caption: Marketing variety
+    :namespaced_name: grower_grading_rule_items.marketing_variety_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_class_id:
+    :name: rmt_class_id
+    :sequence_no: 9
+    :caption: Rmt class
+    :namespaced_name: grower_grading_rule_items.rmt_class_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_size_id:
+    :name: rmt_size_id
+    :sequence_no: 10
+    :caption: Rmt size
+    :namespaced_name: grower_grading_rule_items.rmt_size_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  fruit_size_reference_id:
+    :name: fruit_size_reference_id
+    :sequence_no: 11
+    :caption: Fruit size reference
+    :namespaced_name: grower_grading_rule_items.fruit_size_reference_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inspection_type_id:
+    :name: inspection_type_id
+    :sequence_no: 12
+    :caption: Inspection type
+    :namespaced_name: grower_grading_rule_items.inspection_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  commodity_code:
+    :name: commodity_code
+    :sequence_no: 13
+    :caption: Commodity
+    :namespaced_name: commodities.code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marketing_variety_code:
+    :name: marketing_variety_code
+    :sequence_no: 14
+    :caption: Marketing variety
+    :namespaced_name: marketing_varieties.marketing_variety_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  grade_code:
+    :name: grade_code
+    :sequence_no: 15
+    :caption: Grade
+    :namespaced_name: grades.grade_code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inspection_type_code:
+    :name: inspection_type_code
+    :sequence_no: 16
+    :caption: Inspection type
+    :namespaced_name: inspection_types.inspection_type_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_class_code:
+    :name: rmt_class_code
+    :sequence_no: 17
+    :caption: Rmt class
+    :namespaced_name: rmt_classes.rmt_class_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_size_code:
+    :name: rmt_size_code
+    :sequence_no: 18
+    :caption: Rmt size
+    :namespaced_name: rmt_sizes.size_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  actual_count:
+    :name: actual_count
+    :sequence_no: 19
+    :caption: Actual count
+    :namespaced_name: fruit_actual_counts_for_packs.actual_count_for_pack
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  size_count:
+    :name: size_count
+    :sequence_no: 20
+    :caption: Size count
+    :namespaced_name: std_fruit_size_counts.size_count_value
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  size_reference:
+    :name: size_reference
+    :sequence_no: 21
+    :caption: Size reference
+    :namespaced_name: fruit_size_references.size_reference
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  legacy_data:
+    :name: legacy_data
+    :sequence_no: 22
+    :caption: Legacy data
+    :namespaced_name: grower_grading_rule_items.legacy_data
+    :data_type: :string
+    :width: 200
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  changes:
+    :name: changes
+    :sequence_no: 23
+    :caption: Changes
+    :namespaced_name: grower_grading_rule_items.changes
+    :data_type: :string
+    :width: 200
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 24
+    :caption: Active
+    :namespaced_name: grower_grading_rule_items.active
+    :data_type: :boolean
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_by:
+    :name: created_by
+    :sequence_no: 25
+    :caption: Created by
+    :namespaced_name: grower_grading_rule_items.created_by
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_by:
+    :name: updated_by
+    :sequence_no: 26
+    :caption: Updated by
+    :namespaced_name: grower_grading_rule_items.updated_by
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 27
+    :caption: Created at
+    :namespaced_name: grower_grading_rule_items.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 28
+    :caption: Updated at
+    :namespaced_name: grower_grading_rule_items.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: grower_grading_rule_id
+  :caption: Grower grading rule
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT rule_name, id FROM grower_grading_rules ORDER BY rule_name
+- :column: grower_grading_rule_items.commodity_id
+  :caption: Commodity
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 2
+  :list_def: SELECT code, id FROM commodities ORDER BY code
+- :column: grower_grading_rule_items.grade_id
+  :caption: Grade
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 3
+  :list_def: SELECT grade_code, id FROM grades ORDER BY grade_code
+- :column: grower_grading_rule_items.std_fruit_size_count_id
+  :caption: Std fruit size count
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 4
+  :list_def: SELECT size_count_description, id FROM std_fruit_size_counts ORDER BY
+    size_count_description
+- :column: grower_grading_rule_items.fruit_actual_counts_for_pack_id
+  :caption: Fruit actual counts for pack
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 5
+  :list_def: SELECT id, id FROM fruit_actual_counts_for_packs ORDER BY id
+- :column: grower_grading_rule_items.marketing_variety_id
+  :caption: Marketing variety
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 6
+  :list_def: SELECT marketing_variety_code, id FROM marketing_varieties ORDER BY marketing_variety_code
+- :column: grower_grading_rule_items.rmt_class_id
+  :caption: Rmt class
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 7
+  :list_def: SELECT rmt_class_code, id FROM rmt_classes ORDER BY rmt_class_code
+- :column: grower_grading_rule_items.fruit_size_reference_id
+  :caption: Fruit size reference
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT size_reference, id FROM fruit_size_references ORDER BY size_reference
+- :column: grower_grading_rule_items.inspection_type_id
+  :caption: Inspection type
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 8
+  :list_def: SELECT inspection_type_code, id FROM inspection_types ORDER BY inspection_type_code
+- :column: fruit_actual_counts_for_packs.id
+  :caption: Fruit actual counts for packs
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 9
+  :list_def: 

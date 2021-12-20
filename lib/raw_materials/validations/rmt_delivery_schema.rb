@@ -20,10 +20,24 @@ module RawMaterialsApp
     optional(:bin_scan_mode).maybe(:integer)
     optional(:quantity_bins_with_fruit).maybe(:integer)
     optional(:reference_number).maybe(Types::StrippedString)
+    optional(:rmt_container_type_id).filled(:integer)
+    optional(:rmt_material_owner_party_role_id).filled(:integer)
+    optional(:rmt_container_material_type_id).filled(:integer)
   end
 
   RmtDeliveryReceivedAtSchema = Dry::Schema.Params do
     optional(:id).filled(:integer)
     required(:date_delivered).filled(:time)
+  end
+
+  class ClassifyRawMaterialContract < Dry::Validation::Contract
+    params do
+      optional(:rmt_code_id).maybe(:integer)
+      optional(:rmt_classifications).maybe(:array)
+    end
+
+    rule(:rmt_code_id) do
+      key.failure 'must be filled in' if values.keys.include?(:rmt_code_id) && !values[:rmt_code_id]
+    end
   end
 end

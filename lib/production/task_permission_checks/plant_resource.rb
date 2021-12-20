@@ -4,6 +4,7 @@ module ProductionApp
   module TaskPermissionCheck
     class PlantResource < BaseService
       attr_reader :task, :entity
+
       def initialize(task, plant_resource_id = nil)
         @task = task
         @repo = ResourceRepo.new
@@ -16,6 +17,7 @@ module ProductionApp
         edit: :edit_check,
         delete: :delete_check,
         add_child: :add_child_check,
+        move_node: :move_node_check,
         bulk_add_clm: :bulk_add_clm_check,
         bulk_add_ptm: :bulk_add_ptm_check
       }.freeze
@@ -49,6 +51,17 @@ module ProductionApp
         else
           failed_response 'This plant resource cannot have sub-resources'
         end
+      end
+
+      def move_node_check
+        sys_type = @repo.system_resource_type_from_resource(@entity.system_resource_id)
+        return failed_response('Cannot move a button') if sys_type == Crossbeams::Config::ResourceDefinitions::MODULE_BUTTON
+
+        level = @repo.plant_resource_level(@id)
+        return failed_response('This node is not part of a tree') if level.nil?
+        return failed_response('Cannot move the root node') if level.zero?
+
+        all_ok
       end
 
       def bulk_add_clm_check
