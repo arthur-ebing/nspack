@@ -404,7 +404,7 @@
   :default_value: 
   :ordered_list: true
   :ui_priority: 1
-  :list_def: SELECT truck_registration_number, id FROM rmt_deliveries ORDER BY truck_registration_number
+  :list_def: SELECT id FROM rmt_deliveries ORDER BY id
 - :column: qc_samples.coldroom_location_id
   :caption: Coldroom location
   :data_type: :integer
@@ -420,7 +420,7 @@
   :default_value: 
   :ordered_list: true
   :ui_priority: 1
-  :list_def: SELECT active_run_stage, id FROM production_runs ORDER BY active_run_stage
+  :list_def: SELECT id FROM production_runs ORDER BY id
 - :column: qc_samples.orchard_id
   :caption: Orchard
   :data_type: :integer

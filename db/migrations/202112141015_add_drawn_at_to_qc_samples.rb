@@ -31,6 +31,24 @@ Sequel.migration do
       $function$
       ;
     SQL
+
+    run <<~SQL
+      CREATE OR REPLACE FUNCTION public.fn_qc_defect_classes(in_qc_test_id integer)
+       RETURNS text
+       LANGUAGE sql
+      AS $function$
+      SELECT string_agg(qp.rmt_class_code || ': ' || qp.qty::text, ', ') AS class_counts
+      FROM (
+        SELECT rc.rmt_class_code, SUM(q.qty_fruit_with_percentage) AS qty
+        FROM qc_defect_measurements q
+        JOIN rmt_classes rc ON rc.id = q.rmt_class_id
+        WHERE qc_test_id = in_qc_test_id
+        GROUP BY rc.rmt_class_code
+        ORDER BY rc.rmt_class_code
+        ) qp
+      $function$
+      ;
+    SQL
   end
 
   down do
@@ -45,5 +63,8 @@ Sequel.migration do
     alter_table :qc_starch_measurements do
       rename_column :starch_percentage, :starch_precentage
     end
+
+    run 'DROP FUNCTION public.fn_starch_percentages(integer);'
+    run 'DROP FUNCTION public.fn_qc_defect_classes(integer);'
   end
 end

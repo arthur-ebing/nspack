@@ -124,6 +124,12 @@ module QualityApp
       success_response('Created test', test_id: test_id, test_type: test_type) unless test_id.nil?
     end
 
+    def redirect_url_for_test(qc_test_id)
+      id = repo.get(:qc_tests, qc_test_id, :qc_sample_id)
+      instance = repo.find_qc_sample(id)
+      qc_sample_created_redirect(instance)
+    end
+
     private
 
     def repo

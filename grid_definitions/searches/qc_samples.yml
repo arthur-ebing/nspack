@@ -11,14 +11,14 @@
   :icon: edit
   :title: Edit
   :popup: true
-- :url: "/quality/qc/qc_samples/$:id$"
-  :text: delete
-  :icon: delete
-  :is_delete: true
+- :separator: true
+- :url: "/development/statuses/list/qc_samples/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
   :popup: true
-:page_controls:
-- :control_type: :link
-  :url: "/quality/qc/qc_samples/new"
-  :text: New Qc Sample
-  :style: :button
-  :behaviour: :popup
+- :url: "/quality/qc/qc_samples/$:id$/print_barcode"
+  :text: Print barcode
+  :icon: printer
+  :title: Print barcode
+  :popup: true

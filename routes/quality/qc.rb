@@ -192,6 +192,7 @@ class Nspack < Roda
     # --------------------------------------------------------------------------
     r.on 'qc_tests', Integer do |id|
       interactor = QualityApp::QcTestInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      sample_interactor = QualityApp::QcSampleInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:qc_tests, id) do
@@ -200,7 +201,8 @@ class Nspack < Roda
 
       r.on 'defects' do
         r.get do
-          show_partial_or_page(r) { Quality::Qc::QcTest::Defects.call(id) }
+          redirect_url = sample_interactor.redirect_url_for_test(id)
+          show_partial_or_page(r) { Quality::Qc::QcTest::Defects.call(id, redirect_url: redirect_url) }
         end
 
         r.patch do
@@ -208,8 +210,7 @@ class Nspack < Roda
           if res.success
             show_json_notice(res.message)
           else
-            p res
-            show_json_warning(res.message) # ... display validation errs....
+            show_json_warning(res.message)
           end
         end
       end
@@ -220,10 +221,13 @@ class Nspack < Roda
         show_json_exception(e)
       end
 
-      # r.on 'inline_defect', Integer do |fruit_defect_id|
-      r.on 'inline_defect', Integer do
-        undo_grid_inline_edit(message: 'Undoing while testing...')
-        # update qty / class
+      r.on 'inline_defect', Integer do |fruit_defect_id|
+        res = interactor.save_defect_measure(id, fruit_defect_id, params)
+        if res.success
+          blank_json_response
+        else
+          undo_grid_inline_edit(message: res.message)
+        end
       end
 
       r.on 'starch' do

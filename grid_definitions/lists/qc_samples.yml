@@ -11,39 +11,6 @@
   :icon: edit
   :title: Edit
   :popup: true
-- :url: "/quality/qc/qc_samples/$:id$"
-  :text: delete
-  :icon: delete
-  :is_delete: true
-  :popup: true
-- :url: "/quality/qc/qc_samples/$:id$/complete"
-  :text: Complete
-  :icon: toggle-on
-  :popup: true
-  :hide_if_true: completed
-  :auth:
-    :function: Quality
-    :program: qc
-    :permission: edit
-- :url: "/quality/qc/qc_samples/$:id$/approve"
-  :text: Approve/Reject
-  :icon: gavel
-  :popup: true
-  :hide_if_false: completed
-  :hide_if_true: approved
-  :auth:
-    :function: Quality
-    :program: qc
-    :permission: approve
-- :url: "/quality/qc/qc_samples/$:id$/reopen"
-  :text: Re-open for editing
-  :icon: toggle-off
-  :popup: true
-  :hide_if_false: approved
-  :auth:
-    :function: Quality
-    :program: qc
-    :permission: edit
 - :separator: true
 - :url: "/development/statuses/list/qc_samples/$:id$"
   :text: status
@@ -55,12 +22,12 @@
   :icon: printer
   :title: Print barcode
   :popup: true
-:page_controls:
-- :control_type: :link
-  :url: "/quality/qc/qc_samples/select"
-  :text: Select QC Sample
-  :style: :button
-  :behaviour: :popup
+# :page_controls:
+# - :control_type: :link
+#   :url: "/quality/qc/qc_samples/select"
+#   :text: Select QC Sample
+#   :style: :button
+#   :behaviour: :popup
 :conditions:
   :incomplete:
     - :col: qc_samples.completed

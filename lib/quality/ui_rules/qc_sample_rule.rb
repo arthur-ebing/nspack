@@ -21,6 +21,7 @@ module UiRules
     def set_show_fields # rubocop:disable Metrics/AbcSize
       context, context_ref = @repo.sample_context(@repo.find_qc_sample(@options[:id]))
       starch_summary = @repo.starch_test_summary(@options[:id])
+      defects_summary = @repo.defects_test_summary(@options[:id])
       fields[:id] = { renderer: :label, caption: 'Sample ID' }
       qc_sample_type_id_label = @repo.get(:qc_sample_types, @form_object.qc_sample_type_id, :qc_sample_type_name)
       rmt_delivery_id_label = @repo.get(:rmt_deliveries, @form_object.rmt_delivery_id, :truck_registration_number)
@@ -42,6 +43,7 @@ module UiRules
       fields[:rmt_bin_ids] = { renderer: :label }
       fields[:context] = { renderer: :label, caption: context, with_value: context_ref }
       fields[:starch_summary] = { renderer: :label, with_value: starch_summary, invisible: starch_summary.nil? }
+      fields[:defects_summary] = { renderer: :label, with_value: defects_summary, invisible: defects_summary.nil? }
     end
 
     def set_print_fields
@@ -92,7 +94,7 @@ module UiRules
         return
       end
 
-      @form_object = OpenStruct.new(@repo.find_qc_sample(@options[:id]).to_h.merge(qc_test_type_id: nil, context: nil, starch_summary: nil))
+      @form_object = OpenStruct.new(@repo.find_qc_sample(@options[:id]).to_h.merge(qc_test_type_id: nil, context: nil, starch_summary: nil, defects_summary: nil))
       @form_object = OpenStruct.new(@form_object.to_h.merge(printer: @print_repo.default_printer_for_application(AppConst::PRINT_APP_QC), no_of_prints: 1)) if @mode == :print_barcode
     end
 

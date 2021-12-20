@@ -20,6 +20,8 @@ module QualityApp
 
     crud_calls_for :qc_starch_measurements, name: :qc_starch_measurement
 
+    crud_calls_for :qc_defect_measurements, name: :qc_defect_measurement
+
     def existing_tests_for(qc_sample_id)
       all(:qc_tests, QcTest, qc_sample_id: qc_sample_id).map { |r| r.to_h.merge(test_type_code: 'starch') }
     end
@@ -74,6 +76,14 @@ module QualityApp
       DB.get(Sequel.function(:fn_starch_percentages, test_id))
     end
 
+    def defects_test_summary(qc_sample_id)
+      test_type_id = get_id(:qc_test_types, qc_test_type_name: 'defects')
+      test_id = find_sample_test_of_type(qc_sample_id, test_type_id)
+      return nil if test_id.nil?
+
+      DB.get(Sequel.function(:fn_qc_defect_classes, test_id))
+    end
+
     def sample_id_for_type_and_context(sample_type_id, context, context_key)
       DB[:qc_samples].where(qc_sample_type_id: sample_type_id, context => context_key).get(:id)
     end
@@ -103,6 +113,8 @@ module QualityApp
         END AS status,
         CASE WHEN y.qc_test_type_name = 'starch' THEN
           fn_starch_percentages(t.id)
+        WHEN y.qc_test_type_name = 'defects' THEN
+          fn_qc_defect_classes(t.id)
         ELSE
           NULL
         END AS summary

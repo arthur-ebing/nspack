@@ -8,7 +8,7 @@ module RawMaterials
           ui_rule = UiRules::Compiler.new(:rmt_delivery, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page|
+          Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
@@ -119,6 +119,42 @@ module RawMaterials
               end
             end
 
+            if rules[:do_qc]
+              page.fold_up do |fold|
+                fold.caption 'QC'
+                fold.section do |section|
+                  section.add_control(control_type: :dropdown_button,
+                                      text: '100 Fruit Sample',
+                                      items: rules[:items_fruit])
+                  section.add_control(control_type: :dropdown_button,
+                                      text: 'Progressive defects',
+                                      items: rules[:items_prog])
+                  section.row do |row|
+                    row.column do |col|
+                      col.add_text '100 Fruit Sample', wrapper: :h3, css_classes: 'mid-gray'
+                      if rules[:qc_summary_100_fruit_sample]
+                        col.add_table rules[:qc_summary_100_fruit_sample],
+                                      %i[key sample_size status summary],
+                                      alignment: { sample_size: :right }
+                      else
+                        col.add_text 'No sample', wrapper: :em
+                      end
+                    end
+                    row.column do |col|
+                      col.add_text 'Progressive Defects', wrapper: :h3, css_classes: 'mid-gray'
+                      if rules[:qc_summary_delivery_progressive_tests]
+                        col.add_table rules[:qc_summary_delivery_progressive_tests],
+                                      %i[key sample_size status summary],
+                                      alignment: { sample_size: :right }
+                      else
+                        col.add_text 'No sample', wrapper: :em
+                      end
+                    end
+                  end
+                end
+              end
+            end
+
             unless is_update
               page.section do |section|
                 bin_type = nil
@@ -153,8 +189,6 @@ module RawMaterials
               end
             end
           end
-
-          layout
         end
       end
     end

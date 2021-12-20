@@ -22,6 +22,7 @@ module Quality
               form.add_field :completed
               form.add_field :completed_at
               form.add_field :starch_summary
+              form.add_field :defects_summary
               # form.add_field :rmt_delivery_id
               # form.add_field :coldroom_location_id
               # form.add_field :production_run_id

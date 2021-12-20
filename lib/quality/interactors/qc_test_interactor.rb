@@ -68,7 +68,11 @@ module QualityApp
       test_id = repo.find_sample_test_of_type(qc_sample_id, test_type_id)
       return test_id unless test_id.nil?
 
-      repo.create_qc_test(qc_sample_id: qc_sample_id, qc_test_type_id: test_type_id, sample_size: 20) # Get size from default
+      repo.transaction do
+        repo.create_qc_test(qc_sample_id: qc_sample_id, qc_test_type_id: test_type_id, sample_size: 20)
+        log_status(:qc_samples, qc_sample_id, "CREATED TEST #{qc_test_type}")
+        log_transaction
+      end
     end
 
     def save_starch_test(id, params) # rubocop:disable Metrics/AbcSize
@@ -115,6 +119,45 @@ module QualityApp
         columnDefs: col_defs_for_defects_grid,
         rowDefs: repo.rows_for_defects_test(qc_test_id)
       }.to_json
+    end
+
+    def save_defect_measure(qc_test_id, fruit_defect_id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+      id = repo.get_id(:qc_defect_measurements, qc_test_id: qc_test_id, fruit_defect_id: fruit_defect_id)
+      if id.nil?
+        # Must set qty?
+        kls = case params[:column_name]
+              when 'qty_fruit_with_percentage'
+                repo.get(:fruit_defects, fruit_defect_id, :rmt_class_id)
+              when 'rmt_class_code'
+                repo.get_id(:rmt_classes, rmt_class_code: params[:column_value])
+              else
+                raise Crossbeams::FrameworkError, "No handler for editing column #{params[:column_name]}"
+              end
+        qty = case params[:column_name]
+              when 'qty_fruit_with_percentage'
+                params[:column_value]
+              when 'rmt_class_code'
+                0
+              else
+                raise Crossbeams::FrameworkError, "No handler for editing column #{params[:column_name]}"
+              end
+
+        repo.create_qc_defect_measurement(qc_test_id: qc_test_id,
+                                          fruit_defect_id: fruit_defect_id,
+                                          rmt_class_id: kls,
+                                          qty_fruit_with_percentage: qty)
+      else
+        case params[:column_name]
+        when 'qty_fruit_with_percentage'
+          repo.update_qc_defect_measurement(id, qty_fruit_with_percentage: params[:column_value])
+        when 'rmt_class'
+          kls_id = repo.get_id(:rmt_classes, rmt_class_code: params[:column_value])
+          repo.update_qc_defect_measurement(id, rmt_class_id: kls_id)
+        else
+          raise Crossbeams::FrameworkError, "No handler for editing column #{params[:column_name]}"
+        end
+      end
+      success_response("Changed #{params[:column_name]}")
     end
 
     private

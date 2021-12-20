@@ -343,6 +343,7 @@ module UiRules
         items_fruit << { url: "/quality/qc/qc_samples/new_rmt_delivery_id_sample/#{sample_type_id}/#{@options[:id]}", text: 'Create', behaviour: :popup }
       end
       build_qc_summary('100_fruit_sample', fruit_id)
+
       items_prog = []
       sample_type_id, prog_id = qc_sample_type_and_id('delivery_progressive_tests')
       if prog_id
