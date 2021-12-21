@@ -1,9 +1,12 @@
 ---
 :caption: Fruit Defect Types
-:sql: "SELECT\r\n  \"fruit_defect_types\".\"id\",\r\n  \"fruit_defect_types\".\"fruit_defect_type_name\",\r\n
+:sql: "SELECT\r\n  \"fruit_defect_types\".\"id\",\r\n  \"fruit_defect_categories\".\"defect_category\",\r\n
+  \ \"fruit_defect_types\".\"fruit_defect_type_name\",\r\n  \"fruit_defect_types\".\"reporting_description\",\r\n
   \ \"fruit_defect_types\".\"description\",\r\n  \"fruit_defect_types\".\"active\",\r\n
-  \ \"fruit_defect_types\".\"created_at\",\r\n  \"fruit_defect_types\".\"updated_at\"\r\nFROM\r\n
-  \ \"fruit_defect_types\"\r\nORDER BY\r\n  \"fruit_defect_types\".\"fruit_defect_type_name\"\r\n"
+  \ \"fruit_defect_types\".\"fruit_defect_category_id\",\r\n  \"fruit_defect_types\".\"created_at\",\r\n
+  \ \"fruit_defect_types\".\"updated_at\"\r\nFROM\r\n  \"fruit_defect_types\"\r\nLEFT
+  JOIN \"fruit_defect_categories\" ON \"fruit_defect_categories\".\"id\" = \"fruit_defect_types\".\"fruit_defect_category_id\"\r\nORDER
+  BY\r\n  \"fruit_defect_types\".\"fruit_defect_type_name\"\r\n"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -24,9 +27,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  defect_category:
+    :name: defect_category
+    :sequence_no: 2
+    :caption: Defect category
+    :namespaced_name: fruit_defect_categories.defect_category
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   fruit_defect_type_name:
     :name: fruit_defect_type_name
-    :sequence_no: 2
+    :sequence_no: 3
     :caption: Fruit defect type name
     :namespaced_name: fruit_defect_types.fruit_defect_type_name
     :data_type: :string
@@ -40,9 +59,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  reporting_description:
+    :name: reporting_description
+    :sequence_no: 4
+    :caption: Reporting description
+    :namespaced_name: fruit_defect_types.reporting_description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   description:
     :name: description
-    :sequence_no: 3
+    :sequence_no: 5
     :caption: Description
     :namespaced_name: fruit_defect_types.description
     :data_type: :string
@@ -58,7 +93,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 4
+    :sequence_no: 6
     :caption: Active
     :namespaced_name: fruit_defect_types.active
     :data_type: :boolean
@@ -72,9 +107,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  fruit_defect_category_id:
+    :name: fruit_defect_category_id
+    :sequence_no: 7
+    :caption: Fruit defect category
+    :namespaced_name: fruit_defect_types.fruit_defect_category_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 5
+    :sequence_no: 8
     :caption: Created at
     :namespaced_name: fruit_defect_types.created_at
     :data_type: :datetime
@@ -90,7 +141,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 6
+    :sequence_no: 9
     :caption: Updated at
     :namespaced_name: fruit_defect_types.updated_at
     :data_type: :datetime

@@ -433,6 +433,10 @@ These are the methods used in building a page layout.
 |tag
 |Adds tags to all nodes in the control (only forms will actually apply the tag)
 
+|section
+|block
+|builds a Section using the block.
+
 |row
 |block
 |builds a Row using the block.

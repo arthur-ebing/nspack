@@ -10,6 +10,7 @@ module MasterfilesApp
       assert_respond_to repo, :for_select_qc_test_types
       assert_respond_to repo, :for_select_fruit_defect_types
       assert_respond_to repo, :for_select_fruit_defects
+      assert_respond_to repo, :for_select_fruit_defect_categories
     end
 
     def test_crud_calls
@@ -18,6 +19,7 @@ module MasterfilesApp
       test_crud_calls_for :qc_test_types, name: :qc_test_type, wrapper: QcTestType
       test_crud_calls_for :fruit_defect_types, name: :fruit_defect_type, wrapper: FruitDefectType
       test_crud_calls_for :fruit_defects, name: :fruit_defect, wrapper: FruitDefect
+      test_crud_calls_for :fruit_defect_categories, name: :fruit_defect_category, wrapper: FruitDefectCategory
     end
 
     private

@@ -1,0 +1,24 @@
+---
+:dataminer_definition: qc_samples
+:actions:
+- :url: "/quality/qc/qc_samples/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/quality/qc/qc_samples/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :separator: true
+- :url: "/development/statuses/list/qc_samples/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+- :url: "/quality/qc/qc_samples/$:id$/print_barcode"
+  :text: Print barcode
+  :icon: printer
+  :title: Print barcode
+  :popup: true

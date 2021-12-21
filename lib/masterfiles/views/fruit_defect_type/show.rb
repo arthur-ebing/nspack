@@ -13,8 +13,10 @@ module Masterfiles
             page.form do |form|
               # form.caption 'Fruit Defect Type'
               form.view_only!
+              form.add_field :fruit_defect_category_id
               form.add_field :fruit_defect_type_name
               form.add_field :description
+              form.add_field :reporting_description
               form.add_field :active
             end
           end

@@ -332,3 +332,21 @@ SELECT g.id,
 (SELECT id FROM security_permissions WHERE security_permission = 'weights')
 FROM security_groups g WHERE g.security_group_name = 'container_weights' ON CONFLICT DO NOTHING;
 
+-- QC MEASUREMENT TYPES
+INSERT INTO qc_measurement_types (qc_measurement_type_name, description) VALUES ('starch', 'starch') ON CONFLICT DO NOTHING;
+INSERT INTO qc_measurement_types (qc_measurement_type_name, description) VALUES ('pressure', 'pressure') ON CONFLICT DO NOTHING;
+INSERT INTO qc_measurement_types (qc_measurement_type_name, description) VALUES ('diameter', 'diameter') ON CONFLICT DO NOTHING;
+
+-- QC SAMPLE TYPES
+INSERT INTO qc_sample_types (qc_sample_type_name, default_sample_size, active) VALUES ('100_fruit_sample', 100, false) ON CONFLICT DO NOTHING;
+INSERT INTO qc_sample_types (qc_sample_type_name, default_sample_size, active) VALUES ('delivery_progressive_tests', 20, false) ON CONFLICT DO NOTHING;
+INSERT INTO qc_sample_types (qc_sample_type_name, default_sample_size, active) VALUES ('presort', 20, false) ON CONFLICT DO NOTHING;
+INSERT INTO qc_sample_types (qc_sample_type_name, default_sample_size, active) VALUES ('production_run', 20, false) ON CONFLICT DO NOTHING;
+INSERT INTO qc_sample_types (qc_sample_type_name, default_sample_size, active) VALUES ('coldroom', 20, false) ON CONFLICT DO NOTHING;
+
+-- QC TEST TYPES
+INSERT INTO qc_test_types (qc_test_type_name) VALUES ('defects') ON CONFLICT DO NOTHING;
+INSERT INTO qc_test_types (qc_test_type_name) VALUES ('starch') ON CONFLICT DO NOTHING;
+INSERT INTO qc_test_types (qc_test_type_name) VALUES ('pressure') ON CONFLICT DO NOTHING;
+INSERT INTO qc_test_types (qc_test_type_name) VALUES ('starch (sugar)') ON CONFLICT DO NOTHING;
+INSERT INTO qc_test_types (qc_test_type_name) VALUES ('diameter') ON CONFLICT DO NOTHING;

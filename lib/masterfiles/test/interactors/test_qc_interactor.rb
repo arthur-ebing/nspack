@@ -165,21 +165,72 @@ module MasterfilesApp
       end
     end
 
-    # FRUIT DEFECT TYPES
+    # FRUIT DEFECT CATEGORIES
     # --------------------------------------------------------------------------
-    def test_fruit_defect_type
-      MasterfilesApp::QcRepo.any_instance.stubs(:find_fruit_defect_type).returns(fake_fruit_defect_type)
-      entity = interactor.send(:fruit_defect_type, 1)
-      assert entity.is_a?(FruitDefectType)
+    def test_fruit_defect_category
+      MasterfilesApp::QcRepo.any_instance.stubs(:find_fruit_defect_category).returns(fake_fruit_defect_category)
+      entity = interactor.send(:fruit_defect_category, 1)
+      assert entity.is_a?(FruitDefectCategory)
     end
 
-    def test_create_fruit_defect_type
-      attrs = fake_fruit_defect_type.to_h.reject { |k, _| k == :id }
-      res = interactor.create_fruit_defect_type(attrs)
+    def test_create_fruit_defect_category
+      attrs = fake_fruit_defect_category.to_h.reject { |k, _| k == :id }
+      res = interactor.create_fruit_defect_category(attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(FruitDefectType, res.instance)
+      assert_instance_of(FruitDefectCategory, res.instance)
       assert res.instance.id.nonzero?
     end
+
+    def test_create_fruit_defect_category_fail
+      attrs = fake_fruit_defect_category(defect_category: nil).to_h.reject { |k, _| k == :id }
+      res = interactor.create_fruit_defect_category(attrs)
+      refute res.success, 'should fail validation'
+      assert_equal ['must be filled'], res.errors[:defect_category]
+    end
+
+    def test_update_fruit_defect_category
+      id = create_fruit_defect_category
+      attrs = interactor.send(:repo).find_hash(:fruit_defect_categories, id).reject { |k, _| k == :id }
+      value = attrs[:defect_category]
+      attrs[:defect_category] = 'a_change'
+      res = interactor.update_fruit_defect_category(id, attrs)
+      assert res.success, "#{res.message} : #{res.errors.inspect}"
+      assert_instance_of(FruitDefectCategory, res.instance)
+      assert_equal 'a_change', res.instance.defect_category
+      refute_equal value, res.instance.defect_category
+    end
+
+    def test_update_fruit_defect_category_fail
+      id = create_fruit_defect_category
+      attrs = interactor.send(:repo).find_hash(:fruit_defect_categories, id).reject { |k, _| %i[id defect_category].include?(k) }
+      res = interactor.update_fruit_defect_category(id, attrs)
+      refute res.success, "#{res.message} : #{res.errors.inspect}"
+      assert_equal ['is missing'], res.errors[:defect_category]
+    end
+
+    def test_delete_fruit_defect_category
+      id = create_fruit_defect_category(force_create: true)
+      assert_count_changed(:fruit_defect_categories, -1) do
+        res = interactor.delete_fruit_defect_category(id)
+        assert res.success, res.message
+      end
+    end
+
+    # FRUIT DEFECT TYPES
+    # --------------------------------------------------------------------------
+    # def test_fruit_defect_type
+    #   MasterfilesApp::QcRepo.any_instance.stubs(:find_fruit_defect_type).returns(fake_fruit_defect_type)
+    #   entity = interactor.send(:fruit_defect_type, 1)
+    #   assert entity.is_a?(FruitDefectTypeFlat)
+    # end
+
+    # def test_create_fruit_defect_type
+    #   attrs = fake_fruit_defect_type.to_h.reject { |k, _| k == :id }
+    #   res = interactor.create_fruit_defect_type(attrs)
+    #   assert res.success, "#{res.message} : #{res.errors.inspect}"
+    #   assert_instance_of(FruitDefectTypeFlat, res.instance)
+    #   assert res.instance.id.nonzero?
+    # end
 
     def test_create_fruit_defect_type_fail
       attrs = fake_fruit_defect_type(fruit_defect_type_name: nil).to_h.reject { |k, _| k == :id }
@@ -195,7 +246,7 @@ module MasterfilesApp
       attrs[:fruit_defect_type_name] = 'a_change'
       res = interactor.update_fruit_defect_type(id, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(FruitDefectType, res.instance)
+      assert_instance_of(FruitDefectTypeFlat, res.instance)
       assert_equal 'a_change', res.instance.fruit_defect_type_name
       refute_equal value, res.instance.fruit_defect_type_name
     end
@@ -221,14 +272,14 @@ module MasterfilesApp
     def test_fruit_defect
       MasterfilesApp::QcRepo.any_instance.stubs(:find_fruit_defect).returns(fake_fruit_defect)
       entity = interactor.send(:fruit_defect, 1)
-      assert entity.is_a?(FruitDefect)
+      assert entity.is_a?(FruitDefectFlat)
     end
 
     def test_create_fruit_defect
       attrs = fake_fruit_defect.to_h.reject { |k, _| k == :id }
       res = interactor.create_fruit_defect(attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(FruitDefect, res.instance)
+      assert_instance_of(FruitDefectFlat, res.instance)
       assert res.instance.id.nonzero?
     end
 
@@ -246,7 +297,7 @@ module MasterfilesApp
       attrs[:fruit_defect_code] = 'a_change'
       res = interactor.update_fruit_defect(id, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(FruitDefect, res.instance)
+      assert_instance_of(FruitDefectFlat, res.instance)
       assert_equal 'a_change', res.instance.fruit_defect_code
       refute_equal value, res.instance.fruit_defect_code
     end
@@ -287,6 +338,8 @@ module MasterfilesApp
         id: 1,
         qc_sample_type_name: Faker::Lorem.unique.word,
         description: 'ABC',
+        default_sample_size: 1,
+        required_for_first_orchard_delivery: false,
         active: true
       }
     end
@@ -308,11 +361,26 @@ module MasterfilesApp
       QcTestType.new(qc_test_type_attrs.merge(overrides))
     end
 
+    def fruit_defect_category_attrs
+      {
+        id: 1,
+        defect_category: Faker::Lorem.unique.word,
+        reporting_description: 'ABC',
+        active: true
+      }
+    end
+
+    def fake_fruit_defect_category(overrides = {})
+      FruitDefectCategory.new(fruit_defect_category_attrs.merge(overrides))
+    end
+
     def fruit_defect_type_attrs
       {
         id: 1,
+        fruit_defect_category_id: 1,
         fruit_defect_type_name: Faker::Lorem.unique.word,
         description: 'ABC',
+        reporting_description: 'ABC',
         active: true
       }
     end
@@ -322,22 +390,32 @@ module MasterfilesApp
     end
 
     def fruit_defect_attrs
-      rmt_class_id = create_rmt_class
       fruit_defect_type_id = create_fruit_defect_type
+      fruit_defect_category_id = create_fruit_defect_category
 
       {
         id: 1,
-        rmt_class_id: rmt_class_id,
+        fruit_defect_category_id: fruit_defect_category_id,
+        defect_category: Faker::Lorem.word,
         fruit_defect_type_id: fruit_defect_type_id,
+        fruit_defect_type_name: Faker::Lorem.word,
         fruit_defect_code: Faker::Lorem.unique.word,
         short_description: 'ABC',
         description: 'ABC',
-        internal: false
+        reporting_description: 'ABC',
+        internal: false,
+        external: false,
+        pre_harvest: false,
+        post_harvest: false,
+        severity: 'ABC',
+        qc_class_2: false,
+        qc_class_3: false,
+        active: true
       }
     end
 
     def fake_fruit_defect(overrides = {})
-      FruitDefect.new(fruit_defect_attrs.merge(overrides))
+      FruitDefectFlat.new(fruit_defect_attrs.merge(overrides))
     end
 
     def interactor

@@ -143,6 +143,53 @@ module MasterfilesApp
       failed_response("Unable to delete qc test type. It is still referenced#{e.message.partition('referenced').last}")
     end
 
+    def create_fruit_defect_category(params)
+      res = validate_fruit_defect_category_params(params)
+      return validation_failed_response(res) if res.failure?
+
+      id = nil
+      repo.transaction do
+        id = repo.create_fruit_defect_category(res)
+        log_status(:fruit_defect_categories, id, 'CREATED')
+        log_transaction
+      end
+      instance = fruit_defect_category(id)
+      success_response("Created fruit defect category #{instance.defect_category}", instance)
+    rescue Sequel::UniqueConstraintViolation
+      validation_failed_response(OpenStruct.new(messages: { defect_category: ['This fruit defect category already exists'] }))
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def update_fruit_defect_category(id, params)
+      res = validate_fruit_defect_category_params(params)
+      return validation_failed_response(res) if res.failure?
+
+      repo.transaction do
+        repo.update_fruit_defect_category(id, res)
+        log_transaction
+      end
+      instance = fruit_defect_category(id)
+      success_response("Updated fruit defect category #{instance.defect_category}", instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def delete_fruit_defect_category(id) # rubocop:disable Metrics/AbcSize
+      name = fruit_defect_category(id).defect_category
+      repo.transaction do
+        repo.delete_fruit_defect_category(id)
+        log_status(:fruit_defect_categories, id, 'DELETED')
+        log_transaction
+      end
+      success_response("Deleted fruit defect category #{name}")
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue Sequel::ForeignKeyConstraintViolation => e
+      puts e.message
+      failed_response("Unable to delete fruit defect category. It is still referenced#{e.message.partition('referenced').last}")
+    end
+
     def create_fruit_defect_type(params)
       res = validate_fruit_defect_type_params(params)
       return validation_failed_response(res) if res.failure?
@@ -245,6 +292,8 @@ module MasterfilesApp
               TaskPermissionCheck::QcSampleType.call(task, id)
             when :qc_test_type
               TaskPermissionCheck::QcTestType.call(task, id)
+            when :fruit_defect_category
+              TaskPermissionCheck::FruitDefectCategory.call(task, id)
             when :fruit_defect_type
               TaskPermissionCheck::FruitDefectType.call(task, id)
             when :fruit_defect
@@ -286,7 +335,7 @@ module MasterfilesApp
     end
 
     def fruit_defect_type(id)
-      repo.find_fruit_defect_type(id)
+      repo.find_fruit_defect_type_flat(id)
     end
 
     def validate_fruit_defect_type_params(params)
@@ -299,6 +348,14 @@ module MasterfilesApp
 
     def validate_fruit_defect_params(params)
       FruitDefectSchema.call(params)
+    end
+
+    def fruit_defect_category(id)
+      repo.find_fruit_defect_category(id)
+    end
+
+    def validate_fruit_defect_category_params(params)
+      FruitDefectCategorySchema.call(params)
     end
   end
 end

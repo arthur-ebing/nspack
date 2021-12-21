@@ -10,12 +10,19 @@ module MasterfilesApp
     def entity(attrs = {})
       base_attrs = {
         id: 1,
-        rmt_class_id: 1,
         fruit_defect_type_id: 1,
         fruit_defect_code: Faker::Lorem.unique.word,
         short_description: 'ABC',
         description: 'ABC',
-        internal: false
+        reporting_description: 'ABC',
+        internal: false,
+        external: false,
+        pre_harvest: false,
+        post_harvest: false,
+        severity: 'ABC',
+        qc_class_2: false,
+        qc_class_3: false,
+        active: true
       }
       MasterfilesApp::FruitDefect.new(base_attrs.merge(attrs))
     end

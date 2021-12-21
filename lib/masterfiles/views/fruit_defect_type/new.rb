@@ -16,8 +16,10 @@ module Masterfiles
               form.caption 'New Fruit Defect Type'
               form.action '/masterfiles/quality/fruit_defect_types'
               form.remote! if remote
+              form.add_field :fruit_defect_category_id
               form.add_field :fruit_defect_type_name
               form.add_field :description
+              form.add_field :reporting_description
             end
           end
         end

@@ -1,11 +1,12 @@
 ---
-:caption: Qc Test Types
+:caption: QC Test Types
 :sql: "SELECT\r\n  \"qc_test_types\".\"id\",\r\n  \"qc_test_types\".\"qc_test_type_name\",\r\n
   \ \"qc_test_types\".\"description\",\r\n  \"qc_test_types\".\"active\",\r\n  \"qc_test_types\".\"created_at\",\r\n
   \ \"qc_test_types\".\"updated_at\"\r\nFROM\r\n  \"qc_test_types\"\r\nORDER BY \"qc_test_types\".\"qc_test_type_name\""
 :limit: 
 :offset: 
-:external_settings: {}
+:external_settings:
+  :render_url: 
 :columns:
   id:
     :name: id

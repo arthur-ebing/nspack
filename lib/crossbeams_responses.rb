@@ -135,8 +135,11 @@ module Crossbeams
     # @return [String] the formatted message.
     def unwrap_failed_response(res)
       if res.errors.empty?
+        puts 'noer'
+        p res
         res.message
       else
+        p res.errors
         "#{res.message} - #{unwrap_error_set(res.errors)}"
       end
     end
@@ -146,7 +149,7 @@ module Crossbeams
     # @param error_set [hash,Dry::Schema::MessageSet] the hash or validation error set.
     # @return [string] the errors in readable form.
     def unwrap_error_set(error_set)
-      error_set.to_h.map { |fld, errs| "#{fld} #{unwrap_errors(errs)}" }.join('; ')
+      error_set.to_h.map { |fld, errs| fld == :base ? unwrap_errors(errs) : "#{fld} #{unwrap_errors(errs)}" }.join('; ')
     end
 
     # Take validation errors and unwrap Array or Hash.

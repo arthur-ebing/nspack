@@ -19,6 +19,8 @@ module Masterfiles
               form.method :update
               form.add_field :qc_sample_type_name
               form.add_field :description
+              form.add_field :default_sample_size
+              form.add_field :required_for_first_orchard_delivery
             end
           end
         end

@@ -350,6 +350,14 @@ class AppConst # rubocop:disable Metrics/ClassLength
     '/finished_goods/titan/titan_inspection_results_post_back'
   ].freeze
 
+  # QC
+  QC_SEVERITIES = %w[Major Minor].freeze
+  QC_SAMPLE_100_FRUIT = '100_fruit_sample'
+  QC_SAMPLE_PROGRESSIVE = 'delivery_progressive_tests'
+  QC_SAMPLE_COLDROOM = 'coldroom'
+  QC_SAMPLE_PRESORT = 'presort'
+  QC_SAMPLE_PRODRUN = 'production_run'
+
   # Menu
   FUNCTIONAL_AREA_RMD = 'RMD'
 
@@ -375,6 +383,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   PRINT_APP_PALLET_TRIPSHEET = 'Pallet Tripsheet'
   PRINT_APP_PACKPOINT = 'Packpoint'
   PRINT_APP_PERSONNEL = 'Personnel'
+  PRINT_APP_QC = 'QC'
 
   PRINTER_APPLICATIONS = [
     PRINT_APP_LOCATION,
@@ -384,7 +393,8 @@ class AppConst # rubocop:disable Metrics/ClassLength
     PRINT_APP_PALLET,
     PRINT_APP_PALLET_TRIPSHEET,
     PRINT_APP_PACKPOINT,
-    PRINT_APP_PERSONNEL
+    PRINT_APP_PERSONNEL,
+    PRINT_APP_QC
   ].freeze
 
   # These will need to be configured per installation...

@@ -15,10 +15,13 @@ module UiRules
       @rules[:vehicle_job_id] = @repo.get_value(:vehicle_jobs, :id, rmt_delivery_id: @form_object.id) unless @form_object.id.nil?
       @rules[:refresh_tripsheet] = @form_object.tripsheet_created && !@form_object.tripsheet_offloaded && !@repo.delivery_tripsheet_discreps(@form_object.id).empty?
       @rules[:list_tripsheets] = !@form_object.tripsheet_offloaded && !@repo.delivery_tripsheets(@form_object.id).empty?
+      rules[:do_qc] = do_qc?
+      @qc_repo = QualityApp::QcRepo.new if rules[:do_qc]
 
       common_values_for_fields common_fields
 
       set_show_fields if %i[show reopen].include? @mode
+      build_qc if %i[show edit].include?(@mode) && rules[:do_qc]
       add_behaviours if %i[new edit].include? @mode
 
       form_name 'rmt_delivery'
@@ -315,6 +318,55 @@ module UiRules
                                     RawMaterialsApp::RmtDeliveryRepo.new.find_container_material_owners_by_container_material_type(params[:changed_value])
                                   end
       json_replace_select_options('rmt_delivery_rmt_material_owner_party_role_id', container_material_owners)
+    end
+
+    def do_qc?
+      @repo.exists?(:qc_sample_types, active: true)
+    end
+
+    def qc_sample_type_and_id(sample_type)
+      sample_type_id = @qc_repo.get_id(:qc_sample_types, qc_sample_type_name: sample_type)
+      sample_id = @qc_repo.sample_id_for_type_and_context(sample_type_id, :rmt_delivery_id, @options[:id])
+      [sample_type_id, sample_id]
+    end
+
+    def build_qc # rubocop:disable Metrics/AbcSize
+      first_delivery_rule = RawMaterialsApp::SeasonalDeliveryQcSamples.call(@options[:id])
+      rules[:first_qc_sample_outstanding] = first_delivery_rule.first_test_outstanding?
+      items_fruit = []
+      sample_type_id, fruit_id = qc_sample_type_and_id(AppConst::QC_SAMPLE_100_FRUIT)
+      if fruit_id
+        items_fruit << { url: "/quality/qc/qc_samples/#{fruit_id}/edit", text: 'Edit', behaviour: :popup }
+        # items_fruit << { url: '/', text: 'Complete', popup: true }
+        items_fruit << { url: "/quality/qc/qc_samples/#{fruit_id}/print_barcode", text: 'Print', behaviour: :popup }
+        items_fruit << { url: "/quality/qc/qc_samples/#{fruit_id}/qc_test/starch", text: 'Starch test', behaviour: :popup } # unless first_test_done(sample_type_id, test_type_name)
+        items_fruit << { url: "/quality/qc/qc_samples/#{fruit_id}/qc_test/defects", text: 'Defects test', behaviour: :direct } # unless first_test_done(sample_type_id, test_type_name)
+      elsif first_delivery_rule.need_to_make_a_sample?(AppConst::QC_SAMPLE_100_FRUIT)
+        items_fruit << { url: "/quality/qc/qc_samples/new_rmt_delivery_id_sample/#{sample_type_id}/#{@options[:id]}", text: 'Create', behaviour: :popup }
+      end
+      build_qc_summary(AppConst::QC_SAMPLE_100_FRUIT, fruit_id)
+
+      items_prog = []
+      sample_type_id, prog_id = qc_sample_type_and_id(AppConst::QC_SAMPLE_PROGRESSIVE)
+      if prog_id
+        items_prog << { url: "/quality/qc/qc_samples/#{prog_id}/edit", text: 'Edit', behaviour: :popup }
+        items_prog << { url: "/quality/qc/qc_samples/#{prog_id}/print_barcode", text: 'Print', behaviour: :popup }
+        items_prog << { url: "/quality/qc/qc_samples/#{prog_id}/qc_test/defects", text: 'Defects test', behaviour: :direct } # unless first_test_done(sample_type_id, test_type_name)
+      elsif first_delivery_rule.need_to_make_a_sample?(AppConst::QC_SAMPLE_PROGRESSIVE)
+        items_prog << { url: "/quality/qc/qc_samples/new_rmt_delivery_id_sample/#{sample_type_id}/#{@options[:id]}", text: 'Create', behaviour: :popup }
+      end
+      rules[:items_fruit] = items_fruit
+      rules[:items_prog] = items_prog
+      build_qc_summary(AppConst::QC_SAMPLE_PROGRESSIVE, prog_id)
+    end
+
+    def build_qc_summary(sample_type, sample_id)
+      items = []
+      unless sample_id.nil?
+        items << @qc_repo.sample_summary(sample_id)
+        @qc_repo.sample_test_summaries(sample_id).each { |s| items << s }
+      end
+      rules["qc_summary_#{sample_type}".to_sym] = items
     end
   end
 end

@@ -17,8 +17,10 @@ module Masterfiles
               form.action "/masterfiles/quality/fruit_defect_types/#{id}"
               form.remote!
               form.method :update
+              form.add_field :fruit_defect_category_id
               form.add_field :fruit_defect_type_name
               form.add_field :description
+              form.add_field :reporting_description
             end
           end
         end
