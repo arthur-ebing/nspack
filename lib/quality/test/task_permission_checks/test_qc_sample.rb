@@ -22,6 +22,7 @@ module QualityApp
         editing: false,
         completed: false,
         completed_at: '2010-01-01 12:00',
+        drawn_at: '2010-01-01 12:00',
         rmt_bin_ids: [1, 2, 3]
       }
       QualityApp::QcSample.new(base_attrs.merge(attrs))

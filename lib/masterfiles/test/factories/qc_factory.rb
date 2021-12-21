@@ -64,6 +64,8 @@ module MasterfilesApp
       id = get_available_factory_record(:fruit_defect_types, opts)
       return id unless id.nil?
 
+      opts[:fruit_defect_category_id] ||= create_fruit_defect_category
+
       default = {
         fruit_defect_type_name: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
