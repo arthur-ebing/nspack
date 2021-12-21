@@ -703,10 +703,13 @@ class Nspack < Roda
         r.patch do     # UPDATE
           res = interactor.update_qc_sample_type(id, params[:qc_sample_type])
           if res.success
-            update_grid_row(id, changes: { qc_sample_type_name: res.instance[:qc_sample_type_name],
-                                           description: res.instance[:description],
-                                           default_sample_size: res.instance[:default_sample_size] },
-                                notice: res.message)
+            row_keys = %i[
+              qc_sample_type_name
+              description
+              default_sample_size
+              required_for_first_orchard_delivery
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::Quality::QcSampleType::Edit.call(id, form_values: params[:qc_sample_type], form_errors: res.errors) }
           end
@@ -738,6 +741,7 @@ class Nspack < Roda
             qc_sample_type_name
             description
             default_sample_size
+            required_for_first_orchard_delivery
             active
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
@@ -776,7 +780,8 @@ class Nspack < Roda
         r.patch do     # UPDATE
           res = interactor.update_qc_test_type(id, params[:qc_test_type])
           if res.success
-            update_grid_row(id, changes: { qc_test_type_name: res.instance[:qc_test_type_name], description: res.instance[:description] },
+            update_grid_row(id, changes: { qc_test_type_name: res.instance[:qc_test_type_name],
+                                           description: res.instance[:description] },
                                 notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::Quality::QcTestType::Edit.call(id, form_values: params[:qc_test_type], form_errors: res.errors) }
@@ -822,6 +827,77 @@ class Nspack < Roda
       end
     end
 
+    # FRUIT DEFECT CATEGORIES
+    # --------------------------------------------------------------------------
+    r.on 'fruit_defect_categories', Integer do |id|
+      interactor = MasterfilesApp::QcInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:fruit_defect_categories, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('quality', 'edit')
+        interactor.assert_permission!(:fruit_defect_category, :edit, id)
+        show_partial { Masterfiles::Quality::FruitDefectCategory::Edit.call(id) }
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('quality', 'read')
+          show_partial { Masterfiles::Quality::FruitDefectCategory::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_fruit_defect_category(id, params[:fruit_defect_category])
+          if res.success
+            update_grid_row(id, changes: { defect_category: res.instance[:defect_category], reporting_description: res.instance[:reporting_description] },
+                                notice: res.message)
+          else
+            re_show_form(r, res) { Masterfiles::Quality::FruitDefectCategory::Edit.call(id, form_values: params[:fruit_defect_category], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('quality', 'delete')
+          interactor.assert_permission!(:fruit_defect_category, :delete, id)
+          res = interactor.delete_fruit_defect_category(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+
+    r.on 'fruit_defect_categories' do
+      interactor = MasterfilesApp::QcInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'new' do    # NEW
+        check_auth!('quality', 'new')
+        show_partial_or_page(r) { Masterfiles::Quality::FruitDefectCategory::New.call(remote: fetch?(r)) }
+      end
+      r.post do        # CREATE
+        res = interactor.create_fruit_defect_category(params[:fruit_defect_category])
+        if res.success
+          row_keys = %i[
+            id
+            defect_category
+            reporting_description
+            active
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
+        else
+          re_show_form(r, res, url: '/masterfiles/quality/fruit_defect_categories/new') do
+            Masterfiles::Quality::FruitDefectCategory::New.call(form_values: params[:fruit_defect_category],
+                                                                form_errors: res.errors,
+                                                                remote: fetch?(r))
+          end
+        end
+      end
+    end
+
     # FRUIT DEFECT TYPES
     # --------------------------------------------------------------------------
     r.on 'fruit_defect_types', Integer do |id|
@@ -846,8 +922,14 @@ class Nspack < Roda
         r.patch do     # UPDATE
           res = interactor.update_fruit_defect_type(id, params[:fruit_defect_type])
           if res.success
-            update_grid_row(id, changes: { fruit_defect_type_name: res.instance[:fruit_defect_type_name], description: res.instance[:description] },
-                                notice: res.message)
+            row_keys = %i[
+              fruit_defect_type_name
+              description
+              defect_category
+              fruit_defect_category_id
+              reporting_description
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::Quality::FruitDefectType::Edit.call(id, form_values: params[:fruit_defect_type], form_errors: res.errors) }
           end
@@ -878,6 +960,9 @@ class Nspack < Roda
             id
             fruit_defect_type_name
             description
+            defect_category
+            fruit_defect_category_id
+            reporting_description
             active
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
@@ -917,14 +1002,21 @@ class Nspack < Roda
           res = interactor.update_fruit_defect(id, params[:fruit_defect])
           if res.success
             row_keys = %i[
-              rmt_class_id
+              defect_category
+              fruit_defect_type_name
               fruit_defect_type_id
               fruit_defect_code
               short_description
               description
               internal
-              rmt_class_code
               fruit_defect_type_name
+              reporting_description
+              external
+              pre_harvest
+              post_harvest
+              severity
+              qc_class_2
+              qc_class_3
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
@@ -955,14 +1047,21 @@ class Nspack < Roda
         if res.success
           row_keys = %i[
             id
-            rmt_class_id
+            defect_category
+            fruit_defect_type_name
             fruit_defect_type_id
             fruit_defect_code
             short_description
             description
             internal
-            rmt_class_code
             fruit_defect_type_name
+            reporting_description
+            external
+            pre_harvest
+            post_harvest
+            severity
+            qc_class_2
+            qc_class_3
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)

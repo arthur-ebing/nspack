@@ -350,7 +350,3 @@ INSERT INTO qc_test_types (qc_test_type_name) VALUES ('starch') ON CONFLICT DO N
 INSERT INTO qc_test_types (qc_test_type_name) VALUES ('pressure') ON CONFLICT DO NOTHING;
 INSERT INTO qc_test_types (qc_test_type_name) VALUES ('starch (sugar)') ON CONFLICT DO NOTHING;
 INSERT INTO qc_test_types (qc_test_type_name) VALUES ('diameter') ON CONFLICT DO NOTHING;
-
--- FRUIT DEFECT TYPES
-INSERT INTO fruit_defect_types (fruit_defect_type_name) VALUES ('insect') ON CONFLICT DO NOTHING;
-INSERT INTO fruit_defect_types (fruit_defect_type_name) VALUES ('orchard') ON CONFLICT DO NOTHING;

@@ -400,35 +400,35 @@
 - :column: qc_samples.rmt_delivery_id
   :caption: Rmt delivery
   :data_type: :integer
-  :control_type: :list
+  :control_type: :text
   :default_value: 
   :ordered_list: true
   :ui_priority: 1
-  :list_def: SELECT id FROM rmt_deliveries ORDER BY id
+  :list_def:
 - :column: qc_samples.coldroom_location_id
   :caption: Coldroom location
   :data_type: :integer
-  :control_type: :list
+  :control_type: :text
   :default_value: 
   :ordered_list: true
   :ui_priority: 1
-  :list_def: SELECT location_long_code, id FROM locations ORDER BY location_long_code
+  :list_def:
 - :column: qc_samples.production_run_id
   :caption: Production run
   :data_type: :integer
-  :control_type: :list
+  :control_type: :text
   :default_value: 
   :ordered_list: true
   :ui_priority: 1
-  :list_def: SELECT id FROM production_runs ORDER BY id
+  :list_def:
 - :column: qc_samples.orchard_id
   :caption: Orchard
   :data_type: :integer
-  :control_type: :list
+  :control_type: :text
   :default_value: 
   :ordered_list: true
   :ui_priority: 1
-  :list_def: SELECT orchard_code, id FROM orchards ORDER BY orchard_code
+  :list_def:
 - :column: qc_samples.ref_number
   :caption: Ref number
   :data_type: :string

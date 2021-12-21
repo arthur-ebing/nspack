@@ -52,42 +52,6 @@ class Nspack < Roda
         show_partial { Quality::Qc::QcSample::Edit.call(id) }
       end
 
-      # r.on 'complete' do
-      #   r.get do
-      #     check_auth!('qc', 'edit')
-      #     interactor.assert_permission!(:complete, id)
-      #     show_partial { Quality::Qc::QcSample::Complete.call(id) }
-      #   end
-
-      #   r.post do
-      #     res = interactor.complete_a_qc_sample(id, params[:qc_sample])
-      #     if res.success
-      #       flash[:notice] = res.message
-      #       redirect_to_last_grid(r)
-      #     else
-      #       re_show_form(r, res) { Quality::Qc::QcSample::Complete.call(id, params[:qc_sample], res.errors) }
-      #     end
-      #   end
-      # end
-
-      # r.on 'reopen' do
-      #   r.get do
-      #     check_auth!('qc', 'edit')
-      #     interactor.assert_permission!(:reopen, id)
-      #     show_partial { Quality::Qc::QcSample::Reopen.call(id) }
-      #   end
-
-      #   r.post do
-      #     res = interactor.reopen_a_qc_sample(id, params[:qc_sample])
-      #     if res.success
-      #       flash[:notice] = res.message
-      #       redirect_to_last_grid(r)
-      #     else
-      #       re_show_form(r, res) { Quality::Qc::QcSample::Reopen.call(id, params[:qc_sample], res.errors) }
-      #     end
-      #   end
-      # end
-
       r.is do
         r.get do       # SHOW
           check_auth!('qc', 'read')
@@ -116,9 +80,6 @@ class Nspack < Roda
 
     r.on 'qc_samples' do
       interactor = QualityApp::QcSampleInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-      # r.on 'ui_change', String do |change_type| # Handle UI behaviours
-      #   handle_ui_change(:qc_sample, change_type.to_sym, params)
-      # end
       r.on 'select', String do |test_type|
         r.get do
           check_auth!('qc', 'new')
@@ -128,10 +89,6 @@ class Nspack < Roda
 
         r.post do
           res = interactor.find_test_for_sample(params[:qc_sample][:id], test_type)
-          # Check param etc
-          # see if test exists for sample & redirect there, else create before redirect...
-          # show_partial_or_page(r) { Quality::Qc::QcSample::SelectTest.call(params[:qc_sample][:id], remote: fetch?(r)) }
-          # res = interactor.create_test_for_sample(id, params[:qc_sample])
           if res.success
             r.redirect "/quality/qc/qc_tests/#{res.instance[:test_id]}/#{res.instance[:test_type]}"
           else
@@ -226,7 +183,7 @@ class Nspack < Roda
         if res.success
           blank_json_response
         else
-          undo_grid_inline_edit(message: res.message)
+          undo_grid_inline_edit(message: unwrap_failed_response(res))
         end
       end
 

@@ -69,10 +69,11 @@ module QualityApp
       return test_id unless test_id.nil?
 
       repo.transaction do
-        repo.create_qc_test(qc_sample_id: qc_sample_id, qc_test_type_id: test_type_id, sample_size: 20)
+        test_id = repo.create_qc_test(qc_sample_id: qc_sample_id, qc_test_type_id: test_type_id, sample_size: 20)
         log_status(:qc_samples, qc_sample_id, "CREATED TEST #{qc_test_type}")
         log_transaction
       end
+      test_id
     end
 
     def save_starch_test(id, params) # rubocop:disable Metrics/AbcSize
@@ -121,57 +122,51 @@ module QualityApp
       }.to_json
     end
 
-    def save_defect_measure(qc_test_id, fruit_defect_id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def save_defect_measure(qc_test_id, fruit_defect_id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       id = repo.get_id(:qc_defect_measurements, qc_test_id: qc_test_id, fruit_defect_id: fruit_defect_id)
-      if id.nil?
-        # Must set qty?
-        kls = case params[:column_name]
-              when 'qty_fruit_with_percentage'
-                repo.get(:fruit_defects, fruit_defect_id, :rmt_class_id)
-              when 'rmt_class_code'
-                repo.get_id(:rmt_classes, rmt_class_code: params[:column_value])
-              else
-                raise Crossbeams::FrameworkError, "No handler for editing column #{params[:column_name]}"
-              end
-        qty = case params[:column_name]
-              when 'qty_fruit_with_percentage'
-                params[:column_value]
-              when 'rmt_class_code'
-                0
-              else
-                raise Crossbeams::FrameworkError, "No handler for editing column #{params[:column_name]}"
-              end
+      col = params[:column_name].to_sym
 
-        repo.create_qc_defect_measurement(qc_test_id: qc_test_id,
-                                          fruit_defect_id: fruit_defect_id,
-                                          rmt_class_id: kls,
-                                          qty_fruit_with_percentage: qty)
+      res = UtilityFunctions.validate_integer_length(col, params[:column_value])
+      return validation_failed_response(res) if res.failure?
+
+      can_do2, can_do3 = repo.get(:fruit_defects, fruit_defect_id, %i[qc_class_2 qc_class_3])
+      case col
+      when :qty_class_2
+        return validation_failed_message_response('Cannot capture class 2 for this defect') unless can_do2
+      when :qty_class_3
+        return validation_failed_message_response('Cannot capture class 3 for this defect') unless can_do3
       else
-        case params[:column_name]
-        when 'qty_fruit_with_percentage'
-          repo.update_qc_defect_measurement(id, qty_fruit_with_percentage: params[:column_value])
-        when 'rmt_class'
-          kls_id = repo.get_id(:rmt_classes, rmt_class_code: params[:column_value])
-          repo.update_qc_defect_measurement(id, rmt_class_id: kls_id)
-        else
-          raise Crossbeams::FrameworkError, "No handler for editing column #{params[:column_name]}"
-        end
+        raise Crossbeams::FrameworkError, "No handler for editing column #{col}"
       end
-      success_response("Changed #{params[:column_name]}")
+      sample_size = repo.get(:qc_tests, qc_test_id, :sample_size)
+      return validation_failed_message_response('Cannot capture a quantity more than the sample size') if res[col] > sample_size
+
+      if id.nil?
+        repo.create_qc_defect_measurement(res.merge(qc_test_id: qc_test_id, fruit_defect_id: fruit_defect_id))
+      else
+        repo.update_qc_defect_measurement(id, res)
+      end
+      success_response("Changed #{col}")
     end
 
     private
 
     def col_defs_for_defects_grid
-      classes = repo.select_values(:rmt_classes, :rmt_class_code, active: true)
       Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
         mk.integer :id, 'ID', hide: true
+        mk.col :defect_category, 'Category', groupable: true, width: 100
         mk.col :fruit_defect_type_name, 'Type', groupable: true
-        mk.col :fruit_defect_code, 'Code'
+        mk.col :fruit_defect_code, 'Code', width: 100
         mk.col :short_description, 'Description'
         mk.boolean :internal, 'Int?', groupable: true
-        mk.col :rmt_class_code, 'Class', editable: true, cellEditor: 'search_select', cellEditorParams: { values: classes }
-        mk.integer :qty_fruit_with_percentage, 'Qty', editable: true
+        mk.boolean :external, 'Ext?', groupable: true
+        mk.boolean :pre_harvest, 'Pre?', groupable: true
+        mk.boolean :post_harvest, 'Post?', groupable: true
+        mk.col :severity, 'Severity', groupable: true, width: 100
+        mk.boolean :qc_class_2, 'CL2?', groupable: true
+        mk.integer :qty_class_2, 'CL2 Qty', editable: true
+        mk.boolean :qc_class_3, 'CL3?', groupable: true
+        mk.integer :qty_class_3, 'CL3 Qty', editable: true
       end
     end
 

@@ -26,9 +26,12 @@ module Quality
               form.submit_captions 'Change'
             end
 
-            page.add_grid('defects',
-                          "/quality/qc/qc_tests/#{id}/defects_grid",
-                          caption: 'QC Defects')
+            page.section do |section|
+              section.fit_height!
+              section.add_grid('defects',
+                               "/quality/qc/qc_tests/#{id}/defects_grid",
+                               caption: 'QC Defects')
+            end
           end
         end
       end

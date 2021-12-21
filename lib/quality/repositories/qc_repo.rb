@@ -130,26 +130,51 @@ module QualityApp
       query = <<~SQL
         SELECT
           fruit_defects.id,
+          fruit_defect_categories.defect_category,
           fruit_defect_types.fruit_defect_type_name,
           fruit_defects.fruit_defect_code,
           fruit_defects.short_description,
           internal,
-          COALESCE(defect_classes.rmt_class_code, rmt_classes.rmt_class_code) AS rmt_class_code,
-          qc_defect_measurements.qty_fruit_with_percentage
+          external,
+          pre_harvest,
+          post_harvest,
+          severity,
+          qc_class_2,
+          qc_class_3,
+          qc_defect_measurements.qty_class_2,
+          qc_defect_measurements.qty_class_3
         FROM
           fruit_defects
           JOIN fruit_defect_types ON fruit_defect_types.id = fruit_defects.fruit_defect_type_id
-          LEFT JOIN rmt_classes ON rmt_classes.id = fruit_defects.rmt_class_id
+          JOIN fruit_defect_categories ON fruit_defect_categories.id = fruit_defect_types.fruit_defect_category_id
           LEFT JOIN qc_defect_measurements ON qc_defect_measurements.fruit_defect_id = fruit_defects.id
             AND qc_defect_measurements.qc_test_id = ?
-          LEFT JOIN rmt_classes defect_classes ON defect_classes.id = qc_defect_measurements.rmt_class_id
         WHERE
           fruit_defect_types.active
+          AND fruit_defects.active
         ORDER BY
+          fruit_defect_categories.defect_category,
           fruit_defect_types.fruit_defect_type_name,
           fruit_defects.fruit_defect_code
       SQL
       DB[query, qc_test_id].all
+    end
+
+    # Given a delivery, check if there is a sample of the given type
+    # for the delivery's combination of season, cultivar and orchard.
+    def rmt_delivery_has_first_sample?(rmt_delivery_id, sample_type)
+      season_id, cultivar_id, orchard_id = get(:rmt_deliveries, rmt_delivery_id, %i[season_id cultivar_id orchard_id])
+      query = <<~SQL
+        SELECT s.id
+        FROM qc_samples s
+        JOIN qc_sample_types t ON t.id = s.qc_sample_type_id
+        JOIN rmt_deliveries r ON r.id = s.rmt_delivery_id
+        WHERE t.qc_sample_type_name = ?
+          AND r.season_id = ?
+          AND r.cultivar_id = ?
+          AND r.orchard_id = ?
+      SQL
+      !DB[query, sample_type, season_id, cultivar_id, orchard_id].first.nil?
     end
   end
 end

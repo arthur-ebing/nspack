@@ -105,12 +105,6 @@ module UiRules
                sample_size: @repo.get(:qc_sample_types, @options[:qc_sample_type_id], :default_sample_size),
                context: @options[:context],
                context_key: @options[:context_key] }
-      # qc_sample_type = case @options[:context]
-      #                  when :rmt_delivery_id
-      #                    '100_fruit_sample'
-      #                  when :coldroom_location_id
-      #                    'coldroom'
-      #                  end
       hash[:short_description] = send("desc_#{@options[:context]}".to_sym)
       # hash[:qc_sample_type_id] = @repo.get_id(:qc_sample_types, qc_sample_type_name: qc_sample_type) unless qc_sample_type.nil?
       @form_object = new_form_object_from_struct(QualityApp::QcSample, merge_hash: hash)

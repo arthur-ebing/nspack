@@ -331,31 +331,33 @@ module UiRules
     end
 
     def build_qc # rubocop:disable Metrics/AbcSize
+      first_delivery_rule = RawMaterialsApp::SeasonalDeliveryQcSamples.call(@options[:id])
+      rules[:first_qc_sample_outstanding] = first_delivery_rule.first_test_outstanding?
       items_fruit = []
-      sample_type_id, fruit_id = qc_sample_type_and_id('100_fruit_sample')
+      sample_type_id, fruit_id = qc_sample_type_and_id(AppConst::QC_SAMPLE_100_FRUIT)
       if fruit_id
         items_fruit << { url: "/quality/qc/qc_samples/#{fruit_id}/edit", text: 'Edit', behaviour: :popup }
-        items_fruit << { url: '/', text: 'Complete', popup: true }
+        # items_fruit << { url: '/', text: 'Complete', popup: true }
         items_fruit << { url: "/quality/qc/qc_samples/#{fruit_id}/print_barcode", text: 'Print', behaviour: :popup }
-        items_fruit << { url: "/quality/qc/qc_samples/#{fruit_id}/qc_test/starch", text: 'Starch test', behaviour: :popup }
-        items_fruit << { url: "/quality/qc/qc_samples/#{fruit_id}/qc_test/defects", text: 'Defects test', behaviour: :direct }
-      else
+        items_fruit << { url: "/quality/qc/qc_samples/#{fruit_id}/qc_test/starch", text: 'Starch test', behaviour: :popup } # unless first_test_done(sample_type_id, test_type_name)
+        items_fruit << { url: "/quality/qc/qc_samples/#{fruit_id}/qc_test/defects", text: 'Defects test', behaviour: :direct } # unless first_test_done(sample_type_id, test_type_name)
+      elsif first_delivery_rule.need_to_make_a_sample?(AppConst::QC_SAMPLE_100_FRUIT)
         items_fruit << { url: "/quality/qc/qc_samples/new_rmt_delivery_id_sample/#{sample_type_id}/#{@options[:id]}", text: 'Create', behaviour: :popup }
       end
-      build_qc_summary('100_fruit_sample', fruit_id)
+      build_qc_summary(AppConst::QC_SAMPLE_100_FRUIT, fruit_id)
 
       items_prog = []
-      sample_type_id, prog_id = qc_sample_type_and_id('delivery_progressive_tests')
+      sample_type_id, prog_id = qc_sample_type_and_id(AppConst::QC_SAMPLE_PROGRESSIVE)
       if prog_id
         items_prog << { url: "/quality/qc/qc_samples/#{prog_id}/edit", text: 'Edit', behaviour: :popup }
         items_prog << { url: "/quality/qc/qc_samples/#{prog_id}/print_barcode", text: 'Print', behaviour: :popup }
-        items_prog << { url: "/quality/qc/qc_samples/#{prog_id}/qc_test/defects", text: 'Defects test', behaviour: :direct }
-      else
+        items_prog << { url: "/quality/qc/qc_samples/#{prog_id}/qc_test/defects", text: 'Defects test', behaviour: :direct } # unless first_test_done(sample_type_id, test_type_name)
+      elsif first_delivery_rule.need_to_make_a_sample?(AppConst::QC_SAMPLE_PROGRESSIVE)
         items_prog << { url: "/quality/qc/qc_samples/new_rmt_delivery_id_sample/#{sample_type_id}/#{@options[:id]}", text: 'Create', behaviour: :popup }
       end
       rules[:items_fruit] = items_fruit
       rules[:items_prog] = items_prog
-      build_qc_summary('delivery_progressive_tests', prog_id)
+      build_qc_summary(AppConst::QC_SAMPLE_PROGRESSIVE, prog_id)
     end
 
     def build_qc_summary(sample_type, sample_id)

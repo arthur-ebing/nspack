@@ -19,13 +19,15 @@ module UiRules
       fields[:description] = { renderer: :label }
       fields[:default_sample_size] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
+      fields[:required_for_first_orchard_delivery] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields
       {
-        qc_sample_type_name: { required: true },
+        qc_sample_type_name: { renderer: :label, include_hidden_field: true },
         description: {},
-        default_sample_size: {}
+        default_sample_size: { renderer: :integer },
+        required_for_first_orchard_delivery: { renderer: :checkbox }
       }
     end
 

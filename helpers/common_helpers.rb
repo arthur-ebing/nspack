@@ -634,9 +634,9 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     if res.errors.empty?
       CGI.escapeHTML(res.message)
     elsif res.message == 'Validation error'
-      res.errors.map { |fld, errs| p "#{fld} #{errs.map { |e| CGI.escapeHTML(e.to_s) }.join(', ')}" }.join('; ')
+      res.errors.map { |fld, errs| "#{fld == :base ? '' : "#{fld} "}#{errs.map { |e| CGI.escapeHTML(e.to_s) }.join(', ')}" }.join('; ')
     else
-      "#{CGI.escapeHTML(res.message)} - #{res.errors.map { |fld, errs| p "#{fld} #{errs.map { |e| CGI.escapeHTML(e.to_s) }.join(', ')}" }.join('; ')}"
+      "#{CGI.escapeHTML(res.message)} - #{res.errors.map { |fld, errs| "#{fld} #{errs.map { |e| CGI.escapeHTML(e.to_s) }.join(', ')}" }.join('; ')}"
     end
   end
 

@@ -22,7 +22,7 @@ module UiRules
 
     def common_fields
       {
-        qc_test_type_name: { required: true },
+        qc_test_type_name: { renderer: :label, include_hidden_field: true },
         description: {}
       }
     end

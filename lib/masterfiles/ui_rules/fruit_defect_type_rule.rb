@@ -15,15 +15,22 @@ module UiRules
     end
 
     def set_show_fields
+      fields[:fruit_defect_category_id] = { renderer: :label, with_value: fruit_defect_category_id_label, caption: 'Fruit Defect Category' }
       fields[:fruit_defect_type_name] = { renderer: :label }
       fields[:description] = { renderer: :label }
+      fields[:reporting_description] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields
       {
+        fruit_defect_category_id: { renderer: :select,
+                                    options: @repo.for_select_fruit_defect_categories,
+                                    disabled_options: @repo.for_select_inactive_fruit_defect_categories,
+                                    caption: 'Fruit Defect Category' },
         fruit_defect_type_name: { required: true },
-        description: {}
+        description: {},
+        reporting_description: {}
       }
     end
 
@@ -38,6 +45,10 @@ module UiRules
 
     def make_new_form_object
       @form_object = new_form_object_from_struct(MasterfilesApp::FruitDefectType)
+    end
+
+    def fruit_defect_category_id_label
+      @repo.get(:fruit_defect_categories, @form_object.fruit_defect_category_id, :defect_category)
     end
   end
 end

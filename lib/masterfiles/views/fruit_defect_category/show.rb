@@ -2,20 +2,18 @@
 
 module Masterfiles
   module Quality
-    module FruitDefectType
+    module FruitDefectCategory
       class Show
         def self.call(id)
-          ui_rule = UiRules::Compiler.new(:fruit_defect_type, :show, id: id)
+          ui_rule = UiRules::Compiler.new(:fruit_defect_category, :show, id: id)
           rules   = ui_rule.compile
 
           Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form do |form|
-              # form.caption 'Fruit Defect Type'
+              # form.caption 'Fruit Defect Category'
               form.view_only!
-              form.add_field :fruit_defect_category_id
-              form.add_field :fruit_defect_type_name
-              form.add_field :description
+              form.add_field :defect_category
               form.add_field :reporting_description
               form.add_field :active
             end

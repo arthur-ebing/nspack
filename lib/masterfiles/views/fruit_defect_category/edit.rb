@@ -2,10 +2,10 @@
 
 module Masterfiles
   module Quality
-    module FruitDefectType
+    module FruitDefectCategory
       class Edit
         def self.call(id, form_values: nil, form_errors: nil)
-          ui_rule = UiRules::Compiler.new(:fruit_defect_type, :edit, id: id, form_values: form_values)
+          ui_rule = UiRules::Compiler.new(:fruit_defect_category, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
           Crossbeams::Layout::Page.build(rules) do |page|
@@ -13,13 +13,11 @@ module Masterfiles
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.caption 'Edit Fruit Defect Type'
-              form.action "/masterfiles/quality/fruit_defect_types/#{id}"
+              form.caption 'Edit Fruit Defect Category'
+              form.action "/masterfiles/quality/fruit_defect_categories/#{id}"
               form.remote!
               form.method :update
-              form.add_field :fruit_defect_category_id
-              form.add_field :fruit_defect_type_name
-              form.add_field :description
+              form.add_field :defect_category
               form.add_field :reporting_description
             end
           end

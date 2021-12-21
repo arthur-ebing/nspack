@@ -6,3 +6,8 @@
   :icon: view-show
   :title: View
   :popup: true
+- :url: "/masterfiles/quality/qc_test_types/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true

@@ -350,6 +350,14 @@ class AppConst # rubocop:disable Metrics/ClassLength
     '/finished_goods/titan/titan_inspection_results_post_back'
   ].freeze
 
+  # QC
+  QC_SEVERITIES = %w[Major Minor].freeze
+  QC_SAMPLE_100_FRUIT = '100_fruit_sample'
+  QC_SAMPLE_PROGRESSIVE = 'delivery_progressive_tests'
+  QC_SAMPLE_COLDROOM = 'coldroom'
+  QC_SAMPLE_PRESORT = 'presort'
+  QC_SAMPLE_PRODRUN = 'production_run'
+
   # Menu
   FUNCTIONAL_AREA_RMD = 'RMD'
 

@@ -6,3 +6,19 @@
   :icon: view-show
   :title: View
   :popup: true
+- :url: "/masterfiles/quality/fruit_defect_types/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/quality/fruit_defect_types/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/quality/fruit_defect_types/new"
+  :text: New Fruit Defect Type
+  :style: :button
+  :behaviour: :popup

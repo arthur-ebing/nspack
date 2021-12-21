@@ -12,6 +12,8 @@ module MasterfilesApp
         id: 1,
         qc_sample_type_name: Faker::Lorem.unique.word,
         description: 'ABC',
+        default_sample_size: 1,
+        required_for_first_orchard_delivery: false,
         active: true
       }
       MasterfilesApp::QcSampleType.new(base_attrs.merge(attrs))
