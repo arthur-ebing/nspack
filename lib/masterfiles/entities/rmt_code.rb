@@ -7,6 +7,5 @@ module MasterfilesApp
     attribute :rmt_handling_regime_id, Types::Integer
     attribute :rmt_code, Types::String
     attribute :description, Types::String
-    attribute :legacy_code, Types::String
   end
 end

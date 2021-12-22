@@ -22,7 +22,6 @@ module UiRules
       fields[:rmt_variant_id] = { renderer: :label, with_value: rmt_variant_id_label, caption: 'Rmt Variant' }
       fields[:rmt_handling_regime_id] = { renderer: :label, with_value: rmt_handling_regime_id_label, caption: 'Rmt Handling Regime' }
       fields[:rmt_code] = { renderer: :label }
-      fields[:legacy_code] = { renderer: :label }
       fields[:description] = { renderer: :label }
     end
 
@@ -34,7 +33,6 @@ module UiRules
                                   prompt: 'Select Rmt Handling Regime',
                                   required: true },
         rmt_code: { required: true },
-        legacy_code: {},
         description: {}
       }
     end
