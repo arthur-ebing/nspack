@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class QualityRepo < BaseRepo
+  class QualityRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     # INSPECTION FAILURE TYPES
     # --------------------------------------------------------------------------
     build_for_select :inspection_failure_types,
@@ -62,6 +62,31 @@ module MasterfilesApp
                           order_by: :inspection_type_code
     crud_calls_for :inspection_types, name: :inspection_type
 
+    # LABORATORIES
+    # --------------------------------------------------------------------------
+    build_for_select :laboratories,
+                     label: :lab_code,
+                     value: :id,
+                     order_by: :lab_code
+    build_inactive_select :laboratories,
+                          label: :lab_code,
+                          value: :id,
+                          order_by: :lab_code
+
+    crud_calls_for :laboratories, name: :laboratory, wrapper: Laboratory
+
+    # MRL SAMPLE TYPES
+    # --------------------------------------------------------------------------
+    build_for_select :mrl_sample_types,
+                     label: :sample_type_code,
+                     value: :id,
+                     order_by: :sample_type_code
+    build_inactive_select :mrl_sample_types,
+                          label: :sample_type_code,
+                          value: :id,
+                          order_by: :sample_type_code
+
+    crud_calls_for :mrl_sample_types, name: :mrl_sample_type, wrapper: MrlSampleType
     def find_inspection_type(id) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       hash = find_with_association(:inspection_types,
                                    id,

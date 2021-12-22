@@ -29,7 +29,8 @@ module Crossbeams
             presort_plant_integration: false,
             show_kromco_attributes: false,
             create_depot_location: false,
-            create_bin_asset_trading_partner_location: false  },
+            create_bin_asset_trading_partner_location: false,
+            enforce_mrl_check: false   },
       hl: { bin_pallet_conversion_defaults: {},
             presort_staging_target_location: {},
             delivery_capture_inner_bins: false,
@@ -54,7 +55,8 @@ module Crossbeams
             presort_plant_integration: false,
             show_kromco_attributes: false,
             create_depot_location: false,
-            create_bin_asset_trading_partner_location: false  },
+            create_bin_asset_trading_partner_location: false,
+            enforce_mrl_check: false   },
       kr: { bin_pallet_conversion_defaults: { pallet_format: { stack_type: 'BIN', pallet_base: 'S' },
                                               basic_pack: 'BX750',
                                               grade: 'SA',
@@ -87,7 +89,8 @@ module Crossbeams
             presort_plant_integration: true,
             show_kromco_attributes: true,
             create_depot_location: true,
-            create_bin_asset_trading_partner_location: true  },
+            create_bin_asset_trading_partner_location: true,
+            enforce_mrl_check: true   },
       um: { bin_pallet_conversion_defaults: {},
             presort_staging_target_location: {},
             delivery_capture_inner_bins: false,
@@ -112,7 +115,8 @@ module Crossbeams
             presort_plant_integration: false,
             show_kromco_attributes: false,
             create_depot_location: false,
-            create_bin_asset_trading_partner_location: false  },
+            create_bin_asset_trading_partner_location: false,
+            enforce_mrl_check: false   },
       ud: { bin_pallet_conversion_defaults: {},
             presort_staging_target_location: {},
             delivery_capture_inner_bins: false,
@@ -137,7 +141,8 @@ module Crossbeams
             presort_plant_integration: false,
             show_kromco_attributes: false,
             create_depot_location: false,
-            create_bin_asset_trading_partner_location: false  },
+            create_bin_asset_trading_partner_location: false,
+            enforce_mrl_check: false   },
       cfg: { bin_pallet_conversion_defaults: {},
              presort_staging_target_location: {},
              delivery_capture_inner_bins: false,
@@ -162,7 +167,8 @@ module Crossbeams
              presort_plant_integration: false,
              show_kromco_attributes: false,
              create_depot_location: false,
-             create_bin_asset_trading_partner_location: false },
+             create_bin_asset_trading_partner_location: false,
+             enforce_mrl_check: false  },
       sr: { bin_pallet_conversion_defaults: {},
             presort_staging_target_location: {},
             delivery_capture_inner_bins: false,
@@ -187,7 +193,8 @@ module Crossbeams
             presort_plant_integration: false,
             show_kromco_attributes: false,
             create_depot_location: false,
-            create_bin_asset_trading_partner_location: false   },
+            create_bin_asset_trading_partner_location: false,
+            enforce_mrl_check: false    },
       sr2: { bin_pallet_conversion_defaults: {},
              presort_staging_target_location: {},
              delivery_capture_inner_bins: false,
@@ -212,7 +219,8 @@ module Crossbeams
              presort_plant_integration: false,
              show_kromco_attributes: false,
              create_depot_location: false,
-             create_bin_asset_trading_partner_location: false  }
+             create_bin_asset_trading_partner_location: false,
+             enforce_mrl_check: false   }
     }.freeze
 
     def initialize(client_code)
@@ -400,6 +408,12 @@ module Crossbeams
       return 'Create a location record for depot.' if explain
 
       setting(:create_bin_asset_trading_partner_location)
+    end
+
+    def enforce_mrl_check?(explain: false)
+      return 'Enforce MRL check for deliveries.' if explain
+
+      setting(:enforce_mrl_check)
     end
   end
 end

@@ -1074,5 +1074,148 @@ class Nspack < Roda
         end
       end
     end
+
+    # LABORATORIES
+    # --------------------------------------------------------------------------
+    r.on 'laboratories', Integer do |id|
+      interactor = MasterfilesApp::LaboratoryInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:laboratories, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('quality', 'edit')
+        interactor.assert_permission!(:edit, id)
+        show_partial { Masterfiles::Quality::Laboratory::Edit.call(id) }
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('quality', 'read')
+          show_partial { Masterfiles::Quality::Laboratory::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_laboratory(id, params[:laboratory])
+          if res.success
+            update_grid_row(id, changes: { lab_code: res.instance[:lab_code], lab_name: res.instance[:lab_name], description: res.instance[:description] },
+                                notice: res.message)
+          else
+            re_show_form(r, res) { Masterfiles::Quality::Laboratory::Edit.call(id, form_values: params[:laboratory], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('quality', 'delete')
+          interactor.assert_permission!(:delete, id)
+          res = interactor.delete_laboratory(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+
+    r.on 'laboratories' do
+      interactor = MasterfilesApp::LaboratoryInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'new' do    # NEW
+        check_auth!('quality', 'new')
+        show_partial_or_page(r) { Masterfiles::Quality::Laboratory::New.call(remote: fetch?(r)) }
+      end
+      r.post do        # CREATE
+        res = interactor.create_laboratory(params[:laboratory])
+        if res.success
+          row_keys = %i[
+            id
+            lab_code
+            lab_name
+            description
+            active
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
+        else
+          re_show_form(r, res, url: '/masterfiles/quality/laboratories/new') do
+            Masterfiles::Quality::Laboratory::New.call(form_values: params[:laboratory],
+                                                       form_errors: res.errors,
+                                                       remote: fetch?(r))
+          end
+        end
+      end
+    end
+
+    # MRL SAMPLE TYPES
+    # --------------------------------------------------------------------------
+    r.on 'mrl_sample_types', Integer do |id|
+      interactor = MasterfilesApp::MrlSampleTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:mrl_sample_types, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('quality', 'edit')
+        interactor.assert_permission!(:edit, id)
+        show_partial { Masterfiles::Quality::MrlSampleType::Edit.call(id) }
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('quality', 'read')
+          show_partial { Masterfiles::Quality::MrlSampleType::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_mrl_sample_type(id, params[:mrl_sample_type])
+          if res.success
+            update_grid_row(id, changes: { sample_type_code: res.instance[:sample_type_code], description: res.instance[:description] },
+                                notice: res.message)
+          else
+            re_show_form(r, res) { Masterfiles::Quality::MrlSampleType::Edit.call(id, form_values: params[:mrl_sample_type], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('quality', 'delete')
+          interactor.assert_permission!(:delete, id)
+          res = interactor.delete_mrl_sample_type(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+
+    r.on 'mrl_sample_types' do
+      interactor = MasterfilesApp::MrlSampleTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'new' do    # NEW
+        check_auth!('quality', 'new')
+        show_partial_or_page(r) { Masterfiles::Quality::MrlSampleType::New.call(remote: fetch?(r)) }
+      end
+      r.post do        # CREATE
+        res = interactor.create_mrl_sample_type(params[:mrl_sample_type])
+        if res.success
+          row_keys = %i[
+            id
+            sample_type_code
+            description
+            active
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
+        else
+          re_show_form(r, res, url: '/masterfiles/quality/mrl_sample_types/new') do
+            Masterfiles::Quality::MrlSampleType::New.call(form_values: params[:mrl_sample_type],
+                                                          form_errors: res.errors,
+                                                          remote: fetch?(r))
+          end
+        end
+      end
+    end
   end
 end

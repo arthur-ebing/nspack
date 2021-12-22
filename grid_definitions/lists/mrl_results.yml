@@ -1,0 +1,42 @@
+---
+:dataminer_definition: mrl_results
+:actions:
+- :url: "/quality/mrl/mrl_results/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/quality/mrl/mrl_results/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/quality/mrl/mrl_results/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/quality/mrl/mrl_results/new?pre_harvest_result=true"
+  :text: New Pre Harvest Result
+  :style: :button
+  :behaviour: :popup
+  :hide_for_key:
+    - post_harvest_result
+- :control_type: :link
+  :url: "/quality/mrl/mrl_results/new?post_harvest_result=true"
+  :text: New Post Harvest Result
+  :style: :button
+  :behaviour: :popup
+  :hide_for_key:
+    - pre_harvest_result
+:conditions:
+  :pre_harvest_result:
+    - :col: mrl_results.pre_harvest_result
+      :op: =
+      :val: true
+  :post_harvest_result:
+    - :col: mrl_results.post_harvest_result
+      :op: =
+      :val: true

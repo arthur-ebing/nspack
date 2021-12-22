@@ -77,6 +77,7 @@ module RawMaterials
                                   visible: rules[:refresh_tripsheet],
                                   style: :button)
 
+              section.add_notice rules[:mrl_result_notice], notice_type: :warning if AppConst::CR_RMT.enforce_mrl_check? && !rules[:mrl_result_notice].nil_or_empty?
               section.form do |form|
                 form.caption 'Edit RMT Delivery'
                 form.action "/raw_materials/deliveries/rmt_deliveries/#{id}"

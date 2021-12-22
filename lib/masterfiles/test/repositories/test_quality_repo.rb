@@ -10,6 +10,8 @@ module MasterfilesApp
       assert_respond_to repo, :for_select_inspection_failure_reasons
       assert_respond_to repo, :for_select_inspection_failure_types
       assert_respond_to repo, :for_select_inspection_types
+      assert_respond_to repo, :for_select_laboratories
+      assert_respond_to repo, :for_select_mrl_sample_types
     end
 
     def test_crud_calls
@@ -18,6 +20,8 @@ module MasterfilesApp
       test_crud_calls_for :inspection_failure_reasons, name: :inspection_failure_reason, wrapper: InspectionFailureReason
       test_crud_calls_for :inspection_failure_types, name: :inspection_failure_type, wrapper: InspectionFailureType
       test_crud_calls_for :inspection_types, name: :inspection_type, wrapper: InspectionType
+      test_crud_calls_for :laboratories, name: :laboratory, wrapper: Laboratory
+      test_crud_calls_for :mrl_sample_types, name: :mrl_sample_type, wrapper: MrlSampleType
     end
 
     private

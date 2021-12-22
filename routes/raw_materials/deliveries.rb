@@ -155,6 +155,25 @@ class Nspack < Roda
         end
       end
 
+      r.on 'capture_delivery_mrl_result' do
+        res = interactor.check_existing_mrl_result_for(id)
+        if res.success
+          r.redirect("/quality/mrl/mrl_results/#{res[:instance][:existing_id]}/edit")
+        else
+          r.redirect("/quality/mrl/mrl_results/rmt_delivery/#{id}")
+        end
+      end
+
+      r.on 'print_mrl_labels' do
+        res = interactor.check_existing_mrl_result_for(id)
+        if res.success
+          r.redirect("/quality/mrl/mrl_results/#{res[:instance][:existing_id]}/print_mrl_labels")
+        else
+          flash[:error] = res.message
+          redirect_to_last_grid(r)
+        end
+      end
+
       r.on 'edit' do   # EDIT
         check_auth!('deliveries', 'edit')
         interactor.assert_permission!(:edit, id)

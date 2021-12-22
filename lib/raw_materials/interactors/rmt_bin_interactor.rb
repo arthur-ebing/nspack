@@ -905,6 +905,23 @@ module RawMaterialsApp
       success_response('Rebin Labels Printed Successfully', rebin_ids.join(','))
     end
 
+    def check_mrl_result_status_for(bin_number) # rubocop:disable Metrics/CyclomaticComplexity
+      return ok_response unless AppConst::CR_RMT.enforce_mrl_check?
+      return failed_response('Bin Number: must be filled') if bin_number.nil_or_empty?
+
+      bin_id = repo.get_value(:rmt_bins, :id, bin_asset_number: bin_number)
+      return failed_response("Bin:#{bin_number} not found") unless bin_id
+
+      delivery_id = repo.get(:rmt_bins, bin_id, :rmt_delivery_id)
+      unless delivery_id.nil_or_empty?
+        res = QualityApp::FailedAndPendingMrlResults.call(delivery_id)
+        return res unless res.success
+      end
+      ok_response
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     private
 
     def calc_rebin_params(params) # rubocop:disable Metrics/AbcSize

@@ -63,6 +63,9 @@ module MesscadaApp
       check = check_cultivar_match
       return check.message unless check.success
 
+      check = check_mrl_result_status
+      return check.message unless check.success
+
       nil
     end
 
@@ -200,6 +203,19 @@ module MesscadaApp
 
     def bin_scrapped?
       rmt_bin[:scrapped]
+    end
+
+    def check_mrl_result_status
+      return ok_response unless AppConst::CR_RMT.enforce_mrl_check?
+
+      delivery_id = repo.get(:rmt_bins, rmt_bin[:id], :rmt_delivery_id)
+      unless delivery_id.nil_or_empty?
+        res = QualityApp::FailedAndPendingMrlResults.call(delivery_id)
+        return res unless res.success
+      end
+      ok_response
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
   end
 end

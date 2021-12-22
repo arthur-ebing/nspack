@@ -1554,6 +1554,12 @@ class Nspack < Roda
         end
 
         r.post do
+          val_res = interactor.check_mrl_result_status_for(params[:bin][:bin_number])
+          unless val_res.success
+            store_locally(:errors, val_res)
+            r.redirect("/rmd/rmt_deliveries/rmt_bins/add_bin_to_tripsheet/#{id}")
+          end
+
           res = interactor.add_bin_to_tripsheet(id, params[:bin][:bin_number])
           store_locally(:errors, res) unless res.success
           r.redirect("/rmd/rmt_deliveries/rmt_bins/add_bin_to_tripsheet/#{id}")

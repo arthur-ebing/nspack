@@ -566,6 +566,17 @@ module RawMaterialsApp
       repo.find_cost_flat(id)
     end
 
+    def check_existing_mrl_result_for(delivery_id)
+      arr = %i[farm_id puc_id orchard_id cultivar_id season_id]
+      args = mrl_result_repo.mrl_result_attrs_for(delivery_id, arr)
+      existing_id = mrl_result_repo.look_for_existing_mrl_result_id(args)
+      return failed_response("There is no existing mrl result for delivery id #{delivery_id}") if existing_id.nil?
+
+      success_response('Found existing mrl result', args.merge({ existing_id: existing_id }))
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     private
 
     def rmt_delivery_cost(rmt_delivery_id, cost_id)
@@ -582,6 +593,10 @@ module RawMaterialsApp
 
     def insp_repo
       @insp_repo ||= FinishedGoodsApp::GovtInspectionRepo.new
+    end
+
+    def mrl_result_repo
+      @mrl_result_repo ||= QualityApp::MrlResultRepo.new
     end
 
     def rmt_delivery(id)
