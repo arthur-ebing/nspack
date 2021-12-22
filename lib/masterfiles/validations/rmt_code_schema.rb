@@ -7,5 +7,6 @@ module MasterfilesApp
     required(:rmt_handling_regime_id).filled(:integer)
     required(:rmt_code).filled(Types::StrippedString)
     optional(:description).maybe(Types::StrippedString)
+    optional(:legacy_code).maybe(Types::StrippedString)
   end
 end
