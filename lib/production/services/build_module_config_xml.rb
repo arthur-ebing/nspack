@@ -101,12 +101,12 @@ module ProductionApp
                 print_key = Crossbeams::Config::ResourceDefinitions::REMOTE_PRINTER_SET[p.equipment_type] || p.equipment_type
                 print_set = Crossbeams::Config::ResourceDefinitions::PRINTER_SET[print_key][p.peripheral_model]
                 xml.Printer(Name: p.system_resource_code,
-                            Type: p.equipment_type,
+                            Type: p.equipment_type.sub('remote-', ''),
                             Model: p.peripheral_model,
                             DeviceName: '',
                             ConnectionType: p.connection_type,
-                            NetworkInterface: alternate_ip || p.ip_address,
-                            Port: p.port,
+                            NetworkInterface: p.connection_type == 'USB' ? '' : alternate_ip || p.ip_address,
+                            Port: p.connection_type == 'USB' ? '' : p.port,
                             Language: print_set[:lang],
                             VendorID: p.connection_type == 'USB' ? print_set[:usb_vendor] : '',
                             ProductID: p.connection_type == 'USB' ? print_set[:usb_product] : '',
