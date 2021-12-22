@@ -137,7 +137,21 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def create_rmt_delivery(params)
+    def generate_sample_bin_sequences(sample_size, quantity_bins_with_fruit)
+      (1..quantity_bins_with_fruit).to_a.sample(sample_size)
+    end
+
+    def get_delivery_sample_bins(cultivar_id, quantity_bins_with_fruit)
+      return nil if AppConst::CR_RMT.sample_rmt_bin_percentage.zero?
+      return nil unless repo.allocate_sample_rmt_bins_for_commodity_cultivar?(cultivar_id)
+
+      sample_size = (AppConst::CR_RMT.sample_rmt_bin_percentage * quantity_bins_with_fruit).round
+      generate_sample_bin_sequences(sample_size, quantity_bins_with_fruit)
+    end
+
+    def create_rmt_delivery(params) # rubocop:disable Metrics/AbcSize
+      sample_bins = get_delivery_sample_bins(params[:cultivar_id], params[:quantity_bins_with_fruit].to_i)
+      params[:sample_bins] = sample_bins unless sample_bins.nil_or_empty?
       res = validate_rmt_delivery_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -155,7 +169,15 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def update_rmt_delivery(id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity:
+    def update_rmt_delivery(id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      bins_exist = repo.exists?(:rmt_bins, rmt_delivery_id: id)
+      quantity_bins_with_fruit_changed = repo.get_value(:rmt_deliveries, :quantity_bins_with_fruit, id: id) != params[:quantity_bins_with_fruit].to_i
+      if !bins_exist && quantity_bins_with_fruit_changed
+        sample_bins = get_delivery_sample_bins(params[:cultivar_id], params[:quantity_bins_with_fruit].to_i)
+        params[:sample_bins] = nil
+        params[:sample_bins] = sample_bins unless sample_bins.nil_or_empty?
+      end
+
       res = validate_rmt_delivery_params(params)
       return failed_response(unwrap_failed_response(validation_failed_response(res))) if res.failure? && res.errors.to_h.one? && res.errors.to_h.include?(:season_id)
       return validation_failed_response(res) if res.failure?

@@ -139,6 +139,7 @@ class Nspack < Roda
               use_size_ref_for_edi
               active
               colour_applies
+              allocate_sample_rmt_bins
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else

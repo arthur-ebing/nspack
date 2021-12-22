@@ -79,6 +79,7 @@ module MasterfilesApp
         active: true,
         commodity_group_code: 'ABC',
         use_size_ref_for_edi: false,
+        allocate_sample_rmt_bins: false,
         colour_applies: false
       }
     end

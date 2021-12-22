@@ -677,5 +677,21 @@ module RawMaterialsApp
         .select(Sequel.lit('distinct rmt_material_owner_party_role_id AS id, fn_party_role_name_with_role(rmt_material_owner_party_role_id) AS party_name'))
         .map { |p| [p[:party_name], p[:id]] }
     end
+
+    def allocate_sample_rmt_bins_for_commodity_cultivar?(cultivar_id)
+      DB[:cultivars]
+        .join(:cultivar_groups, id: :cultivar_group_id)
+        .join(:commodities, id: :commodity_id)
+        .where(Sequel[:cultivars][:id] => cultivar_id)
+        .get(:allocate_sample_rmt_bins)
+    end
+
+    def allocate_delivery_bin_samples(delivery_id, cultivar_id, sample_positions) # rubocop:disable Metrics/AbcSize
+      return unless allocate_sample_rmt_bins_for_commodity_cultivar?(cultivar_id)
+
+      bins = select_values(:rmt_bins, %i[id bin_fullness], rmt_delivery_id: delivery_id).sort_by { |s| s[0] }
+      samples = (bins.map { |b| b[0] }.values_at(*sample_positions.collect { |x| x.to_i - 1 }) + bins.find_all { |b| b[1] != AppConst::BIN_FULL }.map { |d| d[0] }).uniq
+      update_rmt_bin(samples, sample_bin: true)
+    end
   end
 end

@@ -25,6 +25,7 @@ module UiRules
       fields[:use_size_ref_for_edi] = { renderer: :label, as_boolean: true }
       fields[:active] = { renderer: :label, as_boolean: true }
       fields[:colour_applies] = { renderer: :label, as_boolean: true }
+      fields[:allocate_sample_rmt_bins] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields
@@ -41,7 +42,8 @@ module UiRules
         requires_standard_counts: { renderer: :checkbox },
         use_size_ref_for_edi: { renderer: :checkbox },
         active: { renderer: :checkbox },
-        colour_applies: { renderer: :checkbox }
+        colour_applies: { renderer: :checkbox },
+        allocate_sample_rmt_bins: { renderer: :checkbox }
       }
     end
 

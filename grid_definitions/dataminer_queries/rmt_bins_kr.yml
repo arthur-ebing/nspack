@@ -1,6 +1,6 @@
 ---
 :caption: RMT Bins
-:sql: "SELECT\r\n    id,\r\n    asset_number,\r\n    puc_id,\r\n    puc_code,\r\n
+:sql: "SELECT\r\n    id,\r\n    asset_number,\r\n    puc_id,\r\n    puc_code,\r\n    sample_bin,\r\n
   \   tip_line,\r\n    legacy_data::text as legacy_data,\r\n    orchard_id,\r\n    orchard_code,\r\n
   \   bin_received_at AS bin_received_date_time,\r\n    (SELECT count(id) FROM bin_sequences
   where rmt_bin_id = vw_rmt_bins_flat.id) as sequences,\r\n    (SELECT STRING_AGG(
@@ -1791,6 +1791,22 @@
     :pinned: 
     :groupable: false
     :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  sample_bin:
+    :name: sample_bin
+    :sequence_no: 100
+    :caption: Sample Bin
+    :namespaced_name: sample_bin
+    :data_type: :boolean
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false

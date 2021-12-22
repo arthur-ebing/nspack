@@ -10,6 +10,6 @@ module MasterfilesApp
     required(:requires_standard_counts).maybe(:bool)
     required(:use_size_ref_for_edi).maybe(:bool)
     required(:colour_applies).maybe(:bool)
-    # required(:active).filled(:bool)
+    required(:allocate_sample_rmt_bins).filled(:bool)
   end
 end

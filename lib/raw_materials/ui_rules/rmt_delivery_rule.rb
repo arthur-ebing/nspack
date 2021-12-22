@@ -83,6 +83,7 @@ module UiRules
                           as_boolean: true }
       fields[:batch_number] = { renderer: :label }
       fields[:batch_number_updated_at] = { renderer: :label }
+      fields[:sample_bins] = { renderer: :label }
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize

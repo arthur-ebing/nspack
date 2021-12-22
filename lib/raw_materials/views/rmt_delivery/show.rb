@@ -106,6 +106,7 @@ module RawMaterials
                     col.add_field :active
                     col.add_field :batch_number
                     col.add_field :batch_number_updated_at
+                    col.add_field :sample_bins
                   end
                 end
               end

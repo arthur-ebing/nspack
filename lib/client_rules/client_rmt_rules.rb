@@ -8,6 +8,7 @@ module Crossbeams
       hb: { bin_pallet_conversion_defaults: {},
             presort_staging_target_location: {},
             delivery_capture_inner_bins: false,
+            sample_rmt_bin_percentage: 0,
             use_raw_material_code: false,
             classify_raw_material: false,
             use_delivery_destination: false,
@@ -32,6 +33,7 @@ module Crossbeams
       hl: { bin_pallet_conversion_defaults: {},
             presort_staging_target_location: {},
             delivery_capture_inner_bins: false,
+            sample_rmt_bin_percentage: 0,
             use_raw_material_code: false,
             classify_raw_material: false,
             use_delivery_destination: false,
@@ -64,6 +66,7 @@ module Crossbeams
                                               sell_by_code: nil },
             presort_staging_target_location: { PRESORT_STAGING_1: 'PRESORT_1', PRESORT_STAGING_2: 'PRESORT_2' },
             delivery_capture_inner_bins: false,
+            sample_rmt_bin_percentage: 0.05,
             use_raw_material_code: true,
             classify_raw_material: true,
             use_delivery_destination: true,
@@ -88,6 +91,7 @@ module Crossbeams
       um: { bin_pallet_conversion_defaults: {},
             presort_staging_target_location: {},
             delivery_capture_inner_bins: false,
+            sample_rmt_bin_percentage: 0,
             use_raw_material_code: false,
             classify_raw_material: false,
             use_delivery_destination: false,
@@ -112,6 +116,7 @@ module Crossbeams
       ud: { bin_pallet_conversion_defaults: {},
             presort_staging_target_location: {},
             delivery_capture_inner_bins: false,
+            sample_rmt_bin_percentage: 0,
             use_raw_material_code: false,
             classify_raw_material: false,
             use_delivery_destination: true,
@@ -136,6 +141,7 @@ module Crossbeams
       cfg: { bin_pallet_conversion_defaults: {},
              presort_staging_target_location: {},
              delivery_capture_inner_bins: false,
+             sample_rmt_bin_percentage: 0,
              use_raw_material_code: false,
              classify_raw_material: false,
              use_delivery_destination: false,
@@ -160,6 +166,7 @@ module Crossbeams
       sr: { bin_pallet_conversion_defaults: {},
             presort_staging_target_location: {},
             delivery_capture_inner_bins: false,
+            sample_rmt_bin_percentage: 0,
             use_raw_material_code: false,
             classify_raw_material: false,
             use_delivery_destination: true,
@@ -184,6 +191,7 @@ module Crossbeams
       sr2: { bin_pallet_conversion_defaults: {},
              presort_staging_target_location: {},
              delivery_capture_inner_bins: false,
+             sample_rmt_bin_percentage: 0,
              use_raw_material_code: false,
              classify_raw_material: false,
              use_delivery_destination: true,
@@ -264,6 +272,12 @@ module Crossbeams
       return 'Should the destination be included in the rmt_delivery.' if explain
 
       setting(:use_delivery_destination)
+    end
+
+    def sample_rmt_bin_percentage(explain: false)
+      return 'The percentage of bins on a delivery to be identified as sample bins (when applicable).' if explain
+
+      setting(:sample_rmt_bin_percentage)
     end
 
     def check_external_bin_valid_for_integration?(explain: false)

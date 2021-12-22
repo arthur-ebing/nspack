@@ -457,7 +457,7 @@ module RawMaterialsApp
       error
     end
 
-    def create_rmt_bins(delivery_id, params) # rubocop:disable Metrics/AbcSize
+    def create_rmt_bins(delivery_id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       res = validate_bin_asset_numbers_duplicate_scans(params)
       return validation_failed_response(OpenStruct.new(message: 'Validation Error', messages: res)) unless res.empty?
 
@@ -483,6 +483,9 @@ module RawMaterialsApp
           id = repo.create_rmt_bin(bin_params)
           log_status(:rmt_bins, id, 'BIN RECEIVED')
         end
+
+        delivery_completed = delivery.quantity_bins_with_fruit == repo.select_values(:rmt_bins, :id, rmt_delivery_id: delivery_id).count
+        repo.allocate_delivery_bin_samples(delivery_id, delivery.cultivar_id, delivery.sample_bins) if delivery_completed && !delivery.sample_bins.nil_or_empty?
 
         log_status(:rmt_deliveries, delivery_id, 'DELIVERY RECEIVED')
         log_transaction
