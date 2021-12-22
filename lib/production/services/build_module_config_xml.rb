@@ -18,6 +18,7 @@ module ProductionApp
 
       @netmask = server.extended_config['netmask'] || '255.255.255.0'
       @gateway = server.extended_config['gateway'] # TODO: set to vlan gateway if applicable
+      @gateway = nil if @gateway == server.ip_address
       # Check if CLM has a vlan set & get mask + gateway from there...
       buttons = repo.robot_button_system_resources(sys_mod.plant_resource_id)
       xml = build_xml(sys_mod, buttons, server)
@@ -27,6 +28,7 @@ module ProductionApp
     def build_xml(sys_mod, buttons, server) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
       return 'No module action defined' if sys_mod.module_action.nil?
 
+      net_interface = alternate_ip || sys_mod.ip_address unless gateway.nil?
       action = Crossbeams::Config::ResourceDefinitions::MODULE_ACTIONS[sys_mod.module_action.to_sym]
       builder = Nokogiri::XML::Builder.new(encoding: 'UTF-8') do |xml| # rubocop:disable Metrics/BlockLength
         xml.comment "\n  (C) #{Time.now.year}, NoSoft MesServer XML Setup File\n  "
@@ -68,10 +70,10 @@ module ProductionApp
             xml.Rs232(Name: '/dev/ttyUSB1', Driver: 'jssc', Function: 'RS232', NetworkInterface: 0, Port: 0)
             xml.Usb(Name: '/dev/ttyACM_DEVICE0', Driver: 'usbcom', Function: 'USBIO', NetworkInterface: 0, Port: 0)
             xml.Usb(Name: '/dev/ttyACM_DEVICE1', Driver: 'usbcom', Function: 'USBIO', NetworkInterface: 0, Port: 0)
-            xml.Ethernet(Name: 'Eth01', Function: 'tcpserver', NetworkInterface: '', Port: 2000, NetMask: netmask, GateWay: '', TTL: 10_000) # FIXME: gateways may need to be set for vlan?
-            xml.Ethernet(Name: 'Eth02', Function: 'tcpserver', NetworkInterface: '', Port: 2091, NetMask: netmask, GateWay: '', TTL: 10_000)
-            xml.Ethernet(Name: 'Eth03', Function: 'tcpserver', NetworkInterface: '', Port: 2095, NetMask: netmask, GateWay: '', TTL: 10_000)
-            xml.Ethernet(Name: 'Eth04', Function: 'httpserver', NetworkInterface: '', Port: 2080, NetMask: netmask, GateWay: '', TTL: 15_000)
+            xml.Ethernet(Name: 'Eth01', Function: 'tcpserver', NetworkInterface: net_interface, Port: 2000, NetMask: netmask, GateWay: gateway, TTL: 10_000) # FIXME: gateways may need to be set for vlan?
+            xml.Ethernet(Name: 'Eth02', Function: 'tcpserver', NetworkInterface: net_interface, Port: 2091, NetMask: netmask, GateWay: gateway, TTL: 10_000)
+            xml.Ethernet(Name: 'Eth03', Function: 'tcpserver', NetworkInterface: net_interface, Port: 2095, NetMask: netmask, GateWay: gateway, TTL: 10_000)
+            xml.Ethernet(Name: 'Eth04', Function: 'httpserver', NetworkInterface: net_interface, Port: 2080, NetMask: netmask, GateWay: gateway, TTL: 15_000)
           end
 
           xml.Peripherals do # rubocop:disable Metrics/BlockLength
