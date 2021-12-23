@@ -142,7 +142,7 @@ module QualityApp
       return validation_failed_message_response('Cannot capture a quantity more than the sample size') if res[col] > sample_size
 
       if id.nil?
-        repo.create_qc_defect_measurement(res.merge(qc_test_id: qc_test_id, fruit_defect_id: fruit_defect_id))
+        repo.create_qc_defect_measurement(res.to_h.merge(qc_test_id: qc_test_id, fruit_defect_id: fruit_defect_id))
       else
         repo.update_qc_defect_measurement(id, res)
       end
