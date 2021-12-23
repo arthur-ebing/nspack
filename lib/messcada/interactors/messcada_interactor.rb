@@ -520,7 +520,7 @@ module MesscadaApp
     end
 
     def rebin_verification_and_weighing(params) # rubocop:disable Metrics/AbcSize
-      res = CartonVerificationAndWeighingSchema.call(params)
+      res = CartonVerificationAndWeighingSchema.call(params.transform_keys { |k| k == :bin_number ? :carton_number : k })
       return validation_failed_response(res) if res.failure?
 
       check_res = validate_device_and_label_exist(res[:device], res[:carton_number])
