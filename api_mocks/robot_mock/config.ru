@@ -355,6 +355,24 @@ class App < Roda # rubocop:disable Metrics/ClassLength
 
             const urlSet = [
               {
+                url: '/messcada/rmt/bin_weighing?',
+                p1: 'device',
+                p2: 'bin_number',
+                p3: 'gross_weight',
+                p4: 'measurement_unit',
+                p5: null,
+                p6: null,
+              },
+              {
+                url: '/messcada/rmt/multibin_weighing?',
+                p1: 'device',
+                p2: 'bin_number',
+                p3: 'gross_weight',
+                p4: 'measurement_unit',
+                p5: null,
+                p6: null,
+              },
+              {
                 url: '/messcada/rmt/bin_tipping?',
                 p1: 'device',
                 p2: 'bin_number',
