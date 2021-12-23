@@ -157,6 +157,24 @@ module MesscadaApp
       end
     end
 
+    def update_multiple_rmt_bin_weights(params) # rubocop:disable Metrics/AbcSize
+      bin_numbers = params[:bin_number].split(',')
+      gross_weight = (params[:gross_weight].to_f / bin_numbers.size)
+      last_res = nil
+      repo.transaction do
+        bin_numbers.each do |bin_number|
+          last_res = update_rmt_bin_weights(bin_number: bin_number,
+                                            gross_weight: gross_weight,
+                                            measurement_unit: params[:measurement_unit],
+                                            device: params[:device])
+          raise Crossbeams::InfoError, unwrap_failed_response(last_res) unless last_res.success
+        end
+      end
+      last_res
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def update_rmt_bin_weights(params) # rubocop:disable Metrics/AbcSize
       res = validate_update_rmt_bin_weights_params(params)
       return validation_failed_response(res) if res.failure?
