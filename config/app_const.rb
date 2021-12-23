@@ -459,7 +459,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # Storage Types
   STORAGE_TYPE_PALLETS = 'PALLETS'
   STORAGE_TYPE_BIN_ASSET = 'BIN_ASSET'
-  STORAGE_TYPE_BINS = 'BINS'
+  STORAGE_TYPE_BINS = 'RMT_BINS'
   EMPTY_BIN_STORAGE = 'EMPTY_BIN_STORAGE'
 
   # Locations: Location Types

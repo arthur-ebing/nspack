@@ -20,7 +20,7 @@
   = \"locations\".\"id\"\r\n  WHERE \"location_assignments_locations\".\"location_assignment_id\"
   = (SELECT id FROM location_assignments WHERE assignment_code = 'CA_TREATMENT')\r\n
   \ AND \"location_storage_types_locations\".\"location_storage_type_id\" = (SELECT
-  id FROM location_storage_types WHERE storage_type_code = 'BINS')\r\nORDER BY\r\n
+  id FROM location_storage_types WHERE storage_type_code = 'RMT_BINS')\r\nORDER BY\r\n
   \ \"locations\".\"location_long_code\""
 :limit: 
 :offset: 
