@@ -94,9 +94,9 @@ class Nspack < Roda
         check_auth!('mrl', 'new')
         res = interactor.delivery_mrl_result_attrs(rmt_delivery_id)
         if res.success
+          attrs = { delivery_result: true, pre_harvest_result: true, post_harvest_result: false }
           show_partial_or_page(r) do
-            Quality::Mrl::MrlResult::New.call(true,
-                                              false,
+            Quality::Mrl::MrlResult::New.call(attrs,
                                               form_values: res.instance,
                                               form_errors: res.errors,
                                               remote: fetch?(r))
@@ -106,11 +106,9 @@ class Nspack < Roda
 
       r.on 'new' do    # NEW
         check_auth!('mrl', 'new')
-        pre_harvest_result = params[:pre_harvest_result] == 'true'
-        post_harvest_result = params[:post_harvest_result] == 'true'
+        attrs = { delivery_result: false, pre_harvest_result: params[:pre_harvest_result] == 'true', post_harvest_result: params[:post_harvest_result] == 'true' }
         show_partial_or_page(r) do
-          Quality::Mrl::MrlResult::New.call(pre_harvest_result,
-                                            post_harvest_result,
+          Quality::Mrl::MrlResult::New.call(attrs,
                                             remote: fetch?(r))
         end
       end
@@ -127,9 +125,9 @@ class Nspack < Roda
           flash[:notice] = res.message
           redirect_to_last_grid(r)
         else
+          attrs = { delivery_result: false, pre_harvest_result: val_res.instance[:pre_harvest_result], post_harvest_result: val_res.instance[:post_harvest_result] }
           re_show_form(r, val_res, url: '/quality/mrl/mrl_results/new') do
-            Quality::Mrl::MrlResult::New.call(val_res.instance[:pre_harvest_result],
-                                              val_res.instance[:post_harvest_result],
+            Quality::Mrl::MrlResult::New.call(attrs,
                                               form_values: val_res.instance,
                                               form_errors: val_res.errors,
                                               remote: fetch?(r))

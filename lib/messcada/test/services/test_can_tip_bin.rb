@@ -31,6 +31,7 @@ module MesscadaApp
     include RawMaterialsApp::RmtDeliveryFactory
     include FinishedGoodsApp::LoadFactory
     include FinishedGoodsApp::VoyageFactory
+    include QualityApp::MrlResultFactory
 
     def bintip_criteria(opts = {})
       crit = {}
@@ -136,6 +137,12 @@ module MesscadaApp
 
       AppConst::TEST_SETTINGS.client_code = 'kr' # Allows missmatched farms if farm groups match...
       assert AppConst::CR_PROD.bintip_allow_farms_of_same_group_to_match?
+      create_mrl_result(cultivar_id: bin[:cultivar_id],
+                        puc_id: bin[:puc_id],
+                        season_id: bin[:season_id],
+                        rmt_delivery_id: bin[:rmt_delivery_id],
+                        farm_id: bin[:farm_id],
+                        orchard_id: bin[:orchard_id])
 
       # 3. farm ids differ & allow groups & groups match
       res = MesscadaApp::CanTipBin.call(bin[:bin_asset_number], 'CLM-01')
@@ -298,6 +305,13 @@ module MesscadaApp
                                      legacy_data: BaseRepo.new.hash_for_jsonb_col(run_data))
       bin = DB[:rmt_bins].where(id: bin_id).first
       run_res = success_response('ok', run_id)
+      create_mrl_result(cultivar_id: bin[:cultivar_id],
+                        puc_id: bin[:puc_id],
+                        season_id: bin[:season_id],
+                        rmt_delivery_id: bin[:rmt_delivery_id],
+                        farm_id: bin[:farm_id],
+                        orchard_id: bin[:orchard_id])
+
       CanTipBin.any_instance.stubs(:active_run_for_device).returns(run_res)
       res = MesscadaApp::CanTipBin.call(bin[:bin_asset_number], 'CLM-01')
       assert res.success, "Should be able to tip the bin - #{res.message}"

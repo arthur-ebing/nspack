@@ -2,7 +2,7 @@
 
 module UiRules
   class MrlResultRule < Base # rubocop:disable Metrics/ClassLength
-    def generate_rules # rubocop:disable Metrics/AbcSize
+    def generate_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       @repo = QualityApp::MrlResultRepo.new
       @cultivar_repo = MasterfilesApp::CultivarRepo.new
       @farm_repo = MasterfilesApp::FarmRepo.new
@@ -12,7 +12,11 @@ module UiRules
 
       make_form_object
       @rules[:hide_pre_harvest_fields] = @form_object.pre_harvest_result ? false : true
-
+      @rules[:delivery_result] = if @mode == :new
+                                   @options[:attrs][:delivery_result]
+                                 else
+                                   false
+                                 end
       apply_form_values
 
       common_values_for_fields common_fields
@@ -88,50 +92,72 @@ module UiRules
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize
-      {
-        farm_id: { renderer: :select,
-                   options: @farm_repo.for_select_farms,
-                   disabled_options: @farm_repo.for_select_inactive_farms,
-                   prompt: 'Select Farm',
-                   caption: 'Farm',
-                   searchable: true,
-                   remove_search_for_small_list: false,
-                   invisible: @rules[:hide_pre_harvest_fields] },
-        orchard_id: { renderer: :select,
-                      options: @farm_repo.for_select_orchards(
-                        where: { farm_id: @form_object.farm_id }
-                      ),
-                      disabled_options: @farm_repo.for_select_inactive_orchards,
-                      prompt: 'Select Orchard',
-                      caption: 'Orchard',
-                      searchable: true,
-                      remove_search_for_small_list: false,
-                      invisible: @rules[:hide_pre_harvest_fields] },
-        cultivar_id: { renderer: :select,
-                       options: @cultivar_repo.for_select_cultivars,
-                       disabled_options: @cultivar_repo.for_select_inactive_cultivars,
-                       prompt: 'Select Cultivar',
-                       caption: 'Cultivar',
-                       required: true,
-                       invisible: @rules[:hide_pre_harvest_fields] },
-        puc_id: { renderer: :select,
-                  options: @farm_repo.for_select_pucs(
-                    where: { farm_id: @form_object.farm_id }
-                  ),
-                  disabled_options: @farm_repo.for_select_inactive_pucs,
-                  prompt: 'Select PUC',
-                  caption: 'PUC',
-                  invisible: @rules[:hide_pre_harvest_fields] },
-        rmt_delivery_id: { renderer: :select,
-                           required: true,
-                           prompt: 'Select Delivery',
-                           options: @repo.for_select_rmt_deliveries(
-                             where: { Sequel[:rmt_deliveries][:orchard_id] => @form_object.orchard_id }
-                           ),
-                           caption: 'Delivery',
-                           searchable: true,
-                           remove_search_for_small_list: false,
-                           invisible: @rules[:hide_pre_harvest_fields] },
+      if @rules[:delivery_result]
+        farm_renderer = { renderer: :hidden }
+        puc_renderer = { renderer: :hidden }
+        orchard_renderer = { renderer: :hidden }
+        cultivar_renderer = { renderer: :hidden }
+        rmt_delivery_renderer = { renderer: :hidden }
+        season_renderer = { renderer: :hidden }
+      else
+        farm_renderer = { renderer: :select,
+                          options: @farm_repo.for_select_farms,
+                          disabled_options: @farm_repo.for_select_inactive_farms,
+                          prompt: 'Select Farm',
+                          caption: 'Farm',
+                          searchable: true,
+                          remove_search_for_small_list: false,
+                          invisible: @rules[:hide_pre_harvest_fields] }
+        puc_renderer = { renderer: :select,
+                         options: @farm_repo.for_select_pucs(
+                           where: { farm_id: @form_object.farm_id }
+                         ),
+                         disabled_options: @farm_repo.for_select_inactive_pucs,
+                         prompt: 'Select PUC',
+                         caption: 'PUC',
+                         invisible: @rules[:hide_pre_harvest_fields] }
+        orchard_renderer = { renderer: :select,
+                             options: @farm_repo.for_select_orchards(
+                               where: { farm_id: @form_object.farm_id }
+                             ),
+                             disabled_options: @farm_repo.for_select_inactive_orchards,
+                             prompt: 'Select Orchard',
+                             caption: 'Orchard',
+                             searchable: true,
+                             remove_search_for_small_list: false,
+                             invisible: @rules[:hide_pre_harvest_fields] }
+        cultivar_renderer = { renderer: :select,
+                              options: @cultivar_repo.for_select_cultivars,
+                              disabled_options: @cultivar_repo.for_select_inactive_cultivars,
+                              prompt: 'Select Cultivar',
+                              caption: 'Cultivar',
+                              required: true,
+                              invisible: @rules[:hide_pre_harvest_fields] }
+        rmt_delivery_renderer = { renderer: :select,
+                                  required: true,
+                                  prompt: 'Select Delivery',
+                                  options: @repo.for_select_rmt_deliveries(
+                                    where: { Sequel[:rmt_deliveries][:orchard_id] => @form_object.orchard_id }
+                                  ),
+                                  caption: 'Delivery',
+                                  searchable: true,
+                                  remove_search_for_small_list: false,
+                                  invisible: @rules[:hide_pre_harvest_fields] }
+        season_renderer = { renderer: :select,
+                            options: @calender_repo.for_select_seasons,
+                            disabled_options: @calender_repo.for_select_inactive_seasons,
+                            caption: 'Season',
+                            prompt: 'Select Season',
+                            searchable: true,
+                            remove_search_for_small_list: false,
+                            required: true }
+      end
+      fields = {
+        farm_id: farm_renderer,
+        orchard_id: orchard_renderer,
+        cultivar_id: cultivar_renderer,
+        puc_id: puc_renderer,
+        rmt_delivery_id: rmt_delivery_renderer,
         production_run_id: { renderer: :integer,
                              required: true,
                              caption: 'Production Run Id',
@@ -143,14 +169,7 @@ module UiRules
                                              caption: 'Post Harvest Parent Mrl Result',
                                              searchable: true,
                                              remove_search_for_small_list: false },
-        season_id: { renderer: :select,
-                     options: @calender_repo.for_select_seasons,
-                     disabled_options: @calender_repo.for_select_inactive_seasons,
-                     caption: 'Season',
-                     prompt: 'Select Season',
-                     searchable: true,
-                     remove_search_for_small_list: false,
-                     required: true },
+        season_id: season_renderer,
         laboratory_id: { renderer: :select,
                          options: @quality_repo.for_select_laboratories,
                          disabled_options: @quality_repo.for_select_inactive_laboratories,
@@ -185,6 +204,27 @@ module UiRules
         result_received_at: { renderer: :input,
                               subtype: :date }
       }
+      if @rules[:delivery_result]
+        fields[:farm_code] = { renderer: :label,
+                               with_value: @repo.get(:farms, @form_object.farm_id, :farm_code),
+                               caption: 'Farm' }
+        fields[:orchard_code] = { renderer: :label,
+                                  with_value: @repo.get(:orchards, @form_object.orchard_id, :orchard_code),
+                                  caption: 'Orchard' }
+        fields[:cultivar_name] = { renderer: :label,
+                                   with_value: @repo.get(:cultivars, @form_object.cultivar_id, :cultivar_name),
+                                   caption: 'Cultivar' }
+        fields[:puc_code] = { renderer: :label,
+                              with_value: @repo.get(:pucs, @form_object.puc_id, :puc_code),
+                              caption: 'Puc' }
+        fields[:rmt_delivery] = { renderer: :label,
+                                  with_value: @form_object.rmt_delivery_id,
+                                  caption: 'Delivery Id' }
+        fields[:season_code] = { renderer: :label,
+                                 with_value: @repo.get(:seasons, @form_object.season_id, :season_code),
+                                 caption: 'Season' }
+      end
+      fields
     end
 
     def set_mrl_result_override_details # rubocop:disable Metrics/AbcSize
@@ -230,8 +270,8 @@ module UiRules
 
     def make_new_form_object
       @form_object = new_form_object_from_struct(QualityApp::MrlResult,
-                                                 merge_hash: { pre_harvest_result: @options[:pre_harvest_result],
-                                                               post_harvest_result: @options[:post_harvest_result],
+                                                 merge_hash: { pre_harvest_result: @options[:attrs][:pre_harvest_result],
+                                                               post_harvest_result: @options[:attrs][:post_harvest_result],
                                                                fruit_received_at: Time.now,
                                                                sample_submitted_at: Time.now,
                                                                result_received_at: nil })

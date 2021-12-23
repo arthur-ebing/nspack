@@ -4,8 +4,8 @@ module Quality
   module Mrl
     module MrlResult
       class New
-        def self.call(pre_harvest_result, post_harvest_result, form_values: nil, form_errors: nil, remote: true)
-          ui_rule = UiRules::Compiler.new(:mrl_result, :new, pre_harvest_result: pre_harvest_result, post_harvest_result: post_harvest_result, form_values: form_values)
+        def self.call(attrs, form_values: nil, form_errors: nil, remote: true)
+          ui_rule = UiRules::Compiler.new(:mrl_result, :new, attrs: attrs, form_values: form_values)
           rules   = ui_rule.compile
 
           Crossbeams::Layout::Page.build(rules) do |page|
@@ -21,20 +21,27 @@ module Quality
                   col.add_field :farm_id
                   col.add_field :puc_id
                   col.add_field :orchard_id
+                  if rules[:delivery_result]
+                    col.add_field :farm_code
+                    col.add_field :puc_code
+                    col.add_field :orchard_code
+                  end
                   col.add_field :production_run_id
                   col.add_field :laboratory_id
                   col.add_field :mrl_sample_type_id
                   col.add_field :fruit_received_at
                   col.add_field :sample_submitted_at
-                  col.add_field :result_received_at
-                  col.add_field :mrl_sample_passed
-                  col.add_field :max_num_chemicals_passed
                   col.add_field :pre_harvest_result
                 end
                 row.column do |col|
                   col.add_field :rmt_delivery_id
                   col.add_field :cultivar_id
                   col.add_field :season_id
+                  if rules[:delivery_result]
+                    col.add_field :rmt_delivery
+                    col.add_field :cultivar_name
+                    col.add_field :season_code
+                  end
                   col.add_field :num_active_ingredients
                   col.add_field :sample_number
                   col.add_field :reference_number

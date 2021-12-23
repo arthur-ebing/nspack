@@ -58,20 +58,23 @@ module QualityApp
     end
 
     def mrl_result_data(attrs) # rubocop:disable Metrics/AbcSize
-      arr = %i[rmt_delivery_id waybill_number reference_number sample_number ph_level num_active_ingredients
-               max_num_chemicals_passed mrl_sample_passed pre_harvest_result post_harvest_result fruit_received_at
-               sample_submitted_at result_received_at]
+      arr = %i[ waybill_number reference_number sample_number ph_level num_active_ingredients
+                pre_harvest_result post_harvest_result fruit_received_at sample_submitted_at]
       defaults = attrs.to_h.slice(*arr)
+      defaults[:season_code] = get(:seasons, attrs[:season_id], :season_code)
+      defaults[:lab_code] = get(:laboratories, attrs[:laboratory_id], :lab_code)
+      defaults[:sample_type_code] = get(:mrl_sample_types, attrs[:mrl_sample_type_id], :sample_type_code)
 
-      data_attrs = defaults.merge({ cultivar_name: get(:cultivars, attrs[:cultivar_id], :cultivar_name),
-                                    puc_code: get(:pucs, attrs[:puc_id], :puc_code),
-                                    season_code: get(:seasons, attrs[:season_id], :season_code),
-                                    farm_code: get(:farms, attrs[:farm_id], :farm_code),
-                                    orchard_code: get(:orchards, attrs[:orchard_id], :orchard_code),
-                                    lab_code: get(:laboratories, attrs[:laboratory_id], :lab_code),
-                                    sample_type_code: get(:mrl_sample_types, attrs[:mrl_sample_type_id], :sample_type_code),
-                                    production_run_code: DB.get(Sequel.function(:fn_production_run_code, attrs[:production_run_id])) })
-      data_attrs
+      args = if attrs[:pre_harvest_result]
+               { rmt_delivery_id: attrs[:rmt_delivery_id],
+                 cultivar_name: get(:cultivars, attrs[:cultivar_id], :cultivar_name),
+                 puc_code: get(:pucs, attrs[:puc_id], :puc_code),
+                 farm_code: get(:farms, attrs[:farm_id], :farm_code),
+                 orchard_code: get(:orchards, attrs[:orchard_id], :orchard_code) }
+             else
+               { production_run_code: DB.get(Sequel.function(:fn_production_run_code, attrs[:production_run_id])) }
+             end
+      defaults.merge(args)
     end
 
     def mrl_result_attrs_for(delivery_id, arr)

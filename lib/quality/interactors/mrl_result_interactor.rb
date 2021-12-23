@@ -16,7 +16,7 @@ module QualityApp
     end
 
     def create_mrl_result(params) # rubocop:disable Metrics/AbcSize
-      res = validate_mrl_result_params(params)
+      res = validate_new_mrl_result_params(params)
       return validation_failed_response(res) if res.failure?
 
       id = nil
@@ -75,7 +75,7 @@ module QualityApp
       success_response('Ok', attrs.merge({ rmt_delivery_id: delivery_id,
                                            fruit_received_at: attrs[:date_delivered],
                                            sample_submitted_at: Time.now,
-                                           result_received_at: Time.now }))
+                                           result_received_at: nil }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -100,6 +100,10 @@ module QualityApp
 
     def mrl_result(id)
       repo.find_mrl_result(id)
+    end
+
+    def validate_new_mrl_result_params(params)
+      NewMrlResultSchema.call(params)
     end
 
     def validate_mrl_result_params(params)
