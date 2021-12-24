@@ -9,6 +9,7 @@ Dir["#{root_dir}/raw_materials/services/*.rb"].sort.each { |f| require f }
 Dir["#{root_dir}/raw_materials/task_permission_checks/*.rb"].sort.each { |f| require f }
 Dir["#{root_dir}/raw_materials/ui_rules/*.rb"].sort.each { |f| require f }
 Dir["#{root_dir}/raw_materials/validations/*.rb"].sort.each { |f| require f }
+Dir["#{root_dir}/raw_materials/view_helpers/**/*.rb"].sort.each { |f| require f }
 Dir["#{root_dir}/raw_materials/views/**/*.rb"].sort.each { |f| require f }
 Dir["#{root_dir}/raw_materials/steppers/*.rb"].sort.each { |f| require f }
 

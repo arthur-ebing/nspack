@@ -1,0 +1,102 @@
+= Views
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== Views
+
+View files are used to define the layout of a page - typically featuring a form.
+The view will generally not have much in the way of logic, as it focuses on the order and position of items in the page.
+
+=== View file structure
+
+* The view is a class with a `self.call` method that returns a `Crossbeams::Layout::Page` object for rendering.
+* The class is defined within modules so that it is uniquely namespaced when called from a route.
+* The UiRules::Compiler class is usually called to compile rendering rules for the elements in the view.
+* The page layout is built up using a DSL for laying out forms, rows, columns, fields, grids and so on.
+
+A typical view:
+
+[source,ruby]
+----
+module Masterfiles
+  module Contact
+    module Address
+      class New                                                                     <1>
+        def self.call(form_values: nil, form_errors: nil, remote: true)             <2>
+          ui_rule = UiRules::Compiler.new(:address, :new, form_values: form_values) <3>
+          rules   = ui_rule.compile                                                 <4>
+
+          Crossbeams::Layout::Page.build(rules) do |page|                           <5>
+            page.form_object ui_rule.form_object                                    <6>
+            page.form_values form_values                                            <7>
+            page.form_errors form_errors
+            page.form do |form|                                                     <8>
+              form.caption 'New Address'
+              form.action '/masterfiles/contact/addresses'
+              form.remote! if remote
+              form.add_field :address_type_id
+              form.add_field :address_line_1
+              # …
+            end
+          end
+        end
+      end
+    end
+  end
+end
+----
+<1> The class is typically named `New`, `Edit`, `Show` etc. to denote the action to be taken, while the modules above provide a namespace in keeping with the menu system.
+<2> The `call` method receives whichever parameters are required and usually `form_values` and `form_errors` so that the form can be re-displayed with validation errors.
+<3> The first two params are the name of the UICompiler (`UiRules::AddressRule` in this case) and the `mode` that is applicable in the compiler.
+<4> This line returns the "compiled" rules for use by the `Page`.
+<5> The start of the page layout is always a page which receives the rules to build upon.
+<6> Boilerplate. Provide the form object to the page.
+<7> `form_values` and `form_errors` will be used to highlight validation errors in a form and re-display the incorrect input from the user.
+<8> Build a form. See link:/developer_documentation/page_layout.adoc[Page Layout] for more details.
+
+=== View helpers
+
+If two views need to use identical layout/logic, this can be implemented in a view helper. Helper files are located in the `view_helpers` dir at the same level as the `views` dir.
+
+* Helper modules should be namespaced like: `Applet::ViewHelpers::Program` - e.g. `MasterfilesApp::ViewHelpers::Contact`.
+* View classes need to `extend` the module to use their methods:
+
+    extend MasterfilesApp::ViewHelpers::Contact.
+
+Example:
+[source,ruby]
+----
+module MasterfilesApp
+  module ViewHelpers
+    module Some
+      def some_section(page, rules)
+        page.add_notice 'Some condition is important' if rules[:some_condition]
+        page.fold_up do |fold|
+          fold.caption 'Applicable to New and Edit...'
+          fold.section do |section|
+            unless rules[:drop_options].empty?
+              section.add_control(control_type: :dropdown_button,
+                                  text: 'Some options',
+                                  items: rules[:drop_options])
+            end
+          end
+        end
+      end
+    end
+  end
+end
+----
+And in the `New` and `Edit` views:
+[source,ruby]
+----
+module Masterfiles
+  module Contact
+    module Address
+      class New
+        extend MasterfilesApp::ViewHelpers::Some
+
+          # …
+          page.add_text 'A shared bit comes here:'
+          some_section(page, rules)
+----

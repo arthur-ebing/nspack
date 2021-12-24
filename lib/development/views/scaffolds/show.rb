@@ -4,11 +4,11 @@ module Development
   module Generators
     module Scaffolds
       class Show
-        def self.call(results) # rubocop:disable Metrics/CyclomaticComplexity
+        def self.call(results) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
           ui_rule = UiRules::Compiler.new(:scaffolds, :new)
           rules   = ui_rule.compile
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page|
+          Crossbeams::Layout::Page.build(rules) do |page|
             page.section do |section|
               section.add_text <<~HTML
                 <p>
@@ -43,6 +43,7 @@ module Development
               toc.unshift('<a href="#applet">Applet</a>') if results[:applet]
               toc.push('<a href="#service">Services</a>') unless results[:services].empty?
               toc.push('<a href="#job">Jobs</a>') unless results[:jobs].empty?
+              toc.push('<a href="#view_helpers">View Helpers</a>') if results[:view_helper]
               section.add_text("<ol><li>#{toc.join('</li><li>')}</ol>")
             end
             if results[:applet]
@@ -108,6 +109,14 @@ module Development
               section.hide_caption = false
               save_snippet_form(section, results[:paths][:route], results[:route])
               section.add_text(results[:route], syntax: :ruby)
+            end
+            if results[:view_helper]
+              page.section do |section|
+                section.caption = '<a name="view_helpers">View Helper</a>'
+                section.hide_caption = false
+                save_snippet_form(section, results[:paths][:view_helper], results[:view_helper])
+                section.add_text(results[:view_helper], syntax: :ruby)
+              end
             end
             page.section do |section|
               section.caption = '<a name="views">Views</a>'
@@ -198,8 +207,6 @@ module Development
               section.add_text(results[:menu_mig], syntax: :ruby)
             end
           end
-
-          layout
         end
 
         def self.save_snippet_form(section, path, code)
