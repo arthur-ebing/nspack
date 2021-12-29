@@ -8,6 +8,7 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Added
 - QC tests for deliveries
+- Grids can be set to load with expanded groups
 ### Changed
 ### Fixed
 

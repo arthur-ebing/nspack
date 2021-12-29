@@ -274,6 +274,25 @@ r.on 'inline_save' do # COLUMN EDITED IN GRID
 end
 ----
 
+=== Grouping
+
+For a grid to be able to group by columns, those columns must have `groupable: true` in the column definition.
+To load the grid in an already-grouped state, the column's `group_by_seq` must be set to an integer value. The column with value `1` will be the top level group, the one with `group_by_seq: 2` will be the next level and so on.
+
+By default a grouped grid will load with all its groups closed. To change that, pass `group_default_expanded: n` to the `add_grid` method of a page or section.
+`n` in this case can be:
+
+-1:: Display fully expanded.
+0:: Display fully collapsed.
+positive number:: Display with this number of levels expanded.
+
+To denote the expanded grouping level in a list/search grid definition, include the following section in the yml file:
+[source,yml]
+----
+:grouping:
+  :groupDefaultExpanded: 1
+----
+
 === Display a tree
 
 A query can be displayed as a tree grid if each row returns an array column that contains the row's ancestors.

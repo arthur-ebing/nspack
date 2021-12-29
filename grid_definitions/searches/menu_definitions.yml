@@ -1,5 +1,7 @@
 ---
 :dataminer_definition: menu_definitions
+:grouping:
+  :groupDefaultExpanded: 1
 :actions:
   - :url: /security/functional_areas/functional_areas/$:functional_area_id$/edit
     :text: edit functional area
