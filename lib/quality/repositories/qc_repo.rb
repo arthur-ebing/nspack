@@ -31,7 +31,8 @@ module QualityApp
       raise Crossbeams::InfoError, "There is no QC Sample with id #{id}" if res.nil?
 
       context, context_ref = sample_context(res)
-      hash = {
+      # hash = {
+      {
         sample_id: id,
         qc_sample_type_code: get(:qc_sample_types, res[:qc_sample_type_id], :qc_sample_type_name),
         sample_date: res[:drawn_at].to_date,
@@ -41,7 +42,7 @@ module QualityApp
         short_description: res[:short_description],
         sample_size: res[:sample_size]
       }
-      QcSampleLabel.new(hash)
+      # QcSampleLabel.new(hash).to_h
     end
 
     def sample_context(res) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
