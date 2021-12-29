@@ -1,5 +1,7 @@
 ---
 :dataminer_definition: rmt_codes
+:grouping:
+  :groupDefaultExpanded: 2
 :actions:
   - :submenu:
       :text: Variants
