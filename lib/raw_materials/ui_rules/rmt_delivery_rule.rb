@@ -351,7 +351,7 @@ module UiRules
       [sample_type_id, sample_id]
     end
 
-    def build_qc # rubocop:disable Metrics/AbcSize
+    def build_qc # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       first_delivery_rule = RawMaterialsApp::SeasonalDeliveryQcSamples.call(@options[:id])
       rules[:first_qc_sample_outstanding] = first_delivery_rule.first_test_outstanding?
       items_fruit = []
@@ -377,9 +377,21 @@ module UiRules
       elsif first_delivery_rule.need_to_make_a_sample?(AppConst::QC_SAMPLE_PROGRESSIVE)
         items_prog << { url: "/quality/qc/qc_samples/new_rmt_delivery_id_sample/#{sample_type_id}/#{@options[:id]}", text: 'Create', behaviour: :popup }
       end
+      build_qc_summary(AppConst::QC_SAMPLE_PROGRESSIVE, prog_id)
+
+      items_prod = []
+      sample_type_id, prod_id = qc_sample_type_and_id(AppConst::QC_SAMPLE_PRODUCER)
+      if prod_id
+        items_prod << { url: "/quality/qc/qc_samples/#{prod_id}/edit", text: 'Edit', behaviour: :popup }
+        items_prod << { url: "/quality/qc/qc_samples/#{prod_id}/print_barcode", text: 'Print', behaviour: :popup }
+        items_prod << { url: "/quality/qc/qc_samples/#{prod_id}/qc_test/starch", text: 'Starch test', behaviour: :popup }
+      elsif first_delivery_rule.need_to_make_a_sample?(AppConst::QC_SAMPLE_PRODUCER)
+        items_prod << { url: "/quality/qc/qc_samples/new_rmt_delivery_id_sample/#{sample_type_id}/#{@options[:id]}", text: 'Create', behaviour: :popup }
+      end
+      build_qc_summary(AppConst::QC_SAMPLE_PRODUCER, prod_id)
       rules[:items_fruit] = items_fruit
       rules[:items_prog] = items_prog
-      build_qc_summary(AppConst::QC_SAMPLE_PROGRESSIVE, prog_id)
+      rules[:items_prod] = items_prod
     end
 
     def build_qc_summary(sample_type, sample_id)

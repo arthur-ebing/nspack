@@ -343,6 +343,7 @@ INSERT INTO qc_sample_types (qc_sample_type_name, default_sample_size, active) V
 INSERT INTO qc_sample_types (qc_sample_type_name, default_sample_size, active) VALUES ('presort', 20, false) ON CONFLICT DO NOTHING;
 INSERT INTO qc_sample_types (qc_sample_type_name, default_sample_size, active) VALUES ('production_run', 20, false) ON CONFLICT DO NOTHING;
 INSERT INTO qc_sample_types (qc_sample_type_name, default_sample_size, active) VALUES ('coldroom', 20, false) ON CONFLICT DO NOTHING;
+INSERT INTO qc_sample_types (qc_sample_type_name, default_sample_size, active) VALUES ('producer', 20, false) ON CONFLICT DO NOTHING;
 
 -- QC TEST TYPES
 INSERT INTO qc_test_types (qc_test_type_name) VALUES ('defects') ON CONFLICT DO NOTHING;

@@ -12,9 +12,13 @@ module RawMaterialsApp
     def call
       qc_fruit = repo.get_value(:qc_sample_types, :required_for_first_orchard_delivery, qc_sample_type_name: AppConst::QC_SAMPLE_100_FRUIT)
       qc_prog = repo.get_value(:qc_sample_types, :required_for_first_orchard_delivery, qc_sample_type_name: AppConst::QC_SAMPLE_PROGRESSIVE)
-      hash = { AppConst::QC_SAMPLE_100_FRUIT => { required: qc_fruit }, AppConst::QC_SAMPLE_PROGRESSIVE => { required: qc_prog } }
+      qc_prod = repo.get_value(:qc_sample_types, :required_for_first_orchard_delivery, qc_sample_type_name: AppConst::QC_SAMPLE_PRODUCER)
+      hash = { AppConst::QC_SAMPLE_100_FRUIT => { required: qc_fruit },
+               AppConst::QC_SAMPLE_PROGRESSIVE => { required: qc_prog },
+               AppConst::QC_SAMPLE_PRODUCER => { required: qc_prog } }
       hash[AppConst::QC_SAMPLE_100_FRUIT][:has_test] = existing_test_for?(AppConst::QC_SAMPLE_100_FRUIT) if qc_fruit
       hash[AppConst::QC_SAMPLE_PROGRESSIVE][:has_test] = existing_test_for?(AppConst::QC_SAMPLE_PROGRESSIVE) if qc_prog
+      hash[AppConst::QC_SAMPLE_PRODUCER][:has_test] = existing_test_for?(AppConst::QC_SAMPLE_PRODUCER) if qc_prod
       Responder.new(hash)
     end
 
@@ -37,7 +41,7 @@ module RawMaterialsApp
       end
 
       def need_to_make_a_sample?(type)
-        raise ArgumentError, "Invalid sample type: #{type}" unless [AppConst::QC_SAMPLE_100_FRUIT, AppConst::QC_SAMPLE_PROGRESSIVE].include?(type)
+        raise ArgumentError, "Invalid sample type: #{type}" unless [AppConst::QC_SAMPLE_100_FRUIT, AppConst::QC_SAMPLE_PROGRESSIVE, AppConst::QC_SAMPLE_PRODUCER].include?(type)
 
         return true unless tests_state[type][:required]
         return true unless tests_state[type][:has_test]
