@@ -47,7 +47,8 @@ class AppConst
     'sr2' => 'Sitrusrand Addo',
     'kr' => 'Kromco',
     'cfg' => 'Ceres Fruit Growers',
-    'ghs' => 'Goede Hoop Sitrus'
+    'ghs' => 'Goede Hoop Sitrus',
+    'mc' => 'Mouton Citrus'
   }.freeze
 
   # Load the client settings from ENV:
