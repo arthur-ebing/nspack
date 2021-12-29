@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MesscadaApp
-  SequencesMatchSchema = Dry::Schema.Params do # rubocop:disable Metrics/BlockLength
+  SequencesMatchSchema = Dry::Schema.Params do
     required(:pallet_id).filled(:integer)
     required(:puc_id).filled(:integer)
     required(:production_run_id).maybe(:integer)

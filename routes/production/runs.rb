@@ -20,14 +20,12 @@ class Nspack < Roda
 
       r.on 'set_bin_tipping_control_data' do
         r.get do
-          run = interactor.production_run(id)
-          show_partial_or_page(r) { Production::Runs::ProductionRun::BinTippingControlData.call(id, form_values: run.legacy_data, remote: fetch?(r)) }
+          show_partial_or_page(r) { Production::Runs::ProductionRun::BinTippingControlData.call(id, remote: fetch?(r)) }
         end
 
         r.post do
           res = interactor.create_run_bin_tipping_control_data(id, params[:bin_tipping_control_data])
           if res.success
-            flash[:notice] = res.message
             r.redirect("/production/runs/production_runs/#{id}/edit")
           else
             re_show_form(r, res, url: "/production/runs/production_runs/#{id}/set_bin_tipping_control_data") do
@@ -47,7 +45,6 @@ class Nspack < Roda
         r.post do
           res = interactor.create_run_bin_tipping_criteria(id, params[:bin_tipping_criteria])
           if res.success
-            flash[:notice] = res.message
             r.redirect("/production/runs/production_runs/#{id}/edit")
           else
             re_show_form(r, res, url: "/production/runs/production_runs/#{id}/set_bin_tipping_criteria") do
@@ -1069,15 +1066,13 @@ class Nspack < Roda
                      OpenStruct.new(type: :set_checked, dom_id: 'bin_tipping_criteria_farm_code', checked: toggle),
                      OpenStruct.new(type: :set_checked, dom_id: 'bin_tipping_criteria_commodity_code', checked: toggle),
                      OpenStruct.new(type: :set_checked, dom_id: 'bin_tipping_criteria_rmt_variety_code', checked: toggle),
-                     OpenStruct.new(type: :set_checked, dom_id: 'bin_tipping_criteria_treatment_code', checked: toggle),
-                     OpenStruct.new(type: :set_checked, dom_id: 'bin_tipping_criteria_rmt_size', checked: toggle),
                      OpenStruct.new(type: :set_checked, dom_id: 'bin_tipping_criteria_product_class_code', checked: toggle),
-                     OpenStruct.new(type: :set_checked, dom_id: 'bin_tipping_criteria_rmt_product_type', checked: toggle),
-                     OpenStruct.new(type: :set_checked, dom_id: 'bin_tipping_criteria_pc_code', checked: toggle),
-                     OpenStruct.new(type: :set_checked, dom_id: 'bin_tipping_criteria_cold_store_type', checked: toggle),
                      OpenStruct.new(type: :set_checked, dom_id: 'bin_tipping_criteria_season_code', checked: toggle),
-                     OpenStruct.new(type: :set_checked, dom_id: 'bin_tipping_criteria_track_indicator_code', checked: toggle),
-                     OpenStruct.new(type: :set_checked, dom_id: 'bin_tipping_criteria_ripe_point_code', checked: toggle)
+                     OpenStruct.new(type: :set_checked, dom_id: 'bin_tipping_criteria_colour_percentage', checked: toggle),
+                     OpenStruct.new(type: :set_checked, dom_id: 'bin_tipping_criteria_actual_cold_treatment', checked: toggle),
+                     OpenStruct.new(type: :set_checked, dom_id: 'bin_tipping_criteria_actual_ripeness_treatment', checked: toggle),
+                     OpenStruct.new(type: :set_checked, dom_id: 'bin_tipping_criteria_rmt_code', checked: toggle),
+                     OpenStruct.new(type: :set_checked, dom_id: 'bin_tipping_criteria_rmt_size', checked: toggle)
                    ])
     end
 

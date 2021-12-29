@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ProductionApp
-  class WorkOrderInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class WorkOrderInteractor < BaseInteractor
     def create_work_order(params) # rubocop:disable Metrics/AbcSize
       res = validate_work_order_params(params)
       return validation_failed_response(res) if res.failure?

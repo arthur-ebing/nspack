@@ -1,4 +1,4 @@
-module JsonHelpers # rubocop:disable Metrics/ModuleLength
+module JsonHelpers
   def prep_hash_with_decimal_for_json(hash)
     hash.transform_values { |v| v.is_a?(BigDecimal) ? v.to_s('F') : v }
   end

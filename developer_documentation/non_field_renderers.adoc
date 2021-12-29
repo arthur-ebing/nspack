@@ -489,6 +489,11 @@ if `query_string` is present, this will be added as the querystring of the callb
 |Hash
 |None.
 
+|options - :group_default_expanded
+|The number of groups to show expanded when loading the grid. (0 == none; -1 == all; any positive number == that number of levels)
+|Integer
+|None.
+
 4+|**The following options are applicable when loading a list grid as a tree**
 
 |options - :tree
@@ -544,7 +549,7 @@ groupDefaultExpanded:: Level to which the tree should be expanded. If `-1`, the 
 4+|**The following options are applicable to multiselect grids**
 
 |options - :is_multiselect
-|Set to true if the grid should render with multiselect chackboxes.
+|Set to true if the grid should render with multiselect checkboxes.
 |Boolean
 |`false`
 

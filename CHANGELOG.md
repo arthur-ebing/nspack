@@ -7,9 +7,14 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
-- QC tests for deliveries
 ### Changed
 ### Fixed
+
+## [1.0.6] - 2021-12-29
+### Added
+- QC tests for deliveries
+- Grids can be set to load with expanded groups
+- Discontinue use of `run.legacy_data`
 
 ## [1.0.5] - 2021-12-20
 ### Added

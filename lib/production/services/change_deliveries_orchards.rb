@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ProductionApp
-  class ChangeDeliveriesOrchards < BaseService # rubocop:disable Metrics/ClassLength
+  class ChangeDeliveriesOrchards < BaseService
     attr_reader :repo, :farm_repo, :cultivar_repo, :change_attrs, :reworks_run_attrs,
                 :delivery_ids, :default_changes_to_apply,
                 :production_runs, :tipped_bins, :carton_labels, :pallet_sequences

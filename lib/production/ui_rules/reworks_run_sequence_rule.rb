@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class ReworksRunSequenceRule < Base # rubocop:disable Metrics/ClassLength
+  class ReworksRunSequenceRule < Base
     def generate_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       @repo = ProductionApp::ReworksRepo.new
       @farm_repo = MasterfilesApp::FarmRepo.new
@@ -462,7 +462,7 @@ module UiRules
     end
 
     def edit_sequence_behaviours # rubocop:disable Metrics/AbcSize
-      behaviours do |behaviour| # rubocop:disable Metrics/BlockLength
+      behaviours do |behaviour|
         behaviour.dropdown_change :basic_pack_code_id,
                                   notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/basic_pack_code_changed",
                                              param_keys: %i[reworks_run_sequence_commodity_id reworks_run_sequence_std_fruit_size_count_id] }]

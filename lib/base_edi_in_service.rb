@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class BaseEdiInService < BaseService # rubocop:disable Metrics/ClassLength
+class BaseEdiInService < BaseService
   attr_reader :flow_type, :edi_in_transaction, :edi_records, :file_name, :logger, :process_from_recordset
 
   def initialize(id, file_path, logger, edi_result)

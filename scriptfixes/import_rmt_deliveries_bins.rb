@@ -30,7 +30,7 @@
 # For deployment at Sitrusrand
 # Import legacy data.
 #
-class ImportRmtDeliveriesBins < BaseScript # rubocop:disable Metrics/ClassLength
+class ImportRmtDeliveriesBins < BaseScript
   def run # rubocop:disable Metrics/AbcSize
     @filename = args[0]
     @status = 'IMPORTED_FOR_GO_LIVE'
@@ -61,7 +61,7 @@ class ImportRmtDeliveriesBins < BaseScript # rubocop:disable Metrics/ClassLength
     table = CSV::Table.new(CSV.parse(File.read(@filename), headers: true).sort_by { |row| row['IN_NUMBER'] })
     in_numbers = table['IN_NUMBER'].uniq
 
-    in_numbers.each do |in_number| # rubocop:disable Metrics/BlockLength
+    in_numbers.each do |in_number|
       delivery_rows = table.select { |row| row['IN_NUMBER'] == in_number }
       row = delivery_rows.first
 
@@ -116,7 +116,7 @@ class ImportRmtDeliveriesBins < BaseScript # rubocop:disable Metrics/ClassLength
       end
 
       # create rmt_bins
-      delivery_rows.each do |delivery_row| # rubocop:disable Metrics/BlockLength
+      delivery_rows.each do |delivery_row|
         bin_asset_number = delivery_row['BINNUMBER'].strip
         if bin_asset_number.gsub('BJV', '').gsub('BVJ', '').gsub('BJ', '').gsub('SR', '').gsub('BV', '').gsub('JB', '').length != 8
           @errors << "check BINNUMBER: #{bin_asset_number}"

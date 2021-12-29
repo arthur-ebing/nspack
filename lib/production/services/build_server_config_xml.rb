@@ -23,9 +23,9 @@ module ProductionApp
       return 'No module action defined' if sys_mod.module_action.nil?
 
       # action = Crossbeams::Config::ResourceDefinitions::MODULE_ACTIONS[sys_mod.module_action.to_sym]
-      builder = Nokogiri::XML::Builder.new(encoding: 'UTF-8') do |xml| # rubocop:disable Metrics/BlockLength
+      builder = Nokogiri::XML::Builder.new(encoding: 'UTF-8') do |xml|
         xml.comment "\n  (C) #{Time.now.year}, NoSoft MesServer XML Setup File\n  "
-        xml.SystemSchema do # rubocop:disable Metrics/BlockLength
+        xml.SystemSchema do
           xml.Messages do
             xml.MsgQueLength 3500
           end

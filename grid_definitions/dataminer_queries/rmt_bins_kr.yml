@@ -1,6 +1,6 @@
 ---
 :caption: RMT Bins
-:sql: "SELECT\r\n    id,\r\n    asset_number,\r\n    puc_id,\r\n    puc_code,\r\n
+:sql: "SELECT\r\n    id,\r\n    asset_number,\r\n    puc_id,\r\n    puc_code,\r\n    sample_bin,\r\n
   \   tip_line,\r\n    legacy_data::text as legacy_data,\r\n    orchard_id,\r\n    orchard_code,\r\n
   \   bin_received_at AS bin_received_date_time,\r\n    (SELECT count(id) FROM bin_sequences
   where rmt_bin_id = vw_rmt_bins_flat.id) as sequences,\r\n    (SELECT STRING_AGG(
@@ -34,10 +34,9 @@
   \   scrapped,\r\n    scrapped_at,\r\n    scrap_remarks,\r\n    unscrapped_at,\r\n
   \   production_run_rebin_id,\r\n    rebin_created_at,\r\n    age,\r\n    legacy_data
   ->> 'colour' AS colour,\r\n    rmt_code,\r\n    legacy_data ->> 'track_slms_indicator_1_code'
-  AS legacy_rmt_code,\r\n    legacy_data ->> 'pc_code' AS pc_code,\r\n    legacy_data
-  ->> 'cold_store_type' AS regime_code,\r\n    fn_current_status('locations', vw_rmt_bins_flat.location_id)
+  AS legacy_rmt_code,\r\n    legacy_data ->> 'pc_code' AS pc_code,\r\n    regime_code,\r\n    fn_current_status('locations', vw_rmt_bins_flat.location_id)
   AS location_status,\r\n    last_coldroom_event,\r\n    coldroom_events,\r\n    classifications,\r\n
-  \   classifications[1] AS classification1,  \r\n    classifications[2] AS classification2,
+  \   classifications[1] AS classification1,  \r\n    classifications[2] AS classification2,\r\n    actual_ripeness_treatment,\r\n    actual_cold_treatment,\r\n
   \ \r\n    classifications[3] AS classification3,\r\n    main_ripeness_treatment,\r\n
   \   main_cold_treatment,\r\n    treatments,\r\n    presort_tip_lot_number,\r\n    main_presort_run_lot_number,\r\n
   \   CASE \r\n    WHEN bin_tipped THEN 'gray'\r\n    WHEN shipped THEN 'blue'\r\n
@@ -1791,6 +1790,22 @@
     :pinned: 
     :groupable: false
     :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  sample_bin:
+    :name: sample_bin
+    :sequence_no: 100
+    :caption: Sample Bin
+    :namespaced_name: sample_bin
+    :data_type: :boolean
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false

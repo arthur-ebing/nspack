@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module EdiApp
-  class PoOutRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class PoOutRepo < BaseRepo
     def po_header_row(load_id)
       load_code = AppConst::CR_EDI.load_id_prefix.empty? ? 'loads.id' : "'#{AppConst::CR_EDI.load_id_prefix}' || loads.id::text"
       query = <<~SQL

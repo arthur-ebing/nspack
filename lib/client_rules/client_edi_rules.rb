@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Crossbeams
-  class ClientEdiRules < BaseClientRules # rubocop:disable Metrics/ClassLength
+  class ClientEdiRules < BaseClientRules
     include Crossbeams::AutoDocumentation
 
     CLIENT_SETTINGS = {
@@ -91,6 +91,20 @@ module Crossbeams
              edi_in_default_phc: 'Unknown',
              edi_out_account: '0000',
              ps_apply_substitutes: false },
+      mc: { install_location: 'MC',
+            install_depot: 'MC',
+            sender: 'MC',
+            load_id_prefix: '',
+            default_edi_in_inv_code: 'UL',
+            li_default_pallet_base: 'S',
+            li_default_pallet_stack_height: 'S',
+            li_receive_restricted_to_orgs: [],
+            csv_overrides: {},
+            send_hbs_edi: false,
+            po_in_force_orchard: false,
+            edi_in_default_phc: nil,
+            edi_out_account: nil,
+            ps_apply_substitutes: false },
       sr: { install_location: 'SRKIRKW',
             install_depot: 'SR',
             sender: 'SR',

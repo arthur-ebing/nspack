@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # A class for defining global constants in a central place.
-class AppConst # rubocop:disable Metrics/ClassLength
+class AppConst
   require_relative 'client_settings_loader'
 
   def self.development?
@@ -47,7 +47,8 @@ class AppConst # rubocop:disable Metrics/ClassLength
     'sr2' => 'Sitrusrand Addo',
     'kr' => 'Kromco',
     'cfg' => 'Ceres Fruit Growers',
-    'ghs' => 'Goede Hoop Sitrus'
+    'ghs' => 'Goede Hoop Sitrus',
+    'mc' => 'Mouton Citrus'
   }.freeze
 
   # Load the client settings from ENV:
@@ -132,6 +133,10 @@ class AppConst # rubocop:disable Metrics/ClassLength
   CREATED_FROM_BIN = 'CREATED_FROM_BIN'
   CONVERTED_TO_REBIN = 'CONVERTED_TO_REBIN'
   EXTENDED_FG_CODE_RECALCULATED = 'EXTENDED_FG_CODE_RECALCULATED'
+
+  # Constants for treatment types
+  COLD_TREATMENT = 'COLD_TREATMENT'
+  RIPENESS_TREATMENT = 'RIPENESS_TREATMENT'
 
   # Constants for bin_scan_mode:
   SCAN_BINS_INDIVIDUALLY = 1
@@ -384,6 +389,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   PRINT_APP_PACKPOINT = 'Packpoint'
   PRINT_APP_PERSONNEL = 'Personnel'
   PRINT_APP_QC = 'QC'
+  PRINT_APP_MRL = 'Mrl'
 
   PRINTER_APPLICATIONS = [
     PRINT_APP_LOCATION,
@@ -394,7 +400,8 @@ class AppConst # rubocop:disable Metrics/ClassLength
     PRINT_APP_PALLET_TRIPSHEET,
     PRINT_APP_PACKPOINT,
     PRINT_APP_PERSONNEL,
-    PRINT_APP_QC
+    PRINT_APP_QC,
+    PRINT_APP_MRL
   ].freeze
 
   # These will need to be configured per installation...

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class PmBomInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class PmBomInteractor < BaseInteractor
     def create_pm_bom(params)
       res = validate_pm_bom_params(params)
       return validation_failed_response(res) if res.failure?

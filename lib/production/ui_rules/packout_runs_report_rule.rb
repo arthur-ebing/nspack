@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class PackoutRunsReportRule < Base # rubocop:disable Metrics/ClassLength
+  class PackoutRunsReportRule < Base
     def generate_rules
       @resource_repo = ProductionApp::ResourceRepo.new
       # @farm_repo = MasterfilesApp::FarmRepo.new

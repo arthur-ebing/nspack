@@ -4,7 +4,7 @@
   AS commodity_group_code,\r\n    commodities.code,\r\n    commodities.description,\r\n
   \   commodities.hs_code,\r\n    commodities.requires_standard_counts,\r\n    commodities.use_size_ref_for_edi,\r\n
   \   commodities.colour_applies,\r\n    fn_masterfile_variants('commodities', commodities.id)
-  AS variant_codes,\r\n    commodities.active,\r\n    commodities.created_at,\r\n
+  AS variant_codes,\r\n    commodities.allocate_sample_rmt_bins,\r\n    commodities.active,\r\n    commodities.created_at,\r\n
   \   commodities.updated_at\r\nFROM  commodities\r\nJOIN commodity_groups ON commodity_groups.id
   = commodities.commodity_group_id"
 :limit: 
@@ -171,22 +171,6 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  active:
-    :name: active
-    :sequence_no: 11
-    :caption: Active
-    :namespaced_name: commodities.active
-    :data_type: :boolean
-    :width: 80
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   created_at:
     :name: created_at
     :sequence_no: 12
@@ -215,6 +199,22 @@
     :pinned: 
     :groupable: false
     :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  allocate_sample_rmt_bins:
+    :name: allocate_sample_rmt_bins
+    :sequence_no: 14
+    :caption: Allocate Sampl Rmt Bins?
+    :namespaced_name: commodities.allocate_sample_rmt_bins
+    :data_type: :boolean
+    :width: 80
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false

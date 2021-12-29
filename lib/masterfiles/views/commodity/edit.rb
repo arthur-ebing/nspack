@@ -23,6 +23,7 @@ module Masterfiles
               form.add_field :requires_standard_counts
               form.add_field :use_size_ref_for_edi
               form.add_field :colour_applies
+              form.add_field :allocate_sample_rmt_bins
             end
 
             if rules[:colour_applies]

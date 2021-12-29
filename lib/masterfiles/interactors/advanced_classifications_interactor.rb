@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class AdvancedClassificationsInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class AdvancedClassificationsInteractor < BaseInteractor
     def create_ripeness_code(params)
       res = validate_ripeness_code_params(params)
       return validation_failed_response(res) if res.failure?
@@ -102,14 +102,13 @@ module MasterfilesApp
       return validation_failed_response(res) if res.failure?
 
       id = nil
-      add_grid_row = repo.exists?(:rmt_variants, cultivar_id: cultivar_id)
       repo.transaction do
         id = repo.create_rmt_variant(res)
         log_status(:rmt_variants, id, 'CREATED')
         log_transaction
       end
       instance = rmt_code_grid_row_by_cultivar_and_variant(cultivar_id, id)
-      success_response("Created rmt variant: #{instance[:rmt_variant_code]} for cultivar: #{instance[:cultivar_name]}", add_grid_row: add_grid_row, rmt_variant: instance)
+      success_response("Created rmt variant: #{instance[:rmt_variant_code]} for cultivar: #{instance[:cultivar_name]}", rmt_variant: instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { rmt_variant_code: ['This rmt variant already exists'] }))
     rescue Crossbeams::InfoError => e

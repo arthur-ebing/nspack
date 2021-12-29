@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class VoyagePortRule < Base # rubocop:disable Metrics/ClassLength
+  class VoyagePortRule < Base
     def generate_rules
       @repo = FinishedGoodsApp::VoyagePortRepo.new
       make_form_object

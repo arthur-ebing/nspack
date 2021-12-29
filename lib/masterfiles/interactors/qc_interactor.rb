@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class QcInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class QcInteractor < BaseInteractor
     def create_qc_measurement_type(params)
       res = validate_qc_measurement_type_params(params)
       return validation_failed_response(res) if res.failure?

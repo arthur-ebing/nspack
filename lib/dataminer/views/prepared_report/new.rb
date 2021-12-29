@@ -4,7 +4,7 @@ module DM
   module Report
     module PreparedReport
       class New
-        def self.call(id, json_var, user, form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/ParameterLists
+        def self.call(id, json_var, user, form_values: nil, form_errors: nil, remote: true)
           ui_rule = UiRules::Compiler.new(:prepared_report, :new, id: id, user: user, form_values: form_values, json_var: json_var)
           rules   = ui_rule.compile
 

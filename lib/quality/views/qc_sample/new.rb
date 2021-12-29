@@ -4,7 +4,7 @@ module Quality
   module Qc
     module QcSample
       class New
-        def self.call(qc_sample_type_id, context:, id:, form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/ParameterLists
+        def self.call(qc_sample_type_id, context:, id:, form_values: nil, form_errors: nil, remote: true)
           ui_rule = UiRules::Compiler.new(:qc_sample, :new, qc_sample_type_id: qc_sample_type_id, context: context, context_key: id, form_values: form_values)
           rules   = ui_rule.compile
 

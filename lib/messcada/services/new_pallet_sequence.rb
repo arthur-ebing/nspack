@@ -4,7 +4,7 @@ module MesscadaApp
   class NewPalletSequence < BaseService
     attr_reader :repo, :carton_id, :carton_quantity, :pallet_id, :user_name, :carton_palletizing, :mix_rule_scope
 
-    def initialize(user_name, carton_id, pallet_id, carton_quantity, carton_palletizing = false, mix_rule_scope = nil) # rubocop:disable Metrics/ParameterLists
+    def initialize(user_name, carton_id, pallet_id, carton_quantity, carton_palletizing = false, mix_rule_scope = nil)
       @user_name = user_name
       @carton_id = carton_id
       @pallet_id = pallet_id

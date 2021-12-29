@@ -12,7 +12,7 @@ module Labels
             rule_base[:name] = 'label'
           end
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page|
+          Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object OpenStruct.new(label_name: label.label_name)
             page.form do |form|
               form.view_only!

@@ -2,7 +2,7 @@
 
 # rubocop:disable Metrics/AbcSize
 module DataminerApp
-  class PreparedReportInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class PreparedReportInteractor < BaseInteractor
     def repo
       @repo ||= PreparedReportRepo.new
     end
@@ -78,8 +78,8 @@ module DataminerApp
                    PreparedReportRepo.new.list_all_reports(@user)
                  end
 
-      col_defs = Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk| # rubocop:disable Metrics/BlockLength
-        mk.action_column do |act| # rubocop:disable Metrics/BlockLength
+      col_defs = Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
+        mk.action_column do |act|
           act.popup_link 'properties', '/dataminer/prepared_reports/$col1$/properties',
                          col1: 'id',
                          icon: 'book-reference',

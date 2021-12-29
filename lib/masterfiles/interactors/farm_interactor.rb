@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class FarmInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class FarmInteractor < BaseInteractor
     def create_farm(params) # rubocop:disable Metrics/AbcSize
       res = validate_farm_params(params)
       return validation_failed_response(res) if res.failure?

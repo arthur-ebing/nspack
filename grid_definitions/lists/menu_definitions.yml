@@ -1,5 +1,7 @@
 ---
 :dataminer_definition: menu_definitions
+:grouping:
+  :groupDefaultExpanded: 1
 :actions:
   - :submenu:
       :text: Functional Area

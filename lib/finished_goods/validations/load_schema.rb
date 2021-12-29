@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  LoadServiceSchema = Dry::Schema.Params do # rubocop:disable Metrics/BlockLength
+  LoadServiceSchema = Dry::Schema.Params do
     optional(:id).filled(:integer)
     optional(:load_id).filled(:integer)
     optional(:rmt_load).maybe(:bool)

@@ -9,7 +9,7 @@ require_relative '../app_loader'
 # The pallet sequences and carton labels require a production run. Please create a run to run this script against.
 # DEBUG=y RACK_ENV=production ruby scripts/base_script.rb ImportCartonStockIntegration 'file_name.csv' production_run_id
 
-class ImportCartonStockIntegration < BaseScript # rubocop:disable Metrics/ClassLength
+class ImportCartonStockIntegration < BaseScript
   PH_CODES = { 'KROMCO' => 'KROMCO_PACKHOUSE' }.freeze
 
   def run # rubocop:disable Metrics/AbcSize

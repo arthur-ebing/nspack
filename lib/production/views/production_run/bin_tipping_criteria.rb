@@ -19,15 +19,13 @@ module Production
               form.add_field :farm_code
               form.add_field :commodity_code
               form.add_field :rmt_variety_code
-              form.add_field :treatment_code
-              form.add_field :rmt_size
               form.add_field :product_class_code
-              form.add_field :rmt_product_type
-              form.add_field :pc_code
-              form.add_field :cold_store_type
               form.add_field :season_code
-              form.add_field :track_indicator_code
-              form.add_field :ripe_point_code
+              form.add_field :colour_percentage
+              form.add_field :actual_cold_treatment
+              form.add_field :actual_ripeness_treatment
+              form.add_field :rmt_code
+              form.add_field :rmt_size
             end
           end
 

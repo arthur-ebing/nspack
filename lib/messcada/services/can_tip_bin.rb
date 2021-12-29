@@ -3,10 +3,10 @@
 module MesscadaApp
   # Given a bin asset number and device, get the run number
   # and check that the bin meets the criteria for tipping on that ran.
-  class CanTipBin < BaseService # rubocop:disable Metrics/ClassLength
+  class CanTipBin < BaseService
     include BinTipSupport
 
-    attr_reader :repo, :bin_number, :device, :production_run_id, :run_attrs, :run_criteria, :legacy_errors
+    attr_reader :repo, :bin_number, :device, :production_run_id, :run_attrs, :legacy_errors
 
     def initialize(bin_number, device)
       @repo = MesscadaRepo.new
@@ -50,7 +50,10 @@ module MesscadaApp
       validate_setup_requirements
     end
 
-    def validate_setup_requirements
+    def validate_setup_requirements # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+      check = repo.check_bin_in_wip(bin_number)
+      return check.message unless check.success
+
       check = check_farm_match
       return check.message unless check.success
 
@@ -61,6 +64,9 @@ module MesscadaApp
       return check.message unless check.success
 
       check = check_cultivar_match
+      return check.message unless check.success
+
+      check = check_mrl_result_status
       return check.message unless check.success
 
       nil
@@ -107,14 +113,13 @@ module MesscadaApp
 
     # Kromco DP checks
     def check_valid_bin_for_kromco_rmt_system # rubocop:disable Metrics/AbcSize
-      legacy_bintip_criteria, @run_criteria = repo.get(:production_runs, production_run_id, %i[legacy_bintip_criteria legacy_data])
+      legacy_bintip_criteria = repo.get(:production_runs, production_run_id, :legacy_bintip_criteria)
       return failed_response("Bin Tipping Criteria Not Setup For Run:#{production_run_id}") unless legacy_bintip_criteria
-      return failed_response("Bin Tipping Legacy Data Not Setup For Run:#{production_run_id}") unless run_criteria
 
       legacy_bintip_criteria.select { |_, v| v == 't' }.each_key do |check|
-        next if %w[farm_code commodity_code rmt_variety_code rmt_product_type].include?(check) # Not yet written...
+        next if %w[farm_code commodity_code rmt_variety_code].include?(check) # Not yet written...
 
-        send("legacy_check_#{check}".to_sym)
+        send("bintip_criteria_check_#{check}".to_sym)
       end
       return ok_response if legacy_errors.empty?
 
@@ -123,42 +128,28 @@ module MesscadaApp
 
     LEGACY_ERROR_MSG = '%s is %s on run, but %s on bin.'
 
-    def legacy_check_treatment_code
-      # log_code_check('Colour', run_criteria['treatment_code'], rmt_bin[:legacy_data]['colour'])
-      return if run_criteria['treatment_code'] == rmt_bin[:legacy_data]['colour']
+    def bintip_criteria_check_colour_percentage
+      # log_code_check('Colour', run_attrs[:colour_percentage], rmt_bin[:colour_percentage])
+      return if rmt_bin[:colour_percentage_id] == run_attrs[:colour_percentage_id]
 
-      legacy_errors << format(LEGACY_ERROR_MSG, 'Colour', run_criteria['treatment_code'] || 'blank', rmt_bin[:legacy_data]['colour'] || 'blank')
+      legacy_errors << format(LEGACY_ERROR_MSG, 'Colour', run_attrs[:colour_percentage] || 'blank', rmt_bin[:colour_percentage] || 'blank')
     end
 
-    def legacy_check_rmt_size
-      # log_code_check('Size', run_criteria['rmt_size'], rmt_bin[:size_code])
-      return if run_criteria['rmt_size'] == rmt_bin[:size_code]
+    def bintip_criteria_check_rmt_size
+      # log_code_check('Size', run_attrs[:size_code], rmt_bin[:size_code])
+      return if rmt_bin[:rmt_size_id] == run_attrs[:rmt_size_id]
 
-      legacy_errors << format(LEGACY_ERROR_MSG, 'Size', run_criteria['rmt_size'] || 'blank', rmt_bin[:size_code] || 'blank')
+      legacy_errors << format(LEGACY_ERROR_MSG, 'Size', run_attrs[:size_code] || 'blank', rmt_bin[:size_code] || 'blank')
     end
 
-    def legacy_check_product_class_code
-      # log_code_check('Class', run_criteria['product_class_code'], rmt_bin[:class_code])
-      return if run_criteria['product_class_code'] == rmt_bin[:class_code]
+    def bintip_criteria_check_product_class_code
+      # log_code_check('Class', run_attrs[:class_code], rmt_bin[:class_code])
+      return if run_attrs[:rmt_class_id] == rmt_bin[:rmt_class_id]
 
-      legacy_errors << format(LEGACY_ERROR_MSG, 'Class', run_criteria['product_class_code'] || 'blank', rmt_bin[:class_code] || 'blank')
+      legacy_errors << format(LEGACY_ERROR_MSG, 'Class', run_attrs[:class_code] || 'blank', rmt_bin[:class_code] || 'blank')
     end
 
-    def legacy_check_pc_code
-      # log_code_check('PC Code', run_criteria['pc_code'], rmt_bin[:legacy_data]['pc_code'])
-      return if run_criteria['pc_code'] == rmt_bin[:legacy_data]['pc_name']
-
-      legacy_errors << format(LEGACY_ERROR_MSG, 'PC Code', run_criteria['pc_code'] || 'blank', rmt_bin[:legacy_data]['pc_name'] || 'blank')
-    end
-
-    def legacy_check_cold_store_type
-      # log_code_check('Cold store type', run_criteria['cold_store_type'], rmt_bin[:legacy_data]['cold_store_type'])
-      return if run_criteria['cold_store_type'] == rmt_bin[:legacy_data]['cold_store_type']
-
-      legacy_errors << format(LEGACY_ERROR_MSG, 'Cold store type', run_criteria['cold_store_type'] || 'blank', rmt_bin[:legacy_data]['cold_store_type'] || 'blank')
-    end
-
-    def legacy_check_season_code
+    def bintip_criteria_check_season_code
       # log_code_check('Season', run_attrs[:season_id], rmt_bin[:season_id])
       return if run_attrs[:season_id] == rmt_bin[:season_id]
 
@@ -166,18 +157,25 @@ module MesscadaApp
       legacy_errors << format(LEGACY_ERROR_MSG, 'Season', *season_codes)
     end
 
-    def legacy_check_track_indicator_code
-      # log_code_check('Track indicator', run_criteria['track_indicator_code'], rmt_bin[:legacy_data]['track_slms_indicator_1_code'])
-      return if run_criteria['track_indicator_code'] == rmt_bin[:legacy_data]['track_slms_indicator_1_code']
+    def bintip_criteria_check_rmt_code
+      # log_code_check('Rmt Code', run_attrs[:rmt_code], rmt_bin[:rmt_code])
+      return if rmt_bin[:rmt_code_id] == run_attrs[:rmt_code_id]
 
-      legacy_errors << format(LEGACY_ERROR_MSG, 'Track indicator', run_criteria['track_indicator_code'] || 'blank', rmt_bin[:legacy_data]['track_slms_indicator_1_code'] || 'blank')
+      legacy_errors << format(LEGACY_ERROR_MSG, 'RMT Code', run_attrs[:rmt_code] || 'blank', rmt_bin[:rmt_code] || 'blank')
     end
 
-    def legacy_check_ripe_point_code
-      # log_code_check('Ripe point', run_criteria['ripe_point_code'], rmt_bin[:legacy_data]['ripe_point_code'])
-      return if run_criteria['ripe_point_code'] == rmt_bin[:legacy_data]['ripe_point_code']
+    def bintip_criteria_check_actual_cold_treatment
+      # log_code_check('Cold Treatment', run_attrs[:actual_cold_treatment_code], rmt_bin[:actual_cold_treatment_code])
+      return if rmt_bin[:actual_cold_treatment_id] == run_attrs[:actual_cold_treatment_id]
 
-      legacy_errors << format(LEGACY_ERROR_MSG, 'Ripe point', run_criteria['ripe_point_code'] || 'blank', rmt_bin[:legacy_data]['ripe_point_code'] || 'blank')
+      legacy_errors << format(LEGACY_ERROR_MSG, 'Cold Treatment', run_attrs[:actual_cold_treatment_code] || 'blank', rmt_bin[:actual_cold_treatment_code] || 'blank')
+    end
+
+    def bintip_criteria_check_actual_ripeness_treatment
+      # log_code_check('Ripeness Treatment', run_attrs[:actual_ripeness_treatment_code], rmt_bin[:actual_ripeness_treatment_code])
+      return if rmt_bin[:actual_ripeness_treatment_id] == run_attrs[:actual_ripeness_treatment_id]
+
+      legacy_errors << format(LEGACY_ERROR_MSG, 'Ripeness Treatment', run_attrs[:actual_ripeness_treatment_code] || 'blank', rmt_bin[:actual_ripeness_treatment_code] || 'blank')
     end
 
     # def log_code_check(name, run_val, bin_val)
@@ -200,6 +198,19 @@ module MesscadaApp
 
     def bin_scrapped?
       rmt_bin[:scrapped]
+    end
+
+    def check_mrl_result_status
+      return ok_response unless AppConst::CR_RMT.enforce_mrl_check?
+
+      delivery_id = repo.get(:rmt_bins, rmt_bin[:id], :rmt_delivery_id)
+      unless delivery_id.nil_or_empty?
+        res = QualityApp::FailedAndPendingMrlResults.call(delivery_id)
+        return res unless res.success
+      end
+      ok_response
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
   end
 end

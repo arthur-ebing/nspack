@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class OrchardTestResultRule < Base # rubocop:disable Metrics/ClassLength
+  class OrchardTestResultRule < Base
     def generate_rules # rubocop:disable Metrics/AbcSize
       @repo = QualityApp::OrchardTestRepo.new
       @cultivar_repo = MasterfilesApp::CultivarRepo.new

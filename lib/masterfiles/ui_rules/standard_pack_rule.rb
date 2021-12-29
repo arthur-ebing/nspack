@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class StandardPackRule < Base # rubocop:disable Metrics/ClassLength
+  class StandardPackRule < Base
     def generate_rules
       @repo = MasterfilesApp::FruitSizeRepo.new
       @setup_repo = ProductionApp::ProductSetupRepo.new

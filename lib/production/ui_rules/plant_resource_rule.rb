@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class PlantResourceRule < Base # rubocop:disable Metrics/ClassLength
+  class PlantResourceRule < Base
     def generate_rules
       @repo = ProductionApp::ResourceRepo.new
       @print_repo = LabelApp::PrinterRepo.new

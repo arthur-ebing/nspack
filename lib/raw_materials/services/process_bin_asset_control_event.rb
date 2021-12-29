@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RawMaterialsApp
-  class  ProcessBinAssetControlEvent < BaseService # rubocop:disable Metrics/ClassLength
+  class  ProcessBinAssetControlEvent < BaseService
     attr_reader :repo, :bin_event_type, :rmt_bin_ids, :changes_made, :set_attrs
 
     def initialize(params)

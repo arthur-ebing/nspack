@@ -2,7 +2,7 @@
 
 module ProductionApp
   module TaskPermissionCheck
-    class PalletMixRule < BaseService # rubocop:disable Metrics/ClassLength
+    class PalletMixRule < BaseService
       attr_reader :task, :repo, :rule, :new_sequence, :oldest_sequence, :carton_number
 
       def initialize(scope, new_sequence, oldest_sequence, carton_number)

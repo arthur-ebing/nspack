@@ -3,7 +3,7 @@
 module Crossbeams
   module Config
     # Store rules for Resource types like how to build resource trees and associations.
-    class ResourceDefinitions # rubocop:disable Metrics/ClassLength
+    class ResourceDefinitions
       COLOURS = %w[
         #234722
         #326699

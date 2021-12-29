@@ -19,23 +19,19 @@ module UiRules
       fields[:farm_code] = { renderer: :checkbox, disabled: true }
       fields[:commodity_code] = { renderer: :checkbox, disabled: true }
       fields[:rmt_variety_code] = { renderer: :checkbox, disabled: true }
-      fields[:treatment_code] = { renderer: :checkbox, disabled: true }
-      fields[:rmt_size] = { renderer: :checkbox, disabled: true }
-      fields[:product_class_code] = { renderer: :checkbox, disabled: true }
-      fields[:rmt_product_type] = { renderer: :checkbox, disabled: true }
-      fields[:pc_code] = { renderer: :checkbox, disabled: true }
-      fields[:cold_store_type] = { renderer: :checkbox, disabled: true }
       fields[:season_code] = { renderer: :checkbox, disabled: true }
-      fields[:track_indicator_code] = { renderer: :checkbox, disabled: true }
-      fields[:ripe_point_code] = { renderer: :checkbox, disabled: true }
-      fields[:rmt_product_type_label] = { renderer: :label, caption: 'RMT Product Type', min_charwidth: 30 }
-      fields[:treatment_code_label] = { renderer: :label, caption: 'Colour' }
-      fields[:rmt_size_label] = { renderer: :label, caption: 'RMT Size' }
-      fields[:ripe_point_code_label] = { renderer: :label, caption: 'Ripe Point Code' }
-      fields[:pc_code_label] = { renderer: :label, caption: 'Pc Code', min_charwidth: 30 }
-      fields[:product_class_code_label] = { renderer: :label, caption: 'Product Class Code' }
-      fields[:track_indicator_code_label] = { renderer: :label, caption: 'Track Indicator Code' }
-      fields[:cold_store_type_label] = { renderer: :label, caption: 'Cold Store Type' }
+      fields[:rmt_size] = { renderer: :checkbox, disabled: true }
+      fields[:rmt_code] = { renderer: :checkbox, disabled: true }
+      fields[:colour_percentage] = { renderer: :checkbox, disabled: true }
+      fields[:actual_ripeness_treatment] = { renderer: :checkbox, disabled: true }
+      fields[:actual_cold_treatment] = { renderer: :checkbox, disabled: true }
+      fields[:product_class_code] = { renderer: :checkbox, disabled: true }
+      fields[:product_class_label] = { renderer: :label, caption: 'Product Class', disabled: true  }
+      fields[:colour_percentage_label] = { renderer: :label, caption: 'Colour', disabled: true }
+      fields[:actual_cold_treatment_label] = { renderer: :label, caption: 'Actual Cold Treatment', disabled: true }
+      fields[:actual_ripeness_treatment_label] = { renderer: :label, caption: 'Actual Ripeness Treatment', disabled: true }
+      fields[:rmt_code_label] = { renderer: :label, caption: 'Rmt Code', disabled: true }
+      fields[:rmt_size_label] = { renderer: :label, caption: 'Rmt Size Code', disabled: true }
     end
 
     def common_fields
@@ -44,15 +40,13 @@ module UiRules
         farm_code: { renderer: :checkbox, required: true },
         commodity_code: { renderer: :checkbox, required: true },
         rmt_variety_code: { renderer: :checkbox, required: true },
-        treatment_code: { renderer: :checkbox, required: true, caption: 'Colour' },
-        rmt_size: { renderer: :checkbox, required: true },
         product_class_code: { renderer: :checkbox, required: true },
-        rmt_product_type: { renderer: :checkbox, required: true },
-        pc_code: { renderer: :checkbox, required: true },
-        cold_store_type: { renderer: :checkbox, required: true },
         season_code: { renderer: :checkbox, required: true },
-        track_indicator_code: { renderer: :checkbox, required: true },
-        ripe_point_code: { renderer: :checkbox, required: true }
+        colour_percentage: { renderer: :checkbox, required: true, caption: 'Colour' },
+        actual_cold_treatment: { renderer: :checkbox, required: true },
+        actual_ripeness_treatment: { renderer: :checkbox, required: true },
+        rmt_code: { renderer: :checkbox, required: true },
+        rmt_size: { renderer: :checkbox, required: true }
       }
     end
 
@@ -61,14 +55,15 @@ module UiRules
       attrs = run.legacy_bintip_criteria
       if @mode == :show
         legacy_bintip_criteria = run.legacy_bintip_criteria || {}
-        legacy_data = run.legacy_data || {}
         attrs = { farm_code: legacy_bintip_criteria['farm_code'], commodity_code: legacy_bintip_criteria['commodity_code'], rmt_variety_code: legacy_bintip_criteria['rmt_variety_code'],
-                  treatment_code: legacy_bintip_criteria['treatment_code'], rmt_size: legacy_bintip_criteria['rmt_size'], product_class_code: legacy_bintip_criteria['product_class_code'],
-                  rmt_product_type: legacy_bintip_criteria['rmt_product_type'], pc_code: legacy_bintip_criteria['pc_code'], cold_store_type: legacy_bintip_criteria['cold_store_type'],
-                  season_code: legacy_bintip_criteria['season_code'], track_indicator_code: legacy_bintip_criteria['track_indicator_code'], ripe_point_code: legacy_bintip_criteria['ripe_point_code'],
-                  rmt_product_type_label: legacy_data['rmt_product_type'], treatment_code_label: legacy_data['treatment_code'], rmt_size_label: legacy_data['rmt_size'],
-                  ripe_point_code_label: legacy_data['ripe_point_code'], pc_code_label: legacy_data['pc_code'], product_class_code_label: legacy_data['product_class_code'],
-                  track_indicator_code_label: legacy_data['track_indicator_code'], cold_store_type_label: legacy_data['cold_store_type'] }
+                  rmt_size: legacy_bintip_criteria['rmt_size'], product_class_code: legacy_bintip_criteria['product_class_code'],
+                  season_code: legacy_bintip_criteria['season_code'], actual_cold_treatment: legacy_bintip_criteria['actual_cold_treatment'], actual_ripeness_treatment: legacy_bintip_criteria['actual_ripeness_treatment'],
+                  rmt_code: legacy_bintip_criteria['rmt_code'], colour_percentage_label: @repo.get_value(:colour_percentages, :colour_percentage, id: run.colour_percentage_id),
+                  product_class_label: @repo.get_value(:rmt_classes, :rmt_class_code, id: run.rmt_class_id),
+                  actual_cold_treatment_label: @repo.get_value(:treatments, :treatment_code, id: run.actual_cold_treatment_id),
+                  actual_ripeness_treatment_label: @repo.get_value(:treatments, :treatment_code, id: run.actual_ripeness_treatment_id),
+                  colour_percentage: legacy_bintip_criteria['colour_percentage'], rmt_code_label: @repo.get_value(:rmt_codes, :rmt_code, id: run.rmt_code_id),
+                  rmt_size_label: @repo.get_value(:rmt_sizes, :size_code, id: run.rmt_size_id) }
       end
 
       @form_object = OpenStruct.new(attrs)

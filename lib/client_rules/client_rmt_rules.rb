@@ -1,13 +1,14 @@
 # frozen_string_literal: true
 
 module Crossbeams
-  class ClientRmtRules < BaseClientRules # rubocop:disable Metrics/ClassLength
+  class ClientRmtRules < BaseClientRules
     include Crossbeams::AutoDocumentation
 
     CLIENT_SETTINGS = {
       hb: { bin_pallet_conversion_defaults: {},
             presort_staging_target_location: {},
             delivery_capture_inner_bins: false,
+            sample_rmt_bin_percentage: 0,
             use_raw_material_code: false,
             classify_raw_material: false,
             use_delivery_destination: false,
@@ -28,10 +29,12 @@ module Crossbeams
             presort_plant_integration: false,
             show_kromco_attributes: false,
             create_depot_location: false,
-            create_bin_asset_trading_partner_location: false  },
+            create_bin_asset_trading_partner_location: false,
+            enforce_mrl_check: false   },
       hl: { bin_pallet_conversion_defaults: {},
             presort_staging_target_location: {},
             delivery_capture_inner_bins: false,
+            sample_rmt_bin_percentage: 0,
             use_raw_material_code: false,
             classify_raw_material: false,
             use_delivery_destination: false,
@@ -52,7 +55,8 @@ module Crossbeams
             presort_plant_integration: false,
             show_kromco_attributes: false,
             create_depot_location: false,
-            create_bin_asset_trading_partner_location: false  },
+            create_bin_asset_trading_partner_location: false,
+            enforce_mrl_check: false   },
       kr: { bin_pallet_conversion_defaults: { pallet_format: { stack_type: 'BIN', pallet_base: 'S' },
                                               basic_pack: 'BX750',
                                               grade: 'SA',
@@ -64,6 +68,7 @@ module Crossbeams
                                               sell_by_code: nil },
             presort_staging_target_location: { PRESORT_STAGING_1: 'PRESORT_1', PRESORT_STAGING_2: 'PRESORT_2' },
             delivery_capture_inner_bins: false,
+            sample_rmt_bin_percentage: 0.05,
             use_raw_material_code: true,
             classify_raw_material: true,
             use_delivery_destination: true,
@@ -84,10 +89,12 @@ module Crossbeams
             presort_plant_integration: true,
             show_kromco_attributes: true,
             create_depot_location: true,
-            create_bin_asset_trading_partner_location: true  },
+            create_bin_asset_trading_partner_location: true,
+            enforce_mrl_check: true   },
       um: { bin_pallet_conversion_defaults: {},
             presort_staging_target_location: {},
             delivery_capture_inner_bins: false,
+            sample_rmt_bin_percentage: 0,
             use_raw_material_code: false,
             classify_raw_material: false,
             use_delivery_destination: false,
@@ -108,10 +115,12 @@ module Crossbeams
             presort_plant_integration: false,
             show_kromco_attributes: false,
             create_depot_location: false,
-            create_bin_asset_trading_partner_location: false  },
+            create_bin_asset_trading_partner_location: false,
+            enforce_mrl_check: false   },
       ud: { bin_pallet_conversion_defaults: {},
             presort_staging_target_location: {},
             delivery_capture_inner_bins: false,
+            sample_rmt_bin_percentage: 0,
             use_raw_material_code: false,
             classify_raw_material: false,
             use_delivery_destination: true,
@@ -132,10 +141,12 @@ module Crossbeams
             presort_plant_integration: false,
             show_kromco_attributes: false,
             create_depot_location: false,
-            create_bin_asset_trading_partner_location: false  },
+            create_bin_asset_trading_partner_location: false,
+            enforce_mrl_check: false   },
       cfg: { bin_pallet_conversion_defaults: {},
              presort_staging_target_location: {},
              delivery_capture_inner_bins: false,
+             sample_rmt_bin_percentage: 0,
              use_raw_material_code: false,
              classify_raw_material: false,
              use_delivery_destination: false,
@@ -156,10 +167,12 @@ module Crossbeams
              presort_plant_integration: false,
              show_kromco_attributes: false,
              create_depot_location: false,
-             create_bin_asset_trading_partner_location: false },
-      sr: { bin_pallet_conversion_defaults: {},
+             create_bin_asset_trading_partner_location: false,
+             enforce_mrl_check: false  },
+      mc: { bin_pallet_conversion_defaults: {},
             presort_staging_target_location: {},
             delivery_capture_inner_bins: false,
+            sample_rmt_bin_percentage: 0,
             use_raw_material_code: false,
             classify_raw_material: false,
             use_delivery_destination: true,
@@ -180,10 +193,38 @@ module Crossbeams
             presort_plant_integration: false,
             show_kromco_attributes: false,
             create_depot_location: false,
-            create_bin_asset_trading_partner_location: false   },
+            create_bin_asset_trading_partner_location: false,
+            enforce_mrl_check: false    },
+      sr: { bin_pallet_conversion_defaults: {},
+            presort_staging_target_location: {},
+            delivery_capture_inner_bins: false,
+            sample_rmt_bin_percentage: 0,
+            use_raw_material_code: false,
+            classify_raw_material: false,
+            use_delivery_destination: true,
+            bin_valid_for_external_integration: false,
+            default_container_material_owner: nil,
+            default_rmt_container_type: 'BIN',
+            all_delivery_bins_of_same_type: false,
+            delivery_capture_container_material: true,
+            delivery_capture_container_material_owner: true,
+            set_defaults_for_new_rmt_delivery: true,
+            convert_carton_to_rebins: false,
+            create_farm_location: false,
+            maintain_legacy_columns: false,
+            pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
+            default_delivery_location: 'FRUIT_RECEPTION_1',
+            use_bin_asset_control: false,
+            presort_legacy_data_fields: [],
+            presort_plant_integration: false,
+            show_kromco_attributes: false,
+            create_depot_location: false,
+            create_bin_asset_trading_partner_location: false,
+            enforce_mrl_check: false    },
       sr2: { bin_pallet_conversion_defaults: {},
              presort_staging_target_location: {},
              delivery_capture_inner_bins: false,
+             sample_rmt_bin_percentage: 0,
              use_raw_material_code: false,
              classify_raw_material: false,
              use_delivery_destination: true,
@@ -204,7 +245,8 @@ module Crossbeams
              presort_plant_integration: false,
              show_kromco_attributes: false,
              create_depot_location: false,
-             create_bin_asset_trading_partner_location: false  }
+             create_bin_asset_trading_partner_location: false,
+             enforce_mrl_check: false   }
     }.freeze
 
     def initialize(client_code)
@@ -264,6 +306,12 @@ module Crossbeams
       return 'Should the destination be included in the rmt_delivery.' if explain
 
       setting(:use_delivery_destination)
+    end
+
+    def sample_rmt_bin_percentage(explain: false)
+      return 'The percentage of bins on a delivery to be identified as sample bins (when applicable).' if explain
+
+      setting(:sample_rmt_bin_percentage)
     end
 
     def check_external_bin_valid_for_integration?(explain: false)
@@ -386,6 +434,12 @@ module Crossbeams
       return 'Create a location record for depot.' if explain
 
       setting(:create_bin_asset_trading_partner_location)
+    end
+
+    def enforce_mrl_check?(explain: false)
+      return 'Enforce MRL check for deliveries.' if explain
+
+      setting(:enforce_mrl_check)
     end
   end
 end

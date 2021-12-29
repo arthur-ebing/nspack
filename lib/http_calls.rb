@@ -2,7 +2,7 @@
 
 # A class for making HTTP calls
 module Crossbeams
-  class HTTPCalls # rubocop:disable Metrics/ClassLength
+  class HTTPCalls
     include Crossbeams::Responses
     attr_reader :use_ssl, :call_logger
 

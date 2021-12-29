@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module EdiApp
-  class HcsOutRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class HcsOutRepo < BaseRepo
     def prepare_depot_pallet_cartons(load_id) # rubocop:disable Metrics/AbcSize
       # Create missing depot pallet carton numbers
       query = <<~SQL

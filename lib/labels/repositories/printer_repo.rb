@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module LabelApp
-  class PrinterRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class PrinterRepo < BaseRepo
     build_for_select :printers,
                      label: %i[printer_name printer_type],
                      value: :id,
@@ -41,7 +41,7 @@ module LabelApp
           AND printer_use = '#{AppConst::PRINTER_USE_INDUSTRIAL}'
           AND printer_code NOT IN ('#{printer_codes.join("', '")}');
       SQL
-      DB.transaction do # rubocop:disable Metrics/BlockLength
+      DB.transaction do
         DB.execute(qry)
         printer_list.each do |printer|
           rec = {

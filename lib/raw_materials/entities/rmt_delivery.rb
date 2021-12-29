@@ -31,6 +31,7 @@ module RawMaterialsApp
     attribute? :quantity_bins_with_fruit, Types::Integer
     attribute :reference_number, Types::String
     attribute :batch_number, Types::String
+    attribute :sample_bins, Types::Array
     attribute :batch_number_updated_at, Types::DateTime
     attribute :rmt_container_type_id, Types::Integer
     attribute :rmt_material_owner_party_role_id, Types::Integer

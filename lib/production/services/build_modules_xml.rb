@@ -16,9 +16,9 @@ module ProductionApp
     end
 
     def build_xml(modules, servers) # rubocop:disable Metrics/AbcSize
-      builder = Nokogiri::XML::Builder.new do |xml| # rubocop:disable Metrics/BlockLength
-        xml.SystemSchema do # rubocop:disable Metrics/BlockLength
-          xml.Modules do # rubocop:disable Metrics/BlockLength
+      builder = Nokogiri::XML::Builder.new do |xml|
+        xml.SystemSchema do
+          xml.Modules do
             unless servers.empty?
               servers.each do |srv|
                 xml.Module(Name: srv[:name],
@@ -35,9 +35,9 @@ module ProductionApp
               end
             end
             unless modules.empty?
-              modules.each do |ph, ph_mods| # rubocop:disable Metrics/BlockLength
+              modules.each do |ph, ph_mods|
                 xml.comment "\n      Packhouse #{ph}\n    "
-                ph_mods.each do |mod| # rubocop:disable Metrics/BlockLength
+                ph_mods.each do |mod|
                   key = mod[:module_action]
                   action_set = key.nil? ? {} : Crossbeams::Config::ResourceDefinitions::MODULE_ACTIONS[key.to_sym] || {}
                   if %w[robot_rpi robot_nspi].include?(mod[:module_type])

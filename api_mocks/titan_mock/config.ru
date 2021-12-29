@@ -2,7 +2,6 @@
 
 require 'roda'
 require 'yaml'
-# rubocop:disable Metrics/BlockLength
 # Mock calls for PPECB Titan API
 class App < Roda
   plugin :symbolized_params
@@ -102,5 +101,4 @@ class App < Roda
     end
   end
 end
-# rubocop:enable Metrics/BlockLength
 run App.freeze.app

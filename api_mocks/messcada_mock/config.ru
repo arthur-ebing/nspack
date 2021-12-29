@@ -3,9 +3,8 @@
 require 'roda'
 require 'net/http'
 
-# rubocop:disable Metrics/BlockLength
 # Mock-up of a NoSoft Raspberry Pi robot
-class App < Roda # rubocop:disable Metrics/ClassLength
+class App < Roda
   plugin :symbolized_params
 
   route do |r|
@@ -504,6 +503,5 @@ class App < Roda # rubocop:disable Metrics/ClassLength
     end
   end
 end
-# rubocop:enable Metrics/BlockLength
 
 run App.freeze.app

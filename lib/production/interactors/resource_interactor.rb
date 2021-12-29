@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ProductionApp
-  class ResourceInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class ResourceInteractor < BaseInteractor
     def create_root_plant_resource(params)
       res = validate_plant_resource_params(params)
       return validation_failed_response(res) if res.failure?

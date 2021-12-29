@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  class TitanInspection < BaseService # rubocop:disable Metrics/ClassLength
+  class TitanInspection < BaseService
     attr_reader :govt_inspection_sheet_id, :task, :user, :repo,
                 :govt_inspection_sheet, :inspection_message_id,
                 :header, :http, :payload

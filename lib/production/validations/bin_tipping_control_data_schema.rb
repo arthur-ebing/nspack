@@ -2,12 +2,11 @@
 
 module ProductionApp
   BinTippingControlDataSchema = Dry::Schema.Params do
-    required(:rmt_product_type).filled(Types::StrippedString)
-    required(:treatment_code).filled(Types::StrippedString)
-    required(:rmt_size).filled(Types::StrippedString)
-    required(:ripe_point_code).filled(Types::StrippedString)
-    required(:pc_code).filled(Types::StrippedString)
-    required(:product_class_code).filled(Types::StrippedString)
-    required(:track_indicator_code).filled(Types::StrippedString)
+    optional(:colour_percentage_id).maybe(:integer)
+    optional(:actual_cold_treatment_id).maybe(:integer)
+    optional(:actual_ripeness_treatment_id).maybe(:integer)
+    optional(:rmt_code_id).maybe(:integer)
+    optional(:rmt_size_id).maybe(:integer)
+    optional(:rmt_class_id).maybe(:integer)
   end
 end

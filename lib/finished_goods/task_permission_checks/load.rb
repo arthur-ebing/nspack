@@ -2,7 +2,7 @@
 
 module FinishedGoodsApp
   module TaskPermissionCheck
-    class Load < BaseService # rubocop:disable Metrics/ClassLength
+    class Load < BaseService
       attr_reader :task, :entity, :repo, :id, :pallet_numbers
       def initialize(task, load_id = nil, pallet_numbers = nil)
         @task = task

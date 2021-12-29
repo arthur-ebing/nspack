@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RawMaterialsApp
-  class RmtBinInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class RmtBinInteractor < BaseInteractor
     def create_bin_tripsheet(planned_location_to_id, move_bins_from_another_tripsheet, vehicle_job_id = nil) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       res = FinishedGoodsApp::TripsheetContract.new.call(move_bins: move_bins_from_another_tripsheet, from_vehicle_job_id: vehicle_job_id)
       return failed_response(unwrap_failed_response(validation_failed_response(res))) if res.failure?
@@ -457,7 +457,7 @@ module RawMaterialsApp
       error
     end
 
-    def create_rmt_bins(delivery_id, params) # rubocop:disable Metrics/AbcSize
+    def create_rmt_bins(delivery_id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       res = validate_bin_asset_numbers_duplicate_scans(params)
       return validation_failed_response(OpenStruct.new(message: 'Validation Error', messages: res)) unless res.empty?
 
@@ -483,6 +483,9 @@ module RawMaterialsApp
           id = repo.create_rmt_bin(bin_params)
           log_status(:rmt_bins, id, 'BIN RECEIVED')
         end
+
+        delivery_completed = delivery.quantity_bins_with_fruit == repo.select_values(:rmt_bins, :id, rmt_delivery_id: delivery_id).count
+        repo.allocate_delivery_bin_samples(delivery_id, delivery.cultivar_id, delivery.sample_bins) if delivery_completed && !delivery.sample_bins.nil_or_empty?
 
         log_status(:rmt_deliveries, delivery_id, 'DELIVERY RECEIVED')
         log_transaction
@@ -900,6 +903,23 @@ module RawMaterialsApp
         return res unless res.success
       end
       success_response('Rebin Labels Printed Successfully', rebin_ids.join(','))
+    end
+
+    def check_mrl_result_status_for(bin_number) # rubocop:disable Metrics/CyclomaticComplexity
+      return ok_response unless AppConst::CR_RMT.enforce_mrl_check?
+      return failed_response('Bin Number: must be filled') if bin_number.nil_or_empty?
+
+      bin_id = repo.get_value(:rmt_bins, :id, bin_asset_number: bin_number)
+      return failed_response("Bin:#{bin_number} not found") unless bin_id
+
+      delivery_id = repo.get(:rmt_bins, bin_id, :rmt_delivery_id)
+      unless delivery_id.nil_or_empty?
+        res = QualityApp::FailedAndPendingMrlResults.call(delivery_id)
+        return res unless res.success
+      end
+      ok_response
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     private

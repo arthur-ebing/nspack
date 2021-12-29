@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class FruitSizeRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class FruitSizeRepo < BaseRepo
     build_inactive_select :basic_pack_codes,
                           alias: :basic_packs,
                           label: :basic_pack_code,

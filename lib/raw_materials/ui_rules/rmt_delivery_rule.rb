@@ -1,13 +1,14 @@
 # frozen_string_literal: true
 
 module UiRules
-  class RmtDeliveryRule < Base # rubocop:disable Metrics/ClassLength
+  class RmtDeliveryRule < Base
     def generate_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       @repo = RawMaterialsApp::RmtDeliveryRepo.new
       make_form_object
       apply_form_values
 
-      @rules[:create_tripsheet] = !@form_object.tripsheet_created && !@form_object.shipped
+      @rules[:mrl_result_notice] = check_mrl_result_status_for(@form_object.id) unless @form_object.id.nil?
+      @rules[:create_tripsheet] = !@form_object.tripsheet_created && !@form_object.shipped && @rules[:mrl_result_notice].nil_or_empty?
       @rules[:start_bins_trip] = @form_object.tripsheet_created && !@form_object.tripsheet_loaded
       @rules[:cancel_delivery_tripheet] = @form_object.tripsheet_created && !@form_object.tripsheet_offloaded
       @rules[:print_delivery_tripheet] = @rules[:cancel_delivery_tripheet]
@@ -28,6 +29,9 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
+      rmt_container_type_id_label = @repo.get(:rmt_container_types, @form_object.rmt_container_type_id, :container_type_code)
+      rmt_owner_label = MasterfilesApp::PartyRepo.new.fn_party_role_name(@form_object.rmt_material_owner_party_role_id)
+      rmt_container_material_type_id_label = @repo.get(:rmt_container_material_types, @form_object.rmt_container_material_type_id, :container_material_type_code)
       @options ||= {}
       fields[:id] = { renderer: :label, caption: 'Delivery Id' }
       fields[:orchard_id] = { renderer: :label,
@@ -83,6 +87,16 @@ module UiRules
                           as_boolean: true }
       fields[:batch_number] = { renderer: :label }
       fields[:batch_number_updated_at] = { renderer: :label }
+      fields[:sample_bins] = { renderer: :label }
+      if AppConst::CR_RMT.all_delivery_bins_of_same_type?
+        fields[:rmt_container_type_id] = { renderer: :label,
+                                           with_value: rmt_container_type_id_label }
+        fields[:rmt_material_owner_party_role_id] = { renderer: :label,
+                                                      with_value: rmt_owner_label }
+        fields[:rmt_container_material_type_id] = { renderer: :label,
+                                                    with_value: rmt_container_material_type_id_label }
+      end
+      fields
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize
@@ -221,6 +235,13 @@ module UiRules
       end
     end
 
+    def check_mrl_result_status_for(delivery_id)
+      return nil unless AppConst::CR_RMT.enforce_mrl_check?
+
+      res = QualityApp::FailedAndPendingMrlResults.call(delivery_id)
+      res.success ? nil : res.message
+    end
+
     private
 
     def add_behaviours
@@ -341,6 +362,7 @@ module UiRules
         items_fruit << { url: "/quality/qc/qc_samples/#{fruit_id}/print_barcode", text: 'Print', behaviour: :popup }
         items_fruit << { url: "/quality/qc/qc_samples/#{fruit_id}/qc_test/starch", text: 'Starch test', behaviour: :popup } # unless first_test_done(sample_type_id, test_type_name)
         items_fruit << { url: "/quality/qc/qc_samples/#{fruit_id}/qc_test/defects", text: 'Defects test', behaviour: :direct } # unless first_test_done(sample_type_id, test_type_name)
+        items_fruit << { url: '/loading_list/qc_sample_types', text: 'List sample types test', behaviour: :direct, loading_window: true }
       elsif first_delivery_rule.need_to_make_a_sample?(AppConst::QC_SAMPLE_100_FRUIT)
         items_fruit << { url: "/quality/qc/qc_samples/new_rmt_delivery_id_sample/#{sample_type_id}/#{@options[:id]}", text: 'Create', behaviour: :popup }
       end

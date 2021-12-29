@@ -11,7 +11,7 @@ module MesscadaApp
   #   filters = ['WHERE pallet_sequences.id = ?']
   #   query = MesscadaApp::DatasetPalletSequence.call(filters)
   #   DB[query, id].first
-  class DatasetPalletSequence # rubocop:disable Metrics/ClassLength
+  class DatasetPalletSequence
     attr_reader :filter_conditions
 
     def initialize(filters)

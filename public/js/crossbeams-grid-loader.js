@@ -1800,6 +1800,7 @@ const crossbeamsGridStaticLoader = {
     let gridOptions = null;
     let forPrint = false;
     let multisel = false;
+    let groupExpandedState = 0;
     let tree = false;
     let treeConfig = {};
     const grid = document.getElementById(gridId);
@@ -1829,6 +1830,7 @@ const crossbeamsGridStaticLoader = {
 
     forPrint = grid.dataset.gridPrint;
     multisel = grid.dataset.gridMulti;
+    groupExpandedState = grid.dataset.groupExpandedState || 0;
     tree = grid.dataset.gridTree !== undefined;
     if (tree) {
       treeConfig = JSON.parse(grid.dataset.gridTree);
@@ -2008,6 +2010,8 @@ const crossbeamsGridStaticLoader = {
           suppressCount: treeConfig.suppressNodeCounts || false,
         },
       };
+    } else {
+      gridOptions.groupDefaultExpanded = Number(groupExpandedState);
     }
 
     if (multisel) {

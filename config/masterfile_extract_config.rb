@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Crossbeams
-  module Config # rubocop:disable Metrics/ModuleLength
+  module Config
     MF_BASE_TABLES = %i[
       address_types
       basic_pack_codes

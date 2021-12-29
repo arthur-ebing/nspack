@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RawMaterialsApp
-  class PresortStagingRunRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class PresortStagingRunRepo < BaseRepo
     build_for_select :presort_staging_runs,
                      label: :id,
                      value: :id,

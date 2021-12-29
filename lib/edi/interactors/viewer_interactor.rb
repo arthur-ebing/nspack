@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module EdiApp
-  class ViewerInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class ViewerInteractor < BaseInteractor
     def edi_upload(params)
       # res = validate_edi_upload_params(params)
       # p res

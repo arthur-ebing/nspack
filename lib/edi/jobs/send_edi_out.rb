@@ -8,7 +8,7 @@ module EdiApp
       # No point in retrying
       self.maximum_retry_count = 0
 
-      def run(flow_type, party_role_id, user_name, record_id, edi_out_rule_id, context) # rubocop:disable Metrics/AbcSize, Metrics/ParameterLists
+      def run(flow_type, party_role_id, user_name, record_id, edi_out_rule_id, context) # rubocop:disable Metrics/AbcSize
         @email_notifiers = DevelopmentApp::UserRepo.new.email_addresses(user_email_group: AppConst::EMAIL_GROUP_EDI_NOTIFIERS)
         @flow_type = flow_type
         @edi_out_rule_id = edi_out_rule_id

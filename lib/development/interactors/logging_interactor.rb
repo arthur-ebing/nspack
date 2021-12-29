@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module DevelopmentApp
-  class LoggingInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class LoggingInteractor < BaseInteractor
     def repo
       @repo ||= LoggingRepo.new
     end
@@ -55,7 +55,7 @@ module DevelopmentApp
 
     def col_defs_for_logged_actions(logged_action, table_name) # rubocop:disable Metrics/AbcSize
       col_names = DevelopmentRepo.new.table_col_names(logged_action.table_name)
-      Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk| # rubocop:disable Metrics/BlockLength
+      Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
         mk.action_column do |act|
           act.popup_link 'Detail diff', '/development/logging/logged_actions/$col1$/diff',
                          col1: 'event_id',

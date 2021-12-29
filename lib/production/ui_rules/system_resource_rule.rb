@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class SystemResourceRule < Base # rubocop:disable Metrics/ClassLength
+  class SystemResourceRule < Base
     def generate_rules
       @repo = ProductionApp::ResourceRepo.new
       make_form_object

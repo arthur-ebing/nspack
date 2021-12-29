@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MesscadaApp
-  class MesscadaInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class MesscadaInteractor < BaseInteractor
     # Take a scanned pallet number and convert it to a system pallet number
     # Sometimes a pallet scanned from an external supplier will not be a
     # valid SSCC format.

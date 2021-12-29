@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  module PackagingFactory # rubocop:disable Metrics/ModuleLength
+  module PackagingFactory
     def create_pallet_base(opts = {})
       id = get_available_factory_record(:pallet_bases, opts)
       return id unless id.nil?

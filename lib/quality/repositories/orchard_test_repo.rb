@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QualityApp
-  class OrchardTestRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class OrchardTestRepo < BaseRepo
     build_for_select :orchard_test_types,
                      label: :test_type_code,
                      value: :id,

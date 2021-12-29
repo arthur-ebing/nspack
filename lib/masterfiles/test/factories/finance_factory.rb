@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  module FinanceFactory # rubocop:disable Metrics/ModuleLength
+  module FinanceFactory
     def create_customer_payment_term(opts = {})
       id = get_available_factory_record(:customer_payment_terms, opts)
       return id unless id.nil?

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class GrowerGradingCartonRule < Base # rubocop:disable Metrics/ClassLength
+  class GrowerGradingCartonRule < Base
     def generate_rules
       @repo = ProductionApp::GrowerGradingRepo.new
       @party_repo = MasterfilesApp::PartyRepo.new

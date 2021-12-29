@@ -15,22 +15,40 @@ module UiRules
       form_name 'bin_tipping_control_data'
     end
 
-    def common_fields # rubocop:disable Metrics/AbcSize
-      run_cultivar = MasterfilesApp::CultivarRepo.new.find_production_run_cultivar(@options[:production_run_id])
+    def common_fields
       {
-        rmt_product_type: { renderer: :select, options: %w[presort orchard_run rebin], required: true, prompt: true, min_charwidth: 30 },
-        treatment_code: { renderer: :select, options: repo.run_treatment_codes, required: true, prompt: true },
-        rmt_size: { renderer: :select, caption: 'Size Code', options: MasterfilesApp::RmtSizeRepo.new.for_select_rmt_sizes.map { |s| s[0] }.uniq, required: true, prompt: true },
-        ripe_point_code: { renderer: :select, options: repo.ripe_point_codes.map { |s| s[0] }.uniq, required: true, prompt: true },
-        pc_code: { renderer: :select, options: @form_object.pc_code ? [@form_object.pc_code] : [], required: true, prompt: true },
-        product_class_code: { renderer: :select, options: MasterfilesApp::FruitRepo.new.for_select_rmt_classes.map { |s| s[0] }.uniq, required: true, prompt: true },
-        track_indicator_code: { renderer: :select, options: repo.track_indicator_codes(run_cultivar).uniq, required: true, prompt: true },
-        cold_store_type: { renderer: :select, options: %w[CA RA KT NO], required: true, prompt: true }
+        rmt_class_id: { renderer: :select,
+                        options: MasterfilesApp::FruitRepo.new.for_select_rmt_classes.uniq,
+                        caption: 'Product Class',
+                        prompt: true },
+        colour_percentage_id: { renderer: :select,
+                                options: repo.for_select_run_colour_percentages(@options[:production_run_id]),
+                                caption: 'Colour',
+                                prompt: true },
+        actual_cold_treatment_id: { renderer: :select,
+                                    options: @repo.for_select_treatments_by_type(AppConst::COLD_TREATMENT),
+                                    prompt: true },
+        actual_ripeness_treatment_id: { renderer: :select,
+                                        options: @repo.for_select_treatments_by_type(AppConst::RIPENESS_TREATMENT),
+                                        prompt: true },
+        rmt_code_id: { renderer: :select,
+                       options: @repo.for_select_rmt_codes_by_run_cultivar(@options[:production_run_id], @form_object.cultivar_id),
+                       prompt: true },
+        rmt_size_id: { renderer: :select,
+                       options: MasterfilesApp::RmtSizeRepo.new.for_select_rmt_sizes,
+                       prompt: true }
       }
     end
 
     def make_form_object
       @form_object = OpenStruct.new
+
+      production_run = @repo.find_hash(:production_runs, @options[:production_run_id])
+      return if production_run.nil?
+
+      fields = %i[colour_percentage_id actual_cold_treatment_id actual_ripeness_treatment_id cultivar_id rmt_code_id rmt_size_id rmt_class_id]
+      hash = Hash[fields.zip(fields.map { |f| production_run[f] })]
+      @form_object = OpenStruct.new(hash)
     end
 
     def add_behaviours

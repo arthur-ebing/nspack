@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RawMaterialsApp
-  class RmtDeliveryInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class RmtDeliveryInteractor < BaseInteractor
     def classify_raw_material(id, params) # rubocop:disable Metrics/AbcSize
       params[:rmt_classifications] = params.find_all { |k, _v| k != :rmt_code_id }.map { |a| a[1] }.reject(&:blank?)
       res = ClassifyRawMaterialContract.new.call(params)
@@ -137,7 +137,21 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def create_rmt_delivery(params)
+    def generate_sample_bin_sequences(sample_size, quantity_bins_with_fruit)
+      (1..quantity_bins_with_fruit).to_a.sample(sample_size)
+    end
+
+    def get_delivery_sample_bins(cultivar_id, quantity_bins_with_fruit)
+      return nil if AppConst::CR_RMT.sample_rmt_bin_percentage.zero?
+      return nil unless repo.allocate_sample_rmt_bins_for_commodity_cultivar?(cultivar_id)
+
+      sample_size = (AppConst::CR_RMT.sample_rmt_bin_percentage * quantity_bins_with_fruit).round
+      generate_sample_bin_sequences(sample_size, quantity_bins_with_fruit)
+    end
+
+    def create_rmt_delivery(params) # rubocop:disable Metrics/AbcSize
+      sample_bins = get_delivery_sample_bins(params[:cultivar_id], params[:quantity_bins_with_fruit].to_i)
+      params[:sample_bins] = sample_bins unless sample_bins.nil_or_empty?
       res = validate_rmt_delivery_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -155,7 +169,15 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def update_rmt_delivery(id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity:
+    def update_rmt_delivery(id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      bins_exist = repo.exists?(:rmt_bins, rmt_delivery_id: id)
+      quantity_bins_with_fruit_changed = repo.get_value(:rmt_deliveries, :quantity_bins_with_fruit, id: id) != params[:quantity_bins_with_fruit].to_i
+      if !bins_exist && quantity_bins_with_fruit_changed
+        sample_bins = get_delivery_sample_bins(params[:cultivar_id], params[:quantity_bins_with_fruit].to_i)
+        params[:sample_bins] = nil
+        params[:sample_bins] = sample_bins unless sample_bins.nil_or_empty?
+      end
+
       res = validate_rmt_delivery_params(params)
       return failed_response(unwrap_failed_response(validation_failed_response(res))) if res.failure? && res.errors.to_h.one? && res.errors.to_h.include?(:season_id)
       return validation_failed_response(res) if res.failure?
@@ -544,6 +566,17 @@ module RawMaterialsApp
       repo.find_cost_flat(id)
     end
 
+    def check_existing_mrl_result_for(delivery_id)
+      arr = %i[farm_id puc_id orchard_id cultivar_id season_id]
+      args = mrl_result_repo.mrl_result_attrs_for(delivery_id, arr)
+      existing_id = mrl_result_repo.look_for_existing_mrl_result_id(args)
+      return failed_response("There is no existing mrl result for delivery id #{delivery_id}") if existing_id.nil?
+
+      success_response('Found existing mrl result', args.merge({ existing_id: existing_id }))
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     private
 
     def rmt_delivery_cost(rmt_delivery_id, cost_id)
@@ -560,6 +593,10 @@ module RawMaterialsApp
 
     def insp_repo
       @insp_repo ||= FinishedGoodsApp::GovtInspectionRepo.new
+    end
+
+    def mrl_result_repo
+      @mrl_result_repo ||= QualityApp::MrlResultRepo.new
     end
 
     def rmt_delivery(id)

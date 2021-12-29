@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class OrchardTestTypeRule < Base # rubocop:disable Metrics/ClassLength
+  class OrchardTestTypeRule < Base
     def generate_rules
       @repo = QualityApp::OrchardTestRepo.new
       make_form_object

@@ -30,7 +30,9 @@ module UiRules
         new_from_menu: { renderer: :checkbox, caption: 'Menu item for new resource',
                          hint: '<p>Set this if you want to call the new route from a menu item <br>(instead of or as well as from a button)</p>' },
         jobs: { hint: 'Names of jobs to be created (separated by commas). Names can be snake_case or CamelCase.' },
-        services: { hint: 'Names of services to be created (separated by commas). Names can be snake_case or CamelCase.' }
+        services: { hint: 'Names of services to be created (separated by commas). Names can be snake_case or CamelCase.' },
+        view_helper: { renderer: :checkbox, caption: 'Add a view helper file',
+                       hint: '<p>Set this if you want the scaffold to generate a ViewHelper and add `extend ViewHelper` to the view files</p>' }
       }
     end
 

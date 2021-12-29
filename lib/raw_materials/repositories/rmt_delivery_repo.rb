@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RawMaterialsApp
-  class RmtDeliveryRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class RmtDeliveryRepo < BaseRepo
     build_for_select :rmt_deliveries,
                      label: :id,
                      value: :id,
@@ -338,6 +338,14 @@ module RawMaterialsApp
                           flatten_columns: { farm_code: :farm_code, description: :farm_description, farm_group_id: :farm_group_id } },
                         { parent_table: :rmt_sizes,
                           flatten_columns: { size_code: :size_code } },
+                        { parent_table: :rmt_codes,
+                          flatten_columns: { rmt_code: :rmt_code } },
+                        { parent_table: :colour_percentages,
+                          flatten_columns: { colour_percentage: :colour_percentage } },
+                        { parent_table: :treatments, foreign_key: :actual_cold_treatment_id,
+                          flatten_columns: { treatment_code: :actual_cold_treatment_code } },
+                        { parent_table: :treatments, foreign_key: :actual_ripeness_treatment_id,
+                          flatten_columns: { treatment_code: :actual_ripeness_treatment_code } },
                         { parent_table: :pucs,
                           flatten_columns: { puc_code: :puc_code } },
                         { parent_table: :seasons,
@@ -676,6 +684,22 @@ module RawMaterialsApp
       DB[:rmt_container_material_owners]
         .select(Sequel.lit('distinct rmt_material_owner_party_role_id AS id, fn_party_role_name_with_role(rmt_material_owner_party_role_id) AS party_name'))
         .map { |p| [p[:party_name], p[:id]] }
+    end
+
+    def allocate_sample_rmt_bins_for_commodity_cultivar?(cultivar_id)
+      DB[:cultivars]
+        .join(:cultivar_groups, id: :cultivar_group_id)
+        .join(:commodities, id: :commodity_id)
+        .where(Sequel[:cultivars][:id] => cultivar_id)
+        .get(:allocate_sample_rmt_bins)
+    end
+
+    def allocate_delivery_bin_samples(delivery_id, cultivar_id, sample_positions) # rubocop:disable Metrics/AbcSize
+      return unless allocate_sample_rmt_bins_for_commodity_cultivar?(cultivar_id)
+
+      bins = select_values(:rmt_bins, %i[id bin_fullness], rmt_delivery_id: delivery_id).sort_by { |s| s[0] }
+      samples = (bins.map { |b| b[0] }.values_at(*sample_positions.collect { |x| x.to_i - 1 }) + bins.find_all { |b| b[1] != AppConst::BIN_FULL }.map { |d| d[0] }).uniq
+      update_rmt_bin(samples, sample_bin: true)
     end
   end
 end

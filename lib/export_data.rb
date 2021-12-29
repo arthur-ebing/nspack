@@ -6,7 +6,7 @@ module Crossbeams
   #
   # Run using a valid key form the config file:
   # Crossbeams::ExportData.run('keyname')
-  class ExportData # rubocop:disable Metrics/ClassLength
+  class ExportData
     attr_reader :key, :report, :recs
 
     class << self
@@ -138,8 +138,8 @@ module Crossbeams
       xls_types = []
       x_styles = []
       first_row = recs.first
-      Axlsx::Package.new do |p| # rubocop:disable Metrics/BlockLength
-        p.workbook do |wb| # rubocop:disable Metrics/BlockLength
+      Axlsx::Package.new do |p|
+        p.workbook do |wb|
           styles = wb.styles
           styles.fonts.first.sz = 10
           tbl_header = styles.add_style b: true, font_name: 'arial', alignment: { horizontal: :center }, sz: 10

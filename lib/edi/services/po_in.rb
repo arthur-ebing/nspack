@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module EdiApp
-  class PoIn < BaseEdiInService # rubocop:disable Metrics/ClassLength
+  class PoIn < BaseEdiInService
     attr_reader :org_code, :po_repo, :tot_cartons, :records
 
     def initialize(edi_in_transaction_id, file_path, logger, edi_result)

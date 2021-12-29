@@ -35,6 +35,7 @@ module RawMaterialsApp
         tripsheet_offloaded_at: '2010-01-01 12:00',
         tripsheet_loaded_at: '2010-01-01 12:00',
         active: true,
+        sample_bins: nil,
         rmt_container_material_type_id: 1
       }
       RawMaterialsApp::RmtDelivery.new(base_attrs.merge(attrs))

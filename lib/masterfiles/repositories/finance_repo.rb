@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class FinanceRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class FinanceRepo < BaseRepo
     build_for_select :currencies,
                      label: :currency,
                      value: :id,

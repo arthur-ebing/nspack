@@ -50,7 +50,7 @@ module ProductionApp
         v[:in_db] = true
       end
 
-      robot_list.each do |clm, attrs| # rubocop:disable Metrics/BlockLength
+      robot_list.each do |clm, attrs|
         next if repo.exists?(:plant_resources, plant_resource_code: attrs[:alias])
 
         robo = { plant_resource_type_id: clm_type, plant_resource_code: attrs[:alias], description: attrs[:alias] }

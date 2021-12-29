@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module LabelApp
-  class CheckPublishStatusJob < BaseQueJob # rubocop:disable Metrics/ClassLength
+  class CheckPublishStatusJob < BaseQueJob
     def run(user_id, label_publish_log_id) # rubocop:disable Metrics/AbcSize
       lookup_label_publish_log(label_publish_log_id)
       lookup_user_name(user_id)

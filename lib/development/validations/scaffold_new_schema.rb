@@ -14,6 +14,7 @@ module DevelopmentApp
       required(:new_from_menu).maybe(:bool)
       required(:jobs).maybe(:string)
       required(:services).maybe(:string)
+      required(:view_helper).maybe(:bool)
       required(:applet).filled(Types::StrippedString)
     end
 

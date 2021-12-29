@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module EdiApp
-  class LiIn < BaseEdiInService # rubocop:disable Metrics/ClassLength
+  class LiIn < BaseEdiInService
     attr_accessor :attrs, :missing_masterfiles, :order_items
     attr_reader :repo, :li_repo, :po_repo, :order_head, :order_item_recs, :file_name, :remarks
 
@@ -135,7 +135,7 @@ module EdiApp
     end
 
     def parse_order_items_edi # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
-      order_item_recs.each do |rec| # rubocop:disable Metrics/BlockLength
+      order_item_recs.each do |rec|
         item = { carton_quantity: rec[:instruction_quantity].to_i }
 
         standard_pack_code_id = po_repo.find_standard_pack_id(rec[:pack])

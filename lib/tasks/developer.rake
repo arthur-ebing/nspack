@@ -7,7 +7,7 @@ require File.expand_path('../../helpers/utility_functions.rb', __dir__)
 class AppDevTasks
   include Rake::DSL
 
-  def initialize # rubocop:disable Metrics/AbcSize
+  def initialize # rubocop:disable Metrics/AbcSize , Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
     namespace :developers do
       desc 'Create or update .env.local and copy ".example" files'
       task :setup do
@@ -35,6 +35,29 @@ class AppDevTasks
       desc 'Client settings: list only required ENV variables'
       task :client_settings_required do
         puts AppClientSettingsLoader.new_env_var_file(required_values_only: true)
+      end
+
+      desc 'Client rules'
+      task client_rules: :load_app do
+        s = "#{AppConst::CLIENT_SET[AppConst::CLIENT_CODE]} (#{AppConst::CLIENT_CODE})"
+        puts '*' * s.length
+        puts s
+        puts '*' * s.length
+        AppConst.constants.grep(/CR_/).sort.each do |const|
+          kl = AppConst.const_get(const)
+          next unless kl.class.name.start_with?('Crossbeams::')
+
+          s = "#{kl.rule_name} (AppConst::#{const})"
+          puts "\n#{'=' * s.length}"
+          puts s
+          puts '=' * s.length
+
+          kl.to_table.each do |h|
+            puts "#{h[:method].to_s.ljust(50)} > #{h[:value].to_s.ljust(80)} |"
+            puts h[:description].length > 130 ? "   #{h[:description]}" : "   #{h[:description].ljust(130)} |"
+            puts '-' * 135
+          end
+        end
       end
 
       desc 'Clear the SQL log file'

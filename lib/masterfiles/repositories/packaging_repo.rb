@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class PackagingRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class PackagingRepo < BaseRepo
     build_for_select :pallet_bases,
                      label: :pallet_base_code,
                      value: :id,

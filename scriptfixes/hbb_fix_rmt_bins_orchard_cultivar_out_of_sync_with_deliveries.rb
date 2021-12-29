@@ -23,7 +23,7 @@ class HbbFixRmtBinsOrchardCultivarOutOfSyncWithDeliveries < BaseScript
     p "Bin Records affected: #{rmt_delivery_bins.count}"
 
     text_data = []
-    rmt_delivery_bins.group_by { |h| h[:delivery_id] }.each do |_k, v| # rubocop:disable Metrics/BlockLength
+    rmt_delivery_bins.group_by { |h| h[:delivery_id] }.each do |_k, v|
       if debug_mode
         v.group_by { |h| "#{h[:bin_orchard_id]},#{h[:bin_cultivar_id]}" }.each do |_key, val|
           delivery = val.first

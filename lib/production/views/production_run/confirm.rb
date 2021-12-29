@@ -4,7 +4,7 @@ module Production
   module Runs
     module ProductionRun
       class Confirm
-        def self.call(id, url: nil, notice: nil, error: nil, button_captions: ['Submit', 'Submitting...'], remote: true) # rubocop:disable Metrics/ParameterLists
+        def self.call(id, url: nil, notice: nil, error: nil, button_captions: ['Submit', 'Submitting...'], remote: true)
           ui_rule = UiRules::Compiler.new(:production_run, :confirm, form_values: nil, id: id)
           rules   = ui_rule.compile
 

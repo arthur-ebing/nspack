@@ -21,7 +21,7 @@
   \   rmt_deliveries.qty_empty_bins,\r\n    rmt_deliveries.current,\r\n    rmt_deliveries.keep_open,\r\n
   \   rmt_deliveries.delivery_tipped,\r\n    rmt_deliveries.shipped,\r\n    rmt_deliveries.date_picked
   AS picked_at,\r\n    rmt_deliveries.tipping_complete_date_time AS tipping_completed_at,\r\n\r\n
-  \   rmt_deliveries.created_at,\r\n    rmt_deliveries.updated_at,\r\n    CASE\r\n
+  \   rmt_deliveries.created_at,\r\n    rmt_deliveries.updated_at,\r\n    rmt_deliveries.sample_bins,\r\n    CASE\r\n
   \       WHEN rmt_deliveries.current THEN 'green'\r\n        WHEN delivery_tipped
   THEN 'gray'\r\n        WHEN keep_open THEN 'orange'\r\n        WHEN shipped THEN
   'blue'\r\n        WHEN NOT received THEN 'purple'\r\n        END AS colour_rule\r\nFROM\r\n
@@ -650,6 +650,22 @@
     :pinned: 
     :groupable: false
     :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  sample_bins:
+    :name: sample_bins
+    :sequence_no: 39
+    :caption: Sample Bins
+    :namespaced_name: rmt_deliveries.sample_bins
+    :data_type: :string
+    :width: 120
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false

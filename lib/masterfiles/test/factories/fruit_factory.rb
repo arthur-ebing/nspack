@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  module FruitFactory # rubocop:disable Metrics/ModuleLength
+  module FruitFactory
     def create_grade(opts = {})
       id = get_available_factory_record(:grades, opts)
       return id unless id.nil?

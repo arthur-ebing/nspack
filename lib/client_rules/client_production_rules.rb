@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Crossbeams
-  class ClientProductionRules < BaseClientRules # rubocop:disable Metrics/ClassLength
+  class ClientProductionRules < BaseClientRules
     include Crossbeams::AutoDocumentation
 
     CLIENT_SETTINGS = {
@@ -174,6 +174,34 @@ module Crossbeams
                                            rebin_changes: [] },
              use_work_orders: false,
              allow_reworks_mixed_tipping: false },
+      mc: { run_allocations: { default: true, can_override: false },
+            pallet_label_seqs_sql: nil,
+            use_gtins: false,
+            print_from_line_scanning: false,
+            incentive_palletizing: true,
+            clm_button_caption_format: '$:size_ref_or_count$ $:product_chars$ $:target_market_group_name$',
+            provide_pack_type_at_verification: false,
+            group_incentive_packer_roles: false,
+            integrate_with_external_rmt_system: false,
+            bin_tip_match_farm_on_group: false,
+            full_bin_tip_criteria_checked: false,
+            default_marketing_org: 'MC',
+            allow_cultivar_group_mix: false,
+            use_packing_specifications: false,
+            use_marketing_puc: false,
+            carton_equals_pallet: { default: false, can_override: false },
+            capture_product_setup_class: false,
+            link_target_markets_to_target_customers: false,
+            require_packaging_bom: false,
+            capture_batch_number_for_pallets: false,
+            derive_nett_weight: false,
+            require_extended_packaging: false,
+            run_cache_legacy_data_fields: [],
+            grower_grading_json_fields: { legacy_data: [],
+                                          carton_changes: [],
+                                          rebin_changes: [] },
+            use_work_orders: false,
+            allow_reworks_mixed_tipping: false },
       sr: { run_allocations: { default: true, can_override: false },
             pallet_label_seqs_sql: nil,
             use_gtins: false,

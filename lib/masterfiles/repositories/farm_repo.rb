@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class FarmRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class FarmRepo < BaseRepo
     build_for_select :production_regions,
                      label: :production_region_code,
                      value: :id,

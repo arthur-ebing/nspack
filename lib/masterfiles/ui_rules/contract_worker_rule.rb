@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class ContractWorkerRule < Base # rubocop:disable Metrics/ClassLength
+  class ContractWorkerRule < Base
     def generate_rules
       @repo = MasterfilesApp::HumanResourcesRepo.new
       @hr_messcada_repo = MesscadaApp::HrRepo.new

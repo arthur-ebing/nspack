@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class MarketingRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class MarketingRepo < BaseRepo
     build_for_select :marks,
                      label: :mark_code,
                      value: :id,

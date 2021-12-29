@@ -12,7 +12,7 @@
 
 require 'csv'
 
-class ImportMasterfilesCsv < BaseScript # rubocop:disable Metrics/ClassLength
+class ImportMasterfilesCsv < BaseScript
   attr_reader :table_name, :input_filename, :output_filename,
               :table_rules, :csv_data, :insert_statement
 

@@ -17,8 +17,8 @@ module ProductionApp
     private
 
     def build_xml(peripherals) # rubocop:disable Metrics/AbcSize
-      builder = Nokogiri::XML::Builder.new do |xml| # rubocop:disable Metrics/BlockLength
-        xml.SystemSchema do # rubocop:disable Metrics/BlockLength
+      builder = Nokogiri::XML::Builder.new do |xml|
+        xml.SystemSchema do
           xml.Peripherals do
             unless peripherals.empty?
               peripherals.each do |ph, periphs|

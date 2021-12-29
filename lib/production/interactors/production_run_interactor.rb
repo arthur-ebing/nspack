@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ProductionApp
-  class ProductionRunInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class ProductionRunInteractor < BaseInteractor
     def validate_new_first(params)
       res = validate_new_first_production_run_params(params)
       return validation_failed_response(res) if res.failure?
@@ -236,10 +236,10 @@ module ProductionApp
       return validation_failed_response(res) if res.failure?
 
       repo.transaction do
-        repo.update(:production_runs, id, legacy_data: params)
+        repo.update(:production_runs, id, res)
       end
 
-      success_response('legacy_data updated successfully')
+      success_response('run control data updated successfully')
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue StandardError => e

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  class OrderItemInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class OrderItemInteractor < BaseInteractor
     def create_order_item(params)
       res = validate_order_item_params(params)
       return validation_failed_response(res) if res.failure?

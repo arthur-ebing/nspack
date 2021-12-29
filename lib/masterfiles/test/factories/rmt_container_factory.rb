@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  module RmtContainerFactory # rubocop:disable Metrics/ModuleLength
+  module RmtContainerFactory
     def create_rmt_container_material_owner(opts = {})
       id = get_available_factory_record(:rmt_container_material_owners, opts)
       return id unless id.nil?

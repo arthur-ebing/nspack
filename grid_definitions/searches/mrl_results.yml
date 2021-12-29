@@ -1,0 +1,24 @@
+---
+:dataminer_definition: mrl_results
+:actions:
+- :url: "/quality/mrl/mrl_results/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/quality/mrl/mrl_results/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/quality/mrl/mrl_results/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/quality/mrl/mrl_results/new"
+  :text: New Mrl Result
+  :style: :button
+  :behaviour: :popup

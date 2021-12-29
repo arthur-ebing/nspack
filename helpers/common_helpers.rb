@@ -1,4 +1,4 @@
-module CommonHelpers # rubocop:disable Metrics/ModuleLength
+module CommonHelpers
   # Show a Crossbeams::Layout page
   # - The block must return a Crossbeams::Layout::Page
   def show_page(&block)

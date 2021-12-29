@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class ReworksRunPalletRule < Base # rubocop:disable Metrics/ClassLength
+  class ReworksRunPalletRule < Base
     def generate_rules # rubocop:disable Metrics/AbcSize,  Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       @repo = ProductionApp::ReworksRepo.new
       @setup_repo = ProductionApp::ProductSetupRepo.new

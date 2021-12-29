@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class LocationRule < Base # rubocop:disable Metrics/ClassLength
+  class LocationRule < Base
     def generate_rules
       @repo = MasterfilesApp::LocationRepo.new
       @print_repo = LabelApp::PrinterRepo.new

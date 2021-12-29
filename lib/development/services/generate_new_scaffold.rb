@@ -10,9 +10,9 @@ module DevelopmentApp
     class ScaffoldConfig
       attr_reader :inflector, :table, :singlename, :new_applet, :applet, :program,
                   :table_meta, :label_field, :short_name, :has_short_name, :program_text,
-                  :nested_route, :new_from_menu, :text_name, :services, :jobs
+                  :nested_route, :new_from_menu, :text_name, :services, :jobs, :view_helper
 
-      def initialize(params, roda_class_name) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+      def initialize(params, roda_class_name) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
         @roda_class_name     = roda_class_name
         @inflector           = Dry::Inflector.new
         @table               = params[:table]
@@ -32,6 +32,7 @@ module DevelopmentApp
         @new_from_menu       = params[:new_from_menu].nil? ? false : params[:new_from_menu]
         @services            = params[:services].nil_or_empty? ? [] : params[:services].split(',').map(&:strip)
         @jobs                = params[:jobs].nil_or_empty? ? [] : params[:jobs].split(',').map(&:strip)
+        @view_helper         = params[:view_helper].nil? ? false : params[:view_helper]
       end
 
       def classnames # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
@@ -54,6 +55,7 @@ module DevelopmentApp
           namespaced_repo: "#{modulename}::#{@shared_repo_name.nil? || @shared_repo_name.empty? ? classname : @inflector.camelize(@shared_repo_name.sub(/Repo$/, ''))}Repo",
           interactor: "#{classname}Interactor",
           namespaced_interactor: "#{modulename}::#{classname}Interactor",
+          view_helper: "#{applet_klass}::ViewHelper::#{program_klass}",
           view_prefix: "#{applet_klass}::#{program_klass}::#{classname}",
           job_classes: job_classes,
           service_classes: srv_classes
@@ -93,6 +95,7 @@ module DevelopmentApp
           validation: "lib/#{@applet}/validations/#{@singlename}_schema.rb",
           route: "routes/#{@applet}/#{@program}.rb",
           uirule: "lib/#{@applet}/ui_rules/#{@singlename}_rule.rb",
+          view_helper: "lib/#{@applet}/view_helpers/#{@program}_helpers.rb",
           view: {
             new: "lib/#{@applet}/views/#{@singlename}/new.rb",
             edit: "lib/#{@applet}/views/#{@singlename}/edit.rb",
@@ -131,22 +134,23 @@ module DevelopmentApp
         sources[:query]      = "-- Error building report - needs tuning: #{e.message}\n\n #{wrapped_sql(qm.base_sql)}"
         sources[:dm_query]   = "Error building report: #{e.message}"
       end
-      sources[:list]       = ListMaker.call(opts)
-      sources[:search]     = SearchMaker.call(opts)
-      sources[:repo]       = RepoMaker.call(opts)
-      sources[:entity]     = EntityMaker.call(opts)
-      sources[:inter]      = InteractorMaker.call(opts)
-      sources[:permission] = PermissionMaker.call(opts)
-      sources[:validation] = ValidationMaker.call(opts)
-      sources[:uirule]     = UiRuleMaker.call(opts)
-      sources[:view]       = ViewMaker.call(opts)
-      sources[:route]      = RouteMaker.call(opts)
-      sources[:menu]       = MenuMaker.call(opts)
-      sources[:menu_mig]   = MenuMigrationMaker.call(opts)
-      sources[:test]       = TestMaker.call(opts)
-      sources[:applet]     = AppletMaker.call(opts) if opts.new_applet
-      sources[:services]   = ServiceMaker.call(opts) unless opts.services.nil?
-      sources[:jobs]       = JobMaker.call(opts) unless opts.jobs.nil?
+      sources[:list]        = ListMaker.call(opts)
+      sources[:search]      = SearchMaker.call(opts)
+      sources[:repo]        = RepoMaker.call(opts)
+      sources[:entity]      = EntityMaker.call(opts)
+      sources[:inter]       = InteractorMaker.call(opts)
+      sources[:permission]  = PermissionMaker.call(opts)
+      sources[:validation]  = ValidationMaker.call(opts)
+      sources[:uirule]      = UiRuleMaker.call(opts)
+      sources[:view]        = ViewMaker.call(opts)
+      sources[:view_helper] = ViewHelpMaker.call(opts) if opts.view_helper
+      sources[:route]       = RouteMaker.call(opts)
+      sources[:menu]        = MenuMaker.call(opts)
+      sources[:menu_mig]    = MenuMigrationMaker.call(opts)
+      sources[:test]        = TestMaker.call(opts)
+      sources[:applet]      = AppletMaker.call(opts) if opts.new_applet
+      sources[:services]    = ServiceMaker.call(opts) unless opts.services.nil?
+      sources[:jobs]        = JobMaker.call(opts) unless opts.jobs.nil?
 
       sources
     end
@@ -163,7 +167,7 @@ module DevelopmentApp
       ar.map { |a| a.scan(/\S.{0,#{width - 2}}\S(?=\s|$)|\S+/).join("\n") }.join("\n")
     end
 
-    class TableMeta # rubocop:disable Metrics/ClassLength
+    class TableMeta
       attr_reader :columns, :column_names, :foreigns, :col_lookup, :fk_lookup, :indexed_columns
 
       DRY_TYPE_LOOKUP = {
@@ -376,6 +380,7 @@ module DevelopmentApp
 
     class InteractorMaker < BaseService
       attr_reader :opts
+
       def initialize(opts)
         @opts = opts
       end
@@ -813,7 +818,7 @@ module DevelopmentApp
       end
     end
 
-    class RouteMaker < BaseService # rubocop:disable Metrics/ClassLength
+    class RouteMaker < BaseService
       attr_reader :opts
       def initialize(opts)
         @opts = opts
@@ -1054,8 +1059,9 @@ module DevelopmentApp
       end
     end
 
-    class UiRuleMaker < BaseService # rubocop:disable Metrics/ClassLength
+    class UiRuleMaker < BaseService
       attr_reader :opts
+
       def initialize(opts)
         @opts = opts
       end
@@ -1248,7 +1254,7 @@ module DevelopmentApp
       end
     end
 
-    class TestMaker < BaseService # rubocop:disable Metrics/ClassLength
+    class TestMaker < BaseService
       attr_reader :opts
       def initialize(opts)
         @opts = opts
@@ -1690,8 +1696,34 @@ module DevelopmentApp
       end
     end
 
-    class ViewMaker < BaseService # rubocop:disable Metrics/ClassLength
+    class ViewHelpMaker < BaseService
       attr_reader :opts
+
+      def initialize(opts)
+        @opts = opts
+      end
+
+      def call
+        <<~RUBY
+          # frozen_string_literal: true
+
+          module RawMaterialsApp
+            module ViewHelpers
+              module #{opts.classnames[:program]}
+                # This method can be called from any view that extends this module.
+                def a_section(page, rules)
+                  page.add_test "Example: \#{rules.inspect}"
+                end
+              end
+            end
+          end
+        RUBY
+      end
+    end
+
+    class ViewMaker < BaseService
+      attr_reader :opts
+
       def initialize(opts)
         @opts = opts
       end
@@ -1734,6 +1766,12 @@ module DevelopmentApp
         end
       end
 
+      def extend_with_helper
+        return '' unless opts.view_helper
+
+        "\n        extend #{opts.classnames[:view_helper]}\n"
+      end
+
       def new_view
         <<~RUBY
           # frozen_string_literal: true
@@ -1741,7 +1779,7 @@ module DevelopmentApp
           module #{opts.classnames[:applet]}
             module #{opts.classnames[:program]}
               module #{opts.classnames[:class]}
-                class New
+                class New#{extend_with_helper}
                   def self.call(#{needs_id}form_values: nil, form_errors: nil, remote: true)
                     ui_rule = UiRules::Compiler.new(:#{opts.singlename}, :new, form_values: form_values)
                     rules   = ui_rule.compile
@@ -1772,7 +1810,7 @@ module DevelopmentApp
           module #{opts.classnames[:applet]}
             module #{opts.classnames[:program]}
               module #{opts.classnames[:class]}
-                class Edit
+                class Edit#{extend_with_helper}
                   def self.call(id, form_values: nil, form_errors: nil)
                     ui_rule = UiRules::Compiler.new(:#{opts.singlename}, :edit, id: id, form_values: form_values)
                     rules   = ui_rule.compile
@@ -1804,7 +1842,7 @@ module DevelopmentApp
           module #{opts.classnames[:applet]}
             module #{opts.classnames[:program]}
               module #{opts.classnames[:class]}
-                class Show
+                class Show#{extend_with_helper}
                   def self.call(id)
                     ui_rule = UiRules::Compiler.new(:#{opts.singlename}, :show, id: id)
                     rules   = ui_rule.compile
@@ -2174,6 +2212,7 @@ module DevelopmentApp
           # Dir["\#{root_dir}/#{opts.applet}/task_permission_checks/*.rb"].sort.each { |f| require f }
           Dir["\#{root_dir}/#{opts.applet}/ui_rules/*.rb"].sort.each { |f| require f }
           Dir["\#{root_dir}/#{opts.applet}/validations/*.rb"].sort.each { |f| require f }
+          # Dir["\#{root_dir}/#{opts.applet}/view_helpers/**/*.rb"].sort.each { |f| require f }
           Dir["\#{root_dir}/#{opts.applet}/views/**/*.rb"].sort.each { |f| require f }
 
           module #{opts.classnames[:module]}

@@ -795,7 +795,7 @@ class Nspack < Roda
             unless AppConst::CARTON_VERIFICATION_REQUIRED
               unless carton_id
                 res = messcada_interactor.carton_verification(carton_number)
-                unless res.success # rubocop:disable Metrics/BlockNesting
+                unless res.success
                   store_locally(:errors, errors: res.errors, error_message: unwrap_failed_response(res))
                   r.redirect("/rmd/production/palletizing/edit_pallet_sequence_view/#{id}")
                 end

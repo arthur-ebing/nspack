@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
 module QualityApp
   class PhytCleanStandardData < BaseService
     attr_reader :repo, :api, :phyt_clean_season_id, :puc_ids
@@ -101,4 +100,3 @@ module QualityApp
     end
   end
 end
-# rubocop:enable Metrics/BlockLength

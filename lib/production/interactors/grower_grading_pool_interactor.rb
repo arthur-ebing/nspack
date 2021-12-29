@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ProductionApp
-  class GrowerGradingPoolInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class GrowerGradingPoolInteractor < BaseInteractor
     def create_grower_grading_pool(params) # rubocop:disable Metrics/AbcSize
       res = validate_new_grower_grading_pool_params(params)
       return validation_failed_response(res) if res.failure?

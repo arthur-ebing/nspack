@@ -20,6 +20,7 @@ module Masterfiles
               form.add_field :use_size_ref_for_edi
               form.add_field :colour_applies
               form.add_field :active
+              form.add_field :allocate_sample_rmt_bins
             end
           end
 

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MesscadaApp
-  class HrInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class HrInteractor < BaseInteractor
     def register_identifier(params) # rubocop:disable Metrics/AbcSize
       res = validate_identifier_for_registration(params)
       return validation_failed_response(res) if res.failure?

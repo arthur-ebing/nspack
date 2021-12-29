@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class PackingSpecificationWizardFruitRule < Base # rubocop:disable Metrics/ClassLength
+  class PackingSpecificationWizardFruitRule < Base
     def generate_rules
       form_name 'packing_specification_wizard'
 

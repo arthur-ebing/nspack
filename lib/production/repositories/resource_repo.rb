@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ProductionApp
-  class ResourceRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class ResourceRepo < BaseRepo
     build_for_select :plant_resource_types,
                      label: :plant_resource_type_code,
                      value: :id,

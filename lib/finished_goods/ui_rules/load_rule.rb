@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class LoadRule < Base # rubocop:disable Metrics/ClassLength
+  class LoadRule < Base
     def generate_rules
       make_form_object
       add_container_specifics_to_form if @mode == :container_weights

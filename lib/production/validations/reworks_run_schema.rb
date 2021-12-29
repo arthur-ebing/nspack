@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module ProductionApp # rubocop:disable Metrics/ModuleLength
+module ProductionApp
   ReworksRunSchema = Dry::Schema.Params do
     optional(:id).filled(:integer)
     required(:user).filled(Types::StrippedString)
@@ -254,7 +254,7 @@ module ProductionApp # rubocop:disable Metrics/ModuleLength
   end
 
   class SequenceSetupDataContract < Dry::Validation::Contract
-    params do # rubocop:disable Metrics/BlockLength
+    params do
       optional(:id).filled(:integer)
       required(:marketing_variety_id).filled(:integer)
       required(:customer_variety_id).maybe(:integer)

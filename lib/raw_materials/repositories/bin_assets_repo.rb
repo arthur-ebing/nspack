@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RawMaterialsApp
-  class BinAssetsRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class BinAssetsRepo < BaseRepo
     build_for_select :bin_asset_transactions,
                      label: :truck_registration_number,
                      value: :id,

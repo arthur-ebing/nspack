@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module EdiApp
-  class ActionsInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class ActionsInteractor < BaseInteractor
     def send_ps(params)
       res = check_for_recent_job(params[:party_role_id])
       return res unless res.success
@@ -97,7 +97,7 @@ module EdiApp
     end
 
     def col_defs_for_manual_intake # rubocop:disable Metrics/AbcSize
-      Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk| # rubocop:disable Metrics/BlockLength
+      Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
         mk.integer 'id', 'id'
         mk.col 'record_type', 'Rec', width: 50, data_type: :string
         # mk.col('sscc', 'Pallet', { width: 200, data_type: :string, editable: true, cellEditor: 'numericCellEditor' })

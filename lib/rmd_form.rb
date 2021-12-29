@@ -3,7 +3,7 @@ module Crossbeams
   #
   # This renders a form that is simpler than the Crossbeams::Layout form
   # specifically for RMDs using the layout_rmd view.
-  class RMDForm # rubocop:disable Metrics/ClassLength
+  class RMDForm
     attr_reader :form_state, :form_name, :progress, :notes, :scan_with_camera,
                 :caption, :action, :button_caption, :csrf_tag, :rules
 

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module EdiApp
-  class FlatFileRepo # rubocop:disable Metrics/ClassLength
+  class FlatFileRepo
     attr_accessor :schema, :record_definitions, :rec_type_lookup, :flow_type, :toc, :mf_key
 
     def initialize(flow_type)

@@ -1,5 +1,5 @@
 module MesscadaApp
-  class PresortBinCreated < BaseService # rubocop:disable Metrics/ClassLength
+  class PresortBinCreated < BaseService
     attr_reader :repo, :bin_asset_number, :presorted_bin, :logger, :plant_resource_code, :delivery_repo, :messcada_repo
 
     def initialize(bin_asset_number, plant_resource_code)

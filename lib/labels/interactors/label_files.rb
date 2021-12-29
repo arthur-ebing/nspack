@@ -5,7 +5,7 @@ module LabelApp
   # - single labels
   # - multi-labels
   # - rotated labels
-  class LabelFiles # rubocop:disable Metrics/ClassLength
+  class LabelFiles
     attr_reader :rotation
 
     def initialize(rotation = 0)
@@ -180,7 +180,7 @@ module LabelApp
       doc = Nokogiri::XML(xml)
       image_height = doc.at_xpath('//image_height').content.to_i
       image_width = doc.at_xpath('//image_width').content.to_i
-      doc.xpath('//variable').each do |var| # rubocop:disable Metrics/BlockLength
+      doc.xpath('//variable').each do |var|
         rot_angle = var.at_xpath('rotation_angle')
         startx = var.at_xpath('startx')
         starty = var.at_xpath('starty')

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  class OrderInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class OrderInteractor < BaseInteractor
     def create_order(params)
       res = validate_order_params(params)
       return validation_failed_response(res) if res.failure?
@@ -126,8 +126,8 @@ module FinishedGoodsApp
       pricing_per_kg = repo.get(:orders, id, :pricing_per_kg)
       load_ids = repo.select_values(:orders_loads, :load_id, order_id: id)
 
-      Crossbeams::DataGrid::ColumnDefiner.new(for_multiselect: for_multiselect).make_columns do |mk| # rubocop:disable Metrics/BlockLength
-        mk.action_column do |act| # rubocop:disable Metrics/BlockLength
+      Crossbeams::DataGrid::ColumnDefiner.new(for_multiselect: for_multiselect).make_columns do |mk|
+        mk.action_column do |act|
           act.popup_view_link '/finished_goods/orders/order_items/$col1$',
                               col1: 'id', icon: 'view-show', text: 'view', title: 'View'
           act.popup_edit_link '/finished_goods/orders/order_items/$col1$/edit',

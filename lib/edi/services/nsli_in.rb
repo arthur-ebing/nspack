@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module EdiApp
-  class NsliIn < BaseEdiInService # rubocop:disable Metrics/ClassLength
+  class NsliIn < BaseEdiInService
     attr_accessor :attrs, :load_id, :pallet_numbers, :missing_masterfiles, :match_data
     attr_reader :org_code, :po_repo, :tot_cartons, :records, :user, :repo, :load_repo, :file_name
 

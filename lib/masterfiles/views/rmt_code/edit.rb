@@ -19,6 +19,7 @@ module Masterfiles
               form.method :update
               form.add_field :rmt_handling_regime_id
               form.add_field :rmt_code
+              form.add_field :legacy_code
               form.add_field :description
             end
           end

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ProductionApp
-  class BuildModuleConfigXml < BaseService # rubocop:disable Metrics/ClassLength
+  class BuildModuleConfigXml < BaseService
     attr_reader :id, :repo, :alternate_ip, :sys_mod, :netmask, :gateway
 
     def initialize(id, alternate_ip: nil)
@@ -30,9 +30,9 @@ module ProductionApp
 
       net_interface = alternate_ip || sys_mod.ip_address unless gateway.nil?
       action = Crossbeams::Config::ResourceDefinitions::MODULE_ACTIONS[sys_mod.module_action.to_sym]
-      builder = Nokogiri::XML::Builder.new(encoding: 'UTF-8') do |xml| # rubocop:disable Metrics/BlockLength
+      builder = Nokogiri::XML::Builder.new(encoding: 'UTF-8') do |xml|
         xml.comment "\n  (C) #{Time.now.year}, NoSoft MesServer XML Setup File\n  "
-        xml.SystemSchema do # rubocop:disable Metrics/BlockLength
+        xml.SystemSchema do
           xml.Messages do
             xml.MsgQueLength 3500
           end
@@ -76,7 +76,7 @@ module ProductionApp
             xml.Ethernet(Name: 'Eth04', Function: 'httpserver', NetworkInterface: net_interface, Port: 2080, NetMask: netmask, GateWay: gateway, TTL: 15_000)
           end
 
-          xml.Peripherals do # rubocop:disable Metrics/BlockLength
+          xml.Peripherals do
             # What does this depend on? Does it matter if it is present in all configs? (e.g. Not at Loftus)
             # Perhaps we need scanner defs
             # and modules can choose to include one.
@@ -137,7 +137,7 @@ module ProductionApp
           # 	Printer=""
           # 	TransactionTrigger="Button"
           # 	>
-          xml.Robots do # rubocop:disable Metrics/BlockLength
+          xml.Robots do
             xml.Robot(Name: sys_mod.system_resource_code,
                       Alias: sys_mod.plant_resource_code,
                       Function: sys_mod.robot_function,

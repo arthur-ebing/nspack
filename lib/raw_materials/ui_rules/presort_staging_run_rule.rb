@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class PresortStagingRunRule < Base # rubocop:disable Metrics/ClassLength
+  class PresortStagingRunRule < Base
     def generate_rules # rubocop:disable Metrics/AbcSize
       @resource_repo = ProductionApp::ResourceRepo.new
       @supplier_repo = MasterfilesApp::SupplierRepo.new

@@ -10,7 +10,7 @@
 #            `-- Pallet sequence -> OP
 #    Batch Trailer               -> BT
 module EdiApp
-  class PoOut < BaseEdiOutService # rubocop:disable Metrics/ClassLength
+  class PoOut < BaseEdiOutService
     attr_reader :org_code, :po_repo
 
     def initialize(edi_out_transaction_id, logger)

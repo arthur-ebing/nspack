@@ -12,5 +12,6 @@ module MasterfilesApp
     attribute :requires_standard_counts, Types::Bool
     attribute :use_size_ref_for_edi, Types::Bool
     attribute :colour_applies, Types::Bool
+    attribute :allocate_sample_rmt_bins, Types::Bool
   end
 end

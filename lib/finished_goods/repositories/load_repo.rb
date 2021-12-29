@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  class LoadRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class LoadRepo < BaseRepo
     crud_calls_for :loads, name: :load, exclude: [:delete]
 
     def delete_load(id)

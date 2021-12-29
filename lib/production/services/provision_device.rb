@@ -2,7 +2,7 @@
 
 # rubocop:disable Style/IdenticalConditionalBranches
 module ProductionApp
-  class ProvisionDevice < BaseService # rubocop:disable Metrics/ClassLength
+  class ProvisionDevice < BaseService
     attr_reader :id, :repo, :network_ip, :usr, :pw, :out, :use_network_ip, :sys_mod, :server
 
     def initialize(id, network_ip, use_network_ip)
@@ -196,7 +196,7 @@ module ProductionApp
     end
 
     def config_splash_locale_autostart # rubocop:disable Metrics/AbcSize
-      Net::SSH.start(network_ip, usr, password: pw) do |ssh| # rubocop:disable Metrics/BlockLength
+      Net::SSH.start(network_ip, usr, password: pw) do |ssh|
         out << '* Set up splash screen'
         log
         if for_reterm
@@ -335,7 +335,7 @@ module ProductionApp
     def update_usb_files # rubocop:disable Metrics/AbcSize
       # NOTE: These USB settings are correct for rPi3B+ and seeed reTerm.
       #       They should be checked before provisioning a newer model.
-      Net::SSH.start(network_ip, usr, password: pw) do |ssh| # rubocop:disable Metrics/BlockLength
+      Net::SSH.start(network_ip, usr, password: pw) do |ssh|
         out << '* Set up USB config'
         log
         out << ssh.exec!(%([ -f "/etc/udev/rules.d/50-usb-permissions.rules" ] && sudo cp /etc/udev/rules.d/50-usb-permissions.rules /etc/udev/rules.d/50-usb-permissions.rules.bak))

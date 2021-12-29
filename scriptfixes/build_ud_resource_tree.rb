@@ -15,7 +15,7 @@
 # Live  : RACK_ENV=production ruby scripts/base_script.rb BuildUdResourceTree
 # Dev   : ruby scripts/base_script.rb BuildUdResourceTree
 #
-class BuildUdResourceTree < BaseScript # rubocop:disable Metrics/ClassLength
+class BuildUdResourceTree < BaseScript
   def run
     DB.transaction do
       update_resources

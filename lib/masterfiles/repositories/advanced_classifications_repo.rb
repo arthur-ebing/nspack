@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class AdvancedClassificationsRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class AdvancedClassificationsRepo < BaseRepo
     build_for_select :ripeness_codes,
                      label: :ripeness_code,
                      value: :id,

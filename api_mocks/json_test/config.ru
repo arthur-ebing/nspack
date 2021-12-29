@@ -3,7 +3,6 @@
 require 'roda'
 require 'net/http'
 
-# rubocop:disable Metrics/BlockLength
 # Log all calls from a JSON robot
 class App < Roda
   plugin :symbolized_params
@@ -56,6 +55,5 @@ class App < Roda
     end
   end
 end
-# rubocop:enable Metrics/BlockLength
 
 run App.freeze.app

@@ -15,7 +15,7 @@ module Crossbeams
     # The main method to use is Crossbeams::Config::UserPermissions.can_user?
     # - pass the user object (or hash) and an array of permission keys.
     #
-    class UserPermissions # rubocop:disable Metrics/ClassLength
+    class UserPermissions
       WEBAPP = :Nspack
 
       BASE = {
