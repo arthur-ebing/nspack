@@ -251,7 +251,7 @@ class Nspack < Roda
                 status
                 asset_number
                 rmt_container_material_type_id
-                rmt_container_material_type
+                container_material_type_code
               ]
               actions = []
               res.instance.each do |instance|
@@ -319,7 +319,7 @@ class Nspack < Roda
                 status
                 asset_number
                 rmt_container_material_type_id
-                rmt_container_material_type
+                container_material_type_code
               ]
               actions = []
               res.instance.each do |instance|
