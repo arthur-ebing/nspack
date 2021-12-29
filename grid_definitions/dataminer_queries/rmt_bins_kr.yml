@@ -34,10 +34,9 @@
   \   scrapped,\r\n    scrapped_at,\r\n    scrap_remarks,\r\n    unscrapped_at,\r\n
   \   production_run_rebin_id,\r\n    rebin_created_at,\r\n    age,\r\n    legacy_data
   ->> 'colour' AS colour,\r\n    rmt_code,\r\n    legacy_data ->> 'track_slms_indicator_1_code'
-  AS legacy_rmt_code,\r\n    legacy_data ->> 'pc_code' AS pc_code,\r\n    legacy_data
-  ->> 'cold_store_type' AS regime_code,\r\n    fn_current_status('locations', vw_rmt_bins_flat.location_id)
+  AS legacy_rmt_code,\r\n    legacy_data ->> 'pc_code' AS pc_code,\r\n    regime_code,\r\n    fn_current_status('locations', vw_rmt_bins_flat.location_id)
   AS location_status,\r\n    last_coldroom_event,\r\n    coldroom_events,\r\n    classifications,\r\n
-  \   classifications[1] AS classification1,  \r\n    classifications[2] AS classification2,
+  \   classifications[1] AS classification1,  \r\n    classifications[2] AS classification2,\r\n    actual_ripeness_treatment,\r\n    actual_cold_treatment,\r\n
   \ \r\n    classifications[3] AS classification3,\r\n    main_ripeness_treatment,\r\n
   \   main_cold_treatment,\r\n    treatments,\r\n    presort_tip_lot_number,\r\n    main_presort_run_lot_number,\r\n
   \   CASE \r\n    WHEN bin_tipped THEN 'gray'\r\n    WHEN shipped THEN 'blue'\r\n

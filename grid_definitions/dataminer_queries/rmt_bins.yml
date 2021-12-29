@@ -25,7 +25,7 @@
   vw_rmt_bins_flat.location_id) AS location_status,\r\n    last_coldroom_event,\r\n
   \   coldroom_events,\r\n    legacy_data ->> 'colour' AS colour,\r\n    rmt_code,\r\n
   \   legacy_data ->> 'track_slms_indicator_1_code' AS legacy_rmt_code,\r\n    legacy_data
-  ->> 'pc_code' AS pc_code,\r\n    legacy_data ->> 'cold_store_type' AS regime_code,\r\n
+  ->> 'pc_code' AS pc_code,\r\n    regime_code,\r\n    actual_ripeness_treatment,\r\n    actual_cold_treatment,\r\n
   \   classifications,\r\n    classifications[1] AS classification1,  \r\n    classifications[2]
   AS classification2,  \r\n    classifications[3] AS classification3,\r\n    main_ripeness_treatment,\r\n
   \   main_cold_treatment,\r\n    treatments,\r\n    presort_tip_lot_number,\r\n    main_presort_run_lot_number,\r\n
@@ -1620,6 +1620,38 @@
     :pinned: 
     :groupable: false
     :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  actual_cold_treatment:
+    :name: actual_cold_treatment
+    :sequence_no: 99
+    :caption: Colour
+    :namespaced_name:
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  actual_ripeness_treatment:
+    :name: actual_ripeness_treatment
+    :sequence_no: 99
+    :caption: Actual Ripeness Treatment
+    :namespaced_name:
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
