@@ -105,19 +105,19 @@ module UiRules
                sample_size: @repo.get(:qc_sample_types, @options[:qc_sample_type_id], :default_sample_size),
                context: @options[:context],
                context_key: @options[:context_key] }
-      hash[:short_description] = send("desc_#{@options[:context]}".to_sym)
+      hash[:short_description], hash[:ref_number] = send("desc_ref_#{@options[:context]}".to_sym)
       # hash[:qc_sample_type_id] = @repo.get_id(:qc_sample_types, qc_sample_type_name: qc_sample_type) unless qc_sample_type.nil?
       @form_object = new_form_object_from_struct(QualityApp::QcSample, merge_hash: hash)
       # @form_object = new_form_object_from_struct(QualityApp::QcSample)
     end
 
-    def desc_rmt_delivery_id
+    def desc_ref_rmt_delivery_id
       instance = RawMaterialsApp::RmtDeliveryRepo.new.find_rmt_delivery(@options[:context_key])
       farm = @repo.get(:farms, instance.farm_id, :farm_code)
       orch = @repo.get(:orchards, instance.orchard_id, :orchard_code)
       cult, desc = @repo.get(:cultivars, instance.cultivar_id, %i[cultivar_code description])
 
-      "Farm #{farm} Orch #{orch} #{cult} #{desc} #{instance.date_delivered.strftime('%Y-%m-%d %H:%M')}"
+      ["Farm #{farm} Orch #{orch} #{cult} #{desc} #{instance.date_delivered.strftime('%Y-%m-%d %H:%M')}", instance.reference_number]
     end
 
     private
