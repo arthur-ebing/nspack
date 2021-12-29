@@ -27,7 +27,6 @@ class Nspack < Roda
         r.post do
           res = interactor.create_run_bin_tipping_control_data(id, params[:bin_tipping_control_data])
           if res.success
-            flash[:notice] = res.message
             r.redirect("/production/runs/production_runs/#{id}/edit")
           else
             re_show_form(r, res, url: "/production/runs/production_runs/#{id}/set_bin_tipping_control_data") do
@@ -47,7 +46,6 @@ class Nspack < Roda
         r.post do
           res = interactor.create_run_bin_tipping_criteria(id, params[:bin_tipping_criteria])
           if res.success
-            flash[:notice] = res.message
             r.redirect("/production/runs/production_runs/#{id}/edit")
           else
             re_show_form(r, res, url: "/production/runs/production_runs/#{id}/set_bin_tipping_criteria") do

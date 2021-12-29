@@ -642,5 +642,41 @@ module MesscadaApp
         .where(size_code: DB[:fruit_size_references].where(id: fruit_size_reference_id).get(:size_reference))
         .get(:id)
     end
+
+    def for_select_run_colour_percentages(production_run_id)
+      DB[:production_runs]
+        .join(:cultivar_groups, id: :cultivar_group_id)
+        .join(:colour_percentages, Sequel[:colour_percentages][:commodity_id] => Sequel[:cultivar_groups][:commodity_id])
+        .where(Sequel[:production_runs][:id] => production_run_id)
+        .select_map([:colour_percentage, Sequel[:colour_percentages][:id]])
+    end
+
+    def for_select_treatments_by_type(treatment_type_code)
+      DB[:treatment_types]
+        .join(:treatments, treatment_type_id: :id)
+        .where(treatment_type_code: treatment_type_code)
+        .select_map([:treatment_code, Sequel[:treatments][:id]])
+    end
+
+    def for_select_rmt_codes_by_run_cultivar(production_run_id, cultivar_id)
+      DB[:production_runs]
+        .join(:rmt_variants, cultivar_id: :cultivar_id)
+        .join(:rmt_codes, Sequel[:rmt_codes][:rmt_variant_id] => Sequel[:rmt_variants][:id])
+        .where(Sequel[:production_runs][:id] => production_run_id, Sequel[:production_runs][:cultivar_id] => cultivar_id)
+        .select_map([:rmt_code, Sequel[:rmt_codes][:id]])
+    end
+
+    def check_bin_in_wip(bin_number)
+      context = DB[:wip_bins]
+                .join(:rmt_bins, id: :rmt_bin_id)
+                .where(bin_asset_number: bin_number)
+                .select(Sequel[:wip_bins][:id], :context)
+                .reverse(Sequel[:wip_bins][:id])
+                .get(:context)
+
+      return ok_response unless context
+
+      failed_response("Bin in WIP #{context}")
+    end
   end
 end

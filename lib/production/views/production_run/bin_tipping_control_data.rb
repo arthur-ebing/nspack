@@ -15,14 +15,12 @@ module Production
             page.form do |form|
               form.action "/production/runs/production_runs/#{id}/set_bin_tipping_control_data"
               form.remote! if remote
-              form.add_field :rmt_product_type
-              form.add_field :treatment_code
-              form.add_field :rmt_size
-              form.add_field :ripe_point_code
-              form.add_field :pc_code
               form.add_field :product_class_code
-              form.add_field :track_indicator_code
-              form.add_field :cold_store_type
+              form.add_field :colour_percentage_id
+              form.add_field :actual_cold_treatment_id
+              form.add_field :actual_ripeness_treatment_id
+              form.add_field :rmt_code_id
+              form.add_field :rmt_size_id
             end
           end
 

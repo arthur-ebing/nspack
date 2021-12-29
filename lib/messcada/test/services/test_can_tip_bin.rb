@@ -36,18 +36,16 @@ module MesscadaApp
     def bintip_criteria(opts = {})
       crit = {}
       %w[
-        cold_store_type
-        commodity_code
-        farm_code
-        pc_code
-        product_class_code
-        ripe_point_code
-        rmt_product_type
+        rmt_code
         rmt_size
-        rmt_variety_code
+        farm_code
         season_code
-        track_indicator_code
-        treatment_code
+        commodity_code
+        rmt_variety_code
+        colour_percentage
+        product_class_code
+        actual_cold_treatment
+        actual_ripeness_treatment
       ].each { |c| crit[c] = opts[c.to_sym] ? 't' : 'f' }
       crit
     end
@@ -291,18 +289,36 @@ module MesscadaApp
       AppConst::TEST_SETTINGS.client_code = 'kr'
       assert AppConst::CR_PROD.kromco_rmt_integration?
 
+      cp_id = create_colour_percentage(colour_percentage: '20-50')
+      cp_id2 = create_colour_percentage(colour_percentage: 'G')
+      size_id = create_rmt_size(size_code: '198')
+      size_id2 = create_rmt_size(size_code: 'SMALL')
+      class_id = create_rmt_class(rmt_class_code: '1L')
+      class_id2 = create_rmt_class(rmt_class_code: 'CII')
+      rmt_code_id = create_rmt_code(rmt_code: 'ARB')
+      rmt_code_id2 = create_rmt_code(rmt_code: 'GDG')
+      season_id = create_season(season_code: '2021_AP')
+      season_id2 = create_season(season_code: '2020_AP')
+      actual_cold_treatment_id = create_treatment(treatment_code: 'SMARTFRESH')
+      actual_cold_treatment_id2 = create_treatment(treatment_code: 'CA')
+      actual_ripeness_treatment_id = create_treatment(treatment_code: 'RA')
+      actual_ripeness_treatment_id2 = create_treatment(treatment_code: 'DA')
       bin_id = create_rmt_bin(bin_asset_number: '123456',
                               tipped_asset_number: nil,
                               exit_ref: nil,
                               bin_tipped_date_time: nil,
-                              rmt_class_id: create_rmt_class(rmt_class_code: '1L'),
-                              rmt_size_id: create_rmt_size(size_code: '198'),
+                              rmt_class_id: class_id,
+                              rmt_size_id: size_id,
+                              rmt_code_id: rmt_code_id,
+                              season_id: season_id,
+                              colour_percentage_id: cp_id,
+                              actual_cold_treatment_id: actual_cold_treatment_id,
+                              actual_ripeness_treatment_id: actual_ripeness_treatment_id,
                               scrapped: false,
                               legacy_data: BaseRepo.new.hash_for_jsonb_col(bin_legacy_data))
 
       # 1. All criteria false
-      run_id = create_production_run(legacy_bintip_criteria: BaseRepo.new.hash_for_jsonb_col(bintip_criteria),
-                                     legacy_data: BaseRepo.new.hash_for_jsonb_col(run_data))
+      run_id = create_production_run(legacy_bintip_criteria: BaseRepo.new.hash_for_jsonb_col(bintip_criteria))
       bin = DB[:rmt_bins].where(id: bin_id).first
       run_res = success_response('ok', run_id)
       create_mrl_result(cultivar_id: bin[:cultivar_id],
@@ -316,82 +332,75 @@ module MesscadaApp
       res = MesscadaApp::CanTipBin.call(bin[:bin_asset_number], 'CLM-01')
       assert res.success, "Should be able to tip the bin - #{res.message}"
 
-      # 2. Cold store type
-      DB[:production_runs].where(id: run_id).update(legacy_bintip_criteria: BaseRepo.new.hash_for_jsonb_col(bintip_criteria(cold_store_type: true)),
-                                                    legacy_data: BaseRepo.new.hash_for_jsonb_col(run_data(cold_store_type: 'RA')))
+      # 2. colour percentage
+      DB[:production_runs].where(id: run_id).update(legacy_bintip_criteria: BaseRepo.new.hash_for_jsonb_col(bintip_criteria(colour_percentage: true)),
+                                                    colour_percentage_id: cp_id2)
       res = MesscadaApp::CanTipBin.call(bin[:bin_asset_number], 'CLM-01')
-      refute res.success, "Should not be able to tip based on cold store type - #{res.message}"
+      refute res.success, "Should not be able to tip based on colour percentage - #{res.message}"
 
-      DB[:production_runs].where(id: run_id).update(legacy_bintip_criteria: BaseRepo.new.hash_for_jsonb_col(bintip_criteria(cold_store_type: true)),
-                                                    legacy_data: BaseRepo.new.hash_for_jsonb_col(run_data))
+      DB[:production_runs].where(id: run_id).update(colour_percentage_id: cp_id)
       res = MesscadaApp::CanTipBin.call(bin[:bin_asset_number], 'CLM-01')
-      assert res.success, "Should be able to tip based on matching cold store type - #{res.message}"
+      assert res.success, "Should be able to tip based on matching colour percentage - #{res.message}"
 
-      # 3. PC code
-      DB[:production_runs].where(id: run_id).update(legacy_bintip_criteria: BaseRepo.new.hash_for_jsonb_col(bintip_criteria(pc_code: true)),
-                                                    legacy_data: BaseRepo.new.hash_for_jsonb_col(run_data(pc_code: 'RA other')))
-      res = MesscadaApp::CanTipBin.call(bin[:bin_asset_number], 'CLM-01')
-      refute res.success, "Should not be able to tip based on pc code - #{res.message}"
-
-      DB[:production_runs].where(id: run_id).update(legacy_bintip_criteria: BaseRepo.new.hash_for_jsonb_col(bintip_criteria(cold_store_type: true)),
-                                                    legacy_data: BaseRepo.new.hash_for_jsonb_col(run_data))
-      res = MesscadaApp::CanTipBin.call(bin[:bin_asset_number], 'CLM-01')
-      assert res.success, "Should be able to tip based on matching pc code - #{res.message}"
-
-      # 4. Product class code
-      DB[:production_runs].where(id: run_id).update(legacy_bintip_criteria: BaseRepo.new.hash_for_jsonb_col(bintip_criteria(product_class_code: true)),
-                                                    legacy_data: BaseRepo.new.hash_for_jsonb_col(run_data(product_class_code: 'AAA')))
-      res = MesscadaApp::CanTipBin.call(bin[:bin_asset_number], 'CLM-01')
-      refute res.success, "Should not be able to tip based on product class code - #{res.message}"
-
-      DB[:production_runs].where(id: run_id).update(legacy_bintip_criteria: BaseRepo.new.hash_for_jsonb_col(bintip_criteria(product_class_code: true)),
-                                                    legacy_data: BaseRepo.new.hash_for_jsonb_col(run_data))
-      res = MesscadaApp::CanTipBin.call(bin[:bin_asset_number], 'CLM-01')
-      assert res.success, "Should be able to tip based on matching product class code - #{res.message}"
-
-      # 5. Ripe point code
-      DB[:production_runs].where(id: run_id).update(legacy_bintip_criteria: BaseRepo.new.hash_for_jsonb_col(bintip_criteria(ripe_point_code: true)),
-                                                    legacy_data: BaseRepo.new.hash_for_jsonb_col(run_data(ripe_point_code: 'AAA')))
-      res = MesscadaApp::CanTipBin.call(bin[:bin_asset_number], 'CLM-01')
-      refute res.success, "Should not be able to tip based on ripe point code - #{res.message}"
-
-      DB[:production_runs].where(id: run_id).update(legacy_bintip_criteria: BaseRepo.new.hash_for_jsonb_col(bintip_criteria(ripe_point_code: true)),
-                                                    legacy_data: BaseRepo.new.hash_for_jsonb_col(run_data))
-      res = MesscadaApp::CanTipBin.call(bin[:bin_asset_number], 'CLM-01')
-      assert res.success, "Should be able to tip based on matching ripe point code - #{res.message}"
-
-      # 6. RMT Size
+      # 3. rmt size
       DB[:production_runs].where(id: run_id).update(legacy_bintip_criteria: BaseRepo.new.hash_for_jsonb_col(bintip_criteria(rmt_size: true)),
-                                                    legacy_data: BaseRepo.new.hash_for_jsonb_col(run_data(rmt_size: 'AAA')))
+                                                    rmt_size_id: size_id2)
       res = MesscadaApp::CanTipBin.call(bin[:bin_asset_number], 'CLM-01')
-      refute res.success, "Should not be able to tip based on RMT size - #{res.message}"
+      refute res.success, "Should not be able to tip based on rmt size - #{res.message}"
 
-      DB[:production_runs].where(id: run_id).update(legacy_bintip_criteria: BaseRepo.new.hash_for_jsonb_col(bintip_criteria(rmt_size: true)),
-                                                    legacy_data: BaseRepo.new.hash_for_jsonb_col(run_data))
+      DB[:production_runs].where(id: run_id).update(rmt_size_id: size_id)
       res = MesscadaApp::CanTipBin.call(bin[:bin_asset_number], 'CLM-01')
-      assert res.success, "Should be able to tip based on matching RMT size - #{res.message}"
+      assert res.success, "Should be able to tip based on matching rmt size - #{res.message}"
 
-      # 7. Track indicator code
-      DB[:production_runs].where(id: run_id).update(legacy_bintip_criteria: BaseRepo.new.hash_for_jsonb_col(bintip_criteria(track_indicator_code: true)),
-                                                    legacy_data: BaseRepo.new.hash_for_jsonb_col(run_data(track_indicator_code: 'AAA')))
+      # 4. product class code
+      DB[:production_runs].where(id: run_id).update(legacy_bintip_criteria: BaseRepo.new.hash_for_jsonb_col(bintip_criteria(product_class_code: true)),
+                                                    rmt_class_id: class_id2)
       res = MesscadaApp::CanTipBin.call(bin[:bin_asset_number], 'CLM-01')
-      refute res.success, "Should not be able to tip based on track indicaator code - #{res.message}"
+      refute res.success, "Should not be able to tip based on class code - #{res.message}"
 
-      DB[:production_runs].where(id: run_id).update(legacy_bintip_criteria: BaseRepo.new.hash_for_jsonb_col(bintip_criteria(track_indicator_code: true)),
-                                                    legacy_data: BaseRepo.new.hash_for_jsonb_col(run_data))
+      DB[:production_runs].where(id: run_id).update(rmt_class_id: class_id)
       res = MesscadaApp::CanTipBin.call(bin[:bin_asset_number], 'CLM-01')
-      assert res.success, "Should be able to tip based on matching track indicaator code - #{res.message}"
+      assert res.success, "Should be able to tip based on matching class code - #{res.message}"
 
-      # 8. Colour (treatment)
-      DB[:production_runs].where(id: run_id).update(legacy_bintip_criteria: BaseRepo.new.hash_for_jsonb_col(bintip_criteria(treatment_code: true)),
-                                                    legacy_data: BaseRepo.new.hash_for_jsonb_col(run_data(treatment_code: 'G')))
+      # 5. rmt code
+      DB[:production_runs].where(id: run_id).update(legacy_bintip_criteria: BaseRepo.new.hash_for_jsonb_col(bintip_criteria(rmt_code: true)),
+                                                    rmt_code_id: rmt_code_id2)
       res = MesscadaApp::CanTipBin.call(bin[:bin_asset_number], 'CLM-01')
-      refute res.success, "Should not be able to tip based on treatment code - #{res.message}"
+      refute res.success, "Should not be able to tip based on rmt code - #{res.message}"
 
-      DB[:production_runs].where(id: run_id).update(legacy_bintip_criteria: BaseRepo.new.hash_for_jsonb_col(bintip_criteria(treatment_code: true)),
-                                                    legacy_data: BaseRepo.new.hash_for_jsonb_col(run_data))
+      DB[:production_runs].where(id: run_id).update(rmt_code_id: rmt_code_id)
       res = MesscadaApp::CanTipBin.call(bin[:bin_asset_number], 'CLM-01')
-      assert res.success, "Should be able to tip based on matching treatment code - #{res.message}"
+      assert res.success, "Should be able to tip based on matching rmt code - #{res.message}"
+
+      # 6. season code
+      DB[:production_runs].where(id: run_id).update(legacy_bintip_criteria: BaseRepo.new.hash_for_jsonb_col(bintip_criteria(season_code: true)),
+                                                    season_id: season_id2)
+      res = MesscadaApp::CanTipBin.call(bin[:bin_asset_number], 'CLM-01')
+      refute res.success, "Should not be able to tip based on season code - #{res.message}"
+
+      DB[:production_runs].where(id: run_id).update(season_id: season_id)
+      res = MesscadaApp::CanTipBin.call(bin[:bin_asset_number], 'CLM-01')
+      assert res.success, "Should be able to tip based on matching season code - #{res.message}"
+
+      # 7. actual cold treatment
+      DB[:production_runs].where(id: run_id).update(legacy_bintip_criteria: BaseRepo.new.hash_for_jsonb_col(bintip_criteria(actual_cold_treatment: true)),
+                                                    actual_cold_treatment_id: actual_cold_treatment_id2)
+      res = MesscadaApp::CanTipBin.call(bin[:bin_asset_number], 'CLM-01')
+      refute res.success, "Should not be able to tip based on actual cold treatment - #{res.message}"
+
+      DB[:production_runs].where(id: run_id).update(actual_cold_treatment_id: actual_cold_treatment_id)
+      res = MesscadaApp::CanTipBin.call(bin[:bin_asset_number], 'CLM-01')
+      assert res.success, "Should be able to tip based on matching actual cold treatment - #{res.message}"
+
+      # 8. actual ripeness treatment
+      DB[:production_runs].where(id: run_id).update(legacy_bintip_criteria: BaseRepo.new.hash_for_jsonb_col(bintip_criteria(actual_ripeness_treatment: true)),
+                                                    actual_ripeness_treatment_id: actual_ripeness_treatment_id2)
+      res = MesscadaApp::CanTipBin.call(bin[:bin_asset_number], 'CLM-01')
+      refute res.success, "Should not be able to tip based on actual ripeness treatment - #{res.message}"
+
+      DB[:production_runs].where(id: run_id).update(actual_ripeness_treatment_id: actual_ripeness_treatment_id)
+      res = MesscadaApp::CanTipBin.call(bin[:bin_asset_number], 'CLM-01')
+      assert res.success, "Should be able to tip based on matching actual ripeness treatment - #{res.message}"
     ensure
       AppConst::TEST_SETTINGS.client_code = AppConst::TEST_SETTINGS.boot_client_code
     end

@@ -10,6 +10,9 @@ module ProductionApp
     include MasterfilesApp::FarmFactory
     include MasterfilesApp::CalendarFactory
     include MasterfilesApp::LocationFactory
+    include MasterfilesApp::FruitFactory
+    include MasterfilesApp::RmtContainerFactory
+    include RawMaterialsApp::RmtBinFactory
     include ResourceFactory
     include ProductSetupFactory
     include ProductionRunFactory
@@ -47,6 +50,12 @@ module ProductionApp
       cultivar_id = create_cultivar
       product_setup_template_id = create_product_setup_template
       production_run_id = create_production_run
+      colour_percentage_id = create_colour_percentage
+      actual_cold_treatment_id = create_treatment
+      actual_ripeness_treatment_id = create_treatment
+      rmt_code_id = create_rmt_code
+      rmt_size_id = create_rmt_size
+      rmt_class_id = create_rmt_class
 
       {
         id: 1,
@@ -60,6 +69,12 @@ module ProductionApp
         cultivar_id: cultivar_id,
         product_setup_template_id: product_setup_template_id,
         cloned_from_run_id: production_run_id,
+        colour_percentage_id: colour_percentage_id,
+        actual_cold_treatment_id: actual_cold_treatment_id,
+        actual_ripeness_treatment_id: actual_ripeness_treatment_id,
+        rmt_code_id: rmt_code_id,
+        rmt_size_id: rmt_size_id,
+        rmt_class_id: rmt_class_id,
         active_run_stage: Faker::Lorem.unique.word,
         started_at: '2010-01-01 12:00',
         closed_at: '2010-01-01 12:00',

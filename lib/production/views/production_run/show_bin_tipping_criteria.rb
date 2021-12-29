@@ -19,17 +19,14 @@ module Production
                   col.add_field :farm_code
                   col.add_field :commodity_code
                   col.add_field :rmt_variety_code
-                  col.add_field :treatment_code
                   col.add_field :rmt_size
                   col.add_field :product_class_code
                 end
                 row.column do |col|
-                  col.add_field :rmt_product_type
-                  col.add_field :pc_code
-                  col.add_field :cold_store_type
                   col.add_field :season_code
-                  col.add_field :track_indicator_code
-                  col.add_field :ripe_point_code
+                  col.add_field :actual_cold_treatment
+                  col.add_field :actual_ripeness_treatment
+                  col.add_field :rmt_code
                 end
               end
 
@@ -41,17 +38,15 @@ module Production
 
               form.row do |row|
                 row.column do |col|
-                  col.add_field :rmt_product_type_label
-                  col.add_field :treatment_code_label
+                  col.add_field :colour_percentage_label
+                  col.add_field :actual_ripeness_treatment_label
                   col.add_field :rmt_size_label
-                  col.add_field :ripe_point_code_label
                 end
 
                 row.column do |col|
-                  col.add_field :pc_code_label
-                  col.add_field :product_class_code_label
-                  col.add_field :track_indicator_code_label
-                  col.add_field :cold_store_type_label
+                  col.add_field :actual_cold_treatment_label
+                  col.add_field :product_class_label
+                  col.add_field :rmt_code_label
                 end
               end
             end

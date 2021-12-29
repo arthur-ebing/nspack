@@ -133,6 +133,10 @@ class AppConst # rubocop:disable Metrics/ClassLength
   CONVERTED_TO_REBIN = 'CONVERTED_TO_REBIN'
   EXTENDED_FG_CODE_RECALCULATED = 'EXTENDED_FG_CODE_RECALCULATED'
 
+  # Constants for treatment types
+  COLD_TREATMENT = 'COLD_TREATMENT'
+  RIPENESS_TREATMENT = 'RIPENESS_TREATMENT'
+
   # Constants for bin_scan_mode:
   SCAN_BINS_INDIVIDUALLY = 1
   SCAN_BIN_GROUPS = 2
