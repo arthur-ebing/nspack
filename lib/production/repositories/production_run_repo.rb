@@ -743,13 +743,17 @@ module ProductionApp
       DB.get(Sequel.function(:fn_current_status, 'production_runs', id))
     end
 
-    def validate_run_bin_tipping_criteria_and_control_data(id) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def validate_run_bin_tipping_criteria_and_control_data(id) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       run = find_production_run(id)
-      data = run.legacy_data.to_h
       run.legacy_bintip_criteria.to_h.select { |_, v| v == 't' }.each_key do |column|
         return " Bintip criteria requires a value for run.#{column}" if column == 'farm_code' && run[:farm_id].nil_or_empty?
         return " Bintip criteria requires a value for run.#{column}" if column == 'rmt_variety_code' && run[:cultivar_id].nil_or_empty?
-        return " Bintip criteria requires a value for #{column}" if !%w[farm_code rmt_variety_code commodity_code].include?(column) && data[column].nil_or_empty?
+        return " Bintip criteria requires a value for run.#{column}" if column == 'rmt_code' && run[:rmt_code_id].nil_or_empty?
+        return " Bintip criteria requires a value for run.#{column}" if column == 'rmt_size' && run[:rmt_size_id].nil_or_empty?
+        return " Bintip criteria requires a value for run.#{column}" if column == 'colour_percentage' && run[:colour_percentage_id].nil_or_empty?
+        return " Bintip criteria requires a value for run.#{column}" if column == 'product_class_code' && run[:rmt_class_id].nil_or_empty?
+        return " Bintip criteria requires a value for run.#{column}" if column == 'actual_cold_treatment' && run[:actual_cold_treatment_id].nil_or_empty?
+        return " Bintip criteria requires a value for run.#{column}" if column == 'actual_ripeness_treatment' && run[:actual_ripeness_treatment_id].nil_or_empty?
       end
       nil
     end
