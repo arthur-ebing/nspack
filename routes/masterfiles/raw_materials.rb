@@ -520,27 +520,22 @@ class Nspack < Roda
         r.post do        # CREATE
           res = interactor.create_rmt_variant(id, params[:rmt_variant])
           if res.success
-            if res.instance[:add_grid_row]
-              row_keys = %i[
-                id
-                code
-                cultivar_group_code
-                cultivar_name
-                cultivar_id
-                rmt_variant_code
-                rmt_code
-                description
-                regime_code
-                for_packing
-                marketing_variety_code
-                rmt_variant_id
-              ]
-              add_grid_row(attrs: select_attributes(res.instance[:rmt_variant], row_keys),
-                           notice: res.message)
-            else
-              flash[:notice] = res.message
-              redirect_to_last_grid(r)
-            end
+            row_keys = %i[
+              id
+              code
+              cultivar_group_code
+              cultivar_name
+              cultivar_id
+              rmt_variant_code
+              rmt_code
+              description
+              regime_code
+              for_packing
+              marketing_variety_code
+              rmt_variant_id
+            ]
+            add_grid_row(attrs: select_attributes(res.instance[:rmt_variant], row_keys),
+                         notice: res.message)
           else
             re_show_form(r, res, url: "/masterfiles/raw_materials/rmt_variants/new/#{id}") do
               Masterfiles::RawMaterials::RmtVariant::New.call(id,
