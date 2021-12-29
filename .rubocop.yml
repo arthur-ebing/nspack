@@ -41,7 +41,10 @@ Metrics/MethodLength:
 Layout/ExtraSpacing:
   Enabled: false
 
+# Block nesting   Metrics/BlockNesting
+# 5 method params Metrics/ParameterLists (maybe just CountKeywordArgs: false initially)
 Metrics/BlockLength:
+  # Enabled: false
   Exclude:
     - 'Rakefile'
     - '**/*.rake'
@@ -52,6 +55,7 @@ Metrics/BlockLength:
     - '**/lib/**/views/**/*.rb'
 
 Metrics/ClassLength:
+  # Enabled: false
   Exclude:
     - '**/test_*.rb'
     - '**/routes/**/*.rb'

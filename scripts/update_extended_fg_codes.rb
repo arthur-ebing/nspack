@@ -15,7 +15,7 @@
 # Dev   : ruby scripts/base_script.rb UpdateExtendedFGCodes nnn
 #
 class UpdateExtendedFGCodes < BaseScript
-  def run # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
+  def run # rubocop:disable Metrics/AbcSize
     raise ArgumentError, 'Please supply the number of days' if args.first.nil?
 
     no_days = args.first.to_i
@@ -74,4 +74,3 @@ class UpdateExtendedFGCodes < BaseScript
     end
   end
 end
-
