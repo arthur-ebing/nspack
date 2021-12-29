@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module LabelApp
-  class LabelRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class LabelRepo < BaseRepo
     crud_calls_for :multi_labels, name: :multi_label
     crud_calls_for :label_publish_logs, name: :label_publish_log, wrapper: LabelPublishLog
     crud_calls_for :label_publish_log_details, name: :label_publish_log_detail, wrapper: LabelPublishLogDetail

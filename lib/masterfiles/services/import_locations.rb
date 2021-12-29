@@ -3,7 +3,7 @@
 require 'csv'
 
 module MasterfilesApp
-  class ImportLocations < BaseService # rubocop:disable Metrics/ClassLength
+  class ImportLocations < BaseService
     attr_reader :filename, :csv_data, :errs, :repo
 
     VALID_HEADERS = %w[
@@ -56,7 +56,7 @@ module MasterfilesApp
       lkp_assign = Hash[repo.for_select_location_assignments]
       lkp_stg_def = Hash[repo.for_select_location_storage_definitions]
       lookups = {}
-      csv_data.each do |row| # rubocop:disable Metrics/BlockLength
+      csv_data.each do |row|
         line += 1
         curr_row = row
         short_code = row['location_short_code'] || next_short_code(row['primary_storage_type'])

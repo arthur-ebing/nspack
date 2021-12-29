@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  class GovtInspectionPalletInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class GovtInspectionPalletInteractor < BaseInteractor
     def create_govt_inspection_pallet(params)
       params[:inspected] = true
       res = CreateGovtInspectionPalletSchema.call(params)

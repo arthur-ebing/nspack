@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ProductionApp
-  class ProductionRunRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class ProductionRunRepo < BaseRepo
     crud_calls_for :production_runs, name: :production_run, wrapper: ProductionRun
     crud_calls_for :production_run_stats, name: :production_run_stat, wrapper: ProductionRunStat
     crud_calls_for :pallet_mix_rules, name: :pallet_mix_rule, wrapper: PalletMixRule

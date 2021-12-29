@@ -7,7 +7,7 @@ module MesscadaApp
     required(:measurement_unit).maybe(Types::StrippedString)
   end
 
-  RmtRebinSchema = Dry::Schema.Params do # rubocop:disable Metrics/BlockLength
+  RmtRebinSchema = Dry::Schema.Params do
     optional(:id).filled(:integer)
     required(:orchard_id).filled(:integer)
     required(:rmt_class_id).maybe(:integer)

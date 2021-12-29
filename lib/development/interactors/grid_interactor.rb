@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module DevelopmentApp
-  class GridInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class GridInteractor < BaseInteractor
     def list_grids
       row_defs = []
       dm_path  = Pathname.new('grid_definitions/dataminer_queries')

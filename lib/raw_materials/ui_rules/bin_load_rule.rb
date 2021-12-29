@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class BinLoadRule < Base # rubocop:disable Metrics/ClassLength
+  class BinLoadRule < Base
     def generate_rules
       set_repo
       make_form_object

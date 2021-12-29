@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class GrowerGradingPoolRule < Base # rubocop:disable Metrics/ClassLength
+  class GrowerGradingPoolRule < Base
     def generate_rules # rubocop:disable Metrics/AbcSize
       @repo = ProductionApp::GrowerGradingRepo.new
 

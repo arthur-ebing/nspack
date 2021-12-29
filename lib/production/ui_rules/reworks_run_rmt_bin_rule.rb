@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class ReworksRunRmtBinRule < Base # rubocop:disable Metrics/ClassLength
+  class ReworksRunRmtBinRule < Base
     def generate_rules
       @repo = ProductionApp::ReworksRepo.new
       @delivery_repo = RawMaterialsApp::RmtDeliveryRepo.new

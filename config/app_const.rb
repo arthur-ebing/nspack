@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # A class for defining global constants in a central place.
-class AppConst # rubocop:disable Metrics/ClassLength
+class AppConst
   require_relative 'client_settings_loader'
 
   def self.development?

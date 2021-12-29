@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RawMaterialsApp
-  class PresortGrowerGradingRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class PresortGrowerGradingRepo < BaseRepo
     build_for_select :presort_grower_grading_pools,
                      label: :maf_lot_number,
                      value: :id,

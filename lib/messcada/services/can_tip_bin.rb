@@ -3,7 +3,7 @@
 module MesscadaApp
   # Given a bin asset number and device, get the run number
   # and check that the bin meets the criteria for tipping on that ran.
-  class CanTipBin < BaseService # rubocop:disable Metrics/ClassLength
+  class CanTipBin < BaseService
     include BinTipSupport
 
     attr_reader :repo, :bin_number, :device, :production_run_id, :run_attrs, :legacy_errors
@@ -50,7 +50,7 @@ module MesscadaApp
       validate_setup_requirements
     end
 
-    def validate_setup_requirements # rubocop:disable Metrics/AbcSize
+    def validate_setup_requirements # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       check = repo.check_bin_in_wip(bin_number)
       return check.message unless check.success
 

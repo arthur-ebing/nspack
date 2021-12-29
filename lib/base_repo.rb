@@ -11,7 +11,7 @@
 # sub class.
 # For example basic CRUD calls for a particular table using:
 #     crud_calls_for
-class BaseRepo # rubocop:disable Metrics/ClassLength
+class BaseRepo
   include Crossbeams::Responses
 
   # Cache the data type of all columns of all tables in the system
@@ -257,7 +257,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # @param lookup_functions [Array] the rules for how to find values via SQL functions (e.g. party_name)
   # @param wrapper [Class, nil] the class of the object to return.
   # @return [Object, nil, Hash] the row wrapped in a new wrapper object or as a Hash.
-  def find_with_association(table_name, id, sub_tables: [], parent_tables: [], lookup_functions: [], wrapper: nil) # rubocop:disable Metrics/ParameterLists
+  def find_with_association(table_name, id, sub_tables: [], parent_tables: [], lookup_functions: [], wrapper: nil)
     BaseRepoAssocationFinder.new(table_name, id, sub_tables: sub_tables, parent_tables: parent_tables, lookup_functions: lookup_functions, wrapper: wrapper).call
   end
 

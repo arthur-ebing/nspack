@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ProductionApp
-  class PackingSpecificationWizardStepper < BaseStep # rubocop:disable Metrics/ClassLength
+  class PackingSpecificationWizardStepper < BaseStep
     include Crossbeams::Responses
 
     def initialize(step_key, user, ip_address)

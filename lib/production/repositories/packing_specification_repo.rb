@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ProductionApp
-  class PackingSpecificationRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class PackingSpecificationRepo < BaseRepo
     build_for_select :packing_specification_items,
                      label: :description,
                      value: :id,

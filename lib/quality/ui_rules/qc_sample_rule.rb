@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class QcSampleRule < Base # rubocop:disable Metrics/ClassLength
+  class QcSampleRule < Base
     def generate_rules
       @repo = QualityApp::QcRepo.new
       @print_repo = LabelApp::PrinterRepo.new

@@ -15,7 +15,7 @@
 # Dev   : ruby scripts/base_script.rb MesScadaUserState name, surname
 # Optionally add ` y` to the end to also check the old MES system state.
 #
-class MesScadaUserState < BaseScript # rubocop:disable Metrics/ClassLength
+class MesScadaUserState < BaseScript
   def run # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
     @name = args.first
     @surname = args[1]

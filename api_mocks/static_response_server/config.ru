@@ -5,11 +5,9 @@ require 'net/http'
 require 'rouge'
 require 'nokogiri'
 
-# rubocop:disable Metrics/BlockLength
-
 # Mock-up of a NoSoft Server so MesScada or Robots can call and
 # receive particular responses.
-class App < Roda # rubocop:disable Metrics/ClassLength
+class App < Roda
   plugin :symbolized_params
 
   MAF_URL_SET = [
@@ -395,5 +393,3 @@ class App < Roda # rubocop:disable Metrics/ClassLength
 end
 
 run App.freeze.app
-
-# rubocop:enable Metrics/BlockLength

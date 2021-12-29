@@ -33,7 +33,7 @@ module UiRules
     end
   end
 
-  class Base # rubocop:disable Metrics/ClassLength
+  class Base
     include JsonHelpers
 
     attr_reader :rules, :inflector
@@ -322,7 +322,7 @@ module UiRules
     end
   end
 
-  class BaseChangeRenderer # rubocop:disable Metrics/ClassLength
+  class BaseChangeRenderer
     attr_reader :router, :options, :params
 
     def initialize(router, options)

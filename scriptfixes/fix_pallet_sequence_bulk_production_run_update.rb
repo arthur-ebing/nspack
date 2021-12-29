@@ -17,7 +17,7 @@
 # Live  : RACK_ENV=production ruby scripts/base_script.rb FixPalletSequenceBulkProductionRunUpdate
 # Dev   : ruby scripts/base_script.rb FixPalletSequenceBulkProductionRunUpdate
 #
-class FixPalletSequenceBulkProductionRunUpdate < BaseScript # rubocop:disable Metrics/ClassLength
+class FixPalletSequenceBulkProductionRunUpdate < BaseScript
   def run # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
     query = <<~SQL
       SELECT reworks_runs.id, reworks_runs.reworks_run_type_id, pallets_affected

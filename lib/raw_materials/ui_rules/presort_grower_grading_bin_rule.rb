@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class PresortGrowerGradingBinRule < Base # rubocop:disable Metrics/ClassLength
+  class PresortGrowerGradingBinRule < Base
     def generate_rules
       @repo = RawMaterialsApp::PresortGrowerGradingRepo.new
       @fruit_repo = MasterfilesApp::FruitRepo.new

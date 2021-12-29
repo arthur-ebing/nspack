@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class GovtInspectionSheetRule < Base # rubocop:disable Metrics/ClassLength
+  class GovtInspectionSheetRule < Base
     def generate_rules
       @repo = FinishedGoodsApp::GovtInspectionRepo.new
       @party_repo = MasterfilesApp::PartyRepo.new

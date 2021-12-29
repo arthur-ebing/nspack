@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module DataminerApp
-  class DataminerInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class DataminerInteractor < BaseInteractor
     def repo
       @repo ||= ReportRepo.new(@context[:for_grid_queries])
     end
@@ -44,7 +44,7 @@ module DataminerApp
         return page
       end
       # {"limit"=>"", "offset"=>"", "crosstab"=>{"row_columns"=>["organization_code", "commodity_code", "fg_code_old"], "column_columns"=>"grade_code", "value_columns"=>"no_pallets"}, "btnSubmit"=>"Run report", "json_var"=>"[]"}
-      page.report.ordered_columns.each do |col| # rubocop:disable Metrics/BlockLength
+      page.report.ordered_columns.each do |col|
         hs                  = { headerName: col.caption, field: col.name, hide: col.hide, headerTooltip: col.caption }
         hs[:width]          = col.width unless col.width.nil?
         hs[:enableValue]    = true if %i[integer number].include?(col.data_type)
@@ -228,7 +228,7 @@ module DataminerApp
 
       page.filename = File.basename(repo.lookup_file_name(id, true))
 
-      page.col_defs = Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk| # rubocop:disable Metrics/BlockLength
+      page.col_defs = Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
         mk.col 'name', 'Column name', pinned: 'left'
         mk.col 'sequence_no', 'Seq', cellClass: 'grid-number-column', pinned: 'left', width: 80
         mk.col 'caption', nil, editable: true, pinned: 'left'

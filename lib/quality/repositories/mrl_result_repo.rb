@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QualityApp
-  class MrlResultRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class MrlResultRepo < BaseRepo
     build_for_select :mrl_results,
                      label: :waybill_number,
                      value: :id,

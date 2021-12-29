@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class BinAssetTransactionRule < Base # rubocop:disable Metrics/ClassLength
+  class BinAssetTransactionRule < Base
     def generate_rules
       @repo = RawMaterialsApp::BinAssetsRepo.new
       make_form_object

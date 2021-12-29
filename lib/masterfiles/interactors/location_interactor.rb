@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/ClassLength
-
 module MasterfilesApp
   class LocationInteractor < BaseInteractor
     def create_location_type(params)
@@ -355,4 +353,3 @@ module MasterfilesApp
     end
   end
 end
-# rubocop:enable Metrics/ClassLength

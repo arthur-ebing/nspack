@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class DestinationInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class DestinationInteractor < BaseInteractor
     def create_region(params)
       res = validate_region_params(params)
       return validation_failed_response(res) if res.failure?

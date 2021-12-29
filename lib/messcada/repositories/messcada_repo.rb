@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MesscadaApp
-  class MesscadaRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class MesscadaRepo < BaseRepo
     crud_calls_for :carton_labels, name: :carton_label, wrapper: CartonLabel
     crud_calls_for :cartons, name: :carton, wrapper: CartonFlat
     crud_calls_for :pallets, name: :pallet, wrapper: Pallet, exclude: [:create]

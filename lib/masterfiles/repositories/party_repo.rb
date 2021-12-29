@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/ClassLength
 # rubocop:disable Metrics/AbcSize
 
 module MasterfilesApp
@@ -595,5 +594,4 @@ module MasterfilesApp
     end
   end
 end
-# rubocop:enable Metrics/ClassLength
 # rubocop:enable Metrics/AbcSize

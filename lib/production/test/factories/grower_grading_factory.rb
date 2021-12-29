@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ProductionApp
-  module GrowerGradingFactory # rubocop:disable Metrics/ModuleLength:
+  module GrowerGradingFactory
     def create_grower_grading_rule(opts = {})
       id = get_available_factory_record(:grower_grading_rules, opts)
       return id unless id.nil?

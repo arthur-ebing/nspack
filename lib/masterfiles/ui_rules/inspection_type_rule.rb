@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class InspectionTypeRule < Base # rubocop:disable Metrics/ClassLength
+  class InspectionTypeRule < Base
     def generate_rules
       @repo = MasterfilesApp::QualityRepo.new
       make_form_object

@@ -19,7 +19,7 @@ require_relative '../app_loader'
 # Live  : RACK_ENV=production ruby scripts/base_script.rb BuildKrResourceTree
 # Dev   : ruby scripts/base_script.rb BuildKrResourceTree
 #
-class BuildKrResourceTree < BaseScript # rubocop:disable Metrics/ClassLength
+class BuildKrResourceTree < BaseScript
   attr_reader :repo, :ph_id, :line_type, :reverse, :itpc_type, :pack_point, :drop_type, :printer_type, :clm_type, :btn_type,
               :ptz_type, :bay_type, :ship_type, :subline_type, :bts_type, :btm_type, :pbtn_type
 

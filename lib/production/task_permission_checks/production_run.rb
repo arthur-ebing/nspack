@@ -2,7 +2,7 @@
 
 module ProductionApp
   module TaskPermissionCheck
-    class ProductionRun < BaseService # rubocop:disable Metrics/ClassLength
+    class ProductionRun < BaseService
       attr_reader :task, :entity, :repo
 
       def initialize(task, production_run_id = nil)

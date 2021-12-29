@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  class ECertPreverify < BaseService # rubocop:disable Metrics/ClassLength
+  class ECertPreverify < BaseService
     attr_accessor :params, :agreement_id, :agreement_code, :business_id, :industry, :pallet_numbers, :create_units, :update_units
 
     def initialize(params)

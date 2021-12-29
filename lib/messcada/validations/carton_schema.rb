@@ -2,7 +2,7 @@
 
 module MesscadaApp
   class CartonContract < Dry::Validation::Contract
-    params do # rubocop:disable Metrics/BlockLength
+    params do
       optional(:id).filled(:integer)
       required(:production_run_id).filled(:integer)
       required(:farm_id).filled(:integer)

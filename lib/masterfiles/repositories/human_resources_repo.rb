@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class HumanResourcesRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class HumanResourcesRepo < BaseRepo
     build_for_select :employment_types,
                      label: :employment_type_code,
                      value: :id,

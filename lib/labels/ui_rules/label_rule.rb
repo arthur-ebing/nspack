@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class LabelRule < Base # rubocop:disable Metrics/ClassLength
+  class LabelRule < Base
     def generate_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       @this_repo = LabelApp::LabelRepo.new
       @print_repo = LabelApp::PrinterRepo.new

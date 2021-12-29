@@ -2,7 +2,7 @@
 
 module SecurityApp
   # Generate INSERT SQL commands that can be used to re-create data in another database.
-  class DataToSql # rubocop:disable Metrics/ClassLength
+  class DataToSql
     def initialize(webapp)
       @webapp = webapp
     end

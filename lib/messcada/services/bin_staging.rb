@@ -1,5 +1,5 @@
 module MesscadaApp
-  class BinStaging < BaseService # rubocop:disable Metrics/ClassLength
+  class BinStaging < BaseService
     attr_reader :repo, :delivery_repo, :locn_repo, :bins, :plant_resource_code, :active_presort_staging_run_id, :active_presort_staging_run_child_id, :bin_ids_map, :current_validation_bin, :staging_run
 
     def initialize(bins, plant_resource_code)

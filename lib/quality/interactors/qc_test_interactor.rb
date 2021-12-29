@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QualityApp
-  class QcTestInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class QcTestInteractor < BaseInteractor
     def create_qc_test(params)
       res = validate_qc_test_params(params)
       return validation_failed_response(res) if res.failure?

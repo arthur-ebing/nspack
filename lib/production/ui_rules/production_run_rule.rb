@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class ProductionRunRule < Base # rubocop:disable Metrics/ClassLength
+  class ProductionRunRule < Base
     def generate_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       @repo = ProductionApp::ProductionRunRepo.new
       @resource_repo = ProductionApp::ResourceRepo.new

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class OrderItemRule < Base # rubocop:disable Metrics/ClassLength
+  class OrderItemRule < Base
     def generate_rules
       @repo = FinishedGoodsApp::OrderRepo.new
       make_form_object

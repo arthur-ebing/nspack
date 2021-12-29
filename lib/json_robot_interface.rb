@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class JsonRobotInterface # rubocop:disable Metrics/ClassLength
+class JsonRobotInterface
   include Crossbeams::Responses
 
   attr_reader :request, :input_payload, :action_type, :mac_addr, :robot_params, :resource_repo, :system_user, :robot, :inflector

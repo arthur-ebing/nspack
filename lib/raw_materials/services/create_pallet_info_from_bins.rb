@@ -1,5 +1,5 @@
 module RawMaterialsApp
-  class CreatePalletInfoFromBins < BaseService # rubocop:disable Metrics/ClassLength
+  class CreatePalletInfoFromBins < BaseService
     attr_accessor :repo, :user_name, :rep_bin, :pallet_format_id, :bins
 
     def initialize(user_name, pallet_format_id, bins_info)
@@ -56,7 +56,7 @@ module RawMaterialsApp
 
     def validate_pallet_sequences_attrs # rubocop:disable Metrics/AbcSize
       instances = []
-      bins.size.times do |i| # rubocop:disable Metrics/BlockLength
+      bins.size.times do |i|
         production_line_packhouse_resource = repo.get_line_packhouse_resource(bins[i][:production_line_id])
         bin_info = bins[i]
         bin = repo.where(:rmt_bins, RawMaterialsApp::RmtBin, bin_asset_number: bin_info[:bin_asset_number])

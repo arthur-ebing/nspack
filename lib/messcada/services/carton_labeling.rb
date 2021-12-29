@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MesscadaApp
-  class CartonLabeling < BaseService # rubocop:disable Metrics/ClassLength
+  class CartonLabeling < BaseService
     attr_reader :repo, :hr_repo, :production_run_id, :setup_data, :carton_label_id, :pick_ref,
                 :pallet_number, :personnel_number, :params, :system_resource,
                 :dedicated_pack, :bin_attrs, :farm_codes, :carton_equals_pallet

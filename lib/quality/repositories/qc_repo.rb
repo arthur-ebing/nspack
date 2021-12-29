@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QualityApp
-  class QcRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class QcRepo < BaseRepo
     build_for_select :qc_samples,
                      label: :presort_run_lot_number,
                      value: :id,

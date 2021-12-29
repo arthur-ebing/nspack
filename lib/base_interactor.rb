@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class BaseInteractor # rubocop:disable Metrics/ClassLength
+class BaseInteractor
   include Crossbeams::Responses
 
   # Create an Interactor.

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  class PalletMovementsInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class PalletMovementsInteractor < BaseInteractor
     def move_pallet(pallet_number, location, location_scan_field) # rubocop:disable Metrics/AbcSize
       pallet = prod_repo.find_pallet_by_pallet_number(pallet_number)
       return validation_failed_response(messages: { pallet_number: ['Pallet does not exist'] }) unless pallet

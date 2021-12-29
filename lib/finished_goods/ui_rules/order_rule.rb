@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class OrderRule < Base # rubocop:disable Metrics/ClassLength
+  class OrderRule < Base
     def generate_rules
       make_form_object
       apply_form_values

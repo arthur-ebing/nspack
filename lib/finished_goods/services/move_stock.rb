@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  class MoveStock < BaseService # rubocop:disable Metrics/ClassLength
+  class MoveStock < BaseService
     attr_reader :stock_type, :stock_item, :stock_item_id, :location_to_id, :business_process, :business_process_context_id, :location_from_id, :stock_item_number, :business_process_id, :stock_type_id
 
     def initialize(stock_type, stock_item_id, location_to_id, business_process = nil, business_process_context_id = nil)

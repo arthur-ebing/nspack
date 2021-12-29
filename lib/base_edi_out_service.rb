@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
+class BaseEdiOutService < BaseService
   attr_reader :flow_type, :hub_address, :record_id, :seq_no, :schema, :record_definitions,
               :record_entries, :edi_out_rule_id, :party_role_id, :logger, :out_context
 

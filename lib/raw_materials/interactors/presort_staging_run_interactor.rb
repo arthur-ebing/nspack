@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RawMaterialsApp
-  class PresortStagingRunInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class PresortStagingRunInteractor < BaseInteractor
     def create_presort_staging_run(params) # rubocop:disable Metrics/AbcSize
       params[:season_id] = calendar_repo.get_season_id(params[:cultivar_id], Time.now) unless params[:cultivar_id].nil_or_empty?
       params[:editing] = true

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class ShiftTypeRule < Base # rubocop:disable Metrics/ClassLength
+  class ShiftTypeRule < Base
     def generate_rules
       @repo = MasterfilesApp::HumanResourcesRepo.new
       @resource_repo = ProductionApp::ResourceRepo.new

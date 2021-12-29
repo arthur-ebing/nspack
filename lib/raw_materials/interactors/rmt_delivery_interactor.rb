@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RawMaterialsApp
-  class RmtDeliveryInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class RmtDeliveryInteractor < BaseInteractor
     def classify_raw_material(id, params) # rubocop:disable Metrics/AbcSize
       params[:rmt_classifications] = params.find_all { |k, _v| k != :rmt_code_id }.map { |a| a[1] }.reject(&:blank?)
       res = ClassifyRawMaterialContract.new.call(params)

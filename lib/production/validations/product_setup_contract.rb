@@ -2,7 +2,7 @@
 
 module ProductionApp
   class ProductSetupContract < Dry::Validation::Contract
-    params do # rubocop:disable Metrics/BlockLength
+    params do
       required(:product_setup_template_id).filled(:integer)
       required(:marketing_variety_id).filled(:integer)
       required(:customer_variety_id).maybe(:integer)

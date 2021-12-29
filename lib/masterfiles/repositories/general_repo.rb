@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class GeneralRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class GeneralRepo < BaseRepo
     build_for_select :uom_types,
                      label: :code,
                      value: :id,

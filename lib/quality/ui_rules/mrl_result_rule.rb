@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class MrlResultRule < Base # rubocop:disable Metrics/ClassLength
+  class MrlResultRule < Base
     def generate_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       @repo = QualityApp::MrlResultRepo.new
       @cultivar_repo = MasterfilesApp::CultivarRepo.new

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module DataminerApp
-  class PreparedReportRepo # rubocop:disable Metrics/ClassLength
+  class PreparedReportRepo
     include Crossbeams::Responses
 
     # Get the database connection from DM_CONNECTIONS for a specific key.

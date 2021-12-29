@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module EdiApp
-  class PsOutRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class PsOutRepo < BaseRepo
     def ps_rows(party_role_id)
       party_role_condition = party_role_condition_for(party_role_id)
 

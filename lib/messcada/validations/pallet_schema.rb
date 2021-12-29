@@ -2,7 +2,7 @@
 
 module MesscadaApp
   class PalletContract < Dry::Validation::Contract
-    params do # rubocop:disable Metrics/BlockLength
+    params do
       optional(:id).filled(:integer)
       optional(:pallet_number).filled(Types::StrippedString)
       optional(:exit_ref).maybe(Types::StrippedString)
@@ -62,7 +62,7 @@ module MesscadaApp
     end
   end
 
-  BinToPalletSchema = Dry::Schema.Params do # rubocop:disable Metrics/BlockLength
+  BinToPalletSchema = Dry::Schema.Params do
     optional(:id).filled(:integer)
     optional(:pallet_number).filled(Types::StrippedString)
     optional(:exit_ref).maybe(Types::StrippedString)

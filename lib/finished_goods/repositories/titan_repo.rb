@@ -1,7 +1,7 @@
 # frozen_null_literal: true
 
 module FinishedGoodsApp
-  class TitanRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class TitanRepo < BaseRepo
     crud_calls_for :titan_requests, name: :titan_request
 
     def find_pallet_for_titan(pallet_id) # rubocop:disable Metrics/AbcSize
@@ -315,7 +315,7 @@ module FinishedGoodsApp
       gi_repo = GovtInspectionRepo.new
       details = []
       pallet_ids = select_values(:pallets, :id, load_id: load_id)
-      pallet_ids.each do |pallet_id| # rubocop:disable Metrics/BlockLength
+      pallet_ids.each do |pallet_id|
         pallet = find_pallet_for_titan(pallet_id)
         govt_inspection_sheet = gi_repo.find_govt_inspection_sheet(pallet.govt_inspection_sheet_id)
         raise Crossbeams::FrameworkError, "Pallet #{pallet.pallet_number} is not on a govt. inspection sheet" if govt_inspection_sheet.nil?

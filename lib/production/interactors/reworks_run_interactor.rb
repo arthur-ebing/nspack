@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ProductionApp
-  class ReworksRunInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class ReworksRunInteractor < BaseInteractor
     def assert_permission!(task, id = nil)
       res = TaskPermissionCheck::ReworksRun.call(task, id)
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success

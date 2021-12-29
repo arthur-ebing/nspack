@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class PackingSpecificationItemRule < Base # rubocop:disable Metrics/ClassLength
+  class PackingSpecificationItemRule < Base
     def generate_rules
       @repo = ProductionApp::PackingSpecificationRepo.new
       @bom_repo = MasterfilesApp::BomRepo.new

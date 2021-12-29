@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MesserverApp
-  class MesserverRepo # rubocop:disable Metrics/ClassLength
+  class MesserverRepo
     include Crossbeams::Responses
 
     def printer_list

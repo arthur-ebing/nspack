@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Crossbeams
-  class ClientProductionRules < BaseClientRules # rubocop:disable Metrics/ClassLength
+  class ClientProductionRules < BaseClientRules
     include Crossbeams::AutoDocumentation
 
     CLIENT_SETTINGS = {

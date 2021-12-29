@@ -1,4 +1,4 @@
-module ErrorHelpers # rubocop:disable Metrics/ModuleLength
+module ErrorHelpers
   # If the SendMailJob fails, this helper will show that there is a problem.
   # @return [string] the mail-problem notification.
   def display_email_sending_failure

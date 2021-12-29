@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RawMaterialsApp
-  class PresortGrowerGradingPoolInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class PresortGrowerGradingPoolInteractor < BaseInteractor
     def create_presort_grower_grading_pool(params) # rubocop:disable Metrics/AbcSize
       res = validate_new_presort_grower_grading_pool_params(params)
       return validation_failed_response(res) if res.failure?

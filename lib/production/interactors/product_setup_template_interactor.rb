@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ProductionApp
-  class ProductSetupTemplateInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class ProductSetupTemplateInteractor < BaseInteractor
     def create_product_setup_template(params)
       res = validate_product_setup_template_params(params)
       return validation_failed_response(res) if res.failure?

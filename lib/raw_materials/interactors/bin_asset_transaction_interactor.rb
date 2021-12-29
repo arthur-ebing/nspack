@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RawMaterialsApp
-  class BinAssetTransactionInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class BinAssetTransactionInteractor < BaseInteractor
     def create_bin_asset_transaction # rubocop:disable Metrics/AbcSize
       res = validate_stepper
       return res unless res.success

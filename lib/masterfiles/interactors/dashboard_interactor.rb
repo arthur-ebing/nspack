@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class DashboardInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class DashboardInteractor < BaseInteractor
     def dashboard_rows # rubocop:disable Metrics/AbcSize
       config = load_config('dashboards.yml')
       if config.nil?
@@ -31,8 +31,8 @@ module MasterfilesApp
 
     def dashboards_list_grid # rubocop:disable Metrics/AbcSize
       row_defs = dashboard_rows
-      col_defs = Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk| # rubocop:disable Metrics/BlockLength
-        mk.action_column do |act| # rubocop:disable Metrics/BlockLength
+      col_defs = Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
+        mk.action_column do |act|
           act.popup_link 'edit dashboard', '/masterfiles/config/dashboards/$col1$/edit',
                          col1: 'id',
                          icon: 'edit',

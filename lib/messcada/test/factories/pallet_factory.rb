@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MesscadaApp
-  module PalletFactory # rubocop:disable Metrics/ModuleLength
+  module PalletFactory
     def create_pallet(opts = {})
       id = get_available_factory_record(:pallets, opts)
       return id unless id.nil?

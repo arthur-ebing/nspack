@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RawMaterialsApp
-  RmtBinSchema = Dry::Schema.Params do # rubocop:disable Metrics/BlockLength
+  RmtBinSchema = Dry::Schema.Params do
     optional(:id).filled(:integer)
     required(:orchard_id).filled(:integer)
     required(:rmt_delivery_id).filled(:integer)
@@ -30,7 +30,7 @@ module RawMaterialsApp
     optional(:rmt_classifications).maybe(:array)
   end
 
-  RmtRebinBinSchema = Dry::Schema.Params do # rubocop:disable Metrics/BlockLength
+  RmtRebinBinSchema = Dry::Schema.Params do
     optional(:id).filled(:integer)
     required(:orchard_id).filled(:integer)
     required(:rmt_class_id).filled(:integer)
@@ -63,7 +63,7 @@ module RawMaterialsApp
     optional(:legacy_data).maybe(:hash)
   end
 
-  UpdateRmtRebinBinSchema = Dry::Schema.Params do # rubocop:disable Metrics/BlockLength
+  UpdateRmtRebinBinSchema = Dry::Schema.Params do
     optional(:id).filled(:integer)
     required(:orchard_id).filled(:integer)
     optional(:rmt_delivery_id).filled(:integer)

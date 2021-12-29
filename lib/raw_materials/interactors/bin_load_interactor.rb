@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RawMaterialsApp
-  class BinLoadInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class BinLoadInteractor < BaseInteractor
     def create_bin_load(params)
       res = validate_bin_load_params(params)
       return validation_failed_response(res) if res.failure?

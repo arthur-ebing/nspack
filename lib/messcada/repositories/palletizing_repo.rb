@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MesscadaApp
-  class PalletizingRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class PalletizingRepo < BaseRepo
     build_for_select :palletizing_bay_states,
                      label: :palletizing_robot_code,
                      value: :id,

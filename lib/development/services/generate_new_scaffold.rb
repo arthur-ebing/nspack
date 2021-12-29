@@ -7,7 +7,7 @@ module DevelopmentApp
     include UtilityFunctions
     attr_accessor :opts
 
-    class ScaffoldConfig # rubocop:disable Metrics/ClassLength
+    class ScaffoldConfig
       attr_reader :inflector, :table, :singlename, :new_applet, :applet, :program,
                   :table_meta, :label_field, :short_name, :has_short_name, :program_text,
                   :nested_route, :new_from_menu, :text_name, :services, :jobs, :view_helper
@@ -167,7 +167,7 @@ module DevelopmentApp
       ar.map { |a| a.scan(/\S.{0,#{width - 2}}\S(?=\s|$)|\S+/).join("\n") }.join("\n")
     end
 
-    class TableMeta # rubocop:disable Metrics/ClassLength
+    class TableMeta
       attr_reader :columns, :column_names, :foreigns, :col_lookup, :fk_lookup, :indexed_columns
 
       DRY_TYPE_LOOKUP = {
@@ -818,7 +818,7 @@ module DevelopmentApp
       end
     end
 
-    class RouteMaker < BaseService # rubocop:disable Metrics/ClassLength
+    class RouteMaker < BaseService
       attr_reader :opts
       def initialize(opts)
         @opts = opts
@@ -1059,7 +1059,7 @@ module DevelopmentApp
       end
     end
 
-    class UiRuleMaker < BaseService # rubocop:disable Metrics/ClassLength
+    class UiRuleMaker < BaseService
       attr_reader :opts
 
       def initialize(opts)
@@ -1254,7 +1254,7 @@ module DevelopmentApp
       end
     end
 
-    class TestMaker < BaseService # rubocop:disable Metrics/ClassLength
+    class TestMaker < BaseService
       attr_reader :opts
       def initialize(opts)
         @opts = opts
@@ -1721,7 +1721,7 @@ module DevelopmentApp
       end
     end
 
-    class ViewMaker < BaseService # rubocop:disable Metrics/ClassLength
+    class ViewMaker < BaseService
       attr_reader :opts
 
       def initialize(opts)

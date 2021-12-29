@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ProductionApp
-  class ApplyGrowerGradingRule < BaseService # rubocop:disable Metrics/ClassLength
+  class ApplyGrowerGradingRule < BaseService
     attr_reader :repo, :rule_id, :user_name, :rebin_rule, :rule_item, :grading_pool_ids, :object_ids, :changes
 
     def initialize(id, user_name)

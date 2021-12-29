@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class AdvancedClassificationsInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class AdvancedClassificationsInteractor < BaseInteractor
     def create_ripeness_code(params)
       res = validate_ripeness_code_params(params)
       return validation_failed_response(res) if res.failure?

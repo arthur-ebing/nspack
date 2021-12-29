@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RawMaterialsApp
-  class RmtDeliveryRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class RmtDeliveryRepo < BaseRepo
     build_for_select :rmt_deliveries,
                      label: :id,
                      value: :id,

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class CustomerInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class CustomerInteractor < BaseInteractor
     def create_customer(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       res = CreateCustomerSchema.call(params)
       return validation_failed_response(res) if res.failure?

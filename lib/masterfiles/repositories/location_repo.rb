@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/ClassLength
-
 module MasterfilesApp
   class LocationRepo < BaseRepo
     build_for_select :locations,
@@ -501,4 +499,3 @@ module MasterfilesApp
     end
   end
 end
-# rubocop:enable Metrics/ClassLength

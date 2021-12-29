@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ProductionApp
-  class ProductionRunInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class ProductionRunInteractor < BaseInteractor
     def validate_new_first(params)
       res = validate_new_first_production_run_params(params)
       return validation_failed_response(res) if res.failure?

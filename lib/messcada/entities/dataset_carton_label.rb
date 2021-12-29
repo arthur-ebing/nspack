@@ -11,7 +11,7 @@ module MesscadaApp
   #   filters = ['WHERE carton_labels.id = ?']
   #   query = MesscadaApp::DatasetCartonLabel.call(filters)
   #   DB[query, id].first
-  class DatasetCartonLabel # rubocop:disable Metrics/ClassLength
+  class DatasetCartonLabel
     attr_reader :filter_conditions
 
     def initialize(filters)

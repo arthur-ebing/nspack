@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class DashboardRule < Base # rubocop:disable Metrics/ClassLength
+  class DashboardRule < Base
     def generate_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       make_form_object
       apply_form_values

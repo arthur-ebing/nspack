@@ -1,4 +1,4 @@
-module UtilityFunctions # rubocop:disable Metrics/ModuleLength
+module UtilityFunctions
   module_function
 
   TIME_DAY = 60 * 60 * 24

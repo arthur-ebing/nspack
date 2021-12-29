@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class QualityRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class QualityRepo < BaseRepo
     # INSPECTION FAILURE TYPES
     # --------------------------------------------------------------------------
     build_for_select :inspection_failure_types,

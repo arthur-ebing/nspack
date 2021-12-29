@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class ProductSetupRule < Base # rubocop:disable Metrics/ClassLength
+  class ProductSetupRule < Base
     def generate_rules # rubocop:disable Metrics/AbcSize
       @repo = ProductionApp::ProductSetupRepo.new
       @fruit_size_repo = MasterfilesApp::FruitSizeRepo.new

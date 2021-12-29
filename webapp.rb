@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/ClassLength
-# rubocop:disable Metrics/BlockLength
-
 require './app_loader'
 
 class Nspack < Roda
@@ -473,5 +470,3 @@ class Nspack < Roda
     HTML
   end
 end
-# rubocop:enable Metrics/ClassLength
-# rubocop:enable Metrics/BlockLength

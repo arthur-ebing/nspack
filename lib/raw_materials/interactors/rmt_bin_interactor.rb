@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RawMaterialsApp
-  class RmtBinInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class RmtBinInteractor < BaseInteractor
     def create_bin_tripsheet(planned_location_to_id, move_bins_from_another_tripsheet, vehicle_job_id = nil) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       res = FinishedGoodsApp::TripsheetContract.new.call(move_bins: move_bins_from_another_tripsheet, from_vehicle_job_id: vehicle_job_id)
       return failed_response(unwrap_failed_response(validation_failed_response(res))) if res.failure?

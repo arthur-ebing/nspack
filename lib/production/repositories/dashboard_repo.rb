@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ProductionApp
-  class DashboardRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class DashboardRepo < BaseRepo
     def robot_states
       # Sys res, plant res
       # robot buttons + allocations

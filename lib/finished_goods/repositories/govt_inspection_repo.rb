@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  class GovtInspectionRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class GovtInspectionRepo < BaseRepo
     build_for_select :pallets,
                      label: :pallet_number,
                      value: :id,

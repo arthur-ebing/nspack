@@ -2,7 +2,7 @@
 
 module MesscadaApp
   module TaskPermissionCheck
-    class Pallet < BaseService # rubocop:disable Metrics/ClassLength
+    class Pallet < BaseService
       attr_reader :tasks, :pallet_ids, :repo, :load_id, :order_id
       def initialize(tasks, args)
         @tasks = Array(tasks)

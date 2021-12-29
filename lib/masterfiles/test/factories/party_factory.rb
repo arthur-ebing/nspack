@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  module PartyFactory # rubocop:disable Metrics/ModuleLength
+  module PartyFactory
     def create_person(opts = {})
       id = get_available_factory_record(:people, opts)
       return id unless id.nil?

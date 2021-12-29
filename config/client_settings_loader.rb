@@ -1,4 +1,4 @@
-class AppClientSettingsLoader # rubocop:disable Metrics/ClassLength
+class AppClientSettingsLoader
   REPLACE_RULES = { # These should become client rules!
     IMPLEMENTATION_OWNER: { env_key: 'IMPLEMENTATION_OWNER',
                             required: true,

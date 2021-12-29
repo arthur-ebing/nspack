@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module LabelApp
-  class LabelInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class LabelInteractor < BaseInteractor
     def repo
       @repo ||= LabelRepo.new
     end

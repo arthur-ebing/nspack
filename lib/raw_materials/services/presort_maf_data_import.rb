@@ -1,5 +1,5 @@
 module RawMaterialsApp
-  class PresortMafDataImport < BaseService # rubocop:disable Metrics/ClassLength
+  class PresortMafDataImport < BaseService
     attr_reader :repo, :maf_lot_number, :grading_pool_id, :user_name, :pool_farm_id, :maf_data_results
 
     def initialize(maf_lot_number, grading_pool_id, user_name)

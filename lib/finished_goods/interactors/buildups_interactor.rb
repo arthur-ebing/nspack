@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  class BuildupsInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class BuildupsInteractor < BaseInteractor
     def buildup_depot_pallet(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       res = validate_pallet_buildup_params(params)
       return validation_failed_response(res) if res.failure?
@@ -223,7 +223,7 @@ module FinishedGoodsApp
     end
 
     def complete_pallet_buildup(id) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity,  Metrics/PerceivedComplexity
-      repo.transaction do # rubocop:disable Metrics/BlockLength
+      repo.transaction do
         pallet_buildup = pallet_buildup(id)
         updates = { completed: true, completed_at: Time.now }
         unless pallet_buildup.completed

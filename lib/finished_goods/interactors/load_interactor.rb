@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  class LoadInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class LoadInteractor < BaseInteractor
     def create_load(params)
       res = LoadServiceSchema.call(params)
       return validation_failed_response(res) if res.failure?

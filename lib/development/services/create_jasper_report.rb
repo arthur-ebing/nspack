@@ -21,7 +21,7 @@ require 'drb/drb'
 #
 # This service will check to see if there is a client-specific report and use it if present by overwriting the parent_folder value.
 #
-class CreateJasperReport < BaseService # rubocop:disable Metrics/ClassLength
+class CreateJasperReport < BaseService
   attr_reader :jasper_params, :parent_folder, :repo
 
   FILE_TYPES = {

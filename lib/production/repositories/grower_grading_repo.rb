@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ProductionApp
-  class GrowerGradingRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class GrowerGradingRepo < BaseRepo
     build_for_select :grower_grading_rules,
                      label: :rule_name,
                      value: :id,

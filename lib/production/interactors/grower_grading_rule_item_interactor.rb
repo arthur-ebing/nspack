@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ProductionApp
-  class GrowerGradingRuleItemInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class GrowerGradingRuleItemInteractor < BaseInteractor
     def create_grower_grading_rule_item(params) # rubocop:disable Metrics/AbcSize
       legacy_data = AppConst::CR_PROD.grower_grading_json_fields[:legacy_data].map { |f| [f, params[f]] }
       params[:legacy_data] = Hash[legacy_data] unless legacy_data.empty?

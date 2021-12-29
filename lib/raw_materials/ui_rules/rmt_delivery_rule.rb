@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class RmtDeliveryRule < Base # rubocop:disable Metrics/ClassLength
+  class RmtDeliveryRule < Base
     def generate_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       @repo = RawMaterialsApp::RmtDeliveryRepo.new
       make_form_object

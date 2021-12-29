@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MesscadaApp
-  class PalletizingInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class PalletizingInteractor < BaseInteractor
     def device_handled_by_rmd?(device)
       ProductionApp::ResourceRepo.new.device_handled_by_rmd?(device)
     end

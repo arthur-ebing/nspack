@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Crossbeams
-  class RobotResponder # rubocop:disable Metrics/ClassLength
+  class RobotResponder
     attr_accessor :display_lines, :extra_elements
     attr_reader :robot_feedback
 

@@ -41,26 +41,20 @@ Metrics/MethodLength:
 Layout/ExtraSpacing:
   Enabled: false
 
-# Block nesting   Metrics/BlockNesting
-# 5 method params Metrics/ParameterLists (maybe just CountKeywordArgs: false initially)
+Metrics/BlockNesting:
+  Enabled: false
+
+Metrics/ParameterLists:
+  Enabled: false
+
 Metrics/BlockLength:
-  # Enabled: false
-  Exclude:
-    - 'Rakefile'
-    - '**/*.rake'
-    - 'spec/**/*.rb'
-    - '**/test_*.rb'
-    - '**/routes/**/*.rb'
-    - '**/lib/**/view_helpers/**/*.rb'
-    - '**/lib/**/views/**/*.rb'
+  Enabled: false
 
 Metrics/ClassLength:
-  # Enabled: false
-  Exclude:
-    - '**/test_*.rb'
-    - '**/routes/**/*.rb'
-    - '**/lib/**/view_helpers/**/*.rb'
-    - '**/lib/**/views/**/*.rb'
+  Enabled: false
+
+Metrics/ModuleLength:
+  Enabled: false
 
 # TODO: Remove the Max option when upgrading beyond 0.89
 Metrics/AbcSize:

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  module HRFactory # rubocop:disable Metrics/ModuleLength
+  module HRFactory
     def create_employment_type(opts = {})
       id = get_available_factory_record(:employment_types, opts)
       return id unless id.nil?

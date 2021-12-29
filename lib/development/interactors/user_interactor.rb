@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module DevelopmentApp
-  class UserInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class UserInteractor < BaseInteractor
     def prepare_password(user_validation)
       new_user = user_validation.to_h
       new_user[:password_hash] = BCrypt::Password.create(new_user.delete(:password))

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class ChangeRunOrchardRule < Base # rubocop:disable Metrics/ClassLength
+  class ChangeRunOrchardRule < Base
     def generate_rules
       @repo = ProductionApp::ReworksRepo.new
       @farm_repo = MasterfilesApp::FarmRepo.new

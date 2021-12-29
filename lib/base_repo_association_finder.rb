@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 # Find an entity and associated entities.
-class BaseRepoAssocationFinder # rubocop:disable Metrics/ClassLength
-  def initialize(table_name, id, sub_tables: [], parent_tables: [], lookup_functions: [], wrapper: nil) # rubocop:disable Metrics/ParameterLists
+class BaseRepoAssocationFinder
+  def initialize(table_name, id, sub_tables: [], parent_tables: [], lookup_functions: [], wrapper: nil)
     raise ArgumentError unless table_name.is_a?(Symbol)
 
     @main_table = table_name

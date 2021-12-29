@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-module FinishedGoodsApp # rubocop:disable Metrics/ModuleLength
-  TitanAddendumPayloadSchema = Dry::Schema.JSON do # rubocop:disable Metrics/BlockLength
+module FinishedGoodsApp
+  TitanAddendumPayloadSchema = Dry::Schema.JSON do
     required(:eCertRequired).filled(:bool)
     required(:cbrid).filled(:integer)
     required(:cbrBillingID).filled(:integer)
@@ -36,7 +36,7 @@ module FinishedGoodsApp # rubocop:disable Metrics/ModuleLength
     required(:estimatedDepartureDate).filled(:string, format?: /\d\d\d\d-\d\d-\d\d/)
     required(:supportingDocuments).maybe(:array)
 
-    required(:consignmentItems).array(:hash) do # rubocop:disable Metrics/BlockLength
+    required(:consignmentItems).array(:hash) do
       required(:CommonName).filled(:string)
       required(:ScientificName).filled(:string)
       required(:nettWeightMeasureCode).filled(:string)
@@ -68,7 +68,7 @@ module FinishedGoodsApp # rubocop:disable Metrics/ModuleLength
       required(:additionalConsignmentNotes).maybe(:string)
     end
 
-    required(:addendumDetails).array(:hash) do # rubocop:disable Metrics/BlockLength
+    required(:addendumDetails).array(:hash) do
       required(:stuffLoadDate).filled(:string, format?: /\d\d\d\d-\d\d-\d\d/)
       required(:loadPointFboCode).filled(:string, max_size?: 7)
       required(:consignmentNumber).filled(:string, max_size?: 10)

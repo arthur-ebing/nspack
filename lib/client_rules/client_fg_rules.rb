@@ -3,7 +3,7 @@
 require File.join(File.expand_path('../../lib', __dir__), 'crossbeams_responses')
 
 module Crossbeams
-  class ClientFgRules < BaseClientRules # rubocop:disable Metrics/ClassLength
+  class ClientFgRules < BaseClientRules
     include Crossbeams::AutoDocumentation
     include Crossbeams::Responses
 

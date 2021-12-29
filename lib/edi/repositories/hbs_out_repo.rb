@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module EdiApp
-  class HbsOutRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class HbsOutRepo < BaseRepo
     def hbs_rmt_rows(load_id)
       query = <<~SQL
         SELECT

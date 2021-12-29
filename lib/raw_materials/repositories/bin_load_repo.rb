@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RawMaterialsApp
-  class BinLoadRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class BinLoadRepo < BaseRepo
     build_for_select :bin_load_purposes, label: :purpose_code, value: :id, order_by: :purpose_code
     build_inactive_select :bin_load_purposes, label: :purpose_code,  value: :id, order_by: :purpose_code
     crud_calls_for :bin_load_purposes, name: :bin_load_purpose, wrapper: BinLoadPurpose

@@ -2,7 +2,7 @@
 
 module MesscadaApp
   module Job
-    class NotifyProductionRunResourceStates < BaseQueJob # rubocop:disable Metrics/ClassLength
+    class NotifyProductionRunResourceStates < BaseQueJob
       attr_reader :production_run_id, :xml, :repo
 
       def run(production_run_id, user_name)
@@ -72,9 +72,9 @@ module MesscadaApp
         modules_for_lbl = clm_modules
         modules_for_bvm = bvm_modules
 
-        builder = Nokogiri::XML::Builder.new do |xml| # rubocop:disable Metrics/BlockLength
-          xml.module_buttons do # rubocop:disable Metrics/BlockLength
-            xml.modules do # rubocop:disable Metrics/BlockLength
+        builder = Nokogiri::XML::Builder.new do |xml|
+          xml.module_buttons do
+            xml.modules do
               unless modules_for_lbl.empty?
                 modules_for_lbl.each do |mod, buttons|
                   xml.module do

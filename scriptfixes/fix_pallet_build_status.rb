@@ -17,7 +17,7 @@
 # Live  : RACK_ENV=production ruby scripts/base_script.rb FixPalletBuildStatus
 # Dev   : ruby scripts/base_script.rb FixPalletBuildStatus
 #
-class FixPalletBuildStatus < BaseScript # rubocop:disable Metrics/ClassLength
+class FixPalletBuildStatus < BaseScript
   # Update build status to 'FULL', palletized = true, partially_palletized = false where fn_calculate_pallet_build_status = 'FULL' && current status = 'OVERFULL' returning id
   # Update palletized_at, set to partial_palletized_at if palletized_at is null for the returned ids
   # Log status for those ids: 'FIX BUILD STATUS', comment 'From OVERFULL to FULL'
@@ -72,7 +72,7 @@ class FixPalletBuildStatus < BaseScript # rubocop:disable Metrics/ClassLength
       AND NOT scrapped
     SQL
 
-    DB.transaction do # rubocop:disable Metrics/BlockLength
+    DB.transaction do
       ids = DB[sel_query, 'FULL', 'OVERFULL'].select_map(:id)
       ds1 = DB[query, 'FULL', true, false, 'FULL', 'OVERFULL']
       no_upd = ds1.update

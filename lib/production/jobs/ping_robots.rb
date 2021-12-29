@@ -12,7 +12,7 @@ module ProductionApp
       def run(user_name) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
         robots = ProductionApp::DashboardRepo.new.robot_system_resources_for_ping
         threads = []
-        robots.each do |robot| # rubocop:disable Metrics/BlockLength
+        robots.each do |robot|
           id = robot[:id]
           ip = robot[:ip_address]
           # call_robot = robot[:equipment_type] != 'robot-rpi'
@@ -39,7 +39,7 @@ module ProductionApp
 
           # next unless call_robot
 
-          threads << Thread.new do # rubocop:disable Metrics/BlockLength
+          threads << Thread.new do
             ht = Crossbeams::HTTPCalls.new
             work = []
             if ht.can_ping?(ip)

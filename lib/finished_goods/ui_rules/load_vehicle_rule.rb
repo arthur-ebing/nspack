@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class LoadVehicleRule < Base # rubocop:disable Metrics/ClassLength
+  class LoadVehicleRule < Base
     def generate_rules
       @repo = FinishedGoodsApp::LoadVehicleRepo.new
       @container_repo = FinishedGoodsApp::LoadContainerRepo.new
