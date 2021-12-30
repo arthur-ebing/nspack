@@ -31,14 +31,14 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      post_harvest_parent_mrl_result_id_label = @repo.get(:mrl_results, @form_object.post_harvest_parent_mrl_result_id, :waybill_number)
-      cultivar_id_label = @repo.get(:cultivars, @form_object.cultivar_id, :cultivar_name)
-      puc_id_label = @repo.get(:pucs, @form_object.puc_id, :puc_code)
-      season_id_label = @repo.get(:seasons, @form_object.season_id, :season_code)
-      farm_id_label = @repo.get(:farms, @form_object.farm_id, :farm_code)
-      laboratory_id_label = @repo.get(:laboratories, @form_object.laboratory_id, :lab_code)
-      mrl_sample_type_id_label = @repo.get(:mrl_sample_types, @form_object.mrl_sample_type_id, :sample_type_code)
-      orchard_id_label = @repo.get(:orchards, @form_object.orchard_id, :orchard_code)
+      post_harvest_parent_mrl_result_id_label = @repo.get(:mrl_results, :waybill_number, @form_object.post_harvest_parent_mrl_result_id)
+      cultivar_id_label = @repo.get(:cultivars, :cultivar_name, @form_object.cultivar_id)
+      puc_id_label = @repo.get(:pucs, :puc_code, @form_object.puc_id)
+      season_id_label = @repo.get(:seasons, :season_code, @form_object.season_id)
+      farm_id_label = @repo.get(:farms, :farm_code, @form_object.farm_id)
+      laboratory_id_label = @repo.get(:laboratories, :lab_code, @form_object.laboratory_id)
+      mrl_sample_type_id_label = @repo.get(:mrl_sample_types, :sample_type_code, @form_object.mrl_sample_type_id)
+      orchard_id_label = @repo.get(:orchards, :orchard_code, @form_object.orchard_id)
       production_run_id_label = ProductionApp::ProductionRunRepo.new.production_run_code(@form_object.production_run_id) unless @form_object.production_run_id.nil?
       fields[:farm_id] = { renderer: :label,
                            with_value: farm_id_label,
@@ -206,22 +206,22 @@ module UiRules
       }
       if @rules[:delivery_result]
         fields[:farm_code] = { renderer: :label,
-                               with_value: @repo.get(:farms, @form_object.farm_id, :farm_code),
+                               with_value: @repo.get(:farms, :farm_code, @form_object.farm_id),
                                caption: 'Farm' }
         fields[:orchard_code] = { renderer: :label,
-                                  with_value: @repo.get(:orchards, @form_object.orchard_id, :orchard_code),
+                                  with_value: @repo.get(:orchards, :orchard_code, @form_object.orchard_id),
                                   caption: 'Orchard' }
         fields[:cultivar_name] = { renderer: :label,
-                                   with_value: @repo.get(:cultivars, @form_object.cultivar_id, :cultivar_name),
+                                   with_value: @repo.get(:cultivars, :cultivar_name, @form_object.cultivar_id),
                                    caption: 'Cultivar' }
         fields[:puc_code] = { renderer: :label,
-                              with_value: @repo.get(:pucs, @form_object.puc_id, :puc_code),
+                              with_value: @repo.get(:pucs, :puc_code, @form_object.puc_id),
                               caption: 'Puc' }
         fields[:rmt_delivery] = { renderer: :label,
                                   with_value: @form_object.rmt_delivery_id,
                                   caption: 'Delivery Id' }
         fields[:season_code] = { renderer: :label,
-                                 with_value: @repo.get(:seasons, @form_object.season_id, :season_code),
+                                 with_value: @repo.get(:seasons, :season_code, @form_object.season_id),
                                  caption: 'Season' }
       end
       fields
@@ -352,7 +352,7 @@ module UiRules
       cultivars = if params[:changed_value].blank?
                     []
                   else
-                    cultivar_id = repo.get(:rmt_deliveries, params[:changed_value], :cultivar_id)
+                    cultivar_id = repo.get(:rmt_deliveries, :cultivar_id, params[:changed_value])
                     repo.for_select_cultivars(where: { id: cultivar_id })
                   end
       json_actions([OpenStruct.new(type: :replace_select_options,
@@ -381,7 +381,7 @@ module UiRules
       seasons = if params[:changed_value].blank? || fruit_received_at.blank?
                   []
                 else
-                  cultivar_id = repo.get(:production_runs, params[:changed_value].to_i, :cultivar_id)
+                  cultivar_id = repo.get(:production_runs, :cultivar_id, params[:changed_value].to_i)
                   season_id = cultivar_id.nil? ? nil : repo.get_season_id(cultivar_id, fruit_received_at)
                   repo.for_select_seasons(
                     where: { Sequel[:seasons][:id] => season_id }
@@ -398,7 +398,7 @@ module UiRules
                   []
                 else
                   fruit_received_at = params[:changed_value]
-                  season_cultivar_id = cultivar_id.blank? ? repo.get(:production_runs, production_run_id, :cultivar_id) : cultivar_id
+                  season_cultivar_id = cultivar_id.blank? ? repo.get(:production_runs, :cultivar_id, production_run_id) : cultivar_id
                   season_id = cultivar_id.nil? ? nil : repo.get_season_id(season_cultivar_id, fruit_received_at)
                   repo.for_select_seasons(
                     where: { Sequel[:seasons][:id] => season_id }

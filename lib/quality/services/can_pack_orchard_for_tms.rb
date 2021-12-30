@@ -10,7 +10,7 @@ module QualityApp
       @repo = OrchardTestRepo.new
       @api = PhytCleanApi.new
       @phyt_clean_season_id = AppConst::PHYT_CLEAN_SEASON_ID
-      @puc_id = repo.get(:orchards, orchard_id, :puc_id)
+      @puc_id = repo.get(:orchards, :puc_id, orchard_id)
       @orchard_id = orchard_id
       @cultivar_id = cultivar_id
       @tm_group_id = Array(tm_group_ids)

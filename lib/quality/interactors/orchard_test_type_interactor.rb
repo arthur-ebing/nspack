@@ -52,7 +52,7 @@ module QualityApp
       repo.transaction do
         result_ids = repo.select_values(:orchard_test_results, :id, orchard_test_type_id: id)
         result_ids.each do |result_id|
-          freeze_result = repo.get(:orchard_test_results, result_id, :freeze_result)
+          freeze_result = repo.get(:orchard_test_results, :freeze_result, result_id)
           raise Crossbeams::InfoError, "Test #{result_id} frozen." if freeze_result
 
           repo.delete_orchard_test_result(result_id)

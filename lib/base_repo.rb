@@ -99,11 +99,16 @@ class BaseRepo
   # Get a single value from a record matching on id
   #
   # @param table_name [Symbol] the db table name.
+  # @param column [Symbol,Array] the column (or array of columns) to query.
   # @param id [Integer] the id of the row.
-  # @param column [Symbol] the column (or array of columns) to query.
   # @return [any] the column value for the matching record or nil.
-  def get(table_name, id, column)
-    DB[table_name].where(id: id).get(column)
+  def get(table_name, column, id)
+    if column.nil? || column.is_a?(Integer) || column.is_a?(String)
+      warn 'Deprecated call: Repo `get` method expects column(s) argument before id argument. get(:table_name, :column, id)', uplevel: 1
+      DB[table_name].where(id: column).get(id)
+    else
+      DB[table_name].where(id: id).get(column)
+    end
   end
 
   # Get a single value (or set of values) from a record given any WHERE clause.

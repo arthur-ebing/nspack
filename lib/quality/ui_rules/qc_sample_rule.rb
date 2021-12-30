@@ -23,11 +23,11 @@ module UiRules
       starch_summary = @repo.starch_test_summary(@options[:id])
       defects_summary = @repo.defects_test_summary(@options[:id])
       fields[:id] = { renderer: :label, caption: 'Sample ID' }
-      qc_sample_type_id_label = @repo.get(:qc_sample_types, @form_object.qc_sample_type_id, :qc_sample_type_name)
-      rmt_delivery_id_label = @repo.get(:rmt_deliveries, @form_object.rmt_delivery_id, :truck_registration_number)
-      coldroom_location_id_label = @repo.get(:locations, @form_object.coldroom_location_id, :location_long_code)
-      production_run_id_label = @repo.get(:production_runs, @form_object.production_run_id, :active_run_stage)
-      orchard_id_label = @repo.get(:orchards, @form_object.orchard_id, :orchard_code)
+      qc_sample_type_id_label = @repo.get(:qc_sample_types, :qc_sample_type_name, @form_object.qc_sample_type_id)
+      rmt_delivery_id_label = @repo.get(:rmt_deliveries, :truck_registration_number, @form_object.rmt_delivery_id)
+      coldroom_location_id_label = @repo.get(:locations, :location_long_code, @form_object.coldroom_location_id)
+      production_run_id_label = @repo.get(:production_runs, :active_run_stage, @form_object.production_run_id)
+      orchard_id_label = @repo.get(:orchards, :orchard_code, @form_object.orchard_id)
       fields[:qc_sample_type_id] = { renderer: :label, with_value: qc_sample_type_id_label, caption: 'Qc Sample Type' }
       fields[:rmt_delivery_id] = { renderer: :label, with_value: rmt_delivery_id_label, caption: 'Rmt Delivery' }
       fields[:coldroom_location_id] = { renderer: :label, with_value: coldroom_location_id_label, caption: 'Coldroom Location' }
@@ -102,7 +102,7 @@ module UiRules
       hash = { @options[:context] => @options[:context_key],
                drawn_at: Time.now,
                sample_type_id: @options[:qc_sample_type_id],
-               sample_size: @repo.get(:qc_sample_types, @options[:qc_sample_type_id], :default_sample_size),
+               sample_size: @repo.get(:qc_sample_types, :default_sample_size, @options[:qc_sample_type_id]),
                context: @options[:context],
                context_key: @options[:context_key] }
       hash[:short_description], hash[:ref_number] = send("desc_ref_#{@options[:context]}".to_sym)
@@ -113,9 +113,9 @@ module UiRules
 
     def desc_ref_rmt_delivery_id
       instance = RawMaterialsApp::RmtDeliveryRepo.new.find_rmt_delivery(@options[:context_key])
-      farm = @repo.get(:farms, instance.farm_id, :farm_code)
-      orch = @repo.get(:orchards, instance.orchard_id, :orchard_code)
-      cult, desc = @repo.get(:cultivars, instance.cultivar_id, %i[cultivar_code description])
+      farm = @repo.get(:farms, :farm_code, instance.farm_id)
+      orch = @repo.get(:orchards, :orchard_code, instance.orchard_id)
+      cult, desc = @repo.get(:cultivars, %i[cultivar_code description], instance.cultivar_id)
 
       ["Farm #{farm} Orch #{orch} #{cult} #{desc} #{instance.date_delivered.strftime('%Y-%m-%d %H:%M')}", instance.reference_number]
     end

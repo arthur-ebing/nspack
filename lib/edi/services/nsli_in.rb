@@ -13,7 +13,7 @@ module EdiApp
       @missing_masterfiles = []
       @repo = EdiApp::EdiInRepo.new
       @load_repo = FinishedGoodsApp::LoadRepo.new
-      @file_name = @repo.get(:edi_in_transactions, edi_in_transaction_id, :file_name)
+      @file_name = @repo.get(:edi_in_transactions, :file_name, edi_in_transaction_id)
     end
 
     def call # rubocop:disable Metrics/AbcSize
@@ -104,11 +104,11 @@ module EdiApp
       instance = load_repo.find_load(load_id)
       voyage_id = instance.voyage_id
       pol_voyage_port_id = repo.get_id(:voyage_ports, port_id: attrs[:pol_port_id], voyage_id: voyage_id)
-      # repo.get(:voyage_ports, pol_voyage_port_id, [:atd, :etd] )
+      # repo.get(:voyage_ports, [:atd, :etd] , pol_voyage_port_id)
       repo.update(:voyage_ports, pol_voyage_port_id, atd: attrs[:atd], etd: attrs[:etd])
 
       pod_voyage_port_id = repo.get_id(:voyage_ports, port_id: attrs[:pod_port_id], voyage_id: voyage_id)
-      # repo.get(:voyage_ports, pod_voyage_port_id, [:ata, :eta])
+      # repo.get(:voyage_ports, [:ata, :eta], pod_voyage_port_id)
       repo.update(:voyage_ports, pod_voyage_port_id, ata: attrs[:ata], eta: attrs[:eta])
     end
 
@@ -153,8 +153,8 @@ module EdiApp
       attrs[:shipper_party_role_id] = get_party_role_id(voyage['shipper'], AppConst::ROLE_SHIPPER)
       attrs[:booking_reference] = voyage['booking_reference']
       attrs[:vessel_id] = get_case_insensitive_match_or_variant(:vessels, vessel_code: voyage['vessel_code'])
-      attrs[:vessel_type_id] = repo.get(:vessels,  attrs[:vessel_id], :vessel_type_id)
-      attrs[:voyage_type_id] = repo.get(:vessel_types, attrs[:vessel_type_id], :voyage_type_id)
+      attrs[:vessel_type_id] = repo.get(:vessels, :vessel_type_id,  attrs[:vessel_id])
+      attrs[:voyage_type_id] = repo.get(:vessel_types, :voyage_type_id, attrs[:vessel_type_id])
 
       # args = { voyage_code: voyage['voyage_code'],
       #          vessel_id: attrs[:vessel_id],

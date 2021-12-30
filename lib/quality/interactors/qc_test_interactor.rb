@@ -129,7 +129,7 @@ module QualityApp
       res = UtilityFunctions.validate_integer_length(col, params[:column_value])
       return validation_failed_response(res) if res.failure?
 
-      can_do2, can_do3 = repo.get(:fruit_defects, fruit_defect_id, %i[qc_class_2 qc_class_3])
+      can_do2, can_do3 = repo.get(:fruit_defects, %i[qc_class_2 qc_class_3], fruit_defect_id)
       case col
       when :qty_class_2
         return validation_failed_message_response('Cannot capture class 2 for this defect') unless can_do2
@@ -138,7 +138,7 @@ module QualityApp
       else
         raise Crossbeams::FrameworkError, "No handler for editing column #{col}"
       end
-      sample_size = repo.get(:qc_tests, qc_test_id, :sample_size)
+      sample_size = repo.get(:qc_tests, :sample_size, qc_test_id)
       return validation_failed_message_response('Cannot capture a quantity more than the sample size') if res[col] > sample_size
 
       if id.nil?

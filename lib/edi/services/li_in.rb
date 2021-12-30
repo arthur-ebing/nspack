@@ -16,7 +16,7 @@ module EdiApp
       @missing_masterfiles = []
       @order_items = []
       @remarks = []
-      @file_name = @repo.get(:edi_in_transactions, edi_in_transaction_id, :file_name)
+      @file_name = @repo.get(:edi_in_transactions, :file_name, edi_in_transaction_id)
     end
 
     # Go through the LD records.

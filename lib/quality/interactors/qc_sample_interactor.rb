@@ -94,7 +94,7 @@ module QualityApp
     def create_test_for_sample(id, params)
       instance = qc_sample(id)
       test_id = nil
-      test_type = repo.get(:qc_test_types, params[:qc_test_type_id], :qc_test_type_name)
+      test_type = repo.get(:qc_test_types, :qc_test_type_name, params[:qc_test_type_id])
       repo.transaction do
         test_id = repo.create_qc_test(params.merge(qc_sample_id: id, sample_size: instance.sample_size))
         log_status(:qc_samples, id, "CREATED TEST #{test_type}")
@@ -125,7 +125,7 @@ module QualityApp
     end
 
     def redirect_url_for_test(qc_test_id)
-      id = repo.get(:qc_tests, qc_test_id, :qc_sample_id)
+      id = repo.get(:qc_tests, :qc_sample_id, qc_test_id)
       instance = repo.find_qc_sample(id)
       qc_sample_created_redirect(instance)
     end

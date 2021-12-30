@@ -39,7 +39,7 @@ module QualityApp
       when :rmt_delivery_id
         ['Delivery', ctx.values.first]
       when :coldroom_location_id
-        code = get(:locations, ctx.values.first, :location_long_code)
+        code = get(:locations, :location_long_code, ctx.values.first)
         ['Coldroom', code]
       when :production_run_id
         ['Production run', ctx.values.first]
@@ -149,7 +149,7 @@ module QualityApp
     # Given a delivery, check if there is a sample of the given type
     # for the delivery's combination of season, cultivar and orchard.
     def rmt_delivery_has_first_sample?(rmt_delivery_id, sample_type)
-      season_id, cultivar_id, orchard_id = get(:rmt_deliveries, rmt_delivery_id, %i[season_id cultivar_id orchard_id])
+      season_id, cultivar_id, orchard_id = get(:rmt_deliveries, %i[season_id cultivar_id orchard_id], rmt_delivery_id)
       query = <<~SQL
         SELECT s.id
         FROM qc_samples s

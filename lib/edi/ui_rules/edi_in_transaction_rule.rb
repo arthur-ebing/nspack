@@ -33,7 +33,7 @@ module UiRules
         fields[:edi_in_inspection_point] = { invisible: true }
         fields[:edi_in_load_number] = { invisible: true }
       else
-        fields[:depot_id] = { renderer: :label, with_value: @repo.get(:depots, @form_object.manual_header['depot_id'], :depot_code) }
+        fields[:depot_id] = { renderer: :label, with_value: @repo.get(:depots, :depot_code, @form_object.manual_header['depot_id']) }
         fields[:edi_in_inspection_point] = { renderer: :label, with_value: @form_object.manual_header['edi_in_inspection_point'] }
         fields[:edi_in_load_number] = { renderer: :label, with_value: @form_object.manual_header['edi_in_load_number'] }
       end

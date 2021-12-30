@@ -82,7 +82,7 @@ module QualityApp
 
     def print_mrl_result_label(mrl_result_id, params) # rubocop:disable Metrics/AbcSize
       instance = repo.find_mrl_result_label_data(mrl_result_id)
-      label_name = repo.get(:label_templates, params[:label_template_id], :label_template_name)
+      label_name = repo.get(:label_templates, :label_template_name, params[:label_template_id])
 
       LabelPrintingApp::PrintLabel.call(label_name, instance, no_of_prints: params[:no_of_prints].to_i, printer: params[:printer])
     rescue Crossbeams::InfoError => e

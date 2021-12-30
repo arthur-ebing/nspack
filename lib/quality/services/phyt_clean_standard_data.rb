@@ -85,7 +85,7 @@ module QualityApp
               result_id = repo.get_id(:orchard_test_results, update_attrs)
               next if result_id.nil?
 
-              next if repo.get(:orchard_test_results, result_id, :freeze_result)
+              next if repo.get(:orchard_test_results, :freeze_result, result_id)
 
               update_attrs[:api_result] = api_result
               QualityApp::UpdateOrchardTestResult.call(result_id, update_attrs, @user)

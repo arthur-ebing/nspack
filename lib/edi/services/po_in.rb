@@ -239,7 +239,7 @@ module EdiApp
       farm_or_puc_desc = if farm_id.nil?
                            "PUC: #{seq[:farm]}"
                          else
-                           "farm: #{po_repo.get(:farms, farm_id, :farm_code)}"
+                           "farm: #{po_repo.get(:farms, :farm_code, farm_id)}"
                          end
       rec[:lookup_data][:farm_id] = farm_id
       rec[:missing_mf][:farm_id] = { mode: :indirect, raise: true, keys: { puc_id: puc_id }, msg: "Farm for PUC: #{seq[:farm]}" } if farm_id.nil?
@@ -264,7 +264,7 @@ module EdiApp
       season_cultivar_desc = if cultivar_id.nil?
                                "cultivar of Marketing Variety: #{seq[:variety]}"
                              else
-                               "cultivar: #{po_repo.get(:cultivars, cultivar_id, :cultivar_code)}"
+                               "cultivar: #{po_repo.get(:cultivars, :cultivar_code, cultivar_id)}"
                              end
       rec[:lookup_data][:season_id] = season_id
       rec[:missing_mf][:season_id] = { mode: :direct, raise: true, keys: { date: inspec_date || tran_date, cultivar_id: cultivar_id }, msg: "Season for #{season_cultivar_desc} covering date: #{(inspec_date || tran_date).to_date}" } if season_id.nil?

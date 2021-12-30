@@ -129,10 +129,10 @@ module UiRules
       end
 
       form_object = @repo.find_orchard_test_result_flat(@options[:id]).to_h
-      @classification = @repo.get(:orchard_test_types, form_object[:orchard_test_type_id], :result_type) == AppConst::CLASSIFICATION
+      @classification = @repo.get(:orchard_test_types, :result_type, form_object[:orchard_test_type_id]) == AppConst::CLASSIFICATION
       form_object[:puc_ids] = Array(form_object[:puc_id])
       form_object[:classification] = @classification
-      form_object[:api_pass_result] = @repo.get(:orchard_test_types, form_object[:orchard_test_type_id], :api_pass_result)
+      form_object[:api_pass_result] = @repo.get(:orchard_test_types, :api_pass_result, form_object[:orchard_test_type_id])
       @form_object = OpenStruct.new(form_object)
     end
 

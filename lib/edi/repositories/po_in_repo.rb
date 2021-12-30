@@ -167,8 +167,8 @@ module EdiApp
 
       check_customer = false
       if packed_tm_group_id && target_market_id
-        tmg_code = get(:target_market_groups, packed_tm_group_id, :target_market_group_name)
-        tm_code = get(:target_markets, target_market_id, :target_market_name)
+        tmg_code = get(:target_market_groups, :target_market_group_name, packed_tm_group_id)
+        tm_code = get(:target_markets, :target_market_name, target_market_id)
         check_customer = true unless target_market == tmg_code || target_market == tm_code
       end
 
