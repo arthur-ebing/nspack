@@ -8,6 +8,7 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Added
 ### Changed
+- Removed RMT client rule: maintain_legacy_columns.
 ### Fixed
 
 ## [1.0.6] - 2021-12-29
