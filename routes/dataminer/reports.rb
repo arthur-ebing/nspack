@@ -17,6 +17,30 @@ class Nspack < Roda
       "<h2>Iframe</h2><h3>Params</h3><p>#{params[:sql]}</p><h3>Base64 decoded:</h3><p>#{Base64.decode64(params[:sql])}</p>"
     end
 
+    r.on 'loading_report_with_params', String do |rpt_id|
+      id = rpt_id.gsub('%20', ' ')
+      path = "/dataminer/reports/show_report_with_params/#{id}?#{request.query_string}"
+      change_window_location_via_json(UtilityFunctions.cache_bust_url(path), request.path)
+    end
+
+    r.on 'show_report_with_params', String do |rpt_id|
+      id = rpt_id.gsub('%20', ' ')
+      p id
+      p params
+      # if params[:_layout] ... layout
+      res = interactor.run_report_with_params(id, params)
+      if res.success
+        "SHOW rpt - #{params.inspect} :: #{res.instance.inspect}" # view
+        # show_json_notice("SHOW rpt - #{params.inspect}")
+      else
+        "ERR - #{params.inspect}"
+        # show_json_warning("ERR - #{params.inspect}")
+      end
+      # change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
+      # change_window_location_via_json(new_location, log_url = nil, download: false)
+      # show_page_in_layout
+    end
+
     r.on 'report', String do |id|
       id = id.gsub('%20', ' ')
 

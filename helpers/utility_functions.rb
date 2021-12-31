@@ -249,7 +249,8 @@ module UtilityFunctions
   # @param path [string] the URL path
   # @return [string] the path with "?seq=nnn" appended. (nnn is time in seconds)
   def cache_bust_url(path)
-    "#{path}?seq=#{Time.now.nsec}"
+    sep = path.include?('?') ? '&' : '?'
+    "#{path}#{sep}seq=#{Time.now.nsec}"
   end
 
   # Render HTML to display a loading graphic - optionally with message.
