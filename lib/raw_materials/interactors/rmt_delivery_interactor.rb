@@ -202,6 +202,7 @@ module RawMaterialsApp
     def delete_rmt_delivery(id) # rubocop:disable Metrics/AbcSize
       tipped_bins = repo.find_delivery_tipped_bins(id)
       return failed_response("#{tipped_bins.length} have already been tipped") unless tipped_bins.empty?
+      return failed_response('There is a completed QC Sample for this delivery') if repo.delivery_has_complete_qc_sample?(id)
 
       repo.transaction do
         bins = repo.find_bins_by_delivery_id(id)
@@ -220,6 +221,7 @@ module RawMaterialsApp
           repo.delete_rmt_bin(bins.map { |b| b[:id] })
         end
 
+        repo.delete_rmt_delivery_samples(id)
         repo.delete_rmt_delivery(id)
         log_status(:rmt_deliveries, id, 'DELETED')
         log_transaction

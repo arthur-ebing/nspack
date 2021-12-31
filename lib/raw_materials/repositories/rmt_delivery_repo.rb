@@ -715,5 +715,21 @@ module RawMaterialsApp
       samples = (bins.map { |b| b[0] }.values_at(*sample_positions.collect { |x| x.to_i - 1 }) + bins.find_all { |b| b[1] != AppConst::BIN_FULL }.map { |d| d[0] }).uniq
       update_rmt_bin(samples, sample_bin: true)
     end
+
+    def delivery_has_complete_qc_sample?(id)
+      exists?(:qc_samples, rmt_delivery_id: id, completed: true)
+    end
+
+    # Find all samples, tests and measurements for a delivery and delete them.
+    def delete_rmt_delivery_samples(id)
+      sample_ids = select_values(:qc_samples, :id, rmt_delivery_id: id)
+      test_ids = select_values(:qc_tests, :id, qc_sample_id: sample_ids)
+
+      DB[:qc_starch_measurements].where(qc_test_id: test_ids).delete
+      DB[:qc_instrument_measurements].where(qc_test_id: test_ids).delete
+      DB[:qc_defect_measurements].where(qc_test_id: test_ids).delete
+      delete(:qc_tests, test_ids)
+      delete(:qc_samples, sample_ids)
+    end
   end
 end

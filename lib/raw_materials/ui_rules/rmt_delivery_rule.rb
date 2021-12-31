@@ -88,6 +88,7 @@ module UiRules
       fields[:batch_number] = { renderer: :label }
       fields[:batch_number_updated_at] = { renderer: :label }
       fields[:sample_bins] = { renderer: :label,
+                               caption: 'Sample bin positions',
                                with_value: @form_object.sample_bins.join(',') }
       fields[:qty_partial_bins] = { renderer: :label,
                                     with_value: @form_object.qty_partial_bins }
@@ -106,6 +107,7 @@ module UiRules
       fields = {
         id: { renderer: :label, caption: 'Delivery Id' },
         sample_bins: { renderer: :label,
+                       caption: 'Sample bin positions',
                        with_value: @form_object.sample_bins.join(',') },
         farm_id: { renderer: :select,
                    options: MasterfilesApp::FarmRepo.new.for_select_farms,
