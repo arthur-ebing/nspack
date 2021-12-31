@@ -145,10 +145,14 @@ module DataminerApp
           mk.column_from_dataminer col
         end
       end
+      row_defs = repo.db_connection_for(db)[sql_to_run].to_a.map do |m|
+        m.each_key { |k| m[k] = m[k].to_f if m[k].is_a?(BigDecimal) }
+        m
+      end
       grid_data = {
         caption: report.caption,
         columnDefs: col_defs,
-        rowDefs: DB[sql_to_run].all
+        rowDefs: row_defs
       }
       success_response('ok', grid_data)
     end
