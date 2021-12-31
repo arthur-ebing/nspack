@@ -30,7 +30,7 @@ module UiRules
     end
 
     def make_form_object
-      rmt_code_id, rmt_classifications = @repo.get(:rmt_deliveries, @options[:id], %i[rmt_code_id rmt_classifications])
+      rmt_code_id, rmt_classifications = @repo.get(:rmt_deliveries, %i[rmt_code_id rmt_classifications], @options[:id])
       rmt_classification_types = AppConst::CR_RMT.classify_raw_material? ? @repo.select_values(:rmt_classification_types, :rmt_classification_type_code) : {}
       attrs = {}
       rmt_classifications&.each do |c|

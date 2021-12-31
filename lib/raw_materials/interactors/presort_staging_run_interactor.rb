@@ -25,7 +25,7 @@ module RawMaterialsApp
     end
 
     def update_presort_staging_run(id, params) # rubocop:disable Metrics/AbcSize
-      params[:supplier_id] = repo.get(:presort_staging_runs, id, :supplier_id) unless params.key?(:supplier_id)
+      params[:supplier_id] = repo.get(:presort_staging_runs, :supplier_id, id) unless params.key?(:supplier_id)
       params[:season_id] = calendar_repo.get_season_id(params[:cultivar_id], Time.now) unless params[:cultivar_id].nil_or_empty?
       legacy = AppConst::CR_RMT.presort_legacy_data_fields.map { |f| [f, params[f]] }
       params[:legacy_data] = Hash[legacy] unless legacy.empty?
@@ -162,7 +162,7 @@ module RawMaterialsApp
     end
 
     def complete_child_staging(id)
-      parent_id = repo.get(:presort_staging_run_children, id, :presort_staging_run_id)
+      parent_id = repo.get(:presort_staging_run_children, :presort_staging_run_id, id)
       repo.transaction do
         repo.update_presort_staging_run_child(id, staged: true, running: false, staged_at: Time.now)
         log_status(:presort_staging_run_children, id, 'STAGED')
@@ -176,7 +176,7 @@ module RawMaterialsApp
     end
 
     def delete_presort_staging_run_child(id) # rubocop:disable Metrics/AbcSize
-      parent_id = repo.get(:presort_staging_run_children, id, :presort_staging_run_id)
+      parent_id = repo.get(:presort_staging_run_children, :presort_staging_run_id, id)
       repo.transaction do
         repo.delete_presort_staging_run_child(id)
         log_status(:presort_staging_run_children, id, 'DELETED')

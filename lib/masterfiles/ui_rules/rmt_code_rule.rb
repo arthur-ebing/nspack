@@ -17,8 +17,8 @@ module UiRules
     end
 
     def set_show_fields
-      rmt_variant_id_label = @repo.get(:rmt_variants, @form_object.rmt_variant_id, :rmt_variant_code)
-      rmt_handling_regime_id_label = @repo.get(:rmt_handling_regimes, @form_object.rmt_handling_regime_id, :regime_code)
+      rmt_variant_id_label = @repo.get(:rmt_variants, :rmt_variant_code, @form_object.rmt_variant_id)
+      rmt_handling_regime_id_label = @repo.get(:rmt_handling_regimes, :regime_code, @form_object.rmt_handling_regime_id)
       fields[:rmt_variant_id] = { renderer: :label, with_value: rmt_variant_id_label, caption: 'Rmt Variant' }
       fields[:rmt_handling_regime_id] = { renderer: :label, with_value: rmt_handling_regime_id_label, caption: 'Rmt Handling Regime' }
       fields[:rmt_code] = { renderer: :label }
@@ -80,8 +80,8 @@ module UiRules
         actions << OpenStruct.new(type: :replace_input_value, dom_id: 'rmt_code_rmt_code', value: nil)
       else
         repo = MasterfilesApp::AdvancedClassificationsRepo.new
-        variant_code = repo.get(:rmt_variants, @params[:rmt_code_rmt_variant_id], :rmt_variant_code)
-        handling_regime_code = repo.get(:rmt_handling_regimes, @params[:changed_value], :regime_code)
+        variant_code = repo.get(:rmt_variants, :rmt_variant_code, @params[:rmt_code_rmt_variant_id])
+        handling_regime_code = repo.get(:rmt_handling_regimes, :regime_code, @params[:changed_value])
         actions << OpenStruct.new(type: :replace_input_value, dom_id: 'rmt_code_rmt_code', value: variant_code + handling_regime_code)
       end
       json_actions(actions)

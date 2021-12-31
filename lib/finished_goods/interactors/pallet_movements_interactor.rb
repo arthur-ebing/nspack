@@ -129,7 +129,7 @@ module FinishedGoodsApp
     end
 
     def location_short_code_for(location_id)
-      repo.get(:locations, location_id, :location_short_code)
+      repo.get(:locations, :location_short_code, location_id)
     end
 
     def validate_pallet_number(pallet_number)

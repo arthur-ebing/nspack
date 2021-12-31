@@ -123,7 +123,7 @@ module FinishedGoodsApp
     end
 
     def col_defs(rpt, id, for_multiselect = false) # rubocop:disable Metrics/AbcSize
-      pricing_per_kg = repo.get(:orders, id, :pricing_per_kg)
+      pricing_per_kg = repo.get(:orders, :pricing_per_kg, id)
       load_ids = repo.select_values(:orders_loads, :load_id, order_id: id)
 
       Crossbeams::DataGrid::ColumnDefiner.new(for_multiselect: for_multiselect).make_columns do |mk|

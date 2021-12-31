@@ -30,7 +30,7 @@ module UiRules
     def set_show_fields
       # marketing_order_id_label = ProductionApp::MarketingOrderRepo.new.find_marketing_order(@form_object.marketing_order_id)&.order_number
       # marketing_order_id_label = @repo.find(:marketing_orders, ProductionApp::MarketingOrder, @form_object.marketing_order_id)&.order_number
-      marketing_order_id_label = @repo.get(:marketing_orders, @form_object.marketing_order_id, :order_number)
+      marketing_order_id_label = @repo.get(:marketing_orders, :order_number, @form_object.marketing_order_id)
       fields[:marketing_order_id] = { renderer: :label, with_value: marketing_order_id_label, caption: 'Marketing Order' }
       fields[:start_date] = { renderer: :label }
       fields[:end_date] = { renderer: :label }

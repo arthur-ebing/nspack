@@ -168,9 +168,9 @@ module FinishedGoodsApp
         pallet_ids = repo.select_values(:pallets, :id, load_id: id)
         array = repo.select_values(:pallet_holdovers, %i[pallet_id holdover_quantity], pallet_id: pallet_ids)
         array.each do |pallet_id, holdover_quantity|
-          next if holdover_quantity == repo.get(:pallets, pallet_id, :carton_quantity)
+          next if holdover_quantity == repo.get(:pallets, :carton_quantity, pallet_id)
 
-          uncompleted << repo.get(:pallets, pallet_id, :pallet_number)
+          uncompleted << repo.get(:pallets, :pallet_number, pallet_id)
         end
         uncompleted
       end

@@ -16,11 +16,11 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      presort_grower_grading_pool_id_label = @repo.get(:presort_grower_grading_pools, @form_object.presort_grower_grading_pool_id, :maf_lot_number)
-      farm_id_label = @repo.get(:farms, @form_object.farm_id, :farm_code)
-      rmt_class_id_label = @repo.get(:rmt_classes, @form_object.rmt_class_id, :rmt_class_code)
-      rmt_size_id_label = @repo.get(:rmt_sizes, @form_object.rmt_size_id, :size_code)
-      treatment_id_label = @repo.get(:treatments, @form_object.treatment_id, :treatment_code)
+      presort_grower_grading_pool_id_label = @repo.get(:presort_grower_grading_pools, :maf_lot_number, @form_object.presort_grower_grading_pool_id)
+      farm_id_label = @repo.get(:farms, :farm_code, @form_object.farm_id)
+      rmt_class_id_label = @repo.get(:rmt_classes, :rmt_class_code, @form_object.rmt_class_id)
+      rmt_size_id_label = @repo.get(:rmt_sizes, :size_code, @form_object.rmt_size_id)
+      treatment_id_label = @repo.get(:treatments, :treatment_code, @form_object.treatment_id)
       fields[:presort_grower_grading_pool_id] = { renderer: :label,
                                                   with_value: presort_grower_grading_pool_id_label,
                                                   caption: 'Maf Lot Number' }
@@ -86,16 +86,16 @@ module UiRules
                             remove_search_for_small_list: false }
       else
         farm_renderer = { renderer: :label,
-                          with_value: @repo.get(:farms, @form_object.farm_id, :farm_code),
+                          with_value: @repo.get(:farms, :farm_code, @form_object.farm_id),
                           caption: 'Farm' }
         rmt_class_renderer = { renderer: :label,
-                               with_value: @repo.get(:rmt_classes, @form_object.rmt_class_id, :rmt_class_code),
+                               with_value: @repo.get(:rmt_classes, :rmt_class_code, @form_object.rmt_class_id),
                                caption: 'Rmt Class' }
         rmt_size_renderer = { renderer: :label,
-                              with_value: @repo.get(:rmt_sizes, @form_object.rmt_size_id, :size_code),
+                              with_value: @repo.get(:rmt_sizes, :size_code, @form_object.rmt_size_id),
                               caption: 'Rmt Size' }
         colour_renderer = { renderer: :label,
-                            with_value: @repo.get(:treatments, @form_object.treatment_id, :treatment_code),
+                            with_value: @repo.get(:treatments, :treatment_code, @form_object.treatment_id),
                             caption: 'Colour' }
       end
       {

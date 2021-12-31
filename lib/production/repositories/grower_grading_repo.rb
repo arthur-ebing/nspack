@@ -259,7 +259,7 @@ module ProductionApp
     end
 
     def grower_grading_rule_changes(grower_grading_rule_id)
-      rebin_rule = get(:grower_grading_rules, grower_grading_rule_id, :rebin_rule)
+      rebin_rule = get(:grower_grading_rules, :rebin_rule, grower_grading_rule_id)
       rebin_rule ? AppConst::CR_PROD.grower_grading_json_fields[:rebin_changes] : AppConst::CR_PROD.grower_grading_json_fields[:carton_changes]
     end
 
@@ -270,8 +270,8 @@ module ProductionApp
 
     def no_rule_item_changes?(grower_grading_rule_item_id, res) # rubocop:disable Metrics/AbcSize
       args = res.to_h
-      legacy_data = get(:grower_grading_rule_items, grower_grading_rule_item_id, :legacy_data)
-      changes = get(:grower_grading_rule_items, grower_grading_rule_item_id, :changes)
+      legacy_data = get(:grower_grading_rule_items, :legacy_data, grower_grading_rule_item_id)
+      changes = get(:grower_grading_rule_items, :changes, grower_grading_rule_item_id)
       legacy_data_changes = args[:legacy_data].reject { |k, v|  legacy_data.key?(k.to_s) && legacy_data[k.to_s] == v }
       rule_item_changes = args[:changes].reject { |k, v|  changes.key?(k.to_s) && changes[k.to_s] == v }
 

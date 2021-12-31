@@ -14,7 +14,7 @@ module FinishedGoodsApp
         hash[:nett_weight_per_carton] = get_value(:standard_product_weights, :nett_weight, { commodity_id: hash[:commodity_id], standard_pack_id: hash[:standard_pack_id] })
         hash[:gross_weight_per_carton] = get_value(:standard_product_weights, :gross_weight, { commodity_id: hash[:commodity_id], standard_pack_id: hash[:standard_pack_id] })
       end
-      hash[:bin] = get(:standard_pack_codes, hash[:standard_pack_id], :bin) || false
+      hash[:bin] = get(:standard_pack_codes, :bin, hash[:standard_pack_id]) || false
 
       PalletForTitan.new(hash)
     end
@@ -95,7 +95,7 @@ module FinishedGoodsApp
       return nil unless ds.get(:id)
 
       hash[:govt_inspection_sheet_id] = govt_inspection_sheet_id
-      hash[:reinspection] = get(:govt_inspection_sheets, govt_inspection_sheet_id, :reinspection)
+      hash[:reinspection] = get(:govt_inspection_sheets, :reinspection, govt_inspection_sheet_id)
       hash[:validated] = ds.where(request_type: 'Validation').get(:success)
       hash[:request_type] = ds.get(:request_type)
       hash[:success] = ds.get(:success)
@@ -136,7 +136,7 @@ module FinishedGoodsApp
       pallet_ids.each do |pallet_id|
         pallet = find_pallet_for_titan(pallet_id)
         ecert_agreement_id = get_value(:ecert_tracking_units, :ecert_agreement_id, pallet_id: pallet_id)
-        ecert_agreement_code = get(:ecert_agreements, ecert_agreement_id, :code)
+        ecert_agreement_code = get(:ecert_agreements, :code, ecert_agreement_id)
         inspection_pallets << { phc: pallet.phc,
                                 sscc: pallet.pallet_number,
                                 commodity: pallet.commodity,
@@ -243,7 +243,7 @@ module FinishedGoodsApp
         importCountryId: load.iso_country_code,
         cfCode: party_repo.find_registration_code_for_party_role('CF', load.shipper_party_role_id).to_s,
         lspCode: party_repo.find_registration_code_for_party_role('LSP', load.shipper_party_role_id).to_s,
-        transportType: get(:voyage_types, load.voyage_type_id, :industry_description),
+        transportType: get(:voyage_types, :industry_description, load.voyage_type_id),
         vesselName: load.vessel_code,
         vesselType: load.container ? 'CONTAINER' : 'CONVENTIONAL',
         voyageNumber: load.voyage_number,

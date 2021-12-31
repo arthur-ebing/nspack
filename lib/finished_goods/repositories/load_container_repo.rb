@@ -55,9 +55,9 @@ module FinishedGoodsApp
     end
 
     def calculate_verified_gross_weight(id)
-      load_id = get(:load_containers, id, :load_id)
+      load_id = get(:load_containers, :load_id, id)
       pallets_gross_weight = DB[:pallets].where(load_id: load_id).select_map(:gross_weight).map { |w| w.nil? ? AppConst::BIG_ZERO : w }.sum
-      container_tare_weight = get(:load_containers, id, :tare_weight) || 0
+      container_tare_weight = get(:load_containers, :tare_weight, id) || 0
       pallets_gross_weight + container_tare_weight
     end
   end

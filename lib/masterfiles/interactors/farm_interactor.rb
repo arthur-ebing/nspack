@@ -87,7 +87,7 @@ module MasterfilesApp
     end
 
     def update_farm_section(id, params) # rubocop:disable Metrics/AbcSize
-      params[:farm_id] = repo.get(:orchards, params[:orchard_ids][0], :farm_id)
+      params[:farm_id] = repo.get(:orchards, :farm_id, params[:orchard_ids][0])
       res = validate_farm_section_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -161,7 +161,7 @@ module MasterfilesApp
     end
 
     def farm_location_id(farm_id)
-      repo.get(:farms, farm_id, :location_id)
+      repo.get(:farms, :location_id, farm_id)
     end
   end
 end

@@ -501,7 +501,7 @@ module ProductionApp
     end
 
     def cosmetic_code_for_seq(pm_mark_id)
-      fruit_mark = (get(:pm_marks, pm_mark_id, :packaging_marks) || []).last
+      fruit_mark = (get(:pm_marks, :packaging_marks, pm_mark_id) || []).last
       return 'No packaging marks found' unless fruit_mark
       return 'UL' if translate_pm_marks(Array(fruit_mark)).first == 'NONE'
 
@@ -513,7 +513,7 @@ module ProductionApp
     end
 
     def calculate_extended_fg_code(packing_specification_item_id, packaging_marks_join: '_') # rubocop:disable Metrics/AbcSize
-      product_setup_id = get(:packing_specification_items, packing_specification_item_id, :product_setup_id)
+      product_setup_id = get(:packing_specification_items, :product_setup_id, packing_specification_item_id)
       prod_setup = find_product_setup(product_setup_id).to_h
 
       fg_code_components = []
@@ -589,7 +589,7 @@ module ProductionApp
       fg_code_components << carton_pack_product
 
       fg_code_components << get_kromco_mes_value(:organizations, seq[:organization_id], :short_description)
-      marks_set = get(:pm_marks, seq[:pm_mark_id], :packaging_marks)
+      marks_set = get(:pm_marks, :packaging_marks, seq[:pm_mark_id])
       marks_set = translate_pm_marks(marks_set || ['No packaging marks found'])
       fg_code_components << marks_set.reverse.join(packaging_marks_join)
       fg_code_components.join('_')
@@ -633,8 +633,8 @@ module ProductionApp
       return false if standard_pack_code_id.nil_or_empty? || grade_id.nil_or_empty?
 
       require_owner = AppConst::CR_RMT.use_bin_asset_control?
-      require_owner = false unless get(:standard_pack_codes, standard_pack_code_id, :bin)
-      require_owner = false unless get(:grades, grade_id, :rmt_grade)
+      require_owner = false unless get(:standard_pack_codes, :bin, standard_pack_code_id)
+      require_owner = false unless get(:grades, :rmt_grade, grade_id)
       require_owner
     end
   end

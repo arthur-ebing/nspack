@@ -57,8 +57,8 @@ module MasterfilesApp
     def get_season_id(cultivar_id, date)
       raise ArgumentError, 'get_season_id: cultivar_id and date required' unless cultivar_id && date
 
-      cultivar_group_id = get(:cultivars, cultivar_id, :cultivar_group_id)
-      commodity_id = get(:cultivar_groups, cultivar_group_id, :commodity_id)
+      cultivar_group_id = get(:cultivars, :cultivar_group_id, cultivar_id)
+      commodity_id = get(:cultivar_groups, :commodity_id, cultivar_group_id)
       DB[:seasons].where(commodity_id: commodity_id).where(Sequel.lit('? between start_date and end_date', date)).get(:id)
     end
 

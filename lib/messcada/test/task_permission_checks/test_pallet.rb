@@ -17,7 +17,7 @@ module MesscadaApp
 
     def test_exist
       pallet_id = create_pallet
-      pallet_number = repo.get(:pallets, pallet_id, :pallet_number)
+      pallet_number = repo.get(:pallets, :pallet_number, pallet_id)
 
       res = TaskPermissionCheck::Pallet.call(:exists, pallet_id: pallet_id)
       assert res.success, 'Pallet should exist'

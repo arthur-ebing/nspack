@@ -51,7 +51,7 @@ module MasterfilesApp
       variant = lookup_mf_variant(hash[:masterfile_table])
       hash[:variant] = variant[:variant]
       hash[:masterfile_column] = variant[:column_name]
-      hash[:masterfile_code] = get(hash[:masterfile_table].to_sym, hash[:masterfile_id], hash[:masterfile_column].to_sym)
+      hash[:masterfile_code] = get(hash[:masterfile_table].to_sym, hash[:masterfile_column].to_sym, hash[:masterfile_id])
 
       MasterfileVariant.new(hash)
     end
@@ -98,7 +98,7 @@ module MasterfilesApp
       transformation = lookup_mf_transformation(hash[:masterfile_table])
       hash[:transformation] = transformation[:transformation]
       hash[:masterfile_column] = transformation[:column_name]
-      hash[:masterfile_code] = get(hash[:masterfile_table].to_sym, hash[:masterfile_id], hash[:masterfile_column].to_sym)
+      hash[:masterfile_code] = get(hash[:masterfile_table].to_sym, hash[:masterfile_column].to_sym, hash[:masterfile_id])
 
       MasterfileTransformation.new(hash)
     end
@@ -135,7 +135,7 @@ module MasterfilesApp
       return transformation if transformation
 
       column ||= lookup_mf_transformation(masterfile_table)[:column_name]
-      get(table_name.to_sym, id, column.to_sym)
+      get(table_name.to_sym, column.to_sym, id)
     end
   end
 end

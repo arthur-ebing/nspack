@@ -116,7 +116,7 @@ module UiRules
 
     def edit_sequence_fields # rubocop:disable Metrics/AbcSize
       # commodity_id = @form_object[:commodity_id].nil_or_empty? ? ProductionApp::ProductSetupRepo.new.get_commodity_id(@form_object.cultivar_group_id, @form_object.cultivar_id) : @form_object[:commodity_id]
-      commodity_id = @form_object[:commodity_id].nil_or_empty? ? @repo.get(:cultivar_groups, @form_object.cultivar_group_id, :commodity_id) : @form_object[:commodity_id]
+      commodity_id = @form_object[:commodity_id].nil_or_empty? ? @repo.get(:cultivar_groups, :commodity_id, @form_object.cultivar_group_id) : @form_object[:commodity_id]
       commodity = @commodity_repo.find_commodity(commodity_id)
       raise Crossbeams::FrameworkError, 'No commodity for cultivar group or sequence' if commodity.nil?
 

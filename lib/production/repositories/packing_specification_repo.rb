@@ -90,7 +90,7 @@ module ProductionApp
       when 'fruit_sticker_1', 'tu_sticker_1', 'ru_sticker_1', 'fruit_sticker_2', 'tu_sticker_2', 'ru_sticker_2'
         column = params[:column_name].gsub(/_[12]/, '_ids').to_sym
         indexer = params[:column_name][-1].to_i - 1
-        current_value = get(:packing_specification_items, id, column)
+        current_value = get(:packing_specification_items, column, id)
         current_value[indexer] = get_id(:pm_products, product_code: params[:column_value])
         value = current_value
       else
@@ -102,7 +102,7 @@ module ProductionApp
 
     def update_packing_specification_item(id, res)
       attrs = res.to_h
-      legacy_data = UtilityFunctions.symbolize_keys(get(:packing_specification_items, id, :legacy_data).to_h)
+      legacy_data = UtilityFunctions.symbolize_keys(get(:packing_specification_items, :legacy_data, id).to_h)
 
       attrs[:legacy_data] = legacy_data.merge(attrs[:legacy_data].to_h)
       update(:packing_specification_items, id, attrs)
@@ -113,7 +113,7 @@ module ProductionApp
 
       hash[:step] ||= 4
       product_setup_template = ProductionApp::ProductSetupRepo.new.find_product_setup_template(hash[:product_setup_template_id])
-      hash[:product_setup_template] = get(:product_setup_templates, hash[:product_setup_template_id], :template_name)
+      hash[:product_setup_template] = get(:product_setup_templates, :template_name, hash[:product_setup_template_id])
       hash[:cultivar_group_id] ||= product_setup_template&.cultivar_group_id
       hash[:cultivar_group] ||= product_setup_template&.cultivar_group_code
       hash[:cultivar_id] ||= product_setup_template&.cultivar_id
@@ -122,28 +122,28 @@ module ProductionApp
       return hash if hash[:step] < 1
 
       # hash[:commodity_id] ||= ProductionApp::ProductSetupRepo.new.get_commodity_id(hash[:cultivar_group_id], hash[:cultivar_id])
-      hash[:commodity_id] ||= get(:cultivar_groups, hash[:cultivar_group_id], :commodity_id)
-      hash[:commodity] = get(:commodities, hash[:commodity_id], :code)
-      hash[:marketing_variety] = get(:marketing_varieties, hash[:marketing_variety_id], :marketing_variety_code)
+      hash[:commodity_id] ||= get(:cultivar_groups, :commodity_id, hash[:cultivar_group_id])
+      hash[:commodity] = get(:commodities, :code, hash[:commodity_id])
+      hash[:marketing_variety] = get(:marketing_varieties, :marketing_variety_code, hash[:marketing_variety_id])
       hash[:std_fruit_size_count] = MasterfilesApp::FruitSizeRepo.new.find_std_fruit_size_count(hash[:std_fruit_size_count_id])&.size_count_value
-      hash[:basic_pack] = get(:basic_pack_codes, hash[:basic_pack_code_id], :basic_pack_code)
-      hash[:standard_pack] = get(:standard_pack_codes, hash[:standard_pack_code_id], :standard_pack_code)
-      hash[:fruit_actual_counts_for_pack] = get(:fruit_actual_counts_for_packs, hash[:fruit_actual_counts_for_pack_id], :actual_count_for_pack)
-      hash[:fruit_size_reference] = get(:fruit_size_references, hash[:fruit_size_reference_id], :size_reference)
-      hash[:grade] = get(:grades, hash[:grade_id], :grade_code)
-      hash[:class] = get(:rmt_classes, hash[:rmt_class_id], :rmt_class_code)
-      hash[:colour_percentage] = get(:colour_percentages, hash[:colour_percentage_id], :colour_percentage)
+      hash[:basic_pack] = get(:basic_pack_codes, :basic_pack_code, hash[:basic_pack_code_id])
+      hash[:standard_pack] = get(:standard_pack_codes, :standard_pack_code, hash[:standard_pack_code_id])
+      hash[:fruit_actual_counts_for_pack] = get(:fruit_actual_counts_for_packs, :actual_count_for_pack, hash[:fruit_actual_counts_for_pack_id])
+      hash[:fruit_size_reference] = get(:fruit_size_references, :size_reference, hash[:fruit_size_reference_id])
+      hash[:grade] = get(:grades, :grade_code, hash[:grade_id])
+      hash[:class] = get(:rmt_classes, :rmt_class_code, hash[:rmt_class_id])
+      hash[:colour_percentage] = get(:colour_percentages, :colour_percentage, hash[:colour_percentage_id])
       hash[:packing_specification_code] = product_setup_partial_code(hash)
       return hash if hash[:step] < 2
 
       marketing_org_party_role = MasterfilesApp::PartyRepo.new.find_party_role(hash[:marketing_org_party_role_id])
       hash[:marketing_org] = marketing_org_party_role&.party_name
-      hash[:marketing_org_description] = get(:organizations, marketing_org_party_role&.organization_id, :short_description)
-      hash[:packed_tm_group] = get(:target_market_groups, hash[:packed_tm_group_id], :target_market_group_name)
-      hash[:target_market] = get(:target_markets, hash[:target_market_id], :target_market_name)
+      hash[:marketing_org_description] = get(:organizations, :short_description, marketing_org_party_role&.organization_id)
+      hash[:packed_tm_group] = get(:target_market_groups, :target_market_group_name, hash[:packed_tm_group_id])
+      hash[:target_market] = get(:target_markets, :target_market_name, hash[:target_market_id])
       hash[:target_customer] = DB.get(Sequel.function(:fn_party_role_name, hash[:target_customer_party_role_id]))
-      hash[:mark] = get(:marks, hash[:mark_id], :mark_code)
-      hash[:inventory_code] = get(:inventory_codes, hash[:inventory_code_id], :inventory_code)
+      hash[:mark] = get(:marks, :mark_code, hash[:mark_id])
+      hash[:inventory_code] = get(:inventory_codes, :inventory_code, hash[:inventory_code_id])
       hash[:customer_variety] = MasterfilesApp::MarketingRepo.new.find_customer_variety(hash[:customer_variety_id])&.variety_as_customer_variety
       hash[:packing_specification_code] = product_setup_partial_code(hash)
       return hash if hash[:step] < 3
@@ -151,12 +151,12 @@ module ProductionApp
       hash[:treatments] = ProductionApp::ProductSetupRepo.new.find_treatment_codes(hash[:product_setup_id]).to_a.join(', ')
       return hash if hash[:step] < 4
 
-      hash[:pallet_base] = get(:pallet_bases, hash[:pallet_base_id], :pallet_base_code)
-      hash[:pallet_stack_type] = get(:pallet_stack_types, hash[:pallet_stack_type_id], :stack_type_code)
-      hash[:stack_height] = get(:pallet_stack_types, hash[:pallet_stack_type_id], :stack_height)
-      hash[:pallet_format] = get(:pallet_formats, hash[:pallet_format_id], :description)
-      hash[:pallet_label] = get(:label_templates, hash[:pallet_label_name], :label_template_name)
-      hash[:cartons_per_pallet] = get(:cartons_per_pallet, hash[:cartons_per_pallet_id], :cartons_per_pallet)
+      hash[:pallet_base] = get(:pallet_bases, :pallet_base_code, hash[:pallet_base_id])
+      hash[:pallet_stack_type] = get(:pallet_stack_types, :stack_type_code, hash[:pallet_stack_type_id])
+      hash[:stack_height] = get(:pallet_stack_types, :stack_height, hash[:pallet_stack_type_id])
+      hash[:pallet_format] = get(:pallet_formats, :description, hash[:pallet_format_id])
+      hash[:pallet_label] = get(:label_templates, :label_template_name, hash[:pallet_label_name])
+      hash[:cartons_per_pallet] = get(:cartons_per_pallet, :cartons_per_pallet, hash[:cartons_per_pallet_id])
       hash[:packing_specification_code] = product_setup_partial_code(hash)
       hash
     end
@@ -189,7 +189,7 @@ module ProductionApp
     end
 
     def delete_packing_specification_item(id)
-      product_setup_id = get(:packing_specification_items, id, :product_setup_id)
+      product_setup_id = get(:packing_specification_items, :product_setup_id, id)
       item_ids = select_values(:packing_specification_items, :id, product_setup_id: product_setup_id)
       delete(:packing_specification_items, id)
       delete(:product_setups, product_setup_id) if item_ids.length == 1

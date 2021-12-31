@@ -21,11 +21,11 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      packhouse_resource_id_label = @repo.get(:plant_resources, @form_object.packhouse_resource_id, :plant_resource_code)
-      line_resource_id_label = @repo.get(:plant_resources, @form_object.line_resource_id, :plant_resource_code)
-      season_id_label = @repo.get(:seasons, @form_object.season_id, :season_code)
-      cultivar_group_id_label = @repo.get(:cultivar_groups, @form_object.cultivar_group_id, :cultivar_group_code)
-      cultivar_id_label = @repo.get(:cultivars, @form_object.cultivar_id, :cultivar_name)
+      packhouse_resource_id_label = @repo.get(:plant_resources, :plant_resource_code, @form_object.packhouse_resource_id)
+      line_resource_id_label = @repo.get(:plant_resources, :plant_resource_code, @form_object.line_resource_id)
+      season_id_label = @repo.get(:seasons, :season_code, @form_object.season_id)
+      cultivar_group_id_label = @repo.get(:cultivar_groups, :cultivar_group_code, @form_object.cultivar_group_id)
+      cultivar_id_label = @repo.get(:cultivars, :cultivar_name, @form_object.cultivar_id)
       fields[:rule_name] = { renderer: :label }
       fields[:description] = { renderer: :label }
       fields[:file_name] = { renderer: :label }

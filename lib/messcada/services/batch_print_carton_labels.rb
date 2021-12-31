@@ -14,7 +14,7 @@ module MesscadaApp
       @repo = MesscadaApp::MesscadaRepo.new
       @production_repo = ProductionApp::ProductionRunRepo.new
       @request_ip = LabelApp::PrinterRepo.new.print_to_robot?(request_ip) ? request_ip : nil
-      @label_name = repo.get(:label_templates, label_template_id, :label_template_name)
+      @label_name = repo.get(:label_templates, :label_template_name, label_template_id)
       resolve_product_setup_id(args)
     end
 

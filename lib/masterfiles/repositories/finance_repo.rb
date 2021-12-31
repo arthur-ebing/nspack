@@ -214,7 +214,7 @@ module MasterfilesApp
     end
 
     def delete_customer(id)
-      customer_party_role_id = get(:customers, id, :customer_party_role_id)
+      customer_party_role_id = get(:customers, :customer_party_role_id, id)
       delete(:customers, id)
       MasterfilesApp::PartyRepo.new.delete_party_role(customer_party_role_id)
     end

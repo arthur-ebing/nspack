@@ -20,8 +20,8 @@ module FinishedGoodsApp
     private
 
     def pass_govt_inspection_pallet(id)
-      govt_inspection_sheet_id = repo.get(:govt_inspection_pallets, id, :govt_inspection_sheet_id)
-      reinspection = repo.get(:govt_inspection_sheets, govt_inspection_sheet_id, :reinspection)
+      govt_inspection_sheet_id = repo.get(:govt_inspection_pallets, :govt_inspection_sheet_id, id)
+      reinspection = repo.get(:govt_inspection_sheets, :reinspection, govt_inspection_sheet_id)
       attrs = { passed: true, inspected: true, failure_reason_id: nil, failure_remarks: nil }
       if reinspection
         attrs[:reinspected] = true

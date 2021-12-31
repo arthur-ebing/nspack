@@ -169,7 +169,7 @@ module RawMaterialsApp
       return nil if hash.nil?
 
       hash[:asset_number] = hash[:bin_asset_number] || hash[:shipped_asset_number] || hash[:tipped_asset_number] || hash[:scrapped_bin_asset_number]
-      hash[:received] = get(:rmt_deliveries, hash[:rmt_delivery_id], :received)
+      hash[:received] = get(:rmt_deliveries, :received, hash[:rmt_delivery_id])
       RmtBinFlat.new(hash)
     end
 
@@ -390,18 +390,18 @@ module RawMaterialsApp
     def get_rmt_bin_tare_weight(rmt_bin)
       inner_tare = calculate_inner_tare_weight(rmt_bin)
 
-      tare_weight = get(:rmt_container_material_types, rmt_bin[:rmt_container_material_type_id], :tare_weight)
+      tare_weight = get(:rmt_container_material_types, :tare_weight, rmt_bin[:rmt_container_material_type_id])
       return tare_weight + inner_tare unless tare_weight.nil?
 
-      new_tare = get(:rmt_container_types, rmt_bin[:rmt_container_type_id], :tare_weight)
+      new_tare = get(:rmt_container_types, :tare_weight, rmt_bin[:rmt_container_type_id])
       (new_tare || AppConst::BIG_ZERO) + inner_tare
     end
 
     def calculate_inner_tare_weight(rmt_bin)
       return AppConst::BIG_ZERO if rmt_bin[:qty_inner_bins].nil? || rmt_bin[:qty_inner_bins].zero? # (OR One? is this always set to at least 1?
 
-      tare_weight = get(:rmt_container_material_types, rmt_bin[:rmt_inner_container_material_id], :tare_weight)
-      tare_weight = get(:rmt_container_types, rmt_bin[:rmt_inner_container_type_id], :tare_weight) if tare_weight.nil?
+      tare_weight = get(:rmt_container_material_types, :tare_weight, rmt_bin[:rmt_inner_container_material_id])
+      tare_weight = get(:rmt_container_types, :tare_weight, rmt_bin[:rmt_inner_container_type_id]) if tare_weight.nil?
 
       return AppConst::BIG_ZERO if tare_weight.nil?
 

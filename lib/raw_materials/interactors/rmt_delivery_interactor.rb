@@ -509,7 +509,7 @@ module RawMaterialsApp
     end
 
     def delivery_tipped?(id)
-      repo.get(:rmt_deliveries, id, :delivery_tipped)
+      repo.get(:rmt_deliveries, :delivery_tipped, id)
     end
 
     def assert_permission!(task, id = nil)

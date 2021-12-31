@@ -13,7 +13,7 @@ module UiRules
 
       @rules[:gtins_required] = AppConst::CR_PROD.use_gtins?
       @rules[:basic_pack_equals_standard_pack] = AppConst::CR_MF.basic_pack_equals_standard_pack?
-      @rules[:colour_applies] ||= @repo.get(:commodities, @form_object.commodity_id, :colour_applies) || false
+      @rules[:colour_applies] ||= @repo.get(:commodities, :colour_applies, @form_object.commodity_id) || false
 
       common_values_for_fields common_fields
 
@@ -25,29 +25,29 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      product_setup_template_id_label = @repo.get(:product_setup_templates, @form_object.product_setup_template_id, :template_name)
-      marketing_variety_id_label = @repo.get(:marketing_varieties, @form_object.marketing_variety_id, :marketing_variety_code)
+      product_setup_template_id_label = @repo.get(:product_setup_templates, :template_name, @form_object.product_setup_template_id)
+      marketing_variety_id_label = @repo.get(:marketing_varieties, :marketing_variety_code, @form_object.marketing_variety_id)
       customer_variety_id_label = MasterfilesApp::MarketingRepo.new.find_customer_variety(@form_object.customer_variety_id)&.variety_as_customer_variety
       std_fruit_size_count_id_label = @fruit_size_repo.find_std_fruit_size_count(@form_object.std_fruit_size_count_id)&.size_count_value
-      basic_pack_code_id_label = @repo.get(:basic_pack_codes, @form_object.basic_pack_code_id, :basic_pack_code)
-      standard_pack_code_id_label = @repo.get(:standard_pack_codes, @form_object.standard_pack_code_id, :standard_pack_code)
+      basic_pack_code_id_label = @repo.get(:basic_pack_codes, :basic_pack_code, @form_object.basic_pack_code_id)
+      standard_pack_code_id_label = @repo.get(:standard_pack_codes, :standard_pack_code, @form_object.standard_pack_code_id)
       fruit_actual_counts_for_pack_id_label = @fruit_size_repo.find_fruit_actual_counts_for_pack(@form_object.fruit_actual_counts_for_pack_id)&.actual_count_for_pack
       fruit_size_reference_id_label = @fruit_size_repo.find_fruit_size_reference(@form_object.fruit_size_reference_id)&.size_reference
       marketing_org_party_role_id_label = @party_repo.find_party_role(@form_object.marketing_org_party_role_id)&.party_name
-      packed_tm_group_id_label = @repo.get(:target_market_groups, @form_object.packed_tm_group_id, :target_market_group_name)
-      target_market_id_label = @repo.get(:target_markets, @form_object.target_market_id, :target_market_name)
+      packed_tm_group_id_label = @repo.get(:target_market_groups, :target_market_group_name, @form_object.packed_tm_group_id)
+      target_market_id_label = @repo.get(:target_markets, :target_market_name, @form_object.target_market_id)
       target_customer_label = @party_repo.fn_party_role_name(@form_object.target_customer_party_role_id)
-      mark_id_label = @repo.get(:marks, @form_object.mark_id, :mark_code)
+      mark_id_label = @repo.get(:marks, :mark_code, @form_object.mark_id)
       inventory_code_id_label = MasterfilesApp::FruitRepo.new.find_inventory_code(@form_object.inventory_code_id)&.inventory_code
-      pallet_format_id_label = @repo.get(:pallet_formats, @form_object.pallet_format_id, :description)
-      cartons_per_pallet_id_label = @repo.get(:cartons_per_pallet, @form_object.cartons_per_pallet_id, :cartons_per_pallet)
+      pallet_format_id_label = @repo.get(:pallet_formats, :description, @form_object.pallet_format_id)
+      cartons_per_pallet_id_label = @repo.get(:cartons_per_pallet, :cartons_per_pallet, @form_object.cartons_per_pallet_id)
       commodity_id_label = @commodity_repo.find_commodity(@form_object.commodity_id)&.code
       grade_id_label = MasterfilesApp::FruitRepo.new.find_grade(@form_object.grade_id)&.grade_code
       pallet_base_id_label = MasterfilesApp::PackagingRepo.new.find_pallet_base(@form_object.pallet_base_id)&.pallet_base_code
       pallet_stack_type_id_label = MasterfilesApp::PackagingRepo.new.find_pallet_stack_type(@form_object.pallet_stack_type_id)&.stack_type_code
       rmt_class_id_label = MasterfilesApp::FruitRepo.new.find_rmt_class(@form_object.rmt_class_id)&.rmt_class_code
-      colour_percentage_id_label = @repo.get(:colour_percentages, @form_object.colour_percentage_id, :description)
-      carton_label_template_id_label = @repo.get(:label_templates, @form_object.carton_label_template_id, :label_template_name)
+      colour_percentage_id_label = @repo.get(:colour_percentages, :description, @form_object.colour_percentage_id)
+      carton_label_template_id_label = @repo.get(:label_templates, :label_template_name, @form_object.carton_label_template_id)
 
       fields[:product_setup_template_id] = { renderer: :label,
                                              with_value: product_setup_template_id_label,
@@ -148,8 +148,8 @@ module UiRules
     def common_fields # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
       product_setup_template_id = @options[:product_setup_template_id].nil_or_empty? ? @repo.find_product_setup(@options[:id]).product_setup_template_id : @options[:product_setup_template_id]
       # commodity_id = @form_object[:commodity_id].nil_or_empty? ? @repo.get_commodity_id(cultivar_group_id, cultivar_id) : @form_object.commodity_id
-      commodity_id = @form_object[:commodity_id].nil_or_empty? ? @repo.get(:cultivar_groups, @form_object.cultivar_group_id, :commodity_id) : @form_object.commodity_id
-      colour_applies = @repo.get(:commodities, commodity_id, :colour_applies)
+      commodity_id = @form_object[:commodity_id].nil_or_empty? ? @repo.get(:cultivar_groups, :commodity_id, @form_object.cultivar_group_id) : @form_object.commodity_id
+      colour_applies = @repo.get(:commodities, :colour_applies, commodity_id)
       default_mkting_org_id = @form_object[:marketing_org_party_role_id].nil_or_empty? ? @party_repo.find_party_role_from_party_name_for_role(AppConst::CR_PROD.default_marketing_org, AppConst::ROLE_MARKETER) : @form_object[:marketing_org_party_role_id]
       basic_pack_codes = if @form_object.rebin
                            @fruit_size_repo.for_select_basic_packs(where: { bin: true })

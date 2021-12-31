@@ -53,9 +53,9 @@ module FinishedGoodsApp
 
       res = ShipLoad.call(load_id, current_user)
       assert res.success, res.message
-      assert repo.get(:pallets, pallet_id, :shipped), 'Should Ship Pallet'
-      assert repo.get(:loads, load_id, :shipped), 'Should Ship Load'
-      assert repo.get(:orders, order_id, :shipped), 'Should Ship Order'
+      assert repo.get(:pallets, :shipped, pallet_id), 'Should Ship Pallet'
+      assert repo.get(:loads, :shipped, load_id), 'Should Ship Load'
+      assert repo.get(:orders, :shipped, order_id), 'Should Ship Order'
     end
 
     def test_ship_order_fail
@@ -72,9 +72,9 @@ module FinishedGoodsApp
 
       res = ShipLoad.call(load_id, current_user)
       assert res.success, res.message
-      assert repo.get(:pallets, pallet_id, :shipped), 'Should Ship Pallet'
-      assert repo.get(:loads, load_id, :shipped), 'Should ship Load'
-      refute repo.get(:orders, order_id, :shipped), 'Should not ship Order'
+      assert repo.get(:pallets, :shipped, pallet_id), 'Should Ship Pallet'
+      assert repo.get(:loads, :shipped, load_id), 'Should ship Load'
+      refute repo.get(:orders, :shipped, order_id), 'Should not ship Order'
     end
 
     def test_ship_load_fail
@@ -86,8 +86,8 @@ module FinishedGoodsApp
 
       res = ShipLoad.call(load_id, current_user)
       refute res.success, res.message
-      refute repo.get(:pallets, pallet_id, :shipped), 'Pallet should not be shipped'
-      refute repo.get(:loads, load_id, :shipped), 'Load should not be shipped'
+      refute repo.get(:pallets, :shipped, pallet_id), 'Pallet should not be shipped'
+      refute repo.get(:loads, :shipped, load_id), 'Load should not be shipped'
     end
 
     def test_ship_load_with_holdover_fail
@@ -96,12 +96,12 @@ module FinishedGoodsApp
       location_id = create_location(force_create: true)
       pallet_id = create_pallet(load_id: load_id, location_id: location_id)
       create_pallet_sequence(pallet_id: pallet_id)
-      carton_quantity = repo.get(:pallets, pallet_id, :carton_quantity)
+      carton_quantity = repo.get(:pallets, :carton_quantity, pallet_id)
       create_pallet_holdover(pallet_id: pallet_id, holdover_quantity: carton_quantity + 1)
 
       res = ShipLoad.call(load_id, current_user)
       refute res.success, res.message
-      refute repo.get(:loads, load_id, :shipped), 'Load should not be shipped'
+      refute repo.get(:loads, :shipped, load_id), 'Load should not be shipped'
     end
 
     def test_ship_load_with_holdover_pass
@@ -112,12 +112,12 @@ module FinishedGoodsApp
       pallet_id = create_pallet(load_id: load_id, location_id: location_id)
       create_pallet_sequence(pallet_id: pallet_id)
 
-      carton_quantity = repo.get(:pallets, pallet_id, :carton_quantity)
+      carton_quantity = repo.get(:pallets, :carton_quantity, pallet_id)
       create_pallet_holdover(pallet_id: pallet_id, holdover_quantity: carton_quantity)
 
       res = ShipLoad.call(load_id, current_user)
       assert res.success, res.message
-      assert repo.get(:loads, load_id, :shipped), 'Load should be shipped'
+      assert repo.get(:loads, :shipped, load_id), 'Load should be shipped'
     end
   end
 end

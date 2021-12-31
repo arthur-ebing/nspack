@@ -123,7 +123,7 @@ module MesscadaApp
       def rmt_grade_check # rubocop:disable Metrics/AbcSize
         raise ArgumentError, 'Load_id nil!' if load_id.nil?
 
-        valid_grade_ids = repo.select_values(:grades, :id, rmt_grade: repo.get(:loads, load_id, :rmt_load))
+        valid_grade_ids = repo.select_values(:grades, :id, rmt_grade: repo.get(:loads, :rmt_load, load_id))
         errors = DB[:pallet_sequences].where(pallet_id: pallet_ids).exclude(grade_id: valid_grade_ids).select_map(:pallet_number).uniq
         return failed_response "Pallet: #{errors.join(', ')}, only pallets with RMT Grades are allowed on RMT Loads." unless errors.empty?
 
@@ -201,7 +201,7 @@ module MesscadaApp
       def order_spec_check # rubocop:disable Metrics/AbcSize
         return all_ok if order_id.nil?
 
-        packed_tm_group_id, marketing_org_party_role_id = repo.get(:orders, order_id, %i[packed_tm_group_id marketing_org_party_role_id])
+        packed_tm_group_id, marketing_org_party_role_id = repo.get(:orders, %i[packed_tm_group_id marketing_org_party_role_id], order_id)
         ds = DB[:pallet_sequences].where(pallet_id: pallet_ids)
         errors = ds.exclude(packed_tm_group_id: packed_tm_group_id).select_map(:pallet_number)
         return failed_response "Pallet: #{errors.join(', ')} does not have the same Packed TM Group as order#{order_id}." unless errors.empty?

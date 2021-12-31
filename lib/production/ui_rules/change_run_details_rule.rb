@@ -9,7 +9,7 @@ module UiRules
 
       make_form_object
 
-      @rules[:labeling] = @repo.get(:production_runs, @form_object.id, :labeling)
+      @rules[:labeling] = @repo.get(:production_runs, :labeling, @form_object.id)
 
       apply_form_values
 

@@ -9,7 +9,7 @@ module FinishedGoodsApp
       @load_id = load_id
       @instance = repo.find_load(load_id)
       @user = user
-      @shipped_at = repo.get(:loads, load_id, :shipped_at) || Time.now
+      @shipped_at = repo.get(:loads, :shipped_at, load_id) || Time.now
     end
 
     def call
@@ -61,7 +61,7 @@ module FinishedGoodsApp
         res = MoveStock.call('PALLET', pallet_id, location_to, 'LOAD_SHIPPED', @load_id)
         raise Crossbeams::InfoError, res.message unless res.success
 
-        pallet_shipped_at = repo.get(:pallets, pallet_id, :shipped_at).nil? ? Time.now : shipped_at
+        pallet_shipped_at = repo.get(:pallets, :shipped_at, pallet_id).nil? ? Time.now : shipped_at
         attrs = { shipped: true, shipped_at: pallet_shipped_at, exit_ref: 'SHIPPED', in_stock: false }
         repo.update(:pallets, pallet_id, attrs)
         repo.log_status(:pallets, pallet_id, 'SHIPPED', user_name: user.user_name)

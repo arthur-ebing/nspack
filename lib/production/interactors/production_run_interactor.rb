@@ -203,7 +203,7 @@ module ProductionApp
     end
 
     def print_pallet_label_from_sequence(pallet_sequence_id, params)
-      pallet_id = repo.get(:pallet_sequences, pallet_sequence_id, :pallet_id)
+      pallet_id = repo.get(:pallet_sequences, :pallet_id, pallet_sequence_id)
       print_pallet_label(pallet_id, params)
     end
 

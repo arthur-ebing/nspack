@@ -272,7 +272,7 @@ module FinishedGoodsApp
         res = ShipLoad.call(id, @user)
         raise Crossbeams::InfoError, res.message unless res.success
 
-        send_edi(id) unless repo.get(:loads, id, :truck_must_be_weighed)
+        send_edi(id) unless repo.get(:loads, :truck_must_be_weighed, id)
         send_hcs_edi(id) if repo.load_is_on_order?(id)
         send_hbs_edi(id)
 
@@ -399,7 +399,7 @@ module FinishedGoodsApp
     end
 
     def load_shipped_date_for(load_id)
-      repo.get(:loads, load_id, :shipped_at).strftime('%Y-%m-%d')
+      repo.get(:loads, :shipped_at, load_id).strftime('%Y-%m-%d')
     end
 
     def confirm_force_shipped_date(load_id, params) # rubocop:disable Metrics/AbcSize
@@ -433,7 +433,7 @@ module FinishedGoodsApp
       changed_weights = weights_changed?(load_container_id, res)
       return success_response('Nothing to update - weights were not changed') unless changed_weights
 
-      send_for_weight = repo.get(:loads, id, :truck_must_be_weighed)
+      send_for_weight = repo.get(:loads, :truck_must_be_weighed, id)
       repo.transaction do
         repo.update(:load_containers, load_container_id, res)
         send_edi(id) if send_for_weight

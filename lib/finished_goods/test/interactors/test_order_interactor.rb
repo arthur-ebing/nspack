@@ -98,7 +98,7 @@ module FinishedGoodsApp
       assert res.success, "#{res.message} : #{res.errors.inspect}"
       assert_instance_of(Order, res.instance)
       assert_equal new_packed_tm_group_id, res.instance.packed_tm_group_id
-      assert_equal new_packed_tm_group_id, interactor.send(:repo).get(:pallet_sequences, pallet_sequence_id, :packed_tm_group_id)
+      assert_equal new_packed_tm_group_id, interactor.send(:repo).get(:pallet_sequences, :packed_tm_group_id, pallet_sequence_id)
       refute_equal value, res.instance.packed_tm_group_id
     end
 

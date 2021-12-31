@@ -139,7 +139,7 @@ module MasterfilesApp
     end
 
     def customer_location_id(customer_id)
-      repo.get(:customers, customer_id, :location_id)
+      repo.get(:customers, :location_id, customer_id)
     end
   end
 end

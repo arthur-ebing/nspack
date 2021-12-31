@@ -40,7 +40,7 @@ module FinishedGoodsApp
     end
 
     def update_pallet_sequence(id, attrs, extended_fg_id, extended_fg_code)
-      legacy_data = UtilityFunctions.symbolize_keys(repo.get(:pallet_sequences, id, :legacy_data).to_h)
+      legacy_data = UtilityFunctions.symbolize_keys(repo.get(:pallet_sequences, :legacy_data, id).to_h)
 
       return if legacy_data[:extended_fg_code] == extended_fg_code && legacy_data[:extended_fg_code] == extended_fg_id
 

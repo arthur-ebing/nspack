@@ -90,10 +90,10 @@ class Nspack < Roda
 
     r.on 'aggregate_packout_print' do
       attrs = params[:packout_report]
-      line = attrs[:line_resource_id].nil_or_empty? ? '' : BaseRepo.new.get(:plant_resources, attrs[:line_resource_id], :plant_resource_code)
-      puc = attrs[:puc_id].nil_or_empty? ? '' : BaseRepo.new.get(:pucs, attrs[:puc_id], :puc_code)
-      orchard = attrs[:orchard_id].nil_or_empty? ? nil : BaseRepo.new.get(:orchards, attrs[:orchard_id], :orchard_code)
-      cultivar = attrs[:cultivar_id].nil_or_empty? ? '' : BaseRepo.new.get(:cultivars, attrs[:cultivar_id], :cultivar_name)
+      line = attrs[:line_resource_id].nil_or_empty? ? '' : BaseRepo.new.get(:plant_resources, :plant_resource_code, attrs[:line_resource_id])
+      puc = attrs[:puc_id].nil_or_empty? ? '' : BaseRepo.new.get(:pucs, :puc_code, attrs[:puc_id])
+      orchard = attrs[:orchard_id].nil_or_empty? ? nil : BaseRepo.new.get(:orchards, :orchard_code, attrs[:orchard_id])
+      cultivar = attrs[:cultivar_id].nil_or_empty? ? '' : BaseRepo.new.get(:cultivars, :cultivar_name, attrs[:cultivar_id])
 
       jasper_params = JasperParams.new('packout_summary',
                                        current_user.login_name,

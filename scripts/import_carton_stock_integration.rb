@@ -126,7 +126,7 @@ class ImportCartonStockIntegration < BaseScript
     args.cultivar_code = args.rmt_variety
     args.cultivar_id = get_id_or_error(:cultivars, cultivar_name: args.rmt_variety, comment: 'rmt_variety')
 
-    args.cultivar_group_id = @repo.get(:cultivars, args.cultivar_id, :cultivar_group_id)
+    args.cultivar_group_id = @repo.get(:cultivars, :cultivar_group_id, args.cultivar_id)
 
     args.product_resource_allocation_id = nil
 
@@ -236,11 +236,11 @@ class ImportCartonStockIntegration < BaseScript
   def get_pm_mark_id(args)
     mark_id = get_id_or_error(:marks, mark_code: args.brand)
     tu_id = get_id_or_error(:inner_pm_marks, inner_pm_mark_code: args.tu_mark, tu_mark: true)
-    tu = @repo.get(:inner_pm_marks, tu_id, :inner_pm_mark_code) || args.tu_mark
+    tu = @repo.get(:inner_pm_marks, :inner_pm_mark_code, tu_id) || args.tu_mark
     ru_id = get_id_or_error(:inner_pm_marks, inner_pm_mark_code: args.ru_mark, ru_mark: true)
-    ru = @repo.get(:inner_pm_marks, ru_id, :inner_pm_mark_code) || args.ru_mark
+    ru = @repo.get(:inner_pm_marks, :inner_pm_mark_code, ru_id) || args.ru_mark
     ri_id = get_id_or_error(:inner_pm_marks, inner_pm_mark_code: args.ri_item_mark, ri_mark: true)
-    ri = @repo.get(:inner_pm_marks, ri_id, :inner_pm_mark_code) || args.ri_item_mark
+    ri = @repo.get(:inner_pm_marks, :inner_pm_mark_code, ri_id) || args.ri_item_mark
     get_id_or_error(:pm_marks,
                     mark_id: mark_id,
                     packaging_marks: "{#{tu},#{ru},#{ri}}")

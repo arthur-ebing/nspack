@@ -65,7 +65,7 @@ module UiRules
                               style: :action_button }
       progress_controls = [inspect, update, validate, validate_cons, results, delete]
       progress_controls = [reinspect, update_reinspection, validate, validate_cons, results, delete] if @form_object.reinspection
-      @form_object.progress_controls = progress_controls unless @repo.get(:govt_inspection_sheets, @options[:govt_inspection_sheet_id], :inspected)
+      @form_object.progress_controls = progress_controls unless @repo.get(:govt_inspection_sheets, :inspected, @options[:govt_inspection_sheet_id])
     end
   end
 end

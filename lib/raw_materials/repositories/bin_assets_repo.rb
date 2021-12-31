@@ -131,7 +131,7 @@ module RawMaterialsApp
                               rmt_container_material_owner_id: get_owner_id(set),
                               location_id: to_location_id)
 
-        existing_qty = get(:bin_asset_locations, id, :quantity) || 0
+        existing_qty = get(:bin_asset_locations, :quantity, id) || 0
         qty = existing_qty + set[:quantity_bins].to_i
         update(:bin_asset_locations, id, quantity: qty)
       end
@@ -326,7 +326,7 @@ module RawMaterialsApp
     end
 
     def update_quantity_for_bin_asset_location(bin_asset_location_id, quantity)
-      existing_qty = get(:bin_asset_locations, bin_asset_location_id, :quantity) || 0
+      existing_qty = get(:bin_asset_locations, :quantity, bin_asset_location_id) || 0
       qty = existing_qty - quantity
 
       # FIXME: While triggers not being used...

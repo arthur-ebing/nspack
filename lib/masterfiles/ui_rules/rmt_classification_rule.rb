@@ -17,7 +17,7 @@ module UiRules
     def set_show_fields
       # rmt_classification_type_id_label = MasterfilesApp::RmtClassificationTypeRepo.new.find_rmt_classification_type(@form_object.rmt_classification_type_id)&.rmt_classification_type_code
       # rmt_classification_type_id_label = @repo.find(:rmt_classification_types, MasterfilesApp::RmtClassificationType, @form_object.rmt_classification_type_id)&.rmt_classification_type_code
-      rmt_classification_type_id_label = @repo.get(:rmt_classification_types, @form_object.rmt_classification_type_id, :rmt_classification_type_code)
+      rmt_classification_type_id_label = @repo.get(:rmt_classification_types, :rmt_classification_type_code, @form_object.rmt_classification_type_id)
       fields[:rmt_classification_type_id] = { renderer: :label, with_value: rmt_classification_type_id_label, caption: 'Rmt Classification Type' }
       fields[:rmt_classification] = { renderer: :label }
     end

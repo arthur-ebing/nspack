@@ -88,7 +88,7 @@ module MasterfilesApp
       assert party_role_created
 
       person_id = create_person
-      party_id = repo.get(:people, person_id, :party_id)
+      party_id = repo.get(:people, :party_id, person_id)
 
       repo.create_party_roles(party_id, role_ids)
       party_role_created = repo.where_hash(:party_roles, party_id: party_id)

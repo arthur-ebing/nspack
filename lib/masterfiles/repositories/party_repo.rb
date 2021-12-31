@@ -78,7 +78,7 @@ module MasterfilesApp
       hash = add_party_name(hash)
       hash[:role_names] = select_values(:roles, :name, { id: hash[:role_ids], specialised: false })
       hash[:specialised_role_names] = select_values(:roles, :name, { id: hash[:role_ids], specialised: true })
-      hash[:parent_organization] = get(:organizations, hash[:parent_id], :medium_description)
+      hash[:parent_organization] = get(:organizations, :medium_description, hash[:parent_id])
       hash[:variant_codes] = fn_masterfile_variants('organizations', id)
       Organization.new(hash)
     end
@@ -132,7 +132,7 @@ module MasterfilesApp
 
       update(:organizations, id, params)
 
-      party_id = get(:organizations, id, :party_id)
+      party_id = get(:organizations, :party_id, id)
       create_party_roles(party_id, role_ids)
     end
 
@@ -172,7 +172,7 @@ module MasterfilesApp
 
       update(:people, id, params)
 
-      party_id = get(:people, id, :party_id)
+      party_id = get(:people, :party_id, id)
       create_party_roles(party_id, role_ids)
     end
 
@@ -192,7 +192,7 @@ module MasterfilesApp
     end
 
     def find_address_for_party_role(address_type, party_role_id)
-      party_id = get(:party_roles, party_role_id, :party_id)
+      party_id = get(:party_roles, :party_id, party_role_id)
       address_type_id = get_id(:address_types, address_type: address_type)
       address_id = DB[:party_addresses].where(address_type_id: address_type_id, party_id: party_id).get(:address_id)
 
@@ -221,7 +221,7 @@ module MasterfilesApp
 
       DB[:party_addresses].where(party_id: party_id).where(address_id: old_ids).delete
       new_ids.each do |prog_id|
-        address_type_id = get(:addresses, prog_id, :address_type_id)
+        address_type_id = get(:addresses, :address_type_id, prog_id)
         DB[:party_addresses].insert(party_id: party_id, address_id: prog_id, address_type_id: address_type_id)
       end
     end

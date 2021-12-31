@@ -63,14 +63,14 @@ module RawMaterialsApp
       return hash unless hash.nil?
 
       {
-        farm_id: repo.get(:production_runs, set[:production_run_rebin_id], :farm_id),
+        farm_id: repo.get(:production_runs, :farm_id, set[:production_run_rebin_id]),
         truck_registration_number: nil,
         reference_number: set[:production_run_rebin_id]
       }
     end
 
     def get_farm_location_id(farm_id)
-      repo.get(:farms, farm_id, :location_id)
+      repo.get(:farms, :location_id, farm_id)
     end
 
     def get_dest_depot_location_id(dest_depot_id)

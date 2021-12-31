@@ -15,7 +15,7 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      fruit_defect_type_id_label = @repo.get(:fruit_defect_types, @form_object.fruit_defect_type_id, :fruit_defect_type_name)
+      fruit_defect_type_id_label = @repo.get(:fruit_defect_types, :fruit_defect_type_name, @form_object.fruit_defect_type_id)
       fields[:defect_category] = { renderer: :label }
       fields[:fruit_defect_type_id] = { renderer: :label, with_value: fruit_defect_type_id_label, caption: 'Fruit Defect Type' }
       fields[:fruit_defect_code] = { renderer: :label }

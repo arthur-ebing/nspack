@@ -186,11 +186,11 @@ module RawMaterialsApp
         bin_ids = ids.map(&:last)
         repo.update(:vehicle_job_units, unit_ids, offloaded_at: Time.now)
         complete_bins_offload_vehicle(vehicle_job_id, bin_ids)
-        govt_inspection_sheet_id = repo.get(:vehicle_jobs, vehicle_job_id, :govt_inspection_sheet_id)
+        govt_inspection_sheet_id = repo.get(:vehicle_jobs, :govt_inspection_sheet_id, vehicle_job_id)
         log_status(:vehicle_jobs, vehicle_job_id, 'BIN TRIP OFFLOADED')
         log_status(:govt_inspection_sheets, govt_inspection_sheet_id, 'BIN TRIP OFFLOADED')
         bins_moved = repo.tripsheet_bin_count(vehicle_job_id, stock_type_id)
-        location_code = repo.get(:locations, location_id, :location_long_code)
+        location_code = repo.get(:locations, :location_long_code, location_id)
         success_response("moved #{bins_moved} bins to location #{location_code}")
       end
     rescue Crossbeams::InfoError => e
@@ -212,7 +212,7 @@ module RawMaterialsApp
         tripsheet_bins = repo.tripsheet_bins(vehicle_job_id)
         if (tripsheet_bins.all.find_all { |p| !p[:offloaded_at] }).empty?
           location_to_id = complete_bins_offload_vehicle(vehicle_job_id, tripsheet_bins.map { |b| b[:stock_item_id] })
-          instance.merge!(vehicle_job_offloaded: true, pallets_moved: tripsheet_bins.count, location: repo.get(:locations, location_to_id, :location_long_code))
+          instance.merge!(vehicle_job_offloaded: true, pallets_moved: tripsheet_bins.count, location: repo.get(:locations, :location_long_code, location_to_id))
         end
       end
 
@@ -225,13 +225,13 @@ module RawMaterialsApp
 
     def complete_bins_offload_vehicle(vehicle_job_id, bin_ids)
       repo.update(:vehicle_jobs, vehicle_job_id, offloaded_at: Time.now)
-      location_to_id = repo.get(:vehicle_jobs, vehicle_job_id, :planned_location_to_id)
+      location_to_id = repo.get(:vehicle_jobs, :planned_location_to_id, vehicle_job_id)
       bin_ids.each do |b|
         res = FinishedGoodsApp::MoveStock.call(AppConst::BIN_STOCK_TYPE, b, location_to_id, AppConst::BIN_OFFLOAD_VEHICLE_MOVE_BIN_BUSINESS_PROCESS, nil)
         raise res.message unless res.success
       end
 
-      rmt_delivery_id = repo.get(:vehicle_jobs, vehicle_job_id, :rmt_delivery_id)
+      rmt_delivery_id = repo.get(:vehicle_jobs, :rmt_delivery_id, vehicle_job_id)
       if rmt_delivery_id
         repo.update(:rmt_deliveries, rmt_delivery_id, tripsheet_offloaded: true, tripsheet_offloaded_at: Time.now)
         log_status(:rmt_deliveries, rmt_delivery_id, AppConst::DELIVERY_TRIPSHEET_OFFLOADED)
@@ -309,7 +309,7 @@ module RawMaterialsApp
       res = validate_rmt_rebin_params(params)
       return validation_failed_response(res) if res.failure?
 
-      return failed_response('Container Material Type must have a tare_weight') unless repo.get(:rmt_container_material_types, params[:rmt_container_material_type_id], :tare_weight)
+      return failed_response('Container Material Type must have a tare_weight') unless repo.get(:rmt_container_material_types, :tare_weight, params[:rmt_container_material_type_id])
 
       bin_asset_numbers = repo.get_available_bin_asset_numbers(params[:qty_bins_to_create])
       return failed_response("Couldn't find #{params[:qty_bins_to_create]} available bin_asset_numbers in the system") unless bin_asset_numbers.length == params[:qty_bins_to_create].to_i
@@ -345,7 +345,7 @@ module RawMaterialsApp
       res = validate_rmt_rebin_params(params)
       return validation_failed_response(res) if res.failure?
 
-      return failed_response('Container Material Type must have a tare_weight') unless repo.get(:rmt_container_material_types, params[:rmt_container_material_type_id], :tare_weight)
+      return failed_response('Container Material Type must have a tare_weight') unless repo.get(:rmt_container_material_types, :tare_weight, params[:rmt_container_material_type_id])
 
       id = nil
       repo.transaction do
@@ -367,7 +367,7 @@ module RawMaterialsApp
       res = validate_update_rmt_rebin_params(params)
       return validation_failed_response(res) if res.failure?
 
-      return failed_response('Container Material Type must have a tare_weight') unless repo.get(:rmt_container_material_types, params[:rmt_container_material_type_id], :tare_weight)
+      return failed_response('Container Material Type must have a tare_weight') unless repo.get(:rmt_container_material_types, :tare_weight, params[:rmt_container_material_type_id])
 
       failed_response('Bum Klaat')
 
@@ -721,10 +721,10 @@ module RawMaterialsApp
       print_params = { no_of_prints: 1, printer: params[:printer] }
       res = nil
       bin_asset_numbers.map { |b| b[1] }.each do |bin_asset_number|
-        instance = { farm_code: !params[:farm_id].nil_or_empty? ? repo.get(:farms, params[:farm_id], :farm_code) : nil,
-                     puc_code: !params[:puc_id].nil_or_empty? ? repo.get(:pucs, params[:puc_id], :puc_code) : nil,
-                     orchard_code: !params[:orchard_id].nil_or_empty? ? repo.get(:orchards, params[:orchard_id], :orchard_code) : nil,
-                     cultivar_name: !params[:cultivar_id].nil_or_empty? ? repo.get(:cultivars, params[:cultivar_id], :cultivar_name) : nil,
+        instance = { farm_code: !params[:farm_id].nil_or_empty? ? repo.get(:farms, :farm_code, params[:farm_id]) : nil,
+                     puc_code: !params[:puc_id].nil_or_empty? ? repo.get(:pucs, :puc_code, params[:puc_id]) : nil,
+                     orchard_code: !params[:orchard_id].nil_or_empty? ? repo.get(:orchards, :orchard_code, params[:orchard_id]) : nil,
+                     cultivar_name: !params[:cultivar_id].nil_or_empty? ? repo.get(:cultivars, :cultivar_name, params[:cultivar_id]) : nil,
                      bin_asset_number: bin_asset_number }
         res = LabelPrintingApp::PrintLabel.call(label_name, instance, print_params)
         return res unless res.success
@@ -831,7 +831,7 @@ module RawMaterialsApp
     end
 
     def location_short_code_for(location_id)
-      repo.get(:locations, location_id, :location_short_code)
+      repo.get(:locations, :location_short_code, location_id)
     end
 
     def move_location_bin(bin_number, location_id) # rubocop:disable Metrics/AbcSize
@@ -852,7 +852,7 @@ module RawMaterialsApp
 
     def rmt_bin_attrs_for_display(rmt_bin_id)
       bin = repo.find_rmt_bin_flat(rmt_bin_id).to_h
-      bin[:bin_load_id] = repo.get(:bin_load_products, bin[:bin_load_product_id], :bin_load_id)
+      bin[:bin_load_id] = repo.get(:bin_load_products, :bin_load_id, bin[:bin_load_product_id])
       bin[:material_owner] = repo.container_material_owner_for(bin[:rmt_material_owner_party_role_id], bin[:rmt_container_material_type_id])
       bin[:presort_unit] = repo.presort_unit_for(bin[:presort_staging_run_child_id])
       bin
@@ -893,7 +893,7 @@ module RawMaterialsApp
     def print_run_rebin_labels(rebin_ids, params)
       return failed_response('Rebin selection cannot be empty') if rebin_ids.nil_or_empty?
 
-      label_name = repo.get(:label_templates, params[:label_template_id], :label_template_name)
+      label_name = repo.get(:label_templates, :label_template_name, params[:label_template_id])
       print_params = { no_of_prints: 1, printer: params[:printer] }
 
       res = nil
@@ -912,7 +912,7 @@ module RawMaterialsApp
       bin_id = repo.get_value(:rmt_bins, :id, bin_asset_number: bin_number)
       return failed_response("Bin:#{bin_number} not found") unless bin_id
 
-      delivery_id = repo.get(:rmt_bins, bin_id, :rmt_delivery_id)
+      delivery_id = repo.get(:rmt_bins, :rmt_delivery_id, bin_id)
       unless delivery_id.nil_or_empty?
         res = QualityApp::FailedAndPendingMrlResults.call(delivery_id)
         return res unless res.success

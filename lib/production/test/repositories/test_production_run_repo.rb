@@ -25,13 +25,13 @@ module ProductionApp
       attrs = fake_production_run.to_h.reject { |k, _| k == :id }
       AppConst::TEST_SETTINGS.client_code = 'hl'
       id = repo.create_production_run(attrs)
-      alloc = repo.get(:production_runs, id, :allocation_required)
+      alloc = repo.get(:production_runs, :allocation_required, id)
       assert alloc
 
       skip 'Temporarily set HB to allow allocations to runs (for Citrus ph)'
       AppConst::TEST_SETTINGS.client_code = 'hb'
       id = repo.create_production_run(attrs)
-      alloc = repo.get(:production_runs, id, :allocation_required)
+      alloc = repo.get(:production_runs, :allocation_required, id)
       refute alloc
     ensure
       AppConst::TEST_SETTINGS.client_code = AppConst::TEST_SETTINGS.boot_client_code

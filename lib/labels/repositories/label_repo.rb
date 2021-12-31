@@ -149,12 +149,12 @@ module LabelApp
     end
 
     def label_publishing_user_login_name(label_publish_log_id)
-      name = get(:label_publish_logs, label_publish_log_id, :user_name)
+      name = get(:label_publish_logs, :user_name, label_publish_log_id)
       get_value(:users, :login_name, user_name: name)
     end
 
     def check_label_for_unset_variables(id)
-      multi = get(:labels, id, :multi_label)
+      multi = get(:labels, :multi_label, id)
       if multi
         res = nil
         DB[:multi_labels].where(label_id: id).select_map(:sub_label_id).each do |label_id|
@@ -168,7 +168,7 @@ module LabelApp
     end
 
     def check_sub_label_for_unset_variables(id) # rubocop:disable Metrics/AbcSize
-      label_json = get(:labels, id, :label_json)
+      label_json = get(:labels, :label_json, id)
       hash = JSON.parse(label_json)
       json = UtilityFunctions.symbolize_keys(hash)
       return ok_response if json[:version].nil?

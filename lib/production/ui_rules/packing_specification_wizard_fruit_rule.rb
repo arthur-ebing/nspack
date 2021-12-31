@@ -121,8 +121,8 @@ module UiRules
       apply_form_values
       form_object_merge!(@repo.extend_packing_specification(@form_object))
 
-      @requires_standard_counts ||= @repo.get(:commodities, @form_object.commodity_id, :requires_standard_counts) || true
-      @colour_applies ||= @repo.get(:commodities, @form_object.commodity_id, :colour_applies) || false
+      @requires_standard_counts ||= @repo.get(:commodities, :requires_standard_counts, @form_object.commodity_id) || true
+      @colour_applies ||= @repo.get(:commodities, :colour_applies, @form_object.commodity_id) || false
       @basic_equals_standard_pack = AppConst::CR_MF.basic_pack_equals_standard_pack?
     end
 
@@ -168,7 +168,7 @@ module UiRules
       @form_object[:commodity_id] = params[:changed_value].to_i
       fields = common_fields
 
-      colour_applies = @repo.get(:commodities, @form_object.commodity_id, :colour_applies)
+      colour_applies = @repo.get(:commodities, :colour_applies, @form_object.commodity_id)
       json_actions([OpenStruct.new(type: :replace_select_options,
                                    dom_id: 'packing_specification_wizard_marketing_variety_id',
                                    options_array: fields[:marketing_variety_id][:options]),

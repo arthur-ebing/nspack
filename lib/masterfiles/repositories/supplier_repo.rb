@@ -48,7 +48,7 @@ module MasterfilesApp
     end
 
     def delete_supplier(id)
-      supplier_party_role_id = get(:suppliers, id, :supplier_party_role_id)
+      supplier_party_role_id = get(:suppliers, :supplier_party_role_id, id)
       delete(:suppliers, id)
       MasterfilesApp::PartyRepo.new.delete_party_role(supplier_party_role_id)
     end

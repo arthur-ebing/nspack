@@ -58,8 +58,8 @@ module MesscadaApp
     end
 
     def carton_equals_pallet?
-      carton_label_id = repo.get(:cartons, carton_id, :carton_label_id)
-      repo.get(:carton_labels, carton_label_id, :carton_equals_pallet)
+      carton_label_id = repo.get(:cartons, :carton_label_id, carton_id)
+      repo.get(:carton_labels, :carton_equals_pallet, carton_label_id)
     end
   end
 end

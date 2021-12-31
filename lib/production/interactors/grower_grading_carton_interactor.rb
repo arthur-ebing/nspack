@@ -94,7 +94,7 @@ module ProductionApp
     end
 
     def changes_made_for(grower_grading_carton_id)
-      changes_made = repo.get(:grower_grading_cartons, grower_grading_carton_id, :changes_made)
+      changes_made = repo.get(:grower_grading_cartons, :changes_made, grower_grading_carton_id)
       changes_made.nil? ? { 'descriptions' => {} } : Hash[changes_made]
     end
   end

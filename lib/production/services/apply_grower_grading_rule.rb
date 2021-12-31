@@ -23,7 +23,7 @@ module ProductionApp
     def apply_grower_grading_rule # rubocop:disable Metrics/AbcSize
       return failed_response("Rule #{rule_id} does not exist") unless repo.rule_exists?(rule_id)
 
-      @rebin_rule = repo.get(:grower_grading_rules, rule_id, :rebin_rule)
+      @rebin_rule = repo.get(:grower_grading_rules, :rebin_rule, rule_id)
       rule_item_ids = repo.select_values(:grower_grading_rule_items, :id, grower_grading_rule_id: rule_id, active: true)
       return failed_response('There are no active rule items to apply') if rule_item_ids.nil_or_empty?
 
@@ -103,13 +103,13 @@ module ProductionApp
     def resolve_change_description(desc, column) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       case column.to_s
       when 'std_fruit_size_count_id'
-        desc['graded_size_count'] = rule_item.changes['std_fruit_size_count_id'].nil_or_empty? ? '' : repo.get(:std_fruit_size_counts, rule_item.changes['std_fruit_size_count_id'], :size_count_value)
+        desc['graded_size_count'] = rule_item.changes['std_fruit_size_count_id'].nil_or_empty? ? '' : repo.get(:std_fruit_size_counts, :size_count_value, rule_item.changes['std_fruit_size_count_id'])
       when 'grade_id'
-        desc['graded_grade_code'] = rule_item.changes['grade_id'].nil_or_empty? ? '' : repo.get(:grades, rule_item.changes['grade_id'], :grade_code)
+        desc['graded_grade_code'] = rule_item.changes['grade_id'].nil_or_empty? ? '' : repo.get(:grades, :grade_code, rule_item.changes['grade_id'])
       when 'rmt_class_id'
-        desc['graded_rmt_class_code'] = rule_item.changes['rmt_class_id'].nil_or_empty? ? '' : repo.get(:rmt_classes, rule_item.changes['rmt_class_id'], :rmt_class_code)
+        desc['graded_rmt_class_code'] = rule_item.changes['rmt_class_id'].nil_or_empty? ? '' : repo.get(:rmt_classes, :rmt_class_code, rule_item.changes['rmt_class_id'])
       when 'rmt_size_id'
-        desc['graded_rmt_size_code'] = rule_item.changes['rmt_size_id'].nil_or_empty? ? '' : repo.get(:rmt_sizes, rule_item.changes['rmt_size_id'], :size_code)
+        desc['graded_rmt_size_code'] = rule_item.changes['rmt_size_id'].nil_or_empty? ? '' : repo.get(:rmt_sizes, :size_code, rule_item.changes['rmt_size_id'])
       when 'gross_weight'
         desc['graded_gross_weight'] =  rule_item.changes['gross_weight']
       when 'nett_weight'

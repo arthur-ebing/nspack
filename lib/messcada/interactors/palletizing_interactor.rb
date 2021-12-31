@@ -630,7 +630,7 @@ module MesscadaApp
     end
 
     def original_carton_sequence(carton_id)
-      repo.get(:cartons, carton_id, :pallet_sequence_id)
+      repo.get(:cartons, :pallet_sequence_id, carton_id)
     end
 
     def print_pallet_label(pallet_id, palletizing_bay_state_id)

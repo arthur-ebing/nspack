@@ -84,7 +84,7 @@ module UiRules
     end
 
     def set_rmt_bin_legacy_fields # rubocop:disable Metrics/AbcSize
-      bin_cultivar = @repo.get(:cultivars, @form_object.cultivar_id, :cultivar_name)
+      bin_cultivar = @repo.get(:cultivars, :cultivar_name, @form_object.cultivar_id)
       fields[:colour] = { renderer: :select, options: @messcada_repo.run_treatment_codes, required: true, prompt: true }
       fields[:ripe_point_code] = { renderer: :select, options: @messcada_repo.ripe_point_codes.map { |s| s[0] }.uniq, required: true, prompt: true }
       fields[:pc_code] = { renderer: :select, options: @form_object.pc_code ? [@form_object.pc_code] : [], required: true, prompt: true }

@@ -12,8 +12,8 @@ module ProductionApp
         (product_setup_ids - existing_ids).each do |product_setup_id|
           create_packing_specification_item(
             product_setup_id: product_setup_id,
-            pm_bom_id: repo.get(:product_setups, product_setup_id, :pm_bom_id),
-            pm_mark_id: repo.get(:product_setups, product_setup_id, :pm_mark_id)
+            pm_bom_id: repo.get(:product_setups, :pm_bom_id, product_setup_id),
+            pm_mark_id: repo.get(:product_setups, :pm_mark_id, product_setup_id)
           )
         end
       end

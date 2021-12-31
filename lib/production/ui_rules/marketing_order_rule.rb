@@ -21,8 +21,8 @@ module UiRules
     end
 
     def set_show_fields
-      customer_party_role_id_label = @repo.get(:party_roles, @form_object.customer_party_role_id, :id)
-      season_id_label = @repo.get(:seasons, @form_object.season_id, :season_code)
+      customer_party_role_id_label = @repo.get(:party_roles, :id, @form_object.customer_party_role_id)
+      season_id_label = @repo.get(:seasons, :season_code, @form_object.season_id)
       fields[:customer_party_role_id] = { renderer: :label, with_value: customer_party_role_id_label, caption: 'Customer Party Role' }
       fields[:season_id] = { renderer: :label, with_value: season_id_label, caption: 'Season' }
       fields[:order_number] = { renderer: :label }

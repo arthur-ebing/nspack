@@ -399,45 +399,45 @@ module ProductionApp
       fruit_actual_counts_for_pack_id = get_value(:fruit_actual_counts_for_packs, :id, args)
 
       pallet_format = MasterfilesApp::PackagingRepo.new.find_pallet_format(attrs[:pallet_format_id])
-      data_attrs = { marketing_variety: get(:marketing_varieties, attrs[:marketing_variety_id], :marketing_variety_code),
+      data_attrs = { marketing_variety: get(:marketing_varieties, :marketing_variety_code, attrs[:marketing_variety_id]),
                      customer_variety: customer_variety(attrs[:customer_variety_id]),
-                     std_size: get(:std_fruit_size_counts, attrs[:std_fruit_size_count_id], :size_count_value),
-                     basic_pack: get(:basic_pack_codes, attrs[:basic_pack_code_id], :basic_pack_code),
-                     std_pack: get(:standard_pack_codes, attrs[:standard_pack_code_id], :standard_pack_code),
-                     actual_count: get(:fruit_actual_counts_for_packs, fruit_actual_counts_for_pack_id, :actual_count_for_pack),
-                     size_ref: get(:fruit_size_references, attrs[:fruit_size_reference_id], :size_reference),
+                     std_size: get(:std_fruit_size_counts, :size_count_value, attrs[:std_fruit_size_count_id]),
+                     basic_pack: get(:basic_pack_codes, :basic_pack_code, attrs[:basic_pack_code_id]),
+                     std_pack: get(:standard_pack_codes, :standard_pack_code, attrs[:standard_pack_code_id]),
+                     actual_count: get(:fruit_actual_counts_for_packs, :actual_count_for_pack, fruit_actual_counts_for_pack_id),
+                     size_ref: get(:fruit_size_references, :size_reference, attrs[:fruit_size_reference_id]),
                      marketing_org: party_repo.fn_party_role_name(attrs[:marketing_org_party_role_id]),
-                     packed_tm_group: get(:target_market_groups, attrs[:packed_tm_group_id], :target_market_group_name),
-                     target_market: get(:target_markets, attrs[:target_market_id], :target_market_name),
-                     mark: get(:marks, attrs[:mark_id], :mark_code),
-                     inventory_code: get(:inventory_codes, attrs[:inventory_code_id], :inventory_code),
-                     pallet_base: get(:pallet_bases, pallet_format[:pallet_base_id], :pallet_base_code),
-                     stack_type: get(:pallet_stack_types, pallet_format[:pallet_stack_type_id], :stack_type_code),
-                     cpp: get(:cartons_per_pallet, attrs[:cartons_per_pallet_id], :cartons_per_pallet),
+                     packed_tm_group: get(:target_market_groups, :target_market_group_name, attrs[:packed_tm_group_id]),
+                     target_market: get(:target_markets, :target_market_name, attrs[:target_market_id]),
+                     mark: get(:marks, :mark_code, attrs[:mark_id]),
+                     inventory_code: get(:inventory_codes, :inventory_code, attrs[:inventory_code_id]),
+                     pallet_base: get(:pallet_bases, :pallet_base_code, pallet_format[:pallet_base_id]),
+                     stack_type: get(:pallet_stack_types, :stack_type_code, pallet_format[:pallet_stack_type_id]),
+                     cpp: get(:cartons_per_pallet, :cartons_per_pallet, attrs[:cartons_per_pallet_id]),
                      client_size_ref: attrs[:client_size_reference],
                      client_product_code: attrs[:client_product_code],
                      treatments: treatments(attrs[:treatment_ids]),
                      order_number: attrs[:marketing_order_number],
                      sell_by_code: attrs[:sell_by_code],
-                     grade: get(:grades, attrs[:grade_id], :grade_code),
+                     grade: get(:grades, :grade_code, attrs[:grade_id]),
                      product_chars: attrs[:product_chars],
-                     tu_labour_product: get(:pm_products, attrs[:tu_labour_product_id], :product_code),
-                     ru_labour_product: get(:pm_products, attrs[:ru_labour_product_id], :product_code),
+                     tu_labour_product: get(:pm_products, :product_code, attrs[:tu_labour_product_id]),
+                     ru_labour_product: get(:pm_products, :product_code, attrs[:ru_labour_product_id]),
                      fruit_stickers: sticker_values(attrs[:fruit_sticker_ids]),
                      tu_stickers: sticker_values(attrs[:tu_sticker_ids]),
                      target_customer: party_repo.fn_party_role_name(attrs[:target_customer_party_role_id]),
-                     colour_percentage: get(:colour_percentages, attrs[:colour_percentage_id], :colour_percentage) }
-      data_attrs = data_attrs.merge(rmt_class_code: get(:rmt_classes, attrs[:rmt_class_id], :rmt_class_code)) if AppConst::CR_PROD.capture_product_setup_class?
+                     colour_percentage: get(:colour_percentages, :colour_percentage, attrs[:colour_percentage_id]) }
+      data_attrs = data_attrs.merge(rmt_class_code: get(:rmt_classes, :rmt_class_code, attrs[:rmt_class_id])) if AppConst::CR_PROD.capture_product_setup_class?
       data_attrs = data_attrs.merge(packaging_bom_attrs(attrs)) if AppConst::CR_PROD.require_packaging_bom?
       data_attrs
     end
 
     def packaging_bom_attrs(attrs)
       {
-        pm_mark: get(:pm_marks, attrs[:pm_mark_id], :packaging_marks),
-        pm_type: get(:pm_types, attrs[:pm_type_id], :pm_type_code),
-        pm_subtype: get(:pm_subtypes, attrs[:pm_subtype_id], :subtype_code),
-        bom: get(:pm_boms, attrs[:pm_bom_id], :bom_code)
+        pm_mark: get(:pm_marks, :packaging_marks, attrs[:pm_mark_id]),
+        pm_type: get(:pm_types, :pm_type_code, attrs[:pm_type_id]),
+        pm_subtype: get(:pm_subtypes, :subtype_code, attrs[:pm_subtype_id]),
+        bom: get(:pm_boms, :bom_code, attrs[:pm_bom_id])
       }
     end
 
@@ -1016,7 +1016,7 @@ module ProductionApp
       carton_id = sequence_carton_id(pallet_sequence_id)
       carton_label_id = get_value(:cartons, :carton_label_id, id: carton_id)
 
-      get(:carton_labels, carton_label_id, :carton_equals_pallet)
+      get(:carton_labels, :carton_equals_pallet, carton_label_id)
     end
 
     def sequence_carton_id(pallet_sequence_id)
@@ -1025,7 +1025,7 @@ module ProductionApp
 
       return carton_id unless carton_id.nil_or_empty?
 
-      get(:pallet_sequences, pallet_sequence_id, :scanned_from_carton_id)
+      get(:pallet_sequences, :scanned_from_carton_id, pallet_sequence_id)
     end
 
     def packhouse_location_id_for_pallet(pallet_id)

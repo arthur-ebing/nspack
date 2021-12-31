@@ -47,7 +47,7 @@ module FinishedGoodsApp
     end
 
     def update_pallet_sequence(id, attrs)
-      legacy_data = UtilityFunctions.symbolize_keys(repo.get(:pallet_sequences, id, :legacy_data).to_h)
+      legacy_data = UtilityFunctions.symbolize_keys(repo.get(:pallet_sequences, :legacy_data, id).to_h)
 
       attrs[:legacy_data] = legacy_data.merge(attrs[:legacy_data].to_h)
       repo.update(:pallet_sequences, id, attrs)

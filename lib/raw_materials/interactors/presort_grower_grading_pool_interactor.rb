@@ -80,7 +80,7 @@ module RawMaterialsApp
     end
 
     def import_maf_data(presort_grading_pool_id)
-      maf_lot_number = repo.get(:presort_grower_grading_pools, presort_grading_pool_id, :maf_lot_number)
+      maf_lot_number = repo.get(:presort_grower_grading_pools, :maf_lot_number, presort_grading_pool_id)
       return failed_response("Maf lot number : #{maf_lot_number} does not exist") if maf_lot_number.nil_or_empty?
 
       repo.transaction do

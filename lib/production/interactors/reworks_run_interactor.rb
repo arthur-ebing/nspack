@@ -8,7 +8,7 @@ module ProductionApp
     end
 
     def reworks_run_errors_grid(rw_run_id)
-      row_defs = repo.get(:reworks_runs, rw_run_id, :errors)
+      row_defs = repo.get(:reworks_runs, :errors, rw_run_id)
       col_defs = reworks_run_errors_grid_col_defs
       {
         columnDefs: col_defs,
@@ -253,7 +253,7 @@ module ProductionApp
     end
 
     def find_cultivar_group_code(cultivar_group_id)
-      repo.get(:cultivar_groups, cultivar_group_id, :cultivar_group_code)
+      repo.get(:cultivar_groups, :cultivar_group_code, cultivar_group_id)
     end
 
     def production_run_objects(production_run_id)
@@ -1340,7 +1340,7 @@ module ProductionApp
       defaults = defaults.merge(manually_weigh_rmt_bin_state(attrs[:pallets_selected].first)) if avg_gross_weight
       if attrs[:tip_orchard_mixing]
         defaults = defaults.merge(tip_orchard_mixing: false,
-                                  allow_orchard_mixing: repo.get(:production_runs, attrs[:production_run_id], :allow_orchard_mixing))
+                                  allow_orchard_mixing: repo.get(:production_runs, :allow_orchard_mixing, attrs[:production_run_id]))
       end
       defaults
     end
@@ -1565,9 +1565,9 @@ module ProductionApp
       owner_id = repo.get_value(:rmt_container_material_owners,
                                 :id,
                                 attrs.slice(:rmt_container_material_type_id, :rmt_material_owner_party_role_id))
-      hash = { rmt_class: repo.get(:rmt_classes, attrs[:rmt_class_id], :rmt_class_code),
-               rmt_size: repo.get(:rmt_sizes, attrs[:rmt_size_id], :size_code),
-               rmt_container_material_type: repo.get(:rmt_container_material_types, attrs[:rmt_container_material_type_id], :container_material_type_code),
+      hash = { rmt_class: repo.get(:rmt_classes, :rmt_class_code, attrs[:rmt_class_id]),
+               rmt_size: repo.get(:rmt_sizes, :size_code, attrs[:rmt_size_id]),
+               rmt_container_material_type: repo.get(:rmt_container_material_types, :container_material_type_code, attrs[:rmt_container_material_type_id]),
                rmt_material_owner: prod_setup_repo.rmt_container_material_owner_for(owner_id) }
 
       if AppConst::CR_RMT.maintain_legacy_columns?
@@ -1791,7 +1791,7 @@ module ProductionApp
     end
 
     def production_run_orchard(production_run_id)
-      repo.get(:production_runs, production_run_id, :orchard_id)
+      repo.get(:production_runs, :orchard_id, production_run_id)
     end
 
     def pallet_sequence_pallet_number(sequence_id)
@@ -1892,7 +1892,7 @@ module ProductionApp
     def reprint_pallet_carton_labels(carton_ids, params)
       return failed_response('Carton selection cannot be empty') if carton_ids.nil_or_empty?
 
-      label_name = repo.get(:label_templates, params[:label_template_id], :label_template_name)
+      label_name = repo.get(:label_templates, :label_template_name, params[:label_template_id])
       labels = repo.reworks_run_pallet_seq_print_data_for_cartons(carton_ids)
       labels.each do |label|
         LabelPrintingApp::PrintLabel.call(label_name,
@@ -1941,7 +1941,7 @@ module ProductionApp
     end
 
     def reworks_run_type(id)
-      repo.get(:reworks_run_types, id, :run_type)
+      repo.get(:reworks_run_types, :run_type, id)
     end
 
     def selected_pallet_numbers(reworks_run_type, sequence_ids)
@@ -2044,7 +2044,7 @@ module ProductionApp
     end
 
     def allow_sequence_scrapping?(pallet_sequence_id)
-      pallet_id = repo.get(:pallet_sequences, pallet_sequence_id, :pallet_id)
+      pallet_id = repo.get(:pallet_sequences, :pallet_id, pallet_sequence_id)
       allow = repo.individual_cartons?(pallet_sequence_id)
       allow = false unless repo.pallet_sequence_carton_quantity(pallet_sequence_id) == 1
       allow = false if cannot_remove_sequence(pallet_id)
@@ -2058,13 +2058,13 @@ module ProductionApp
     def standard_pack(standard_pack_code_id)
       return nil if standard_pack_code_id.nil_or_empty?
 
-      repo.get(:standard_pack_codes, standard_pack_code_id, :standard_pack_code)
+      repo.get(:standard_pack_codes, :standard_pack_code, standard_pack_code_id)
     end
 
     def fruit_sticker(fruit_sticker_id)
       return nil if fruit_sticker_id.nil_or_empty?
 
-      repo.get(:pm_products, fruit_sticker_id, :product_code)
+      repo.get(:pm_products, :product_code, fruit_sticker_id)
     end
 
     def oldest_sequence_id(pallet_number)

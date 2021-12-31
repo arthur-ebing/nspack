@@ -31,7 +31,7 @@ module FinishedGoodsApp
 
       hash[:inspector] = DB.get(Sequel.function(:fn_party_role_name, hash[:inspector_party_role_id]))
       hash[:inspected] = !hash[:inspector_id].nil?
-      hash[:pallet_number] = get(:pallets, hash[:pallet_id], :pallet_number)
+      hash[:pallet_number] = get(:pallets, :pallet_number, hash[:pallet_id])
       hash[:failure_reasons] = select_values(:inspection_failure_reasons, :failure_reason, id: hash[:inspection_failure_reason_ids].to_a)
 
       Inspection.new(hash)
@@ -42,7 +42,7 @@ module FinishedGoodsApp
       return nil unless pallet_id
 
       hash = { pallet_id: pallet_id, pallet_number: pallet_number }
-      hash[:palletized] = get(:pallets, pallet_id, :palletized)
+      hash[:palletized] = get(:pallets, :palletized, pallet_id)
 
       ds = DB[:pallet_sequences].where(pallet_id: hash[:pallet_id])
       hash[:tm_ids] = ds.select_map(:target_market_id)

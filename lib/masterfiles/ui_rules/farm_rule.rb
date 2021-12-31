@@ -18,7 +18,7 @@ module UiRules
       owner_party_role_id_label = MasterfilesApp::PartyRepo.new.find_party_role(@form_object.owner_party_role_id)&.party_name
       pdn_region_id_label = @repo.find_hash(:production_regions, @form_object.pdn_region_id)[:production_region_code]
       farm_group_id_label = @repo.find_farm_group(@form_object.farm_group_id)&.farm_group_code
-      location_id_label = @repo.get(:locations, @form_object.location_id, :location_long_code)
+      location_id_label = @repo.get(:locations, :location_long_code, @form_object.location_id)
       fields[:owner_party_role_id] = { renderer: :label,
                                        with_value: owner_party_role_id_label,
                                        caption: 'Farm Owner' }

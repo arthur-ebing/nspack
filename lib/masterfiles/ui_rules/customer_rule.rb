@@ -18,7 +18,7 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      location_id_label = @repo.get(:locations, @form_object.location_id, :location_long_code)
+      location_id_label = @repo.get(:locations, :location_long_code, @form_object.location_id)
       fields[:currencies] = { renderer: :list,
                               items: @form_object.currencies }
       fields[:default_currency] = { renderer: :label }

@@ -29,9 +29,9 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      rmt_container_type_id_label = @repo.get(:rmt_container_types, @form_object.rmt_container_type_id, :container_type_code)
+      rmt_container_type_id_label = @repo.get(:rmt_container_types, :container_type_code, @form_object.rmt_container_type_id)
       rmt_owner_label = MasterfilesApp::PartyRepo.new.fn_party_role_name(@form_object.rmt_material_owner_party_role_id)
-      rmt_container_material_type_id_label = @repo.get(:rmt_container_material_types, @form_object.rmt_container_material_type_id, :container_material_type_code)
+      rmt_container_material_type_id_label = @repo.get(:rmt_container_material_types, :container_material_type_code, @form_object.rmt_container_material_type_id)
       @options ||= {}
       fields[:id] = { renderer: :label, caption: 'Delivery Id' }
       fields[:orchard_id] = { renderer: :label,
@@ -125,7 +125,7 @@ module UiRules
                         hide_on_load: @options[:farm_section].nil_or_empty? },
         cultivar_id: { renderer: :select,
                        options: MasterfilesApp::CultivarRepo.new.for_select_cultivars(
-                         where: { id: @repo.get(:orchards, @form_object.orchard_id, :cultivar_ids).to_a }
+                         where: { id: @repo.get(:orchards, :cultivar_ids, @form_object.orchard_id).to_a }
                        ),
                        disabled_options: MasterfilesApp::CultivarRepo.new.for_select_inactive_cultivars,
                        caption: 'Cultivar',

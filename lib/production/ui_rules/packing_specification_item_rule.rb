@@ -9,7 +9,7 @@ module UiRules
       make_form_object
       apply_form_values
 
-      @rules[:rebin] ||= @repo.get(:product_setups, @form_object.product_setup_id, :rebin) || false
+      @rules[:rebin] ||= @repo.get(:product_setups, :rebin, @form_object.product_setup_id) || false
 
       set_show_fields if %i[show].include? @mode
 

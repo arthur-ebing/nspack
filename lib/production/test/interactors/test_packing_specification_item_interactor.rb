@@ -77,10 +77,10 @@ module ProductionApp
       repo = BaseRepo.new
       pm_bom_id = create_pm_bom
       pm_mark_id = create_pm_mark
-      mark_id = repo.get(:pm_marks, pm_mark_id, :mark_id)
+      mark_id = repo.get(:pm_marks, :mark_id, pm_mark_id)
       product_setup_id = create_product_setup
-      std_fruit_size_count_id = repo.get(:product_setups, product_setup_id, :std_fruit_size_count_id)
-      basic_pack_id = repo.get(:product_setups, product_setup_id, :basic_pack_code_id)
+      std_fruit_size_count_id = repo.get(:product_setups, :std_fruit_size_count_id, product_setup_id)
+      basic_pack_id = repo.get(:product_setups, :basic_pack_code_id, product_setup_id)
       tu_labour_product_id = create_pm_product
       ru_labour_product_id = create_pm_product
 

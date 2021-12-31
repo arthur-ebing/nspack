@@ -49,7 +49,7 @@ module FinishedGoodsApp
       end
 
       def pallet_not_shipped_check
-        shipped = repo.get(:pallets, params[:pallet_id], :shipped)
+        shipped = repo.get(:pallets, :shipped, params[:pallet_id])
         return failed_response "Pallet: #{pallet_number} already shipped." if shipped
 
         ok_response

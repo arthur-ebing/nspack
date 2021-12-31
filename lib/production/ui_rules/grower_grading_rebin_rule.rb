@@ -19,10 +19,10 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      grower_grading_pool_id_label = @repo.get(:grower_grading_pools, @form_object.grower_grading_pool_id, :pool_name)
+      grower_grading_pool_id_label = @repo.get(:grower_grading_pools, :pool_name, @form_object.grower_grading_pool_id)
       grower_grading_rule_item_id_label = @repo.find_grower_grading_rule_item(@form_object.grower_grading_rule_item_id)&.rule_item_code
-      rmt_class_id_label = @repo.get(:rmt_classes, @form_object.rmt_class_id, :rmt_class_code)
-      rmt_size_id_label = @repo.get(:rmt_sizes, @form_object.rmt_size_id, :size_code)
+      rmt_class_id_label = @repo.get(:rmt_classes, :rmt_class_code, @form_object.rmt_class_id)
+      rmt_size_id_label = @repo.get(:rmt_sizes, :size_code, @form_object.rmt_size_id)
       fields[:grower_grading_pool_id] = { renderer: :label,
                                           with_value: grower_grading_pool_id_label,
                                           caption: 'Grower Grading Pool' }
@@ -50,8 +50,8 @@ module UiRules
 
       return fields unless @rules[:show_changes_fields]
 
-      graded_rmt_class_id_label = @form_object.changes_made.to_h['rmt_class_id'].nil_or_empty? ? '' : @repo.get(:rmt_classes, @form_object.changes_made.to_h['rmt_class_id'], :rmt_class_code)
-      graded_rmt_size_id_label = @form_object.changes_made.to_h['rmt_size_id'].nil_or_empty? ? '' : @repo.get(:rmt_sizes, @form_object.changes_made.to_h['rmt_size_id'], :size_code)
+      graded_rmt_class_id_label = @form_object.changes_made.to_h['rmt_class_id'].nil_or_empty? ? '' : @repo.get(:rmt_classes, :rmt_class_code, @form_object.changes_made.to_h['rmt_class_id'])
+      graded_rmt_size_id_label = @form_object.changes_made.to_h['rmt_size_id'].nil_or_empty? ? '' : @repo.get(:rmt_sizes, :size_code, @form_object.changes_made.to_h['rmt_size_id'])
       fields[:graded_rmt_class_id] = { renderer: :label,
                                        caption: 'Graded Rmt Class',
                                        with_value: graded_rmt_class_id_label }

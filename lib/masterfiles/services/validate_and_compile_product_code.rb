@@ -44,7 +44,7 @@ module MasterfilesApp
       res = MinimumPmProductSchema.call(params)
       return res if res.failure?
 
-      params[:basic_pack_code] = repo.get(:basic_pack_codes, params[:basic_pack_id], :basic_pack_code)
+      params[:basic_pack_code] = repo.get(:basic_pack_codes, :basic_pack_code, params[:basic_pack_id])
       params[:pm_subtype_short_code] = pm_subtype.short_code
       params[:pm_type_short_code] = pm_type.short_code
 

@@ -92,7 +92,7 @@ module UiRules
 
     def make_new_form_object
       @form_object = OpenStruct.new(voyage_id: @options[:voyage_id],
-                                    voyage_type_id: @repo.get(:voyages, @options[:voyage_id], :voyage_type_id),
+                                    voyage_type_id: @repo.get(:voyages, :voyage_type_id, @options[:voyage_id]),
                                     port_id: nil,
                                     port_type_id: nil,
                                     trans_shipment_vessel_id: nil,
@@ -106,7 +106,7 @@ module UiRules
 
     def add_rules
       vis = { port_id: true, trans_shipment_vessel_id: true, ata: true, atd: true, eta: true, etd: true }
-      case @repo.get(:port_types, @form_object.port_type_id, :port_type_code)
+      case @repo.get(:port_types, :port_type_code, @form_object.port_type_id)
       when 'POL'
         vis[:port_id] = vis[:atd] = vis[:etd] = false
       when 'POD'

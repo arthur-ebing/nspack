@@ -218,7 +218,7 @@ module UiRules
         }
       end
 
-      cultivar_ids = @repo.get(:orchards, @form_object.orchard_id, :cultivar_ids)
+      cultivar_ids = @repo.get(:orchards, :cultivar_ids, @form_object.orchard_id)
       cultivar_ids ||= @repo.select_values(:orchards, :cultivar_ids, puc_id: @form_object.puc_id).flatten.uniq
       group_ids = @repo.select_values(:cultivars, :cultivar_group_id, id: cultivar_ids.to_a).uniq
       cultivar_groups = @cultivar_repo.for_select_cultivar_groups(where: { id: group_ids })

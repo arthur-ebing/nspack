@@ -53,7 +53,7 @@ module MesscadaApp
     def pallet_sequence_id
       assert_ok_scan(__method__)
 
-      pallet_was_scanned ? nil : repo.get(:cartons, carton_id, :pallet_sequence_id)
+      pallet_was_scanned ? nil : repo.get(:cartons, :pallet_sequence_id, carton_id)
     end
 
     def first_sequence_id
@@ -67,7 +67,7 @@ module MesscadaApp
 
       return @entity[:carton_equals_pallet_id] if carton_with_pallet_label?
 
-      pallet_was_scanned ? id : repo.get(:pallet_sequences, pallet_sequence_id, :pallet_id)
+      pallet_was_scanned ? id : repo.get(:pallet_sequences, :pallet_id, pallet_sequence_id)
     end
 
     def pallet_number
@@ -75,7 +75,7 @@ module MesscadaApp
 
       return formatted_number if carton_with_pallet_label?
 
-      pallet_was_scanned ? formatted_number : repo.get(:pallets, pallet_id, :pallet_number)
+      pallet_was_scanned ? formatted_number : repo.get(:pallets, :pallet_number, pallet_id)
     end
 
     private

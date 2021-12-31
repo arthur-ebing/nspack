@@ -22,8 +22,6 @@ module Labels
               end
             end
           end
-
-          layout
         end
       end
     end

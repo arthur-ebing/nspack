@@ -1117,7 +1117,7 @@ class Nspack < Roda
     # REPRINT PALLET LABEL
     # --------------------------------------------------------------------------
     r.on 'reprint_pallet_label', Integer do |pallet_sequence_id|
-      pallet_number = BaseRepo.new.get(:pallet_sequences, pallet_sequence_id, :pallet_number)
+      pallet_number = BaseRepo.new.get(:pallet_sequences, :pallet_number, pallet_sequence_id)
       form_state = { pallet_number: pallet_number,
                      scanned_number: pallet_number,
                      qty_to_print: 4,

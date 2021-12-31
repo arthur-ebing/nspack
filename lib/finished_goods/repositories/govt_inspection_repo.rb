@@ -49,7 +49,7 @@ module FinishedGoodsApp
       hash[:failed_pallets] = exists?(:govt_inspection_pallets, govt_inspection_sheet_id: id, inspected: true, passed: false)
       hash[:inspection_billing] = DB.get(Sequel.function(:fn_party_role_name, hash[:inspection_billing_party_role_id]))
       hash[:exporter] = DB.get(Sequel.function(:fn_party_role_name, hash[:exporter_party_role_id]))
-      inspector_party_role_id = get(:inspectors, hash[:inspector_id], :inspector_party_role_id)
+      inspector_party_role_id = get(:inspectors, :inspector_party_role_id, hash[:inspector_id])
       hash[:inspector] = DB.get(Sequel.function(:fn_party_role_name, inspector_party_role_id))
       hash[:status] = DB.get(Sequel.function(:fn_current_status, 'govt_inspection_sheets', id))
       pallet_ids = select_values(:govt_inspection_pallets, :pallet_id, govt_inspection_sheet_id: id)
@@ -105,7 +105,7 @@ module FinishedGoodsApp
     end
 
     def finish_govt_inspection_sheet(id, user) # rubocop:disable Metrics/AbcSize
-      reinspection = get(:govt_inspection_sheets, id, :reinspection)
+      reinspection = get(:govt_inspection_sheets, :reinspection, id)
       status = reinspection ? 'MANUALLY REINSPECTED BY GOVT' : 'MANUALLY INSPECTED BY GOVT'
 
       attrs = { inspected: true, results_captured: true, results_captured_at: Time.now }
@@ -138,7 +138,7 @@ module FinishedGoodsApp
 
       all_hash(:govt_inspection_pallets, govt_inspection_sheet_id: id).each do |govt_inspection_pallet|
         pallet_id = govt_inspection_pallet[:pallet_id]
-        next unless govt_inspection_pallet[:id] == get(:pallets, pallet_id, :last_govt_inspection_pallet_id)
+        next unless govt_inspection_pallet[:id] == get(:pallets, :last_govt_inspection_pallet_id, pallet_id)
 
         params = { inspected: false,
                    govt_inspection_passed: nil,

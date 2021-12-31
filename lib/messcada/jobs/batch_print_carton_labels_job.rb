@@ -29,7 +29,7 @@ module MesscadaApp
       end
 
       def find_label(label_template_id)
-        @label_name = repo.get(:label_templates, label_template_id, :label_template_name)
+        @label_name = repo.get(:label_templates, :label_template_name, label_template_id)
       end
 
       def send_label_to_printer(vars)
@@ -60,7 +60,7 @@ module MesscadaApp
         # For a robot printing to an attached printer, we don't know the actual printer code: use 'DEFAULT'
         return 'DEFAULT' if printer_id.nil?
 
-        repo.get(:printers, printer_id, :printer_code)
+        repo.get(:printers, :printer_code, printer_id)
       end
 
       def resolve_supporting_data(hash)

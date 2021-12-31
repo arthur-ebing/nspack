@@ -62,7 +62,7 @@ module RawMaterialsApp
       return load_bin(loaded[index][0], bin_asset_number) unless index.nil?
 
       bin_load_product_ids.each do |bin_load_product_id|
-        qty_bins = repo.get(:bin_load_products, bin_load_product_id, :qty_bins)
+        qty_bins = repo.get(:bin_load_products, :qty_bins, bin_load_product_id)
         qty_loaded = loaded_bins(loaded, bin_load_product_id).length
         return load_bin(bin_load_product_id, bin_asset_number) if qty_loaded < qty_bins
 

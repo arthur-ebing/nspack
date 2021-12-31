@@ -112,7 +112,7 @@ module ProductionApp
     def check_mrl_result_status
       return ok_response unless AppConst::CR_RMT.enforce_mrl_check?
 
-      delivery_id = repo.get(:rmt_bins, rmt_bin_id, :rmt_delivery_id)
+      delivery_id = repo.get(:rmt_bins, :rmt_delivery_id, rmt_bin_id)
       unless delivery_id.nil_or_empty?
         res = QualityApp::FailedAndPendingMrlResults.call(delivery_id)
         return res unless res.success

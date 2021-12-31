@@ -26,13 +26,13 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      grower_grading_rule_id_label = @repo.get(:grower_grading_rules, @form_object.grower_grading_rule_id, :rule_name)
-      season_id_label = @repo.get(:seasons, @form_object.season_id, :season_code)
-      cultivar_group_id_label = @repo.get(:cultivar_groups, @form_object.cultivar_group_id, :cultivar_group_code)
-      cultivar_id_label = @repo.get(:cultivars, @form_object.cultivar_id, :cultivar_name)
-      commodity_id_label = @repo.get(:commodities, @form_object.commodity_id, :code)
-      farm_id_label = @repo.get(:farms, @form_object.farm_id, :farm_code)
-      inspection_type_id_label = @repo.get(:inspection_types, @form_object.inspection_type_id, :inspection_type_code)
+      grower_grading_rule_id_label = @repo.get(:grower_grading_rules, :rule_name, @form_object.grower_grading_rule_id)
+      season_id_label = @repo.get(:seasons, :season_code, @form_object.season_id)
+      cultivar_group_id_label = @repo.get(:cultivar_groups, :cultivar_group_code, @form_object.cultivar_group_id)
+      cultivar_id_label = @repo.get(:cultivars, :cultivar_name, @form_object.cultivar_id)
+      commodity_id_label = @repo.get(:commodities, :code, @form_object.commodity_id)
+      farm_id_label = @repo.get(:farms, :farm_code, @form_object.farm_id)
+      inspection_type_id_label = @repo.get(:inspection_types, :inspection_type_code, @form_object.inspection_type_id)
       fields[:grower_grading_rule_id] = { renderer: :label,
                                           with_value: grower_grading_rule_id_label,
                                           caption: 'Grower Grading Rule' }

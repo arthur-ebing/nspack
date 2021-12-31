@@ -49,7 +49,7 @@ module MesscadaApp
     end
 
     def pallet_carton_quantity(pallet_id)
-      repo.get(:pallets, pallet_id, :carton_quantity).to_i
+      repo.get(:pallets, :carton_quantity, pallet_id).to_i
     end
 
     def clone_autopack_pallet_carton

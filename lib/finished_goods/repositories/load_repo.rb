@@ -79,12 +79,12 @@ module FinishedGoodsApp
       # load_container
       hash[:load_container_id] = get_id(:load_containers, load_id: id)
       hash[:container] = !hash[:load_container_id].nil?
-      hash[:temperature_code] = get(:cargo_temperatures, hash[:cargo_temperature_id], :temperature_code)
+      hash[:temperature_code] = get(:cargo_temperatures, :temperature_code, hash[:cargo_temperature_id])
 
       # Voyage
-      hash[:pol_port_code] = get(:ports, hash[:pol_port_id], :port_code)
-      hash[:pod_port_code] = get(:ports, hash[:pod_port_id], :port_code)
-      hash[:vessel_code] = get(:vessels, hash[:vessel_id], :vessel_code)
+      hash[:pol_port_code] = get(:ports, :port_code, hash[:pol_port_id])
+      hash[:pod_port_code] = get(:ports, :port_code, hash[:pod_port_id])
+      hash[:vessel_code] = get(:vessels, :vessel_code, hash[:vessel_id])
 
       # Load
       hash[:load_id] = id
@@ -125,7 +125,7 @@ module FinishedGoodsApp
       log_multiple_statuses(:pallets, pallet_ids, 'ALLOCATED', user_name: user.user_name)
 
       allocated_count = select_values(:pallets, :id, load_id: load_id).length
-      max_count = get(:loads, load_id, :rmt_load) ? AppConst::CR_FG.max_bin_count_for_load? : AppConst::CR_FG.max_pallet_count_for_load?
+      max_count = get(:loads, :rmt_load, load_id) ? AppConst::CR_FG.max_bin_count_for_load? : AppConst::CR_FG.max_pallet_count_for_load?
       raise Crossbeams::InfoError, "Allocation exceeded max count of #{max_count} pallets on load" if allocated_count > max_count
 
       # updates load status allocated

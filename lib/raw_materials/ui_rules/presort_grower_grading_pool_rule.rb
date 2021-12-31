@@ -19,9 +19,9 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      season_id_label = @repo.get(:seasons, @form_object.season_id, :season_code)
-      commodity_id_label = @repo.get(:commodities, @form_object.commodity_id, :code)
-      farm_id_label = @repo.get(:farms, @form_object.farm_id, :farm_code)
+      season_id_label = @repo.get(:seasons, :season_code, @form_object.season_id)
+      commodity_id_label = @repo.get(:commodities, :code, @form_object.commodity_id)
+      farm_id_label = @repo.get(:farms, :farm_code, @form_object.farm_id)
       fields[:maf_lot_number] = { renderer: :label }
       fields[:description] = { renderer: :label }
       fields[:track_slms_indicator_code] = { renderer: :label,
@@ -49,9 +49,9 @@ module UiRules
     end
 
     def common_fields
-      season_id_label = @repo.get(:seasons, @form_object.season_id, :season_code)
-      commodity_id_label = @repo.get(:commodities, @form_object.commodity_id, :code)
-      farm_id_label = @repo.get(:farms, @form_object.farm_id, :farm_code)
+      season_id_label = @repo.get(:seasons, :season_code, @form_object.season_id)
+      commodity_id_label = @repo.get(:commodities, :code, @form_object.commodity_id)
+      farm_id_label = @repo.get(:farms, :farm_code, @form_object.farm_id)
       {
         maf_lot_number: { required: true },
         description: {},

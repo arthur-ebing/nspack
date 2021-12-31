@@ -75,11 +75,11 @@ module UiRules
     end
 
     def sequence_pallet_id(pallet_sequence_id)
-      @repo.get(:pallet_sequences, pallet_sequence_id, :pallet_id)
+      @repo.get(:pallet_sequences, :pallet_id, pallet_sequence_id)
     end
 
     def sequence_pallet_number(pallet_sequence_id)
-      @repo.get(:pallet_sequences, pallet_sequence_id, :pallet_number)
+      @repo.get(:pallet_sequences, :pallet_number, pallet_sequence_id)
     end
 
     def oldest_sequence_id(pallet_number)
@@ -87,11 +87,11 @@ module UiRules
     end
 
     def pallet_sequence_cartons_per_pallet_id(pallet_sequence_id)
-      @repo.get(:pallet_sequences, pallet_sequence_id, :cartons_per_pallet_id)
+      @repo.get(:pallet_sequences, :cartons_per_pallet_id, pallet_sequence_id)
     end
 
     def default_no_of_clones(cartons_per_pallet_id, pallet_id)
-      (@repo.get(:cartons_per_pallet, cartons_per_pallet_id, :cartons_per_pallet).to_i - @repo.get(:pallets, pallet_id, :carton_quantity).to_i)
+      (@repo.get(:cartons_per_pallet, :cartons_per_pallet, cartons_per_pallet_id).to_i - @repo.get(:pallets, :carton_quantity, pallet_id).to_i)
     end
   end
 end

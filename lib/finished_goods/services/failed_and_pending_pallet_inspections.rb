@@ -47,7 +47,7 @@ module FinishedGoodsApp
     def failed_inspections
       inspection_types = []
       repo.open_ended_failed_inspections_for(pallet_id).each do |id|
-        inspection_types << repo.get(:inspection_types, id, :inspection_type_code)
+        inspection_types << repo.get(:inspection_types, :inspection_type_code, id)
       end
       inspection_types << AppConst::GOVT_INSPECTION_AGENCY if failed_govt_inspection?
       inspection_types
@@ -56,7 +56,7 @@ module FinishedGoodsApp
     def pending_inspections
       inspection_types = []
       repo.open_ended_pending_inspections_for(pallet_id).each do |id|
-        inspection_types << repo.get(:inspection_types, id, :inspection_type_code)
+        inspection_types << repo.get(:inspection_types, :inspection_type_code, id)
       end
       inspection_types << AppConst::GOVT_INSPECTION_AGENCY if pending_govt_inspection?
       inspection_types
@@ -79,7 +79,7 @@ module FinishedGoodsApp
       # pallet has not been inspected(pallets.inspected is false) AND
       # PPECB inspection_type's applies_to_all_grades and/or applies_to_all_packed_tm_groups is true OR
       # pallet's grade and/or packed_tm_group is part of the PPECB domain
-      return false if repo.get(:pallets, pallet_id, :inspected)
+      return false if repo.get(:pallets, :inspected, pallet_id)
 
       match_packed_tm_group && match_grade
     end

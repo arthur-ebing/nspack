@@ -28,7 +28,7 @@ module MasterfilesApp
       ar = message[/(Key \(.+\))/].split('(')
       hash = Hash[ar[1].split(')').first.split(', ').map(&:to_sym).zip(ar[2].split(')').first.split(', ').map(&:to_i))]
       party_name = repo.fn_party_name(hash[:party_id])
-      address_type = repo.get(:address_types, hash[:address_type_id], :address_type)
+      address_type = repo.get(:address_types, :address_type, hash[:address_type_id])
       failed_response "#{party_name} can't have multiple #{address_type}es."
     end
   end

@@ -146,7 +146,7 @@ module RawMaterialsApp
     end
 
     def grading_bin_weight_attrs(grading_bin_id, rmt_bin_weight)
-      grading_bin_weight = (repo.get(:presort_grower_grading_bins, grading_bin_id, :maf_weight) + rmt_bin_weight)
+      grading_bin_weight = (repo.get(:presort_grower_grading_bins, :maf_weight, grading_bin_id) + rmt_bin_weight)
       { maf_weight: grading_bin_weight, rmt_bin_weight: grading_bin_weight }
     end
 

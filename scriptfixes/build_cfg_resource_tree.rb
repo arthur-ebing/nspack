@@ -94,7 +94,7 @@ class BuildCfgResourceTree < BaseScript
 
       res = plant_res(clm_type, "CLM-#{seq_str}", "NTD #{seq}")
       clm_id = repo.create_child_plant_resource(line_id, res, sys_code: "CLM-#{seq_str}")
-      sysres_id = repo.get(:plant_resources, clm_id, :system_resource_id)
+      sysres_id = repo.get(:plant_resources, :system_resource_id, clm_id)
       repo.update_system_resource(sysres_id, clm_attrs.merge(ip_address: "192.168.13.#{seq + 10}"))
       # Add buttons (& link to packpoints...)
       4.times do |b|
@@ -102,7 +102,7 @@ class BuildCfgResourceTree < BaseScript
         res = plant_res(btn_type, "CLM-#{seq_str}-B#{no}", "NTD #{seq_str} Button B#{no}")
         repo.create_child_plant_resource(clm_id, res, sys_code: "CLM-#{seq_str}-B#{no}")
       end
-      sysres_id = repo.get(:plant_resources, printer_id, :system_resource_id)
+      sysres_id = repo.get(:plant_resources, :system_resource_id, printer_id)
       attrs = { ip_address: "192.168.13.#{seq + 150}", connection_type: 'USB', port: 9100, equipment_type: 'zebra', printer_language: 'zpl', pixels_mm: 8, peripheral_model: 'GK420d', module_function: 'NSLD-Printing', ttl: 9000, cycle_time: 9000 }
       repo.update_system_resource(sysres_id, attrs)
       # link printer

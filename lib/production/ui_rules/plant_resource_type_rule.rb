@@ -34,7 +34,7 @@ module UiRules
     def represents_type
       return nil if @form_object.represents_plant_resource_type_id.nil?
 
-      @repo.get(:plant_resource_types, @form_object.represents_plant_resource_type_id, :plant_resource_type_code)
+      @repo.get(:plant_resource_types, :plant_resource_type_code, @form_object.represents_plant_resource_type_id)
     end
 
     def make_form_object

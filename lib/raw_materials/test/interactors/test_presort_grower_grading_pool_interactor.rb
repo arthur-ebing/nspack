@@ -79,7 +79,7 @@ module RawMaterialsApp
     def presort_grower_grading_pool_attrs
       repo = BaseRepo.new
       bin_id = create_rmt_bin(presort_tip_lot_number: '123456', bin_tipped: true)
-      maf_lot_number = repo.get(:rmt_bins, bin_id, :presort_tip_lot_number)
+      maf_lot_number = repo.get(:rmt_bins, :presort_tip_lot_number, bin_id)
       season_id = create_season
       commodity_id = create_commodity
       farm_id = create_farm

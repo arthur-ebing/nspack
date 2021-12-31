@@ -61,7 +61,7 @@ module RawMaterialsApp
       end
 
       def activate_run_check
-        resource_id = @repo.get(:presort_staging_runs, @id, :presort_unit_plant_resource_id)
+        resource_id = @repo.get(:presort_staging_runs, :presort_unit_plant_resource_id, @id)
         return failed_response("Cannot activate presort_run: #{@id}. There already exists an active run for this plant unit") if @repo.exists?(:presort_staging_runs, presort_unit_plant_resource_id: resource_id, running: true)
 
         all_ok

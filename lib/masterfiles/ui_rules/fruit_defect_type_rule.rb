@@ -48,7 +48,7 @@ module UiRules
     end
 
     def fruit_defect_category_id_label
-      @repo.get(:fruit_defect_categories, @form_object.fruit_defect_category_id, :defect_category)
+      @repo.get(:fruit_defect_categories, :defect_category, @form_object.fruit_defect_category_id)
     end
   end
 end

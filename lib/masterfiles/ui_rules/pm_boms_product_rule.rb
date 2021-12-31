@@ -74,7 +74,7 @@ module UiRules
       end
 
       res = @repo.find_pm_boms_product(@options[:id])
-      @form_object = OpenStruct.new(res.to_h.merge(pm_subtype_id: @repo.get(:pm_products, res.pm_product_id, :pm_subtype_id)))
+      @form_object = OpenStruct.new(res.to_h.merge(pm_subtype_id: @repo.get(:pm_products, :pm_subtype_id, res.pm_product_id)))
     end
 
     def make_new_form_object

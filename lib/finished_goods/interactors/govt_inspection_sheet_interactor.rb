@@ -121,7 +121,7 @@ module FinishedGoodsApp
     end
 
     def toggle_use_inspection_destination(id)
-      use_inspection_destination = repo.get(:govt_inspection_sheets, id, :use_inspection_destination_for_load_out)
+      use_inspection_destination = repo.get(:govt_inspection_sheets, :use_inspection_destination_for_load_out, id)
 
       repo.transaction do
         repo.update_govt_inspection_sheet(id, use_inspection_destination_for_load_out: !use_inspection_destination)
@@ -191,7 +191,7 @@ module FinishedGoodsApp
       return failed_response('Pallet has been scrapped') if pallet[:scrapped]
       return failed_response('Pallet has been shipped') if pallet[:shipped]
       return failed_response("Pallet:#{pallet_number} belongs to another tripsheet") if repo.vehicle_job_unit_in_different_tripsheet?(pallet[:id], id, AppConst::PALLET_STOCK_TYPE)
-      return failed_response("Cannot add:#{pallet_number}. Tripsheet has already been offloaded") if repo.get(:vehicle_jobs, id, :offloaded_at)
+      return failed_response("Cannot add:#{pallet_number}. Tripsheet has already been offloaded") if repo.get(:vehicle_jobs, :offloaded_at, id)
       return failed_response("Pallet is still on bay: #{repo.palletizing_bay_for_pallet(pallet_number)}") if pallet[:has_individual_cartons] && !pallet[:palletized]
 
       res = ProductionApp::ReworksRepo.new.are_pallets_out_of_wip?(pallet[:id])
@@ -252,8 +252,8 @@ module FinishedGoodsApp
     end
 
     def cancel_manual_tripsheet(vehicle_job_id, stock_type_code) # rubocop:disable Metrics/AbcSize
-      return failed_response('Cannot cancel. Tripsheet has already been offloaded') if repo.get(:vehicle_jobs, vehicle_job_id, :offloaded_at)
-      return failed_response('Cannot cancel. Tripsheet has been completed') if repo.get(:vehicle_jobs, vehicle_job_id, :loaded_at)
+      return failed_response('Cannot cancel. Tripsheet has already been offloaded') if repo.get(:vehicle_jobs, :offloaded_at, vehicle_job_id)
+      return failed_response('Cannot cancel. Tripsheet has been completed') if repo.get(:vehicle_jobs, :loaded_at, vehicle_job_id)
 
       repo.transaction do
         tripsheet_pallets = repo.get_tripsheet_pallet_ids(vehicle_job_id)
@@ -330,7 +330,7 @@ module FinishedGoodsApp
     end
 
     def cancel_tripsheet(govt_inspection_sheet_id) # rubocop:disable Metrics/AbcSize
-      return failed_response('Tripsheet has already been offloaded') if repo.get(:govt_inspection_sheets, govt_inspection_sheet_id, :tripsheet_offloaded)
+      return failed_response('Tripsheet has already been offloaded') if repo.get(:govt_inspection_sheets, :tripsheet_offloaded, govt_inspection_sheet_id)
 
       repo.transaction do
         vehicle_job_id = repo.get_id(:vehicle_jobs, govt_inspection_sheet_id: govt_inspection_sheet_id)
@@ -435,7 +435,7 @@ module FinishedGoodsApp
             location_to_id = complete_offload_vehicle(vehicle_job_unit[:vehicle_job_id])
             instance.store(:vehicle_job_offloaded, true)
             instance.store(:pallets_moved, tripsheet_pallets.all.size)
-            instance.store(:location, repo.get(:locations, location_to_id, :location_long_code))
+            instance.store(:location, repo.get(:locations, :location_long_code, location_to_id))
           end
         end
       end
@@ -448,10 +448,10 @@ module FinishedGoodsApp
     end
 
     def complete_offload_vehicle(vehicle_job_id) # rubocop:disable Metrics/AbcSize
-      govt_inspection_sheet_id = repo.get(:vehicle_jobs, vehicle_job_id, :govt_inspection_sheet_id)
+      govt_inspection_sheet_id = repo.get(:vehicle_jobs, :govt_inspection_sheet_id, vehicle_job_id)
       repo.update(:vehicle_jobs, vehicle_job_id, offloaded_at: Time.now)
       repo.update(:govt_inspection_sheets, govt_inspection_sheet_id, tripsheet_offloaded: true, tripsheet_offloaded_at: Time.now)
-      location_to_id = repo.get(:vehicle_jobs, vehicle_job_id, :planned_location_to_id)
+      location_to_id = repo.get(:vehicle_jobs, :planned_location_to_id, vehicle_job_id)
       tripsheet_pallets = repo.get_vehicle_job_units(vehicle_job_id)
       tripsheet_pallets.each do |p|
         res = FinishedGoodsApp::MoveStock.call(AppConst::PALLET_STOCK_TYPE, p[:stock_item_id], location_to_id, 'MOVE_PALLET', nil)
@@ -495,7 +495,7 @@ module FinishedGoodsApp
       check_pallet!(:verification_passed, pallet_number)
       check_pallet!(:pallet_weight, pallet_number)
 
-      if repo.get(:govt_inspection_sheets, id, :reinspection)
+      if repo.get(:govt_inspection_sheets, :reinspection, id)
         check_pallet!(:inspected, pallet_number)
       else
         check_pallet!(:not_on_inspection_sheet, pallet_number)

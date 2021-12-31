@@ -53,7 +53,7 @@ module UiRules
       @repo = FinishedGoodsApp::OrderRepo.new
 
       customer_id = @repo.get_id(:customers, customer_party_role_id: @form_object.customer_party_role_id)
-      contact_person_ids, currency_ids = @repo.get(:customers, customer_id, %i[contact_person_ids currency_ids])
+      contact_person_ids, currency_ids = @repo.get(:customers, %i[contact_person_ids currency_ids], customer_id)
       deal_type_ids = @repo.select_values(:customer_payment_term_sets, :deal_type_id, customer_id: customer_id)
       incoterm_ids = @repo.select_values(:customer_payment_term_sets, :incoterm_id, customer_id: customer_id)
 

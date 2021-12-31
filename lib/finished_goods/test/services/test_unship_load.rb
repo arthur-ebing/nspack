@@ -57,9 +57,9 @@ module FinishedGoodsApp
 
       res = UnshipLoad.call(load_id, current_user)
       assert res.success, 'Should unship load'
-      refute repo.get(:pallets, pallet_id, :shipped), 'Should unship Pallet'
-      refute repo.get(:loads, load_id, :shipped), 'Should unship Load'
-      refute repo.get(:orders, order_id, :shipped), 'Should unship Order'
+      refute repo.get(:pallets, :shipped, pallet_id), 'Should unship Pallet'
+      refute repo.get(:loads, :shipped, load_id), 'Should unship Load'
+      refute repo.get(:orders, :shipped, order_id), 'Should unship Order'
     end
   end
 end

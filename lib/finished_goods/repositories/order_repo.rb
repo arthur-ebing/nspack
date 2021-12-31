@@ -104,7 +104,7 @@ module FinishedGoodsApp
       pallet_ids = select_values(:pallet_sequences, :pallet_id, order_item_id: id)
       hash[:loads] = select_values(:pallets, :load_id, id: pallet_ids).uniq
       hash[:load_id] = hash[:loads].first
-      hash[:pricing_per_kg] = get(:orders, hash[:order_id], :pricing_per_kg)
+      hash[:pricing_per_kg] = get(:orders, :pricing_per_kg, hash[:order_id])
       OrderItem.new(hash)
     end
 

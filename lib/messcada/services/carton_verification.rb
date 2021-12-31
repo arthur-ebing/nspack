@@ -54,7 +54,7 @@ module MesscadaApp
 
           @pallet_id = res.instance.pallet_id
           @pallet_sequence_id = res.instance.pallet_sequence_id
-          @pallet_number = repo.get(:pallets, pallet_id, :pallet_number)
+          @pallet_number = repo.get(:pallets, :pallet_number, pallet_id)
         end
       end
 
@@ -86,8 +86,8 @@ module MesscadaApp
     end
 
     def pallet_required?
-      carton_label_id ||= repo.get(:cartons, carton_id, :carton_label_id)
-      carton_equals_pallet = repo.get(:carton_labels, carton_label_id, :carton_equals_pallet)
+      carton_label_id ||= repo.get(:cartons, :carton_label_id, carton_id)
+      carton_equals_pallet = repo.get(:carton_labels, :carton_equals_pallet, carton_label_id)
       return false unless carton_equals_pallet
 
       !pallet_exists?
@@ -101,8 +101,8 @@ module MesscadaApp
     def pallet_exists? # rubocop:disable Metrics/AbcSize
       @pallet_sequence_id = repo.carton_label_carton_palletizing_sequence(carton_label_id)
       @pallet_sequence_id ||= repo.carton_label_scanned_from_carton_sequence(carton_label_id)
-      @pallet_id ||= repo.get(:pallet_sequences, pallet_sequence_id, :pallet_id)
-      @pallet_number ||= repo.get(:pallet_sequences, pallet_sequence_id, :pallet_number)
+      @pallet_id ||= repo.get(:pallet_sequences, :pallet_id, pallet_sequence_id)
+      @pallet_number ||= repo.get(:pallet_sequences, :pallet_number, pallet_sequence_id)
 
       !pallet_id.nil? && !pallet_sequence_id.nil?
     end

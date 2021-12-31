@@ -17,7 +17,7 @@ module UiRules
     def set_show_fields
       # cultivar_id_label = MasterfilesApp::CultivarRepo.new.find_cultivar(@form_object.cultivar_id)&.cultivar_name
       # cultivar_id_label = @repo.find(:cultivars, MasterfilesApp::Cultivar, @form_object.cultivar_id)&.cultivar_name
-      cultivar_id_label = @repo.get(:cultivars, @form_object.cultivar_id, :cultivar_name)
+      cultivar_id_label = @repo.get(:cultivars, :cultivar_name, @form_object.cultivar_id)
       fields[:cultivar_id] = { renderer: :label, with_value: cultivar_id_label, caption: 'Cultivar' }
       fields[:rmt_variant_code] = { renderer: :label }
       fields[:description] = { renderer: :label }

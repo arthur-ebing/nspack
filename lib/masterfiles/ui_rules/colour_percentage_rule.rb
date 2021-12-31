@@ -14,7 +14,7 @@ module UiRules
     end
 
     def set_show_fields
-      commodity_id_label = @repo.get(:commodities, @form_object.commodity_id, :code)
+      commodity_id_label = @repo.get(:commodities, :code, @form_object.commodity_id)
       fields[:commodity_id] = { renderer: :label,
                                 with_value: commodity_id_label,
                                 caption: 'Commodity' }
@@ -24,8 +24,8 @@ module UiRules
     end
 
     def common_fields
-      commodity_id = @options[:commodity_id] || @repo.get(:colour_percentages, @options[:id], :commodity_id)
-      commodity_id_label = @repo.get(:commodities, commodity_id, :code)
+      commodity_id = @options[:commodity_id] || @repo.get(:colour_percentages, :commodity_id, @options[:id])
+      commodity_id_label = @repo.get(:commodities, :code, commodity_id)
       {
         commodity_code: { renderer: :label,
                           with_value: commodity_id_label,

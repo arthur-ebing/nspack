@@ -56,7 +56,7 @@ module ProductionApp
         return ok_response if rule[:allow_tm_mix]
         return ok_response if new_sequence[:packed_tm_group_id] == oldest_sequence[:packed_tm_group_id]
 
-        new = repo.get(:target_market_groups, new_sequence[:packed_tm_group_id], :target_market_group_name)
+        new = repo.get(:target_market_groups, :target_market_group_name, new_sequence[:packed_tm_group_id])
         error('tm_group', oldest_sequence[:target_market_group_name], new)
       end
 
@@ -64,7 +64,7 @@ module ProductionApp
         return ok_response if rule[:allow_grade_mix]
         return ok_response if new_sequence[:grade_id] == oldest_sequence[:grade_id]
 
-        new = repo.get(:grades, new_sequence[:grade_id], :grade_code)
+        new = repo.get(:grades, :grade_code, new_sequence[:grade_id])
         error('grade', oldest_sequence[:grade_code], new)
       end
 
@@ -72,7 +72,7 @@ module ProductionApp
         return ok_response if rule[:allow_mark_mix]
         return ok_response if new_sequence[:mark_id] == oldest_sequence[:mark_id]
 
-        new = repo.get(:marks, new_sequence[:mark_id], :mark_code)
+        new = repo.get(:marks, :mark_code, new_sequence[:mark_id])
         error('mark', oldest_sequence[:mark_code], new)
       end
 
@@ -80,7 +80,7 @@ module ProductionApp
         return ok_response if rule[:allow_size_ref_mix]
         return ok_response if new_sequence[:fruit_size_reference_id] == oldest_sequence[:fruit_size_reference_id]
 
-        new = repo.get(:fruit_size_references, new_sequence[:fruit_size_reference_id], :size_reference)
+        new = repo.get(:fruit_size_references, :size_reference, new_sequence[:fruit_size_reference_id])
         error('size_ref', oldest_sequence[:size_reference], new)
       end
 
@@ -88,7 +88,7 @@ module ProductionApp
         return ok_response if rule[:allow_pack_mix]
         return ok_response if new_sequence[:standard_pack_code_id] == oldest_sequence[:standard_pack_code_id]
 
-        new = repo.get(:standard_pack_codes, new_sequence[:standard_pack_code_id], :standard_pack_code)
+        new = repo.get(:standard_pack_codes, :standard_pack_code, new_sequence[:standard_pack_code_id])
         error('pack', oldest_sequence[:standard_pack_code], new)
       end
 
@@ -96,7 +96,7 @@ module ProductionApp
         return ok_response if rule[:allow_std_count_mix]
         return ok_response if new_sequence[:std_fruit_size_count_id] == oldest_sequence[:std_fruit_size_count_id]
 
-        new = repo.get(:std_fruit_size_counts, new_sequence[:std_fruit_size_count_id], :size_count_value)
+        new = repo.get(:std_fruit_size_counts, :size_count_value, new_sequence[:std_fruit_size_count_id])
         error('size_count', oldest_sequence[:size_count_value], new)
       end
 
@@ -104,7 +104,7 @@ module ProductionApp
         return ok_response if rule[:allow_inventory_code_mix]
         return ok_response if new_sequence[:inventory_code_id] == oldest_sequence[:inventory_code_id]
 
-        new = repo.get(:inventory_codes, new_sequence[:inventory_code_id], :inventory_code)
+        new = repo.get(:inventory_codes, :inventory_code, new_sequence[:inventory_code_id])
         error('inventory', oldest_sequence[:inventory_code], new)
       end
 
@@ -112,7 +112,7 @@ module ProductionApp
         return ok_response if rule[:allow_cultivar_mix]
         return ok_response if new_sequence[:cultivar_id] == oldest_sequence[:cultivar_id]
 
-        new = repo.get(:cultivars, new_sequence[:cultivar_id], :cultivar_name)
+        new = repo.get(:cultivars, :cultivar_name, new_sequence[:cultivar_id])
         error('cultivar', oldest_sequence[:cultivar_name], new)
       end
 
@@ -120,7 +120,7 @@ module ProductionApp
         return ok_response if rule[:allow_cultivar_group_mix]
         return ok_response if new_sequence[:cultivar_group_id] == oldest_sequence[:cultivar_group_id]
 
-        new = repo.get(:cultivar_groups, new_sequence[:cultivar_group_id], :cultivar_group_code)
+        new = repo.get(:cultivar_groups, :cultivar_group_code, new_sequence[:cultivar_group_id])
         error('cultivar_group', oldest_sequence[:cultivar_group_code], new)
       end
 
@@ -128,7 +128,7 @@ module ProductionApp
         return ok_response if rule[:allow_puc_mix]
         return ok_response if new_sequence[:puc_id] == oldest_sequence[:puc_id]
 
-        new = repo.get(:pucs, new_sequence[:puc_id], :puc_code)
+        new = repo.get(:pucs, :puc_code, new_sequence[:puc_id])
         error('puc', oldest_sequence[:puc_code], new)
       end
 
@@ -136,7 +136,7 @@ module ProductionApp
         return ok_response if rule[:allow_orchard_mix]
         return ok_response if new_sequence[:orchard_id] == oldest_sequence[:orchard_id]
 
-        new = repo.get(:orchards, new_sequence[:orchard_id], :orchard_code)
+        new = repo.get(:orchards, :orchard_code, new_sequence[:orchard_id])
         error('orchard', oldest_sequence[:orchard_code], new)
       end
     end

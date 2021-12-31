@@ -113,7 +113,7 @@ module MesscadaApp
 
     # Kromco DP checks
     def check_valid_bin_for_kromco_rmt_system # rubocop:disable Metrics/AbcSize
-      legacy_bintip_criteria = repo.get(:production_runs, production_run_id, :legacy_bintip_criteria)
+      legacy_bintip_criteria = repo.get(:production_runs, :legacy_bintip_criteria, production_run_id)
       return failed_response("Bin Tipping Criteria Not Setup For Run:#{production_run_id}") unless legacy_bintip_criteria
 
       legacy_bintip_criteria.select { |_, v| v == 't' }.each_key do |check|
@@ -203,7 +203,7 @@ module MesscadaApp
     def check_mrl_result_status
       return ok_response unless AppConst::CR_RMT.enforce_mrl_check?
 
-      delivery_id = repo.get(:rmt_bins, rmt_bin[:id], :rmt_delivery_id)
+      delivery_id = repo.get(:rmt_bins, :rmt_delivery_id, rmt_bin[:id])
       unless delivery_id.nil_or_empty?
         res = QualityApp::FailedAndPendingMrlResults.call(delivery_id)
         return res unless res.success

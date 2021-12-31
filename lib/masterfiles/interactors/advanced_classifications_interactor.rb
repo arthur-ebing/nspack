@@ -116,7 +116,7 @@ module MasterfilesApp
     end
 
     def update_rmt_variant(id, params)
-      params[:cultivar_id] = repo.get(:rmt_variants, id, :cultivar_id)
+      params[:cultivar_id] = repo.get(:rmt_variants, :cultivar_id, id)
       res = validate_rmt_variant_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -169,7 +169,7 @@ module MasterfilesApp
     end
 
     def update_rmt_code(id, params)
-      params[:rmt_variant_id] = repo.get(:rmt_codes, id, :rmt_variant_id)
+      params[:rmt_variant_id] = repo.get(:rmt_codes, :rmt_variant_id, id)
       res = validate_rmt_code_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -187,7 +187,7 @@ module MasterfilesApp
       res = TaskPermissionCheck::RmtCode.call(:delete, id)
       raise failed_response(res.message) unless res.success
 
-      name = repo.get(:rmt_codes, id, :rmt_code)
+      name = repo.get(:rmt_codes, :rmt_code, id)
       repo.transaction do
         repo.delete_rmt_code(id)
         log_status(:rmt_codes, id, 'DELETED')

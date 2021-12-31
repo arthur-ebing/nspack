@@ -591,7 +591,7 @@ module ProductionApp
       plant_resource_code, represented_id = get_value(:plant_resources, %i[plant_resource_code represents_plant_resource_id], system_resource_id: system_resource_id)
       return plant_resource_code if represented_id.nil?
 
-      get(:plant_resources, represented_id, :plant_resource_code)
+      get(:plant_resources, :plant_resource_code, represented_id)
     end
 
     def robot_buttons(robot_id) # rubocop:disable Metrics/AbcSize

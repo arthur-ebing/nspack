@@ -9,7 +9,7 @@ module UiRules
 
       make_form_object
 
-      @rules[:rebin_rule] = @repo.get(:grower_grading_rules, @form_object.grower_grading_rule_id, :rebin_rule)
+      @rules[:rebin_rule] = @repo.get(:grower_grading_rules, :rebin_rule, @form_object.grower_grading_rule_id)
       @rules[:legacy_data_fields] = AppConst::CR_PROD.grower_grading_json_fields[:legacy_data]
       @rules[:rule_item_changes_fields] = @repo.grower_grading_rule_changes(@form_object.grower_grading_rule_id)
       @rules[:show_legacy_data_fields] = !@rules[:legacy_data_fields].empty?
@@ -27,16 +27,16 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
-      grower_grading_rule_id_label = @repo.get(:grower_grading_rules, @form_object.grower_grading_rule_id, :rule_name)
-      commodity_id_label = @repo.get(:commodities, @form_object.commodity_id, :code)
-      grade_id_label = @repo.get(:grades, @form_object.grade_id, :grade_code)
-      std_fruit_size_count_id_label = @repo.get(:std_fruit_size_counts, @form_object.std_fruit_size_count_id, :size_count_value)
-      fruit_actual_counts_for_pack_id_label = @repo.get(:fruit_actual_counts_for_packs, @form_object.fruit_actual_counts_for_pack_id, :actual_count_for_pack)
-      marketing_variety_id_label = @repo.get(:marketing_varieties, @form_object.marketing_variety_id, :marketing_variety_code)
-      fruit_size_reference_id_label = @repo.get(:fruit_size_references, @form_object.fruit_size_reference_id, :size_reference)
-      rmt_class_id_label = @repo.get(:rmt_classes, @form_object.rmt_class_id, :rmt_class_code)
-      rmt_size_id_label = @repo.get(:rmt_sizes, @form_object.rmt_size_id, :size_code)
-      inspection_type_id_label = @repo.get(:inspection_types, @form_object.inspection_type_id, :inspection_type_code)
+      grower_grading_rule_id_label = @repo.get(:grower_grading_rules, :rule_name, @form_object.grower_grading_rule_id)
+      commodity_id_label = @repo.get(:commodities, :code, @form_object.commodity_id)
+      grade_id_label = @repo.get(:grades, :grade_code, @form_object.grade_id)
+      std_fruit_size_count_id_label = @repo.get(:std_fruit_size_counts, :size_count_value, @form_object.std_fruit_size_count_id)
+      fruit_actual_counts_for_pack_id_label = @repo.get(:fruit_actual_counts_for_packs, :actual_count_for_pack, @form_object.fruit_actual_counts_for_pack_id)
+      marketing_variety_id_label = @repo.get(:marketing_varieties, :marketing_variety_code, @form_object.marketing_variety_id)
+      fruit_size_reference_id_label = @repo.get(:fruit_size_references, :size_reference, @form_object.fruit_size_reference_id)
+      rmt_class_id_label = @repo.get(:rmt_classes, :rmt_class_code, @form_object.rmt_class_id)
+      rmt_size_id_label = @repo.get(:rmt_sizes, :size_code, @form_object.rmt_size_id)
+      inspection_type_id_label = @repo.get(:inspection_types, :inspection_type_code, @form_object.inspection_type_id)
       fields[:grower_grading_rule_id] = { renderer: :label,
                                           with_value: grower_grading_rule_id_label,
                                           caption: 'Grading Rule' }
@@ -87,10 +87,10 @@ module UiRules
 
       return fields unless @rules[:show_rule_item_changes_fields]
 
-      graded_rmt_class_id_label = @form_object.changes.to_h['rmt_class_id'].nil_or_empty? ? '' : @repo.get(:rmt_classes, @form_object.changes.to_h['rmt_class_id'], :rmt_class_code)
-      graded_rmt_size_id_label = @form_object.changes.to_h['rmt_size_id'].nil_or_empty? ? '' : @repo.get(:rmt_sizes, @form_object.changes.to_h['rmt_size_id'], :size_code)
-      graded_grade_id_label = @form_object.changes.to_h['grade_id'].nil_or_empty? ? '' : @repo.get(:grades, @form_object.changes.to_h['grade_id'], :grade_code)
-      graded_size_count_id_label = @form_object.changes.to_h['std_fruit_size_count_id'].nil_or_empty? ? '' : @repo.get(:std_fruit_size_counts, @form_object.changes.to_h['std_fruit_size_count_id'], :size_count_value)
+      graded_rmt_class_id_label = @form_object.changes.to_h['rmt_class_id'].nil_or_empty? ? '' : @repo.get(:rmt_classes, :rmt_class_code, @form_object.changes.to_h['rmt_class_id'])
+      graded_rmt_size_id_label = @form_object.changes.to_h['rmt_size_id'].nil_or_empty? ? '' : @repo.get(:rmt_sizes, :size_code, @form_object.changes.to_h['rmt_size_id'])
+      graded_grade_id_label = @form_object.changes.to_h['grade_id'].nil_or_empty? ? '' : @repo.get(:grades, :grade_code, @form_object.changes.to_h['grade_id'])
+      graded_size_count_id_label = @form_object.changes.to_h['std_fruit_size_count_id'].nil_or_empty? ? '' : @repo.get(:std_fruit_size_counts, :size_count_value, @form_object.changes.to_h['std_fruit_size_count_id'])
       fields[:graded_rmt_class_id] = { renderer: :label,
                                        caption: 'Graded Rmt Class',
                                        with_value: graded_rmt_class_id_label }
@@ -276,7 +276,7 @@ module UiRules
       @form_object = new_form_object_from_struct(ProductionApp::GrowerGradingRuleItem,
                                                  merge_hash: {
                                                    grower_grading_rule_id: @options[:grower_grading_rule_id],
-                                                   grading_rule: @repo.get(:grower_grading_rules, @options[:grower_grading_rule_id], :rule_name)
+                                                   grading_rule: @repo.get(:grower_grading_rules, :rule_name, @options[:grower_grading_rule_id])
                                                  })
     end
 
