@@ -371,7 +371,7 @@ module UiRules
         items_fruit << { url: "/quality/qc/qc_samples/#{fruit_id}/print_barcode", text: 'Print', behaviour: :popup }
         items_fruit << { url: "/quality/qc/qc_samples/#{fruit_id}/qc_test/starch", text: 'Starch test', behaviour: :popup } # unless first_test_done(sample_type_id, test_type_name)
         items_fruit << { url: "/quality/qc/qc_samples/#{fruit_id}/qc_test/defects", text: 'Defects test', behaviour: :direct } # unless first_test_done(sample_type_id, test_type_name)
-        #### items_fruit << { url: "/dataminer/reports/loading_report_with_params/application_test_rmt?reference_number=#{@form_object.reference_number}&_loading=layout_dash_content", text: 'Test DM report with params', behaviour: :direct, loading_window: true }
+        items_fruit << { url: "/dataminer/reports/loading_report_with_params/oldmes_ftadf?instruments_fta_sessions.transaction_id=#{@form_object.reference_number}", text: 'OLD MES FTA data', behaviour: :direct, loading_window: true }
       elsif first_delivery_rule.need_to_make_a_sample?(AppConst::QC_SAMPLE_100_FRUIT)
         items_fruit << { url: "/quality/qc/qc_samples/new_rmt_delivery_id_sample/#{sample_type_id}/#{@options[:id]}", text: 'Create', behaviour: :popup }
       end

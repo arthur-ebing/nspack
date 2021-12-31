@@ -128,19 +128,29 @@ module DataminerApp
       page
     end
 
-    def run_report_with_params(id, params) # rubocop:disable Metrics/AbcSize
+    # Given a report and parameters, run it and return data ready to display in a grid:
+    def load_report_with_params(id, params) # rubocop:disable Metrics/AbcSize
       db, = repo.split_db_and_id(id)
       report = repo.lookup_report(id)
       crosstab_config = repo.lookup_crosstab(id)
-      vars = params.reject { |k, _| %i[_loading seq].include?(k) }.map { |k, v| { col: k, op: '=', val: v.to_s } }
-      # page.json_var = params[:json_var]
+      # Currently force all params to use `=` operator...
+      vars = params.reject { |k, _| k == :seq }.map { |k, v| { col: k, op: '=', val: v.to_s } }
       json_p = { json_var: vars.to_json }
-      # :json_var: '[{"col":"bin_received_date_time","op":"between","opText":"between","val":"2019-12-01","valTo":"2019-12-19","text":"2019-12-01","textTo":"2019-12-19","caption":"receive
 
       setup_report_with_parameters(report, json_p, crosstab_config, db)
       db_type = repo.db_connection_for(db).database_type
       sql_to_run = report.runnable_sql_delimited(db_type)
-      success_response('ok', sql_to_run)
+      col_defs = Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
+        report.ordered_columns.each do |col|
+          mk.column_from_dataminer col
+        end
+      end
+      grid_data = {
+        caption: report.caption,
+        columnDefs: col_defs,
+        rowDefs: DB[sql_to_run].all
+      }
+      success_response('ok', grid_data)
     end
 
     def admin_report_list_grid(for_grids: false) # rubocop:disable Metrics/AbcSize

@@ -17,28 +17,25 @@ class Nspack < Roda
       "<h2>Iframe</h2><h3>Params</h3><p>#{params[:sql]}</p><h3>Base64 decoded:</h3><p>#{Base64.decode64(params[:sql])}</p>"
     end
 
+    # Display a DM report in a loading page:
+    # Run the report and stash the results while the loading page is displaying.
+    # Then call show_report_with_params to display the stashed report in a grid.
     r.on 'loading_report_with_params', String do |rpt_id|
       id = rpt_id.gsub('%20', ' ')
-      path = "/dataminer/reports/show_report_with_params/#{id}?#{request.query_string}"
-      change_window_location_via_json(UtilityFunctions.cache_bust_url(path), request.path)
+      res = interactor.load_report_with_params(id, params)
+
+      if res.success
+        store_locally(:dm_loading_rpt, res.instance, request.ip)
+        path = '/dataminer/reports/show_report_with_params'
+        change_window_location_via_json(UtilityFunctions.cache_bust_url(path), request.path)
+      else
+        show_json_warning(res.message)
+      end
     end
 
-    r.on 'show_report_with_params', String do |rpt_id|
-      id = rpt_id.gsub('%20', ' ')
-      p id
-      p params
-      # if params[:_layout] ... layout
-      res = interactor.run_report_with_params(id, params)
-      if res.success
-        "SHOW rpt - #{params.inspect} :: #{res.instance.inspect}" # view
-        # show_json_notice("SHOW rpt - #{params.inspect}")
-      else
-        "ERR - #{params.inspect}"
-        # show_json_warning("ERR - #{params.inspect}")
-      end
-      # change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
-      # change_window_location_via_json(new_location, log_url = nil, download: false)
-      # show_page_in_layout
+    r.on 'show_report_with_params' do
+      grid_data = retrieve_from_local_store(:dm_loading_rpt, request.ip)
+      show_page_in_layout('layout_dash_content') { DM::Report::Report::GridDataPage.call(grid_data) }
     end
 
     r.on 'report', String do |id|
