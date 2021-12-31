@@ -257,6 +257,11 @@ class Nspack < Roda
         puts e.message
         puts e.backtrace.join("\n")
         show_json_exception(e)
+      rescue Crossbeams::FrameworkError => e
+        ErrorMailer.send_exception_email(e, subject: e.message, message: "Execute run for #{id}.")
+        puts e.message
+        puts e.backtrace.join("\n")
+        show_json_exception(e)
       end
 
       r.on 're_execute_run' do
@@ -291,6 +296,11 @@ class Nspack < Roda
           update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
         end
       rescue Crossbeams::InfoError => e
+        ErrorMailer.send_exception_email(e, subject: e.message, message: "Re-execute run for #{id}.")
+        puts e.message
+        puts e.backtrace.join("\n")
+        show_json_exception(e)
+      rescue Crossbeams::FrameworkError => e
         ErrorMailer.send_exception_email(e, subject: e.message, message: "Re-execute run for #{id}.")
         puts e.message
         puts e.backtrace.join("\n")

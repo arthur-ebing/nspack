@@ -215,6 +215,20 @@ class AppConst
   BIN_FULL = 'Full'
   BIN_FULLNESS_OPTIONS = %w[Quarter Half Three\ Quarters Full].freeze
 
+  # Constants for bin tipping
+  BINTIP_COLS = {
+    'actual_cold_treatment' => :actual_cold_treatment_id,
+    'actual_ripeness_treatment' => :actual_ripeness_treatment_id,
+    'colour_percentage' => :colour_percentage_id,
+    'farm_code' => :farm_id,
+    'product_class_code' => :rmt_class_id,
+    'rmt_code' => :rmt_code_id,
+    'season_code' => :season_id,
+    'commodity_code' => :commodity_id,
+    'rmt_size' => :rmt_size_id,
+    'rmt_variety_code' => :cultivar_id
+  }.freeze
+
   # Constants for location assignments:
   WAREHOUSE_RECEIVING_AREA = 'WAREHOUSE_RECEIVING_AREA'
   PRESORTING = 'PRESORTING'
