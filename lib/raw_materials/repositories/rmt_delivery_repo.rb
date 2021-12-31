@@ -691,20 +691,20 @@ module RawMaterialsApp
     end
 
     def bin_sample?(bin_asset_number, rmt_delivery_id, bin_fullness)
-      sample_positions = get(:rmt_deliveries, :sample_bins, rmt_delivery_id)
-      delivery_bins = select_values(:rmt_bins, %i[id bin_asset_number], rmt_delivery_id: rmt_delivery_id).sort_by { |s| s[0] }.map { |b| b[1] }
-      bin_position = delivery_bins.index(bin_asset_number) + 1
-      return true if bin_fullness != AppConst::BIN_FULL || sample_positions.include?(bin_position)
-      return false unless sample_positions.include?(bin_position)
+      return true unless bin_fullness == AppConst::BIN_FULL
 
-      nil
+      sample_positions = get(:rmt_deliveries, :sample_bins, rmt_delivery_id)
+      delivery_bins = select_values_in_order(:rmt_bins, :bin_asset_number, order: :id, where: { rmt_delivery_id: rmt_delivery_id })
+      bin_position = delivery_bins.index(bin_asset_number) + 1
+      return true if sample_positions.include?(bin_position)
+
+      false
     end
 
     def update_rmt_bin_asset_level(bin_asset_number, bin_fullness, rmt_delivery_id)
       updates = { bin_fullness: bin_fullness }
-      unless (is_sample = bin_sample?(bin_asset_number, rmt_delivery_id, bin_fullness)).nil?
-        updates.store(:sample_bin, is_sample)
-      end
+      updates[:sample_bin] = true if bin_sample?(bin_asset_number, rmt_delivery_id, bin_fullness)
+
       DB[:rmt_bins].where(bin_asset_number: bin_asset_number).update(updates)
     end
 

@@ -749,7 +749,8 @@ module ProductionApp
         raise Crossbeams::FrameworkError, "Column #{column} is not used for bintip criteria checking." unless AppConst::BINTIP_COLS.keys.include?(column)
         next if %w[farm_code rmt_variety_code commodity_code].include?(column)
 
-        raise Crossbeams::InfoError, " Bintip criteria requires a value for run.#{column}" if run[AppConst::BINTIP_COLS[column]].nil_or_empty?
+        # raise Crossbeams::InfoError, " Bintip criteria requires a value for run.#{column}" if run[AppConst::BINTIP_COLS[column]].nil_or_empty?
+        return " Bintip criteria requires a value for run.#{column}" if run[AppConst::BINTIP_COLS[column]].nil_or_empty?
       end
       nil
     end

@@ -267,16 +267,17 @@ module RawMaterialsApp
         set_delivery_bin_samples(id, bins, bin_fullness)
       end
       res
-    rescue StandardError => e
-      failed_response(e.message)
+      # rescue StandardError => e
+      #   failed_response(e.message)
     end
 
     def set_delivery_bin_samples(delivery_id, bins, bin_fullness)
-      bins.each do |bin|
-        unless (is_sample = repo.bin_sample?(bin[:bin_asset_number], delivery_id, bin_fullness)).nil?
-          repo.update(:rmt_bins, bin[:id], sample_bin: is_sample)
-        end
-      end
+      bins.each { |bin| repo.update(:rmt_bins, bin[:id], sample_bin: true) if repo.bin_sample?(bin[:bin_asset_number], delivery_id, bin_fullness) }
+      # bins.each do |bin|
+      #   unless (is_sample = repo.bin_sample?(bin[:bin_asset_number], delivery_id, bin_fullness)).nil?
+      #     repo.update(:rmt_bins, bin[:id], sample_bin: is_sample)
+      #   end
+      # end
     end
 
     def create_bin_groups(id, params) # rubocop:disable Metrics/AbcSize
@@ -295,8 +296,8 @@ module RawMaterialsApp
         set_delivery_bin_samples(id, bins, bin_fullness)
       end
       res
-    rescue StandardError => e
-      failed_response(e.message)
+      # rescue StandardError => e
+      #   failed_response(e.message)
     end
 
     def create_bins(params, bin_asset_numbers, bin_asset_number_ids = nil) # rubocop:disable Metrics/AbcSize
@@ -420,9 +421,7 @@ module RawMaterialsApp
       repo.transaction do
         id = repo.create_rmt_bin(res)
 
-        unless (is_sample = repo.bin_sample?(res[:bin_asset_number], delivery_id, res[:bin_fullness])).nil?
-          repo.update(:rmt_bins, id, sample_bin: is_sample)
-        end
+        repo.update(:rmt_bins, id, sample_bin: true) if repo.bin_sample?(res[:bin_asset_number], delivery_id, res[:bin_fullness])
 
         unless params[:gross_weight].nil_or_empty?
           options = { force_find_by_id: false, weighed_manually: true, avg_gross_weight: false }
@@ -641,10 +640,7 @@ module RawMaterialsApp
         repo.update_rmt_bin(id, res)
 
         bin_asset_number = repo.get(:rmt_bins, :bin_asset_number, id)
-        unless (is_sample = repo.bin_sample?(bin_asset_number, delivery.id, res[:bin_fullness])).nil?
-          repo.update(:rmt_bins, id, sample_bin: is_sample)
-        end
-
+        repo.update(:rmt_bins, id, sample_bin: true) if repo.bin_sample?(bin_asset_number, delivery.id, res[:bin_fullness])
         log_transaction
       end
       instance = rmt_bin(id)
