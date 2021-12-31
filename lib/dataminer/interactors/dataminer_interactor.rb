@@ -151,8 +151,8 @@ module DataminerApp
       end
       grid_data = {
         caption: report.caption,
-        columnDefs: col_defs,
-        rowDefs: row_defs
+        col_defs: col_defs,
+        row_defs: row_defs
       }
       success_response('ok', grid_data)
     end

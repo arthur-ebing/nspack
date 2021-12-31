@@ -11,7 +11,7 @@ module DM
               section.add_grid('rpt_grid',
                                nil,
                                caption: grid_data[:caption],
-                               cold_defs: grid_data[:col_defs],
+                               col_defs: grid_data[:col_defs],
                                row_defs: grid_data[:row_defs])
             end
           end
