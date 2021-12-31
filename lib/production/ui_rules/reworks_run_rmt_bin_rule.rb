@@ -7,7 +7,6 @@ module UiRules
       @delivery_repo = RawMaterialsApp::RmtDeliveryRepo.new
       @container_repo = MasterfilesApp::RmtContainerMaterialTypeRepo.new
       @messcada_repo = MesscadaApp::MesscadaRepo.new
-      @rules[:maintain_legacy_columns] = AppConst::CR_RMT.maintain_legacy_columns?
 
       make_form_object
       apply_form_values
@@ -92,19 +91,11 @@ module UiRules
       fields[:track_slms_indicator_1_code] = { renderer: :select, options: @messcada_repo.track_indicator_codes(bin_cultivar).uniq, required: true, prompt: true }
     end
 
-    def make_form_object # rubocop:disable Metrics/AbcSize
+    def make_form_object
       defaults = { reworks_run_type_id: @options[:reworks_run_type_id],
                    bin_number: @options[:bin_number],
                    measurement_unit: 'KG' }
       attrs = rmt_bin(@options[:bin_number]).to_h.merge(defaults)
-
-      if rules[:maintain_legacy_columns]
-        bin_legacy_data = attrs[:legacy_data].to_h
-        legacy_data = { colour: bin_legacy_data['colour'], pc_code: bin_legacy_data['pc_code'],
-                        cold_store_type: bin_legacy_data['cold_store_type'], track_slms_indicator_1_code: bin_legacy_data['track_slms_indicator_1_code'],
-                        ripe_point_code: bin_legacy_data['ripe_point_code'] }
-        attrs = attrs.merge(legacy_data)
-      end
 
       @form_object = OpenStruct.new(attrs)
     end

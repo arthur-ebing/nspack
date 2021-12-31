@@ -21,7 +21,6 @@ module Crossbeams
             set_defaults_for_new_rmt_delivery: true,
             convert_carton_to_rebins: false,
             create_farm_location: false,
-            maintain_legacy_columns: false,
             pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
             default_delivery_location: 'FRUIT_RECEPTION_1',
             use_bin_asset_control: false,
@@ -47,7 +46,6 @@ module Crossbeams
             set_defaults_for_new_rmt_delivery: true,
             convert_carton_to_rebins: false,
             create_farm_location: false,
-            maintain_legacy_columns: false,
             pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
             default_delivery_location: 'FRUIT_RECEPTION_1',
             use_bin_asset_control: false,
@@ -81,7 +79,6 @@ module Crossbeams
             set_defaults_for_new_rmt_delivery: true,
             convert_carton_to_rebins: false,
             create_farm_location: true,
-            maintain_legacy_columns: true,
             pending_delivery_location: nil,
             default_delivery_location: 'FRUIT RECEPTION',
             use_bin_asset_control: true,
@@ -107,7 +104,6 @@ module Crossbeams
             set_defaults_for_new_rmt_delivery: true,
             convert_carton_to_rebins: false,
             create_farm_location: false,
-            maintain_legacy_columns: false,
             pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
             default_delivery_location: 'FRUIT RECEPTION',
             use_bin_asset_control: false,
@@ -133,7 +129,6 @@ module Crossbeams
             set_defaults_for_new_rmt_delivery: false,
             convert_carton_to_rebins: false,
             create_farm_location: true,
-            maintain_legacy_columns: false,
             pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
             default_delivery_location: 'FRUIT_RECEPTION_1',
             use_bin_asset_control: false,
@@ -159,7 +154,6 @@ module Crossbeams
              set_defaults_for_new_rmt_delivery: false,
              convert_carton_to_rebins: false,
              create_farm_location: false,
-             maintain_legacy_columns: false,
              pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
              default_delivery_location: 'FRUIT_RECEPTION_1',
              use_bin_asset_control: false,
@@ -185,7 +179,6 @@ module Crossbeams
             set_defaults_for_new_rmt_delivery: true,
             convert_carton_to_rebins: false,
             create_farm_location: false,
-            maintain_legacy_columns: false,
             pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
             default_delivery_location: 'FRUIT_RECEPTION_1',
             use_bin_asset_control: false,
@@ -211,7 +204,6 @@ module Crossbeams
             set_defaults_for_new_rmt_delivery: true,
             convert_carton_to_rebins: false,
             create_farm_location: false,
-            maintain_legacy_columns: false,
             pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
             default_delivery_location: 'FRUIT_RECEPTION_1',
             use_bin_asset_control: false,
@@ -237,7 +229,6 @@ module Crossbeams
              set_defaults_for_new_rmt_delivery: true,
              convert_carton_to_rebins: true,
              create_farm_location: true,
-             maintain_legacy_columns: false,
              pending_delivery_location: 'IN_TRANSIT_TO_PACKHOUSE',
              default_delivery_location: 'FRUIT_RECEPTION_1',
              use_bin_asset_control: false,
@@ -336,12 +327,6 @@ module Crossbeams
       return 'Create a location record for farm.' if explain
 
       setting(:create_farm_location)
-    end
-
-    def maintain_legacy_columns?(explain: false)
-      return 'Maintain legacy columns for rebins.' if explain
-
-      setting(:maintain_legacy_columns)
     end
 
     def pending_delivery_location(explain: false)

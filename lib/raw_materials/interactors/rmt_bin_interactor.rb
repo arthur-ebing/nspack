@@ -322,13 +322,6 @@ module RawMaterialsApp
 
     def create_rebin_groups(production_run_id, params) # rubocop:disable Metrics/AbcSize
       params = params.merge(production_run_rebin_id: production_run_id)
-      legacy_data = repo.get_value(:production_runs, :legacy_data, id: production_run_id)
-
-      if AppConst::CR_RMT.maintain_legacy_columns?
-        params[:legacy_data] = { colour: legacy_data['treatment_code'], pc_code: legacy_data['pc_code'],
-                                 cold_store_type: legacy_data['cold_store_type'], track_slms_indicator_1_code: legacy_data['track_indicator_code'],
-                                 ripe_point_code: legacy_data['ripe_point_code'] }
-      end
 
       params = calc_rebin_params(params)
       res = validate_rmt_rebin_params(params)

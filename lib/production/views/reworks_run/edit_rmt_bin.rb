@@ -30,13 +30,6 @@ module Production
                   col.add_field :rmt_size_id
                   col.add_field :rmt_container_material_type_id
                   col.add_field :rmt_material_owner_party_role_id
-                  if rules[:maintain_legacy_columns]
-                    col.add_field :colour
-                    col.add_field :ripe_point_code
-                    col.add_field :pc_code
-                    col.add_field :cold_store_type
-                    col.add_field :track_slms_indicator_1_code
-                  end
                 end
                 row.blank_column
               end
