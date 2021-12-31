@@ -88,6 +88,7 @@ module RawMaterials
                 form.row do |row|
                   row.column do |col|
                     col.add_field :id
+                    col.add_field :sample_bins
                     col.add_field :farm_id
                     col.add_field :puc_id
                     col.add_field :orchard_id
@@ -116,6 +117,7 @@ module RawMaterials
                     col.add_field :tipping_complete_date_time
                     col.add_field :batch_number
                     col.add_field :batch_number_updated_at
+                    col.add_field :qty_partial_bins
                     # col.add_field :keep_open
                   end
                 end

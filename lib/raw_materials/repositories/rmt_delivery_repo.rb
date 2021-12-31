@@ -84,10 +84,6 @@ module RawMaterialsApp
       DB[:rmt_bins].where(rmt_delivery_id: id).count
     end
 
-    def update_rmt_bin_asset_level(bin_asset_number, bin_fullness)
-      DB[:rmt_bins].where(bin_asset_number: bin_asset_number).update(bin_fullness: bin_fullness)
-    end
-
     def for_select_delivery_context_info
       qry = <<~SQL
         SELECT d.id, d.id || '_' || p.puc_code || '_' || o.orchard_code || '_' || c.cultivar_name || '_' || to_char(d.date_delivered, 'YYYY-MM-DD') as delivery_code
@@ -232,7 +228,7 @@ module RawMaterialsApp
     def delivery_confirmation_details(id)
       query = <<~SQL
         select d.id, c.cultivar_name, cg.cultivar_group_code, f.farm_code, p.puc_code, o.orchard_code
-        , d.truck_registration_number, d.date_delivered, d.date_picked
+        , d.truck_registration_number, d.date_delivered, d.date_picked, d.sample_bins
         , count(b.id) as bins_received, (d.quantity_bins_with_fruit - count(b.id)) as qty_bins_remaining
         from rmt_deliveries d
         join cultivars c on c.id=d.cultivar_id
@@ -692,6 +688,24 @@ module RawMaterialsApp
         .join(:commodities, id: :commodity_id)
         .where(Sequel[:cultivars][:id] => cultivar_id)
         .get(:allocate_sample_rmt_bins)
+    end
+
+    def bin_sample?(bin_asset_number, rmt_delivery_id, bin_fullness)
+      sample_positions = get(:rmt_deliveries, :sample_bins, rmt_delivery_id)
+      delivery_bins = select_values(:rmt_bins, %i[id bin_asset_number], rmt_delivery_id: rmt_delivery_id).sort_by { |s| s[0] }.map { |b| b[1] }
+      bin_position = delivery_bins.index(bin_asset_number) + 1
+      return true if bin_fullness != AppConst::BIN_FULL || sample_positions.include?(bin_position)
+      return false unless sample_positions.include?(bin_position)
+
+      nil
+    end
+
+    def update_rmt_bin_asset_level(bin_asset_number, bin_fullness, rmt_delivery_id)
+      updates = { bin_fullness: bin_fullness }
+      unless (is_sample = bin_sample?(bin_asset_number, rmt_delivery_id, bin_fullness)).nil?
+        updates.store(:sample_bin, is_sample)
+      end
+      DB[:rmt_bins].where(bin_asset_number: bin_asset_number).update(updates)
     end
 
     def allocate_delivery_bin_samples(delivery_id, cultivar_id, sample_positions) # rubocop:disable Metrics/AbcSize

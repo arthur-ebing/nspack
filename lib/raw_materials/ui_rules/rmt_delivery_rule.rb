@@ -87,7 +87,10 @@ module UiRules
                           as_boolean: true }
       fields[:batch_number] = { renderer: :label }
       fields[:batch_number_updated_at] = { renderer: :label }
-      fields[:sample_bins] = { renderer: :label }
+      fields[:sample_bins] = { renderer: :label,
+                               with_value: @form_object.sample_bins.join(',') }
+      fields[:qty_partial_bins] = { renderer: :label,
+                                    with_value: @form_object.qty_partial_bins }
       if AppConst::CR_RMT.all_delivery_bins_of_same_type?
         fields[:rmt_container_type_id] = { renderer: :label,
                                            with_value: rmt_container_type_id_label }
@@ -102,6 +105,8 @@ module UiRules
     def common_fields # rubocop:disable Metrics/AbcSize
       fields = {
         id: { renderer: :label, caption: 'Delivery Id' },
+        sample_bins: { renderer: :label,
+                       with_value: @form_object.sample_bins.join(',') },
         farm_id: { renderer: :select,
                    options: MasterfilesApp::FarmRepo.new.for_select_farms,
                    disabled_options: MasterfilesApp::FarmRepo.new.for_select_inactive_farms,
@@ -173,7 +178,9 @@ module UiRules
                                     caption: 'Qty Bins With Fruit',
                                     minvalue: 0 },
         batch_number: { renderer: :label },
-        batch_number_updated_at: { renderer: :label }
+        batch_number_updated_at: { renderer: :label },
+        qty_partial_bins: { renderer: :integer,
+                            minvalue: 0 }
       }
       if AppConst::CR_RMT.all_delivery_bins_of_same_type?
         fields[:rmt_container_type_id] = { renderer: :select, options: MasterfilesApp::RmtContainerTypeRepo.new.for_select_rmt_container_types, required: true, prompt: true }

@@ -240,8 +240,8 @@ module RawMaterialsApp
       location_to_id
     end
 
-    def update_rmt_bin_asset_level(bin_asset_number, bin_fullness)
-      repo.update_rmt_bin_asset_level(bin_asset_number, bin_fullness)
+    def update_rmt_bin_asset_level(bin_asset_number, bin_fullness, rmt_delivery_id)
+      repo.update_rmt_bin_asset_level(bin_asset_number, bin_fullness, rmt_delivery_id)
     end
 
     def create_scanned_bin_groups(id, params) # rubocop:disable Metrics/AbcSize
@@ -260,7 +260,23 @@ module RawMaterialsApp
         end
       end
 
-      create_bins(params, bin_asset_numbers)
+      res = create_bins(params, bin_asset_numbers)
+      unless res.failure?
+        bin_fullness = res.instance[0].bin_fullness
+        bins = res.instance.map { |b| { id: b.id, bin_asset_number: b.bin_asset_number } }
+        set_delivery_bin_samples(id, bins, bin_fullness)
+      end
+      res
+    rescue StandardError => e
+      failed_response(e.message)
+    end
+
+    def set_delivery_bin_samples(delivery_id, bins, bin_fullness)
+      bins.each do |bin|
+        unless (is_sample = repo.bin_sample?(bin[:bin_asset_number], delivery_id, bin_fullness)).nil?
+          repo.update(:rmt_bins, bin[:id], sample_bin: is_sample)
+        end
+      end
     end
 
     def create_bin_groups(id, params) # rubocop:disable Metrics/AbcSize
@@ -272,7 +288,15 @@ module RawMaterialsApp
       bin_asset_numbers = repo.get_available_bin_asset_numbers(params[:qty_bins_to_create])
       return validation_failed_response(OpenStruct.new(messages: { qty_bins_to_create: ["Couldn't find #{params[:qty_bins_to_create].to_i - bin_asset_numbers.length} available bin_asset_numbers in the system"] })) unless bin_asset_numbers.length == params[:qty_bins_to_create].to_i
 
-      create_bins(params, bin_asset_numbers.map(&:last), bin_asset_numbers.map(&:first))
+      res = create_bins(params, bin_asset_numbers.map(&:last), bin_asset_numbers.map(&:first))
+      unless res.failure?
+        bin_fullness = res.instance[0].bin_fullness
+        bins = res.instance.map { |b| { id: b.id, bin_asset_number: b.bin_asset_number } }
+        set_delivery_bin_samples(id, bins, bin_fullness)
+      end
+      res
+    rescue StandardError => e
+      failed_response(e.message)
     end
 
     def create_bins(params, bin_asset_numbers, bin_asset_number_ids = nil) # rubocop:disable Metrics/AbcSize
@@ -381,7 +405,7 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def create_rmt_bin(delivery_id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def create_rmt_bin(delivery_id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       vres = validate_bin_asset_no_format(params)
       return vres unless vres.success
       return failed_response("Scanned Bin Number:#{params[:bin_asset_number]} is already in stock") unless bin_asset_number_available?(params[:bin_asset_number])
@@ -395,6 +419,10 @@ module RawMaterialsApp
       id = nil
       repo.transaction do
         id = repo.create_rmt_bin(res)
+
+        unless (is_sample = repo.bin_sample?(res[:bin_asset_number], delivery_id, res[:bin_fullness])).nil?
+          repo.update(:rmt_bins, id, sample_bin: is_sample)
+        end
 
         unless params[:gross_weight].nil_or_empty?
           options = { force_find_by_id: false, weighed_manually: true, avg_gross_weight: false }
@@ -611,6 +639,12 @@ module RawMaterialsApp
 
       repo.transaction do
         repo.update_rmt_bin(id, res)
+
+        bin_asset_number = repo.get(:rmt_bins, :bin_asset_number, id)
+        unless (is_sample = repo.bin_sample?(bin_asset_number, delivery.id, res[:bin_fullness])).nil?
+          repo.update(:rmt_bins, id, sample_bin: is_sample)
+        end
+
         log_transaction
       end
       instance = rmt_bin(id)
@@ -684,6 +718,10 @@ module RawMaterialsApp
 
     def get_delivery_confirmation_details(id)
       repo.delivery_confirmation_details(id)
+    end
+
+    def delivery_sample_bins(delivery_id)
+      repo.select_values(:rmt_bins, :bin_asset_number, rmt_delivery_id: delivery_id, sample_bin: true)
     end
 
     def bin_details(id)

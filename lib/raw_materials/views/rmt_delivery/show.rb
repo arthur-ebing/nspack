@@ -78,6 +78,7 @@ module RawMaterials
                 form.row do |row|
                   row.column do |col|
                     col.add_field :id
+                    col.add_field :sample_bins
                     col.add_field :season_id
                     col.add_field :farm_id
                     col.add_field :puc_id
@@ -109,7 +110,7 @@ module RawMaterials
                     col.add_field :active
                     col.add_field :batch_number
                     col.add_field :batch_number_updated_at
-                    col.add_field :sample_bins
+                    col.add_field :qty_partial_bins
                   end
                 end
               end

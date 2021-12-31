@@ -99,6 +99,7 @@ module RawMaterialsApp
         batch_number: Faker::Lorem.unique.word,
         qty_damaged_bins: 1,
         qty_empty_bins: 1,
+        qty_partial_bins: 1,
         delivery_tipped: false,
         date_picked: '2010-01-01',
         received: true,

@@ -41,6 +41,7 @@ module RawMaterials
                   col.add_field :date_delivered
                   col.add_field :qty_empty_bins
                   col.add_field :quantity_bins_with_fruit
+                  col.add_field :qty_partial_bins
                   # col.add_field :delivery_tipped
                   # col.add_field :tipping_complete_date_time
                   # col.add_field :keep_open

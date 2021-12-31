@@ -38,6 +38,7 @@ module RawMaterialsApp
     attribute :scrapped_at, Types::DateTime
     attribute? :scrapped, Types::Bool
     attribute? :active, Types::Bool
+    attribute? :sample_bin, Types::Bool
     attribute :scrapped_rmt_delivery_id, Types::Integer
     attribute :legacy_data, Types::Hash
   end
@@ -112,6 +113,7 @@ module RawMaterialsApp
     attribute :presort_staging_run_child_id, Types::Integer
     attribute :presort_tip_lot_number, Types::String
     attribute :tipped_in_presort_at, Types::DateTime
+    attribute? :sample_bin, Types::Bool
     attribute :verified_from_carton_label_id, Types::Integer
   end
 end

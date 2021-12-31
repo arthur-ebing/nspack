@@ -1302,6 +1302,7 @@ class Nspack < Roda
 
       r.on 'delivery_confirmation', Integer do |id|
         delivery = interactor.get_delivery_confirmation_details(id)
+        delivery_sample_bins = interactor.delivery_sample_bins(id)
         form = Crossbeams::RMDForm.new({},
                                        notes: nil,
                                        form_name: :delivery,
@@ -1321,6 +1322,13 @@ class Nspack < Roda
         form.add_label(:date_delivered, 'Date Delivered', delivery[:date_delivered])
         form.add_label(:bins_received, 'Bins Received', delivery[:bins_received])
         form.add_label(:qty_bins_remaining, 'Qty Bins Remaining', delivery[:qty_bins_remaining])
+        form.add_label(:sample_bins, 'Sample Positions', delivery[:sample_bins].join(','))
+        unless delivery_sample_bins.empty?
+          form.add_section_header('Sample Bins')
+          delivery_sample_bins.each do |bin|
+            form.add_label(:bin, nil, bin)
+          end
+        end
         form.add_button('Next', "/rmd/rmt_deliveries/rmt_bins/receive_rmt_bins/#{id}")
         form.add_csrf_tag csrf_tag
         view(inline: form.render, layout: :layout_rmd)
@@ -1356,6 +1364,7 @@ class Nspack < Roda
 
       r.on 'receive_rmt_bins', Integer do |id|
         delivery = interactor.get_delivery_confirmation_details(id)
+        delivery_sample_bins = interactor.delivery_sample_bins(id)
         default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DEFAULT_RMT_CONTAINER_TYPE)
 
         capture_container_material = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL
@@ -1391,6 +1400,13 @@ class Nspack < Roda
         form.add_label(:orchard_code, 'Orchard', delivery[:orchard_code])
         form.add_label(:bins_received, 'Bins Received', delivery[:bins_received])
         form.add_label(:qty_bins_remaining, 'Qty Bins Remaining', delivery[:qty_bins_remaining])
+        form.add_label(:sample_bins, 'Sample Positions', delivery[:sample_bins].join(','))
+        unless delivery_sample_bins.empty?
+          form.add_section_header('Sample Bins')
+          delivery_sample_bins.each do |bin|
+            form.add_label(:bin, nil, bin)
+          end
+        end
         form.add_select(:rmt_container_type_id, 'Container Type', items: MasterfilesApp::RmtContainerTypeRepo.new.for_select_rmt_container_types, value: default_rmt_container_type[:id], required: true, prompt: true) unless AppConst::CR_RMT.all_delivery_bins_of_same_type?
         form.add_select(:rmt_class_id, 'RMT Class', items: MasterfilesApp::FruitRepo.new.for_select_rmt_classes, prompt: true, required: false)
 
@@ -1844,7 +1860,7 @@ class Nspack < Roda
       r.on 'set_bin_level_next', Integer do |id|
         if RawMaterialsApp::RmtDeliveryRepo.new.exists?(:rmt_bins, bin_asset_number: params[:bin][:bin_asset_number], rmt_delivery_id: id)
           store_locally(:flash_notice, "Bin:#{params[:bin][:bin_asset_number]} level set to: #{params[:bin][:bin_fullness]} successfully")
-          interactor.update_rmt_bin_asset_level(params[:bin][:bin_asset_number], params[:bin][:bin_fullness])
+          interactor.update_rmt_bin_asset_level(params[:bin][:bin_asset_number], params[:bin][:bin_fullness], id)
         else
           store_locally(:errors, message:  "Bin:#{params[:bin][:bin_asset_number]} does not belong to the scanned delivery:#{id}")
         end
@@ -1852,7 +1868,7 @@ class Nspack < Roda
       end
 
       r.on 'set_bin_level_complete', Integer do |id|
-        interactor.update_rmt_bin_asset_level(params[:bin][:bin_asset_number], params[:bin][:bin_fullness]) unless params[:bin][:bin_asset_number].nil_or_empty?
+        interactor.update_rmt_bin_asset_level(params[:bin][:bin_asset_number], params[:bin][:bin_fullness], id) unless params[:bin][:bin_asset_number].nil_or_empty?
 
         delivery = interactor.get_delivery_confirmation_details(id)
         form = Crossbeams::RMDForm.new({},

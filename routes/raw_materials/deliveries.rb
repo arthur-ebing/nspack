@@ -337,6 +337,7 @@ class Nspack < Roda
                 scrapped_at
                 status
                 asset_number
+                sample_bin
                 rmt_container_material_type_id
                 container_material_type_code
               ]
@@ -745,6 +746,7 @@ class Nspack < Roda
               rebin_created_at
               scrapped
               scrapped_at
+              sample_bin
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else

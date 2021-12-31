@@ -38,5 +38,6 @@ module RawMaterialsApp
     attribute :rmt_code_id, Types::Integer
     attribute :rmt_classifications, Types::Array
     attribute :rmt_container_material_type_id, Types::Integer
+    attribute :qty_partial_bins, Types::Integer
   end
 end

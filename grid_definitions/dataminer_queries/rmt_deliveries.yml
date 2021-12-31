@@ -18,7 +18,7 @@
   \   --\r\n    rmt_deliveries.cultivar_id,\r\n    cultivars.cultivar_name,\r\n    cultivars.cultivar_code,\r\n
   \   --\r\n    rmt_deliveries.rmt_delivery_destination_id,\r\n    rmt_delivery_destinations.delivery_destination_code,\r\n
   \   --\r\n    rmt_deliveries.truck_registration_number,\r\n    rmt_deliveries.qty_damaged_bins,\r\n
-  \   rmt_deliveries.qty_empty_bins,\r\n    rmt_deliveries.current,\r\n    rmt_deliveries.keep_open,\r\n
+  \   rmt_deliveries.qty_empty_bins,\r\n    rmt_deliveries.current,\r\n    rmt_deliveries.qty_partial_bins,\r\n    rmt_deliveries.keep_open,\r\n
   \   rmt_deliveries.delivery_tipped,\r\n    rmt_deliveries.shipped,\r\n    rmt_deliveries.date_picked
   AS picked_at,\r\n    rmt_deliveries.tipping_complete_date_time AS tipping_completed_at,\r\n\r\n
   \   rmt_deliveries.created_at,\r\n    rmt_deliveries.updated_at,\r\n    rmt_deliveries.sample_bins,\r\n    CASE\r\n
@@ -154,6 +154,22 @@
     :pinned: 
     :groupable: false
     :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  qty_partial_bins:
+    :name: qty_partial_bins
+    :sequence_no: 7
+    :caption: Qty Partial Bins
+    :namespaced_name:
+    :data_type: :number
+    :width: 150
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
