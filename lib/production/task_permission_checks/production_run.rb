@@ -75,7 +75,6 @@ module ProductionApp
       def execute_check
         return failed_response 'Setup is not yet complete' unless entity.setup_complete # || entity.reconfiguring
         return failed_response 'There is a tipping run already active on this line' if line_has_active_tipping_run?
-        return failed_response 'Bintip control data must be set before executing the run' if entity.legacy_data.nil? && AppConst::CLIENT_CODE == 'kr'
 
         res = check_orchard_tests_for_run
         return res unless res.success
