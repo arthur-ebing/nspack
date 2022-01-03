@@ -13,9 +13,9 @@ require_relative '../app_loader'
 #
 # To run:
 # -------
-# Debug : DEBUG=y RACK_ENV=production ruby scripts/base_script.rb BuildUdResourceTree
-# Live  : RACK_ENV=production ruby scripts/base_script.rb BuildUdResourceTree
-# Dev   : ruby scripts/base_script.rb BuildUdResourceTree
+# Debug : DEBUG=y RACK_ENV=production ruby scripts/base_script.rb BuildCfgResourceTree
+# Live  : RACK_ENV=production ruby scripts/base_script.rb BuildCfgResourceTree
+# Dev   : ruby scripts/base_script.rb BuildCfgResourceTree
 #
 class BuildCfgResourceTree < BaseScript
   attr_reader :repo, :ph_id, :line_type, :reverse, :line_id, :pack_point, :drop_type, :printer_type, :clm_type, :btn_type,
@@ -107,7 +107,7 @@ class BuildCfgResourceTree < BaseScript
       printer_id = repo.create_child_plant_resource(line_id, res, sys_code: "PRN-#{seq_str}")
 
       res = plant_res(clm_type, "CLM-#{seq_str}", "NTD #{seq}")
-      clm_id = repo.create_child_plant_resource(this_line_id, res, sys_code: "CLM-#{seq_str}")
+      clm_id = repo.create_child_plant_resource(this_line, res, sys_code: "CLM-#{seq_str}")
       sysres_id = repo.get(:plant_resources, :system_resource_id, clm_id)
       repo.update_system_resource(sysres_id, clm_attrs.merge(ip_address: "192.168.13.#{seq + 10}"))
       # Add buttons (& link to packpoints...)
