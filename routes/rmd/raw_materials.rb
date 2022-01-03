@@ -1431,11 +1431,11 @@ class Nspack < Roda
           form.add_label(:qty_inner_bins, 'Qty Inner Bins', '1', '1', hide_on_load: true)
         end
 
-        form.add_field(:bin_asset_number1, delivery[:sample_bins].include?(1 + delivery[:delivery_qty_bins]) ? 'SAMPLE ASSET1' : 'Asset Number1', scan: 'key248_all', scan_type: :bin_asset, submit_form: false, required: true)
+        form.add_field(:bin_asset_number1, delivery[:sample_bins].include?(1 + delivery[:delivery_qty_bins]) ? 'SAMPLE ASSET' : 'Asset Number1', scan: 'key248_all', scan_type: :bin_asset, submit_form: false, required: true)
         delivery[:qty_bins_remaining] = AppConst::BIN_SCANNING_BATCH_SIZE.to_i unless delivery[:qty_bins_remaining] < AppConst::BIN_SCANNING_BATCH_SIZE.to_i
         if delivery[:qty_bins_remaining] > 1
           (2..(delivery[:qty_bins_remaining])).each do |c|
-            label = delivery[:sample_bins].include?(c + delivery[:delivery_qty_bins]) ? "SAMPLE ASSET#{c}" : "Asset Number#{c}"
+            label = delivery[:sample_bins].include?(c + delivery[:delivery_qty_bins]) ? 'SAMPLE ASSET' : "Asset Number#{c}"
             form.add_field("bin_asset_number#{c}".to_sym, label, scan: 'key248_all', scan_type: :bin_asset, submit_form: false, required: false)
           end
         end
