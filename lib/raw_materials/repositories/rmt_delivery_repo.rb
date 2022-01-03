@@ -228,7 +228,7 @@ module RawMaterialsApp
     def delivery_confirmation_details(id)
       query = <<~SQL
         select d.id, c.cultivar_name, cg.cultivar_group_code, f.farm_code, p.puc_code, o.orchard_code
-        , d.truck_registration_number, d.date_delivered, d.date_picked, d.sample_bins
+        , d.truck_registration_number, d.date_delivered, d.date_picked, d.sample_bins,  count(b.id) as delivery_qty_bins
         , count(b.id) as bins_received, (d.quantity_bins_with_fruit - count(b.id)) as qty_bins_remaining
         from rmt_deliveries d
         join cultivars c on c.id=d.cultivar_id
