@@ -1431,11 +1431,12 @@ class Nspack < Roda
           form.add_label(:qty_inner_bins, 'Qty Inner Bins', '1', '1', hide_on_load: true)
         end
 
-        form.add_field(:bin_asset_number1, 'Asset Number1', scan: 'key248_all', scan_type: :bin_asset, submit_form: false, required: true)
+        form.add_field(:bin_asset_number1, delivery[:sample_bins].include?(1 + delivery[:delivery_qty_bins]) ? 'SAMPLE ASSET' : 'Asset Number1', scan: 'key248_all', scan_type: :bin_asset, submit_form: false, required: true)
         delivery[:qty_bins_remaining] = AppConst::BIN_SCANNING_BATCH_SIZE.to_i unless delivery[:qty_bins_remaining] < AppConst::BIN_SCANNING_BATCH_SIZE.to_i
         if delivery[:qty_bins_remaining] > 1
-          (1..(delivery[:qty_bins_remaining] - 1)).each do |c|
-            form.add_field("bin_asset_number#{c + 1}".to_sym, "Asset Number#{c + 1}", scan: 'key248_all', scan_type: :bin_asset, submit_form: false, required: false)
+          (2..(delivery[:qty_bins_remaining])).each do |c|
+            label = delivery[:sample_bins].include?(c + delivery[:delivery_qty_bins]) ? 'SAMPLE ASSET' : "Asset Number#{c}"
+            form.add_field("bin_asset_number#{c}".to_sym, label, scan: 'key248_all', scan_type: :bin_asset, submit_form: false, required: false)
           end
         end
 
@@ -1871,6 +1872,7 @@ class Nspack < Roda
         interactor.update_rmt_bin_asset_level(params[:bin][:bin_asset_number], params[:bin][:bin_fullness], id) unless params[:bin][:bin_asset_number].nil_or_empty?
 
         delivery = interactor.get_delivery_confirmation_details(id)
+        delivery_sample_bins = interactor.delivery_sample_bins(id)
         form = Crossbeams::RMDForm.new({},
                                        notes: nil,
                                        form_name: :delivery,
@@ -1888,6 +1890,12 @@ class Nspack < Roda
         form.add_label(:orchard_code, 'Orchard', delivery[:orchard_code])
         form.add_label(:truck_registration_number, 'Truck Reg Number', delivery[:truck_registration_number])
         form.add_label(:date_delivered, 'Date Delivered', delivery[:date_delivered])
+        unless delivery_sample_bins.empty?
+          form.add_section_header('Sample Bins')
+          delivery_sample_bins.each do |bin|
+            form.add_label(:bin, nil, bin)
+          end
+        end
         form.add_csrf_tag csrf_tag
         view(inline: form.render, layout: :layout_rmd)
       end
