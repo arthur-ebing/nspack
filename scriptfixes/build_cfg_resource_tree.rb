@@ -19,7 +19,7 @@ require_relative '../app_loader'
 #
 class BuildCfgResourceTree < BaseScript
   attr_reader :repo, :ph_id, :line_type, :reverse, :line_id, :pack_point, :drop_type, :printer_type, :clm_type, :btn_type,
-              :ptz_type, :bay_type, :ship_type, :subline_type, :bts_type, :btm_type
+              :ptz_type, :bay_type, :ship_type, :subline_type, :bts_type, :btm_type, :dem_line_id, :ps_line_id, :cl2_line_id
 
   # Spec: 130 NTD and 130 printers (network/usb, not decided yet)
   # ip range: 192.168.13.xxx, starting at .11
@@ -27,9 +27,9 @@ class BuildCfgResourceTree < BaseScript
   # SITE
   #   MES
   #   PH3 (?)
-  #     LINE 1
+  #     N1
   #     LINE 2
-  def run # rubocop:disable Metrics/AbcSize
+  def run # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
     # Make this reversable using a parameter
 
     @reverse = args.length == 1
@@ -38,8 +38,17 @@ class BuildCfgResourceTree < BaseScript
     @ph_id = @repo.get_id(:plant_resources, plant_resource_code: 'PH3')
     return failed_response('PH3 PACKHOUSE resource does not exist!') if @ph_id.nil?
 
-    @line_id = @repo.get_id(:plant_resources, plant_resource_code: 'LINE3')
-    return failed_response('LINE3 LINE resource does not exist!') if @line_id.nil?
+    @line_id = @repo.get_id(:plant_resources, plant_resource_code: 'N1')
+    return failed_response('N1 LINE resource does not exist!') if @line_id.nil?
+
+    @dem_line_id = @repo.get_id(:plant_resources, plant_resource_code: 'N1_DEMANDFEED')
+    return failed_response('N1_DEMANDFEED SUB_LINE resource does not exist!') if @dem_line_id.nil?
+
+    @ps_line_id = @repo.get_id(:plant_resources, plant_resource_code: 'N1_PACKSTATIONS')
+    return failed_response('N1_PACKSTATIONS SUB_LINE resource does not exist!') if @ps_line_id.nil?
+
+    @cl2_line_id = @repo.get_id(:plant_resources, plant_resource_code: 'N1_CLASS2')
+    return failed_response('N1_CLASS2 SUB_LINE resource does not exist!') if @cl2_line_id.nil?
 
     @line_type = @repo.plant_resource_type_id_from_code(Crossbeams::Config::ResourceDefinitions::LINE)
     @drop_type = @repo.plant_resource_type_id_from_code(Crossbeams::Config::ResourceDefinitions::DROP)
@@ -85,15 +94,20 @@ class BuildCfgResourceTree < BaseScript
 
   def create_modules_and_printers # rubocop:disable Metrics/AbcSize
     clm_attrs = { port: 2000, group_incentive: true, login: true, logoff: false, equipment_type: 'robot-nspi', robot_function: 'HTTP-CartonLabel', module_function: 'carton_labelling', ttl: 10_000, cycle_time: 9000, module_action: 'carton_labeling', publishing: true, extended_config: { distro_type: 'seeed_reterm' } }
-
+    this_line = dem_line_id
     130.times do |n|
       seq = n + 1
+      if seq > 48
+        this_line = cl2_line_id
+      elsif seq > 24
+        this_line = ps_line_id
+      end
       seq_str = seq.to_s.rjust(3, '0')
       res = plant_res(printer_type, "PRN-#{seq_str}", "Printer #{seq}") # model etc...
       printer_id = repo.create_child_plant_resource(line_id, res, sys_code: "PRN-#{seq_str}")
 
       res = plant_res(clm_type, "CLM-#{seq_str}", "NTD #{seq}")
-      clm_id = repo.create_child_plant_resource(line_id, res, sys_code: "CLM-#{seq_str}")
+      clm_id = repo.create_child_plant_resource(this_line_id, res, sys_code: "CLM-#{seq_str}")
       sysres_id = repo.get(:plant_resources, :system_resource_id, clm_id)
       repo.update_system_resource(sysres_id, clm_attrs.merge(ip_address: "192.168.13.#{seq + 10}"))
       # Add buttons (& link to packpoints...)
