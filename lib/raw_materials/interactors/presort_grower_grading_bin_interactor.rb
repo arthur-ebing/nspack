@@ -65,7 +65,7 @@ module RawMaterialsApp
               when 'rmt_size_code'
                 { rmt_size_id:  repo.get_id(:rmt_sizes, size_code: val) }
               when 'colour'
-                { treatment_id:  repo.get_id(:treatments, treatment_code: val) }
+                { colour_percentage_id:  repo.get_id(:colour_percentages, colour_percentage: val, commodity_id: repo.get_grading_pool_commodity_id(grading_bin_id)) }
               when 'rmt_bin_weight'
                 { rmt_bin_weight:  val }
               end

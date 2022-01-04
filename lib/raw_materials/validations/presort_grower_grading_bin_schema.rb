@@ -16,7 +16,7 @@ module RawMaterialsApp
     required(:created_by).filled(Types::StrippedString)
     required(:rmt_class_id).maybe(:integer)
     required(:rmt_size_id).maybe(:integer)
-    required(:treatment_id).maybe(:integer)
+    required(:colour_percentage_id).maybe(:integer)
     required(:rmt_bin_weight).filled(:decimal)
   end
 
@@ -28,7 +28,7 @@ module RawMaterialsApp
     required(:updated_by).filled(Types::StrippedString)
     required(:rmt_class_id).maybe(:integer)
     required(:rmt_size_id).maybe(:integer)
-    required(:treatment_id).maybe(:integer)
+    required(:colour_percentage_id).maybe(:integer)
     required(:rmt_bin_weight).maybe(:decimal)
   end
 
@@ -38,7 +38,7 @@ module RawMaterialsApp
     required(:farm_id).filled(:integer)
     required(:rmt_class_id).maybe(:integer)
     required(:rmt_size_id).maybe(:integer)
-    required(:treatment_id).maybe(:integer)
+    required(:colour_percentage_id).maybe(:integer)
     required(:rmt_bin_weight).maybe(:decimal)
     required(:maf_rmt_code).maybe(Types::StrippedString)
     required(:maf_article).maybe(Types::StrippedString)

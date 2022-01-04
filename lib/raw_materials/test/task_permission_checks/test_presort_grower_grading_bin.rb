@@ -14,7 +14,7 @@ module RawMaterialsApp
         farm_id: 1,
         rmt_class_id: 1,
         rmt_size_id: 1,
-        treatment_id: 1,
+        colour_percentage_id: 1,
         maf_rmt_code: Faker::Lorem.unique.word,
         maf_article: 'ABC',
         maf_class: 'ABC',

@@ -56,9 +56,9 @@ module RawMaterialsApp
                                                    { parent_table: :rmt_sizes,
                                                      columns: [:size_code],
                                                      flatten_columns: { size_code: :rmt_size_code } },
-                                                   { parent_table: :treatments,
-                                                     columns: [:treatment_code],
-                                                     flatten_columns: { treatment_code: :colour } }])
+                                                   { parent_table: :colour_percentages,
+                                                     columns: [:colour_percentage],
+                                                     flatten_columns: { colour_percentage: :colour } }])
       return nil if hash.nil?
 
       hash[:adjusted_weight] = hash[:rmt_bin_weight] - hash[:maf_weight]
@@ -124,6 +124,14 @@ module RawMaterialsApp
       args = res.to_h.reject { |k, _| %i[id active graded maf_weight rmt_bin_weight created_by updated_by created_at updated_at].include?(k) }
       id = get_id(:presort_grower_grading_bins, args)
       id
+    end
+
+    def get_grading_pool_commodity_id(grading_bin_id)
+      DB[:presort_grower_grading_pools]
+        .where(id: DB[:presort_grower_grading_bins]
+                                     .where(id: grading_bin_id)
+                                     .get(:presort_grower_grading_pool_id))
+        .get(:commodity_id)
     end
   end
 end

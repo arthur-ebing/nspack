@@ -35,7 +35,7 @@ module RawMaterialsApp
       opts[:farm_id] ||= create_farm
       opts[:rmt_class_id] ||= create_rmt_class
       opts[:rmt_size_id] ||= create_rmt_size
-      opts[:treatment_id] ||= create_treatment
+      opts[:colour_percentage_id] ||= create_colour_percentage
 
       default = {
         maf_rmt_code: Faker::Lorem.unique.word,
