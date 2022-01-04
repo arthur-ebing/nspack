@@ -18,7 +18,7 @@ module RawMaterialsApp
     attribute :maf_total_lot_weight, Types::Decimal
     attribute :created_by, Types::String
     attribute :updated_by, Types::String
-    attribute :treatment_id, Types::Integer
+    attribute :colour_percentage_id, Types::Integer
     attribute :rmt_bin_weight, Types::Decimal
     attribute? :graded, Types::Bool
     attribute? :active, Types::Bool
@@ -43,7 +43,7 @@ module RawMaterialsApp
     attribute :maf_total_lot_weight, Types::Decimal
     attribute :created_by, Types::String
     attribute :updated_by, Types::String
-    attribute :treatment_id, Types::Integer
+    attribute :colour_percentage_id, Types::Integer
     attribute :rmt_bin_weight, Types::Decimal
     attribute :adjusted_weight, Types::Decimal
     attribute? :graded, Types::Bool

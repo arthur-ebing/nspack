@@ -5,6 +5,8 @@ module UiRules
     def generate_rules
       @repo = RawMaterialsApp::PresortGrowerGradingRepo.new
       @fruit_repo = MasterfilesApp::FruitRepo.new
+      @commodity_repo = MasterfilesApp::CommodityRepo.new
+
       make_form_object
       apply_form_values
 
@@ -20,7 +22,7 @@ module UiRules
       farm_id_label = @repo.get(:farms, :farm_code, @form_object.farm_id)
       rmt_class_id_label = @repo.get(:rmt_classes, :rmt_class_code, @form_object.rmt_class_id)
       rmt_size_id_label = @repo.get(:rmt_sizes, :size_code, @form_object.rmt_size_id)
-      treatment_id_label = @repo.get(:treatments, :treatment_code, @form_object.treatment_id)
+      colour_percentage_id_label = @repo.get(:colour_percentages, :colour_percentage, @form_object.colour_percentage_id)
       fields[:presort_grower_grading_pool_id] = { renderer: :label,
                                                   with_value: presort_grower_grading_pool_id_label,
                                                   caption: 'Maf Lot Number' }
@@ -50,15 +52,16 @@ module UiRules
       fields[:updated_at] = { renderer: :label,
                               format: :without_timezone_or_seconds }
       fields[:graded] = { renderer: :label, as_boolean: true }
-      fields[:treatment_id] = { renderer: :label,
-                                with_value: treatment_id_label,
-                                caption: 'Colour' }
+      fields[:colour_percentage_id] = { renderer: :label,
+                                        with_value: colour_percentage_id_label,
+                                        caption: 'Colour' }
       fields[:rmt_bin_weight] = { renderer: :label }
       fields[:adjusted_weight] = { renderer: :label }
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize
       presort_grower_grading_pool_id = @options[:presort_grading_pool_id].nil_or_empty? ? @repo.find_presort_grower_grading_bin(@options[:id]).presort_grower_grading_pool_id : @options[:presort_grading_pool_id]
+      commodity_id = @repo.get(:presort_grower_grading_pools, :commodity_id, presort_grower_grading_pool_id)
       if @mode == :new
         farm_renderer = { renderer: :select,
                           options: MasterfilesApp::FarmRepo.new.for_select_farms(where: { id: @form_object.farm_id }),
@@ -78,8 +81,10 @@ module UiRules
                               searchable: true,
                               remove_search_for_small_list: false }
         colour_renderer = { renderer: :select,
-                            options: @fruit_repo.for_select_treatments,
-                            disabled_options: @fruit_repo.for_select_inactive_treatments,
+                            options: @commodity_repo.for_select_colour_percentages(
+                              where: { commodity_id: commodity_id }
+                            ),
+                            disabled_options: @commodity_repo.for_select_inactive_colour_percentages,
                             caption: 'Colour',
                             prompt: 'Select Colour',
                             searchable: true,
@@ -95,7 +100,7 @@ module UiRules
                               with_value: @repo.get(:rmt_sizes, :size_code, @form_object.rmt_size_id),
                               caption: 'Rmt Size' }
         colour_renderer = { renderer: :label,
-                            with_value: @repo.get(:treatments, :treatment_code, @form_object.treatment_id),
+                            with_value: @repo.get(:colour_percentages, :colour_percentage, @form_object.colour_percentage_id),
                             caption: 'Colour' }
       end
       {
@@ -107,7 +112,7 @@ module UiRules
         farm_id: farm_renderer,
         rmt_class_id: rmt_class_renderer,
         rmt_size_id: rmt_size_renderer,
-        treatment_id: colour_renderer,
+        colour_percentage_id: colour_renderer,
         maf_rmt_code: {},
         maf_article: {},
         maf_class: {},

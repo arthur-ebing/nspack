@@ -2,11 +2,11 @@
 :caption: Presort Grower Grading Bins
 :sql: "SELECT \"presort_grower_grading_bins\".\"id\", \r\n\"presort_grower_grading_bins\".\"presort_grower_grading_pool_id\",
   \r\n\"presort_grower_grading_bins\".\"farm_id\", \r\n\"presort_grower_grading_bins\".\"rmt_class_id\",
-  \r\n\"presort_grower_grading_bins\".\"rmt_size_id\", \r\n\"presort_grower_grading_bins\".\"treatment_id\",\r\n\"presort_grower_grading_pools\".\"maf_lot_number\",
+  \r\n\"presort_grower_grading_bins\".\"rmt_size_id\", \r\n\"presort_grower_grading_bins\".\"colour_percentage_id\",\r\n\"presort_grower_grading_pools\".\"maf_lot_number\",
   \r\n\"farms\".\"farm_code\", \r\n\"presort_grower_grading_bins\".\"maf_rmt_code\",
   \r\n\"presort_grower_grading_bins\".\"maf_article\", \r\n\"presort_grower_grading_bins\".\"maf_class\",
   \r\n\"rmt_classes\".\"rmt_class_code\",\r\n\"presort_grower_grading_bins\".\"maf_colour\",
-  \r\n\"treatments\".\"treatment_code\" AS colour,\r\n\"presort_grower_grading_bins\".\"maf_count\",
+  \r\n\"colour_percentages\".\"colour_percentage\" AS colour,\r\n\"presort_grower_grading_bins\".\"maf_count\",
   \r\n\"rmt_sizes\".\"size_code\" AS rmt_size_code, \r\n\"presort_grower_grading_bins\".\"maf_weight\",
   \r\n\"presort_grower_grading_bins\".\"rmt_bin_weight\", \r\n(\"presort_grower_grading_bins\".\"rmt_bin_weight\"
   - \"presort_grower_grading_bins\".\"maf_weight\" ) AS adjusted_weight,\r\n\"presort_grower_grading_bins\".\"maf_article_count\",
@@ -21,7 +21,7 @@
   = \"presort_grower_grading_bins\".\"presort_grower_grading_pool_id\" \r\nLEFT JOIN
   \"rmt_classes\" ON \"rmt_classes\".\"id\" = \"presort_grower_grading_bins\".\"rmt_class_id\"
   \r\nLEFT JOIN \"rmt_sizes\" ON \"rmt_sizes\".\"id\" = \"presort_grower_grading_bins\".\"rmt_size_id\"\r\nLEFT
-  JOIN \"treatments\" ON \"treatments\".\"id\" = \"presort_grower_grading_bins\".\"treatment_id\""
+  JOIN \"colour_percentages\" ON \"colour_percentages\".\"id\" = \"presort_grower_grading_bins\".\"colour_percentage_id\""
 :limit: 
 :offset: 
 :external_settings: {}
@@ -106,11 +106,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  treatment_id:
-    :name: treatment_id
+  colour_percentage_id:
+    :name: colour_percentage_id
     :sequence_no: 6
-    :caption: Treatment
-    :namespaced_name: presort_grower_grading_bins.treatment_id
+    :caption: Colour
+    :namespaced_name: presort_grower_grading_bins.colour_percentage_id
     :data_type: :integer
     :width: 
     :format: 
@@ -238,7 +238,7 @@
     :name: colour
     :sequence_no: 14
     :caption: Colour
-    :namespaced_name: treatments.treatment_code
+    :namespaced_name: colour_percentages.colour_percentage
     :data_type: :string
     :width: 100
     :format: 
@@ -540,12 +540,11 @@
   :ordered_list: true
   :ui_priority: 1
   :list_def: SELECT size_code, id FROM rmt_sizes ORDER BY size_code
-- :column: presort_grower_grading_bins.treatment_id
+- :column: presort_grower_grading_bins.colour_percentage_id
   :caption: Colour
   :data_type: :integer
   :control_type: :list
   :default_value: 
   :ordered_list: true
   :ui_priority: 1
-  :list_def: SELECT treatment_code, id FROM treatments WHERE treatment_type_id = (SELECT
-    id FROM treatment_types WHERE treatment_type_code = 'PRESORT') ORDER BY treatment_code
+  :list_def: SELECT colour_percentage, id FROM colour_percentages ORDER BY colour_percentage
