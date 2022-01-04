@@ -30,46 +30,38 @@ module RawMaterials
                                   loading_window: true,
                                   style: :button)
 
-              section.add_control(control_type: :link,
-                                  text: 'List Tripsheets',
+              list_tripsheets = { text: 'List Tripsheets',
                                   url: "/raw_materials/deliveries/rmt_deliveries/#{id}/list_tripsheet",
                                   behaviour: :popup,
-                                  visible: rules[:list_tripsheets],
-                                  style: :button)
+                                  visible: rules[:list_tripsheets] }
 
-              section.add_control(control_type: :link,
-                                  text: 'Create Tripsheet',
-                                  url: "/raw_materials/deliveries/rmt_deliveries/#{id}/create_tripsheet",
-                                  behaviour: :popup,
-                                  visible: rules[:create_tripsheet],
-                                  style: :button)
+              create_tripsheet = { text: 'Create Tripsheet',
+                                   url: "/raw_materials/deliveries/rmt_deliveries/#{id}/create_tripsheet",
+                                   behaviour: :popup,
+                                   visible: rules[:create_tripsheet] }
 
-              section.add_control(control_type: :link,
-                                  text: 'Start Bins Trip',
+              start_bins_trip = { text: 'Start Bins Trip',
                                   url: "/raw_materials/deliveries/rmt_deliveries/#{id}/start_bins_trip",
-                                  visible: rules[:start_bins_trip],
-                                  style: :button)
+                                  visible: rules[:start_bins_trip] }
 
-              cancel = { control_type: :link,
-                         text: 'Cancel Tripheet',
-                         url: "/raw_materials/deliveries/rmt_deliveries/#{id}/cancel_delivery_tripheet",
-                         visible: rules[:cancel_delivery_tripheet],
-                         style: :button }
-              cancel.store(:prompt, 'Vehicle is already loaded, do you want to cancel?') if rules[:vehicle_loaded]
-              section.add_control(cancel)
+              cancel_tripsheet = { text: 'Cancel Tripsheet',
+                                   url: "/raw_materials/deliveries/rmt_deliveries/#{id}/cancel_delivery_tripheet",
+                                   visible: rules[:cancel_delivery_tripheet] }
+              cancel_tripsheet.store(:prompt, 'Vehicle is already loaded, do you want to cancel?') if rules[:vehicle_loaded]
 
-              section.add_control(control_type: :link,
-                                  text: 'Print Tripsheet',
+              print_tripsheet = { text: 'Print Tripsheet',
                                   url: "/rmd/finished_goods/print_tripsheet/#{rules[:vehicle_job_id]}",
                                   visible: rules[:cancel_delivery_tripheet],
-                                  loading_window: true,
-                                  style: :button)
+                                  loading_window: true }
 
-              section.add_control(control_type: :link,
-                                  text: 'Refresh Tripsheet',
-                                  url: "/raw_materials/deliveries/rmt_deliveries/#{id}/refresh_delivery_tripheet",
-                                  visible: rules[:refresh_tripsheet],
-                                  style: :button)
+              refresh_tripsheet = { text: 'Refresh Tripsheet',
+                                    url: "/raw_materials/deliveries/rmt_deliveries/#{id}/refresh_delivery_tripheet",
+                                    visible: rules[:refresh_tripsheet] }
+
+              tripsheet_items = [create_tripsheet, start_bins_trip, list_tripsheets, cancel_tripsheet, print_tripsheet, refresh_tripsheet]
+              section.add_control(control_type: :dropdown_button,
+                                  text: 'Tripsheets',
+                                  items: tripsheet_items)
 
               section.add_notice rules[:mrl_result_notice], notice_type: :warning if AppConst::CR_RMT.enforce_mrl_check? && !rules[:mrl_result_notice].nil_or_empty?
               section.form do |form|
