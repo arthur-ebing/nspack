@@ -47,8 +47,8 @@ module RawMaterialsApp
       def complete_check
         return failed_response 'PresortGrowerGradingPool has already been completed' if completed?
 
-        ungraded_bins = @repo.select_values(:presort_grower_grading_bins, :id, presort_grower_grading_pool_id: @id, graded: false)
-        return failed_response 'Some bins on the pool are not yet graded.' unless ungraded_bins.empty?
+        # ungraded_bins = @repo.select_values(:presort_grower_grading_bins, :id, presort_grower_grading_pool_id: @id, graded: false)
+        # return failed_response 'Some bins on the pool are not yet graded.' unless ungraded_bins.empty?
 
         all_ok
       end
