@@ -146,6 +146,7 @@ module RawMaterialsApp
       return nil unless repo.allocate_sample_rmt_bins_for_commodity_cultivar?(cultivar_id)
 
       sample_size = (AppConst::CR_RMT.sample_rmt_bin_percentage * quantity_bins_with_fruit).round
+      sample_size = 1 if sample_size.zero?
       generate_sample_bin_sequences(sample_size, quantity_bins_with_fruit)
     end
 

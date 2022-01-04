@@ -108,7 +108,7 @@ module UiRules
         id: { renderer: :label, caption: 'Delivery Id' },
         sample_bins: { renderer: :label,
                        caption: 'Sample bin positions',
-                       with_value: @form_object.sample_bins.join(',') },
+                       with_value: @form_object.sample_bins.to_a.join(',') },
         farm_id: { renderer: :select,
                    options: MasterfilesApp::FarmRepo.new.for_select_farms,
                    disabled_options: MasterfilesApp::FarmRepo.new.for_select_inactive_farms,

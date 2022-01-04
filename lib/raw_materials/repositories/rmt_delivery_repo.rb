@@ -708,12 +708,19 @@ module RawMaterialsApp
       DB[:rmt_bins].where(bin_asset_number: bin_asset_number).update(updates)
     end
 
-    def allocate_delivery_bin_samples(delivery_id, cultivar_id, sample_positions) # rubocop:disable Metrics/AbcSize
+    def allocate_delivery_bin_sample(bin_asset_number, bin_id, delivery_id, cultivar_id, sample_positions)
       return unless allocate_sample_rmt_bins_for_commodity_cultivar?(cultivar_id)
 
-      bins = select_values(:rmt_bins, %i[id bin_fullness], rmt_delivery_id: delivery_id).sort_by { |s| s[0] }
-      samples = (bins.map { |b| b[0] }.values_at(*sample_positions.collect { |x| x.to_i - 1 }) + bins.find_all { |b| b[1] != AppConst::BIN_FULL }.map { |d| d[0] }).uniq
-      update_rmt_bin(samples, sample_bin: true)
+      qry = <<~SQL
+        SELECT b.position
+        FROM (
+          SELECT rmt_bins.*, ROW_NUMBER() OVER(ORDER BY rmt_bins.id) AS position
+          FROM rmt_bins WHERE rmt_bins.rmt_delivery_id = ?
+        ) b
+        WHERE b.bin_asset_number = ?
+      SQL
+      bin_position = DB[qry, delivery_id, bin_asset_number].get(:position)
+      update_rmt_bin(bin_id, sample_bin: true) if  sample_positions.include?(bin_position)
     end
 
     def delivery_has_complete_qc_sample?(id)
