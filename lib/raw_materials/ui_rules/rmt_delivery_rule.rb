@@ -8,7 +8,7 @@ module UiRules
       apply_form_values
 
       @rules[:mrl_result_notice] = check_mrl_result_status_for(@form_object.id) unless @form_object.id.nil?
-      @rules[:create_tripsheet] = !@form_object.tripsheet_created && !@form_object.shipped && @rules[:mrl_result_notice].nil_or_empty?
+      @rules[:create_tripsheet] = !@form_object.tripsheet_created && !@form_object.shipped && (@rules[:pending_mrl_result] || !@rules[:failed_mrl_result])
       @rules[:start_bins_trip] = @form_object.tripsheet_created && !@form_object.tripsheet_loaded
       @rules[:cancel_delivery_tripheet] = @form_object.tripsheet_created && !@form_object.tripsheet_offloaded
       @rules[:print_delivery_tripheet] = @rules[:cancel_delivery_tripheet]
@@ -248,6 +248,8 @@ module UiRules
       return nil unless AppConst::CR_RMT.enforce_mrl_check?
 
       res = QualityApp::FailedAndPendingMrlResults.call(delivery_id)
+      @rules[:failed_mrl_result] = res[:errors][:failed]
+      @rules[:pending_mrl_result] = res[:errors][:pending]
       res.success ? nil : res.message
     end
 
