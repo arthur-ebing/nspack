@@ -73,7 +73,7 @@ module RawMaterialsApp
       farm_id = create_farm
       rmt_class_id = create_rmt_class
       rmt_size_id = create_rmt_size
-      treatment_id = create_treatment
+      colour_percentage_id = create_colour_percentage
 
       {
         id: 1,
@@ -81,7 +81,7 @@ module RawMaterialsApp
         farm_id: farm_id,
         rmt_class_id: rmt_class_id,
         rmt_size_id: rmt_size_id,
-        treatment_id: treatment_id,
+        colour_percentage_id: colour_percentage_id,
         maf_rmt_code: Faker::Lorem.unique.word,
         maf_article: 'ABC',
         maf_class: 'ABC',

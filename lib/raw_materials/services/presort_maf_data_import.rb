@@ -1,12 +1,13 @@
 module RawMaterialsApp
   class PresortMafDataImport < BaseService
-    attr_reader :repo, :maf_lot_number, :grading_pool_id, :user_name, :pool_farm_id, :maf_data_results
+    attr_reader :repo, :maf_lot_number, :grading_pool_id, :user_name, :pool_farm_id, :maf_data_results, :commodity_id
 
     def initialize(maf_lot_number, grading_pool_id, user_name)
       @repo = RawMaterialsApp::PresortGrowerGradingRepo.new
       @maf_lot_number = maf_lot_number
       @grading_pool_id = grading_pool_id
       @user_name = user_name
+      @commodity_id = repo.get(:presort_grower_grading_pools, :commodity_id, grading_pool_id)
     end
 
     def call # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
@@ -107,7 +108,7 @@ module RawMaterialsApp
                     maf_tipped_quantity: maf_bin['maf_infeed_bin_qty'],
                     maf_total_lot_weight: maf_bin['maf_lot_weight'],
                     rmt_class_id: repo.get_id(:rmt_classes, rmt_class_code: attrs[:maf_class]),
-                    treatment_id: repo.get_id(:treatments, treatment_code: attrs[:maf_colour]),
+                    colour_percentage_id: repo.get_id(:colour_percentages, colour_percentage: attrs[:maf_colour], commodity_id: commodity_id),
                     rmt_size_id: repo.get_id(:rmt_sizes, size_code: attrs[:maf_count]) })
     end
 

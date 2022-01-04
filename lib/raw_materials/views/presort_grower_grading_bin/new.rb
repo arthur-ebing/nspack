@@ -29,7 +29,7 @@ module RawMaterials
                   col.add_field :maf_count
                   col.add_field :rmt_size_id
                   col.add_field :maf_colour
-                  col.add_field :treatment_id
+                  col.add_field :colour_percentage_id
                   col.add_field :maf_tipped_quantity
                 end
                 row.column do |col|

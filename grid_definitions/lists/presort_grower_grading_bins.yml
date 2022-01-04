@@ -32,8 +32,8 @@
     colour:
       :editor: :search_select
       :width: 300
-      :value_sql: SELECT NULL UNION SELECT treatment_code FROM treatments
-        WHERE treatment_type_id = (SELECT id FROM treatment_types WHERE treatment_type_code = 'PRESORT')
+      :value_sql: SELECT NULL UNION SELECT colour_percentage FROM colour_percentages
+        WHERE commodity_id = (SELECT commodity_id FROM presort_grower_grading_pools WHERE id = $:presort_grower_grading_pool_id$)
         ORDER BY 1 NULLS FIRST
     rmt_bin_weight:
       :editor: :numeric
