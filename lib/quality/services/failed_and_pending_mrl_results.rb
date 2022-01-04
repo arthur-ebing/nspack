@@ -23,8 +23,12 @@ module QualityApp
     def check_errors # rubocop:disable Metrics/AbcSize
       farm_id, cultivar_id, season_id = repo.get_value(:rmt_deliveries, %i[farm_id cultivar_id season_id], id: rmt_delivery_id)
       mrl_result_ids = repo.select_values(:mrl_results, :id, farm_id: farm_id, cultivar_id: cultivar_id, season_id: season_id)
-      return failed_response("MRL sample required for delivery #{rmt_delivery_id}.", { rmt_delivery_id: rmt_delivery_id }) if mrl_result_ids.nil_or_empty?
-
+      if mrl_result_ids.nil_or_empty?
+        return OpenStruct.new(success: false,
+                              instance: { rmt_delivery_id: rmt_delivery_id },
+                              errors: { failed: true, pending: false },
+                              message: "MRL sample required for delivery #{rmt_delivery_id}.")
+      end
       passed = repo.check_mrl_results_status(mrl_result_ids,
                                              where: { mrl_sample_passed: true, max_num_chemicals_passed: true, pre_harvest_result: true },
                                              exclude: { result_received_at: nil })
