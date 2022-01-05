@@ -198,6 +198,45 @@ class Nspack < Roda
         end
       end
 
+      r.on 'select_destination_node' do
+        r.get do
+          check_auth!('locations', 'move_node')
+          # interactor.assert_permission!(:move_node, id) --> are there rules for which locations can be targets?
+          show_partial { Masterfiles::Locations::Location::SelectDestination.call(id: id) }
+        end
+
+        r.post do
+          store_locally(:destination_location_id, params[:location][:id].to_i, request.ip)
+          show_json_notice('Destination location has been stored. You can move a location to it.')
+        end
+      end
+
+      r.on 'move_node' do
+        r.get do
+          check_auth!('locations', 'move_node')
+          # interactor.assert_permission!(:move_node, id)
+          destination_id = copy_from_local_store(:destination_location_id, request.ip)
+          show_partial { Masterfiles::Locations::Location::Move.call(id: id, destination_location_id: destination_id) }
+        end
+
+        r.post do
+          res = interactor.move_location(id, params[:location])
+          if res.success
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
+          else
+            destination_id = copy_from_local_store(:destination_location_id, request.ip)
+            re_show_form(r, res, url: "/masterfiles/locations/locations/#{id}/move_node") do
+              Masterfiles::Locations::Location::Move.call(id: id,
+                                                          destination_location_id: destination_id,
+                                                          form_values: params[:location],
+                                                          form_errors: res.errors,
+                                                          remote: fetch?(r))
+            end
+          end
+        end
+      end
+
       r.is do
         r.get do       # SHOW
           check_auth!('locations', 'read')

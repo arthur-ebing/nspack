@@ -591,10 +591,22 @@ module CommonHelpers
   # @param ip_address [string] the ip address of the client (defaults to the ip address from the request)
   # @return [Object] the retrieved value.
   def retrieve_from_local_store(key, ip_address = nil)
-    raise ArgumentError, 'store_locally: key must be a Symbol' unless key.is_a? Symbol
+    raise ArgumentError, 'retrieve_from_local_store: key must be a Symbol' unless key.is_a? Symbol
 
     store = LocalStore.new(current_user.id, ip_address || request.ip)
     store.read_once(key)
+  end
+
+  # Return a stored value for the current user from local storage (leaving it in place for re-use).
+  #
+  # @param key [Symbol] the key that was used when stored.
+  # @param ip_address [string] the ip address of the client (defaults to the ip address from the request)
+  # @return [Object] the retrieved value.
+  def copy_from_local_store(key, ip_address = nil)
+    raise ArgumentError, 'copy_from_local_store: key must be a Symbol' unless key.is_a? Symbol
+
+    store = LocalStore.new(current_user.id, ip_address || request.ip)
+    store.read(key)
   end
 
   # Stash a page in local storage for fetching later.

@@ -63,6 +63,27 @@
   :icon: list
   :title: Variants
   :popup: false
+- :submenu:
+    :text: Move Location
+    :items:
+      - :url: "/masterfiles/locations/locations/$:id$/select_destination_node"
+        :text: Select as new (destination) parent
+        :icon: check-square
+        :title: Select as destination (Parent Location)
+        :popup: true
+        :auth:
+          :function: masterfiles
+          :program: locations
+          :permission: move_node
+      - :url: "/masterfiles/locations/locations/$:id$/move_node"
+        :text: Move below selected destination
+        :icon: arrow-left
+        :title: Move this resource
+        :popup: true
+        :auth:
+          :function: masterfiles
+          :program: locations
+          :permission: move_node
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/locations/locations/new"

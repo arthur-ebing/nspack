@@ -2,7 +2,7 @@
 
 module UiRules
   class LocationRule < Base
-    def generate_rules
+    def generate_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       @repo = MasterfilesApp::LocationRepo.new
       @print_repo = LabelApp::PrinterRepo.new
       make_form_object
@@ -12,6 +12,8 @@ module UiRules
 
       set_show_fields if @mode == :show
       set_print_fields if @mode == :print_barcode
+      set_destination_fields if @mode == :select_destination
+      set_move_fields if @mode == :move
       make_location_header_table if %i[view_stock].include? @mode
 
       add_behaviours if @options[:id]
@@ -55,6 +57,21 @@ module UiRules
       fields[:no_of_prints] = { renderer: :integer, required: true }
     end
 
+    def set_destination_fields
+      fields[:id] = { renderer: :hidden }
+      fields[:location_type_id] = { renderer: :label, with_value: location_type_label }
+      fields[:location_long_code] = { renderer: :label, caption: 'Long Code' }
+    end
+
+    def set_move_fields
+      destination_node = @repo.get(:locations, :location_long_code, @options[:destination_location_id])
+      fields[:id] = { renderer: :hidden }
+      fields[:destination_location_id] = { renderer: :hidden }
+      fields[:location_type_id] = { renderer: :label, with_value: location_type_label }
+      fields[:location_long_code] = { renderer: :label, caption: 'Long Code' }
+      fields[:destination_node] = { renderer: :label, with_value: destination_node, caption: 'Destination' }
+    end
+
     def common_fields
       fixed_type = @mode == :new_flat || not_hierarchical_location_type
       type_renderer = if fixed_type
@@ -83,7 +100,7 @@ module UiRules
       }
     end
 
-    def make_form_object
+    def make_form_object # rubocop:disable Metrics/AbcSize
       if %i[new new_flat].include?(@mode)
         make_new_form_object
         return
@@ -92,6 +109,7 @@ module UiRules
       @form_object = @repo.find_location(@options[:id])
       @form_object = OpenStruct.new(@form_object.to_h.merge(location_type_label: location_type_label))
       @form_object = OpenStruct.new(@form_object.to_h.merge(printer: @print_repo.default_printer_for_application(AppConst::PRINT_APP_LOCATION), no_of_prints: 1)) if @mode == :print_barcode
+      @form_object = OpenStruct.new(@form_object.to_h.merge(destination_location_id: @options[:destination_location_id])) if @mode == :move
     end
 
     def make_new_form_object

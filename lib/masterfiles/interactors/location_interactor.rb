@@ -237,6 +237,14 @@ module MasterfilesApp
       }.to_json
     end
 
+    def move_location(id, params)
+      new_id = params[:destination_location_id].to_i
+      repo.transaction do
+        repo.move_tree_node(:tree_locations, :descendant_location_id, :ancestor_location_id, id, new_id)
+      end
+      success_response('Location was moved')
+    end
+
     private
 
     def repo

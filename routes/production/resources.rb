@@ -158,9 +158,9 @@ class Nspack < Roda
         end
       end
 
-      r.on 'move_node' do   # NEW CHILD
+      r.on 'move_node' do
         r.get do
-          check_auth!('resources', 'edit')
+          check_auth!('resources', 'move_node')
           interactor.assert_permission!(:move_node, id) # check type & if root etc
           show_partial { Production::Resources::PlantResource::Move.call(id: id) }
         end

@@ -33,6 +33,10 @@
   :icon: arrow-left
   :title: Move this resource
   :popup: true
+  :auth:
+    :function: production
+    :program: resources
+    :permission: move_node
 # - :submenu:
 #     :text: Bulk add
 #     :items:
