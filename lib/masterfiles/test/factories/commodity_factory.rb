@@ -15,7 +15,8 @@ module MasterfilesApp
         active: true,
         requires_standard_counts: false,
         use_size_ref_for_edi: false,
-        colour_applies: false
+        colour_applies: false,
+        derive_rmt_nett_weight: false
       }
       DB[:commodities].insert(default.merge(opts))
     end

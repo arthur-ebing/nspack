@@ -80,7 +80,8 @@ module MasterfilesApp
         cultivar_group_code: Faker::Lorem.unique.word,
         commodity_code: 'ABC',
         marketing_varieties: %w[A B C],
-        active: true
+        active: true,
+        std_rmt_bin_nett_weight: 1.0
       }
     end
 

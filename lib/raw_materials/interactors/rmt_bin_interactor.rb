@@ -310,12 +310,29 @@ module RawMaterialsApp
           params[:bin_asset_number] = bin_asset_number
           bin_id = repo.create_rmt_bin(params)
           log_status(:rmt_bins, bin_id, 'BIN RECEIVED')
+          if repo.derive_rmt_bin_gross_weight?(params[:cultivar_id])
+            res = weigh_rmt_bin(params)
+            raise Crossbeams::InfoError, res.message unless res.success
+          end
           created_bins << rmt_bin(bin_id)
         end
         repo.update(:bin_asset_numbers, bin_asset_number_ids, last_used_at: Time.now) if bin_asset_number_ids
       end
 
       success_response('Bins Created Successfully', created_bins)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def weigh_rmt_bin(rmt_bin)
+      rmt_bin[:gross_weight] = repo.calculate_rmt_bin_gross_weight(rmt_bin)
+      unless rmt_bin[:gross_weight].nil_or_empty?
+        options = { force_find_by_id: false, weighed_manually: true, avg_gross_weight: false }
+        attrs = { bin_number: rmt_bin[:bin_asset_number], gross_weight: rmt_bin[:gross_weight].to_i }
+        res = MesscadaApp::UpdateBinWeights.call(attrs, options)
+        return res unless res.success
+      end
+      ok_response
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -415,7 +432,7 @@ module RawMaterialsApp
         id = repo.create_rmt_bin(res)
 
         repo.update(:rmt_bins, id, sample_bin: true) if repo.bin_sample?(res[:bin_asset_number], delivery_id, res[:bin_fullness])
-
+        params[:gross_weight] = repo.calculate_rmt_bin_gross_weight(res) if repo.derive_rmt_bin_gross_weight?(res.to_h[:cultivar_id])
         unless params[:gross_weight].nil_or_empty?
           options = { force_find_by_id: false, weighed_manually: true, avg_gross_weight: false }
           bin_number = res.to_h[:bin_asset_number]
@@ -503,6 +520,11 @@ module RawMaterialsApp
           id = repo.create_rmt_bin(bin_params)
           repo.allocate_delivery_bin_sample(bin_asset_number, id, delivery_id, delivery.cultivar_id, delivery.sample_bins)
           log_status(:rmt_bins, id, 'BIN RECEIVED')
+          rmt_bin = repo.find_hash(:rmt_bins, id)
+          if repo.derive_rmt_bin_gross_weight?(rmt_bin[:cultivar_id])
+            res = weigh_rmt_bin(rmt_bin)
+            raise Crossbeams::InfoError, res.message unless res.success
+          end
         end
         log_status(:rmt_deliveries, delivery_id, 'DELIVERY RECEIVED')
         log_transaction

@@ -5,12 +5,12 @@
   \   cultivars.cultivar_name,\r\n    cultivars.cultivar_code,\r\n    cultivars.description,\r\n
   \   ARRAY_AGG(marketing_variety_code) AS marketing_variety_codes,\r\n    fn_masterfile_variants('cultivars',
   cultivars.id) AS variant_codes,\r\n    cultivars.created_at,\r\n    cultivars.updated_at,\r\n
-  \   cultivars.active\r\nFROM cultivars\r\nJOIN cultivar_groups ON cultivar_groups.id
-  = cultivars.cultivar_group_id\r\nJOIN commodities ON commodities.id = cultivar_groups.commodity_id\r\nLEFT
-  JOIN marketing_varieties_for_cultivars ON marketing_varieties_for_cultivars.cultivar_id
-  = cultivars.id\r\nLEFT JOIN marketing_varieties ON marketing_varieties_for_cultivars.marketing_variety_id
-  = marketing_varieties.id\r\n\r\nGROUP BY cultivars.id,\r\n         cultivar_groups.id,\r\n
-  \        commodities.id\r\n"
+  \   cultivars.active,\r\n    cultivars.std_rmt_bin_nett_weight\r\nFROM cultivars\r\nJOIN
+  cultivar_groups ON cultivar_groups.id = cultivars.cultivar_group_id\r\nJOIN commodities
+  ON commodities.id = cultivar_groups.commodity_id\r\nLEFT JOIN marketing_varieties_for_cultivars
+  ON marketing_varieties_for_cultivars.cultivar_id = cultivars.id\r\nLEFT JOIN marketing_varieties
+  ON marketing_varieties_for_cultivars.marketing_variety_id = marketing_varieties.id\r\n\r\nGROUP
+  BY cultivars.id,\r\n         cultivar_groups.id,\r\n         commodities.id\r\n"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -218,6 +218,22 @@
     :hide: false
     :pinned: 
     :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  std_rmt_bin_nett_weight:
+    :name: std_rmt_bin_nett_weight
+    :sequence_no: 14
+    :caption: Std rmt bin nett weight
+    :namespaced_name: cultivars.std_rmt_bin_nett_weight
+    :data_type: :number
+    :width: 150
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false

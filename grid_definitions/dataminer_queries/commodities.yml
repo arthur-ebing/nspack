@@ -4,9 +4,9 @@
   AS commodity_group_code,\r\n    commodities.code,\r\n    commodities.description,\r\n
   \   commodities.hs_code,\r\n    commodities.requires_standard_counts,\r\n    commodities.use_size_ref_for_edi,\r\n
   \   commodities.colour_applies,\r\n    fn_masterfile_variants('commodities', commodities.id)
-  AS variant_codes,\r\n    commodities.allocate_sample_rmt_bins,\r\n    commodities.active,\r\n    commodities.created_at,\r\n
-  \   commodities.updated_at\r\nFROM  commodities\r\nJOIN commodity_groups ON commodity_groups.id
-  = commodities.commodity_group_id"
+  AS variant_codes,\r\n    commodities.allocate_sample_rmt_bins,\r\n    commodities.active,\r\n
+  \   commodities.derive_rmt_nett_weight,\r\n    commodities.created_at,\r\n    commodities.updated_at\r\nFROM
+  \ commodities\r\nJOIN commodity_groups ON commodity_groups.id = commodities.commodity_group_id"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -171,9 +171,57 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  allocate_sample_rmt_bins:
+    :name: allocate_sample_rmt_bins
+    :sequence_no: 11
+    :caption: Allocate Sampl Rmt Bins?
+    :namespaced_name: commodities.allocate_sample_rmt_bins
+    :data_type: :boolean
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 12
+    :caption: Active
+    :namespaced_name: commodities.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  derive_rmt_nett_weight:
+    :name: derive_rmt_nett_weight
+    :sequence_no: 13
+    :caption: Derive rmt nett weight
+    :namespaced_name: commodities.derive_rmt_nett_weight
+    :data_type: :boolean
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 12
+    :sequence_no: 14
     :caption: Created at
     :namespaced_name: commodities.created_at
     :data_type: :datetime
@@ -189,7 +237,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 13
+    :sequence_no: 15
     :caption: Updated at
     :namespaced_name: commodities.updated_at
     :data_type: :datetime
@@ -199,22 +247,6 @@
     :pinned: 
     :groupable: false
     :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  allocate_sample_rmt_bins:
-    :name: allocate_sample_rmt_bins
-    :sequence_no: 14
-    :caption: Allocate Sampl Rmt Bins?
-    :namespaced_name: commodities.allocate_sample_rmt_bins
-    :data_type: :boolean
-    :width: 80
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: true
-    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false

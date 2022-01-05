@@ -24,6 +24,7 @@ module Masterfiles
               form.add_field :use_size_ref_for_edi
               form.add_field :colour_applies
               form.add_field :allocate_sample_rmt_bins
+              form.add_field :derive_rmt_nett_weight
             end
 
             if rules[:colour_applies]

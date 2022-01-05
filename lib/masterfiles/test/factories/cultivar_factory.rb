@@ -24,7 +24,8 @@ module MasterfilesApp
         cultivar_name: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
         cultivar_code: Faker::Lorem.word,
-        active: true
+        active: true,
+        std_rmt_bin_nett_weight: Faker::Number.decimal
       }
       DB[:cultivars].insert(default.merge(opts))
     end

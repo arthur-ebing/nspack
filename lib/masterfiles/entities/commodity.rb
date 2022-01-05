@@ -13,5 +13,6 @@ module MasterfilesApp
     attribute :use_size_ref_for_edi, Types::Bool
     attribute :colour_applies, Types::Bool
     attribute :allocate_sample_rmt_bins, Types::Bool
+    attribute :derive_rmt_nett_weight, Types::Bool
   end
 end

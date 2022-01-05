@@ -20,6 +20,7 @@ module Masterfiles
               form.add_field :cultivar_name
               form.add_field :cultivar_code
               form.add_field :description
+              form.add_field :std_rmt_bin_nett_weight
             end
           end
 

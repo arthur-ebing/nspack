@@ -140,6 +140,7 @@ class Nspack < Roda
               active
               colour_applies
               allocate_sample_rmt_bins
+              derive_rmt_nett_weight
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
@@ -177,6 +178,7 @@ class Nspack < Roda
             use_size_ref_for_edi
             active
             colour_applies
+            derive_rmt_nett_weight
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)
@@ -332,6 +334,7 @@ class Nspack < Roda
               cultivar_name
               cultivar_code
               description
+              std_rmt_bin_nett_weight
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else

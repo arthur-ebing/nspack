@@ -26,6 +26,7 @@ module UiRules
       fields[:active] = { renderer: :label, as_boolean: true }
       fields[:colour_applies] = { renderer: :label, as_boolean: true }
       fields[:allocate_sample_rmt_bins] = { renderer: :label, as_boolean: true }
+      fields[:derive_rmt_nett_weight] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields
@@ -43,7 +44,8 @@ module UiRules
         use_size_ref_for_edi: { renderer: :checkbox },
         active: { renderer: :checkbox },
         colour_applies: { renderer: :checkbox },
-        allocate_sample_rmt_bins: { renderer: :checkbox }
+        allocate_sample_rmt_bins: { renderer: :checkbox },
+        derive_rmt_nett_weight: { renderer: :checkbox }
       }
     end
 
@@ -61,7 +63,8 @@ module UiRules
                                     requires_standard_counts: true,
                                     use_size_ref_for_edi: nil,
                                     active: true,
-                                    colour_applies: nil)
+                                    colour_applies: nil,
+                                    derive_rmt_nett_weight: false)
     end
   end
 end

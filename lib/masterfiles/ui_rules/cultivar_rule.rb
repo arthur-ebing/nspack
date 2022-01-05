@@ -22,6 +22,7 @@ module UiRules
       fields[:description] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
       fields[:marketing_varieties] = { renderer: :list, items: @form_object.marketing_varieties }
+      fields[:std_rmt_bin_nett_weight] = { renderer: :label }
     end
 
     def common_fields
@@ -34,7 +35,8 @@ module UiRules
         cultivar_name: { required: true },
         cultivar_code: { hint: 'Formal code registered with external systems. <br>
                                 This code must be correct in order to communicate with external systems such as phytclean.' },
-        description: {}
+        description: {},
+        std_rmt_bin_nett_weight: { renderer: :numeric }
       }
     end
 
@@ -45,10 +47,7 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(cultivar_group_id: nil,
-                                    cultivar_code: nil,
-                                    cultivar_name: nil,
-                                    description: nil)
+      @form_object = new_form_object_from_struct(MasterfilesApp::Cultivar)
     end
   end
 end

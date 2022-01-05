@@ -11,5 +11,6 @@ module MasterfilesApp
     required(:use_size_ref_for_edi).maybe(:bool)
     required(:colour_applies).maybe(:bool)
     required(:allocate_sample_rmt_bins).filled(:bool)
+    required(:derive_rmt_nett_weight).maybe(:bool)
   end
 end

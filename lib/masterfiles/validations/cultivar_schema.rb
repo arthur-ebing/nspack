@@ -7,5 +7,6 @@ module MasterfilesApp
     required(:cultivar_name).filled(Types::StrippedString)
     required(:description).maybe(Types::StrippedString)
     required(:cultivar_code).maybe(Types::StrippedString)
+    required(:std_rmt_bin_nett_weight).maybe(:decimal)
   end
 end

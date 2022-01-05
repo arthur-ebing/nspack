@@ -738,5 +738,24 @@ module RawMaterialsApp
       delete(:qc_tests, test_ids)
       delete(:qc_samples, sample_ids)
     end
+
+    def derive_rmt_bin_gross_weight?(cultivar_id)
+      commodity_id = get_commodity_id_for_cultivar(cultivar_id)
+      derive_rmt_nett_weight, allocate_sample_rmt_bins = get_value(:commodities, %i[derive_rmt_nett_weight allocate_sample_rmt_bins], id: commodity_id)
+      derive_rmt_nett_weight && !allocate_sample_rmt_bins
+    end
+
+    def get_commodity_id_for_cultivar(cultivar_id)
+      DB[:cultivar_groups].where(id: DB[:cultivars]
+                                       .where(id: cultivar_id)
+                                       .get(:cultivar_group_id))
+                          .get(:commodity_id)
+    end
+
+    def calculate_rmt_bin_gross_weight(rmt_bin)
+      std_rmt_bin_nett_weight = get(:cultivars, rmt_bin[:cultivar_id], :std_rmt_bin_nett_weight) || AppConst::BIG_ZERO
+      tare_weight = get_rmt_bin_tare_weight(rmt_bin)
+      std_rmt_bin_nett_weight + tare_weight
+    end
   end
 end

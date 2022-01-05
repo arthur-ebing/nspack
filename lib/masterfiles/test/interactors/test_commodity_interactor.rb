@@ -80,7 +80,8 @@ module MasterfilesApp
         commodity_group_code: 'ABC',
         use_size_ref_for_edi: false,
         allocate_sample_rmt_bins: false,
-        colour_applies: false
+        colour_applies: false,
+        derive_rmt_nett_weight: false
       }
     end
 

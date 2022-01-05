@@ -11,5 +11,6 @@ module MasterfilesApp
     attribute :description, Types::String
     attribute :marketing_varieties, Types::Array
     attribute? :active, Types::Bool
+    attribute :std_rmt_bin_nett_weight, Types::Decimal
   end
 end
