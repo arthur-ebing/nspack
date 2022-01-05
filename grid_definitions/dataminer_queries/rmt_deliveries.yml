@@ -8,8 +8,9 @@
   \   rmt_deliveries.reference_number,\r\n    NOT (rmt_deliveries.keep_open OR rmt_deliveries.delivery_tipped)
   AS show_keep_delivery_open,\r\n    --\r\n    SUM(rmt_bins.qty_bins) AS qty_bins,\r\n
   \   ARRAY_AGG(DISTINCT rmt_bins.production_run_tipped_id ORDER BY rmt_bins.production_run_tipped_id)
-  AS production_runs,\r\n    SUM(tipped_rmt_bins.qty_bins) > 0 AS contains_tipped_bins,\r\n\r\n
-  \   SUM(tipped_rmt_bins.qty_bins) AS qty_bins_tipped,\r\n\r\n    ARRAY_AGG(DISTINCT
+  AS production_runs,\r\n    SUM(CASE WHEN rmt_bins.bin_tipped THEN rmt_bins.qty_bins
+  ELSE 0 END) > 0 AS contains_tipped_bins,\r\n\r\n    SUM(CASE WHEN rmt_bins.bin_tipped
+  THEN rmt_bins.qty_bins ELSE 0 END) AS qty_bins_tipped,\r\n\r\n    ARRAY_AGG(DISTINCT
   rmt_class_code ORDER BY rmt_class_code) AS classes,\r\n    SUM(rmt_bins.nett_weight)::INTEGER
   AS nett_weight,\r\n    SUM(rmt_bins.gross_weight)::INTEGER AS gross_weight,\r\n
   \   --\r\n    rmt_deliveries.season_id,\r\n    seasons.season_code,\r\n    --\r\n
@@ -18,24 +19,23 @@
   \   --\r\n    rmt_deliveries.cultivar_id,\r\n    cultivars.cultivar_name,\r\n    cultivars.cultivar_code,\r\n
   \   --\r\n    rmt_deliveries.rmt_delivery_destination_id,\r\n    rmt_delivery_destinations.delivery_destination_code,\r\n
   \   --\r\n    rmt_deliveries.truck_registration_number,\r\n    rmt_deliveries.qty_damaged_bins,\r\n
-  \   rmt_deliveries.qty_empty_bins,\r\n    rmt_deliveries.current,\r\n    rmt_deliveries.qty_partial_bins,\r\n    rmt_deliveries.keep_open,\r\n
-  \   rmt_deliveries.delivery_tipped,\r\n    rmt_deliveries.shipped,\r\n    rmt_deliveries.date_picked
-  AS picked_at,\r\n    rmt_deliveries.tipping_complete_date_time AS tipping_completed_at,\r\n\r\n
-  \   rmt_deliveries.created_at,\r\n    rmt_deliveries.updated_at,\r\n    rmt_deliveries.sample_bins,\r\n    CASE\r\n
-  \       WHEN rmt_deliveries.current THEN 'green'\r\n        WHEN delivery_tipped
-  THEN 'gray'\r\n        WHEN keep_open THEN 'orange'\r\n        WHEN shipped THEN
-  'blue'\r\n        WHEN NOT received THEN 'purple'\r\n        END AS colour_rule\r\nFROM\r\n
-  \   rmt_deliveries\r\n        JOIN seasons ON seasons.id = rmt_deliveries.season_id\r\n
-  \       JOIN farms ON farms.id = rmt_deliveries.farm_id\r\n        JOIN pucs ON
-  pucs.id = rmt_deliveries.puc_id\r\n        JOIN orchards ON orchards.id = rmt_deliveries.orchard_id\r\n
-  \       JOIN cultivars ON cultivars.id = rmt_deliveries.cultivar_id\r\n        LEFT
-  JOIN rmt_delivery_destinations ON rmt_delivery_destinations.id = rmt_deliveries.rmt_delivery_destination_id\r\n
+  \   rmt_deliveries.qty_empty_bins,\r\n    rmt_deliveries.current,\r\n    rmt_deliveries.qty_partial_bins,\r\n
+  \   rmt_deliveries.keep_open,\r\n    rmt_deliveries.delivery_tipped,\r\n    rmt_deliveries.shipped,\r\n
+  \   rmt_deliveries.date_picked AS picked_at,\r\n    rmt_deliveries.tipping_complete_date_time
+  AS tipping_completed_at,\r\n\r\n    rmt_deliveries.created_at,\r\n    rmt_deliveries.updated_at,\r\n
+  \   rmt_deliveries.sample_bins,\r\n    CASE\r\n        WHEN rmt_deliveries.current
+  THEN 'green'\r\n        WHEN delivery_tipped THEN 'gray'\r\n        WHEN keep_open
+  THEN 'orange'\r\n        WHEN shipped THEN 'blue'\r\n        WHEN NOT received THEN
+  'purple'\r\n        END AS colour_rule\r\nFROM\r\n    rmt_deliveries\r\n        JOIN
+  seasons ON seasons.id = rmt_deliveries.season_id\r\n        JOIN farms ON farms.id
+  = rmt_deliveries.farm_id\r\n        JOIN pucs ON pucs.id = rmt_deliveries.puc_id\r\n
+  \       JOIN orchards ON orchards.id = rmt_deliveries.orchard_id\r\n        JOIN
+  cultivars ON cultivars.id = rmt_deliveries.cultivar_id\r\n        LEFT JOIN rmt_delivery_destinations
+  ON rmt_delivery_destinations.id = rmt_deliveries.rmt_delivery_destination_id\r\n
   \       LEFT JOIN rmt_bins ON rmt_bins.rmt_delivery_id = rmt_deliveries.id\r\n        LEFT
-  JOIN rmt_bins tipped_rmt_bins ON tipped_rmt_bins.rmt_delivery_id = rmt_deliveries.id
-  AND tipped_rmt_bins.bin_tipped\r\n        LEFT JOIN rmt_classes ON rmt_bins.rmt_class_id
-  = rmt_classes.id\r\nGROUP BY\r\n    rmt_deliveries.id,\r\n    seasons.id,\r\n    farms.id,\r\n
-  \   pucs.id,\r\n    orchards.id,\r\n    cultivars.id,\r\n    rmt_delivery_destinations.id\r\nORDER
-  BY\r\n    rmt_deliveries.id DESC"
+  JOIN rmt_classes ON rmt_bins.rmt_class_id = rmt_classes.id\r\nGROUP BY\r\n    rmt_deliveries.id,\r\n
+  \   seasons.id,\r\n    farms.id,\r\n    pucs.id,\r\n    orchards.id,\r\n    cultivars.id,\r\n
+  \   rmt_delivery_destinations.id\r\nORDER BY\r\n    rmt_deliveries.id DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -154,22 +154,6 @@
     :pinned: 
     :groupable: false
     :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  qty_partial_bins:
-    :name: qty_partial_bins
-    :sequence_no: 7
-    :caption: Qty Partial Bins
-    :namespaced_name:
-    :data_type: :number
-    :width: 150
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -542,9 +526,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  qty_partial_bins:
+    :name: qty_partial_bins
+    :sequence_no: 31
+    :caption: Qty Partial Bins
+    :namespaced_name: rmt_deliveries.qty_partial_bins
+    :data_type: :number
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   keep_open:
     :name: keep_open
-    :sequence_no: 31
+    :sequence_no: 32
     :caption: Keep Open
     :namespaced_name: rmt_deliveries.keep_open
     :data_type: :boolean
@@ -560,7 +560,7 @@
     :group_max: false
   delivery_tipped:
     :name: delivery_tipped
-    :sequence_no: 32
+    :sequence_no: 33
     :caption: Tipped
     :namespaced_name: rmt_deliveries.delivery_tipped
     :data_type: :boolean
@@ -576,7 +576,7 @@
     :group_max: false
   shipped:
     :name: shipped
-    :sequence_no: 33
+    :sequence_no: 34
     :caption: Shipped
     :namespaced_name: rmt_deliveries.shipped
     :data_type: :boolean
@@ -592,7 +592,7 @@
     :group_max: false
   picked_at:
     :name: picked_at
-    :sequence_no: 34
+    :sequence_no: 35
     :caption: Picked at
     :namespaced_name: rmt_deliveries.date_picked
     :data_type: :datetime
@@ -608,7 +608,7 @@
     :group_max: false
   tipping_completed_at:
     :name: tipping_completed_at
-    :sequence_no: 35
+    :sequence_no: 36
     :caption: Tipping completed at
     :namespaced_name: rmt_deliveries.tipping_complete_date_time
     :data_type: :datetime
@@ -624,7 +624,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 36
+    :sequence_no: 37
     :caption: Created at
     :namespaced_name: rmt_deliveries.created_at
     :data_type: :datetime
@@ -640,29 +640,13 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 37
+    :sequence_no: 38
     :caption: Updated at
     :namespaced_name: rmt_deliveries.updated_at
     :data_type: :datetime
     :width: 
     :format: :datetime_with_secs
     :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  colour_rule:
-    :name: colour_rule
-    :sequence_no: 38
-    :caption: Colour rule
-    :namespaced_name: 
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: true
     :pinned: 
     :groupable: false
     :group_by_seq: 
@@ -677,11 +661,27 @@
     :namespaced_name: rmt_deliveries.sample_bins
     :data_type: :string
     :width: 120
-    :format:
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: true
-    :group_by_seq:
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  colour_rule:
+    :name: colour_rule
+    :sequence_no: 40
+    :caption: Colour rule
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
