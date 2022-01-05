@@ -289,8 +289,10 @@ module ProductionApp
     end
 
     def move_plant_resource(id, params)
-      new_id = params[:destination_node]
-      repo.move_tree_node(:tree_plant_resources, :descendant_plant_resource_id, :ancestor_plant_resource_id, id, new_id)
+      new_id = params[:destination_node].to_i
+      repo.transaction do
+        repo.move_tree_node(:tree_plant_resources, :descendant_plant_resource_id, :ancestor_plant_resource_id, id, new_id)
+      end
       success_response('Resource was moved')
     end
 

@@ -601,69 +601,39 @@ class BaseRepo
   def move_tree_node(tree_table, descendant_col, ancestor_col, node_id, new_parent_id) # rubocop:disable Metrics/AbcSize
     raise Crossbeams::InfoError, 'This node cannot be moved to its own descendant' unless DB[:tree_plant_resources].where(ancestor_plant_resource_id: node_id, descendant_plant_resource_id: new_parent_id).first.nil?
 
-    # FIXME: sub nodes not moved with the node...
-    del_query = <<~SQL
-      DELETE FROM #{tree_table}
-      WHERE #{descendant_col} IN (SELECT #{descendant_col}
-                                  FROM #{tree_table}
-                                  WHERE #{ancestor_col} = ?)
-      AND #{ancestor_col} IN (SELECT #{ancestor_col}
-                              FROM #{tree_table}
-                              WHERE #{descendant_col} = ?
-                              AND #{ancestor_col} != #{descendant_col})
-    SQL
+    nodes_to_move = DB[tree_table].where(ancestor_col => node_id).exclude(descendant_col => node_id).select_map(descendant_col)
+    sub_nodes_with_parent = DB[tree_table].where(descendant_col => nodes_to_move, path_length: 1).select_map([descendant_col, ancestor_col])
+    parent_tree = sub_nodes_with_parent.group_by(&:last)
+
+    DB[tree_table].where(descendant_col => nodes_to_move.unshift(node_id)).delete
+    add_tree_subnode(parent_tree, tree_table, descendant_col, ancestor_col, node_id, new_parent_id)
+  end
+
+  # Recursive method to add node and its sub-nodes to a tree.
+  # Move a node from one position in a tree hierarchy to another.
+  #
+  # @param parent_tree [hash] a hash of parent nodes pointing to an array of their children.
+  # @param tree_table [symbol] the name of the table that defines the hierarchy.
+  # @param descendant_col [symbol] the name of the descendant column in the tree table.
+  # @param ancestor_col [symbol] the name of the ancestor column in the tree table.
+  # @param node_id [integer] the id of the row in the associated table.
+  # @param new_parent_id [integer] the id of the node that will become the new parent of the node.
+  # @return [void]
+  def add_tree_subnode(parent_tree, tree_table, descendant_col, ancestor_col, node_id, new_parent_id)
     ins_query = <<~SQL
       INSERT INTO #{tree_table} (#{ancestor_col}, #{descendant_col}, path_length)
-      SELECT supertree.#{ancestor_col}, subtree.#{descendant_col}, supertree.path_length + 1
-      FROM #{tree_table} AS supertree
-      CROSS JOIN #{tree_table} AS subtree
-      WHERE supertree.#{descendant_col} = ?
-        AND subtree.#{ancestor_col} = ?
+      SELECT t.#{ancestor_col}, ?, t.path_length + 1
+      FROM #{tree_table} AS t
+      WHERE t.#{descendant_col} = ?
+      UNION ALL
+      SELECT ?, ?, 0;
     SQL
-    logger = Logger.new('log/move_node.log')
-    logger.info ">>> Move #{tree_table} from #{node_id} to #{new_parent_id}"
-    logger.info '>>> DELETE'
-    logger.info del_query
-    logger.info '>>> INS'
-    logger.info ins_query
-    logger.info ">>> All descendants for node #{node_id}"
-    qry = "SELECT #{ancestor_col}, #{descendant_col}, path_length FROM #{tree_table} WHERE #{ancestor_col} = #{node_id} ORDER BY path_length, #{descendant_col}"
-    res = DB[qry].map { |r| r[descendant_col] }
-    logger.info qry
-    logger.info res.inspect
-    logger.info ">>> All ancestors for node #{node_id}"
-    qry = "SELECT #{ancestor_col}, #{descendant_col}, path_length FROM #{tree_table} WHERE #{descendant_col} = #{node_id} ORDER BY path_length DESC, #{ancestor_col}"
-    res = DB[qry].map { |r| r[ancestor_col] }
-    logger.info qry
-    logger.info res.inspect
-    delsel_query = <<~SQL
-      SELECT #{ancestor_col}, #{descendant_col}, path_length FROM #{tree_table}
-      WHERE #{descendant_col} IN (SELECT #{descendant_col}
-                                  FROM #{tree_table}
-                                  WHERE #{ancestor_col} = ?)
-      AND #{ancestor_col} IN (SELECT #{ancestor_col}
-                              FROM #{tree_table}
-                              WHERE #{descendant_col} = ?
-                              AND #{ancestor_col} != #{descendant_col})
-    SQL
-    logger.info '>>> Selection for delete:'
-    res = DB[delsel_query, node_id, node_id].map { |r| [r[ancestor_col], r[descendant_col], r[:path_length]] }
-    logger.info res.inspect
+    DB[ins_query, node_id, new_parent_id, node_id, node_id].insert
 
-    # INSERT INTO #{tree_table} (#{ancestor_col}, #{descendant_col}, path_length)
-    inssel_query = <<~SQL
-      SELECT supertree.#{ancestor_col}, subtree.#{descendant_col}, COALESCE(supertree.path_length, 0) + 1
-      FROM #{tree_table} AS supertree
-      CROSS JOIN #{tree_table} AS subtree
-      WHERE supertree.#{descendant_col} = ?
-        AND subtree.#{ancestor_col} = ?
-    SQL
-    logger.info '>>> Selection for insert:'
-    res = DB[inssel_query, new_parent_id, node_id].map { |r| [r[ancestor_col], r[descendant_col], r[:path_length]] }
-    logger.info res.inspect
+    sub_nodes = parent_tree[node_id]
+    return if sub_nodes.nil?
 
-    # DB[del_query, node_id, node_id].delete
-    # DB[ins_query, new_parent_id, node_id].insert
+    sub_nodes.map(&:first).each { |n| add_tree_subnode(parent_tree, tree_table, descendant_col, ancestor_col, n, node_id) }
   end
 
   def self.inherited(klass)
