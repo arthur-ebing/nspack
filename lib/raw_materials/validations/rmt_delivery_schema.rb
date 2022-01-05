@@ -18,7 +18,7 @@ module RawMaterialsApp
     optional(:current).filled(:bool)
     optional(:keep_open).filled(:bool)
     optional(:bin_scan_mode).maybe(:integer)
-    optional(:quantity_bins_with_fruit).maybe(:integer)
+    optional(:quantity_bins_with_fruit).filled(:integer)
     optional(:reference_number).maybe(Types::StrippedString)
     optional(:sample_bins).maybe(Types::Array)
     optional(:rmt_container_type_id).filled(:integer)

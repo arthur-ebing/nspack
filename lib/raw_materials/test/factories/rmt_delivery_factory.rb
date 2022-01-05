@@ -29,6 +29,7 @@ module RawMaterialsApp
         reference_number: Faker::Lorem.unique.word,
         qty_damaged_bins: Faker::Number.number(digits: 4),
         qty_empty_bins: Faker::Number.number(digits: 4),
+        quantity_bins_with_fruit: Faker::Number.number(digits: 4),
         active: true,
         delivery_tipped: false,
         date_picked: '2010-01-01',

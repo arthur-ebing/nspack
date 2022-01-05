@@ -151,14 +151,15 @@ module RawMaterialsApp
     end
 
     def create_rmt_delivery(params) # rubocop:disable Metrics/AbcSize
-      sample_bins = get_delivery_sample_bins(params[:cultivar_id], params[:quantity_bins_with_fruit].to_i)
-      params[:sample_bins] = sample_bins unless sample_bins.nil_or_empty?
       res = validate_rmt_delivery_params(params)
       return validation_failed_response(res) if res.failure?
 
+      sample_bins = get_delivery_sample_bins(res[:cultivar_id], res[:quantity_bins_with_fruit])
+      sample_hash = sample_bins.nil_or_empty? ? {} : { sample_bins: sample_bins }
+
       id = nil
       repo.transaction do
-        id = repo.create_rmt_delivery(res)
+        id = repo.create_rmt_delivery(res.to_h.merge(sample_hash))
         log_status(:rmt_deliveries, id, 'DELIVERY_RECEIVED')
         log_transaction
       end
@@ -171,20 +172,20 @@ module RawMaterialsApp
     end
 
     def update_rmt_delivery(id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
-      bins_exist = repo.exists?(:rmt_bins, rmt_delivery_id: id)
-      quantity_bins_with_fruit_changed = repo.get_value(:rmt_deliveries, :quantity_bins_with_fruit, id: id) != params[:quantity_bins_with_fruit].to_i
-      if !bins_exist && quantity_bins_with_fruit_changed
-        sample_bins = get_delivery_sample_bins(params[:cultivar_id], params[:quantity_bins_with_fruit].to_i)
-        params[:sample_bins] = nil
-        params[:sample_bins] = sample_bins unless sample_bins.nil_or_empty?
-      end
-
       res = validate_rmt_delivery_params(params)
       return failed_response(unwrap_failed_response(validation_failed_response(res))) if res.failure? && res.errors.to_h.one? && res.errors.to_h.include?(:season_id)
       return validation_failed_response(res) if res.failure?
 
+      bins_exist = repo.exists?(:rmt_bins, rmt_delivery_id: id)
+      quantity_bins_with_fruit_changed = repo.get_value(:rmt_deliveries, :quantity_bins_with_fruit, id: id) != res[:quantity_bins_with_fruit]
+      sample_hash = {}
+      if !bins_exist && quantity_bins_with_fruit_changed
+        sample_bins = get_delivery_sample_bins(res[:cultivar_id], res[:quantity_bins_with_fruit])
+        sample_hash = sample_bins.nil_or_empty? ? {} : { sample_bins: sample_bins }
+      end
+
       repo.transaction do
-        repo.update_rmt_delivery(id, res)
+        repo.update_rmt_delivery(id, res.to_h.merge(sample_hash))
         if AppConst::CR_RMT.all_delivery_bins_of_same_type?
           bin_ids = repo.select_values(:rmt_bins, :id, rmt_delivery_id: id)
           attrs = { rmt_container_type_id: res[:rmt_container_type_id],
