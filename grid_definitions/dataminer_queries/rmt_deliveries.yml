@@ -8,9 +8,8 @@
   \   rmt_deliveries.reference_number,\r\n    NOT (rmt_deliveries.keep_open OR rmt_deliveries.delivery_tipped)
   AS show_keep_delivery_open,\r\n    --\r\n    SUM(rmt_bins.qty_bins) AS qty_bins,\r\n
   \   ARRAY_AGG(DISTINCT rmt_bins.production_run_tipped_id ORDER BY rmt_bins.production_run_tipped_id)
-  AS production_runs,\r\n    SUM(CASE WHEN rmt_bins.bin_tipped THEN rmt_bins.qty_bins
-  ELSE 0 END) > 0 AS contains_tipped_bins,\r\n\r\n    SUM(CASE WHEN rmt_bins.bin_tipped
-  THEN rmt_bins.qty_bins ELSE 0 END) AS qty_bins_tipped,\r\n\r\n    ARRAY_AGG(DISTINCT
+  AS production_runs,\r\n    SUM(tipped_rmt_bins.qty_bins) > 0 AS contains_tipped_bins,\r\n\r\n
+  \   SUM(tipped_rmt_bins.qty_bins) AS qty_bins_tipped,\r\n\r\n    ARRAY_AGG(DISTINCT
   rmt_class_code ORDER BY rmt_class_code) AS classes,\r\n    SUM(rmt_bins.nett_weight)::INTEGER
   AS nett_weight,\r\n    SUM(rmt_bins.gross_weight)::INTEGER AS gross_weight,\r\n
   \   --\r\n    rmt_deliveries.season_id,\r\n    seasons.season_code,\r\n    --\r\n
@@ -23,19 +22,21 @@
   \   rmt_deliveries.keep_open,\r\n    rmt_deliveries.delivery_tipped,\r\n    rmt_deliveries.shipped,\r\n
   \   rmt_deliveries.date_picked AS picked_at,\r\n    rmt_deliveries.tipping_complete_date_time
   AS tipping_completed_at,\r\n\r\n    rmt_deliveries.created_at,\r\n    rmt_deliveries.updated_at,\r\n
-  \   rmt_deliveries.sample_bins,\r\n    CASE\r\n        WHEN rmt_deliveries.current
-  THEN 'green'\r\n        WHEN delivery_tipped THEN 'gray'\r\n        WHEN keep_open
-  THEN 'orange'\r\n        WHEN shipped THEN 'blue'\r\n        WHEN NOT received THEN
-  'purple'\r\n        END AS colour_rule\r\nFROM\r\n    rmt_deliveries\r\n        JOIN
-  seasons ON seasons.id = rmt_deliveries.season_id\r\n        JOIN farms ON farms.id
-  = rmt_deliveries.farm_id\r\n        JOIN pucs ON pucs.id = rmt_deliveries.puc_id\r\n
-  \       JOIN orchards ON orchards.id = rmt_deliveries.orchard_id\r\n        JOIN
-  cultivars ON cultivars.id = rmt_deliveries.cultivar_id\r\n        LEFT JOIN rmt_delivery_destinations
-  ON rmt_delivery_destinations.id = rmt_deliveries.rmt_delivery_destination_id\r\n
+  \   rmt_deliveries.sample_bins,\r\n    rmt_deliveries.sample_bins_weighed,\r\n    rmt_deliveries.sample_weights_extrapolated_at,\r\n
+  \   CASE\r\n        WHEN rmt_deliveries.current THEN 'green'\r\n        WHEN delivery_tipped
+  THEN 'gray'\r\n        WHEN keep_open THEN 'orange'\r\n        WHEN shipped THEN
+  'blue'\r\n        WHEN NOT received THEN 'purple'\r\n        END AS colour_rule\r\nFROM\r\n
+  \   rmt_deliveries\r\n        JOIN seasons ON seasons.id = rmt_deliveries.season_id\r\n
+  \       JOIN farms ON farms.id = rmt_deliveries.farm_id\r\n        JOIN pucs ON
+  pucs.id = rmt_deliveries.puc_id\r\n        JOIN orchards ON orchards.id = rmt_deliveries.orchard_id\r\n
+  \       JOIN cultivars ON cultivars.id = rmt_deliveries.cultivar_id\r\n        LEFT
+  JOIN rmt_delivery_destinations ON rmt_delivery_destinations.id = rmt_deliveries.rmt_delivery_destination_id\r\n
   \       LEFT JOIN rmt_bins ON rmt_bins.rmt_delivery_id = rmt_deliveries.id\r\n        LEFT
-  JOIN rmt_classes ON rmt_bins.rmt_class_id = rmt_classes.id\r\nGROUP BY\r\n    rmt_deliveries.id,\r\n
-  \   seasons.id,\r\n    farms.id,\r\n    pucs.id,\r\n    orchards.id,\r\n    cultivars.id,\r\n
-  \   rmt_delivery_destinations.id\r\nORDER BY\r\n    rmt_deliveries.id DESC"
+  JOIN rmt_bins tipped_rmt_bins ON tipped_rmt_bins.rmt_delivery_id = rmt_deliveries.id
+  AND tipped_rmt_bins.bin_tipped\r\n        LEFT JOIN rmt_classes ON rmt_bins.rmt_class_id
+  = rmt_classes.id\r\nGROUP BY\r\n    rmt_deliveries.id,\r\n    seasons.id,\r\n    farms.id,\r\n
+  \   pucs.id,\r\n    orchards.id,\r\n    cultivars.id,\r\n    rmt_delivery_destinations.id\r\nORDER
+  BY\r\n    rmt_deliveries.id DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -670,9 +671,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  sample_bins_weighed:
+    :name: sample_bins_weighed
+    :sequence_no: 40
+    :caption: Sample bins weighed
+    :namespaced_name: rmt_deliveries.sample_bins_weighed
+    :data_type: :boolean
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  sample_weights_extrapolated_at:
+    :name: sample_weights_extrapolated_at
+    :sequence_no: 41
+    :caption: Sample weights extrapolated at
+    :namespaced_name: rmt_deliveries.sample_weights_extrapolated_at
+    :data_type: :datetime
+    :width: 160
+    :format: :datetime_with_secs
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 40
+    :sequence_no: 42
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

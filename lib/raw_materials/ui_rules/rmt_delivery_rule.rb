@@ -92,6 +92,8 @@ module UiRules
                                with_value: @form_object.sample_bins.join(',') }
       fields[:qty_partial_bins] = { renderer: :label,
                                     with_value: @form_object.qty_partial_bins }
+      fields[:sample_bins_weighed] = { renderer: :label, as_boolean: true }
+      fields[:sample_weights_extrapolated_at] = { renderer: :label, format: :without_timezone_or_seconds }
       if AppConst::CR_RMT.all_delivery_bins_of_same_type?
         fields[:rmt_container_type_id] = { renderer: :label,
                                            with_value: rmt_container_type_id_label }
@@ -182,7 +184,13 @@ module UiRules
         batch_number: { renderer: :label },
         batch_number_updated_at: { renderer: :label },
         qty_partial_bins: { renderer: :integer,
-                            minvalue: 0 }
+                            minvalue: 0 },
+        sample_bins_weighed: { renderer: :label,
+                               caption: 'Sample bins weighed',
+                               as_boolean: true },
+        sample_weights_extrapolated_at: { renderer: :label,
+                                          caption: 'Extrapolated at' }
+
       }
       if AppConst::CR_RMT.all_delivery_bins_of_same_type?
         fields[:rmt_container_type_id] = { renderer: :select, options: MasterfilesApp::RmtContainerTypeRepo.new.for_select_rmt_container_types, required: true, prompt: true }

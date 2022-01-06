@@ -713,4 +713,11 @@ class AppConst
   # Refresh pallet data
   REFRESH_PALLET_DATA_TABLES = %w[carton_labels pallet_sequences].freeze
   REFRESH_PALLET_DATA_COLUMNS = %w[fruit_actual_counts_for_pack_id fruit_size_reference_id sell_by_code].freeze
+
+  BIN_FULLNESS_STD_WEIGHT_RATIO = {
+    'Full' => 1.00,
+    'Three Quarters' => 0.75,
+    'Half' => 0.50,
+    'Quarter' => 0.25
+  }.freeze
 end

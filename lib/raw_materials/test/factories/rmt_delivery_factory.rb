@@ -38,7 +38,9 @@ module RawMaterialsApp
         tipping_complete_date_time: '2010-01-01 12:00',
         created_at: '2010-01-01 12:00',
         updated_at: '2010-01-01 12:00',
-        rmt_container_material_type_id: rmt_container_material_type_id
+        rmt_container_material_type_id: rmt_container_material_type_id,
+        sample_bins_weighed: false,
+        sample_weights_extrapolated_at: '2010-01-01 12:00'
       }
       DB[:rmt_deliveries].insert(default.merge(opts))
     end

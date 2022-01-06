@@ -755,7 +755,7 @@ module RawMaterialsApp
     def calculate_rmt_bin_gross_weight(rmt_bin)
       std_rmt_bin_nett_weight = get(:cultivars, rmt_bin[:cultivar_id], :std_rmt_bin_nett_weight) || AppConst::BIG_ZERO
       tare_weight = get_rmt_bin_tare_weight(rmt_bin)
-      std_rmt_bin_nett_weight + tare_weight
+      (std_rmt_bin_nett_weight * AppConst::BIN_FULLNESS_STD_WEIGHT_RATIO[rmt_bin[:bin_fullness]]) + tare_weight
     end
 
     def extrapolate_sample_weights?(cultivar_id)

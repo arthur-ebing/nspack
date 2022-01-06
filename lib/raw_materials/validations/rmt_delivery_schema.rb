@@ -25,6 +25,8 @@ module RawMaterialsApp
     optional(:rmt_material_owner_party_role_id).filled(:integer)
     optional(:rmt_container_material_type_id).filled(:integer)
     optional(:qty_partial_bins).filled(:integer)
+    optional(:sample_bins_weighed).maybe(:bool)
+    optional(:sample_weights_extrapolated_at).maybe(:time)
   end
 
   RmtDeliveryReceivedAtSchema = Dry::Schema.Params do

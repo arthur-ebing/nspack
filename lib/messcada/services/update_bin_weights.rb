@@ -14,7 +14,7 @@ module MesscadaApp
       @avg_gross_weight = options[:avg_gross_weight].nil? ? false : options[:avg_gross_weight]
     end
 
-    def call
+    def call # rubocop:disable Metrics/AbcSize
       rmt_bin = find_rmt_bin
       return failed_response("Bin:#{bin_number} could not be found") if rmt_bin.nil?
       return failed_response('Bin Scrapped') if rmt_bin[:scrapped]
@@ -27,7 +27,7 @@ module MesscadaApp
 
       update_rmt_bin_weights(rmt_bin[:id], updates)
 
-      success_response('RMT Bin weights updated successfully')
+      success_response('RMT Bin weights updated successfully', rmt_bin[:id])
     end
 
     private

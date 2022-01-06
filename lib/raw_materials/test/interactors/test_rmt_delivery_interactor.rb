@@ -112,7 +112,9 @@ module RawMaterialsApp
         current: false,
         sample_bins: nil,
         active: true,
-        rmt_container_material_type_id: rmt_container_material_type_id
+        rmt_container_material_type_id: rmt_container_material_type_id,
+        sample_bins_weighed: false,
+        sample_weights_extrapolated_at: '2010-01-01 12:00'
       }
     end
 
