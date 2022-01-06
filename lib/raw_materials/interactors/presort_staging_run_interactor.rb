@@ -27,8 +27,6 @@ module RawMaterialsApp
     def update_presort_staging_run(id, params) # rubocop:disable Metrics/AbcSize
       params[:supplier_id] = repo.get(:presort_staging_runs, :supplier_id, id) unless params.key?(:supplier_id)
       params[:season_id] = calendar_repo.get_season_id(params[:cultivar_id], Time.now) unless params[:cultivar_id].nil_or_empty?
-      legacy = AppConst::CR_RMT.presort_legacy_data_fields.map { |f| [f, params[f]] }
-      params[:legacy_data] = Hash[legacy] unless legacy.empty?
       res = validate_presort_staging_run_params(params)
       return validation_failed_response(res) if res.failure?
 

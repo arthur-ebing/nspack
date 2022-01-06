@@ -41,6 +41,10 @@ module RawMaterialsApp
     attribute? :sample_bin, Types::Bool
     attribute :scrapped_rmt_delivery_id, Types::Integer
     attribute :legacy_data, Types::Hash
+    attribute :colour_percentage_id, Types::Integer
+    attribute :actual_cold_treatment_id, Types::Integer
+    attribute :actual_ripeness_treatment_id, Types::Integer
+    attribute :rmt_code_id, Types::Integer
   end
 
   class RmtBinFlat < Dry::Struct
@@ -115,5 +119,14 @@ module RawMaterialsApp
     attribute :tipped_in_presort_at, Types::DateTime
     attribute? :sample_bin, Types::Bool
     attribute :verified_from_carton_label_id, Types::Integer
+    attribute :colour_percentage_id, Types::Integer
+    attribute :actual_cold_treatment_id, Types::Integer
+    attribute :actual_ripeness_treatment_id, Types::Integer
+    attribute :rmt_code_id, Types::Integer
+    attribute :rmt_code, Types::String
+    attribute :colour_percentage, Types::String
+    attribute :actual_cold_treatment_code, Types::String
+    attribute :actual_ripeness_treatment_code, Types::String
+    attribute :rmt_code_description, Types::String
   end
 end

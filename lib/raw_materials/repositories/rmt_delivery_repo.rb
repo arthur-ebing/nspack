@@ -335,7 +335,7 @@ module RawMaterialsApp
                         { parent_table: :rmt_sizes,
                           flatten_columns: { size_code: :size_code } },
                         { parent_table: :rmt_codes,
-                          flatten_columns: { rmt_code: :rmt_code } },
+                          flatten_columns: { rmt_code: :rmt_code, description: :rmt_code_description } },
                         { parent_table: :colour_percentages,
                           flatten_columns: { colour_percentage: :colour_percentage } },
                         { parent_table: :treatments, foreign_key: :actual_cold_treatment_id,

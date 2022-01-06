@@ -35,6 +35,14 @@ module RawMaterialsApp
                           columns: [:plant_resource_code],
                           foreign_key: :presort_unit_plant_resource_id,
                           flatten_columns: { plant_resource_code: :plant_resource_code } },
+                        { parent_table: :rmt_codes,
+                          flatten_columns: { rmt_code: :rmt_code } },
+                        { parent_table: :colour_percentages,
+                          flatten_columns: { colour_percentage: :colour_percentage } },
+                        { parent_table: :treatments, foreign_key: :actual_cold_treatment_id,
+                          flatten_columns: { treatment_code: :actual_cold_treatment_code } },
+                        { parent_table: :treatments, foreign_key: :actual_ripeness_treatment_id,
+                          flatten_columns: { treatment_code: :actual_ripeness_treatment_code } },
                         { parent_table: :cultivars,
                           columns: [:cultivar_name],
                           flatten_columns: { cultivar_name: :cultivar_name } },
@@ -141,16 +149,6 @@ module RawMaterialsApp
       call_logger = Crossbeams::HTTPTextCallLogger.new('APPORT-BIN-TIPPED', log_path: AppConst::PRESORT_BIN_TIPPED_LOG_FILE)
       http = Crossbeams::HTTPCalls.new(use_ssl: false, call_logger: call_logger)
       http.request_post("#{AppConst.mssql_staging_interface(plant_resource_code)}/select", parameters)
-    end
-
-    def bin_mrl_failed?(bin_number)
-      url = "#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/pre_sorting/legacy_bin_mrl_failed?bin_number=#{bin_number}"
-      http = Crossbeams::HTTPCalls.new
-      res = http.request_get(url)
-      return failed_response(res.message) unless res.success
-
-      instance = JSON.parse(res.instance.body)
-      return instance['msg'] if instance['bin_mrl_failed']
     end
 
     def child_run_farm(child_run_id)

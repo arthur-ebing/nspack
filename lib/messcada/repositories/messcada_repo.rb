@@ -646,8 +646,16 @@ module MesscadaApp
     def for_select_run_colour_percentages(production_run_id)
       DB[:production_runs]
         .join(:cultivar_groups, id: :cultivar_group_id)
-        .join(:colour_percentages, Sequel[:colour_percentages][:commodity_id] => Sequel[:cultivar_groups][:commodity_id])
+        .join(:colour_percentages, commodity_id: Sequel[:cultivar_groups][:commodity_id])
         .where(Sequel[:production_runs][:id] => production_run_id)
+        .select_map([:colour_percentage, Sequel[:colour_percentages][:id]])
+    end
+
+    def for_select_run_colour_percentages_for_cultivar(cultivar_id)
+      DB[:cultivars]
+        .join(:cultivar_groups, id: :cultivar_group_id)
+        .join(:colour_percentages, commodity_id: Sequel[:cultivar_groups][:commodity_id])
+        .where(Sequel[:cultivars][:id] => cultivar_id)
         .select_map([:colour_percentage, Sequel[:colour_percentages][:id]])
     end
 
@@ -658,11 +666,10 @@ module MesscadaApp
         .select_map([:treatment_code, Sequel[:treatments][:id]])
     end
 
-    def for_select_rmt_codes_by_run_cultivar(production_run_id, cultivar_id)
-      DB[:production_runs]
-        .join(:rmt_variants, cultivar_id: :cultivar_id)
+    def for_select_rmt_codes_by_cultivar(cultivar_id)
+      DB[:rmt_variants]
         .join(:rmt_codes, Sequel[:rmt_codes][:rmt_variant_id] => Sequel[:rmt_variants][:id])
-        .where(Sequel[:production_runs][:id] => production_run_id, Sequel[:production_runs][:cultivar_id] => cultivar_id)
+        .where(Sequel[:rmt_variants][:cultivar_id] => cultivar_id)
         .select_map([:rmt_code, Sequel[:rmt_codes][:id]])
     end
 
@@ -676,7 +683,7 @@ module MesscadaApp
 
       return ok_response unless context
 
-      failed_response("Bin in WIP #{context}")
+      failed_response("Bin in WIP: #{context}")
     end
   end
 end

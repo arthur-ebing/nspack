@@ -1,11 +1,12 @@
 module MesscadaApp
   class BinStaging < BaseService
-    attr_reader :repo, :delivery_repo, :locn_repo, :bins, :plant_resource_code, :active_presort_staging_run_id, :active_presort_staging_run_child_id, :bin_ids_map, :current_validation_bin, :staging_run
+    attr_reader :repo, :delivery_repo, :locn_repo, :messcada_repo, :bins, :plant_resource_code, :active_presort_staging_run_id, :active_presort_staging_run_child_id, :bin_ids_map, :current_validation_bin, :staging_run
 
     def initialize(bins, plant_resource_code)
       @repo = RawMaterialsApp::PresortStagingRunRepo.new
       @delivery_repo = RawMaterialsApp::RmtDeliveryRepo.new
       @locn_repo = MasterfilesApp::LocationRepo.new
+      @messcada_repo = MesscadaApp::MesscadaRepo.new
       @bins = bins.compact
       @plant_resource_code = plant_resource_code
       @bin_ids_map = {}
@@ -113,11 +114,14 @@ module MesscadaApp
       err = bin_from_ra7?(asset_number)
       errors << err unless err.nil?
 
-      err = bin_under_quarantine?(asset_number)
-      errors << err unless err.nil?
+      check = messcada_repo.check_bin_in_wip(asset_number)
+      errors << check.message  unless check.success
 
-      err = repo.bin_mrl_failed?(asset_number)
-      errors << err unless err.nil?
+      delivery_id = repo.get_value(:rmt_bins, :rmt_delivery_id, bin_asset_number: asset_number)
+      unless delivery_id.nil_or_empty?
+        res = QualityApp::FailedAndPendingMrlResults.call(delivery_id)
+        errors << res.message unless res.success
+      end
 
       errs = valid_bin_for_active_parent_run?(asset_number)
       errors += errs unless errs.nil?
@@ -154,14 +158,6 @@ module MesscadaApp
       return "Bin:#{asset_number} is from RA7" if locn_repo.belongs_to_parent?(bin_location_id, ra7_id)
     end
 
-    def bin_under_quarantine?(asset_number)
-      return "Bin:#{asset_number} is quarantined" if %w[QFA QFS].include?(current_validation_bin[:legacy_data]['treatment_code'])
-    end
-
-    def bin_run_error(key, bin_value, run_value)
-      "bin #{key}[#{bin_value}] does not match that of the active staging_run #{key}[#{run_value}]"
-    end
-
     def valid_bin_for_active_child_run?(asset_number)
       run_farm_code = repo.child_run_farm(active_presort_staging_run_child_id)
       bin_farm_code = repo.bin_farm(asset_number)
@@ -175,15 +171,18 @@ module MesscadaApp
       validations
     end
 
+    VALID_BIN_ERROR_MSG = '%s is %s on bin, but %s on run.'.freeze
+
     def valid_bin_for_active_parent_run?(asset_number) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       errs = []
-      errs << bin_run_error('season_code', current_validation_bin.season_code, staging_run.season_code) if current_validation_bin.season_id != staging_run.season_id
-      errs << bin_run_error('cultivar_name', current_validation_bin.cultivar_name, staging_run.cultivar_name) if current_validation_bin.cultivar_id != staging_run.cultivar_id
-      errs << bin_run_error('track_indicator_code', current_validation_bin.legacy_data.to_h['track_slms_indicator_1_code'], staging_run.legacy_data.to_h['track_indicator_code']) if !staging_run.legacy_data.to_h['track_indicator_code'].nil_or_empty? && current_validation_bin.legacy_data.to_h['track_slms_indicator_1_code'] != staging_run.legacy_data.to_h['track_indicator_code']
-      errs << bin_run_error('ripe_point_code', current_validation_bin.legacy_data.to_h['ripe_point_code'], staging_run.legacy_data.to_h['ripe_point_code']) if !staging_run.legacy_data.to_h['ripe_point_code'].nil_or_empty? && current_validation_bin.legacy_data.to_h['ripe_point_code'] != staging_run.legacy_data.to_h['ripe_point_code']
-      errs << bin_run_error('colour', current_validation_bin.legacy_data.to_h['colour'], staging_run.legacy_data.to_h['treatment_code']) if !staging_run.legacy_data.to_h['treatment_code'].nil_or_empty? && current_validation_bin.legacy_data.to_h['colour'] != staging_run.legacy_data.to_h['treatment_code']
-      errs << bin_run_error('rmt_class_code', current_validation_bin.class_code, staging_run.rmt_class_code) if !staging_run[:rmt_class_id].nil? && current_validation_bin[:rmt_class_id] != staging_run[:rmt_class_id]
-      errs << bin_run_error('size_code', current_validation_bin.size_code, staging_run.size_code) if !staging_run[:rmt_size_id].nil? && current_validation_bin[:rmt_size_id] != staging_run[:rmt_size_id]
+      errs << format(VALID_BIN_ERROR_MSG, 'season_code', current_validation_bin.season_code || 'blank', staging_run.season_code || 'blank') if current_validation_bin.season_id != staging_run.season_id
+      errs << format(VALID_BIN_ERROR_MSG, 'cultivar_name', current_validation_bin.cultivar_name || 'blank', staging_run.cultivar_name || 'blank') if current_validation_bin.cultivar_id != staging_run.cultivar_id
+      errs << format(VALID_BIN_ERROR_MSG, 'colour', current_validation_bin.colour_percentage || 'blank', staging_run.colour_percentage || 'blank') if staging_run.colour_percentage_id && current_validation_bin.colour_percentage_id != staging_run.colour_percentage_id
+      errs << format(VALID_BIN_ERROR_MSG, 'cold_treatment_code', current_validation_bin.actual_cold_treatment_code || 'blank', staging_run.actual_cold_treatment_code || 'blank') if staging_run.actual_cold_treatment_id && current_validation_bin.actual_cold_treatment_id != staging_run.actual_cold_treatment_id
+      errs << format(VALID_BIN_ERROR_MSG, 'ripeness_treatment_code', current_validation_bin.actual_ripeness_treatment_code || 'blank', staging_run.actual_ripeness_treatment_code || 'blank') if staging_run.actual_ripeness_treatment_id && current_validation_bin.actual_ripeness_treatment_id != staging_run.actual_ripeness_treatment_id
+      errs << format(VALID_BIN_ERROR_MSG, 'rmt_code', current_validation_bin.rmt_code || 'blank', staging_run.rmt_code || 'blank') if staging_run.rmt_code_id && current_validation_bin.rmt_code_id != staging_run.rmt_code_id
+      errs << format(VALID_BIN_ERROR_MSG, 'rmt_class_code', current_validation_bin.class_code || 'blank', staging_run.rmt_class_code || 'blank') if staging_run.rmt_class_id && current_validation_bin.rmt_class_id != staging_run.rmt_class_id
+      errs << format(VALID_BIN_ERROR_MSG, 'size_code', current_validation_bin.size_code || 'blank', staging_run.size_code || 'blank') if staging_run.rmt_size_id && current_validation_bin.rmt_size_id != staging_run.rmt_size_id
       errs << "bin location_code[#{current_validation_bin.location_long_code}] is not in [RA_6 or RA_7 or PRESORT]" unless valid_bin_location_for_staging?(asset_number)
       return errs unless errs.empty?
     end
