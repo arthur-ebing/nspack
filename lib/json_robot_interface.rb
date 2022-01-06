@@ -15,6 +15,7 @@ class JsonRobotInterface
   }.freeze
 
   def initialize(system_user, request, input_payload)
+    AppConst::ROBOT_LOG.info("ROBOT INTERFACE init (#{input_payload.inspect}): #{Time.now}") if ENV['ROBODEBUG']
     @request = request
     @system_user = system_user
     @input_payload = input_payload
@@ -23,6 +24,7 @@ class JsonRobotInterface
   end
 
   def check_params
+    AppConst::ROBOT_LOG.info("ROBOT INTERFACE check params (#{input_payload.inspect}): #{Time.now}") if ENV['ROBODEBUG']
     vres = validate_params
     return vres unless vres.success
 
@@ -60,12 +62,14 @@ class JsonRobotInterface
   end
 
   def process_request
+    AppConst::ROBOT_LOG.info("ROBOT INTERFACE process req (#{input_payload.inspect}): #{Time.now}") if ENV['ROBODEBUG']
     puts "#{Time.now.strftime('%Y-%m-%d %H:%M:%S')} JSON ROBOT: #{@robot.system_resource_code} - #{input_payload.inspect}"
 
     send(inflector.underscore(action_type))
   end
 
   def respond(feedback, success, type: :station, orange: false)
+    AppConst::ROBOT_LOG.info("ROBOT INTERFACE respond (#{input_payload.inspect}): #{Time.now}") if ENV['ROBODEBUG']
     lcd1, lcd2, lcd3, lcd4 = feedback.four_lines
     res = {
       RESPONSE_TYPES[type] => {
@@ -201,6 +205,10 @@ class JsonRobotInterface
   end
 
   def publish_button # rubocop:disable Metrics/AbcSize
+    puts "START Publish button: #{Time.now}"
+    old_log = DB.loggers.first
+    DB.logger = Logger.new('log/sql_for_tipbin.log')
+
     class_name = "MesscadaApp::RobotHandleButton#{inflector.classify(robot.module_action)}"
     klass = inflector.constantize(class_name)
     p "Handing work over to #{class_name}"
@@ -216,6 +224,9 @@ class JsonRobotInterface
                                               short1: 'System error',
                                               short2: 'Cannot process')
     respond(feedback, false)
+  ensure
+    puts "END Publish button: #{Time.now}"
+    DB.logger = old_log
   end
 
   def register_identifier # rubocop:disable Metrics/AbcSize

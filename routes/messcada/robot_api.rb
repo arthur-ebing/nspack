@@ -6,6 +6,8 @@ class Nspack < Roda
     # ROBOT API
     # --------------------------------------------------------------------------
     r.on 'api' do
+      puts "START ROBOT API (params.inspect): #{Time.now}"
+      AppConst::ROBOT_LOG.info("START ROBOT API (#{params.inspect}): #{Time.now}") if ENV['ROBODEBUG']
       response['Content-Type'] = 'application/json'
       json_robot_interface = JsonRobotInterface.new(system_user, request, params)
       res = json_robot_interface.check_params

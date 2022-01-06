@@ -193,6 +193,7 @@ module MesscadaApp
     end
 
     def tip_rmt_bin(params) # rubocop:disable Metrics/AbcSize
+      AppConst::ROBOT_LOG.info("START BINTIP (#{params.inspect}): #{Time.now}") if ENV['ROBODEBUG']
       res = validate_tip_rmt_bin_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -203,6 +204,7 @@ module MesscadaApp
           log_status(:rmt_bins, res.instance[:rmt_bin_id], 'TIPPED')
           log_transaction
         end
+        AppConst::ROBOT_LOG.info("END BINTIP (#{params.inspect}): #{Time.now}") if ENV['ROBODEBUG']
         res
       end
     rescue Crossbeams::InfoError => e

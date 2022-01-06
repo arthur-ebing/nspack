@@ -13,6 +13,7 @@ module MesscadaApp
     end
 
     def call # rubocop:disable Metrics/AbcSize
+      AppConst::ROBOT_LOG.info("START ROBOT SCAN (#{robot.system_resource_code}): #{Time.now}") if ENV['ROBODEBUG']
       # For KR, supervisor actions are not going to be in place initially.
       # When a bin is scanned that does not exist, show an appropriate error.
       # When a bin is tipped that has already been tipped, show an appropriate error.
@@ -21,6 +22,7 @@ module MesscadaApp
       res = interactor.tip_rmt_bin(params)
       # TODO: Handle needs supervisor etc. Also for KR, create bin from old system if it does not exist...
       feedback = interactor.bin_tipping_response(res, params)
+      AppConst::ROBOT_LOG.info("PRE-FEEDBACK ROBOT SCAN (#{robot.system_resource_code}): #{Time.now}") if ENV['ROBODEBUG']
       robot_interface.respond(feedback, res.success)
 
       # BINTIP states...

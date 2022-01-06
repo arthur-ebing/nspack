@@ -72,7 +72,7 @@ Layout/SpaceAroundOperators:
   AllowForAlignment: true
 
 Lint/Env:
-  Enabled: true
+  Enabled: false
   Include:
     - '**/*.rb'
   Exclude:
