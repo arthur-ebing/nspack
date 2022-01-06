@@ -757,5 +757,16 @@ module RawMaterialsApp
       tare_weight = get_rmt_bin_tare_weight(rmt_bin)
       std_rmt_bin_nett_weight + tare_weight
     end
+
+    def extrapolate_sample_weights?(cultivar_id)
+      commodity_id = get_commodity_id_for_cultivar(cultivar_id)
+      derive_rmt_nett_weight, allocate_sample_rmt_bins = get_value(:commodities, %i[derive_rmt_nett_weight allocate_sample_rmt_bins], id: commodity_id)
+      allocate_sample_rmt_bins && !derive_rmt_nett_weight
+    end
+
+    def average_sample_full_bin_weight_for(rmt_delivery_id)
+      arr = select_values(:rmt_bins, :nett_weight, rmt_delivery_id: rmt_delivery_id, sample_bin: true, bin_fullness: AppConst::BIN_FULL)
+      arr.nil_or_empty? ? nil : arr.inject(:+).to_f / arr.size
+    end
   end
 end

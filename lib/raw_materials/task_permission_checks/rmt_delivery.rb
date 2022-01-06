@@ -14,7 +14,9 @@ module RawMaterialsApp
       CHECKS = {
         create: :create_check,
         edit: :edit_check,
-        delete: :delete_check
+        delete: :delete_check,
+        exists: :delivery_exists_check,
+        delivery_tipped: :delivery_tipped_check
       }.freeze
 
       def call
@@ -42,8 +44,28 @@ module RawMaterialsApp
         all_ok
       end
 
+      def delivery_exists_check
+        return failed_response("RMT Delivery : #{@id} does not exist") unless delivery_exists?
+
+        all_ok
+      end
+
+      def delivery_tipped_check
+        return failed_response("RMT Delivery : #{@id} already tipped") if delivery_tipped?
+
+        all_ok
+      end
+
       def bins_tipped?
         @repo.exists?(:rmt_bins, rmt_delivery_id: @id, bin_tipped: true)
+      end
+
+      def delivery_exists?
+        @repo.exists?(:rmt_deliveries, id: @id)
+      end
+
+      def delivery_tipped?
+        @repo.get(:rmt_deliveries, :delivery_tipped, @id)
       end
     end
   end

@@ -494,7 +494,7 @@ module RawMaterialsApp
       error
     end
 
-    def create_rmt_bins(delivery_id, params) # rubocop:disable Metrics/AbcSize
+    def create_rmt_bins(delivery_id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity,  Metrics/PerceivedComplexity
       res = validate_bin_asset_numbers_duplicate_scans(params)
       return validation_failed_response(OpenStruct.new(message: 'Validation Error', messages: res)) unless res.empty?
 
