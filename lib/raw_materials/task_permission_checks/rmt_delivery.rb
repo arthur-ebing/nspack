@@ -51,7 +51,8 @@ module RawMaterialsApp
       end
 
       def delivery_tipped_check
-        return failed_response("RMT Delivery : #{@id} already tipped") if delivery_tipped?
+        # return failed_response("RMT Delivery : #{@id} already tipped") if delivery_tipped?
+        return failed_response("RMT Delivery : #{@id} tipped date out of range") unless delivery_tipped_date_in_range?
 
         all_ok
       end
@@ -66,6 +67,10 @@ module RawMaterialsApp
 
       def delivery_tipped?
         @repo.get(:rmt_deliveries, :delivery_tipped, @id)
+      end
+
+      def delivery_tipped_date_in_range?
+        @repo.exists?(:rmt_deliveries, Sequel.lit(" id = #{@id} AND tipping_complete_date_time > '2022-01-01 00:00'"))
       end
     end
   end
