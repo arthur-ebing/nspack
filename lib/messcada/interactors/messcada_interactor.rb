@@ -147,9 +147,9 @@ module MesscadaApp
                                        line5: "cult group: #{res.instance[:cultivar_group_code]}",
                                        line6: "cult:#{res.instance[:cultivar_name]}",
                                        short1: res.message,
-                                       short2: "run:#{res.instance[:run_id]}, tipped: #{res.instance[:bins_tipped]}",
-                                       short3: "farm:#{res.instance[:farm_code]}, puc:#{res.instance[:puc_code]}, orch:#{res.instance[:orchard_code]}",
-                                       short4: "cult: #{res.instance[:cultivar_group_code]}, / #{res.instance[:cultivar_name]}")
+                                       short2: "run:#{res.instance[:run_id]} tipped: #{res.instance[:bins_tipped]}",
+                                       short3: "F:#{res.instance[:farm_code]}; P:#{res.instance[:puc_code]}; O:#{res.instance[:orchard_code]}",
+                                       short4: "cult: #{res.instance[:cultivar_group_code]} / #{res.instance[:cultivar_name]}")
       else
         MesscadaApp::RobotFeedback.new(device: params[:device],
                                        status: false,
