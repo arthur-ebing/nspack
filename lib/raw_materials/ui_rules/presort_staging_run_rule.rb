@@ -22,8 +22,6 @@ module UiRules
       common_values_for_fields common_fields
       add_plant_resource_field
 
-      set_show_fields unless @rules[:can_edit?] || @mode == :new
-
       add_behaviours
 
       form_name 'presort_staging_run'
@@ -39,35 +37,6 @@ module UiRules
                                  caption: 'Supplier',
                                  prompt: true }
       end
-    end
-
-    def set_show_fields # rubocop:disable Metrics/AbcSize
-      supplier_id_label = @supplier_repo.find_supplier(@form_object.supplier_id)&.supplier
-      cultivar_id_label = repo.get(:cultivars, :cultivar_name, @form_object.cultivar_id)
-      presort_unit_plant_resource_id_label = repo.get(:plant_resources, :plant_resource_code, @form_object.presort_unit_plant_resource_id)
-      rmt_class_id_label = repo.get(:rmt_classes, :rmt_class_code, @form_object.rmt_class_id)
-      rmt_size_id_label = repo.get(:rmt_sizes, :size_code, @form_object.rmt_size_id)
-      season_id_label = repo.get(:seasons, :season_code, @form_object.season_id)
-      fields[:id] = { renderer: :label, with_value: @form_object.id, caption: 'Run Id' }
-      fields[:setup_uncompleted_at] = { renderer: :label, format: :without_timezone_or_seconds }
-      fields[:setup_completed] = { renderer: :label, as_boolean: true }
-      fields[:presort_unit_plant_resource_id] = { renderer: :label, with_value: presort_unit_plant_resource_id_label, caption: 'Line Plant Resource' }
-      fields[:supplier_id] = { renderer: :label, with_value: supplier_id_label, caption: 'Supplier' }
-      fields[:setup_completed_at] = { renderer: :label, format: :without_timezone_or_seconds }
-      fields[:canceled] = { renderer: :label, as_boolean: true }
-      fields[:canceled_at] = { renderer: :label, format: :without_timezone_or_seconds }
-      fields[:cultivar_id] = { renderer: :label, with_value: cultivar_id_label, caption: 'Cultivar' }
-      fields[:rmt_class_id] = { renderer: :label, with_value: rmt_class_id_label, caption: 'Rmt Class' }
-      fields[:rmt_size_id] = { renderer: :label, with_value: rmt_size_id_label, caption: 'Rmt Size' }
-      fields[:season_id] = { renderer: :label, with_value: season_id_label, caption: 'Season' }
-      fields[:editing] = { renderer: :label, as_boolean: true }
-      fields[:staged] = { renderer: :label, as_boolean: true }
-      fields[:running] = { renderer: :label, as_boolean: true }
-      return fields unless rules[:implements_presort_legacy_data_fields]
-
-      fields[:treatment_code] = { renderer: :label, with_value: @form_object.legacy_data.to_h['treatment_code'] }
-      fields[:ripe_point_code] = { renderer: :label, with_value: @form_object.legacy_data.to_h['ripe_point_code'] }
-      fields[:track_indicator_code] = { renderer: :label, with_value: @form_object.legacy_data.to_h['track_indicator_code'] }
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize
@@ -95,11 +64,19 @@ module UiRules
 
       return fields unless rules[:implements_presort_legacy_data_fields]
 
-      cultivar_name = repo.get(:cultivars, :cultivar_name, @form_object.cultivar_id)
-      track_indicator_codes = messcada_repo.track_indicator_codes(cultivar_name).uniq if cultivar_name
-      fields[:treatment_code] = { renderer: :select, options: messcada_repo.presort_staging_run_treatment_codes.uniq, prompt: true }
-      fields[:ripe_point_code] = { renderer: :select, options: messcada_repo.ripe_point_codes.map { |s| s[0] }.uniq, prompt: true }
-      fields[:track_indicator_code] = { renderer: :select, options: track_indicator_codes, prompt: true }
+      fields[:colour_percentage_id] = { renderer: :select,
+                                        options: messcada_repo.for_select_run_colour_percentages_for_cultivar(@form_object.cultivar_id),
+                                        caption: 'Colour',
+                                        prompt: true }
+      fields[:actual_cold_treatment_id] = { renderer: :select,
+                                            options: messcada_repo.for_select_treatments_by_type(AppConst::COLD_TREATMENT),
+                                            prompt: true }
+      fields[:actual_ripeness_treatment_id] = { renderer: :select,
+                                                options: messcada_repo.for_select_treatments_by_type(AppConst::RIPENESS_TREATMENT),
+                                                prompt: true }
+      fields[:rmt_code_id] = { renderer: :select,
+                               options: messcada_repo.for_select_rmt_codes_by_cultivar(@form_object.cultivar_id),
+                               prompt: true }
       fields
     end
 
@@ -110,10 +87,6 @@ module UiRules
       end
 
       @form_object = repo.find_presort_staging_run(@options[:id])
-      return @form_object unless rules[:implements_presort_legacy_data_fields]
-
-      legacy = AppConst::CR_RMT.presort_legacy_data_fields.map { |f| [f, @form_object.legacy_data.to_h[f.to_s]] }
-      @form_object = OpenStruct.new(@form_object.to_h.merge(Hash[legacy]))
     end
 
     def make_new_form_object
@@ -212,15 +185,19 @@ module UiRules
 
     def cultivar_changed # rubocop:disable Metrics/AbcSize
       actions = []
-      unless params[:changed_value].nil_or_empty?
+      if !params[:changed_value].nil_or_empty?
         season_id = MasterfilesApp::CalendarRepo.new.get_season_id(params[:changed_value], Time.now)
         season_code = repo.get_value(:seasons, :season_code, id: season_id) if season_id
 
         if AppConst::CR_RMT.implements_presort_legacy_data_fields?
-          cultivar_name = repo.get(:cultivars, :cultivar_name, params[:changed_value])
-          track_indicator_codes = messcada_repo.track_indicator_codes(cultivar_name).uniq if cultivar_name
-          actions << OpenStruct.new(type: :replace_select_options, dom_id: 'presort_staging_run_track_indicator_code', options_array: track_indicator_codes.to_a)
+          colour_percentages = messcada_repo.for_select_run_colour_percentages_for_cultivar(params[:changed_value])
+          actions << OpenStruct.new(type: :replace_select_options, dom_id: 'presort_staging_run_colour_percentage_id', options_array: colour_percentages)
+          rmt_codes = messcada_repo.for_select_rmt_codes_by_cultivar(params[:changed_value])
+          actions << OpenStruct.new(type: :replace_select_options, dom_id: 'presort_staging_run_rmt_code_id', options_array: rmt_codes)
         end
+      elsif AppConst::CR_RMT.implements_presort_legacy_data_fields?
+        actions << OpenStruct.new(type: :replace_select_options, dom_id: 'presort_staging_run_colour_percentage_id', options_array: [])
+        actions << OpenStruct.new(type: :replace_select_options, dom_id: 'presort_staging_run_rmt_code_id', options_array: [])
       end
 
       actions << OpenStruct.new(type: :replace_inner_html, dom_id: 'presort_staging_run_season_id', value: season_code)

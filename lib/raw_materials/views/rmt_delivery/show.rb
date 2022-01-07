@@ -87,6 +87,7 @@ module RawMaterials
                     col.add_field :truck_registration_number
                     col.add_field :qty_damaged_bins
                     col.add_field :qty_empty_bins
+                    col.add_field :sample_bins_weighed
                   end
 
                   row.column do |col|
@@ -103,6 +104,7 @@ module RawMaterials
                     col.add_field :batch_number
                     col.add_field :batch_number_updated_at
                     col.add_field :qty_partial_bins
+                    col.add_field :sample_weights_extrapolated_at
                   end
                 end
               end

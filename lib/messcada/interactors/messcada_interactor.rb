@@ -179,7 +179,13 @@ module MesscadaApp
       res = validate_update_rmt_bin_weights_params(params)
       return validation_failed_response(res) if res.failure?
 
-      MesscadaApp::UpdateBinWeights.call(res)
+      res = MesscadaApp::UpdateBinWeights.call(res)
+      return res unless res.success
+
+      sample_bin = repo.get(:rmt_bins, :sample_bin, res.instance)
+      enqueue_extrapolate_sample_weights_job(res.instance) if sample_bin
+
+      success_response('RMT Bin weights updated successfully')
     rescue Crossbeams::InfoError => e
       ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message(__method__))
       puts e.message
@@ -190,6 +196,14 @@ module MesscadaApp
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
+    end
+
+    def enqueue_extrapolate_sample_weights_job(rmt_bin_id)
+      rmt_delivery_id = repo.get(:rmt_bins, :rmt_delivery_id, rmt_bin_id)
+      return if rmt_delivery_id.nil?
+
+      cultivar_id = repo.get(:rmt_deliveries, :cultivar_id, rmt_delivery_id)
+      RawMaterialsApp::Job::ExtrapolateDeliverySampleWeights.enqueue(rmt_delivery_id) if delivery_repo.extrapolate_sample_weights?(cultivar_id)
     end
 
     def tip_rmt_bin(params) # rubocop:disable Metrics/AbcSize
@@ -725,6 +739,10 @@ module MesscadaApp
 
     def locations_repo
       @locations_repo ||= MasterfilesApp::LocationRepo.new
+    end
+
+    def delivery_repo
+      @delivery_repo ||= RawMaterialsApp::RmtDeliveryRepo.new
     end
 
     def pallet(id)

@@ -23,9 +23,10 @@ module RawMaterials
               form.add_field :rmt_size_id
               form.add_field :season_id
               if rules[:implements_presort_legacy_data_fields]
-                form.add_field :treatment_code
-                form.add_field :ripe_point_code
-                form.add_field :track_indicator_code
+                form.add_field :colour_percentage_id
+                form.add_field :actual_cold_treatment_id
+                form.add_field :actual_ripeness_treatment_id
+                form.add_field :rmt_code_id
               end
             end
           end

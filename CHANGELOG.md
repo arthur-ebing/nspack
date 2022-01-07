@@ -8,8 +8,21 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Added
 ### Changed
-- Removed RMT client rule: maintain_legacy_columns.
 ### Fixed
+
+## [1.0.7] - 2022-01-07
+### Added
+- Extrapolate bin weights on a delivery from sample bin weights.
+- Derive weights for RMT bins.
+- Locations and Plant Resources can be moved within the tree hierarchy.
+- MRL results on deliveries.
+### Changed
+- Removed RMT client rule: maintain_legacy_columns.
+- Removed use of legacy data in presorting.
+### Fixed
+- Deliveries were showing incorrect tipped qty in the grid.
+- Limit parameter was not being applied to search grids.
+- Scans were expecting a prefix for delivery barcodes.
 
 ## [1.0.6] - 2021-12-29
 ### Added

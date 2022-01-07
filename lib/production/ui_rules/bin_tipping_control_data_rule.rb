@@ -32,7 +32,7 @@ module UiRules
                                         options: @repo.for_select_treatments_by_type(AppConst::RIPENESS_TREATMENT),
                                         prompt: true },
         rmt_code_id: { renderer: :select,
-                       options: @repo.for_select_rmt_codes_by_run_cultivar(@options[:production_run_id], @form_object.cultivar_id),
+                       options: @repo.for_select_rmt_codes_by_cultivar(@form_object.cultivar_id),
                        prompt: true },
         rmt_size_id: { renderer: :select,
                        options: MasterfilesApp::RmtSizeRepo.new.for_select_rmt_sizes,

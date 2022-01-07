@@ -110,6 +110,8 @@ module RawMaterials
                     col.add_field :batch_number
                     col.add_field :batch_number_updated_at
                     col.add_field :qty_partial_bins
+                    col.add_field :sample_bins_weighed
+                    col.add_field :sample_weights_extrapolated_at
                     # col.add_field :keep_open
                   end
                 end

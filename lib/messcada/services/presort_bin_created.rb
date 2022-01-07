@@ -79,12 +79,20 @@ module MesscadaApp
       cultivar_group_id = repo.get_value(:cultivars, :cultivar_group_id, id: presorted_bin_staging_run[:cultivar_id])
       tare_weight = repo.get_value(:rmt_container_material_types, :tare_weight, id: rmt_container_material_type_id)
       location_id = repo.get_value(:locations, :id, location_long_code: AppConst::CR_RMT.presort_staging_target_location(plant_resource_code))
+      cold_treatment_code, ripeness_treatment_code = representative_bin['Code_frigo'].split('_')
+      actual_cold_treatment_id = repo.get_value(:treatments, :id, treatment_code: cold_treatment_code)
+      actual_ripeness_treatment_id = repo.get_value(:treatments, :id, treatment_code: ripeness_treatment_code)
+      colour_percentage_id = repo.get_value(:colour_percentages, :id, colour_percentage: presorted_bin_rmt_product_code.split('_')[2])
       bin_attrs = { season_id: presorted_bin_staging_run[:season_id],
                     presorted: true,
                     cultivar_id: presorted_bin_staging_run[:cultivar_id],
                     rmt_container_material_type_id: rmt_container_material_type_id,
                     rmt_material_owner_party_role_id: rmt_material_owner_party_role_id,
                     cultivar_group_id: cultivar_group_id,
+                    actual_cold_treatment_id: actual_cold_treatment_id,
+                    actual_ripeness_treatment_id: actual_ripeness_treatment_id,
+                    colour_percentage_id: colour_percentage_id,
+                    rmt_code_id: presorted_bin_staging_run[:rmt_code_id],
                     bin_fullness: 'Full',
                     qty_bins: 1,
                     location_id: location_id,
@@ -94,14 +102,6 @@ module MesscadaApp
                     is_rebin: false,
                     main_presort_run_lot_number: representative_bin['Numero_lot_max'],
                     rmt_container_type_id: repo.get_value(:rmt_container_types, :id, container_type_code: AppConst::CR_RMT.default_rmt_container_type) }
-      bin_attrs[:legacy_data] = { 'cold_store_type' => representative_bin['Code_frigo'],
-                                  'numero_lot_max' => representative_bin['Numero_lot_max'],
-                                  'colour' => presorted_bin_rmt_product_code.split('_')[2],
-                                  'track_slms_indicator_1_code' => presorted_bin_staging_run[:legacy_data]['track_indicator_code'],
-                                  'code_cumul' => representative_bin['Code_cumul'],
-                                  'coldstore_type' => representative_bin['Code_frigo'],
-                                  'ripe_point_code' => presorted_bin_rmt_product_code.split('_')[4],
-                                  'pc_code' => repo.legacy_pc_code(presorted_bin_rmt_product_code.split('_')[4]) }
 
       puc_code = repo.puc_code_for_farm(representative_bin['Code_adherent_max'])
       mfs = { farm_code: representative_bin['Code_adherent_max'],

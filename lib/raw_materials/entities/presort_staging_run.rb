@@ -20,6 +20,10 @@ module RawMaterialsApp
     attribute :staged, Types::Bool
     attribute :legacy_data, Types::Hash
     attribute? :running, Types::Bool
+    attribute :colour_percentage_id, Types::Integer
+    attribute :actual_cold_treatment_id, Types::Integer
+    attribute :actual_ripeness_treatment_id, Types::Integer
+    attribute :rmt_code_id, Types::Integer
   end
 
   class PresortStagingRunFlat < Dry::Struct
@@ -41,7 +45,6 @@ module RawMaterialsApp
     attribute :staged, Types::Bool
     attribute :legacy_data, Types::Hash
     attribute? :running, Types::Bool
-
     attribute :status, Types::String
     attribute :plant_resource_code, Types::String
     attribute :cultivar_name, Types::String
@@ -50,5 +53,13 @@ module RawMaterialsApp
     attribute :season_code, Types::String
     attribute :supplier, Types::String
     attribute :supplier_party_role_id, Types::Integer
+    attribute :colour_percentage_id, Types::Integer
+    attribute :actual_cold_treatment_id, Types::Integer
+    attribute :actual_ripeness_treatment_id, Types::Integer
+    attribute :rmt_code_id, Types::Integer
+    attribute :rmt_code, Types::String
+    attribute :colour_percentage, Types::String
+    attribute :actual_cold_treatment_code, Types::String
+    attribute :actual_ripeness_treatment_code, Types::String
   end
 end

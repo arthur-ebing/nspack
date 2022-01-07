@@ -190,6 +190,7 @@ module ProductionApp
         upd[:pallet_format_id] = new_pallet_format if new_pallet_format
         upd[:cartons_per_pallet_id] = new_cartons_per_pallet_id if new_cartons_per_pallet_id
 
+        messcada_repo.update(:pallets, pallet_sequence[:pallet_id], pallet_format_id: new_pallet_format) if new_pallet_format
         messcada_repo.update_pallet_sequence(pallet_sequence_id, upd)
         log_status(:pallets, pallet_sequence[:pallet_id], AppConst::PALLETIZED_SEQUENCE_UPDATED)
         log_transaction

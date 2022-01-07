@@ -18,5 +18,9 @@ module RawMaterialsApp
     optional(:staged).maybe(:bool)
     optional(:running).maybe(:bool)
     optional(:legacy_data).maybe(:hash)
+    optional(:colour_percentage_id).maybe(:integer)
+    optional(:actual_cold_treatment_id).maybe(:integer)
+    optional(:actual_ripeness_treatment_id).maybe(:integer)
+    optional(:rmt_code_id).maybe(:integer)
   end
 end

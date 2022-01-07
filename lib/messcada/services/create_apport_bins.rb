@@ -42,9 +42,9 @@ module MesscadaApp
           NomApporteur,CodeEspece,NomEspece,
           Partie,Year,Free_int1,Free_int2,Free_string1,
           Free_string2,Free_string3)
-          VALUES('#{bin[:bin_asset_number]}',getdate(),'#{code_parcelle}','#{bin[:legacy_data]['track_slms_indicator_1_code']}'
+          VALUES('#{bin[:bin_asset_number]}',getdate(),'#{code_parcelle}','#{bin[:rmt_code]}'
           ,'#{code_apporteur}','#{bin[:container_material_type_code]}','#{bin[:id]}','#{bin[:nett_weight]}'
-          ,'#{presort_staging_child_run_id}','#{bin[:legacy_data]['treatment_code']}','#{nom_parcelle}','#{bin[:legacy_data]['track_slms_indicator_1_description']}'
+          ,'#{presort_staging_child_run_id}','#{bin[:colour_percentage]}','#{nom_parcelle}','#{bin[:rmt_code_description]}'
           ,'#{bin[:farm_description]}','#{bin[:commodity_code]}','#{bin[:commodity_description]}'
           ,'#{bin[:production_run_rebin_id]}','#{bin[:season_year]}',NULL,'#{bin[:season_year]}','#{bin[:cultivar_name]}'
           ,'#{bin[:farm_group_id]}',NULL);\n
@@ -78,14 +78,14 @@ module MesscadaApp
       child_run_farm_code = repo.child_run_farm(presort_staging_child_run_id)
       if child_run_farm_code.upcase == '0P'
         code_apporteur = '0P'
-        code_parcelle = "0P_#{bin[:legacy_data]['track_slms_indicator_1_code']}"
-        nom_parcelle = "0P_#{bin[:legacy_data]['track_slms_indicator_1_code']}"
+        code_parcelle = "0P_#{bin.rmt_code}"
+        nom_parcelle = "0P_#{bin.rmt_code}"
       else
         code_apporteur = bin[:farm_code]
         registered_orchard_code = repo.get_value(:registered_orchards, :orchard_code, puc_code: bin[:puc_code], cultivar_code: bin[:cultivar_code], marketing_orchard: true)
         orchard_code = registered_orchard_code.nil? ? bin[:orchard_code] : registered_orchard_code
-        nom_parcelle = "#{orchard_code}_#{bin[:farm_code]}_#{bin[:legacy_data]['track_slms_indicator_1_code']}"
-        code_parcelle = "#{orchard_code}_#{bin[:farm_code]}_#{bin[:legacy_data]['track_slms_indicator_1_code']}"
+        nom_parcelle = "#{orchard_code}_#{bin[:farm_code]}_#{bin.rmt_code}"
+        code_parcelle = "#{orchard_code}_#{bin[:farm_code]}_#{bin.rmt_code}"
       end
       [code_apporteur, code_parcelle, nom_parcelle]
     end
