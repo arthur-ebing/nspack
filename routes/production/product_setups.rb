@@ -364,15 +364,19 @@ class Nspack < Roda
       end
 
       r.on 'packed_tm_group_changed' do
-        if params[:changed_value].blank? || params[:product_setup_marketing_variety_id].blank?
-          customer_varieties = []
-          target_markets = []
-        else
-          packed_tm_group_id = params[:changed_value]
-          marketing_variety_id = params[:product_setup_marketing_variety_id]
-          customer_varieties = interactor.for_select_customer_varieties(packed_tm_group_id, marketing_variety_id)
-          target_markets = MasterfilesApp::TargetMarketRepo.new.for_select_packed_group_tms(where: { target_market_group_id: packed_tm_group_id })
-        end
+        packed_tm_group_id = params[:changed_value]
+        marketing_variety_id = params[:product_setup_marketing_variety_id]
+
+        customer_varieties = if packed_tm_group_id.blank? || marketing_variety_id.blank?
+                               []
+                             else
+                               interactor.for_select_customer_varieties(packed_tm_group_id, marketing_variety_id)
+                             end
+        target_markets = if packed_tm_group_id.blank?
+                           []
+                         else
+                           MasterfilesApp::TargetMarketRepo.new.for_select_packed_group_tms(where: { target_market_group_id: packed_tm_group_id })
+                         end
         json_actions([OpenStruct.new(type: :replace_select_options,
                                      dom_id: 'product_setup_customer_variety_id',
                                      options_array: customer_varieties),
