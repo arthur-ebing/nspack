@@ -92,6 +92,21 @@ module QualityApp
       failed_response(e.message)
     end
 
+    def capture_mrl_result(id, params)
+      res = validate_capture_mrl_result_params(params)
+      return validation_failed_response(res) if res.failure?
+
+      repo.transaction do
+        repo.update_mrl_result(id, res)
+        log_status(:mrl_results, id, 'MRL RESULT CAPTURED', comment: "Result_received_at: #{res[:result_received_at]}")
+        log_transaction
+      end
+      instance = mrl_result(id)
+      success_response("Captured mrl result #{instance.result_received_at}", instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     private
 
     def repo
@@ -108,6 +123,10 @@ module QualityApp
 
     def validate_mrl_result_params(params)
       MrlResultSchema.call(params)
+    end
+
+    def validate_capture_mrl_result_params(params)
+      CaptureMrlResultSchema.call(params)
     end
   end
 end

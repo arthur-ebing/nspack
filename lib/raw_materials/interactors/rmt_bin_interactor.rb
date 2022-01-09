@@ -311,7 +311,7 @@ module RawMaterialsApp
           bin_id = repo.create_rmt_bin(params)
           log_status(:rmt_bins, bin_id, 'BIN RECEIVED')
           if repo.derive_rmt_bin_gross_weight?(params[:cultivar_id])
-            res = weigh_rmt_bin(params)
+            res = apply_derived_rmt_bin_weight(params)
             raise Crossbeams::InfoError, res.message unless res.success
           end
           created_bins << rmt_bin(bin_id)
@@ -324,8 +324,8 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def weigh_rmt_bin(rmt_bin)
-      rmt_bin[:gross_weight] = repo.calculate_rmt_bin_gross_weight(rmt_bin)
+    def apply_derived_rmt_bin_weight(rmt_bin)
+      rmt_bin[:gross_weight] = repo.derive_rmt_bin_gross_weight(rmt_bin)
       unless rmt_bin[:gross_weight].nil_or_empty?
         options = { force_find_by_id: false, weighed_manually: true, avg_gross_weight: false }
         attrs = { bin_number: rmt_bin[:bin_asset_number], gross_weight: rmt_bin[:gross_weight].to_i }
@@ -432,7 +432,7 @@ module RawMaterialsApp
         id = repo.create_rmt_bin(res)
 
         repo.update(:rmt_bins, id, sample_bin: true) if repo.bin_sample?(res[:bin_asset_number], delivery_id, res[:bin_fullness])
-        params[:gross_weight] = repo.calculate_rmt_bin_gross_weight(res) if repo.derive_rmt_bin_gross_weight?(res.to_h[:cultivar_id])
+        params[:gross_weight] = repo.derive_rmt_bin_gross_weight(res) if repo.derive_rmt_bin_gross_weight?(res.to_h[:cultivar_id])
         unless params[:gross_weight].nil_or_empty?
           options = { force_find_by_id: false, weighed_manually: true, avg_gross_weight: false }
           bin_number = res.to_h[:bin_asset_number]
@@ -522,7 +522,7 @@ module RawMaterialsApp
           log_status(:rmt_bins, id, 'BIN RECEIVED')
           rmt_bin = repo.find_hash(:rmt_bins, id)
           if repo.derive_rmt_bin_gross_weight?(rmt_bin[:cultivar_id])
-            res = weigh_rmt_bin(rmt_bin)
+            res = apply_derived_rmt_bin_weight(rmt_bin)
             raise Crossbeams::InfoError, res.message unless res.success
           end
         end

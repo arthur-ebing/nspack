@@ -27,9 +27,6 @@ module Quality
                   col.add_field :mrl_sample_type_id
                   col.add_field :fruit_received_at
                   col.add_field :sample_submitted_at
-                  col.add_field :result_received_at
-                  col.add_field :mrl_sample_passed
-                  col.add_field :max_num_chemicals_passed
                   col.add_field :pre_harvest_result
                 end
                 row.column do |col|

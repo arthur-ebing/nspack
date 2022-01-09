@@ -4,6 +4,8 @@ module UiRules
   class RmtDeliveryRule < Base
     def generate_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       @repo = RawMaterialsApp::RmtDeliveryRepo.new
+      @mrl_result_repo = QualityApp::MrlResultRepo.new
+
       make_form_object
       apply_form_values
 
@@ -409,9 +411,30 @@ module UiRules
         items_prod << { url: "/quality/qc/qc_samples/new_rmt_delivery_id_sample/#{sample_type_id}/#{@options[:id]}", text: 'Create', behaviour: :popup }
       end
       build_qc_summary(AppConst::QC_SAMPLE_PRODUCER, prod_id)
+
+      items_mrl = []
+      mrl_result_id = mrl_result_id_for(@options[:id])
+      if mrl_result_id
+        rules[:mrl_test_result] = @mrl_result_repo.mrl_result_summary(mrl_result_id)
+        items_mrl << { url: "/quality/mrl/mrl_results/#{mrl_result_id}/edit", text: 'Edit', behaviour: :popup }
+        items_mrl << { url: "/quality/mrl/mrl_results/#{mrl_result_id}/capture_mrl_result", text: 'Capture Result', behaviour: :popup }
+        items_mrl << { url: "/quality/mrl/mrl_results/#{mrl_result_id}", text: 'View', behaviour: :popup }
+        items_mrl << { url: "/quality/mrl/mrl_results/#{mrl_result_id}/print_mrl_labels", text: 'Print MRL Label', behaviour: :popup }
+      else
+        rules[:mrl_test_result] = []
+        items_mrl << { url: "/raw_materials/deliveries/rmt_deliveries/#{@options[:id]}/capture_delivery_mrl_result", text: 'Create', behaviour: :popup }
+      end
+
       rules[:items_fruit] = items_fruit
       rules[:items_prog] = items_prog
       rules[:items_prod] = items_prod
+      rules[:items_mrl] = items_mrl
+    end
+
+    def mrl_result_id_for(delivery_id)
+      arr = %i[farm_id puc_id orchard_id cultivar_id season_id]
+      args = @mrl_result_repo.mrl_result_attrs_for(delivery_id, arr)
+      @mrl_result_repo.look_for_existing_mrl_result_id(args)
     end
 
     def build_qc_summary(sample_type, sample_id)

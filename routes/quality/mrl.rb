@@ -50,6 +50,23 @@ class Nspack < Roda
         end
       end
 
+      r.on 'capture_mrl_result' do
+        r.get do
+          check_auth!('mrl', 'edit')
+          interactor.assert_permission!(:edit, id)
+          show_partial { Quality::Mrl::MrlResult::CaptureResult.call(id) }
+        end
+        r.patch do
+          res = interactor.capture_mrl_result(id, params[:mrl_result])
+          if res.success
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
+          else
+            re_show_form(r, res) { Quality::Mrl::MrlResult::CaptureResult.call(id, form_values: params[:mrl_result], form_errors: res.errors) }
+          end
+        end
+      end
+
       r.on 'edit' do   # EDIT
         check_auth!('mrl', 'edit')
         interactor.assert_permission!(:edit, id)

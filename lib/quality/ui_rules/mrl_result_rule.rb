@@ -24,6 +24,7 @@ module UiRules
       set_show_fields if %i[show].include? @mode
       set_mrl_result_override_details if %i[override].include? @mode
       set_print_mrl_labels_fields if @mode == :print_mrl_label
+      set_mrl_result_details if %i[capture_result].include? @mode
 
       add_behaviours if %i[new edit].include? @mode
 
@@ -202,7 +203,8 @@ module UiRules
                                subtype: :date,
                                required: true },
         result_received_at: { renderer: :input,
-                              subtype: :date }
+                              subtype: :date,
+                              required: true }
       }
       if @rules[:delivery_result]
         fields[:farm_code] = { renderer: :label,
@@ -250,6 +252,23 @@ module UiRules
                                      required: true }
       fields[:no_of_prints] = { renderer: :integer,
                                 required: true }
+    end
+
+    def set_mrl_result_details(columns = nil, display_columns = 3)
+      compact_header(columns: columns || %i[ rmt_delivery_id farm_code puc_code orchard_code cultivar_name season_code
+                                             sample_type_code lab_code reference_number sample_number waybill_number num_active_ingredients
+                                             ph_level pre_harvest_result post_harvest_result fruit_received_at sample_submitted_at result_received_at],
+                     display_columns: display_columns,
+                     header_captions: {
+                       cultivar_name: 'Cultivar',
+                       puc_code: 'PUC',
+                       farm_code: 'Farm',
+                       orchard_code: 'Orchard',
+                       season_code: 'Season',
+                       production_run_code: 'Production Run',
+                       sample_type_code: 'Sample Type',
+                       lab_code: 'Laboratory'
+                     })
     end
 
     def make_form_object

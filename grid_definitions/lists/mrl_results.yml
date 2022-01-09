@@ -11,6 +11,11 @@
   :icon: edit
   :title: Edit
   :popup: true
+- :url: "/quality/mrl/mrl_results/$:id$/capture_mrl_result"
+  :text: capture result
+  :icon: edit
+  :title: Edit
+  :popup: true
 - :url: "/quality/mrl/mrl_results/$:id$"
   :text: delete
   :icon: delete

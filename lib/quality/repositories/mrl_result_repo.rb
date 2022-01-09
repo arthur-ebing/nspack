@@ -127,5 +127,24 @@ module QualityApp
         .exclude(exclude)
         .empty?
     end
+
+    def mrl_result_summary(mrl_result_id)
+      return [] if mrl_result_id.nil?
+
+      query = <<~SQL
+        SELECT mrl_sample_types.sample_type_code,
+               laboratories.lab_code,
+               mrl_results.sample_number,
+               mrl_results.reference_number,
+               mrl_results.mrl_sample_passed,
+               mrl_results.max_num_chemicals_passed,
+               mrl_results.result_received_at
+        FROM mrl_results
+        JOIN laboratories ON laboratories.id = mrl_results.laboratory_id
+        JOIN mrl_sample_types ON mrl_sample_types.id = mrl_results.mrl_sample_type_id
+        WHERE mrl_results.id = ?
+      SQL
+      DB[query, mrl_result_id].all
+    end
   end
 end

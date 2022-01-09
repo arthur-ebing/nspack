@@ -76,17 +76,6 @@
   :popup: true
   :show_for_client_rule: CR_RMT.show_classify_raw_material_form?
 - :separator: true
-- :submenu:
-    :text: mrl_samples
-    :items:
-      - :url: "/raw_materials/deliveries/rmt_deliveries/$:id$/capture_delivery_mrl_result"
-        :text: capture mrl result
-        :icon: add-solid
-        :popup: true
-      - :url: "/raw_materials/deliveries/rmt_deliveries/$:id$/print_mrl_labels"
-        :text: print labels
-        :popup: true
-- :separator: true
 :page_controls:
   - :control_type: :link
     :url: '/raw_materials/deliveries/rmt_deliveries/new'

@@ -12,6 +12,7 @@ module RawMaterialsApp
             section.add_control(control_type: :dropdown_button, text: '100 Fruit Sample', items: rules[:items_fruit]) unless rules[:items_fruit].empty?
             section.add_control(control_type: :dropdown_button, text: 'Progressive defects', items: rules[:items_prog]) unless rules[:items_prog].empty?
             section.add_control(control_type: :dropdown_button, text: 'Producer starch', items: rules[:items_prod]) unless rules[:items_prod].empty?
+            section.add_control(control_type: :dropdown_button, text: 'MRL', items: rules[:items_mrl]) unless rules[:items_mrl].empty?
             section.row do |row|
               unless rules[:items_fruit].empty?
                 row.column do |col|
@@ -48,6 +49,18 @@ module RawMaterialsApp
                     col.add_table rules[:qc_summary_producer],
                                   %i[key sample_size status summary],
                                   alignment: { sample_size: :right }
+                  end
+                end
+              end
+
+              unless rules[:items_mrl].empty?
+                row.column do |col|
+                  col.add_text 'MRL Results', wrapper: :h3, css_classes: 'mid-gray'
+                  if rules[:mrl_test_result].empty?
+                    col.add_text 'No MRL Result', wrapper: :em
+                  else
+                    col.add_table rules[:mrl_test_result],
+                                  %i[lab_code sample_type_code sample_number reference_number mrl_sample_passed max_num_chemicals_passed result_received_at]
                   end
                 end
               end

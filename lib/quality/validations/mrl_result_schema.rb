@@ -51,4 +51,11 @@ module QualityApp
   MrlResultDeliverySchema = Dry::Schema.Params do
     required(:rmt_delivery_id).filled(:integer)
   end
+
+  CaptureMrlResultSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:result_received_at).filled(:time)
+    required(:max_num_chemicals_passed).maybe(:bool)
+    required(:mrl_sample_passed).maybe(:bool)
+  end
 end
