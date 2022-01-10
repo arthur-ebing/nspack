@@ -52,7 +52,7 @@ module RawMaterialsApp
 
       def delivery_tipped_check
         # return failed_response("RMT Delivery : #{@id} already tipped") if delivery_tipped?
-        return failed_response("RMT Delivery : #{@id} tipped date out of range") unless delivery_tipped_date_in_range?
+        # return failed_response("RMT Delivery : #{@id} tipped date out of range") unless delivery_tipped_date_in_range?
 
         all_ok
       end
