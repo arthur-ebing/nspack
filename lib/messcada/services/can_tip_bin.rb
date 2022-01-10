@@ -126,7 +126,7 @@ module MesscadaApp
       failed_response("Tipping Criteria Fails for bin #{bin_number}: #{legacy_errors.join(' ')}")
     end
 
-    LEGACY_ERROR_MSG = '%s is %s on run, but %s on bin.'
+    LEGACY_ERROR_MSG = '%s: %s on run; %s on bin.'
 
     def bintip_criteria_check_colour_percentage
       # log_code_check('Colour', run_attrs[:colour_percentage], rmt_bin[:colour_percentage])
