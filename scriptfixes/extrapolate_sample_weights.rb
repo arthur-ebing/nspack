@@ -29,7 +29,7 @@ class ExtrapolateSampleWeights < BaseScript
                        .join(:cultivar_groups, id: :cultivar_group_id)
                        .join(:commodities, id: :commodity_id)
                        .where(allocate_sample_rmt_bins: true, derive_rmt_nett_weight: false)
-                       .where(Sequel.lit('tipping_complete_date_time').> Time.parse('2022-01-01 00:00'))
+                       .where(Sequel.lit('date_delivered').> Time.parse('2022-01-01 00:00'))
                        .distinct
                        .select_map(Sequel[:rmt_deliveries][:id])
     return failed_response('There are no deliveries to fix') if rmt_delivery_ids.nil_or_empty?
