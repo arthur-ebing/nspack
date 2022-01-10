@@ -52,7 +52,9 @@ module RawMaterialsApp
                   end
                 end
               end
+            end
 
+            section.row do |row|
               unless rules[:items_mrl].empty?
                 row.column do |col|
                   col.add_text 'MRL Results', wrapper: :h3, css_classes: 'mid-gray'
