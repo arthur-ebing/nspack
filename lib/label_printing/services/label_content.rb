@@ -2,21 +2,29 @@
 
 module LabelPrintingApp
   module LabelContent
+    def label_date_for_functions
+      @label_date_for_functions ||= @supporting_data[:packed_date] || Date.today
+    end
+
     # Built-in functions - can't be private!
     def iso_day
-      (@supporting_data[:packed_date] || Date.today).strftime('%j')
+      label_date_for_functions.strftime('%j')
     end
 
     def iso_week
-      (@supporting_data[:packed_date] || Date.today).strftime('%V')
+      label_date_for_functions.strftime('%V')
     end
 
     def iso_week_day
-      (@supporting_data[:packed_date] || Date.today).strftime('%u')
+      label_date_for_functions.strftime('%u')
     end
 
     def current_date
-      (@supporting_data[:packed_date] || Date.today).strftime('%Y-%m-%d')
+      label_date_for_functions.strftime('%Y-%m-%d')
+    end
+
+    def ogl_number
+      %(L#{label_date_for_functions.strftime('%')}-#{label_date_for_functions.strftime('%u')})
     end
 
     def sequence_table(pallet_id)

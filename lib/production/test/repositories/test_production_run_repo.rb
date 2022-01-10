@@ -92,7 +92,8 @@ module ProductionApp
         active: true,
         allow_cultivar_group_mixing: false,
         legacy_data: {},
-        legacy_bintip_criteria: {}
+        legacy_bintip_criteria: {},
+        run_batch_number: 'ABC'
       }
     end
 

@@ -20,6 +20,7 @@ module Production
                   col.add_field :orchard_id
                   col.add_field :cultivar_group_id
                   col.add_field :product_setup_template_id
+                  col.add_field :run_batch_number
                 end
                 row.column do |col|
                   col.add_field :production_line_id

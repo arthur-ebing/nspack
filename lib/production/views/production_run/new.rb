@@ -37,6 +37,7 @@ module Production
                   col.add_field :allow_cultivar_group_mixing
                   col.add_field :allow_cultivar_mixing
                   col.add_field :allow_orchard_mixing
+                  col.add_field :run_batch_number
                 end
               end
             end

@@ -137,7 +137,8 @@ module ProductionApp
         labeling: false,
         active: true,
         legacy_data: {},
-        legacy_bintip_criteria: {}
+        legacy_bintip_criteria: {},
+        run_batch_number: 'ABC'
       }
     end
 

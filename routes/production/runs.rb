@@ -150,6 +150,7 @@ class Nspack < Roda
               colour_rule
               commodity_code
               allow_cultivar_group_mixing
+              run_batch_number
             ]
             add_grid_row(attrs: select_attributes(res.instance.to_h.merge(status: "CLONED from run id #{id}"), row_keys),
                          notice: res.message)
@@ -759,7 +760,8 @@ class Nspack < Roda
                           packhouse_code
                           line_code
                           status
-                          allow_cultivar_group_mixing]
+                          allow_cultivar_group_mixing
+                          run_batch_number]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message, grid_id: 'grid_production_runs')
           else
             re_show_form(r, res) { Production::Runs::ProductionRun::Edit.call(id, form_values: params[:production_run], form_errors: res.errors) }
@@ -980,6 +982,7 @@ class Nspack < Roda
               colour_rule
               commodity_code
               allow_cultivar_group_mixing
+              run_batch_number
             ]
             add_grid_row(attrs: select_attributes(res.instance.to_h.merge(status: 'CREATED'), row_keys),
                          notice: res.message)

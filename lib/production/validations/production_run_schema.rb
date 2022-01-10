@@ -12,6 +12,7 @@ module ProductionApp
       required(:allow_cultivar_mixing).maybe(:bool)
       required(:allow_orchard_mixing).maybe(:bool)
       required(:allow_cultivar_group_mixing).maybe(:bool)
+      required(:run_batch_number).maybe(Types::StrippedString)
     end
 
     rule(:allow_cultivar_mixing, :cultivar_id) do
@@ -35,6 +36,7 @@ module ProductionApp
       required(:allow_orchard_mixing).maybe(:bool)
       required(:allow_cultivar_group_mixing).maybe(:bool)
       optional(:legacy_bintip_criteria).maybe(:hash)
+      required(:run_batch_number).maybe(Types::StrippedString)
     end
     rule(:allow_cultivar_mixing, :cultivar_id) do
       base.failure 'Do not select a cultivar when allowing cultivar mixing.' if values[:cultivar_id] && values[:allow_cultivar_mixing]
@@ -68,6 +70,7 @@ module ProductionApp
       optional(:setup_complete).maybe(:bool)
       optional(:completed).maybe(:bool)
       required(:allow_cultivar_group_mixing).maybe(:bool)
+      required(:run_batch_number).maybe(Types::StrippedString)
     end
     rule(:allow_cultivar_mixing, :cultivar_id) do
       base.failure 'Do not select a cultivar when allowing cultivar mixing.' if values[:cultivar_id] && values[:allow_cultivar_mixing]
@@ -101,6 +104,7 @@ module ProductionApp
       optional(:setup_complete).maybe(:bool)
       optional(:completed).maybe(:bool)
       required(:allow_cultivar_group_mixing).maybe(:bool)
+      required(:run_batch_number).maybe(Types::StrippedString)
     end
     rule(:allow_cultivar_mixing, :cultivar_id) do
       base.failure 'Do not select a cultivar when allowing cultivar mixing.' if values[:cultivar_id] && values[:allow_cultivar_mixing]

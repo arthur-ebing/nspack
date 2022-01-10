@@ -37,7 +37,8 @@ module ProductionApp
         updated_at: '2010-01-01 12:00',
         allow_cultivar_group_mixing: false,
         legacy_bintip_criteria: nil,
-        legacy_data: nil
+        legacy_data: nil,
+        run_batch_number: Faker::Lorem.word
       }
       DB[:production_runs].insert(default.merge(opts))
     end

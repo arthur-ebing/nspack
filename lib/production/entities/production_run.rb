@@ -33,11 +33,12 @@ module ProductionApp
     attribute :legacy_data, Types::Hash.optional
     attribute :legacy_bintip_criteria, Types::Hash.optional
     attribute :colour_percentage_id, Types::Integer
-    attribute  :actual_cold_treatment_id, Types::Integer
-    attribute  :actual_ripeness_treatment_id, Types::Integer
-    attribute  :rmt_code_id, Types::Integer
-    attribute  :rmt_size_id, Types::Integer
-    attribute  :rmt_class_id, Types::Integer
+    attribute :actual_cold_treatment_id, Types::Integer
+    attribute :actual_ripeness_treatment_id, Types::Integer
+    attribute :rmt_code_id, Types::Integer
+    attribute :rmt_size_id, Types::Integer
+    attribute :rmt_class_id, Types::Integer
+    attribute :run_batch_number, Types::String
 
     def next_stage
       if tipping && labeling
@@ -97,16 +98,17 @@ module ProductionApp
     attribute :legacy_data, Types::Hash.optional
     attribute :legacy_bintip_criteria, Types::Hash.optional
     attribute :colour_percentage_id, Types::Integer
-    attribute  :actual_cold_treatment_id, Types::Integer
-    attribute  :actual_ripeness_treatment_id, Types::Integer
-    attribute  :rmt_code_id, Types::Integer
-    attribute  :rmt_size_id, Types::Integer
-    attribute  :rmt_class_id, Types::Integer
+    attribute :actual_cold_treatment_id, Types::Integer
+    attribute :actual_ripeness_treatment_id, Types::Integer
+    attribute :rmt_code_id, Types::Integer
+    attribute :rmt_size_id, Types::Integer
+    attribute :rmt_class_id, Types::Integer
     attribute :size_code, Types::String
     attribute :rmt_code, Types::String
     attribute :colour_percentage, Types::String
     attribute :actual_cold_treatment_code, Types::String
     attribute :actual_ripeness_treatment_code, Types::String
     attribute :class_code, Types::String
+    attribute :run_batch_number, Types::String
   end
 end
