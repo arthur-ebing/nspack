@@ -11,6 +11,10 @@
   :icon: edit
   :title: Edit
   :popup: true
+- :url: "/quality/qc/qc_samples/$:id$/manage"
+  :text: manage
+  :icon: check-square
+  :hide_if_null: production_run_id
 - :separator: true
 - :url: "/development/statuses/list/qc_samples/$:id$"
   :text: status

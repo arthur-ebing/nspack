@@ -49,7 +49,7 @@ module Crossbeams
             edi_out_account: '8385',
             ps_apply_substitutes: false },
       um: { install_location: 'MATCOLD',
-            install_depot: '',
+            install_depot: 'UM',
             sender: 'UM',
             load_id_prefix: '',
             default_edi_in_inv_code: 'UL',

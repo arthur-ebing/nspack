@@ -154,6 +154,11 @@
   :icon: printer
   :title: Reports for Production Run $:id$
   :popup: true
+- :url: "/quality/qc/qc_samples/production_run_sample/$:id$/production_run"
+  :text: QC
+  :icon: check-square
+  :title: QC for Production Run $:id$
+  :popup: true
 - :separator: true
 - :url: "/development/statuses/list/production_runs/$:id$"
   :text: status

@@ -21,6 +21,18 @@ module QualityApp
       failed_response(e.message)
     end
 
+    def find_qc_sample_or_type(context, context_key, sample_type: nil, sample_type_id: nil)
+      raise ArgumentError, 'Sample type code or id must be provided to find_qc_sample_or_type' if sample_type.nil? && sample_type_id.nil?
+
+      sample_type_id = repo.get_id(:qc_sample_types, qc_sample_type_name: sample_type) if sample_type_id.nil?
+      raise Crossbeams::InfoError, "There is no active sample type #{sample_type}" if sample_type_id.nil?
+
+      sample_id = repo.sample_id_for_type_and_context(sample_type_id, context, context_key)
+      return failed_response('No sample', sample_type_id) if sample_id.nil?
+
+      success_response('Found sample', sample_id)
+    end
+
     def update_qc_sample(id, params)
       res = validate_qc_sample_params(params)
       return validation_failed_response(res) if res.failure?
@@ -49,37 +61,6 @@ module QualityApp
       puts e.message
       failed_response("Unable to delete qc sample. It is still referenced#{e.message.partition('referenced').last}")
     end
-
-    # def complete_a_qc_sample(id, params)
-    #   res = complete_a_record(:qc_samples, id, params.merge(enqueue_job: false))
-    #   if res.success
-    #     success_response(res.message, qc_sample(id))
-    #   else
-    #     failed_response(res.message, qc_sample(id))
-    #   end
-    # end
-
-    # def reopen_a_qc_sample(id, params)
-    #   res = reopen_a_record(:qc_samples, id, params.merge(enqueue_job: false))
-    #   if res.success
-    #     success_response(res.message, qc_sample(id))
-    #   else
-    #     failed_response(res.message, qc_sample(id))
-    #   end
-    # end
-
-    # def approve_or_reject_a_qc_sample(id, params)
-    #   res = if params[:approve_action] == 'a'
-    #           approve_a_record(:qc_samples, id, params.merge(enqueue_job: false))
-    #         else
-    #           reject_a_record(:qc_samples, id, params.merge(enqueue_job: false))
-    #         end
-    #   if res.success
-    #     success_response(res.message, qc_sample(id))
-    #   else
-    #     failed_response(res.message, qc_sample(id))
-    #   end
-    # end
 
     def assert_permission!(task, id = nil)
       res = TaskPermissionCheck::QcSample.call(task, id)
@@ -147,6 +128,7 @@ module QualityApp
     # After creating a QC sample, calculate the route to be redirected.
     def qc_sample_created_redirect(instance)
       return "/raw_materials/deliveries/rmt_deliveries/#{instance.rmt_delivery_id}" if instance.rmt_delivery_id
+      return "/quality/qc/qc_samples/#{instance.id}/manage" if instance.production_run_id
 
       '/'
     end

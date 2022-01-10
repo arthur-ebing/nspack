@@ -411,6 +411,9 @@ const crossbeamsUtils = {
         }
       } else if (data.actions) {
         crossbeamsUtils.processActions(data.actions);
+      } else if (data.redirect) {
+        document.getElementById(this.nextDialogContent()).innerHTML = 'Redirecting...';
+        window.location = data.redirect;
       } else if (data.replaceDialog) {
         crossbeamsUtils.setDialogContent(data.replaceDialog.content, data.replaceDialog.title);
       }

@@ -2,7 +2,7 @@
 
 module UiRules
   class QcSampleRule < Base
-    def generate_rules
+    def generate_rules # rubocop:disable Metrics/AbcSize
       @repo = QualityApp::QcRepo.new
       @print_repo = LabelApp::PrinterRepo.new
       make_form_object
@@ -12,6 +12,7 @@ module UiRules
 
       set_show_fields if %i[show reopen print_barcode select_test].include? @mode
       set_print_fields if @mode == :print_barcode
+      set_manage_fields if @mode == :manage
       fields[:id][:renderer] = :label if @mode == :edit
       rules[:existing_tests] = existing_tests
 
@@ -44,6 +45,44 @@ module UiRules
       fields[:context] = { renderer: :label, caption: context, with_value: context_ref }
       fields[:starch_summary] = { renderer: :label, with_value: starch_summary, invisible: starch_summary.nil? }
       fields[:defects_summary] = { renderer: :label, with_value: defects_summary, invisible: defects_summary.nil? }
+    end
+
+    def set_manage_fields # rubocop:disable Metrics/AbcSize
+      items_prodrun = []
+      if @form_object[:production_run_id]
+        items_prodrun << { url: "/quality/qc/qc_samples/#{@options[:id]}/edit", text: 'Edit', behaviour: :popup }
+        items_prodrun << { url: "/quality/qc/qc_samples/#{@options[:id]}/print_barcode", text: 'Print', behaviour: :popup }
+        items_prodrun << { url: "/quality/qc/qc_samples/#{@options[:id]}/qc_test/defects", text: 'Defects test', behaviour: :direct }
+      end
+      rules[:items_prodrun] = items_prodrun
+      # if delivery, check the type and add items as applies to the type...
+
+      obj = @form_object.to_h
+      obj[:sample_type] = @repo.get(:qc_sample_types, :qc_sample_type_name, @form_object.qc_sample_type_id)
+      obj[:drawn_at] = obj[:drawn_at].strftime('%Y-%m-%d %H:%M')
+      ctx, ctx_key = @repo.sample_context(@form_object)
+      ctx_sym = inflector.underscore(ctx).to_sym
+      obj[ctx_sym] = ctx_key
+      cols = %i[id sample_type ref_number short_description sample_size drawn_at]
+      cols << ctx_sym
+      rules[:compact_header] = compact_header(columns: cols,
+                                              display_columns: 3,
+                                              header_captions: { id: 'Sample id', short_description: 'Description' },
+                                              with_object: obj)
+      rules[:heading1] = "#{ctx} #{ctx_key}"
+      rules[:heading2] = "QC #{obj[:sample_type]} sample no #{@form_object[:id]}"
+
+      build_summary(obj[:sample_type], @options[:id])
+    end
+
+    def build_summary(sample_type, sample_id)
+      summary = { caption: inflector.humanize(sample_type) }
+      summary[:items] = []
+      unless sample_id.nil?
+        summary[:items] << @repo.sample_summary(sample_id)
+        @repo.sample_test_summaries(sample_id).each { |s| summary[:items] << s }
+      end
+      rules[:qc_summary] = summary
     end
 
     def set_print_fields
@@ -118,6 +157,10 @@ module UiRules
       cult, desc = @repo.get(:cultivars, %i[cultivar_code description], instance.cultivar_id)
 
       ["Farm #{farm} Orch #{orch} #{cult} #{desc} #{instance.date_delivered.strftime('%Y-%m-%d %H:%M')}", instance.reference_number]
+    end
+
+    def desc_ref_production_run_id
+      [ProductionApp::ProductionRunRepo.new.production_run_code(@options[:context_key]), @options[:context_key]]
     end
 
     private

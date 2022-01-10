@@ -52,6 +52,10 @@ class Nspack < Roda
         show_partial { Quality::Qc::QcSample::Edit.call(id) }
       end
 
+      r.on 'manage' do
+        show_page { Quality::Qc::QcSample::Manage.call(id) }
+      end
+
       r.is do
         r.get do       # SHOW
           check_auth!('qc', 'read')
@@ -60,7 +64,11 @@ class Nspack < Roda
         r.patch do     # UPDATE
           res = interactor.update_qc_sample(id, params[:qc_sample])
           if res.success
-            show_json_notice(res.message)
+            if request.referer.end_with?('manage')
+              redirect_via_json(request.referer)
+            else
+              show_json_notice(res.message)
+            end
           else
             re_show_form(r, res) { Quality::Qc::QcSample::Edit.call(id, form_values: params[:qc_sample], form_errors: res.errors) }
           end
@@ -118,6 +126,16 @@ class Nspack < Roda
         check_auth!('qc', 'new')
         set_last_grid_url('/list/qc_samples', r)
         show_partial_or_page(r) { Quality::Qc::QcSample::New.call(qc_sample_type_id, context: :rmt_delivery_id, id: rmt_delivery_id, remote: fetch?(r)) }
+      end
+
+      r.on 'production_run_sample', Integer, String do |production_run_id, sample_type|
+        check_auth!('qc', 'new')
+        res = interactor.find_qc_sample_or_type(:production_run_id, production_run_id, sample_type: sample_type)
+        if res.success
+          redirect_via_json("/quality/qc/qc_samples/#{res.instance}/manage")
+        else
+          show_partial_or_page(r) { Quality::Qc::QcSample::New.call(res.instance, context: :production_run_id, id: production_run_id, remote: fetch?(r)) }
+        end
       end
 
       r.post do        # CREATE

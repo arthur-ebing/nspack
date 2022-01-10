@@ -20,7 +20,7 @@ module UiRules
       query = <<~SQL
         SELECT qc_samples.id AS sample_id, qc_sample_type_name AS sample_type,
         ref_number, short_description,
-        '#{context_ref}' AS #{context}, sample_size
+        '#{context_ref}' AS #{inflector.underscore(context.gsub(' ', '_'))}, sample_size
         FROM qc_samples
         JOIN qc_sample_types ON qc_sample_types.id = qc_samples.qc_sample_type_id
         WHERE qc_samples.id = ?
