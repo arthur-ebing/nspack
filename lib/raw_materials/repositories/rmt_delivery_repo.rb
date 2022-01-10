@@ -169,6 +169,38 @@ module RawMaterialsApp
       RmtBinFlat.new(hash)
     end
 
+    def find_rmt_delivery_flat(id)
+      hash = find_with_association(
+        :rmt_deliveries, id,
+        parent_tables: [{ parent_table: :orchards,
+                          flatten_columns: { orchard_code: :orchard_code } },
+                        { parent_table: :farms,
+                          flatten_columns: { farm_code: :farm_code } },
+                        { parent_table: :pucs,
+                          flatten_columns: { puc_code: :puc_code } },
+                        { parent_table: :seasons,
+                          flatten_columns: { season_code: :season_code } },
+                        { parent_table: :rmt_container_types,
+                          flatten_columns: { container_type_code: :container_type_code } },
+                        { parent_table: :rmt_container_material_types,
+                          flatten_columns: { container_material_type_code: :container_material_type_code } },
+                        { parent_table: :rmt_delivery_destinations,
+                          flatten_columns: { delivery_destination_code: :delivery_destination_code } },
+                        { parent_table: :cultivars, foreign_key: :cultivar_id,
+                          flatten_columns: { cultivar_code: :cultivar_code,  cultivar_name: :cultivar_name } },
+                        { parent_table: :rmt_codes,
+                          flatten_columns: { rmt_code: :rmt_code, description: :rmt_code_description } }],
+        lookup_functions: [{ function: :fn_current_status, args: ['rmt_deliveries', :id], col_name: :status },
+                           { function: :fn_party_role_name, args: [:rmt_material_owner_party_role_id], col_name: :rmt_owner }]
+      )
+
+      return nil if hash.nil?
+
+      hash[:regime_code], hash[:rmt_variant_code] = MasterfilesApp::AdvancedClassificationsRepo.new.find_regime_and_variant_by_rmt_code(hash[:rmt_code])
+      hash[:farm_section] = MasterfilesApp::FarmRepo.new.find_orchard_farm_section(hash[:orchard_id])
+      RmtDeliveryFlat.new(hash)
+    end
+
     def farm_pucs(farm_id)
       DB[:pucs].where(id: DB[:farms_pucs].where(farm_id: farm_id).select(:puc_id)).map { |p| [p[:puc_code], p[:id]] }
     end

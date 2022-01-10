@@ -87,6 +87,21 @@ module MasterfilesApp
       DB[query].first
     end
 
+    def find_regime_and_variant_by_rmt_code(rmt_code)
+      DB[:rmt_codes]
+        .join(:rmt_variants, id: :rmt_variant_id)
+        .join(:rmt_handling_regimes, id: Sequel[:rmt_codes][:rmt_handling_regime_id])
+        .where(Sequel[:rmt_codes][:rmt_code] => rmt_code)
+        .get(%i[regime_code rmt_variant_code])
+    end
+
+    def find_rmt_classification_type_by_classification(rmt_classification_id)
+      DB[:rmt_classifications]
+        .join(:rmt_classification_types, id: :rmt_classification_type_id)
+        .where(Sequel[:rmt_classifications][:id] => rmt_classification_id)
+        .get(:rmt_classification_type_code)
+    end
+
     def rmt_classifications_grid_row(where)
       query = <<~SQL
         SELECT "rmt_classifications"."id", "rmt_classifications"."rmt_classification", "rmt_classification_types"."id" AS rmt_classification_type_id

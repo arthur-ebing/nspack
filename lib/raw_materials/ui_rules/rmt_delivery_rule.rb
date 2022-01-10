@@ -13,11 +13,12 @@ module UiRules
       @rules[:create_tripsheet] = !@form_object.tripsheet_created && !@form_object.shipped && (@rules[:pending_mrl_result] || !@rules[:failed_mrl_result])
       @rules[:start_bins_trip] = @form_object.tripsheet_created && !@form_object.tripsheet_loaded
       @rules[:cancel_delivery_tripheet] = @form_object.tripsheet_created && !@form_object.tripsheet_offloaded
-      @rules[:print_delivery_tripheet] = @rules[:cancel_delivery_tripheet]
+      @rules[:print_delivery_tripheet] = @form_object.tripsheet_created
       @rules[:vehicle_loaded] = @form_object.tripsheet_loaded
       @rules[:vehicle_job_id] = @repo.get_value(:vehicle_jobs, :id, rmt_delivery_id: @form_object.id) unless @form_object.id.nil?
       @rules[:refresh_tripsheet] = @form_object.tripsheet_created && !@form_object.tripsheet_offloaded && !@repo.delivery_tripsheet_discreps(@form_object.id).empty?
       @rules[:list_tripsheets] = !@form_object.tripsheet_offloaded && !@repo.delivery_tripsheets(@form_object.id).empty?
+      rules[:tripsheet_button] = !@repo.delivery_tripsheets(@form_object.id).empty? || @rules[:create_tripsheet]
       rules[:do_qc] = do_qc?
       @qc_repo = QualityApp::QcRepo.new if rules[:do_qc]
 
@@ -31,88 +32,54 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      rmt_container_type_id_label = @repo.get(:rmt_container_types, :container_type_code, @form_object.rmt_container_type_id)
-      rmt_owner_label = MasterfilesApp::PartyRepo.new.fn_party_role_name(@form_object.rmt_material_owner_party_role_id)
-      rmt_container_material_type_id_label = @repo.get(:rmt_container_material_types, :container_material_type_code, @form_object.rmt_container_material_type_id)
-      @options ||= {}
-      fields[:id] = { renderer: :label, caption: 'Delivery Id' }
-      fields[:orchard_id] = { renderer: :label,
-                              with_value: MasterfilesApp::FarmRepo.new.find_orchard(@form_object.orchard_id)&.orchard_code,
-                              caption: 'Orchard' }
-      fields[:farm_section] = { renderer: :label,
-                                with_value: @options[:farm_section].to_s,
-                                hide_on_load: @options[:farm_section].nil_or_empty?,
-                                caption: 'Farm Section' }
-      fields[:cultivar_id] = { renderer: :label,
-                               with_value: MasterfilesApp::CultivarRepo.new.find_cultivar(@form_object.cultivar_id)&.cultivar_name,
-                               caption: 'Cultivar' }
-      fields[:rmt_delivery_destination_id] = { renderer: :label,
-                                               with_value: MasterfilesApp::RmtDeliveryDestinationRepo.new.find_rmt_delivery_destination(@form_object.rmt_delivery_destination_id)&.delivery_destination_code,
-                                               caption: 'Destination',
-                                               hide_on_load: !AppConst::CR_RMT.include_destination_in_delivery? }
-      fields[:season_id] = { renderer: :label,
-                             with_value: MasterfilesApp::CalendarRepo.new.find_season(@form_object.season_id)&.season_code,
-                             caption: 'Season' }
-      fields[:farm_id] = { renderer: :label,
-                           with_value: MasterfilesApp::FarmRepo.new.find_farm(@form_object.farm_id)&.farm_code,
-                           caption: 'Farm' }
-      fields[:puc_id] = { renderer: :label,
-                          with_value: MasterfilesApp::FarmRepo.new.find_puc(@form_object.puc_id)&.puc_code,
-                          caption: 'PUC' }
-      fields[:truck_registration_number] = { renderer: :label,
-                                             hide_on_load: !AppConst::DELIVERY_CAPTURE_TRUCK_AT_FRUIT_RECEPTION }
-      fields[:reference_number] = { renderer: :label }
-      fields[:qty_damaged_bins] = { renderer: :label,
-                                    hide_on_load: !AppConst::DELIVERY_CAPTURE_DAMAGED_BINS }
-      fields[:qty_empty_bins] = { renderer: :label,
-                                  hide_on_load: !AppConst::DELIVERY_CAPTURE_EMPTY_BINS }
-      fields[:date_picked] = { renderer: :label,
-                               caption: 'Picked at' }
-      fields[:received] = { renderer: :label,
-                            as_boolean: true }
-      fields[:date_delivered] = { renderer: :label,
-                                  caption: 'Received at',
-                                  format: :without_timezone_or_seconds }
-      fields[:tipping_complete_date_time] = { renderer: :label,
-                                              caption: 'Tipped at' }
-      fields[:quantity_bins_with_fruit] = { renderer: :label }
-      fields[:current] = { renderer: :label,
-                           as_boolean: true }
-      fields[:delivery_tipped] = { renderer: :label,
-                                   caption: 'Tipped',
-                                   as_boolean: true }
-      fields[:keep_open] = { renderer: :label,
-                             as_boolean: true }
-      fields[:bin_scan_mode] = { renderer: :label,
-                                 with_value: @form_object.bin_scan_mode }
-      fields[:active] = { renderer: :label,
-                          as_boolean: true }
-      fields[:batch_number] = { renderer: :label }
-      fields[:batch_number_updated_at] = { renderer: :label }
-      fields[:sample_bins] = { renderer: :label,
-                               caption: 'Sample bin positions',
-                               with_value: @form_object.sample_bins.join(',') }
-      fields[:qty_partial_bins] = { renderer: :label,
-                                    with_value: @form_object.qty_partial_bins }
-      fields[:sample_bins_weighed] = { renderer: :label, as_boolean: true }
-      fields[:sample_weights_extrapolated_at] = { renderer: :label, format: :without_timezone_or_seconds }
-      if AppConst::CR_RMT.all_delivery_bins_of_same_type?
-        fields[:rmt_container_type_id] = { renderer: :label,
-                                           with_value: rmt_container_type_id_label }
-        fields[:rmt_material_owner_party_role_id] = { renderer: :label,
-                                                      with_value: rmt_owner_label }
-        fields[:rmt_container_material_type_id] = { renderer: :label,
-                                                    with_value: rmt_container_material_type_id_label }
+      header = @form_object.to_h
+      header[:sample_bin_positions] = @form_object.sample_bins.join(',')
+      cols = %i[id sample_bin_positions season_code farm_code puc_code orchard_code farm_section container_type_code rmt_owner
+                container_material_type_code delivery_destination_code reference_number truck_registration_number qty_damaged_bins
+                qty_empty_bins sample_bins_weighed quantity_bins_with_fruit bin_scan_mode current date_picked received date_delivered
+                delivery_tipped tipping_complete_date_time keep_open active batch_number batch_number_updated_at sample_weights_extrapolated_at
+                qty_partial_bins rmt_code rmt_variant_code regime_code]
+      @form_object.rmt_classifications.to_a.each do |c|
+        type = MasterfilesApp::AdvancedClassificationsRepo.new.find_rmt_classification_type_by_classification(c)
+        label = type.to_sym
+        cols << label
+        header[label] = @repo.get_value(:rmt_classifications, :rmt_classification, id: c)
       end
-      fields
+
+      cols.delete(:farm_section) if @form_object.farm_section.nil_or_empty?
+      unless AppConst::CR_RMT.all_delivery_bins_of_same_type?
+        cols.delete(:container_type_code)
+        cols.delete(:rmt_owner)
+        cols.delete(:container_material_type_code)
+      end
+      cols.delete(:truck_registration_number) unless AppConst::DELIVERY_CAPTURE_TRUCK_AT_FRUIT_RECEPTION
+      cols.delete(:qty_damaged_bins) unless AppConst::DELIVERY_CAPTURE_DAMAGED_BINS
+      cols.delete(:qty_empty_bins) unless AppConst::DELIVERY_CAPTURE_EMPTY_BINS
+      rules[:compact_header] = compact_header(columns: cols,
+                                              display_columns: 3, with_object: header)
     end
 
-    def common_fields # rubocop:disable Metrics/AbcSize
+    def common_fields # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+      header = @form_object.to_h
+      header[:sample_bin_positions] = @form_object.sample_bins.join(',')
+      cols = %i[id sample_bin_positions sample_bins_weighed farm_section batch_number_updated_at delivery_tipped tipping_complete_date_time batch_number
+                sample_weights_extrapolated_at rmt_code rmt_variant_code regime_code]
+      @form_object.rmt_classifications.to_a.each do |c|
+        type = MasterfilesApp::AdvancedClassificationsRepo.new.find_rmt_classification_type_by_classification(c)
+        label = type.to_sym
+        cols << label
+        header[label] = @repo.get_value(:rmt_classifications, :rmt_classification, id: c)
+      end
+
+      cols.delete(:farm_section) if @form_object.farm_section.nil_or_empty?
+      cols.delete(:batch_number_updated_at) if @form_object.batch_number_updated_at.nil?
+      cols.delete(:batch_number) if @form_object.batch_number.nil_or_empty?
+      cols.delete(:sample_weights_extrapolated_at) if @form_object.sample_weights_extrapolated_at.nil?
+      cols.delete(:tipping_complete_date_time) if @form_object.tipping_complete_date_time.nil?
+      rules[:compact_header] = compact_header(columns: cols,
+                                              display_columns: 3, with_object: header)
+
       fields = {
-        id: { renderer: :label, caption: 'Delivery Id' },
-        sample_bins: { renderer: :label,
-                       caption: 'Sample bin positions',
-                       with_value: @form_object.sample_bins.to_a.join(',') },
         farm_id: { renderer: :select,
                    options: MasterfilesApp::FarmRepo.new.for_select_farms,
                    disabled_options: MasterfilesApp::FarmRepo.new.for_select_inactive_farms,
@@ -131,9 +98,6 @@ module UiRules
                       caption: 'Orchard',
                       required: true,
                       prompt: true  },
-        farm_section: { renderer: :label,
-                        with_value: @options[:farm_section].to_s,
-                        hide_on_load: @options[:farm_section].nil_or_empty? },
         cultivar_id: { renderer: :select,
                        options: MasterfilesApp::CultivarRepo.new.for_select_cultivars(
                          where: { id: @repo.get(:orchards, :cultivar_ids, @form_object.orchard_id).to_a }
@@ -164,35 +128,17 @@ module UiRules
                     hide_on_load: true },
         date_delivered: { renderer: :datetime,
                           caption: 'Received at' },
-        current_date_delivered: { renderer: :label,
-                                  with_value: @form_object.date_delivered,
-                                  caption: 'Current Received date' },
         bin_scan_mode: { renderer: :select,
                          options: AppConst::BIN_SCAN_MODE_OPTIONS,
                          caption: 'Web Bin Scan Mode',
                          prompt: true },
         current: { renderer: :checkbox,
                    caption: 'Set As Current' },
-        delivery_tipped: { renderer: :label,
-                           caption: 'Tipped',
-                           as_boolean: true },
-        tipping_complete_date_time: { renderer: :label,
-                                      caption: 'Tipped at' },
-        keep_open: { renderer: :label,
-                     as_boolean: true },
         quantity_bins_with_fruit: { renderer: :integer,
                                     caption: 'Qty Bins With Fruit',
                                     minvalue: 0 },
-        batch_number: { renderer: :label },
-        batch_number_updated_at: { renderer: :label },
         qty_partial_bins: { renderer: :integer,
-                            minvalue: 0 },
-        sample_bins_weighed: { renderer: :label,
-                               caption: 'Sample bins weighed',
-                               as_boolean: true },
-        sample_weights_extrapolated_at: { renderer: :label,
-                                          caption: 'Extrapolated at' }
-
+                            minvalue: 0 }
       }
       if AppConst::CR_RMT.all_delivery_bins_of_same_type?
         fields[:rmt_container_type_id] = { renderer: :select, options: MasterfilesApp::RmtContainerTypeRepo.new.for_select_rmt_container_types, required: true, prompt: true }
@@ -214,8 +160,7 @@ module UiRules
         return
       end
 
-      @form_object = @repo.find_rmt_delivery(@options[:id])
-      @options[:farm_section] = MasterfilesApp::FarmRepo.new.find_orchard_farm_section(@form_object.orchard_id)
+      @form_object = @repo.find_rmt_delivery_flat(@options[:id])
     end
 
     def make_new_form_object
