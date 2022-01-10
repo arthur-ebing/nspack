@@ -9,20 +9,20 @@ module EdiApp
           rmt_bins.nett_weight AS weight,
           rmt_classes.description AS class,
           commodities.code AS fruit_class,
-          rmt_sizes.size_code AS bin_size,
+          coalesce(rmt_sizes.size_code,'UNS') AS bin_size,
           COALESCE(rmt_bins.bin_asset_number, rmt_bins.tipped_asset_number, rmt_bins.shipped_asset_number, rmt_bins.scrapped_bin_asset_number) AS bin_id,
           'BS' || lpad(bin_loads.id::text, 6, '0') AS exit_ref,
           COALESCE(rmt_bins.exit_ref_date_time, rmt_bins.updated_at) AS exit_date,
           customers.financial_account_code AS hw_customer_code,
           customers.financial_account_code AS trading_partner,
           'BINSALES' AS line_of_business,
-          rmt_bins.legacy_data ->> 'track_slms_indicator_1_code' AS current_rmt_type,
+          rmt_codes.rmt_code AS current_rmt_type,
           cultivars.cultivar_code AS cultivar,
           1 AS qty,
           seasons.season_year season,
           farms.farm_code AS farm_id,
           farm_groups.farm_group_code AS farm_sub_group,
-          concat(rmt_bins.legacy_data ->> 'track_slms_indicator_1_code'::text, '_', commodities.code, '_', cultivars.cultivar_code, '_', rmt_bins.legacy_data ->> 'colour'::text, '_', rmt_classes.rmt_class_code, '_', rmt_bins.legacy_data ->> 'ripe_point_code'::text, '_', rmt_sizes.size_code) AS product_code
+          concat(rmt_codes.rmt_code::text, '_', commodities.code, '_', cultivars.cultivar_code, '_', coalesce(colour_percentages.colour_percentage,'STD')::text, '_', coalesce(rmt_classes.rmt_class_code,'OR'), '_',  coalesce(rmt_sizes.size_code,'UNS')) AS product_code
         FROM
           rmt_bins
           LEFT JOIN seasons ON seasons.id = rmt_bins.season_id
@@ -48,6 +48,8 @@ module EdiApp
           LEFT JOIN bin_load_products ON bin_load_products.id = rmt_bins.bin_load_product_id
           LEFT JOIN bin_loads ON bin_loads.id = bin_load_products.bin_load_id
           LEFT JOIN customers ON customers.customer_party_role_id = bin_loads.customer_party_role_id
+          LEFT JOIN rmt_codes ON rmt_codes.id = rmt_bins.rmt_code_id
+          LEFT JOIN colour_percentages ON colour_percentages.id = rmt_bins.colour_percentage_id
         WHERE bin_load_products.bin_load_id = ?
         ORDER BY COALESCE(rmt_bins.bin_asset_number, rmt_bins.tipped_asset_number, rmt_bins.shipped_asset_number, rmt_bins.scrapped_bin_asset_number)
       SQL
