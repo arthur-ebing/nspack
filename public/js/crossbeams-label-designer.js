@@ -2281,9 +2281,7 @@ const LabelDesigner = (function LabelDesigner() { // eslint-disable-line max-cla
       ldState.variableUI.staticInputValue.required = false;
       ldState.variableUI.staticInput.style.display = 'none';
       ldState.variableUI.barcodeBool.disabled = false;
-      ldState.variableUI.barcodeBool.checked = false;
-      ldState.variableUI.barcodeBoolWrapper.hidden = true;
-      toggleBarcodeOptions(false);
+      ldState.variableUI.barcodeBoolWrapper.hidden = false;
       ldState.variableUI.compoundVars.hidden = false;
     } else {
       ldState.variableUI.staticInputValue.required = false;
@@ -2428,6 +2426,11 @@ const LabelDesigner = (function LabelDesigner() { // eslint-disable-line max-cla
     ldState.variableUI.barcodeSymbology.value = curr.barcodeSymbology;
     ldState.variableUI.barcodeErrorLevel.value = curr.barcodeErrorLevel;
     ldState.variableUI.staticInputValue.value = curr.staticValue ? curr.staticValue : '';
+
+    if (varType === 'Compound Variable') {
+      ldState.variableUI.compoundDisp.textContent = ldState.selectedShape.attrs.varType.replace('CMP:', '').replace(/[${}]/g, '');
+      ldState.variableUI.compoundRes.value = ldState.selectedShape.attrs.varType;
+    }
 
     // Set the UI barcode show/hide state
     varChange(varType);
@@ -3454,12 +3457,6 @@ const LabelDesigner = (function LabelDesigner() { // eslint-disable-line max-cla
         dShape = shape.attrs;
         groupAttrs = JSON.parse(shape.group).attrs;
         textAttrs = JSON.parse(shape.textBox).attrs;
-        if (Number(shape.attrs.barcodeWidthFactor) > 1.9) {
-          console.log('Attrs', dShape);
-          console.log('Group', groupAttrs);
-          console.log('Text', textAttrs);
-          console.log('SHAPE', shape);
-        }
         family = dShape.fontFamily;
         if (dShape.bold) {
           if (dShape.italic) {
