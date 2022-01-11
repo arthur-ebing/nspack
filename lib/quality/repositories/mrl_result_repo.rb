@@ -88,6 +88,7 @@ module QualityApp
       query = <<~SQL
         SELECT mrl_results.id AS mrl_result_id,
                mrl_results.rmt_delivery_id,
+               mrl_results.sample_number,
                mrl_results.reference_number,
                rmt_deliveries.reference_number AS delivery_ref_no,
                cultivars.cultivar_name,
