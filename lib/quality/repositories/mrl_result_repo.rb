@@ -90,21 +90,14 @@ module QualityApp
                mrl_results.rmt_delivery_id,
                mrl_results.reference_number,
                rmt_deliveries.reference_number AS delivery_ref_no,
-               mrl_results.cultivar_id,
-               mrl_results.farm_id,
-               mrl_results.puc_id,
-               mrl_results.orchard_id,
                cultivars.cultivar_name,
                pucs.puc_code,
                farms.farm_code,
                orchards.orchard_code,
                mrl_results.fruit_received_at,
                mrl_results.sample_submitted_at,
-               mrl_results.laboratory_id,
-               mrl_results.mrl_sample_type_id,
                laboratories.lab_code,
                mrl_sample_types.sample_type_code,
-               rmt_deliveries.rmt_code_id,
                rmt_codes.rmt_code
         FROM mrl_results
         LEFT JOIN rmt_deliveries ON rmt_deliveries.id = mrl_results.rmt_delivery_id
