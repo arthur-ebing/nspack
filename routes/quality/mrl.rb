@@ -32,7 +32,7 @@ class Nspack < Roda
           else
             flash[:error] = res.message
           end
-          redirect_to_last_grid(r)
+          redirect_via_json(request.referer)
         end
       end
 
@@ -60,7 +60,7 @@ class Nspack < Roda
           res = interactor.capture_mrl_result(id, params[:mrl_result])
           if res.success
             flash[:notice] = res.message
-            redirect_to_last_grid(r)
+            redirect_via_json(request.referer)
           else
             re_show_form(r, res) { Quality::Mrl::MrlResult::CaptureResult.call(id, form_values: params[:mrl_result], form_errors: res.errors) }
           end
@@ -82,7 +82,7 @@ class Nspack < Roda
           res = interactor.update_mrl_result(id, params[:mrl_result])
           if res.success
             flash[:notice] = res.message
-            redirect_to_last_grid(r)
+            redirect_via_json(request.referer)
           else
             re_show_form(r, res) { Quality::Mrl::MrlResult::Edit.call(id, form_values: params[:mrl_result], form_errors: res.errors) }
           end
@@ -140,7 +140,7 @@ class Nspack < Roda
           end
           res = interactor.create_mrl_result(params[:mrl_result])
           flash[:notice] = res.message
-          redirect_to_last_grid(r)
+          redirect_via_json(request.referer)
         else
           attrs = { delivery_result: false, pre_harvest_result: val_res.instance[:pre_harvest_result], post_harvest_result: val_res.instance[:post_harvest_result] }
           re_show_form(r, val_res, url: '/quality/mrl/mrl_results/new') do
