@@ -34,7 +34,7 @@
   :text: preview
   :icon: view-show
   :title: Preview
-  :popup: true
+  :loading_window: true
   #:hide_if_false: completed
 - :separator: true
 - :url: "/raw_materials/presort_grower_grading/presort_grower_grading_pools/$:id$/complete_pool"
