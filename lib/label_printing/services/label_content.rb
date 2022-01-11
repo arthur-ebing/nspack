@@ -49,17 +49,17 @@ module LabelPrintingApp
 
       fields = AppConst::BARCODE_PRINT_RULES[field.to_sym][:fields]
       vals = fields.map { |f| instance[f] }
-      assert_no_nil_fields!(vals, fields)
+      assert_no_nil_fields!(field, vals, fields)
 
       format(fmt_str, *vals)
     end
 
-    def assert_no_nil_fields!(vals, fields)
+    def assert_no_nil_fields!(field, vals, fields)
       return unless vals.any?(&:nil?)
 
       in_err = vals.zip(fields).select { |v, _| v.nil? }.map(&:last)
 
-      raise Crossbeams::FrameworkError, "Make barcode: instance does not have a value for: #{in_err.join(', ')}"
+      raise Crossbeams::FrameworkError, "Make BCD barcode: this instance does not have a value for: #{in_err.join(', ')}. Column value is required for BARCODE_PRINT_RULES[:#{field}]."
     end
 
     def values_from(lbl_required)
