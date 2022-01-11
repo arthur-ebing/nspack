@@ -32,8 +32,10 @@ module FinishedGoodsApp
       @govt_inspection_sheet = repo.find_govt_inspection_sheet(govt_inspection_sheet_id)
       return failed_response 'Govt Inspection Record not found' unless govt_inspection_sheet
 
-      @inspection_message_id = repo.get_last(:titan_requests, :inspection_message_id, govt_inspection_sheet_id: govt_inspection_sheet_id)
-      return failed_response 'Cant find inspection message id' unless inspection_message_id || %i[request_inspection request_reinspection].include?(task)
+      unless mode == :validate_by_consignment_call
+        @inspection_message_id = repo.get_last(:titan_requests, :inspection_message_id, govt_inspection_sheet_id: govt_inspection_sheet_id)
+        return failed_response 'Cant find inspection message id' unless inspection_message_id || %i[request_inspection request_reinspection].include?(task)
+      end
 
       send(mode)
     end
@@ -155,7 +157,7 @@ module FinishedGoodsApp
 
     def validate_by_consignment_call
       auth_token_call if header.nil?
-      url = "#{AppConst::TITAN_API_HOST}/pi/ProductInspection/InspectionMessages/ValidationResult?consignmentNumber=#{govt_inspection_sheet.consignment_note_number}"
+      url = "#{AppConst::TITAN_API_HOST}/pi/ProductInspection/ValidationResult?consignmentNumber=#{govt_inspection_sheet.consignment_note_number}"
       @header.delete('api-version')
 
       res = http.request_get(url, header)

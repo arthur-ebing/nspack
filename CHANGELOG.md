@@ -7,8 +7,14 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
+- QC defects for production runs
+- Run batch number for production runs
 ### Changed
+- Improvements to MRL usability
+- `LabelDesigner`: a compound variable can also be a barcode
 ### Fixed
+- HBS EDI out columns
+- Titan validation by consignment call
 
 ## [1.0.7] - 2022-01-07
 ### Added
