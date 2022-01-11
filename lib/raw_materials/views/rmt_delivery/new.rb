@@ -21,7 +21,6 @@ module RawMaterials
                   col.add_field :farm_id
                   col.add_field :puc_id
                   col.add_field :orchard_id
-                  col.add_field :farm_section
                   col.add_field :cultivar_id
                   if AppConst::CR_RMT.all_delivery_bins_of_same_type?
                     col.add_field :rmt_container_type_id

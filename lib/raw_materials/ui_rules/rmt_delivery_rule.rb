@@ -128,6 +128,9 @@ module UiRules
                     hide_on_load: true },
         date_delivered: { renderer: :datetime,
                           caption: 'Received at' },
+        current_date_delivered: { renderer: :label,
+                                  with_value: @form_object.date_delivered,
+                                  caption: 'Current Received date' },
         bin_scan_mode: { renderer: :select,
                          options: AppConst::BIN_SCAN_MODE_OPTIONS,
                          caption: 'Web Bin Scan Mode',
@@ -259,19 +262,12 @@ module UiRules
     end
 
     def orchard_change
-      if params[:changed_value].blank?
-        farm_section = nil
-        cultivars = []
-      else
-        farm_section = MasterfilesApp::FarmRepo.new.find_orchard_farm_section(params[:changed_value])
-        cultivars = RawMaterialsApp::RmtDeliveryRepo.new.orchard_cultivars(params[:changed_value])
-      end
-      json_actions([OpenStruct.new(type: farm_section.nil_or_empty? ? :hide_element : :show_element,
-                                   dom_id: 'rmt_delivery_farm_section_field_wrapper'),
-                    OpenStruct.new(type: :replace_inner_html,
-                                   dom_id: 'rmt_delivery_farm_section',
-                                   value: farm_section),
-                    OpenStruct.new(type: :replace_select_options,
+      cultivars = if params[:changed_value].blank?
+                    []
+                  else
+                    RawMaterialsApp::RmtDeliveryRepo.new.orchard_cultivars(params[:changed_value])
+                  end
+      json_actions([OpenStruct.new(type: :replace_select_options,
                                    dom_id: 'rmt_delivery_cultivar_id',
                                    options_array: cultivars)])
     end
