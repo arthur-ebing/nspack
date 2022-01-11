@@ -72,7 +72,7 @@ module MesscadaApp
         modules_for_lbl = clm_modules
         modules_for_bvm = bvm_modules
 
-        builder = Nokogiri::XML::Builder.new do |xml|
+        builder = Nokogiri::XML::Builder.new(encoding: 'UTF-8') do |xml|
           xml.module_buttons do
             xml.modules do
               unless modules_for_lbl.empty?
