@@ -93,7 +93,7 @@ class BaseEdiInService < BaseService
       @edi_result.schema_valid = false
       @edi_result.notes = "CSV validation error:\n\n#{res.message}:\n#{res.instance.join("\n")}"
       log_err(@edi_result.notes)
-      raise Crossbeams::InfoError, 'Invalid CSV file'
+      raise Crossbeams::InfoError, "Invalid CSV file - #{res.message}"
     end
     @edi_records = @csv_file_repo.records_from_file(file_path)
   end

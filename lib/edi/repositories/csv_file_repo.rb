@@ -16,7 +16,7 @@ module EdiApp
 
       schema = YAML.load_file(schema_file)
       required_keys = schema.keys.map(&:to_s)
-      header = File.foreach(file_path).first.chomp.split(',')
+      header = File.foreach(file_path).first.chomp.split(',').map { |r| r.gsub('"', '') }
       result = required_keys - header
 
       if result.empty?
