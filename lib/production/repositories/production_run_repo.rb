@@ -745,7 +745,7 @@ module ProductionApp
 
     def validate_run_bin_tipping_criteria_and_control_data(id)
       run = find_production_run(id)
-      run.legacy_bintip_criteria.to_h.select { |_, v| v == 't' }.each_key do |column|
+      run.legacy_bintip_criteria.to_h.select { |_, v| ['t', true].include?(v) }.each_key do |column|
         raise Crossbeams::FrameworkError, "Column #{column} is not used for bintip criteria checking." unless AppConst::BINTIP_COLS.keys.include?(column)
         next if %w[farm_code rmt_variety_code commodity_code].include?(column)
 

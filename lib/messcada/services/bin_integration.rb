@@ -86,7 +86,7 @@ module MesscadaApp
                           'farm_code' => bin_mfs_res.instance[:farm_id], 'commodity_code' => bin_mfs_res.instance[:commodity_id], 'rmt_variety_code' => bin_mfs_res.instance[:cultivar_id], 'season_code' => bin_mfs_res.instance[:season_id],
                           'product_class_code' => res.instance['product_class_code'], 'cold_store_type' => res.instance['cold_store_type_code'] }
 
-      run.legacy_bintip_criteria.find_all { |_k, v| v == 't' }.each do |c|
+      run.legacy_bintip_criteria.find_all { |_k, v| ['t', true].include?(v) }.each do |c|
         mf_keys = %w[farm_code commodity_code rmt_variety_code season_code]
         unless bin_legacy_data[c[0]] == run_legacy_data[c[0]] # rubocop:disable Style/Next
           run_legacy_data_code = if mf_keys.include?(c[0])
