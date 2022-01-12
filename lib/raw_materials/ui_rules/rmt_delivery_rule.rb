@@ -34,19 +34,18 @@ module UiRules
     def set_show_fields # rubocop:disable Metrics/AbcSize
       header = @form_object.to_h
       header[:sample_bin_positions] = @form_object.sample_bins.join(',')
-      cols = %i[farm_code puc_code orchard_code cultivar_code reference_number date_delivered date_picked delivery_destination_code
-                quantity_bins_with_fruit qty_partial_bins truck_registration_number delivery_tipped tipping_complete_date_time
-                received bin_scan_mode keep_open sample_bin_positions rmt_variant_code regime_code rmt_code]
+      cols = %i[id delivery_tipped container_type_code farm_code tipping_complete_date_time container_material_type_code
+                puc_code received rmt_owner orchard_code bin_scan_mode sample_bins_weighed
+                cultivar_code keep_open sample_weights_extrapolated_at season_code sample_bin_positions current
+                reference_number rmt_variant_code batch_number date_delivered regime_code batch_number_updated_at
+                date_picked rmt_code delivery_destination_code quantity_bins_with_fruit qty_damaged_bins qty_empty_bins
+                qty_partial_bins truck_registration_number farm_section active]
       @form_object.rmt_classifications.to_a.each do |c|
         type = MasterfilesApp::AdvancedClassificationsRepo.new.find_rmt_classification_type_by_classification(c)
         label = type.to_sym
         cols << label
         header[label] = @repo.get_value(:rmt_classifications, :rmt_classification, id: c)
       end
-      arr = %i[container_type_code container_material_type_code rmt_owner sample_bins_weighed sample_weights_extrapolated_at
-               current batch_number batch_number_updated_at season_code
-               farm_section qty_damaged_bins qty_empty_bins active id]
-      cols.push(*arr)
       cols.delete(:farm_section) if @form_object.farm_section.nil_or_empty?
       unless AppConst::CR_RMT.all_delivery_bins_of_same_type?
         cols.delete(:container_type_code)
