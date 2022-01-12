@@ -162,7 +162,7 @@ module Crossbeams
              use_packing_specifications: false,
              use_marketing_puc: false,
              carton_equals_pallet: { default: false, can_override: true },
-             capture_product_setup_class: false,
+             capture_product_setup_class: true,
              link_target_markets_to_target_customers: false,
              require_packaging_bom: false,
              capture_batch_number_for_pallets: false,
