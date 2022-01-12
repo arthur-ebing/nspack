@@ -34,18 +34,19 @@ module UiRules
     def set_show_fields # rubocop:disable Metrics/AbcSize
       header = @form_object.to_h
       header[:sample_bin_positions] = @form_object.sample_bins.join(',')
-      cols = %i[id sample_bin_positions season_code farm_code puc_code orchard_code farm_section container_type_code rmt_owner
-                container_material_type_code delivery_destination_code reference_number truck_registration_number qty_damaged_bins
-                qty_empty_bins sample_bins_weighed quantity_bins_with_fruit bin_scan_mode current date_picked received date_delivered
-                delivery_tipped tipping_complete_date_time keep_open active batch_number batch_number_updated_at sample_weights_extrapolated_at
-                qty_partial_bins rmt_code rmt_variant_code regime_code]
+      cols = %i[farm_code puc_code orchard_code cultivar_code reference_number date_delivered date_picked delivery_destination_code
+                quantity_bins_with_fruit qty_partial_bins truck_registration_number delivery_tipped tipping_complete_date_time
+                received bin_scan_mode keep_open sample_bin_positions rmt_variant_code regime_code rmt_code]
       @form_object.rmt_classifications.to_a.each do |c|
         type = MasterfilesApp::AdvancedClassificationsRepo.new.find_rmt_classification_type_by_classification(c)
         label = type.to_sym
         cols << label
         header[label] = @repo.get_value(:rmt_classifications, :rmt_classification, id: c)
       end
-
+      arr = %i[container_type_code container_material_type_code rmt_owner sample_bins_weighed sample_weights_extrapolated_at
+               current batch_number batch_number_updated_at season_code
+               farm_section qty_damaged_bins qty_empty_bins active id]
+      cols.push(*arr)
       cols.delete(:farm_section) if @form_object.farm_section.nil_or_empty?
       unless AppConst::CR_RMT.all_delivery_bins_of_same_type?
         cols.delete(:container_type_code)
@@ -56,7 +57,10 @@ module UiRules
       cols.delete(:qty_damaged_bins) unless AppConst::DELIVERY_CAPTURE_DAMAGED_BINS
       cols.delete(:qty_empty_bins) unless AppConst::DELIVERY_CAPTURE_EMPTY_BINS
       rules[:compact_header] = compact_header(columns: cols,
-                                              display_columns: 3, with_object: header)
+                                              display_columns: 3, with_object: header,
+                                              header_captions: {
+                                                rmt_owner: 'Container Material Owner'
+                                              })
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
