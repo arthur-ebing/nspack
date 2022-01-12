@@ -118,7 +118,7 @@ module MesscadaApp
       return failed_response("Bin Tipping Criteria Not Setup For Run:#{production_run_id}") unless legacy_bintip_criteria
 
       legacy_bintip_criteria.select { |_, v| ['t', true].include?(v) }.each_key do |check|
-        next if %w[farm_code commodity_code rmt_variety_code].include?(check) # Not yet written...
+        next if %w[farm_code commodity_code rmt_variety_code treatment_code].include?(check)
 
         send("bintip_criteria_check_#{check}".to_sym)
       end
