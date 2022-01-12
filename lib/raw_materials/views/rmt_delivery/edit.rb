@@ -72,7 +72,7 @@ module RawMaterials
                                   items: tripsheet_items,
                                   visible: rules[:tripsheet_button])
 
-              section.add_notice rules[:mrl_result_notice], notice_type: :warning if AppConst::CR_RMT.enforce_mrl_check? && !rules[:mrl_result_notice].nil_or_empty?
+              section.add_notice rules[:mrl_result_notice], notice_type: :warning, inline_caption: true if AppConst::CR_RMT.enforce_mrl_check? && !rules[:mrl_result_notice].nil_or_empty?
               section.add_text rules[:compact_header]
               section.form do |form|
                 form.caption 'Edit RMT Delivery'
