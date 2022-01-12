@@ -175,6 +175,7 @@ module UiRules
                                     farm_id: res[:farm_id],
                                     puc_id: res[:puc_id],
                                     truck_registration_number: nil,
+                                    sample_bins: [],
                                     qty_damaged_bins: nil,
                                     qty_empty_bins: nil,
                                     delivery_tipped: false,
