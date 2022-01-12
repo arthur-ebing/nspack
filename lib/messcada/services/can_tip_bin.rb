@@ -31,6 +31,7 @@ module MesscadaApp
                                                                                                      stock_item_id: rmt_bin[:id],
                                                                                                      offloaded_at: nil)
 
+      # TODO: rename this rule...
       if AppConst::CR_PROD.kromco_rmt_integration?
         res = check_valid_bin_for_kromco_rmt_system
         return res unless res.success
@@ -116,7 +117,7 @@ module MesscadaApp
       legacy_bintip_criteria = repo.get(:production_runs, :legacy_bintip_criteria, production_run_id)
       return failed_response("Bin Tipping Criteria Not Setup For Run:#{production_run_id}") unless legacy_bintip_criteria
 
-      legacy_bintip_criteria.select { |_, v| v == 't' }.each_key do |check|
+      legacy_bintip_criteria.select { |_, v| ['t', true].include?(v) }.each_key do |check|
         next if %w[farm_code commodity_code rmt_variety_code].include?(check) # Not yet written...
 
         send("bintip_criteria_check_#{check}".to_sym)
