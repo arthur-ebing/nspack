@@ -75,8 +75,7 @@ module EdiApp
       id = MasterfilesApp::PartyRepo.new.find_party_role_from_org_code_for_role(marketing_org, AppConst::ROLE_MARKETER)
       return id unless id.nil?
 
-      id = repo.get_variant_id(:marketing_party_roles, marketing_org) if id.nil?
-      id
+      repo.get_variant_id(:marketing_party_roles, marketing_org)
     end
 
     def get_masterfile_match_or_variant(table_name, args)
@@ -84,8 +83,7 @@ module EdiApp
       return id unless id.nil?
 
       _col, val = args.first
-      id = repo.get_variant_id(table_name, val)
-      id
+      repo.get_variant_id(table_name, val)
     end
 
     def resolve_size_count_attrs(params, attrs)
@@ -105,16 +103,14 @@ module EdiApp
                                                          actual_count_for_pack: params[:size_count] })
       return id unless id.nil?
 
-      id = repo.get_variant_id(:fruit_actual_counts_for_packs, params[:size_count]) if id.nil?
-      id
+      repo.get_variant_id(:fruit_actual_counts_for_packs, params[:size_count])
     end
 
     def find_std_fruit_size_count_id(size_count_value, commodity_id)
       id = repo.get_id(:std_fruit_size_counts, { commodity_id: commodity_id, size_count_value: size_count_value.to_i })
       return id unless id.nil?
 
-      id = repo.get_variant_id(:std_fruit_size_counts, size_count_value) if id.nil?
-      id
+      repo.get_variant_id(:std_fruit_size_counts, size_count_value)
     end
   end
 end

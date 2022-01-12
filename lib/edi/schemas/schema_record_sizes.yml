@@ -27,6 +27,8 @@ LI:
   LD: 311
   DT: 311
   BT: 18
+NSGTIN:
+  CSV: true
 NSLI:
   XML: true
 UISTK:

@@ -1,0 +1,14 @@
+---
+:gtin_code: :string
+:transaction_number: :string
+:org_code: :string
+:commodity_code: :string
+:marketing_variety_code: :string
+:standard_pack_code: :string
+:grade_code: :string
+:mark_code: :string
+:inventory_code: :string
+:size_count_code: :string
+:active: :string
+:date_from: :string
+:date_to: :string
