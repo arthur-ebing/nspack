@@ -114,6 +114,39 @@ module EdiApp
   end
 end
 __END__
+-- Paltrack query:
+SELECT
+gtin AS gtin_code,
+tran_no AS transaction_number,
+orgzn AS org_code,
+commodity AS commodity_code,
+variety AS marketing_variety_code,
+pack AS standard_pack_code,
+grade AS grade_code,
+mark AS mark_code,
+inv_code AS inventory_code,
+size_count AS size_count_code,
+NULL AS date_from, -- Can be NULL, will be set to today in that case
+NULL AS date_to,   -- Can be NULL
+CASE WHEN active = 'N' THEN 'N' ELSE NULL END AS active
+FROM gtin
+
+
+-- CMS query
+SELECT code AS gtin_code,
+transaction_number,
+organisation AS org_code,
+commodity AS commodity_code,
+variety AS marketing_variety_code,
+pack AS standard_pack_code,
+grade AS grade_code,
+mark AS mark_code,
+inventory_code,
+sizecount AS size_count_code,
+NULL AS date_from, -- Can be NULL, will be set to today in that case
+NULL AS date_to,   -- Can be NULL
+CASE WHEN active = 0 THEN 'N' ELSE NULL END AS active
+FROM cs_gtins
 
 
 SELECT
