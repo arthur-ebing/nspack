@@ -9,6 +9,7 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 ### Added
 - QC defects for production runs
 - Run batch number for production runs
+- NSGTIN EDI IN process for importing GTIN records
 ### Changed
 - Improvements to MRL usability
 - `LabelDesigner`: a compound variable can also be a barcode
