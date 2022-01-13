@@ -39,7 +39,8 @@ module EdiApp
     def create_gtin_records # rubocop:disable Metrics/AbcSize
       repo.transaction do
         @edi_records.each do |rec|
-          res = EdiNsgtinInSchema.call(prepare_inputs(rec.transform_keys(&:to_sym)))
+          trimmed_rec = rec.transform_values { |v| v.nil? ? v : v.strip }
+          res = EdiNsgtinInSchema.call(prepare_inputs(trimmed_rec.transform_keys(&:to_sym)))
           raise Crossbeams::InfoError, validation_failed_response(res) if res.failure? # OR collect these?
 
           attrs = { transaction_number: res[:transaction_number],
