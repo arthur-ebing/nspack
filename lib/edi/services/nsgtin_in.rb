@@ -88,10 +88,12 @@ module EdiApp
     end
 
     def resolve_size_count_attrs(params, attrs)
-      size = params[:size_count]
+      size = params[:size_count_code]
       if size =~ /\D/
-        attrs[:fruit_size_reference_id] = get_masterfile_match_or_variant(:fruit_size_references, size_reference: params[:size_count])
+        # log('Looking for size ref')
+        attrs[:fruit_size_reference_id] = get_masterfile_match_or_variant(:fruit_size_references, size_reference: params[:size_count_code])
       else
+        # log('Looking for count')
         attrs[:fruit_actual_counts_for_pack_id] = find_fruit_actual_counts_for_pack_id(params, attrs)
       end
       attrs
@@ -99,7 +101,9 @@ module EdiApp
 
     def find_fruit_actual_counts_for_pack_id(params, attrs)
       basic_pack_code_id = @po_repo.find_basic_pack_id(attrs[:standard_pack_code_id]) # 4
-      @po_repo.get_fruit_actual_counts_for_pack_via_std_commodity(basic_pack_code_id, params[:size_count], attrs[:commodity_id])
+      @po_repo.fruit_actual_counts_for_pack_via_std_commodity(basic_pack_code_id, params[:size_count_code], attrs[:commodity_id])
+      # log("Count for #{basic_pack_code_id}, #{params[:size_count_code]}, #{attrs[:commodity_id]} - id: #{id}")
+      # id
     end
   end
 end
