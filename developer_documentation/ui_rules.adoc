@@ -48,7 +48,7 @@ Call the method in the rule file and use the resulting `rules[:compact_header]` 
 
 Parameters:
 
-columns:: Required. Array of symbols matching attributes in the `form_object`. The columns to display in the table in sequence.
+columns:: Required. Array of symbols matching attributes in the `form_object`. The columns to display in the table in sequence. See note below for using an array of arrays to control the layout a bit more.
 display_columns:: Optional. Integer - defaults to `2`. The number of columns (combination of `th` for label and `td` for value) to display in the table.
 header_captions:: Optional. Hash in the form `{ column_name: 'Header caption' }`. Only provide captions for columns where the default is not good enough.
 with_object:: Optional. Hash in the form `{ column_name: value }`. If present, the values will be built from this object instead of the `form_object`.
@@ -68,6 +68,63 @@ compact_header(columns: %i[production_run_code template_name packhouse_code
 # And in the view:
 page.add_text rules[:compact_header]
 ----
+NOTE: IF the `columns` array is an array of arrays, each sub-array will be a vertical column. See the examples here to compare the two behaviours:
+[source,ruby]
+----
+# With an array of arrays:
+@form_object = { a: '1', b: '2', c: '3', d: '4', e: '5',
+                 f: '6', g: '7', h: '8', i: '9' }
+columns = [[:a, :b, :c], [:d, :e, :f], [:g, :h, :i]]
+compact_header(columns: columns, display_columns: 3)
+----
+
+|===
+
+|**a** |1 |**d** |4 |**g** |7
+
+|**b**
+|2
+|**e**
+|5
+|**h**
+|8
+
+|**c**
+|3
+|**f**
+|6
+|**i**
+|9
+
+|===
+[source,ruby]
+----
+# With the normal flat array of symbols:
+@form_object = { a: '1', b: '2', c: '3', d: '4', e: '5',
+                 f: '6', g: '7', h: '8', i: '9' }
+columns = [:a, :b, :c, :d, :e, :f, :g, :h, :i]
+compact_header(columns: columns, display_columns: 3)
+----
+
+|===
+
+|**a** |1 |**b** |2 |**c** |3
+
+|**d**
+|4
+|**e**
+|5
+|**f**
+|6
+
+|**g**
+|7
+|**h**
+|8
+|**i**
+|9
+
+|===
 
 ==== common_values_for_fields
 

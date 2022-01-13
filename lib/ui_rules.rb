@@ -90,17 +90,29 @@ module UiRules
     end
 
     # Generate HTML for a table of columns from the +@form_object+.
+    # The table shows only elements that are in the `columns` array.
+    # If the columns array is an array of arrays, each array will be a vertical set of items.
     #
-    # @param columns [array] the columns to display in the table in sequence. Array of symbols matching attributes in the +@`form_object+.
+    # @param columns [array] the columns to display in the table in sequence. Array of symbols matching attributes in the +@`form_object+. (Can be multidemensional)
     # @param display_columns [integer] the number of table columns (combination of `th` for label and `td` for value) to display. Defaults to 2.
     # @param header_captions [hash] captions for columns where the default is not good enough. Hash in the form `{ column_name: 'Header caption' }`.
     # @param with_object [hash] object to use for values instead of the +@form_object+. Hash in the form `{ column_name: value }`.
     def compact_header(columns:, display_columns: 2, header_captions: {}, with_object: nil) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
-      raise("#{self.class} form object has not been set up before calling 'compact_header`") if @form_object.nil? && with_obejct.nil?
+      raise Crossbeams::FrameworkError, "#{self.class} form object has not been set up before calling 'compact_header`" if @form_object.nil? && with_obejct.nil?
 
+      if columns.first.is_a?(Array)
+        raise Crossbeams::FrameworkError, "#{self.class} columns array has #{columns.length} column sets, which does not match `display_columns` (#{display_columns})." if columns.length != display_columns
+
+        max = columns.map(&:length).max
+        cols = []
+        max.times { |n| columns.each { |a| cols << a[n] unless a[n].nil? } }
+        # cols.each_slice(3) {|a| puts a.join(', ') }
+      else
+        cols = columns
+      end
       row = 0
       cells = {}
-      columns.each_with_index do |a, i|
+      cols.each_with_index do |a, i|
         row += 1 if (i % display_columns).zero?
         cells[row] ||= []
         val = (with_object || @form_object)[a]
