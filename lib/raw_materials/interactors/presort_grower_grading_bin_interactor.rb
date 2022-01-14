@@ -78,13 +78,17 @@ module RawMaterialsApp
       end
 
       instance = presort_grower_grading_bin(grading_bin_id)
+      grading_pool_id = repo.get(:presort_grower_grading_bins, :presort_grower_grading_pool_id, grading_bin_id)
+      grading_pool = repo.find_presort_grower_grading_pool(grading_pool_id)
       success_response('Updated grower grading bin', { changes: { rmt_class_code: instance[:rmt_class_code],
                                                                   rmt_size_code: instance[:rmt_size_code],
                                                                   colour: instance[:colour],
                                                                   rmt_bin_weight: instance[:rmt_bin_weight],
                                                                   graded: instance[:graded],
                                                                   adjusted_weight: instance[:adjusted_weight] },
-                                                       output_weight_adjusted: output_weight_adjusted  })
+                                                       output_weight_adjusted: output_weight_adjusted,
+                                                       total_graded_weight: grading_pool[:total_graded_weight],
+                                                       input_minus_output_weight: grading_pool[:input_minus_output_weight] })
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

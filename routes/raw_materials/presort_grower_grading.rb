@@ -277,15 +277,12 @@ class Nspack < Roda
                                     ids: id,
                                     changes: res.instance[:changes])]
           if res.instance[:output_weight_adjusted]
-            repo = RawMaterialsApp::PresortGrowerGradingRepo.new
-            grading_pool_id = repo.get(:presort_grower_grading_bins, :presort_grower_grading_pool_id, id)
-            grading_pool = repo.find_presort_grower_grading_pool(grading_pool_id)
             actions << OpenStruct.new(type: :replace_inner_html,
                                       dom_id: 'presort_grower_grading_pool_total_graded_weight',
-                                      value: UtilityFunctions.delimited_number(grading_pool[:total_graded_weight]))
+                                      value: UtilityFunctions.delimited_number(res.instance[:total_graded_weight], delimiter: '', no_decimals: 3))
             actions << OpenStruct.new(type: :replace_inner_html,
                                       dom_id: 'presort_grower_grading_pool_input_minus_output_weight',
-                                      value: UtilityFunctions.delimited_number(grading_pool[:input_minus_output_weight]))
+                                      value: UtilityFunctions.delimited_number(res.instance[:input_minus_output_weight], delimiter: '', no_decimals: 3))
           end
           json_actions(actions, res.message)
         else
