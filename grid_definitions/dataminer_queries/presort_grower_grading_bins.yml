@@ -301,7 +301,7 @@
   rmt_bin_weight:
     :name: rmt_bin_weight
     :sequence_no: 18
-    :caption: Rmt bin weight
+    :caption: Output bin weight
     :namespaced_name: presort_grower_grading_bins.rmt_bin_weight
     :data_type: :number
     :width: 120
