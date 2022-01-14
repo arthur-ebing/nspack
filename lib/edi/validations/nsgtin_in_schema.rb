@@ -23,7 +23,7 @@ module EdiApp
     required(:mark_id).maybe(:integer)
     required(:grade_id).maybe(:integer)
     required(:inventory_code_id).maybe(:integer)
-    required(:fruit_actual_counts_for_pack_id).maybe(:integer)
+    optional(:fruit_actual_counts_for_pack_id).maybe(:integer)
     optional(:fruit_size_reference_id).maybe(:integer)
   end
 end

@@ -177,14 +177,5 @@ module EdiApp
                              packed_tm_group_id: packed_tm_group_id,
                              target_market_id: target_market_id)
     end
-
-    def fruit_actual_counts_for_pack_via_std_commodity(basic_pack_code_id, size_count, commodity_id)
-      DB[:fruit_actual_counts_for_packs]
-        .join(:std_fruit_size_counts, id: :std_fruit_size_count_id)
-        .where(basic_pack_code_id: basic_pack_code_id,
-               actual_count_for_pack: size_count,
-               commodity_id: commodity_id)
-        .get(Sequel[:fruit_actual_counts_for_packs][:id])
-    end
   end
 end
