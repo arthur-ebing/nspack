@@ -3,33 +3,25 @@
 module EdiApp
   class NsgtinIn < BaseEdiInService
     # attr_accessor :missing_masterfiles, :match_data, :parsed_bins
-    attr_reader :user, :repo
+    attr_reader :user, :repo, :party_repo, :edi_in_repo
 
     def initialize(edi_in_transaction_id, file_path, logger, edi_in_result)
       super(edi_in_transaction_id, file_path, logger, edi_in_result)
-      @repo = EdiApp::EdiInRepo.new
-      @po_repo = EdiApp::PoInRepo.new
+      @repo = NsgtinInRepo.new
+      @edi_in_repo = EdiApp::EdiInRepo.new
+      @party_repo = MasterfilesApp::PartyRepo.new
       @user = OpenStruct.new(user_name: 'System')
-      # @missing_masterfiles = []
-      # @match_data = []
     end
 
     def call
       # Read all records & create GTIN records, fetching ids when possible
       # Afterwards trigger a job to generate masterfiles from gtins where ids are blank... (client setting)
-      #
+
       create_gtin_records
-      # parse_palbin_edi
-      #
-      # match_data_on(prepare_array_for_match(match_data))
-      #
-      # check_missing_masterfiles
-      #
-      # business_validation
-      #
-      # create_records
 
       # Enqueue a job to work through GTINS without ids...
+      enqueue_masterfile_import
+
       success_response('GTINs processed')
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
@@ -40,19 +32,29 @@ module EdiApp
     def create_gtin_records # rubocop:disable Metrics/AbcSize
       repo.transaction do
         @edi_records.each do |rec|
-          trimmed_rec = rec.transform_values { |v| v.nil? ? v : v.strip }
-          res = EdiNsgtinInSchema.call(prepare_inputs(trimmed_rec.transform_keys(&:to_sym)))
+          trimmed_rec = rec.transform_values { |v| v.nil? ? v : v.strip }.transform_keys(&:to_sym)
+          # Ignore any GTIN that does not have ALL masterfile columns filled (the system cannot do a lookup)
+          next if gtin_has_missing_values(trimmed_rec)
+
+          res = EdiNsgtinInSchema.call(prepare_inputs(trimmed_rec))
           raise Crossbeams::InfoError, validation_failed_response(res) if res.failure? # OR collect these?
 
           attrs = { transaction_number: res[:transaction_number],
                     gtin_code: res[:gtin_code] }
 
-          gtin_id = repo.get_id_or_create_with_status(:gtins, 'NSGTIN_PROCESSED', attrs)
+          gtin_id = edi_in_repo.get_id_or_create_with_status(:gtins, 'NSGTIN_PROCESSED', attrs)
           repo.update(:gtins, gtin_id, res.to_h)
         end
 
         ok_response
       end
+    end
+
+    def gtin_has_missing_values(trimmed_rec)
+      cols = %i[org_code commodity_code marketing_variety_code standard_pack_code mark_code grade_code inventory_code size_count_code]
+      return true if cols.any? { |c| trimmed_rec[c].nil? || trimmed_rec[c].empty? }
+
+      false
     end
 
     def prepare_inputs(rec) # rubocop:disable Metrics/AbcSize
@@ -71,20 +73,24 @@ module EdiApp
       resolve_size_count_attrs(rec, attrs)
     end
 
+    def enqueue_masterfile_import
+      EdiApp::Job::GenerateMasterfilesFromGtins.enqueue
+    end
+
     # FOLLOWING IS COPIED FROM MFGTIN - move to a repo?
     def get_marketing_org_id(marketing_org)
-      id = MasterfilesApp::PartyRepo.new.find_party_role_from_org_code_for_role(marketing_org, AppConst::ROLE_MARKETER)
+      id = party_repo.find_party_role_from_org_code_for_role(marketing_org, AppConst::ROLE_MARKETER)
       return id unless id.nil?
 
-      repo.get_variant_id(:marketing_party_roles, marketing_org)
+      edi_in_repo.get_variant_id(:marketing_party_roles, marketing_org)
     end
 
     def get_masterfile_match_or_variant(table_name, args)
-      id = repo.get_case_insensitive_match(table_name, args)
+      id = edi_in_repo.get_case_insensitive_match(table_name, args)
       return id unless id.nil?
 
       _col, val = args.first
-      repo.get_variant_id(table_name, val)
+      edi_in_repo.get_variant_id(table_name, val)
     end
 
     def resolve_size_count_attrs(params, attrs)
@@ -100,8 +106,8 @@ module EdiApp
     end
 
     def find_fruit_actual_counts_for_pack_id(params, attrs)
-      basic_pack_code_id = @po_repo.find_basic_pack_id(attrs[:standard_pack_code_id]) # 4
-      @po_repo.fruit_actual_counts_for_pack_via_std_commodity(basic_pack_code_id, params[:size_count_code], attrs[:commodity_id])
+      basic_pack_code_id = repo.find_basic_pack_id(attrs[:standard_pack_code_id])
+      repo.fruit_actual_counts_for_pack_via_std_commodity(basic_pack_code_id, params[:size_count_code], attrs[:commodity_id])
       # log("Count for #{basic_pack_code_id}, #{params[:size_count_code]}, #{attrs[:commodity_id]} - id: #{id}")
       # id
     end
