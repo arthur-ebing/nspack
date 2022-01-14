@@ -17,7 +17,22 @@ module RawMaterials
                                   url: '/list/presort_grower_grading_pools',
                                   style: :back_button)
             end
-            page.add_text rules[:compact_header]
+            page.section do |section|
+              section.form do |form|
+                form.view_only!
+                form.no_submit!
+                form.row do |row|
+                  row.column do |col|
+                    col.add_text rules[:compact_header]
+                  end
+                  row.column do |col|
+                    col.add_field :rmt_bin_weight
+                    col.add_field :total_graded_weight
+                    col.add_field :input_minus_output_weight
+                  end
+                end
+              end
+            end
             page.section do |section|
               section.show_border!
               section.add_control(control_type: :link,

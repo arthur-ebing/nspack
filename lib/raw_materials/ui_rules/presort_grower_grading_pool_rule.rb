@@ -79,9 +79,8 @@ module UiRules
     end
 
     def set_manage_pool_details(columns = nil, display_columns = 3)
-      compact_header(columns: columns || %i[maf_lot_number description track_slms_indicator_code season_code
-                                            commodity_code farm_code rmt_bin_count rmt_bin_weight total_graded_weight
-                                            active completed created_by updated_by created_at updated_at],
+      compact_header(columns: columns || %i[maf_lot_number description track_slms_indicator_code season_code commodity_code
+                                            farm_code rmt_bin_count completed created_by updated_by created_at updated_at],
                      display_columns: display_columns,
                      header_captions: {
                        maf_lot_number: 'Maf Lot Number',
@@ -91,6 +90,11 @@ module UiRules
                        commodity_code: 'Commodity',
                        farm_code: 'Farm'
                      })
+      fields[:rmt_bin_weight] = { renderer: :label,
+                                  caption: 'Tipped Bin Weight' }
+      fields[:total_graded_weight] = { renderer: :label,
+                                       caption: 'Total Output Bin Weight' }
+      fields[:input_minus_output_weight] = { renderer: :label }
     end
 
     def make_form_object

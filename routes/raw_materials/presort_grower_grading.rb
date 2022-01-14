@@ -273,10 +273,18 @@ class Nspack < Roda
       r.on 'inline_edit_bin_fields' do
         res = interactor.inline_edit_bin_fields(id, params)
         if res.success
-          json_actions([OpenStruct.new(type: :update_grid_row,
-                                       ids: id,
-                                       changes: res.instance[:changes])],
-                       res.message)
+          actions = [OpenStruct.new(type: :update_grid_row,
+                                    ids: id,
+                                    changes: res.instance[:changes])]
+          if res.instance[:output_weight_adjusted]
+            actions << OpenStruct.new(type: :replace_inner_html,
+                                      dom_id: 'presort_grower_grading_pool_total_graded_weight',
+                                      value: UtilityFunctions.delimited_number(res.instance[:total_graded_weight], delimiter: '', no_decimals: 3))
+            actions << OpenStruct.new(type: :replace_inner_html,
+                                      dom_id: 'presort_grower_grading_pool_input_minus_output_weight',
+                                      value: UtilityFunctions.delimited_number(res.instance[:input_minus_output_weight], delimiter: '', no_decimals: 3))
+          end
+          json_actions(actions, res.message)
         else
           undo_grid_inline_edit(message: res.message, message_type: :error)
         end

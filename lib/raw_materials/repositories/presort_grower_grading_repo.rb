@@ -38,6 +38,7 @@ module RawMaterialsApp
       return nil if hash.nil?
 
       hash[:total_graded_weight] = select_values(:presort_grower_grading_bins, :rmt_bin_weight, presort_grower_grading_pool_id: id).sum
+      hash[:input_minus_output_weight] = hash[:rmt_bin_weight] - hash[:total_graded_weight]
       PresortGrowerGradingPoolFlat.new(hash)
     end
 
