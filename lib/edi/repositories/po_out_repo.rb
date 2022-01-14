@@ -49,7 +49,7 @@ module EdiApp
     end
 
     def po_details(load_id)
-      load_code = AppConst::CR_EDI.load_id_prefix.empty? ? 'loads.id' : "'#{AppConst::CR_EDI.load_id_prefix}' || loads.id::text"
+      load_code = AppConst::CR_EDI.load_id_prefix.empty? ? "LPAD(loads.id::text, 10, '0')" : "'#{AppConst::CR_EDI.load_id_prefix}' || LPAD(loads.id::text, #{10 - AppConst::CR_EDI.load_id_prefix.length}, '0')"
       query = <<~SQL
         SELECT
           #{load_code} AS load_id,
