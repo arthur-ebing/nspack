@@ -5,7 +5,7 @@ module RawMaterialsApp
     attribute :id, Types::Integer
     attribute :maf_lot_number, Types::String
     attribute :description, Types::String
-    attribute :track_slms_indicator_code, Types::String
+    attribute :rmt_code_ids, Types::Array
     attribute :season_id, Types::Integer
     attribute :commodity_id, Types::Integer
     attribute :farm_id, Types::Integer
@@ -24,7 +24,7 @@ module RawMaterialsApp
     attribute :id, Types::Integer
     attribute :maf_lot_number, Types::String
     attribute :description, Types::String
-    attribute :track_slms_indicator_code, Types::String
+    attribute :rmt_code_ids, Types::Array
     attribute :season_id, Types::Integer
     attribute :commodity_id, Types::Integer
     attribute :farm_id, Types::Integer
@@ -42,5 +42,6 @@ module RawMaterialsApp
     attribute :farm_code, Types::String
     attribute :total_graded_weight, Types::Decimal
     attribute :input_minus_output_weight, Types::Decimal
+    attribute :rmt_codes, Types::String
   end
 end

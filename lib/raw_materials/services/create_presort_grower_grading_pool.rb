@@ -32,9 +32,10 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def create_presort_grading_pools
+    def create_presort_grading_pools # rubocop:disable Metrics/AbcSize
       repo.presort_grading_pool_details_for(maf_lot_number).each do |pool|
         pool[:created_by] = user_name
+        pool[:rmt_code_ids] = repo.select_values(:rmt_bins, :rmt_code_id, presort_tip_lot_number: pool[:maf_lot_number]).compact
         res = validate_presort_grading_pool_params(pool)
         return validation_failed_response(res) if res.failure?
 
