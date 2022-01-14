@@ -53,7 +53,7 @@
     :caption: Commodity
     :namespaced_name: commodities.code
     :data_type: :string
-    :width: 
+    :width: 110
     :format: 
     :hide: false
     :pinned: 
@@ -82,10 +82,10 @@
   cultivar_group_code:
     :name: cultivar_group_code
     :sequence_no: 5
-    :caption: Cultivar group code
+    :caption: Cultivar Group
     :namespaced_name: cultivar_groups.cultivar_group_code
     :data_type: :string
-    :width: 90
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -98,10 +98,10 @@
   cultivar_name:
     :name: cultivar_name
     :sequence_no: 6
-    :caption: Cultivar name
+    :caption: Cultivar Name
     :namespaced_name: cultivars.cultivar_name
     :data_type: :string
-    :width: 90
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -114,10 +114,10 @@
   cultivar_code:
     :name: cultivar_code
     :sequence_no: 7
-    :caption: Cultivar code
+    :caption: Cultivar Code
     :namespaced_name: cultivars.cultivar_code
     :data_type: :string
-    :width: 90
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -226,10 +226,10 @@
   std_rmt_bin_nett_weight:
     :name: std_rmt_bin_nett_weight
     :sequence_no: 14
-    :caption: Std rmt bin nett weight
+    :caption: Std RMT bin nett weight
     :namespaced_name: cultivars.std_rmt_bin_nett_weight
     :data_type: :number
-    :width: 150
+    :width: 200
     :format: :delimited_1000
     :hide: false
     :pinned: 
