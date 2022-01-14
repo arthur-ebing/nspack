@@ -41,5 +41,6 @@ module RawMaterialsApp
     attribute :season_code, Types::String
     attribute :farm_code, Types::String
     attribute :total_graded_weight, Types::Decimal
+    attribute :input_minus_output_weight, Types::Decimal
   end
 end

@@ -273,10 +273,21 @@ class Nspack < Roda
       r.on 'inline_edit_bin_fields' do
         res = interactor.inline_edit_bin_fields(id, params)
         if res.success
-          json_actions([OpenStruct.new(type: :update_grid_row,
-                                       ids: id,
-                                       changes: res.instance[:changes])],
-                       res.message)
+          actions = [OpenStruct.new(type: :update_grid_row,
+                                    ids: id,
+                                    changes: res.instance[:changes])]
+          if res.instance[:output_weight_adjusted]
+            repo = RawMaterialsApp::PresortGrowerGradingRepo.new
+            grading_pool_id = repo.get(:presort_grower_grading_bins, :presort_grower_grading_pool_id, id)
+            grading_pool = repo.find_presort_grower_grading_pool(grading_pool_id)
+            actions << OpenStruct.new(type: :replace_inner_html,
+                                      dom_id: 'presort_grower_grading_pool_total_graded_weight',
+                                      value: UtilityFunctions.delimited_number(grading_pool[:total_graded_weight]))
+            actions << OpenStruct.new(type: :replace_inner_html,
+                                      dom_id: 'presort_grower_grading_pool_input_minus_output_weight',
+                                      value: UtilityFunctions.delimited_number(grading_pool[:input_minus_output_weight]))
+          end
+          json_actions(actions, res.message)
         else
           undo_grid_inline_edit(message: res.message, message_type: :error)
         end

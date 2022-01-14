@@ -59,6 +59,7 @@ module RawMaterialsApp
 
     def inline_edit_bin_fields(grading_bin_id, params) # rubocop:disable Metrics/AbcSize
       val = params[:column_value]
+      output_weight_adjusted = params[:column_name] == 'rmt_bin_weight'
       attrs = case params[:column_name]
               when 'rmt_class_code'
                 { rmt_class_id:  repo.get_id(:rmt_classes, rmt_class_code: val) }
@@ -82,7 +83,8 @@ module RawMaterialsApp
                                                                   colour: instance[:colour],
                                                                   rmt_bin_weight: instance[:rmt_bin_weight],
                                                                   graded: instance[:graded],
-                                                                  adjusted_weight: instance[:adjusted_weight] } })
+                                                                  adjusted_weight: instance[:adjusted_weight] },
+                                                       output_weight_adjusted: output_weight_adjusted  })
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
