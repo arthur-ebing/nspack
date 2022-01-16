@@ -289,5 +289,19 @@ module MasterfilesApp
         .where(Sequel[:fruit_size_references][:id] => fruit_size_reference_id)
         .get(Sequel[:rmt_sizes][:id])
     end
+
+    def actual_and_standard_counts_for(commodity_id, standard_pack_code_id)
+      query = <<~SQL
+        SELECT standard_pack_codes.id, std_fruit_size_counts.id, actual_count_for_pack, size_count_value
+        FROM standard_pack_codes
+        JOIN basic_packs_standard_packs ON basic_packs_standard_packs.standard_pack_id = standard_pack_codes.id
+        JOIN fruit_actual_counts_for_packs ON fruit_actual_counts_for_packs.basic_pack_code_id = basic_packs_standard_packs.basic_pack_id
+        JOIN std_fruit_size_counts ON std_fruit_size_counts.id = fruit_actual_counts_for_packs.std_fruit_size_count_id
+        WHERE std_fruit_size_counts.commodity_id = ?
+          AND standard_pack_codes.id = ?
+        ORDER BY actual_count_for_pack
+      SQL
+      DB[query, commodity_id, standard_pack_code_id].all
+    end
   end
 end

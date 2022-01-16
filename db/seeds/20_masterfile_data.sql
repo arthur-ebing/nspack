@@ -72,6 +72,9 @@ INSERT INTO vessel_types (voyage_type_id, vessel_type_code, description) VALUES(
 -- UNITS OF MEASURE TYPE
 INSERT INTO uom_types (code) VALUES ('INVENTORY') ON CONFLICT DO NOTHING;
 
+-- UNITS OF MEASURE - EACH
+INSERT INTO uoms (uom_code, uom_type_id) VALUES ('EACH', (SELECT id FROM uom_types WHERE code = 'INVENTORY')) ON CONFLICT DO NOTHING;
+
 -- CONTAINER_STACK_TYPES
 INSERT INTO container_stack_types (stack_type_code, description) VALUES('S', 'Standard') ON CONFLICT DO NOTHING;
 INSERT INTO container_stack_types (stack_type_code, description) VALUES('H', 'High') ON CONFLICT DO NOTHING;

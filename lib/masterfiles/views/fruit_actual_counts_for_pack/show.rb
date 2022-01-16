@@ -8,7 +8,7 @@ module Masterfiles
           ui_rule = UiRules::Compiler.new(:fruit_actual_counts_for_pack, :show, id: id)
           rules   = ui_rule.compile
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page|
+          Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form do |form|
               form.view_only!
@@ -20,8 +20,6 @@ module Masterfiles
               form.add_field :size_references
             end
           end
-
-          layout
         end
       end
     end

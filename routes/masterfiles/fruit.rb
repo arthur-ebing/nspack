@@ -883,6 +883,52 @@ class Nspack < Roda
       end
     end
 
+    # SETUP STANDARD AND ACTUAL COUNTS
+    # -------------------------------------------------------------------------
+    r.on 'setup_standard_and_actual_counts' do
+      interactor = MasterfilesApp::FruitSizeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'counts_grid' do
+        interactor.counts_grid(params)
+      rescue StandardError => e
+        show_json_exception(e)
+      end
+
+      r.on 'inline_edit', Integer, Integer, String do |commodity_id, standard_pack_code_id, row_id|
+        if row_id.start_with?('e')
+          undo_grid_inline_edit(message: 'Cannot change an existing standard count - use the Std Fruit Size Counts interface for that.', message_type: :error)
+        elsif params[:old_value] != 'null'
+          undo_grid_inline_edit(message: 'Cannot change an already-added standard count value - use the Std Fruit Size Counts interface for that.')
+        else
+          actual_count = row_id.sub('n', '').to_i
+          std_count = params[:column_value]
+          res = interactor.add_actual_and_standard_counts(commodity_id, standard_pack_code_id, actual_count, std_count)
+          if res.success
+            show_json_notice(res.message)
+          else
+            undo_grid_inline_edit(message: res.message)
+          end
+        end
+      end
+
+      r.get do
+        raise Crossbeams::TaskNotPermittedError, 'Quick setup of counts is only available if base and standard packs are equivalent' unless AppConst::CR_MF.basic_pack_equals_standard_pack?
+
+        show_partial_or_page(r) { Masterfiles::Fruit::FruitActualCountsForPack::SetupCounts.call }
+      end
+
+      r.post do
+        res = interactor.validate_standard_and_actual_counts(params[:setup_counts])
+        if res.success
+          show_page { Masterfiles::Fruit::FruitActualCountsForPack::SetupCountsGrid.call(form_values: params[:setup_counts]) }
+        else
+          re_show_form(r, res, url:  '/masterfiles/fruit/setup_standard_and_actual_counts') do
+            Masterfiles::Fruit::FruitActualCountsForPack::SetupCounts.call(form_values: params[:setup_counts], form_errors: res.errors)
+          end
+        end
+      end
+    end
+
     r.on 'back', Integer do |id|
       r.on 'fruit_actual_counts_for_packs' do
         # NOTE: Working on the principle that your views are allowed access to your repositories
