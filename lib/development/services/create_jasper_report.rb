@@ -172,6 +172,8 @@ class CreateJasperReport < BaseService
   end
 
   def add_output_path
+    return File.join(jasper_params.output_dir, jasper_params.file_name) if jasper_params.output_dir
+
     File.join(ENV['ROOT'], 'public', 'downloads', 'jasper', jasper_params.file_name)
   end
 end
