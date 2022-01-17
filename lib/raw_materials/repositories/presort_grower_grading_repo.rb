@@ -39,6 +39,7 @@ module RawMaterialsApp
 
       hash[:total_graded_weight] = select_values(:presort_grower_grading_bins, :rmt_bin_weight, presort_grower_grading_pool_id: id).sum
       hash[:input_minus_output_weight] = hash[:rmt_bin_weight] - hash[:total_graded_weight]
+      hash[:rmt_codes] = hash[:rmt_code_ids].nil? ? nil : select_values(:rmt_codes, :rmt_code, id: hash[:rmt_code_ids].to_a).join(',')
       PresortGrowerGradingPoolFlat.new(hash)
     end
 
@@ -94,9 +95,10 @@ module RawMaterialsApp
     end
 
     def presort_grading_pool_details_for(maf_lot_number)
+      return {} if maf_lot_number.nil?
+
       query = <<~SQL
         SELECT rmt_bins.presort_tip_lot_number AS maf_lot_number,
-               rmt_bins.legacy_data ->> 'track_indicator_code' AS track_slms_indicator_code,
                rmt_bins.season_id,
                seasons.commodity_id,
                rmt_bins.farm_id,
@@ -108,10 +110,10 @@ module RawMaterialsApp
         AND rmt_bins.active
         AND rmt_bins.bin_tipped
         AND NOT rmt_bins.scrapped
-        GROUP BY rmt_bins.presort_tip_lot_number, track_slms_indicator_code,
+        GROUP BY rmt_bins.presort_tip_lot_number,
                  rmt_bins.season_id, seasons.commodity_id, rmt_bins.farm_id
       SQL
-      DB[query, maf_lot_number].all unless maf_lot_number.nil?
+      DB[query, maf_lot_number].all
     end
 
     def presort_grading_pool_farm_for(presort_grading_pool_id)

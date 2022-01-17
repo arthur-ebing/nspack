@@ -88,7 +88,7 @@ module RawMaterialsApp
         id: 1,
         maf_lot_number: maf_lot_number,
         description: 'ABC',
-        track_slms_indicator_code: 'ABC',
+        rmt_code_ids: nil,
         season_id: season_id,
         commodity_id: commodity_id,
         farm_id: farm_id,

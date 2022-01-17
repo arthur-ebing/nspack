@@ -19,12 +19,12 @@ module RawMaterials
               form.method :update
               form.add_field :maf_lot_number
               form.add_field :description
-              form.add_field :track_slms_indicator_code
               form.add_field :season_id
               form.add_field :commodity_id
               form.add_field :farm_id
               form.add_field :rmt_bin_count
               form.add_field :rmt_bin_weight
+              form.add_field :rmt_codes
             end
           end
         end

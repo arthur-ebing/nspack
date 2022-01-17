@@ -178,7 +178,7 @@ class Nspack < Roda
             row_keys = %i[
               maf_lot_number
               description
-              track_slms_indicator_code
+              rmt_codes
               season_code
               commodity_code
               farm_code
@@ -236,7 +236,7 @@ class Nspack < Roda
             id
             maf_lot_number
             description
-            track_slms_indicator_code
+            rmt_codes
             season_code
             commodity_code
             farm_code

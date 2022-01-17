@@ -13,7 +13,7 @@ module RawMaterialsApp
       default = {
         maf_lot_number: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
-        track_slms_indicator_code: Faker::Lorem.word,
+        rmt_code_ids: nil,
         rmt_bin_count: Faker::Number.number(digits: 4),
         rmt_bin_weight: Faker::Number.decimal,
         pro_rata_factor: Faker::Number.decimal,
