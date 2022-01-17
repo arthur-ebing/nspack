@@ -24,6 +24,7 @@ module DevelopmentApp
 
     def call
       return if config.nil?
+      return if options[:to] == ''
 
       create_instance_vars
       @table_text = inflector.humanize(inflector.singularize(table_name.to_s))

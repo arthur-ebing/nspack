@@ -105,15 +105,16 @@ module EdiApp
             org_id = repo.get_id(:organizations, short_description: code)
             params = { short_description: code,
                        medium_description: code,
-                       long_description: code }
-            if org_id.nil?
-              params[:column_name] = 'Create New Organization'
-            else
-              params[:column_name] = :existing_id
-              params[:existing_id] = org_id
-            end
-            res = MasterfilesApp::CreatePartyRole.call(AppConst::ROLE_MARKETER, params)
-            raise Crossbeams::InfoError, res.message unless res.success
+                       long_description: code,
+                       vat_number: nil,
+                       company_reg_no: nil }
+            params[:pr_id] = if org_id.nil?
+                               'Create New Organization'
+                             else
+                               org_id
+                             end
+            res = MasterfilesApp::CreatePartyRole.call(AppConst::ROLE_MARKETER, params, 'GTIN import', column_name: :pr_id)
+            raise Crossbeams::InfoError, unwrap_failed_response(res) unless res.success
 
             repo.update_gtin_marketing_orgs(code, res.instance.party_role_id)
           end
