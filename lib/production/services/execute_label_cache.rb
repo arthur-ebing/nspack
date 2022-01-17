@@ -28,7 +28,7 @@ module ProductionApp
       end
     end
 
-    def cache_run
+    def cache_run # rubocop:disable Metrics/AbcSize
       @cache_run ||= {
         production_run_id: production_run[:id],
         farm_id: production_run[:farm_id],
@@ -37,7 +37,11 @@ module ProductionApp
         cultivar_group_id: production_run[:cultivar_group_id],
         packhouse_resource_id: production_run[:packhouse_resource_id],
         production_line_id: production_run[:production_line_id],
-        season_id: production_run[:season_id]
+        season_id: production_run[:season_id],
+        colour_percentage_id: production_run[:colour_percentage_id],
+        actual_cold_treatment_id: production_run[:actual_cold_treatment_id],
+        actual_ripeness_treatment_id: production_run[:actual_ripeness_treatment_id],
+        rmt_code_id: production_run[:rmt_code_id]
       }
     end
 

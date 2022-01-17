@@ -61,7 +61,9 @@
   THEN 'error'\r\n        WHEN aggregated.verified AND NOT aggregated.verifications_passed
   THEN 'error'\r\n        END AS colour_rule,\r\n    vw_pallets.pallet_id AS id,\r\n
   \   pallet_sequences.production_run_id,\r\n    pallet_sequences.work_order_item_id,\r\n
-  \   fn_work_order_item_code(pallet_sequences.work_order_item_id) AS work_order_item_code\r\n\r\nFROM
+  \   fn_work_order_item_code(pallet_sequences.work_order_item_id) AS work_order_item_code,\r\n
+  \   aggregated.colour_percentages,\r\n    aggregated.actual_cold_treatments,\r\n
+  \   aggregated.actual_ripeness_treatments,\r\n    aggregated.rmt_codes\r\n\r\nFROM
   vw_pallets\r\nLEFT JOIN vw_pallet_sequences_aggregated aggregated ON aggregated.pallet_id
   = vw_pallets.pallet_id\r\nLEFT JOIN pallet_sequences ON pallet_sequences.pallet_id
   = vw_pallets.pallet_id\r\n\r\nORDER BY vw_pallets.pallet_number DESC;"
@@ -2484,6 +2486,70 @@
     :namespaced_name: 
     :data_type: :string
     :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  colour_percentages:
+    :name: colour_percentages
+    :sequence_no: 152
+    :caption: Colour percentages
+    :namespaced_name: aggregated.colour_percentages
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  actual_cold_treatments:
+    :name: actual_cold_treatments
+    :sequence_no: 153
+    :caption: Actual cold treatments
+    :namespaced_name: aggregated.actual_cold_treatments
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  actual_ripeness_treatments:
+    :name: actual_ripeness_treatments
+    :sequence_no: 154
+    :caption: Actual ripeness treatments
+    :namespaced_name: aggregated.actual_ripeness_treatments
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_codes:
+    :name: rmt_codes
+    :sequence_no: 155
+    :caption: Rmt codes
+    :namespaced_name: aggregated.rmt_codes
+    :data_type: :string
+    :width: 
     :format: 
     :hide: false
     :pinned: 

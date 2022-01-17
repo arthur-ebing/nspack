@@ -108,7 +108,14 @@ module Production
                       fold.add_field :tu_sticker_ids
                     end
                   end
-                  row.blank_column
+                  row.column do |col|
+                    col.fold_up do |fold|
+                      fold.caption 'Raw Material  details'
+                      fold.add_field :rmt_code_id
+                      fold.add_field :actual_cold_treatment_id
+                      fold.add_field :actual_ripeness_treatment_id
+                    end
+                  end
                 end
               end
               # form.fold_up do |fold|

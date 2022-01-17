@@ -36,7 +36,10 @@
   \ carton_labels.rmt_bin_id,\r\n  rmt_bins.tipped_asset_number,\r\n  carton_labels.dp_carton,\r\n
   \ carton_labels.gtin_code,\r\n  fn_party_role_name (carton_labels.target_customer_party_role_id)
   AS target_customer,\r\n  legacy_barcodes.legacy_carton_number,\r\n  carton_labels.colour_percentage_id,\r\n
-  \ colour_percentages.colour_percentage,\r\n  colour_percentages.description AS colour_description
+  \ colour_percentages.colour_percentage,\r\n  colour_percentages.description AS colour_description,\r\n
+  \ carton_labels.actual_cold_treatment_id,\r\n  actual_cold_treatments.treatment_code
+  AS actual_cold_treatment,\r\n  carton_labels.actual_ripeness_treatment_id,\r\n  actual_ripeness_treatments.treatment_code
+  AS actual_ripeness_treatment,\r\n  carton_labels.rmt_code_id,\r\n  rmt_codes.rmt_code
   \r\nFROM\r\n  cartons\r\n  JOIN carton_labels ON carton_labels.id = cartons.carton_label_id\r\n
   \ LEFT JOIN production_runs ON production_runs.id = carton_labels.production_run_id\r\n
   \ LEFT JOIN product_setup_templates ON product_setup_templates.id = production_runs.product_setup_template_id\r\n
@@ -78,8 +81,11 @@
   = carton_labels.marketing_orchard_id\r\n  LEFT JOIN pallet_sequences ON pallet_sequences.id
   = cartons.pallet_sequence_id\r\n  LEFT JOIN legacy_barcodes ON legacy_barcodes.carton_label_id
   = cartons.carton_label_id\r\n  LEFT JOIN colour_percentages ON colour_percentages.id
-  = carton_labels.colour_percentage_id\r\n  LEFT JOIN rmt_bins ON rmt_bins.id = carton_labels.rmt_bin_id\r\nORDER
-  BY\r\n  cartons.id DESC"
+  = carton_labels.colour_percentage_id\r\n  LEFT JOIN rmt_bins ON rmt_bins.id = carton_labels.rmt_bin_id\r\n
+  \ LEFT JOIN treatments actual_cold_treatments ON actual_cold_treatments.id = carton_labels.actual_cold_treatment_id\r\n
+  \ LEFT JOIN treatments actual_ripeness_treatments ON actual_ripeness_treatments.id
+  = carton_labels.actual_ripeness_treatment_id\r\n  LEFT JOIN rmt_codes ON rmt_codes.id
+  = carton_labels.rmt_code_id\r\nORDER BY\r\n  cartons.id DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -1212,6 +1218,102 @@
     :namespaced_name: colour_percentages.description
     :data_type: :string
     :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  actual_cold_treatment_id:
+    :name: actual_cold_treatment_id
+    :sequence_no: 72
+    :caption: Actual cold treatment
+    :namespaced_name: carton_labels.actual_cold_treatment_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  actual_cold_treatment:
+    :name: actual_cold_treatment
+    :sequence_no: 73
+    :caption: Actual cold treatment
+    :namespaced_name: actual_cold_treatments.treatment_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  actual_ripeness_treatment_id:
+    :name: actual_ripeness_treatment_id
+    :sequence_no: 74
+    :caption: Actual ripeness treatment
+    :namespaced_name: carton_labels.actual_ripeness_treatment_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  actual_ripeness_treatment:
+    :name: actual_ripeness_treatment
+    :sequence_no: 75
+    :caption: Actual ripeness treatment
+    :namespaced_name: actual_ripeness_treatments.treatment_code
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_code_id:
+    :name: rmt_code_id
+    :sequence_no: 76
+    :caption: Rmt code
+    :namespaced_name: carton_labels.rmt_code_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_code:
+    :name: rmt_code
+    :sequence_no: 77
+    :caption: Rmt code
+    :namespaced_name: rmt_codes.rmt_code
+    :data_type: :string
+    :width: 100
     :format: 
     :hide: false
     :pinned: 

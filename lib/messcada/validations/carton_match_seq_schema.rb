@@ -49,5 +49,8 @@ module MesscadaApp
     required(:treatment_ids).maybe(:array).maybe { each(:integer) }
     required(:colour_percentage_id).maybe(:integer)
     required(:work_order_item_id).maybe(:integer)
+    required(:actual_cold_treatment_id).maybe(:integer)
+    required(:actual_ripeness_treatment_id).maybe(:integer)
+    required(:rmt_code_id).maybe(:integer)
   end
 end

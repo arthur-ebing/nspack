@@ -75,6 +75,9 @@ module MesscadaApp
       optional(:colour_percentage_id).maybe(:integer)
       optional(:work_order_item_id).maybe(:integer)
       optional(:sell_by_code).maybe(Types::StrippedString)
+      optional(:actual_cold_treatment_id).maybe(:integer)
+      optional(:actual_ripeness_treatment_id).maybe(:integer)
+      optional(:rmt_code_id).maybe(:integer)
     end
 
     rule(:fruit_size_reference_id, :fruit_actual_counts_for_pack_id) do
@@ -153,5 +156,8 @@ module MesscadaApp
     optional(:colour_percentage_id).maybe(:integer)
     optional(:work_order_item_id).maybe(:integer)
     optional(:sell_by_code).maybe(Types::StrippedString)
+    optional(:actual_cold_treatment_id).maybe(:integer)
+    optional(:actual_ripeness_treatment_id).maybe(:integer)
+    optional(:rmt_code_id).maybe(:integer)
   end
 end

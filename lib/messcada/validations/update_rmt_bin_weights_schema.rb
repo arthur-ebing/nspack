@@ -38,5 +38,9 @@ module MesscadaApp
     optional(:scrapped_rmt_delivery_id).maybe(:integer)
     required(:verified_from_carton_label_id).filled(:integer)
     optional(:legacy_data).maybe(:hash)
+    optional(:colour_percentage_id).maybe(:integer)
+    optional(:actual_cold_treatment_id).maybe(:integer)
+    optional(:actual_ripeness_treatment_id).maybe(:integer)
+    optional(:rmt_code_id).maybe(:integer)
   end
 end

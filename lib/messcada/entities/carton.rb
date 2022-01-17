@@ -93,6 +93,9 @@ module MesscadaApp
     attribute :colour_percentage_id, Types::Integer
     attribute :work_order_item_id, Types::Integer
     attribute :sell_by_code, Types::String
+    attribute :actual_cold_treatment_id, Types::Integer
+    attribute :actual_ripeness_treatment_id, Types::Integer
+    attribute :rmt_code_id, Types::Integer
   end
 
   class ScannedCartonNumber < Dry::Struct

@@ -82,7 +82,8 @@ module MesscadaApp
     end
 
     def set_rebin_params # rubocop:disable Metrics/AbcSize
-      arr = %i[season_id cultivar_group_id cultivar_id puc_id farm_id orchard_id rmt_class_id]
+      arr = %i[season_id cultivar_group_id cultivar_id puc_id farm_id orchard_id rmt_class_id
+               colour_percentage_id actual_cold_treatment_id actual_ripeness_treatment_id rmt_code_id]
       params = {
         bin_asset_number: carton_label_id.to_s,
         rmt_delivery_id: nil,

@@ -269,7 +269,13 @@ module MesscadaApp
          pallet_sequences.colour_percentage_id,
          colour_percentages.colour_percentage,
          pallet_sequences.work_order_item_id,
-         fn_work_order_item_code(pallet_sequences.work_order_item_id) AS work_order_item_code
+         fn_work_order_item_code(pallet_sequences.work_order_item_id) AS work_order_item_code,
+         pallet_sequences.actual_cold_treatment_id,
+         actual_cold_treatments.treatment_code AS actual_cold_treatment,
+         pallet_sequences.actual_ripeness_treatment_id,
+         actual_ripeness_treatments.treatment_code AS actual_ripeness_treatment,
+         pallet_sequences.rmt_code_id,
+         rmt_codes.rmt_code
 
         FROM pallet_sequences
         JOIN pallets ON pallets.id = pallet_sequences.pallet_id
@@ -346,6 +352,9 @@ module MesscadaApp
         LEFT JOIN rmt_container_material_owners ON rmt_container_material_owners.id = pallets.rmt_container_material_owner_id
         LEFT JOIN rmt_container_material_types ON rmt_container_material_types.id = rmt_container_material_owners.rmt_container_material_type_id
         LEFT JOIN colour_percentages ON colour_percentages.id = pallet_sequences.colour_percentage_id
+        LEFT JOIN treatments actual_cold_treatments ON actual_cold_treatments.id = pallet_sequences.actual_cold_treatment_id
+        LEFT JOIN treatments actual_ripeness_treatments ON actual_ripeness_treatments.id = pallet_sequences.actual_ripeness_treatment_id
+        LEFT JOIN rmt_codes ON rmt_codes.id = pallet_sequences.rmt_code_id
 
       SQL
     end

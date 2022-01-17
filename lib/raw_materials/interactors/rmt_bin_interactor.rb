@@ -611,7 +611,11 @@ module RawMaterialsApp
         cultivar_id: run.cultivar_id,
         season_id: run.season_id,
         farm_id: run.farm_id,
-        puc_id: run.puc_id }
+        puc_id: run.puc_id,
+        colour_percentage_id: run.colour_percentage_id,
+        actual_cold_treatment_id: run.actual_cold_treatment_id,
+        actual_ripeness_treatment_id: run.actual_ripeness_treatment_id,
+        rmt_code_id: run.rmt_code_id }
     end
 
     def get_header_inherited_field(delivery, container_type_id) # rubocop:disable Metrics/AbcSize

@@ -291,6 +291,9 @@ module ProductionApp
       optional(:target_customer_party_role_id).maybe(:integer)
       optional(:colour_percentage_id).maybe(:integer)
       required(:fruit_actual_counts_for_pack_id).maybe(:integer)
+      optional(:actual_cold_treatment_id).maybe(:integer)
+      optional(:actual_ripeness_treatment_id).maybe(:integer)
+      optional(:rmt_code_id).maybe(:integer)
     end
 
     rule(:fruit_size_reference_id, :fruit_actual_counts_for_pack_id) do

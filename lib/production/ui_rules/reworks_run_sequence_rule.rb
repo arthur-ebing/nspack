@@ -10,6 +10,7 @@ module UiRules
       @fruit_repo = MasterfilesApp::FruitRepo.new
       @bom_repo = MasterfilesApp::BomRepo.new
       @commodity_repo = MasterfilesApp::CommodityRepo.new
+      @messcada_repo = MesscadaApp::MesscadaRepo.new
 
       make_form_object
       apply_form_values
@@ -389,6 +390,24 @@ module UiRules
                                          searchable: true,
                                          hide_on_load: !commodity.colour_applies,
                                          remove_search_for_small_list: false }
+      fields[:actual_cold_treatment_id] =  { renderer: :select,
+                                             options: @messcada_repo.for_select_treatments_by_type(AppConst::COLD_TREATMENT),
+                                             caption: 'Actual Cold Treatment',
+                                             prompt: 'Select Actual Cold Treatment',
+                                             searchable: true,
+                                             remove_search_for_small_list: false }
+      fields[:actual_ripeness_treatment_id] =  { renderer: :select,
+                                                 options: @messcada_repo.for_select_treatments_by_type(AppConst::RIPENESS_TREATMENT),
+                                                 caption: 'Actual Ripeness Treatment',
+                                                 prompt: 'Select Actual Ripeness Treatment',
+                                                 searchable: true,
+                                                 remove_search_for_small_list: false }
+      fields[:rmt_code_id] =  { renderer: :select,
+                                options: @messcada_repo.for_select_rmt_codes_by_cultivar(@form_object.cultivar_id),
+                                caption: 'RMT Code',
+                                prompt: 'Select RMT Code',
+                                searchable: true,
+                                remove_search_for_small_list: false }
     end
 
     def make_form_object # rubocop:disable Metrics/AbcSize

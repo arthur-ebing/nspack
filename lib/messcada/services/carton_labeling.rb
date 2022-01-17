@@ -65,6 +65,7 @@ module MesscadaApp
       return res unless res.success
 
       attrs = setup_data[:production_run_data].merge(setup_data[:setup_data]).reject { |k, _| k == :id }
+      attrs[:colour_percentage_id] = setup_data[:production_run_data][:colour_percentage_id] if attrs[:colour_percentage_id].nil?
       @pick_ref = UtilityFunctions.calculate_pick_ref(packhouse_no)
       attrs = attrs.merge(pick_ref: pick_ref,
                           target_customer_party_role_id: target_customer_party_role)

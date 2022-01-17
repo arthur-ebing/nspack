@@ -91,9 +91,13 @@
   NULL::text) AS edi_size_counts,\r\n  ps.work_order_item_id,\r\n  fn_work_order_item_code
   (ps.work_order_item_id) AS work_order_item_code,\r\n  pallets.created_at,\r\n  pallets.active,\r\n
   \ array_remove(array_agg(DISTINCT ps.sell_by_code), NULL::text) AS sell_by_codes,\r\n
-  \ CASE WHEN pallets.scrapped THEN\r\n    'warning'\r\n  WHEN pallets.shipped THEN\r\n
-  \   'inactive'\r\n  WHEN pallets.allocated THEN\r\n    'ready'\r\n  WHEN pallets.in_stock
-  THEN\r\n    'ok'\r\n  WHEN pallets.palletized\r\n    OR pallets.partially_palletized
+  \ array_remove(array_agg(DISTINCT colour_percentages.colour_percentage::text),NULL)
+  AS colour_percentages,\r\n  array_remove(array_agg(DISTINCT actual_cold_treatments.treatment_code::text),NULL)
+  AS actual_cold_treatments,\r\n  array_remove(array_agg(DISTINCT actual_ripeness_treatments.treatment_code::text),NULL)
+  AS actual_ripeness_treatments,\r\n  array_remove(array_agg(DISTINCT rmt_codes.rmt_code::text),NULL)
+  AS rmt_codes,\r\n  CASE WHEN pallets.scrapped THEN\r\n    'warning'\r\n  WHEN pallets.shipped
+  THEN\r\n    'inactive'\r\n  WHEN pallets.allocated THEN\r\n    'ready'\r\n  WHEN
+  pallets.in_stock THEN\r\n    'ok'\r\n  WHEN pallets.palletized\r\n    OR pallets.partially_palletized
   THEN\r\n    'inprogress'\r\n  WHEN pallets.inspected\r\n    AND NOT pallets.govt_inspection_passed
   THEN\r\n    'error'\r\n  WHEN fn_pallet_verification_failed (pallets.id) THEN\r\n
   \   'error'\r\n  END AS colour_rule\r\nFROM\r\n  pallet_sequences ps\r\n  LEFT JOIN
@@ -128,7 +132,11 @@
   \ LEFT JOIN govt_inspection_sheets ON govt_inspection_sheets.id = govt_inspection_pallets.govt_inspection_sheet_id\r\n
   \ LEFT JOIN destination_countries inspected_dest_country ON inspected_dest_country.id
   = govt_inspection_sheets.destination_country_id\r\n  LEFT JOIN plant_resources palletizing_bays
-  ON palletizing_bays.id = pallets.palletizing_bay_resource_id\r\nGROUP BY\r\n  ps.pallet_id,\r\n
+  ON palletizing_bays.id = pallets.palletizing_bay_resource_id\r\n  LEFT JOIN colour_percentages
+  ON colour_percentages.id = ps.colour_percentage_id\r\n  LEFT JOIN treatments actual_cold_treatments
+  ON actual_cold_treatments.id = ps.actual_cold_treatment_id\r\n  LEFT JOIN treatments
+  actual_ripeness_treatments ON actual_ripeness_treatments.id = ps.actual_ripeness_treatment_id\r\n
+  \ LEFT JOIN rmt_codes ON rmt_codes.id = ps.rmt_code_id\r\nGROUP BY\r\n  ps.pallet_id,\r\n
   \ pallets.id,\r\n  locations.location_long_code,\r\n  inspected_dest_country.country_name,\r\n
   \ pallet_bases.pallet_base_code,\r\n  pallet_stack_types.stack_type_code,\r\n  govt_inspection_sheets.consignment_note_number,\r\n
   \ pm_products.product_code,\r\n  pm_products_2.product_code,\r\n  palletizing_bays.plant_resource_code,\r\n
@@ -1872,9 +1880,73 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  colour_percentages:
+    :name: colour_percentages
+    :sequence_no: 109
+    :caption: Colour percentages
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  actual_cold_treatments:
+    :name: actual_cold_treatments
+    :sequence_no: 110
+    :caption: Actual cold treatments
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  actual_ripeness_treatments:
+    :name: actual_ripeness_treatments
+    :sequence_no: 111
+    :caption: Actual ripeness treatments
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_codes:
+    :name: rmt_codes
+    :sequence_no: 112
+    :caption: Rmt codes
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 109
+    :sequence_no: 113
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

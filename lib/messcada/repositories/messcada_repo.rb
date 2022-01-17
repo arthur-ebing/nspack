@@ -633,7 +633,11 @@ module MesscadaApp
                 :rmt_class_id,
                 :packhouse_resource_id,
                 :fruit_size_reference_id,
-                :production_run_id)
+                :production_run_id,
+                :colour_percentage_id,
+                :actual_cold_treatment_id,
+                :actual_ripeness_treatment_id,
+                :rmt_code_id)
         .first
     end
 
