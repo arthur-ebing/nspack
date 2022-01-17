@@ -1,10 +1,11 @@
 ---
 :caption: Presort Grower Grading Pools
-:sql: "SELECT \"presort_grower_grading_pools\".\"id\",\r\n \"presort_grower_grading_pools\".\"maf_lot_number\",
-  \r\n\"presort_grower_grading_pools\".\"description\",\r\n \"presort_grower_grading_pools\".\"track_slms_indicator_code\",
-  \r\n\"presort_grower_grading_pools\".\"season_id\", \r\n\"presort_grower_grading_pools\".\"commodity_id\",
-  \r\n\"presort_grower_grading_pools\".\"farm_id\", \r\n\"commodities\".\"code\" AS
-  commodity_code, \r\n\"farms\".\"farm_code\", \r\n\"seasons\".\"season_code\", \r\n\"presort_grower_grading_pools\".\"rmt_bin_count\",\r\n\"presort_grower_grading_pools\".\"rmt_bin_weight\",
+:sql: "SELECT \"presort_grower_grading_pools\".\"id\",\r\n\"presort_grower_grading_pools\".\"maf_lot_number\",
+  \r\n\"presort_grower_grading_pools\".\"description\",\r\n\"presort_grower_grading_pools\".\"rmt_code_ids\",
+  \r\narray_remove(array_agg(DISTINCT rmt_codes.rmt_code::text), NULL::text) AS rmt_codes,\r\n\"presort_grower_grading_pools\".\"season_id\",
+  \r\n\"presort_grower_grading_pools\".\"commodity_id\", \r\n\"presort_grower_grading_pools\".\"farm_id\",
+  \r\n\"commodities\".\"code\" AS commodity_code, \r\n\"farms\".\"farm_code\", \r\n\"seasons\".\"season_code\",
+  \r\n\"presort_grower_grading_pools\".\"rmt_bin_count\",\r\n\"presort_grower_grading_pools\".\"rmt_bin_weight\",
   \r\n\"presort_grower_grading_pools\".\"pro_rata_factor\", \r\n\"presort_grower_grading_pools\".\"completed\",
   \r\n\"presort_grower_grading_pools\".\"active\", \r\n EXISTS(SELECT id FROM presort_grower_grading_bins
   WHERE presort_grower_grading_pool_id = presort_grower_grading_pools.id) AS has_grading_bins,\r\n\"presort_grower_grading_pools\".\"created_by\",
@@ -13,7 +14,10 @@
   \"presort_grower_grading_pools\".\"id\") AS status \r\nFROM \"presort_grower_grading_pools\"
   \r\nJOIN \"commodities\" ON \"commodities\".\"id\" = \"presort_grower_grading_pools\".\"commodity_id\"
   \r\nJOIN \"farms\" ON \"farms\".\"id\" = \"presort_grower_grading_pools\".\"farm_id\"
-  \r\nLEFT JOIN \"seasons\" ON \"seasons\".\"id\" = \"presort_grower_grading_pools\".\"season_id\""
+  \r\nLEFT JOIN \"seasons\" ON \"seasons\".\"id\" = \"presort_grower_grading_pools\".\"season_id\"\r\nLEFT
+  JOIN rmt_codes ON rmt_codes.id = ANY (presort_grower_grading_pools.rmt_code_ids)\r\nGROUP
+  BY \"presort_grower_grading_pools\".\"id\",\r\n\"commodities\".\"code\",\r\n\"farms\".\"farm_code\",
+  \r\n\"seasons\".\"season_code\""
 :limit: 
 :offset: 
 :external_settings: {}
@@ -66,17 +70,33 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  track_slms_indicator_code:
-    :name: track_slms_indicator_code
+  rmt_code_ids:
+    :name: rmt_code_ids
     :sequence_no: 4
-    :caption: Track slms indicator code
-    :namespaced_name: presort_grower_grading_pools.track_slms_indicator_code
+    :caption: Rmt code ids
+    :namespaced_name: presort_grower_grading_pools.rmt_code_ids
     :data_type: :string
-    :width: 140
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_codes:
+    :name: rmt_codes
+    :sequence_no: 5
+    :caption: Rmt codes
+    :namespaced_name: 
+    :data_type: :string
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
-    :groupable: true
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -84,7 +104,7 @@
     :group_max: false
   season_id:
     :name: season_id
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Season
     :namespaced_name: presort_grower_grading_pools.season_id
     :data_type: :integer
@@ -100,7 +120,7 @@
     :group_max: false
   commodity_id:
     :name: commodity_id
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Commodity
     :namespaced_name: presort_grower_grading_pools.commodity_id
     :data_type: :integer
@@ -116,7 +136,7 @@
     :group_max: false
   farm_id:
     :name: farm_id
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Farm
     :namespaced_name: presort_grower_grading_pools.farm_id
     :data_type: :integer
@@ -132,7 +152,7 @@
     :group_max: false
   commodity_code:
     :name: commodity_code
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Commodity
     :namespaced_name: commodities.code
     :data_type: :string
@@ -148,7 +168,7 @@
     :group_max: false
   farm_code:
     :name: farm_code
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Farm
     :namespaced_name: farms.farm_code
     :data_type: :string
@@ -164,7 +184,7 @@
     :group_max: false
   season_code:
     :name: season_code
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Season
     :namespaced_name: seasons.season_code
     :data_type: :string
@@ -180,7 +200,7 @@
     :group_max: false
   rmt_bin_count:
     :name: rmt_bin_count
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Rmt bin count
     :namespaced_name: presort_grower_grading_pools.rmt_bin_count
     :data_type: :integer
@@ -196,7 +216,7 @@
     :group_max: false
   rmt_bin_weight:
     :name: rmt_bin_weight
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Rmt bin weight
     :namespaced_name: presort_grower_grading_pools.rmt_bin_weight
     :data_type: :number
@@ -212,7 +232,7 @@
     :group_max: false
   pro_rata_factor:
     :name: pro_rata_factor
-    :sequence_no: 13
+    :sequence_no: 14
     :caption: Pro rata factor
     :namespaced_name: presort_grower_grading_pools.pro_rata_factor
     :data_type: :number
@@ -228,7 +248,7 @@
     :group_max: false
   completed:
     :name: completed
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: Completed
     :namespaced_name: presort_grower_grading_pools.completed
     :data_type: :boolean
@@ -244,7 +264,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Active
     :namespaced_name: presort_grower_grading_pools.active
     :data_type: :boolean
@@ -260,7 +280,7 @@
     :group_max: false
   has_grading_bins:
     :name: has_grading_bins
-    :sequence_no: 16
+    :sequence_no: 17
     :caption: Has grading bins
     :namespaced_name: 
     :data_type: :boolean
@@ -276,7 +296,7 @@
     :group_max: false
   created_by:
     :name: created_by
-    :sequence_no: 17
+    :sequence_no: 18
     :caption: Created by
     :namespaced_name: presort_grower_grading_pools.created_by
     :data_type: :string
@@ -292,7 +312,7 @@
     :group_max: false
   updated_by:
     :name: updated_by
-    :sequence_no: 18
+    :sequence_no: 19
     :caption: Updated by
     :namespaced_name: presort_grower_grading_pools.updated_by
     :data_type: :string
@@ -308,7 +328,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 19
+    :sequence_no: 20
     :caption: Created at
     :namespaced_name: presort_grower_grading_pools.created_at
     :data_type: :datetime
@@ -324,7 +344,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 20
+    :sequence_no: 21
     :caption: Updated at
     :namespaced_name: presort_grower_grading_pools.updated_at
     :data_type: :datetime
@@ -340,7 +360,7 @@
     :group_max: false
   status:
     :name: status
-    :sequence_no: 21
+    :sequence_no: 22
     :caption: Status
     :namespaced_name: 
     :data_type: :string

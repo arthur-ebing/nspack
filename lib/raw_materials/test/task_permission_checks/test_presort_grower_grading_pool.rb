@@ -12,7 +12,7 @@ module RawMaterialsApp
         id: 1,
         maf_lot_number: Faker::Lorem.unique.word,
         description: 'ABC',
-        track_slms_indicator_code: 'ABC',
+        rmt_code_ids: nil,
         season_id: 1,
         commodity_id: 1,
         farm_id: 1,

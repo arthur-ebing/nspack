@@ -24,8 +24,8 @@ module UiRules
       farm_id_label = @repo.get(:farms, :farm_code, @form_object.farm_id)
       fields[:maf_lot_number] = { renderer: :label }
       fields[:description] = { renderer: :label }
-      fields[:track_slms_indicator_code] = { renderer: :label,
-                                             caption: 'Track Indicator Code' }
+      fields[:rmt_codes] = { renderer: :label,
+                             caption: 'Rmt Codes' }
       fields[:season_id] = { renderer: :label,
                              with_value: season_id_label,
                              caption: 'Season' }
@@ -55,8 +55,8 @@ module UiRules
       {
         maf_lot_number: { required: true },
         description: {},
-        track_slms_indicator_code: { renderer: :label,
-                                     caption: 'Track Indicator Code' },
+        rmt_codes: { renderer: :label,
+                     caption: 'Rmt Codes' },
         season_id: { renderer: :label,
                      with_value: season_id_label,
                      caption: 'Season' },
@@ -79,13 +79,12 @@ module UiRules
     end
 
     def set_manage_pool_details(columns = nil, display_columns = 3)
-      compact_header(columns: columns || %i[maf_lot_number description track_slms_indicator_code season_code commodity_code
+      compact_header(columns: columns || %i[maf_lot_number description rmt_codes season_code commodity_code
                                             farm_code rmt_bin_count completed created_by updated_by created_at updated_at],
                      display_columns: display_columns,
                      header_captions: {
                        maf_lot_number: 'Maf Lot Number',
                        description: 'Description',
-                       track_slms_indicator_code: 'Track Indicator Code',
                        season_code: 'Season',
                        commodity_code: 'Commodity',
                        farm_code: 'Farm'

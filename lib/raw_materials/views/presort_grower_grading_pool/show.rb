@@ -16,9 +16,9 @@ module RawMaterials
               form.row do |row|
                 row.column do |col|
                   col.add_field :maf_lot_number
-                  col.add_field :track_slms_indicator_code
                   col.add_field :commodity_id
                   col.add_field :rmt_bin_count
+                  col.add_field :rmt_codes
                   col.add_field :created_by
                   col.add_field :active
                 end

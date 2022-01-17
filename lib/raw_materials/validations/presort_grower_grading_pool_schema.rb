@@ -14,7 +14,7 @@ module RawMaterialsApp
     optional(:id).filled(:integer)
     required(:maf_lot_number).filled(Types::StrippedString)
     optional(:description).maybe(Types::StrippedString)
-    required(:track_slms_indicator_code).maybe(Types::StrippedString)
+    optional(:rmt_code_ids).maybe(:array).maybe { each(:integer) }
     required(:season_id).maybe(:integer)
     required(:commodity_id).filled(:integer)
     required(:farm_id).filled(:integer)
