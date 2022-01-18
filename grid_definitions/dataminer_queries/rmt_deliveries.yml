@@ -97,7 +97,7 @@
     :caption: Farm
     :namespaced_name: farms.farm_code
     :data_type: :string
-    :width: 80
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -161,7 +161,7 @@
     :caption: Orchard
     :namespaced_name: orchards.orchard_code
     :data_type: :string
-    :width: 80
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -193,7 +193,7 @@
     :caption: Cultivar
     :namespaced_name: cultivars.cultivar_name
     :data_type: :string
-    :width: 80
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -209,7 +209,7 @@
     :caption: Cultivar code
     :namespaced_name: cultivars.cultivar_code
     :data_type: :string
-    :width: 100
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -222,7 +222,7 @@
   rmt_code:
     :name: rmt_code
     :sequence_no: 11
-    :caption: Rmt code
+    :caption: RMT code
     :namespaced_name: rmt_codes.rmt_code
     :data_type: :string
     :width: 100
@@ -273,7 +273,7 @@
     :caption: Reference number
     :namespaced_name: rmt_deliveries.reference_number
     :data_type: :string
-    :width: 120
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -366,7 +366,7 @@
   tipping_completed_at:
     :name: tipping_completed_at
     :sequence_no: 20
-    :caption: Tipping completed at
+    :caption: Tip completed at
     :namespaced_name: rmt_deliveries.tipping_complete_date_time
     :data_type: :datetime
     :width: 150
@@ -385,7 +385,7 @@
     :caption: Regime Code
     :namespaced_name: rmt_handling_regimes.regime_code
     :data_type: :string
-    :width: 100
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -401,7 +401,7 @@
     :caption: Variant Code
     :namespaced_name: rmt_variants.rmt_variant_code
     :data_type: :string
-    :width: 100
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -417,7 +417,7 @@
     :caption: Classification1
     :namespaced_name: rmt_classifications1.rmt_classification
     :data_type: :string
-    :width: 100
+    :width: 130
     :format: 
     :hide: false
     :pinned: 
@@ -433,7 +433,7 @@
     :caption: Classification2
     :namespaced_name: rmt_classifications2.rmt_classification
     :data_type: :string
-    :width: 100
+    :width: 130
     :format: 
     :hide: false
     :pinned: 
@@ -465,7 +465,7 @@
     :caption: Sample bins weighed
     :namespaced_name: rmt_deliveries.sample_bins_weighed
     :data_type: :boolean
-    :width: 120
+    :width: 180
     :format: 
     :hide: false
     :pinned: 
@@ -499,7 +499,7 @@
     :data_type: :boolean
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :pinned: 
     :groupable: false
     :group_by_seq: 
@@ -513,7 +513,7 @@
     :caption: Production runs
     :namespaced_name: 
     :data_type: :string
-    :width: 90
+    :width: 130
     :format: 
     :hide: false
     :pinned: 
@@ -526,10 +526,10 @@
   contains_tipped_bins:
     :name: contains_tipped_bins
     :sequence_no: 30
-    :caption: Contains Tipped Bins
+    :caption: Has Tipped Bins
     :namespaced_name: 
     :data_type: :boolean
-    :width: 90
+    :width: 130
     :format: 
     :hide: false
     :pinned: 
@@ -654,10 +654,10 @@
   delivery_destination_code:
     :name: delivery_destination_code
     :sequence_no: 38
-    :caption: Delivery destination code
+    :caption: Delivery destination
     :namespaced_name: rmt_delivery_destinations.delivery_destination_code
     :data_type: :string
-    :width: 120
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -673,7 +673,7 @@
     :caption: Truck registration
     :namespaced_name: rmt_deliveries.truck_registration_number
     :data_type: :string
-    :width: 120
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -801,7 +801,7 @@
     :caption: Sample weights extrapolated at
     :namespaced_name: rmt_deliveries.sample_weights_extrapolated_at
     :data_type: :datetime
-    :width: 160
+    :width: 220
     :format: :datetime_with_secs
     :hide: false
     :pinned: 
