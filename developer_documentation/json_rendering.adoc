@@ -31,7 +31,7 @@ This should be used in the response to a link loaded in a "loading_window" (see 
 Use the `download` option if the route will return a file for download. Otherwise the loading window continues
 to show that it is loading after the file has been downloaded.
 
-    change_window_location_via_json(new_location, log_url = nil, download: fale)
+    change_window_location_via_json(new_location, log_url = nil, download: false)
 
 === Redirect to the last grid
 
@@ -71,11 +71,13 @@ When a dialog opens another dialog, you might want to close the second dialog an
 
 After a grid action opens a dialog and changes are saved from the dialog, you might want to update certain values on the current row without reloading the page.
 
-    update_grid_row(ids, changes:, grid_id: nil, notice: nil)
+    update_grid_row(ids, changes:, grid_id: nil, notice: nil, error: nil)
 
-`id` is the id of the row to change, but can also be an array of ids if you want to update several rows with the same changes.
-`changes` is a Hash of symbol key/values where the symbol key matches the field name in the grid and the value is what you want to place in the grid cell.
+id:: is the id of the row to change, but can also be an array of ids if you want to update several rows with the same changes.
+changes:: is a Hash of symbol key/values where the symbol key matches the field name in the grid and the value is what you want to place in the grid cell.
 grid_id:: an _optional_ string providing the grid's DOM id. Not required for actions fired from a grid or from a link that specifies the grid id.
+notice:: an _optional_ string message to display as information.
+error:: an _optional_ string message to display as an error.
 
 === Close the dialog and add a row to the grid
 
@@ -83,8 +85,9 @@ Like with updating a grid row, this will close the dialog and append a row to th
 
     add_grid_row(attrs:, grid_id: nil, notice: nil)
 
-`attrs` is a Hash of symbol key/values where the symbol key matches the field name in the grid and the value is what you want to place in the grid cell.
+attrs:: is a Hash of symbol key/values where the symbol key matches the field name in the grid and the value is what you want to place in the grid cell.
 grid_id:: an _optional_ string providing the grid's DOM id. Not required for actions fired from a grid or from a link that specifies the grid id.
+notice:: an _optional_ string message to display as information.
 
 `add_grid_row` will automatically set the `created_at` and `updated_at` fields in the new row if the grid has them (so they do not need to be included int the `attrs` Hash).
 
@@ -92,13 +95,19 @@ The newly-added row will be scrolled into view if necessary.
 
 == Changing DOM elements
 
-The main helper for this is `json_actions` which receives an array of actions to be carried out in the page and an optional flash message to be displayed and optional flag to indicate that a dialog should not be closed after processing the response in the page.
+The main helper for this is `json_actions` which receives:
+
+* an array of actions to be carried out in the page
+* an optional flash message to be displayed
+* an optional flag to indicate that a dialog should not be closed after processing the response in the page
+* an optional flash error to be displayed
+
 Each action is of a specific type which tells the calling javascript what to do.
 
 e.g.
 [source,ruby]
 ----
-json_actions(actions, message = nil, keep_dialog_open: false)
+json_actions(actions, message = nil, keep_dialog_open: false, error: nil)
 
 json_actions([OpenStruct.new(type: :replace_multi_options,
                              dom_id: 'product_code_columns_product_code_column_ids',
@@ -107,6 +116,8 @@ json_actions([OpenStruct.new(type: :replace_multi_options,
                              dom_id: 'product_code_columns_chosen_column_ids',
                              value: ids.join(','))],
              'Re-assigned product columns')
+
+json_actions(array_of_actions, error: "There was a problem, but we've still updated the row")
 ----
 
 === Actions
