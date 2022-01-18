@@ -58,6 +58,7 @@ class AppConst
   raise 'CLIENT_CODE must be lowercase.' unless CLIENT_CODE == CLIENT_CODE.downcase
   raise "Unknown CLIENT_CODE - #{CLIENT_CODE}" unless CLIENT_SET.keys.include?(CLIENT_CODE)
 
+  CLIENT_FULL_NAME = CLIENT_SET[CLIENT_CODE]
   SHOW_DB_NAME = ENV.fetch('DATABASE_URL').rpartition('@').last
   PROVISION_PW = ENV['PROVISION_PW']
 
