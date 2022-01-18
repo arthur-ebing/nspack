@@ -21,8 +21,8 @@ module QualityApp
     private
 
     def check_errors # rubocop:disable Metrics/AbcSize
-      farm_id, cultivar_id, season_id = repo.get_value(:rmt_deliveries, %i[farm_id cultivar_id season_id], id: rmt_delivery_id)
-      mrl_result_ids = repo.select_values(:mrl_results, :id, farm_id: farm_id, cultivar_id: cultivar_id, season_id: season_id)
+      puc_id, cultivar_id, season_id = repo.get_value(:rmt_deliveries, %i[puc_id cultivar_id season_id], id: rmt_delivery_id)
+      mrl_result_ids = repo.select_values(:mrl_results, :id, puc_id: puc_id, cultivar_id: cultivar_id, season_id: season_id)
       if mrl_result_ids.nil_or_empty?
         return OpenStruct.new(success: false,
                               instance: { rmt_delivery_id: rmt_delivery_id },
