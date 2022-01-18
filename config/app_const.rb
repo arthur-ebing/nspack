@@ -260,6 +260,7 @@ class AppConst
   PARTY_ROLE_REGISTRATION_TYPES = { 'LSP' => ROLE_SHIPPER,
                                     'CF' => ROLE_SHIPPER,
                                     'FBO' => ROLE_EXPORTER,
+                                    'MARKETER_GLN' => ROLE_MARKETER,
                                     'BILLING' => ROLE_INSPECTION_BILLING }.freeze
 
   # Target Market Type: 'PACKED'
