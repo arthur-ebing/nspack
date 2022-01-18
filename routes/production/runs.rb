@@ -251,7 +251,12 @@ class Nspack < Roda
           # MessageBus to activerun page to refresh
           acts = [OpenStruct.new(type: :update_grid_row,  ids: id, changes: select_attributes(res.instance[:this_run], row_keys))]
           acts << OpenStruct.new(type: :update_grid_row,  ids: res.instance[:other_run][:id], changes: select_attributes(res.instance[:other_run], row_keys.reject { |k| k == :re_executed_at })) if res.instance[:other_run]
-          json_actions(acts, res.message)
+
+          if res.success
+            json_actions(acts, res.message)
+          else
+            json_actions(acts, error: unwrap_failed_response(res))
+          end
         end
       rescue Crossbeams::InfoError => e
         ErrorMailer.send_exception_email(e, subject: e.message, message: "Execute run for #{id}.")
@@ -294,7 +299,11 @@ class Nspack < Roda
             allocation_required
             view_allocs
           ]
-          update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+          if res.success
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+          else
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), error: unwrap_failed_response(res))
+          end
         end
       rescue Crossbeams::InfoError => e
         ErrorMailer.send_exception_email(e, subject: e.message, message: "Re-execute run for #{id}.")

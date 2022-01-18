@@ -161,9 +161,10 @@ module JsonHelpers
   #   { redirect: { url: action.url } }
   # end
 
-  def json_actions(actions, message = nil, keep_dialog_open: false)
+  def json_actions(actions, message = nil, keep_dialog_open: false, error: nil)
     res = { actions: Array(actions).map { |a| build_json_action(a) } }
     res[:flash] = { notice: message } unless message.nil?
+    res[:flash] = { error: error } unless error.nil?
     res[:keep_dialog_open] = true if keep_dialog_open
     res.to_json
   end

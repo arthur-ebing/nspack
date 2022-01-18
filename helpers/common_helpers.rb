@@ -459,10 +459,12 @@ module CommonHelpers
   # @param ids [Integer/Array] the id or ids of the row(s) to update.
   # @param changes [Hash] the changed columns and their values.
   # @param notice [String/Nil] the flash message to show.
+  # @param error [String/Nil] the flash error message to show.
   # @return [JSON] the changes to be applied.
-  def update_grid_row(ids, changes:, notice: nil, grid_id: nil)
+  def update_grid_row(ids, changes:, notice: nil, grid_id: nil, error: nil)
     res = action_update_grid_row(ids, changes: changes, grid_id: grid_id)
     res[:flash] = { notice: notice } if notice
+    res[:flash] = { error: error } if error
     res.to_json
   end
 
