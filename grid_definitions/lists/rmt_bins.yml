@@ -1,7 +1,5 @@
 ---
 :dataminer_definition: rmt_bins
-:dataminer_client_definitions:
-  'kr': rmt_bins_kr
 :actions:
 - :url: "/raw_materials/deliveries/rmt_bins/$:id$"
   :text: view
