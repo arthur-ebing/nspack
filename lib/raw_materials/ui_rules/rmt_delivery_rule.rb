@@ -377,7 +377,7 @@ module UiRules
     end
 
     def mrl_result_id_for(delivery_id)
-      arr = %i[farm_id puc_id orchard_id cultivar_id season_id]
+      arr = %i[puc_id cultivar_id season_id]
       args = @mrl_result_repo.mrl_result_attrs_for(delivery_id, arr)
       @mrl_result_repo.look_for_existing_mrl_result_id(args)
     end

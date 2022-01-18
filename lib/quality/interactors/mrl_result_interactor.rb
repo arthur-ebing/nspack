@@ -7,7 +7,7 @@ module QualityApp
       return validation_failed_response(res) if res.failure?
 
       attrs = res.to_h
-      args = attrs[:pre_harvest_result] ? attrs.slice(:farm_id, :puc_id, :orchard_id, :cultivar_id, :season_id) : attrs.slice(:production_run_id)
+      args = attrs[:pre_harvest_result] ? attrs.slice(:puc_id, :cultivar_id, :season_id) : attrs.slice(:production_run_id)
       attrs[:existing_id] = repo.look_for_existing_mrl_result_id(args)
 
       success_response('Found existing mrl result', attrs)
