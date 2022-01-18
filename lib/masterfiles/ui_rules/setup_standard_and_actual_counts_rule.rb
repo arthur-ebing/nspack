@@ -43,7 +43,7 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(commodity_id: nil,
+      @form_object = OpenStruct.new(commodity_id: @options[:commodity_id],
                                     list_of_counts: nil,
                                     standard_pack_code_id: nil)
     end

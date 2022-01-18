@@ -914,7 +914,8 @@ class Nspack < Roda
       r.get do
         raise Crossbeams::TaskNotPermittedError, 'Quick setup of counts is only available if base and standard packs are equivalent' unless AppConst::CR_MF.basic_pack_equals_standard_pack?
 
-        show_partial_or_page(r) { Masterfiles::Fruit::FruitActualCountsForPack::SetupCounts.call }
+        commodity_id = params[:commodity_id]
+        show_partial_or_page(r) { Masterfiles::Fruit::FruitActualCountsForPack::SetupCounts.call(commodity_id: commodity_id) }
       end
 
       r.post do

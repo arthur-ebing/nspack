@@ -4,8 +4,8 @@ module Masterfiles
   module Fruit
     module FruitActualCountsForPack
       class SetupCounts
-        def self.call(form_values: nil, form_errors: nil)
-          ui_rule = UiRules::Compiler.new(:setup_standard_and_actual_counts, :new, form_values: form_values)
+        def self.call(commodity_id: nil, form_values: nil, form_errors: nil)
+          ui_rule = UiRules::Compiler.new(:setup_standard_and_actual_counts, :new, commodity_id: commodity_id, form_values: form_values)
           rules   = ui_rule.compile
 
           Crossbeams::Layout::Page.build(rules) do |page|

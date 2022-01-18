@@ -28,7 +28,13 @@ module Masterfiles
                 end
               end
             end
-            page.add_notice 'Enter the standard count next to each actual count (where "Exists?" is not checked) in the grid below to generate a standard and actual count'
+            page.section do |section|
+              section.add_control control_type: :link,
+                                  text: 'Select again',
+                                  url: "/masterfiles/fruit/setup_standard_and_actual_counts?commodity_id=#{form_values[:commodity_id]}",
+                                  style: :back_button
+              section.add_notice 'Enter the standard count next to each actual count (where "Exists?" is not checked) in the grid below to generate a standard and actual count', inline_caption: true
+            end
             page.section do |section|
               section.fit_height!
               section.add_grid('counts',
