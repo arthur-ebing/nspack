@@ -227,7 +227,7 @@
   :default_value: 
   :ordered_list: true
   :ui_priority: 1
-  :list_def: SELECT DISTINCT table_name FROM audit.logged_actions ORDER BY table_name
+  :list_def: SELECT DISTINCT event_object_table AS table_name FROM information_schema.triggers WHERE trigger_name = 'audit_trigger_row' ORDER BY event_object_table;
 - :column: a.row_data_id
   :caption: ID
   :data_type: :integer
