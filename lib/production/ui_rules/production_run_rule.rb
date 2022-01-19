@@ -58,6 +58,7 @@ module UiRules
                                                as_boolean: true,
                                                hide_on_load: @rules[:allow_cultivar_group_mixing] ? false : true }
       fields[:run_batch_number] = { renderer: :label }
+      fields[:lot_no_date] = { renderer: :label }
     end
 
     def make_header_table(columns = nil, display_columns = 2)
@@ -65,7 +66,7 @@ module UiRules
                                             line_code farm_code puc_code orchard_code season_code
                                             cultivar_group_code cultivar_name allow_cultivar_group_mixing
                                             allow_cultivar_mixing allow_orchard_mixing status active_run_stage
-                                            run_batch_number],
+                                            run_batch_number lot_no_date],
                      display_columns: display_columns,
                      header_captions: {
                        production_run_code: 'Run',
@@ -83,7 +84,8 @@ module UiRules
                        allow_orchard_mixing: 'Mix Orchard?',
                        status: 'Status',
                        active_run_stage: 'Run stage',
-                       run_batch_number: 'Batch no'
+                       run_batch_number: 'Batch no',
+                       lot_no_date: 'Lo no date'
                      })
     end
 
@@ -283,7 +285,8 @@ module UiRules
         completed: { renderer: :label, as_boolean: true },
         allow_cultivar_group_mixing: { renderer: :checkbox,
                                        hide_on_load: @rules[:allow_cultivar_group_mixing] ? false : true },
-        run_batch_number: { hide_on_load: @rules[:hide_on_new_second_form] }
+        run_batch_number: { hide_on_load: @rules[:hide_on_new_second_form] },
+        lot_no_date: { renderer: :date, hide_on_load: @rules[:hide_on_new_second_form] }
       }
     end
 
@@ -362,6 +365,7 @@ module UiRules
                                     setup_complete: nil,
                                     completed: nil,
                                     run_batch_number: nil,
+                                    lot_no_date: nil,
                                     allow_cultivar_group_mixing: nil)
     end
 

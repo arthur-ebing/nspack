@@ -6,6 +6,10 @@ module LabelPrintingApp
       @label_date_for_functions ||= @supporting_data[:packed_date] || Date.today
     end
 
+    def label_date_time_for_functions
+      @label_date_time_for_functions ||= Time.now
+    end
+
     # Built-in functions - can't be private!
     def iso_day
       label_date_for_functions.strftime('%j')
@@ -23,8 +27,8 @@ module LabelPrintingApp
       label_date_for_functions.strftime('%Y-%m-%d')
     end
 
-    def ogl_number
-      %(L#{label_date_for_functions.strftime('%')}-#{label_date_for_functions.strftime('%u')})
+    def current_date_time
+      label_date_time_for_functions.strftime('%Y-%m-%d %H:%M:%S')
     end
 
     def sequence_table(pallet_id)

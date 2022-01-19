@@ -110,5 +110,6 @@ module ProductionApp
     attribute :actual_ripeness_treatment_code, Types::String
     attribute :class_code, Types::String
     attribute :run_batch_number, Types::String
+    attribute :lot_no_date, Types::Date
   end
 end

@@ -13,10 +13,10 @@
   \   production_runs.completed_at,\r\n    production_runs.allow_cultivar_group_mixing,\r\n
   \   production_runs.allow_cultivar_mixing,\r\n    production_runs.allow_orchard_mixing,\r\n
   \   production_runs.tipping,\r\n    production_runs.labeling,\r\n    production_runs.closed,\r\n
-  \   production_runs.setup_complete,\r\n    production_runs.completed,\r\n    production_runs.farm_id,\r\n
-  \   production_runs.puc_id,\r\n    production_runs.packhouse_resource_id,\r\n    production_runs.production_line_id,\r\n
-  \   production_runs.season_id,\r\n    production_runs.orchard_id,\r\n    production_runs.cultivar_group_id,\r\n
-  \   production_runs.cultivar_id,\r\n    production_runs.product_setup_template_id,\r\n
+  \   production_runs.setup_complete,\r\n    production_runs.completed,\r\n    production_runs.lot_no_date,\r\n
+  \   production_runs.farm_id,\r\n    production_runs.puc_id,\r\n    production_runs.packhouse_resource_id,\r\n
+  \   production_runs.production_line_id,\r\n    production_runs.season_id,\r\n    production_runs.orchard_id,\r\n
+  \   production_runs.cultivar_group_id,\r\n    production_runs.cultivar_id,\r\n    production_runs.product_setup_template_id,\r\n
   \   production_runs.cloned_from_run_id,\r\n    production_runs.active,\r\n    production_runs.created_at,\r\n
   \   production_runs.updated_at,\r\n    production_runs.allocation_required,\r\n
   \   (production_runs.product_setup_template_id IS NOT NULL AND production_runs.setup_complete
@@ -538,9 +538,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  lot_no_date:
+    :name: lot_no_date
+    :sequence_no: 31
+    :caption: Lot no date
+    :namespaced_name: production_runs.lot_no_date
+    :data_type: :date
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   farm_id:
     :name: farm_id
-    :sequence_no: 31
+    :sequence_no: 32
     :caption: Farm
     :namespaced_name: production_runs.farm_id
     :data_type: :integer
@@ -556,7 +572,7 @@
     :group_max: false
   puc_id:
     :name: puc_id
-    :sequence_no: 32
+    :sequence_no: 33
     :caption: PUC
     :namespaced_name: production_runs.puc_id
     :data_type: :integer
@@ -572,7 +588,7 @@
     :group_max: false
   packhouse_resource_id:
     :name: packhouse_resource_id
-    :sequence_no: 33
+    :sequence_no: 34
     :caption: Packhouse resource
     :namespaced_name: production_runs.packhouse_resource_id
     :data_type: :integer
@@ -588,7 +604,7 @@
     :group_max: false
   production_line_id:
     :name: production_line_id
-    :sequence_no: 34
+    :sequence_no: 35
     :caption: Production line
     :namespaced_name: production_runs.production_line_id
     :data_type: :integer
@@ -604,7 +620,7 @@
     :group_max: false
   season_id:
     :name: season_id
-    :sequence_no: 35
+    :sequence_no: 36
     :caption: Season
     :namespaced_name: production_runs.season_id
     :data_type: :integer
@@ -620,7 +636,7 @@
     :group_max: false
   orchard_id:
     :name: orchard_id
-    :sequence_no: 36
+    :sequence_no: 37
     :caption: Orchard
     :namespaced_name: production_runs.orchard_id
     :data_type: :integer
@@ -636,7 +652,7 @@
     :group_max: false
   cultivar_group_id:
     :name: cultivar_group_id
-    :sequence_no: 37
+    :sequence_no: 38
     :caption: Cultivar group
     :namespaced_name: production_runs.cultivar_group_id
     :data_type: :integer
@@ -652,7 +668,7 @@
     :group_max: false
   cultivar_id:
     :name: cultivar_id
-    :sequence_no: 38
+    :sequence_no: 39
     :caption: Cultivar
     :namespaced_name: production_runs.cultivar_id
     :data_type: :integer
@@ -668,7 +684,7 @@
     :group_max: false
   product_setup_template_id:
     :name: product_setup_template_id
-    :sequence_no: 39
+    :sequence_no: 40
     :caption: Product setup template
     :namespaced_name: production_runs.product_setup_template_id
     :data_type: :integer
@@ -684,7 +700,7 @@
     :group_max: false
   cloned_from_run_id:
     :name: cloned_from_run_id
-    :sequence_no: 40
+    :sequence_no: 41
     :caption: Cloned from run
     :namespaced_name: production_runs.cloned_from_run_id
     :data_type: :integer
@@ -700,7 +716,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 41
+    :sequence_no: 42
     :caption: Active
     :namespaced_name: production_runs.active
     :data_type: :boolean
@@ -716,7 +732,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 42
+    :sequence_no: 43
     :caption: Created at
     :namespaced_name: production_runs.created_at
     :data_type: :datetime
@@ -732,7 +748,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 43
+    :sequence_no: 44
     :caption: Updated at
     :namespaced_name: production_runs.updated_at
     :data_type: :datetime
@@ -748,7 +764,7 @@
     :group_max: false
   allocation_required:
     :name: allocation_required
-    :sequence_no: 44
+    :sequence_no: 45
     :caption: Allocation required
     :namespaced_name: production_runs.allocation_required
     :data_type: :boolean
@@ -764,7 +780,7 @@
     :group_max: false
   view_allocs:
     :name: view_allocs
-    :sequence_no: 45
+    :sequence_no: 46
     :caption: View allocs
     :namespaced_name: 
     :data_type: :boolean
@@ -780,7 +796,7 @@
     :group_max: false
   pallet_ids:
     :name: pallet_ids
-    :sequence_no: 46
+    :sequence_no: 47
     :caption: Pallet ids
     :namespaced_name: 
     :data_type: :string
@@ -796,7 +812,7 @@
     :group_max: false
   has_pallets:
     :name: has_pallets
-    :sequence_no: 47
+    :sequence_no: 48
     :caption: Has pallets
     :namespaced_name: 
     :data_type: :boolean
@@ -812,7 +828,7 @@
     :group_max: false
   delivery_ids:
     :name: delivery_ids
-    :sequence_no: 48
+    :sequence_no: 49
     :caption: Delivery ids
     :namespaced_name: 
     :data_type: :string
@@ -828,7 +844,7 @@
     :group_max: false
   has_deliveries:
     :name: has_deliveries
-    :sequence_no: 49
+    :sequence_no: 50
     :caption: Has deliveries
     :namespaced_name: 
     :data_type: :boolean
@@ -844,7 +860,7 @@
     :group_max: false
   has_bins:
     :name: has_bins
-    :sequence_no: 50
+    :sequence_no: 51
     :caption: Has bins
     :namespaced_name: 
     :data_type: :boolean
@@ -860,7 +876,7 @@
     :group_max: false
   has_rebins:
     :name: has_rebins
-    :sequence_no: 51
+    :sequence_no: 52
     :caption: Has rebins
     :namespaced_name: 
     :data_type: :boolean
@@ -876,7 +892,7 @@
     :group_max: false
   has_cartons:
     :name: has_cartons
-    :sequence_no: 52
+    :sequence_no: 53
     :caption: Has cartons
     :namespaced_name: 
     :data_type: :boolean
@@ -892,7 +908,7 @@
     :group_max: false
   size_code:
     :name: size_code
-    :sequence_no: 53
+    :sequence_no: 54
     :caption: Rmt size
     :namespaced_name: rmt_sizes.size_code
     :data_type: :string
@@ -908,7 +924,7 @@
     :group_max: false
   rmt_class_code:
     :name: rmt_class_code
-    :sequence_no: 54
+    :sequence_no: 55
     :caption: Class
     :namespaced_name: rmt_classes.rmt_class_code
     :data_type: :string
@@ -924,7 +940,7 @@
     :group_max: false
   rmt_code:
     :name: rmt_code
-    :sequence_no: 55
+    :sequence_no: 56
     :caption: Rmt Code
     :namespaced_name: rmt_codes.rmt_code
     :data_type: :string
@@ -940,7 +956,7 @@
     :group_max: false
   ripeness_treatment:
     :name: ripeness_treatment
-    :sequence_no: 56
+    :sequence_no: 57
     :caption: Ripeness Treatment
     :namespaced_name: ripeness_treatments.treatment_code
     :data_type: :string
@@ -956,7 +972,7 @@
     :group_max: false
   cold_treatment:
     :name: cold_treatment
-    :sequence_no: 57
+    :sequence_no: 58
     :caption: Cold Treatment
     :namespaced_name: cold_treatments.treatment_code
     :data_type: :string
@@ -972,7 +988,7 @@
     :group_max: false
   colour_percentage:
     :name: colour_percentage
-    :sequence_no: 58
+    :sequence_no: 59
     :caption: Colour
     :namespaced_name: colour_percentages.colour_percentage
     :data_type: :string
@@ -988,7 +1004,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 59
+    :sequence_no: 60
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

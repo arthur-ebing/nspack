@@ -8,7 +8,7 @@ module Production
           ui_rule = UiRules::Compiler.new(:production_run, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page|
+          Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
@@ -48,6 +48,7 @@ module Production
                     col.add_field :season_id
                     col.add_field :cultivar_id
                     col.add_field :allow_orchard_mixing
+                    col.add_field :lot_no_date
                   end
                 end
                 form.row do |row|
@@ -77,8 +78,6 @@ module Production
               end
             end
           end
-
-          layout
         end
       end
     end
