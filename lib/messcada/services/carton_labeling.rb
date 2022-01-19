@@ -40,8 +40,8 @@ module MesscadaApp
       Date.today.strftime('%Y-%m-%d')
     end
 
-    def ogl_number
-      %(L#{Date.today.strftime('%')}-#{Date.today.strftime('%u')})
+    def current_date_time
+      Time.now.strftime('%Y-%m-%d %H:%M:%S')
     end
 
     def print_command # rubocop:disable Metrics/AbcSize
@@ -54,7 +54,7 @@ module MesscadaApp
         .gsub('$:FNC:iso_week$', iso_week)
         .gsub('$:FNC:iso_week_day$', iso_week_day)
         .gsub('$:FNC:current_date$', current_date)
-        .gsub('$:FNC:ogl_number$', ogl_number)
+        .gsub('$:FNC:current_date_time$', current_date_time)
         .gsub('$:farm_code$', farm_codes[:farm_code].to_s)
         .gsub('$:puc_code$', farm_codes[:puc_code].to_s)
         .gsub('$:orchard_code$', farm_codes[:orchard_code].to_s)

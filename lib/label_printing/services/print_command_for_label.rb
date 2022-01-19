@@ -18,7 +18,7 @@ module LabelPrintingApp
       lbl_required = fields_for_label
       field_positions = special_field_positions(lbl_required, %w[carton_label_id pick_ref pallet_number personnel_number
                                                                  farm_code puc_code orchard_code FNC:iso_day FNC:iso_week
-                                                                 FNC:iso_week_day FNC:current_date FNC:ogl_number])
+                                                                 FNC:iso_week_day FNC:current_date])
       vars = values_from(lbl_required)
       build_command_string(vars, field_positions)
     rescue Crossbeams::FrameworkError => e

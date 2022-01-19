@@ -8,7 +8,7 @@ module Production
           ui_rule = UiRules::Compiler.new(:production_run, :show, id: id)
           rules   = ui_rule.compile
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page|
+          Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form do |form|
               # form.caption 'Production Run'
@@ -21,6 +21,7 @@ module Production
                   col.add_field :cultivar_group_id
                   col.add_field :product_setup_template_id
                   col.add_field :run_batch_number
+                  col.add_field :lot_no_date
                 end
                 row.column do |col|
                   col.add_field :production_line_id
@@ -58,8 +59,6 @@ module Production
               end
             end
           end
-
-          layout
         end
       end
     end

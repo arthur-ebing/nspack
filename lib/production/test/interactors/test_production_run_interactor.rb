@@ -138,7 +138,8 @@ module ProductionApp
         active: true,
         legacy_data: {},
         legacy_bintip_criteria: {},
-        run_batch_number: 'ABC'
+        run_batch_number: 'ABC',
+        lot_no_date: '2010-01-01'
       }
     end
 
