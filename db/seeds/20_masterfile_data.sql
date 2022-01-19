@@ -112,6 +112,7 @@ INSERT INTO reworks_run_types (run_type, description) VALUES('SCRAP CARTON', 'Sc
 INSERT INTO reworks_run_types (run_type, description) VALUES('UNSCRAP CARTON', 'Unscrap Carton') ON CONFLICT DO NOTHING;
 INSERT INTO reworks_run_types (run_type, description) VALUES('WIP PALLETS', 'WIP Pallets') ON CONFLICT DO NOTHING;
 INSERT INTO reworks_run_types (run_type, description) VALUES('WIP BINS', 'WIP Bins') ON CONFLICT DO NOTHING;
+INSERT INTO reworks_run_types (run_type, description) VALUES('BULK REBIN RUN UPDATE', 'Bulk Rebin Run Update') ON CONFLICT DO NOTHING;
 
 -- LOCATION TYPES
 INSERT INTO location_types (location_type_code, short_code, hierarchical) VALUES('SITE', 'SITE', 't') ON CONFLICT DO NOTHING;

@@ -39,7 +39,8 @@ module UiRules
       @rules[:changes_made_array_count] = @rules[:array_of_changes_made] ? @form_object.changes_made_array.to_a.size : 0
       @rules[:same_pallet_list] = @form_object.pallets_selected.split("\n") == @form_object.pallets_affected.split("\n")
       @rules[:bulk_bin_run_update] = AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE == reworks_run_type_id_label
-      @rules[:bulk_production_run_update] = @rules[:bulk_pallet_run_update] || @rules[:bulk_bin_run_update]
+      @rules[:bulk_rebin_run_update] = AppConst::RUN_TYPE_BULK_REBIN_RUN_UPDATE == reworks_run_type_id_label
+      @rules[:bulk_production_run_update] = @rules[:bulk_pallet_run_update] || @rules[:bulk_bin_run_update] || @rules[:bulk_rebin_run_update]
       @rules[:bulk_weigh_bins] = AppConst::RUN_TYPE_BULK_WEIGH_BINS == reworks_run_type_id_label
       @rules[:tip_mixed_orchards] = AppConst::RUN_TYPE_TIP_MIXED_ORCHARDS == reworks_run_type_id_label
       @rules[:restore_repacked_pallet] = AppConst::RUN_TYPE_RESTORE_REPACKED_PALLET == reworks_run_type_id_label
@@ -139,7 +140,8 @@ module UiRules
       @rules[:bulk_pallet_run_update] = AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE == reworks_run_type_id_label
       @rules[:single_edit] = @rules[:single_pallet_edit] || @rules[:weigh_rmt_bins] || @rules[:single_bin_edit]
       @rules[:bulk_bin_run_update] = AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE == reworks_run_type_id_label
-      @rules[:bulk_production_run_update] = @rules[:bulk_pallet_run_update] || @rules[:bulk_bin_run_update]
+      @rules[:bulk_rebin_run_update] = AppConst::RUN_TYPE_BULK_REBIN_RUN_UPDATE == reworks_run_type_id_label
+      @rules[:bulk_production_run_update] = @rules[:bulk_pallet_run_update] || @rules[:bulk_bin_run_update] || @rules[:bulk_rebin_run_update]
       @rules[:bulk_weigh_bins] = AppConst::RUN_TYPE_BULK_WEIGH_BINS == reworks_run_type_id_label
       @rules[:untip_bins] = AppConst::RUN_TYPE_UNTIP_BINS == reworks_run_type_id_label
       @rules[:tip_mixed_orchards] = AppConst::RUN_TYPE_TIP_MIXED_ORCHARDS == reworks_run_type_id_label
@@ -222,7 +224,13 @@ module UiRules
                                  hide_on_load: @rules[:bulk_update_pallet_dates] ? false : true },
         bin_asset_number: { hide_on_load: @rules[:weigh_rmt_bins] ? false : true },
         context: { required: true,
-                   hide_on_load: @rules[:wip_run_type] ? false : true }
+                   hide_on_load: @rules[:wip_run_type] ? false : true },
+        created_at: { renderer: :input,
+                      subtype: :date,
+                      caption: 'Created Since',
+                      hide_on_load: @rules[:bulk_bin_run_update] || @rules[:bulk_rebin_run_update] ? false : true },
+        tipped: { renderer: :checkbox,
+                  hide_on_load: @rules[:bulk_rebin_run_update] ? false : true }
       }
     end
 
@@ -264,7 +272,7 @@ module UiRules
     end
 
     def text_area_caption
-      if @rules[:bin_run_type]
+      if @rules[:bin_run_type] || @rules[:bulk_bin_run_update] || @rules[:bulk_rebin_run_update]
         'Bins'
       elsif @rules[:carton_run_type]
         'Cartons'

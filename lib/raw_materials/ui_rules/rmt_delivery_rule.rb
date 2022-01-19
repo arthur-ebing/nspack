@@ -31,33 +31,20 @@ module UiRules
       form_name 'rmt_delivery'
     end
 
-    def set_show_fields # rubocop:disable Metrics/AbcSize
+    def set_show_fields
       header = @form_object.to_h
       header[:sample_bin_positions] = @form_object.sample_bins.join(',')
-      cols = %i[id delivery_tipped container_type_code farm_code tipping_complete_date_time container_material_type_code
-                puc_code received rmt_owner orchard_code bin_scan_mode sample_bins_weighed
-                cultivar_code keep_open sample_weights_extrapolated_at season_code sample_bin_positions current
-                reference_number rmt_variant_code batch_number date_delivered regime_code batch_number_updated_at
-                date_picked rmt_code delivery_destination_code quantity_bins_with_fruit qty_damaged_bins qty_empty_bins
-                qty_partial_bins truck_registration_number farm_section active]
+      col3 = %i[rmt_variant_code regime_code rmt_code]
       @form_object.rmt_classifications.to_a.each do |c|
         type = MasterfilesApp::AdvancedClassificationsRepo.new.find_rmt_classification_type_by_classification(c)
         label = type.to_sym
-        cols << label
+        col3 << label
         header[label] = @repo.get_value(:rmt_classifications, :rmt_classification, id: c)
       end
-      cols.delete(:farm_section) if @form_object.farm_section.nil_or_empty?
-      unless AppConst::CR_RMT.all_delivery_bins_of_same_type?
-        cols.delete(:container_type_code)
-        cols.delete(:rmt_owner)
-        cols.delete(:container_material_type_code)
-      end
-      cols.delete(:truck_registration_number) unless AppConst::DELIVERY_CAPTURE_TRUCK_AT_FRUIT_RECEPTION
-      cols.delete(:qty_damaged_bins) unless AppConst::DELIVERY_CAPTURE_DAMAGED_BINS
-      cols.delete(:qty_empty_bins) unless AppConst::DELIVERY_CAPTURE_EMPTY_BINS
-      rules[:compact_header] = compact_header(columns: cols,
+      rules[:compact_header] = compact_header(columns: resolve_delivery_show_columns(col3),
                                               display_columns: 3, with_object: header,
                                               header_captions: {
+                                                id: 'Delivery ID',
                                                 rmt_owner: 'Container Material Owner'
                                               })
     end
@@ -389,6 +376,28 @@ module UiRules
         @qc_repo.sample_test_summaries(sample_id).each { |s| items << s }
       end
       rules["qc_summary_#{sample_type}".to_sym] = items
+    end
+
+    def resolve_delivery_show_columns(col3)
+      col1 = %i[id farm_code puc_code orchard_code cultivar_code reference_number delivery_destination_code
+                quantity_bins_with_fruit qty_partial_bins sample_bin_positions]
+
+      col2 = %i[date_delivered date_picked sample_weights_extrapolated_at tipping_complete_date_time
+                received delivery_tipped keep_open sample_bins_weighed bin_scan_mode truck_registration_number]
+      col2.delete(:truck_registration_number) unless AppConst::DELIVERY_CAPTURE_TRUCK_AT_FRUIT_RECEPTION
+
+      arr = %i[container_type_code container_material_type_code rmt_owner season_code qty_damaged_bins qty_empty_bins farm_section]
+      col3.push(*arr)
+      col3.delete(:farm_section) if @form_object.farm_section.nil_or_empty?
+      unless AppConst::CR_RMT.all_delivery_bins_of_same_type?
+        col3.delete(:container_type_code)
+        col3.delete(:rmt_owner)
+        col3.delete(:container_material_type_code)
+      end
+      col3.delete(:qty_damaged_bins) unless AppConst::DELIVERY_CAPTURE_DAMAGED_BINS
+      col3.delete(:qty_empty_bins) unless AppConst::DELIVERY_CAPTURE_EMPTY_BINS
+
+      [col1, col2, col3]
     end
   end
 end

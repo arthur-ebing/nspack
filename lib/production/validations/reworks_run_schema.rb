@@ -132,6 +132,8 @@ module ProductionApp
     required(:to_production_run_id).filled(:integer)
     optional(:make_changes).maybe(:bool)
     optional(:allow_cultivar_group_mixing).maybe(:bool)
+    optional(:created_at).maybe(:date)
+    optional(:tipped).maybe(:bool)
   end
 
   ReworksBulkWeighBinsSchema = Dry::Schema.Params do
@@ -221,6 +223,8 @@ module ProductionApp
     required(:rmt_container_material_type_id).maybe(:integer)
     required(:rmt_material_owner_party_role_id).maybe(:integer)
     optional(:legacy_data).maybe(:hash)
+    optional(:created_at).maybe(:date)
+    optional(:tipped).maybe(:bool)
   end
 
   class ReworksWeighRmtBinsContract < Dry::Validation::Contract

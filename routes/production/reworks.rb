@@ -456,7 +456,7 @@ class Nspack < Roda
           r.post do
             res = interactor.create_reworks_run(id, params[:reworks_run])
             run_type = ProductionApp::ReworksRepo.new.find_reworks_run_type(id)[:run_type]
-            bulk_production_run_update = (run_type == AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE) || (run_type == AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE)
+            bulk_production_run_update = (run_type == AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE) || (run_type == AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE) || (run_type == AppConst::RUN_TYPE_BULK_REBIN_RUN_UPDATE)
             if res.success
               if res.instance[:make_changes]
                 store_locally(:reworks_run_params, res.instance)
