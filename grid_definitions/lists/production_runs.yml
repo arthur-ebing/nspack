@@ -90,7 +90,7 @@
 - :url: "/production/runs/production_runs/$:id$/allocate_setups"
   :text: view allocated product setups
   :icon: list
-  :hide_if_false: view_allocs
+  :hide_if_false: view_allocs,allocation_required
 - :url: "/production/runs/production_runs/$:id$/view_setups"
   :text: view setups
   :icon: list
