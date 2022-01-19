@@ -529,7 +529,10 @@ module ProductionApp
 
       reworks_run_type = reworks_run_type(reworks_run_type_id)
       rmt_bins = case reworks_run_type
-                 when AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE, AppConst::RUN_TYPE_UNTIP_BINS, AppConst::RUN_TYPE_CHANGE_BIN_DELIVERY
+                 when AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE,
+                      AppConst::RUN_TYPE_BULK_REBIN_RUN_UPDATE,
+                      AppConst::RUN_TYPE_UNTIP_BINS,
+                      AppConst::RUN_TYPE_CHANGE_BIN_DELIVERY
                    selected_bins(multiselect_list)
                  else
                    selected_rmt_bins(multiselect_list)
@@ -585,12 +588,12 @@ module ProductionApp
       case reworks_run_type
       when AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE
         resolve_pallet_numbers_from_multiselect(reworks_run_type_id, multiselect_list)
-      when AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE
+      when AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE, AppConst::RUN_TYPE_BULK_REBIN_RUN_UPDATE
         resolve_rmt_bins_from_multiselect(reworks_run_type_id, multiselect_list)
       end
     end
 
-    def resolve_update_selected_input(reworks_run_type, attrs) # rubocop:disable Metrics/AbcSize
+    def resolve_update_selected_input(reworks_run_type, attrs) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       change_descriptions = {}
       case reworks_run_type
       when AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE
@@ -601,11 +604,23 @@ module ProductionApp
         change_descriptions = { before: production_run_details(attrs[:from_production_run_id]).sort.to_h,
                                 after: production_run_details(attrs[:to_production_run_id]).sort.to_h }
         repo.update_pallet_sequence(children, after_attrs)
+        children.each do |id|
+          repo.update_carton_labels_for_pallet_sequence(id, after_attrs) if repo.individual_cartons?(id)
+        end
       when AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE
         message = "#{AppConst::REWORKS_ACTION_BULK_BIN_RUN_UPDATE} was successful"
         children = attrs[:pallets_selected]
         before_attrs = { production_run_tipped_id: attrs[:from_production_run_id] }
         after_attrs = { production_run_tipped_id: attrs[:to_production_run_id] }
+        res = move_bin(attrs[:to_production_run_id], children)
+        return res unless res.success
+
+        repo.update_rmt_bin(children, after_attrs)
+      when AppConst::RUN_TYPE_BULK_REBIN_RUN_UPDATE
+        message = "#{AppConst::REWORKS_ACTION_BULK_REBIN_RUN_UPDATE} was successful"
+        children = attrs[:pallets_selected]
+        before_attrs = { production_run_rebin_id: attrs[:from_production_run_id] }
+        after_attrs = { production_run_rebin_id: attrs[:to_production_run_id] }
         res = move_bin(attrs[:to_production_run_id], children)
         return res unless res.success
 
@@ -642,6 +657,8 @@ module ProductionApp
         children.each do |sequence_id|
           sequence = pallet_sequence(sequence_id)
           log_reworks_runs_status_and_transaction(reworks_run_id, sequence[:pallet_id], sequence_id, AppConst::REWORKS_ACTION_BULK_PALLET_RUN_UPDATE)
+          carton_label_ids = repo.select_values(:cartons, :carton_label_id, pallet_sequence_id: sequence_id)
+          log_multiple_statuses(:carton_labels, carton_label_ids, AppConst::REWORKS_ACTION_BULK_PALLET_RUN_UPDATE)
         end
       when AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE
         log_multiple_statuses(:rmt_bins, children, AppConst::REWORKS_ACTION_BULK_BIN_RUN_UPDATE)
@@ -669,6 +686,11 @@ module ProductionApp
       return validation_failed_response(res) unless res.success
 
       params[:pallets_selected] = res.instance[:pallet_numbers]
+      if [AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE, AppConst::RUN_TYPE_BULK_REBIN_RUN_UPDATE].include?(reworks_run_type)
+        params[:created_at] =  res.instance[:created_at]
+        params[:tipped] =  res.instance[:tipped]
+      end
+
       res = validate_reworks_permissions(reworks_run_type, params[:pallets_selected])
       return validation_failed_response(res) unless res.success
 
@@ -743,7 +765,8 @@ module ProductionApp
          AppConst::RUN_TYPE_BATCH_PALLET_EDIT
         'edit_pallet'
       when AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE,
-          AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE
+          AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE,
+        AppConst::RUN_TYPE_BULK_REBIN_RUN_UPDATE
         'edit_bulk_production_run'
       end
     end
@@ -1771,6 +1794,8 @@ module ProductionApp
         message = "Changes to #{AppConst::REWORKS_ACTION_BULK_PALLET_RUN_UPDATE} has been discarded"
       when AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE
         message = "Changes to #{AppConst::REWORKS_ACTION_BULK_BIN_RUN_UPDATE} has been discarded"
+      when AppConst::RUN_TYPE_BULK_REBIN_RUN_UPDATE
+        message = "Changes to #{AppConst::REWORKS_ACTION_BULK_REBIN_RUN_UPDATE} has been discarded"
       end
       success_response('ok', message)
     end
@@ -2249,12 +2274,16 @@ module ProductionApp
 
       if AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE == reworks_run_type
         res = validate_pallet_numbers(reworks_run_type, params[:pallets_selected], from_production_run_id)
-      elsif AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE == reworks_run_type
+      elsif (AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE == reworks_run_type) || (AppConst::RUN_TYPE_BULK_REBIN_RUN_UPDATE == reworks_run_type)
         res = validate_rmt_bins(reworks_run_type, params[:pallets_selected], from_production_run_id)
       end
       return OpenStruct.new(success: false,  messages: res.messages, pallets_selected: pallets_selected.split(',')) unless res.success
 
       attrs = { from_production_run_id: from_production_run_id, to_production_run_id: to_production_run_id, pallet_numbers: res.instance[:pallet_numbers] }
+      if [AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE, AppConst::RUN_TYPE_BULK_REBIN_RUN_UPDATE].include?(reworks_run_type)
+        attrs[:created_at] = params[:created_at]
+        attrs[:tipped] = params[:tipped] == 't'
+      end
       OpenStruct.new(success: true, instance:  attrs)
     end
 
@@ -2289,7 +2318,8 @@ module ProductionApp
            AppConst::RUN_TYPE_TIP_MIXED_ORCHARDS
         ReworksRunTipBinsSchema.call(params)
       when AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE,
-           AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE
+           AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE,
+        AppConst::RUN_TYPE_BULK_REBIN_RUN_UPDATE
         ReworksRunBulkProductionRunUpdateSchema.call(params)
       when AppConst::RUN_TYPE_BULK_WEIGH_BINS
         ReworksBulkWeighBinsSchema.call(params)

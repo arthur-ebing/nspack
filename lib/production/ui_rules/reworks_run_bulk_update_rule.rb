@@ -17,7 +17,8 @@ module UiRules
       reworks_run_type_id_label = @repo.find_hash(:reworks_run_types, @form_object.reworks_run_type_id)[:run_type]
       @rules[:bulk_pallet_run_update] = AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE == reworks_run_type_id_label
       @rules[:bulk_bin_run_update] = AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE == reworks_run_type_id_label
-      @rules[:bulk_production_run_update] = @rules[:bulk_pallet_run_update] || @rules[:bulk_bin_run_update]
+      @rules[:bulk_rebin_run_update] = AppConst::RUN_TYPE_BULK_REBIN_RUN_UPDATE == reworks_run_type_id_label
+      @rules[:bulk_production_run_update] = @rules[:bulk_pallet_run_update] || @rules[:bulk_bin_run_update] || @rules[:bulk_rebin_run_update]
 
       fields[:reworks_run_type_id] = { renderer: :hidden }
       fields[:reworks_run_type] = { renderer: :label,
@@ -26,6 +27,8 @@ module UiRules
       fields[:pallets_selected] = { renderer: :hidden }
       fields[:from_production_run_id] = { renderer: :hidden }
       fields[:to_production_run_id] = { renderer: :hidden }
+      fields[:created_at] = { renderer: :hidden }
+      fields[:tipped] = { renderer: :hidden }
 
       fields[:changes_made] = {
         left_caption: 'Before',
@@ -39,6 +42,8 @@ module UiRules
       @form_object = OpenStruct.new(reworks_run_type_id: @options[:id],
                                     from_production_run_id: @options[:attrs][:from_production_run_id],
                                     to_production_run_id: @options[:attrs][:to_production_run_id],
+                                    created_at: @options[:attrs][:created_at],
+                                    tipped: @options[:attrs][:tipped],
                                     pallets_selected: @options[:attrs][:pallets_selected],
                                     params: @options[:attrs])
     end

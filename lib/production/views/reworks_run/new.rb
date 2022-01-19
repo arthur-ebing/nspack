@@ -93,6 +93,8 @@ module Production
                 row.column do |col|
                   col.add_field :from_production_run_id
                   col.add_field :to_production_run_id
+                  col.add_field :created_at
+                  col.add_field :tipped
                 end
                 row.blank_column
               end

@@ -2018,4 +2018,22 @@
   :default_value: 
   :ordered_list: false
   :ui_priority: 1
-  :list_def: 
+  :list_def:
+- :column: created_at
+  :caption: Crated At
+  :data_type: :datetime
+  :control_type: :daterange
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+- :column: is_rebin
+  :caption: Rebin?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+    - true
+    - false
