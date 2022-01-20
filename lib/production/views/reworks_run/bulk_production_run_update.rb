@@ -56,13 +56,13 @@ module Production
               end
             end
             page.section do |section|
-              section.add_notice 'The following production run details have changed', inline_caption: true
+              section.add_notice "Run details for #{caption} will change as shown below", inline_caption: true
               section.add_diff :changes_made
             end
             page.section do |section|
               section.row do |row|
                 row.column do |col|
-                  col.add_notice "Select #{caption} for update from the grid below", inline_caption: true
+                  col.add_notice "Select #{caption} for update from the grid below", inline_caption: true, show_caption: false
                   col.add_control(control_type: :link,
                                   text: 'Cancel',
                                   url: "/production/reworks/reworks_run_types/#{id}/reject_bulk_production_run_update",

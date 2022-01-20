@@ -31,8 +31,8 @@ module UiRules
       fields[:tipped] = { renderer: :hidden }
 
       fields[:changes_made] = {
-        left_caption: 'Before',
-        right_caption: 'After',
+        left_caption: "From run #{@form_object.from_production_run_id}",
+        right_caption: "To run #{@form_object.to_production_run_id}",
         left_record: production_run(@form_object.from_production_run_id).sort.to_h,
         right_record: production_run(@form_object.to_production_run_id).sort.to_h
       }
