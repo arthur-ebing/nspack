@@ -22,7 +22,7 @@ module EdiApp
       if result.empty?
         ok_response
       else
-        failed_response('missing headers', result)
+        failed_response("missing headers - #{result.join(', ')}", result)
       end
     end
 

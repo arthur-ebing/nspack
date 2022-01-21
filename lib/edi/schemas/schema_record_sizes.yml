@@ -31,6 +31,8 @@ NSGTIN:
   CSV: true
 NSLI:
   XML: true
+NSRUN:
+  CSV: true
 UISTK:
   CSV: true
 PALBIN:

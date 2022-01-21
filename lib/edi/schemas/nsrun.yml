@@ -1,0 +1,40 @@
+---
+:run_batch_number: :string
+:packhouse_code: :string
+:line_code: :string
+:farm_code: :string
+:puc_code: :string
+:season_code: :string
+:orchard_code: :string
+:cultivar_group_code: :string
+:cultivar_code: :string           # (OPT)
+:lot_no_date: :string
+:marketing_variety: :string
+:std_fruit_size_count: :integer   # std count (OPT - commodity says "required" - if true, std + actual required otherwise just size ref)
+:basic_pack_code: :string         # (OPT but validate if basic != std)
+:standard_pack_code: :string
+:actual_count: :integer
+:fruit_size_reference: :string    # (OPT, but must be there if commod says not required)
+:marketing_org_code: :string
+:packed_tm_group: :string
+:mark_code: :string
+:inventory_code: :string
+:grade_code: :string
+:target_market_code: :string
+:gtin_code: :string
+:pallet_base: :string
+:pallet_stack_type: :string
+:cartons_per_pallet: :integer
+:client_size_reference: :string   # (OPT)
+:client_product_code: :string     # (OPT)
+:treatment_ids: :string           # (OPT - pass ids, not codes & validate)
+:marketing_order_number: :string  # (OPT)
+:sell_by_code: :string            # (OPT)
+:product_chars: :string           # (OPT)
+:rmt_class_code: :string          # (OPT)
+:target_customer_code: :string    # (OPT)
+:colour_percentage_code: :string  # (OPT)
+:carton_label_template: :string   # (OPT)
+:rebin: :string                   # (OPT, default false)
+:rmt_code: :string                # (OPT)
+:rmt_size_code: :string           # (OPT)

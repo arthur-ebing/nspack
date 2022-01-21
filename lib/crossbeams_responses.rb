@@ -135,11 +135,8 @@ module Crossbeams
     # @return [String] the formatted message.
     def unwrap_failed_response(res)
       if res.errors.empty?
-        puts 'noer'
-        p res
         res.message
       else
-        p res.errors
         "#{res.message} - #{unwrap_error_set(res.errors)}"
       end
     end
