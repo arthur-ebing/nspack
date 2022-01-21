@@ -124,6 +124,8 @@ module UiRules
       requires_standard_counts = commodity.requires_standard_counts
       default_mkting_org_id = @form_object[:marketing_org_party_role_id].nil_or_empty? ? MasterfilesApp::PartyRepo.new.find_party_role_from_party_name_for_role(AppConst::CR_PROD.default_marketing_org, AppConst::ROLE_MARKETER) : @form_object[:marketing_org_party_role_id]
       default_pm_type_id = @form_object[:pm_type_id].nil_or_empty? ? MasterfilesApp::BomRepo.new.find_pm_type(DB[:pm_types].where(pm_type_code: AppConst::DEFAULT_FG_PACKAGING_TYPE).select_map(:id))&.id : @form_object[:pm_type_id]
+      fields[:id] =  { renderer: :hidden }
+      fields[:pallet_id] =  { renderer: :hidden }
       fields[:pallet_number] =  { renderer: :label,
                                   with_value: @form_object[:pallet_number],
                                   caption: 'Pallet Number',

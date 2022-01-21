@@ -258,6 +258,8 @@ module ProductionApp
   end
 
   class SequenceSetupDataContract < Dry::Validation::Contract
+    option :has_individual_cartons
+
     params do
       optional(:id).filled(:integer)
       required(:marketing_variety_id).filled(:integer)
@@ -306,6 +308,10 @@ module ProductionApp
 
     rule(:pm_mark_id) do
       key.failure 'must be filled' if values[:pm_mark_id].nil_or_empty? && AppConst::CR_PROD.use_packing_specifications?
+    end
+
+    rule(:pm_bom_id) do
+      key.failure 'must be filled' if values[:pm_bom_id].nil_or_empty? && has_individual_cartons && AppConst::CR_PROD.use_packing_specifications?
     end
   end
 end

@@ -1009,7 +1009,9 @@ module ProductionApp
       end
 
       params[:fruit_actual_counts_for_pack_id] = find_fruit_actual_counts_for_pack_id(params[:basic_pack_code_id].to_i, params[:std_fruit_size_count_id].to_i)
-      res = SequenceSetupDataContract.new.call(params)
+      has_individual_cartons = repo.get(:pallets, :has_individual_cartons, params[:pallet_id])
+      contract = SequenceSetupDataContract.new(has_individual_cartons: has_individual_cartons)
+      res = contract.call(params)
       return validation_failed_response(res) if res.failure?
 
       rejected_fields = %i[id product_setup_template_id pallet_label_name]
