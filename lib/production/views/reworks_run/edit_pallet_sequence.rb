@@ -26,6 +26,8 @@ module Production
                 row.column do |col|
                   col.add_field :pallet_number
                   col.add_field :pallet_sequence_number
+                  col.add_field :id
+                  col.add_field :pallet_id
                 end
               end
               form.row do |row|
