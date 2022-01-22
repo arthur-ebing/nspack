@@ -39,6 +39,7 @@ module ProductionApp
     attribute :rmt_size_id, Types::Integer
     attribute :rmt_class_id, Types::Integer
     attribute :run_batch_number, Types::String
+    attribute :lot_no_date, Types::Date
 
     def next_stage
       if tipping && labeling

@@ -139,7 +139,7 @@ module ProductionApp
         legacy_data: {},
         legacy_bintip_criteria: {},
         run_batch_number: 'ABC',
-        lot_no_date: '2010-01-01'
+        lot_no_date: Date.today
       }
     end
 

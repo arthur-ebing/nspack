@@ -39,7 +39,7 @@ module ProductionApp
         legacy_bintip_criteria: nil,
         legacy_data: nil,
         run_batch_number: Faker::Lorem.word,
-        lot_no_date: '2010-01-01'
+        lot_no_date: Date.today
       }
       DB[:production_runs].insert(default.merge(opts))
     end

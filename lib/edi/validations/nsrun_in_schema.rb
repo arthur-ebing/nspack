@@ -31,8 +31,8 @@ module EdiApp
       required(:mark_code).filled(Types::StrippedString)
       required(:inventory_code).filled(Types::StrippedString)
       required(:grade_code).filled(Types::StrippedString)
-      required(:target_market_code).filled(Types::StrippedString)
-      required(:gtin_code).filled(Types::StrippedString)
+      required(:target_market_code).maybe(Types::StrippedString)
+      required(:gtin_code).maybe(Types::StrippedString)
       required(:pallet_base).filled(Types::StrippedString)
       required(:pallet_stack_type).filled(Types::StrippedString)
       required(:cartons_per_pallet).filled(:integer)
@@ -47,8 +47,6 @@ module EdiApp
       required(:colour_percentage_code).maybe(Types::StrippedString)
       required(:carton_label_template).maybe(Types::StrippedString)
       required(:rebin).maybe(Types::StrippedString)
-      required(:rmt_code).maybe(Types::StrippedString)
-      required(:rmt_size_code).maybe(Types::StrippedString)
     end
 
     rule(:basic_pack_code) do

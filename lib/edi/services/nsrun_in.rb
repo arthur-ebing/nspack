@@ -4,10 +4,6 @@ module EdiApp
   class NsrunIn < BaseEdiInService
     attr_reader :user, :repo, :party_repo, :edi_in_repo, :payload
 
-    # def initialize(edi_in_transaction_id, file_path, logger, edi_in_result)
-    #   super(edi_in_transaction_id, file_path, logger, edi_in_result)
-    # end
-
     def call
       return success_response('Nothing to do - no input') if @edi_records.empty?
 
@@ -15,7 +11,12 @@ module EdiApp
       prepare_header
       prepare_items
 
-      ProductionRunImport.call(payload)
+      res = ProductionRunImport.call(payload)
+      if res.success
+        res
+      else
+        failed_response(unwrap_failed_response(res))
+      end
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -32,7 +33,7 @@ module EdiApp
     def header_values_from(rec)
       keys = %i[run_batch_number farm_code puc_code packhouse_code line_code
                 season_code orchard_code lot_no_date cultivar_group_code cultivar_code
-                cold_treatment_code ripeness_treatment_code rmt_code_code rmt_size_code]
+                cold_treatment_code ripeness_treatment_code rmt_code rmt_size_code]
       rec.slice(*keys)
     end
 
