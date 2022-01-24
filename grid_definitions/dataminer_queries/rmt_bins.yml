@@ -201,7 +201,7 @@
     :caption: Sequences
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -214,10 +214,10 @@
   sequence_farms:
     :name: sequence_farms
     :sequence_no: 11
-    :caption: Sequence farms
+    :caption: Sequence Farms
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -230,10 +230,10 @@
   sequence_orchards:
     :name: sequence_orchards
     :sequence_no: 12
-    :caption: Sequence orchards
+    :caption: Sequence Orchards
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -246,10 +246,10 @@
   sequence_weights:
     :name: sequence_weights
     :sequence_no: 13
-    :caption: Sequence weights
+    :caption: Sequence Weights
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -390,14 +390,14 @@
   staged_for_presorting:
     :name: staged_for_presorting
     :sequence_no: 22
-    :caption: Staged for presorting
+    :caption: Staged?
     :namespaced_name: staged_for_presorting
-    :data_type: :string
+    :data_type: :boolean
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -408,9 +408,9 @@
     :sequence_no: 23
     :caption: Staged for presorting at
     :namespaced_name: staged_for_presorting_at
-    :data_type: :string
+    :data_type: :datetime
     :width: 
-    :format: 
+    :format: :datetime_with_secs
     :hide: false
     :pinned: 
     :groupable: false
@@ -424,7 +424,7 @@
     :sequence_no: 24
     :caption: Presort staging run child
     :namespaced_name: presort_staging_run_child_id
-    :data_type: :string
+    :data_type: :integer
     :width: 
     :format: 
     :hide: false
@@ -518,11 +518,11 @@
   tipped_in_presort_at:
     :name: tipped_in_presort_at
     :sequence_no: 30
-    :caption: Tipped in presort at
+    :caption: Tipped In Presort At
     :namespaced_name: tipped_in_presort_at
-    :data_type: :string
+    :data_type: :datetime
     :width: 
-    :format: 
+    :format: :datetime_with_secs
     :hide: false
     :pinned: 
     :groupable: false
@@ -1513,7 +1513,7 @@
     :caption: Colour percentage
     :namespaced_name: colour_percentage
     :data_type: :string
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -1529,7 +1529,7 @@
     :caption: Rmt code
     :namespaced_name: rmt_code
     :data_type: :string
-    :width: 80
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -1577,7 +1577,7 @@
     :caption: Last coldroom event
     :namespaced_name: last_coldroom_event
     :data_type: :string
-    :width: 120
+    :width: 400
     :format: 
     :hide: false
     :pinned: 
@@ -2037,3 +2037,35 @@
   :list_def:
     - true
     - false
+- :column: staged_for_presorting
+  :caption: Staged?
+  :data_type: :boolean
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: tipped_in_presort_at
+  :caption: Tipped In Presort At
+  :data_type: :datetime
+  :control_type: :daterange
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: shipped_asset_number
+  :caption: Shipped asset number
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: tipped_asset_number
+  :caption: Tipped asset number
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
