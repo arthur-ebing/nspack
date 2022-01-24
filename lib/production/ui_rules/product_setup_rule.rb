@@ -306,7 +306,11 @@ module UiRules
                                 required: true,
                                 prompt: 'Select Pallet Stack Type',
                                 remove_search_for_small_list: false },
-        pallet_format_id: { renderer: :select, options: MasterfilesApp::PackagingRepo.new.for_select_pallet_formats,
+        pallet_format_id: { renderer: :select, options: MasterfilesApp::PackagingRepo.new.for_select_pallet_formats(where:
+                                                                                                          {
+                                                                                                            pallet_base_id: @form_object.pallet_base_id,
+                                                                                                            pallet_stack_type_id: @form_object.pallet_stack_type_id
+                                                                                                          }),
                             disabled_options: MasterfilesApp::PackagingRepo.new.for_select_inactive_pallet_formats,
                             caption: 'Pallet Format',
                             required: true,
@@ -320,7 +324,11 @@ module UiRules
                              prompt: 'Select Pallet Label Name',
                              remove_search_for_small_list: false },
         cartons_per_pallet_id: { renderer: :select,
-                                 options: MasterfilesApp::PackagingRepo.new.for_select_cartons_per_pallet,
+                                 options: MasterfilesApp::PackagingRepo.new.for_select_cartons_per_pallet(where:
+                                                                                                          {
+                                                                                                            pallet_format_id: @form_object.pallet_format_id,
+                                                                                                            basic_pack_id: @form_object.basic_pack_code_id
+                                                                                                          }),
                                  disabled_options: MasterfilesApp::PackagingRepo.new.for_select_inactive_cartons_per_pallet,
                                  caption: 'Cartons per Pallet',
                                  required: true,
@@ -402,6 +410,9 @@ module UiRules
                                              param_keys: %i[product_setup_marketing_variety_id] }]
         # behaviour.dropdown_change :target_market_id,
         #                           notify: [{ url: '/production/product_setups/product_setups/target_market_changed' }]
+        behaviour.dropdown_change :pallet_base_id,
+                                  notify: [{ url: '/production/product_setups/product_setups/pallet_base_changed',
+                                             param_keys: %i[product_setup_pallet_stack_type_id] }]
         behaviour.dropdown_change :pallet_stack_type_id,
                                   notify: [{ url: '/production/product_setups/product_setups/pallet_stack_type_changed',
                                              param_keys: %i[product_setup_pallet_base_id] }]

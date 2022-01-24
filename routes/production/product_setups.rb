@@ -409,6 +409,19 @@ class Nspack < Roda
                                      options_array: customer_varieties)])
       end
 
+      r.on 'pallet_base_changed' do
+        pallet_stack_type_id = params[:product_setup_pallet_stack_type_id]
+        if pallet_stack_type_id.blank? || params[:changed_value].blank?
+          pallet_formats = []
+        else
+          pallet_base_id = params[:changed_value]
+          pallet_formats = interactor.for_select_pallet_formats(pallet_base_id, pallet_stack_type_id)
+        end
+        json_actions([OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'product_setup_pallet_format_id',
+                                     options_array: pallet_formats)])
+      end
+
       r.on 'pallet_stack_type_changed' do
         pallet_base_id = params[:product_setup_pallet_base_id]
         if pallet_base_id.blank? || params[:changed_value].blank?
