@@ -1,0 +1,278 @@
+---
+:caption: QA Standards
+:sql: SELECT "qa_standards"."id", "qa_standards"."qa_standard_name", "qa_standards"."description",
+  "qa_standards"."season_id", "qa_standards"."qa_standard_type_id", "qa_standards"."target_market_ids",
+  "qa_standards"."packed_tm_group_ids", "qa_standards"."internal_standard", "qa_standards"."applies_to_all_markets",
+  "qa_standards"."active", "qa_standards"."created_at", "qa_standards"."updated_at",
+  "qa_standard_types"."qa_standard_type_code", "seasons"."season_code", fn_current_status('qa_standards',
+  "qa_standards"."id") AS status FROM "qa_standards" JOIN "qa_standard_types" ON "qa_standard_types"."id"
+  = "qa_standards"."qa_standard_type_id" JOIN "seasons" ON "seasons"."id" = "qa_standards"."season_id"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: qa_standards.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  qa_standard_name:
+    :name: qa_standard_name
+    :sequence_no: 2
+    :caption: Qa standard name
+    :namespaced_name: qa_standards.qa_standard_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  description:
+    :name: description
+    :sequence_no: 3
+    :caption: Description
+    :namespaced_name: qa_standards.description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  season_id:
+    :name: season_id
+    :sequence_no: 4
+    :caption: Season
+    :namespaced_name: qa_standards.season_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  qa_standard_type_id:
+    :name: qa_standard_type_id
+    :sequence_no: 5
+    :caption: Qa standard type
+    :namespaced_name: qa_standards.qa_standard_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  target_market_ids:
+    :name: target_market_ids
+    :sequence_no: 6
+    :caption: Target market ids
+    :namespaced_name: qa_standards.target_market_ids
+    :data_type: :integer_array
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packed_tm_group_ids:
+    :name: packed_tm_group_ids
+    :sequence_no: 7
+    :caption: Packed tm group ids
+    :namespaced_name: qa_standards.packed_tm_group_ids
+    :data_type: :integer_array
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  internal_standard:
+    :name: internal_standard
+    :sequence_no: 8
+    :caption: Internal standard
+    :namespaced_name: qa_standards.internal_standard
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  applies_to_all_markets:
+    :name: applies_to_all_markets
+    :sequence_no: 9
+    :caption: Applies to all markets
+    :namespaced_name: qa_standards.applies_to_all_markets
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 10
+    :caption: Active
+    :namespaced_name: qa_standards.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 11
+    :caption: Created at
+    :namespaced_name: qa_standards.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 12
+    :caption: Updated at
+    :namespaced_name: qa_standards.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  qa_standard_type_code:
+    :name: qa_standard_type_code
+    :sequence_no: 13
+    :caption: Qa standard type code
+    :namespaced_name: qa_standard_types.qa_standard_type_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  season_code:
+    :name: season_code
+    :sequence_no: 14
+    :caption: Season code
+    :namespaced_name: seasons.season_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 15
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: qa_standards.qa_standard_name
+  :caption: Qa standard name
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: qa_standards.season_id
+  :caption: Season
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT season_code, id FROM seasons ORDER BY season_code
+- :column: qa_standards.qa_standard_type_id
+  :caption: Qa standard type
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT qa_standard_type_code, id FROM qa_standard_types ORDER BY qa_standard_type_code

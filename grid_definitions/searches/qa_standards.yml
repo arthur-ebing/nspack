@@ -1,0 +1,24 @@
+---
+:dataminer_definition: qa_standards
+:actions:
+- :url: "/masterfiles/quality/qa_standards/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/masterfiles/quality/qa_standards/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/quality/qa_standards/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/quality/qa_standards/new"
+  :text: New QA Standard
+  :style: :button
+  :behaviour: :popup

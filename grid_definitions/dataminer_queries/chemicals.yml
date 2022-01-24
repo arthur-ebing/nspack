@@ -1,0 +1,212 @@
+---
+:caption: Chemicals
+:sql: SELECT "chemicals"."id", "chemicals"."chemical_name", "chemicals"."description",
+  "chemicals"."eu_max_level", "chemicals"."arfd_max_level", "chemicals"."orchard_chemical",
+  "chemicals"."drench_chemical", "chemicals"."packline_chemical", "chemicals"."active",
+  "chemicals"."created_at", "chemicals"."updated_at", fn_current_status('chemicals',
+  "chemicals"."id") AS status FROM "chemicals"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: chemicals.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  chemical_name:
+    :name: chemical_name
+    :sequence_no: 2
+    :caption: Chemical name
+    :namespaced_name: chemicals.chemical_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  description:
+    :name: description
+    :sequence_no: 3
+    :caption: Description
+    :namespaced_name: chemicals.description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  eu_max_level:
+    :name: eu_max_level
+    :sequence_no: 4
+    :caption: Eu max level
+    :namespaced_name: chemicals.eu_max_level
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  arfd_max_level:
+    :name: arfd_max_level
+    :sequence_no: 5
+    :caption: Arfd max level
+    :namespaced_name: chemicals.arfd_max_level
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  orchard_chemical:
+    :name: orchard_chemical
+    :sequence_no: 6
+    :caption: Orchard chemical
+    :namespaced_name: chemicals.orchard_chemical
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  drench_chemical:
+    :name: drench_chemical
+    :sequence_no: 7
+    :caption: Drench chemical
+    :namespaced_name: chemicals.drench_chemical
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packline_chemical:
+    :name: packline_chemical
+    :sequence_no: 8
+    :caption: Packline chemical
+    :namespaced_name: chemicals.packline_chemical
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 9
+    :caption: Active
+    :namespaced_name: chemicals.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 10
+    :caption: Created at
+    :namespaced_name: chemicals.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 11
+    :caption: Updated at
+    :namespaced_name: chemicals.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 12
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: chemicals.chemical_name
+  :caption: Chemical name
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

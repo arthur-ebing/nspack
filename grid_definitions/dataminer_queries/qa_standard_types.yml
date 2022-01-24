@@ -1,0 +1,131 @@
+---
+:caption: QA Standard Types
+:sql: SELECT "qa_standard_types"."id", "qa_standard_types"."qa_standard_type_code",
+  "qa_standard_types"."description", "qa_standard_types"."active", "qa_standard_types"."created_at",
+  "qa_standard_types"."updated_at", fn_current_status('qa_standard_types', "qa_standard_types"."id")
+  AS status FROM "qa_standard_types"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: qa_standard_types.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  qa_standard_type_code:
+    :name: qa_standard_type_code
+    :sequence_no: 2
+    :caption: Qa standard type code
+    :namespaced_name: qa_standard_types.qa_standard_type_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  description:
+    :name: description
+    :sequence_no: 3
+    :caption: Description
+    :namespaced_name: qa_standard_types.description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 4
+    :caption: Active
+    :namespaced_name: qa_standard_types.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 5
+    :caption: Created at
+    :namespaced_name: qa_standard_types.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 6
+    :caption: Updated at
+    :namespaced_name: qa_standard_types.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 7
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: qa_standard_types.qa_standard_type_code
+  :caption: Qa standard type code
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

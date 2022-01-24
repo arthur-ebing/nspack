@@ -1217,5 +1217,313 @@ class Nspack < Roda
         end
       end
     end
+
+    # QA STANDARD TYPES
+    # --------------------------------------------------------------------------
+    r.on 'qa_standard_types', Integer do |id|
+      interactor = MasterfilesApp::QaStandardTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:qa_standard_types, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('quality', 'edit')
+        interactor.assert_permission!(:edit, id)
+        show_partial { Masterfiles::Quality::QaStandardType::Edit.call(id) }
+      end
+
+      # r.on 'complete' do
+      #   r.get do
+      #     check_auth!('quality', 'edit')
+      #     interactor.assert_permission!(:complete, id)
+      #     show_partial { Masterfiles::Quality::QaStandardType::Complete.call(id) }
+      #   end
+
+      #   r.post do
+      #     res = interactor.complete_a_qa_standard_type(id, params[:qa_standard_type])
+      #     if res.success
+      #       flash[:notice] = res.message
+      #       redirect_to_last_grid(r)
+      #     else
+      #       re_show_form(r, res) { Masterfiles::Quality::QaStandardType::Complete.call(id, params[:qa_standard_type], res.errors) }
+      #     end
+      #   end
+      # end
+
+      # r.on 'approve' do
+      #   r.get do
+      #     check_auth!('quality', 'approve')
+      #     interactor.assert_permission!(:approve, id)
+      #     show_partial { Masterfiles::Quality::QaStandardType::Approve.call(id) }
+      #   end
+
+      #   r.post do
+      #     res = interactor.approve_or_reject_a_qa_standard_type(id, params[:qa_standard_type])
+      #     if res.success
+      #       flash[:notice] = res.message
+      #       redirect_to_last_grid(r)
+      #     else
+      #       re_show_form(r, res) { Masterfiles::Quality::QaStandardType::Approve.call(id, params[:qa_standard_type], res.errors) }
+      #     end
+      #   end
+      # end
+
+      # r.on 'reopen' do
+      #   r.get do
+      #     check_auth!('quality', 'edit')
+      #     interactor.assert_permission!(:reopen, id)
+      #     show_partial { Masterfiles::Quality::QaStandardType::Reopen.call(id) }
+      #   end
+
+      #   r.post do
+      #     res = interactor.reopen_a_qa_standard_type(id, params[:qa_standard_type])
+      #     if res.success
+      #       flash[:notice] = res.message
+      #       redirect_to_last_grid(r)
+      #     else
+      #       re_show_form(r, res) { Masterfiles::Quality::QaStandardType::Reopen.call(id, params[:qa_standard_type], res.errors) }
+      #     end
+      #   end
+      # end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('quality', 'read')
+          show_partial { Masterfiles::Quality::QaStandardType::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_qa_standard_type(id, params[:qa_standard_type])
+          if res.success
+            update_grid_row(id, changes: { qa_standard_type_code: res.instance[:qa_standard_type_code], description: res.instance[:description] },
+                                notice: res.message)
+          else
+            re_show_form(r, res) { Masterfiles::Quality::QaStandardType::Edit.call(id, form_values: params[:qa_standard_type], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('quality', 'delete')
+          interactor.assert_permission!(:delete, id)
+          res = interactor.delete_qa_standard_type(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+
+    r.on 'qa_standard_types' do
+      interactor = MasterfilesApp::QaStandardTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      # r.on 'ui_change', String do |change_type| # Handle UI behaviours
+      #   handle_ui_change(:qa_standard_type, change_type.to_sym, params)
+      # end
+      r.on 'new' do    # NEW
+        check_auth!('quality', 'new')
+        show_partial_or_page(r) { Masterfiles::Quality::QaStandardType::New.call(remote: fetch?(r)) }
+      end
+      r.post do        # CREATE
+        res = interactor.create_qa_standard_type(params[:qa_standard_type])
+        if res.success
+          row_keys = %i[
+            id
+            qa_standard_type_code
+            description
+            active
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
+        else
+          re_show_form(r, res, url: '/masterfiles/quality/qa_standard_types/new') do
+            Masterfiles::Quality::QaStandardType::New.call(form_values: params[:qa_standard_type],
+                                                      form_errors: res.errors,
+                                                      remote: fetch?(r))
+          end
+        end
+      end
+    end
+
+    # CHEMICALS
+    # --------------------------------------------------------------------------
+    r.on 'chemicals', Integer do |id|
+      interactor = MasterfilesApp::ChemicalInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:chemicals, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('quality', 'edit')
+        interactor.assert_permission!(:edit, id)
+        show_partial { Masterfiles::Quality::Chemical::Edit.call(id) }
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('quality', 'read')
+          show_partial { Masterfiles::Quality::Chemical::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_chemical(id, params[:chemical])
+          if res.success
+            row_keys = %i[
+              chemical_name
+              description
+              eu_max_level
+              arfd_max_level
+              orchard_chemical
+              drench_chemical
+              packline_chemical
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+          else
+            re_show_form(r, res) { Masterfiles::Quality::Chemical::Edit.call(id, form_values: params[:chemical], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('quality', 'delete')
+          interactor.assert_permission!(:delete, id)
+          res = interactor.delete_chemical(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+
+    r.on 'chemicals' do
+      interactor = MasterfilesApp::ChemicalInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      # r.on 'ui_change', String do |change_type| # Handle UI behaviours
+      #   handle_ui_change(:chemical, change_type.to_sym, params)
+      # end
+      r.on 'new' do    # NEW
+        check_auth!('quality', 'new')
+        show_partial_or_page(r) { Masterfiles::Quality::Chemical::New.call(remote: fetch?(r)) }
+      end
+      r.post do        # CREATE
+        res = interactor.create_chemical(params[:chemical])
+        if res.success
+          row_keys = %i[
+            id
+            chemical_name
+            description
+            eu_max_level
+            arfd_max_level
+            orchard_chemical
+            drench_chemical
+            packline_chemical
+            active
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
+        else
+          re_show_form(r, res, url: '/masterfiles/quality/chemicals/new') do
+            Masterfiles::Quality::Chemical::New.call(form_values: params[:chemical],
+                                                form_errors: res.errors,
+                                                remote: fetch?(r))
+          end
+        end
+      end
+    end
+
+    # QA STANDARDS
+    # --------------------------------------------------------------------------
+    r.on 'qa_standards', Integer do |id|
+      interactor = MasterfilesApp::QaStandardInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:qa_standards, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('quality', 'edit')
+        interactor.assert_permission!(:edit, id)
+        show_partial { Masterfiles::Quality::QaStandard::Edit.call(id) }
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('quality', 'read')
+          show_partial { Masterfiles::Quality::QaStandard::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_qa_standard(id, params[:qa_standard])
+          if res.success
+            row_keys = %i[
+              qa_standard_name
+              description
+              season_id
+              qa_standard_type_id
+              target_market_ids
+              packed_tm_group_ids
+              internal_standard
+              applies_to_all_markets
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+          else
+            re_show_form(r, res) { Masterfiles::Quality::QaStandard::Edit.call(id, form_values: params[:qa_standard], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('quality', 'delete')
+          interactor.assert_permission!(:delete, id)
+          res = interactor.delete_qa_standard(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+
+    r.on 'qa_standards' do
+      interactor = MasterfilesApp::QaStandardInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      r.on 'change', String, String do |change_mode, change_field|
+        puts ">>>>>  handle_ui_change (#{change_field})  <<<<<<<"
+        # handle_ui_change(:qa_standard, change_mode.to_sym, params, { field: change_field.to_sym })
+        handle_ui_change(:qa_standard, change_field.to_sym, params, { field: change_field.to_sym })
+      end
+
+      # r.on 'ui_change', String do |change_type| # Handle UI behaviours
+      #   handle_ui_change(:qa_standard, change_type.to_sym, params)
+      # end
+      r.on 'new' do    # NEW
+        check_auth!('quality', 'new')
+        show_partial_or_page(r) { Masterfiles::Quality::QaStandard::New.call(remote: fetch?(r)) }
+      end
+      r.post do        # CREATE
+        res = interactor.create_qa_standard(params[:qa_standard])
+        if res.success
+          row_keys = %i[
+            id
+            qa_standard_name
+            description
+            season_id
+            qa_standard_type_id
+            target_market_ids
+            packed_tm_group_ids
+            internal_standard
+            applies_to_all_markets
+            active
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
+        else
+          re_show_form(r, res, url: '/masterfiles/quality/qa_standards/new') do
+            Masterfiles::Quality::QaStandard::New.call(form_values: params[:qa_standard],
+                                                  form_errors: res.errors,
+                                                  remote: fetch?(r))
+          end
+        end
+      end
+    end
+
   end
 end

@@ -1,0 +1,58 @@
+---
+:dataminer_definition: chemicals
+:actions:
+- :url: "/masterfiles/quality/chemicals/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/masterfiles/quality/chemicals/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/quality/chemicals/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :url: "/masterfiles/quality/chemicals/$:id$/complete"
+  :text: Complete
+  :icon: toggle-on
+  :popup: true
+  :hide_if_true: completed
+  :auth:
+    :function: Masterfiles
+    :program: general
+    :permission: edit
+- :url: "/masterfiles/quality/chemicals/$:id$/approve"
+  :text: Approve/Reject
+  :icon: gavel
+  :popup: true
+  :hide_if_false: completed
+  :hide_if_true: approved
+  :auth:
+    :function: Masterfiles
+    :program: general
+    :permission: approve
+- :url: "/masterfiles/quality/chemicals/$:id$/reopen"
+  :text: Re-open for editing
+  :icon: toggle-off
+  :popup: true
+  :hide_if_false: approved
+  :auth:
+    :function: Masterfiles
+    :program: general
+    :permission: edit
+- :separator: true
+- :url: "/development/statuses/list/chemicals/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/quality/chemicals/new"
+  :text: New Chemical
+  :style: :button
+  :behaviour: :popup
