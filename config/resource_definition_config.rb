@@ -493,7 +493,8 @@ module Crossbeams
           Par5: 'measurement_unit',
           ReaderID: '',
           ContainerType: 'bin',
-          WeightUnits: 'Kg'
+          WeightUnits: 'Kg',
+          transaction_trigger: 'Scanner'
         },
         bin_tipping_weighing: {
           url: '/messcada/rmt/bin_tipping/weighing?',

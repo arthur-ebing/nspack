@@ -138,6 +138,7 @@ module ProductionApp
           # 	TransactionTrigger="Button"
           # 	>
           xml.Robots do
+            trigger = action[:transaction_trigger] || 'Button' # NB. PSM has not trigger?
             xml.Robot(Name: sys_mod.system_resource_code,
                       Alias: sys_mod.plant_resource_code,
                       Function: sys_mod.robot_function,
@@ -150,7 +151,7 @@ module ProductionApp
                       Scale: '',
                       Printer: '',
                       LabelQuantity: buttons.map { |a| (a.extended_config || {})['no_of_labels_to_print'] }.compact.max || 1,
-                      TransactionTrigger: 'Button') do
+                      TransactionTrigger: trigger) do
               if sys_mod.module_action == 'carton_labeling'
                 buttons.each_with_index do |button, index|
                   hs = {

@@ -93,7 +93,8 @@ module ProductionApp
         allow_cultivar_group_mixing: false,
         legacy_data: {},
         legacy_bintip_criteria: {},
-        run_batch_number: 'ABC'
+        run_batch_number: 'ABC',
+        lot_no_date: Date.today
       }
     end
 
