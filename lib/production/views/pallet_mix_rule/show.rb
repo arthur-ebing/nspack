@@ -13,21 +13,30 @@ module Production
             page.form do |form|
               # form.caption 'Pallet Mix Rule'
               form.view_only!
-              form.add_field :scope
-              # form.add_field :production_run_id
-              # form.add_field :pallet_id
-              form.add_field :allow_tm_mix
-              form.add_field :allow_grade_mix
-              form.add_field :allow_size_ref_mix
-              form.add_field :allow_pack_mix
-              form.add_field :allow_std_count_mix
-              form.add_field :allow_mark_mix
-              form.add_field :allow_inventory_code_mix
-              form.add_field :allow_cultivar_mix
-              form.add_field :allow_cultivar_group_mix
-              form.add_field :allow_puc_mix
-              form.add_field :allow_orchard_mix
-              form.add_field :packhouse_plant_resource_id
+              form.row do |row|
+                row.column do |col|
+                  col.add_field :scope
+                  # col.add_field :production_run_id
+                  # col.add_field :pallet_id
+                  col.add_field :allow_puc_mix
+                  col.add_field :allow_orchard_mix
+                  col.add_field :allow_cultivar_group_mix
+                  col.add_field :allow_cultivar_mix
+                  col.add_field :allow_variety_mix
+                  col.add_field :allow_std_count_mix
+                  col.add_field :allow_size_ref_mix
+                end
+                row.column do |col|
+                  col.add_field :packhouse_plant_resource_id
+                  col.add_field :allow_tm_mix
+                  col.add_field :allow_marketing_org_mix
+                  col.add_field :allow_grade_mix
+                  col.add_field :allow_pack_mix
+                  col.add_field :allow_mark_mix
+                  col.add_field :allow_inventory_code_mix
+                  col.add_field :allow_sell_by_mix
+                end
+              end
             end
           end
 

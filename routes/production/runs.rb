@@ -1061,6 +1061,9 @@ class Nspack < Roda
             allow_puc_mix
             allow_orchard_mix
             packhouse_code
+            allow_variety_mix
+            allow_marketing_org_mix
+            allow_sell_by_mix
           ]
           update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
         else
@@ -1114,7 +1117,10 @@ class Nspack < Roda
                      OpenStruct.new(type: :set_checked, dom_id: 'pallet_mix_rule_allow_cultivar_mix', checked: toggle),
                      OpenStruct.new(type: :set_checked, dom_id: 'pallet_mix_rule_allow_cultivar_group_mix', checked: toggle),
                      OpenStruct.new(type: :set_checked, dom_id: 'pallet_mix_rule_allow_puc_mix', checked: toggle),
-                     OpenStruct.new(type: :set_checked, dom_id: 'pallet_mix_rule_allow_orchard_mix', checked: toggle)
+                     OpenStruct.new(type: :set_checked, dom_id: 'pallet_mix_rule_allow_orchard_mix', checked: toggle),
+                     OpenStruct.new(type: :set_checked, dom_id: 'pallet_mix_rule_allow_variety_mix', checked: toggle),
+                     OpenStruct.new(type: :set_checked, dom_id: 'pallet_mix_rule_allow_marketing_org_mix', checked: toggle),
+                     OpenStruct.new(type: :set_checked, dom_id: 'pallet_mix_rule_allow_sell_by_mix', checked: toggle)
                    ])
     end
 

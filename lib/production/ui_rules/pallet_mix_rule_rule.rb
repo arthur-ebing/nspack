@@ -30,6 +30,9 @@ module UiRules
       fields[:allow_puc_mix] = { renderer: :label, as_boolean: true }
       fields[:allow_orchard_mix] = { renderer: :label, as_boolean: true }
       fields[:packhouse_plant_resource_id] = { renderer: :label, with_value: packhouse_plant_resource_id_label, caption: 'Packhouse Plant Resource' }
+      fields[:allow_variety_mix] = { renderer: :label, as_boolean: true }
+      fields[:allow_marketing_org_mix] = { renderer: :label, as_boolean: true }
+      fields[:allow_sell_by_mix] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields
@@ -46,7 +49,10 @@ module UiRules
         allow_cultivar_mix: { renderer: :checkbox },
         allow_cultivar_group_mix: { renderer: :checkbox },
         allow_puc_mix: { renderer: :checkbox },
-        allow_orchard_mix: { renderer: :checkbox }
+        allow_orchard_mix: { renderer: :checkbox },
+        allow_variety_mix: { renderer: :checkbox },
+        allow_marketing_org_mix: { renderer: :checkbox },
+        allow_sell_by_mix: { renderer: :checkbox }
         # packhouse_plant_resource_id: { renderer: :select, options: @resource_repo.for_select_plant_resources_of_type(Crossbeams::Config::ResourceDefinitions::PACKHOUSE),
         #                                caption: 'PH Plant Resource', prompt: true }
       }
@@ -62,20 +68,7 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(scope: nil,
-                                    production_run_id: nil,
-                                    pallet_id: nil,
-                                    allow_tm_mix: nil,
-                                    allow_grade_mix: nil,
-                                    allow_size_ref_mix: nil,
-                                    allow_pack_mix: nil,
-                                    allow_std_count_mix: nil,
-                                    allow_mark_mix: nil,
-                                    allow_cultivar_mix: nil,
-                                    allow_cultivar_group_mix: nil,
-                                    allow_puc_mix: nil,
-                                    allow_orchard_mix: nil,
-                                    allow_inventory_code_mix: nil)
+      @form_object = new_form_object_from_struct(ProductionApp::PalletMixRule)
     end
 
     private

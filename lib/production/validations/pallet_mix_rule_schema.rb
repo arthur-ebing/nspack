@@ -18,5 +18,8 @@ module ProductionApp
     optional(:allow_cultivar_group_mix).maybe(:bool)
     optional(:allow_puc_mix).maybe(:bool)
     optional(:allow_orchard_mix).maybe(:bool)
+    optional(:allow_variety_mix).maybe(:bool)
+    optional(:allow_marketing_org_mix).maybe(:bool)
+    optional(:allow_sell_by_mix).maybe(:bool)
   end
 end

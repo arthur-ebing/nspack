@@ -18,6 +18,9 @@ module ProductionApp
     attribute :allow_cultivar_group_mix, Types::Bool
     attribute :allow_puc_mix, Types::Bool
     attribute :allow_orchard_mix, Types::Bool
+    attribute :allow_variety_mix, Types::Bool
+    attribute :allow_marketing_org_mix, Types::Bool
+    attribute :allow_sell_by_mix, Types::Bool
   end
 
   class PalletMixRuleFlat < Dry::Struct
@@ -38,5 +41,8 @@ module ProductionApp
     attribute :allow_puc_mix, Types::Bool
     attribute :allow_orchard_mix, Types::Bool
     attribute :packhouse_code, Types::String
+    attribute :allow_variety_mix, Types::Bool
+    attribute :allow_marketing_org_mix, Types::Bool
+    attribute :allow_sell_by_mix, Types::Bool
   end
 end

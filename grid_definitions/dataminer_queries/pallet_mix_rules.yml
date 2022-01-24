@@ -1,18 +1,20 @@
 ---
 :caption: Pallet Mix Rules
-:sql: SELECT "pallet_mix_rules"."id", "pallet_mix_rules"."scope", "pallet_mix_rules"."production_run_id",
-  "pallet_mix_rules"."pallet_id", "pallet_mix_rules"."allow_tm_mix", "pallet_mix_rules"."allow_grade_mix",
-  "pallet_mix_rules"."allow_size_ref_mix", "pallet_mix_rules"."allow_pack_mix", "pallet_mix_rules"."allow_std_count_mix",
-  "pallet_mix_rules"."allow_mark_mix", "pallet_mix_rules"."allow_inventory_code_mix",
-  "pallet_mix_rules"."allow_cultivar_mix", "pallet_mix_rules"."allow_cultivar_group_mix",
-  "pallet_mix_rules"."allow_puc_mix", "pallet_mix_rules"."allow_orchard_mix", "pallet_mix_rules"."packhouse_plant_resource_id",
-  "plant_resources"."plant_resource_code" AS packhouse_code
-   FROM "pallet_mix_rules" LEFT JOIN "plant_resources"
-  ON "plant_resources"."id" = "pallet_mix_rules"."packhouse_plant_resource_id" LEFT
-  JOIN "pallets" ON "pallets"."id" = "pallet_mix_rules"."pallet_id" LEFT JOIN "production_runs"
-  ON "production_runs"."id" = "pallet_mix_rules"."production_run_id"
-:limit:
-:offset:
+:sql: "SELECT \"pallet_mix_rules\".\"id\", \"pallet_mix_rules\".\"scope\", \"pallet_mix_rules\".\"production_run_id\",
+  \"pallet_mix_rules\".\"pallet_id\", \"pallet_mix_rules\".\"allow_tm_mix\", \"pallet_mix_rules\".\"allow_grade_mix\",
+  \"pallet_mix_rules\".\"allow_size_ref_mix\", \"pallet_mix_rules\".\"allow_pack_mix\",
+  \"pallet_mix_rules\".\"allow_std_count_mix\", \"pallet_mix_rules\".\"allow_mark_mix\",
+  \"pallet_mix_rules\".\"allow_inventory_code_mix\", \"pallet_mix_rules\".\"allow_cultivar_mix\",
+  \"pallet_mix_rules\".\"allow_cultivar_group_mix\", \"pallet_mix_rules\".\"allow_puc_mix\",
+  \r\n\"pallet_mix_rules\".\"allow_orchard_mix\",  \"pallet_mix_rules\".\"allow_variety_mix\",
+  \"pallet_mix_rules\".\"allow_marketing_org_mix\", \"pallet_mix_rules\".\"allow_sell_by_mix\",
+  \"pallet_mix_rules\".\"packhouse_plant_resource_id\", \"plant_resources\".\"plant_resource_code\"
+  AS packhouse_code \r\nFROM \"pallet_mix_rules\" \r\nLEFT JOIN \"plant_resources\"
+  ON \"plant_resources\".\"id\" = \"pallet_mix_rules\".\"packhouse_plant_resource_id\"
+  \r\nLEFT JOIN \"pallets\" ON \"pallets\".\"id\" = \"pallet_mix_rules\".\"pallet_id\"
+  \r\nLEFT JOIN \"production_runs\" ON \"production_runs\".\"id\" = \"pallet_mix_rules\".\"production_run_id\""
+:limit: 
+:offset: 
 :external_settings: {}
 :columns:
   id:
@@ -21,12 +23,12 @@
     :caption: Id
     :namespaced_name: pallet_mix_rules.id
     :data_type: :integer
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: true
-    :pinned:
+    :pinned: 
     :groupable: true
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -37,12 +39,12 @@
     :caption: Scope
     :namespaced_name: pallet_mix_rules.scope
     :data_type: :string
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: true
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -53,12 +55,12 @@
     :caption: Production run
     :namespaced_name: pallet_mix_rules.production_run_id
     :data_type: :integer
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: true
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -69,12 +71,12 @@
     :caption: Pallet
     :namespaced_name: pallet_mix_rules.pallet_id
     :data_type: :integer
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: true
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -85,12 +87,12 @@
     :caption: Allow tm mix
     :namespaced_name: pallet_mix_rules.allow_tm_mix
     :data_type: :boolean
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: true
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -101,12 +103,12 @@
     :caption: Allow grade mix
     :namespaced_name: pallet_mix_rules.allow_grade_mix
     :data_type: :boolean
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: true
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -117,12 +119,12 @@
     :caption: Allow size ref mix
     :namespaced_name: pallet_mix_rules.allow_size_ref_mix
     :data_type: :boolean
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: true
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -133,12 +135,12 @@
     :caption: Allow pack mix
     :namespaced_name: pallet_mix_rules.allow_pack_mix
     :data_type: :boolean
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: true
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -149,12 +151,12 @@
     :caption: Allow std count mix
     :namespaced_name: pallet_mix_rules.allow_std_count_mix
     :data_type: :boolean
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: true
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -165,12 +167,12 @@
     :caption: Allow mark mix
     :namespaced_name: pallet_mix_rules.allow_mark_mix
     :data_type: :boolean
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: true
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -181,12 +183,12 @@
     :caption: Allow inventory code mix
     :namespaced_name: pallet_mix_rules.allow_inventory_code_mix
     :data_type: :boolean
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: true
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -197,12 +199,12 @@
     :caption: Allow cultivar mix
     :namespaced_name: pallet_mix_rules.allow_cultivar_mix
     :data_type: :boolean
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: true
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -213,12 +215,12 @@
     :caption: Allow cultivar group mix
     :namespaced_name: pallet_mix_rules.allow_cultivar_group_mix
     :data_type: :boolean
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: true
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -229,12 +231,12 @@
     :caption: Allow PUC mix
     :namespaced_name: pallet_mix_rules.allow_puc_mix
     :data_type: :boolean
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: true
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -245,70 +247,118 @@
     :caption: Allow orchard mix
     :namespaced_name: pallet_mix_rules.allow_orchard_mix
     :data_type: :boolean
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: true
-    :group_by_seq:
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  allow_variety_mix:
+    :name: allow_variety_mix
+    :sequence_no: 16
+    :caption: Allow variety mix
+    :namespaced_name: pallet_mix_rules.allow_variety_mix
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  allow_marketing_org_mix:
+    :name: allow_marketing_org_mix
+    :sequence_no: 17
+    :caption: Allow marketing org mix
+    :namespaced_name: pallet_mix_rules.allow_marketing_org_mix
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  allow_sell_by_mix:
+    :name: allow_sell_by_mix
+    :sequence_no: 18
+    :caption: Allow sell by mix
+    :namespaced_name: pallet_mix_rules.allow_sell_by_mix
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
   packhouse_plant_resource_id:
     :name: packhouse_plant_resource_id
-    :sequence_no: 16
+    :sequence_no: 19
     :caption: Packhouse plant resource
     :namespaced_name: pallet_mix_rules.packhouse_plant_resource_id
     :data_type: :integer
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: true
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
   packhouse_code:
     :name: packhouse_code
-    :sequence_no: 17
+    :sequence_no: 20
     :caption: Packhouse Code
     :namespaced_name: plant_resources.plant_resource_code
     :data_type: :string
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
 :query_parameter_definitions:
-  - :column: pallet_mix_rules.production_run_id
-    :caption: Production run
-    :data_type: :integer
-    :control_type: :list
-    :default_value:
-    :ordered_list: true
-    :ui_priority: 1
-    :list_def: SELECT active_run_stage, id FROM production_runs ORDER BY active_run_stage
-  - :column: pallet_mix_rules.pallet_id
-    :caption: Pallet
-    :data_type: :integer
-    :control_type: :list
-    :default_value:
-    :ordered_list: true
-    :ui_priority: 1
-    :list_def: SELECT pallet_number, id FROM pallets ORDER BY pallet_number
-  - :column: pallet_mix_rules.packhouse_plant_resource_id
-    :caption: Packhouse plant resource
-    :data_type: :integer
-    :control_type: :list
-    :default_value:
-    :ordered_list: true
-    :ui_priority: 1
-    :list_def: SELECT plant_resource_code, id FROM plant_resources ORDER BY plant_resource_code
+- :column: pallet_mix_rules.production_run_id
+  :caption: Production run
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT active_run_stage, id FROM production_runs ORDER BY active_run_stage
+- :column: pallet_mix_rules.pallet_id
+  :caption: Pallet
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT pallet_number, id FROM pallets ORDER BY pallet_number
+- :column: pallet_mix_rules.packhouse_plant_resource_id
+  :caption: Packhouse plant resource
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT plant_resource_code, id FROM plant_resources ORDER BY plant_resource_code

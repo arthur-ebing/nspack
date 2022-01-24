@@ -26,7 +26,10 @@ module ProductionApp
         mix_cultivar: :mix_cultivar_check,
         mix_cultivar_group: :mix_cultivar_group_check,
         mix_puc: :mix_puc_check,
-        mix_orchard: :mix_orchard_check
+        mix_orchard: :mix_orchard_check,
+        mix_variety: :mix_variety_check,
+        mix_marketing_org: :mix_marketing_org_check,
+        mix_sell_by: :mix_sell_by_check
       }.freeze
 
       def call
@@ -138,6 +141,29 @@ module ProductionApp
 
         new = repo.get(:orchards, :orchard_code, new_sequence[:orchard_id])
         error('orchard', oldest_sequence[:orchard_code], new)
+      end
+
+      def mix_variety_check
+        return ok_response if rule[:allow_variety_mix]
+        return ok_response if new_sequence[:marketing_variety_id] == oldest_sequence[:marketing_variety_id]
+
+        new = repo.get(:marketing_varieties, :marketing_variety_code, new_sequence[:marketing_variety_id])
+        error('marketing_variety', oldest_sequence[:marketing_variety_code], new)
+      end
+
+      def mix_marketing_org_check
+        return ok_response if rule[:allow_marketing_org_mix]
+        return ok_response if new_sequence[:marketing_org_party_role_id] == oldest_sequence[:marketing_org_party_role_id]
+
+        new = MasterfilesApp::PartyRepo.new.fn_party_role_name(new_sequence[:marketing_org_party_role_id])
+        error('marketing_org', oldest_sequence[:marketing_org], new)
+      end
+
+      def mix_sell_by_check
+        return ok_response if rule[:allow_sell_by_mix]
+        return ok_response if new_sequence[:sell_by_code] == oldest_sequence[:sell_by_code]
+
+        error('sell_by', oldest_sequence[:sell_by_code], new_sequence[:sell_by_code])
       end
     end
   end
