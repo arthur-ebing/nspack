@@ -619,8 +619,11 @@ module ProductionApp
       when AppConst::RUN_TYPE_BULK_REBIN_RUN_UPDATE
         message = "#{AppConst::REWORKS_ACTION_BULK_REBIN_RUN_UPDATE} was successful"
         children = attrs[:pallets_selected]
-        before_attrs = { production_run_rebin_id: attrs[:from_production_run_id] }
-        after_attrs = { production_run_rebin_id: attrs[:to_production_run_id] }
+        before_attrs = rebin_production_run_attrs(attrs[:from_production_run_id])
+        after_attrs = rebin_production_run_attrs(attrs[:to_production_run_id])
+        change_descriptions = { before: production_run_details(attrs[:from_production_run_id]).sort.to_h,
+                                after: production_run_details(attrs[:to_production_run_id]).sort.to_h }
+
         res = move_bin(attrs[:to_production_run_id], children)
         return res unless res.success
 
@@ -630,6 +633,17 @@ module ProductionApp
                                           after: after_attrs.sort.to_h,
                                           change_descriptions: change_descriptions)
       { children: children, after_attrs: after_attrs, changes_made: changes_made, message: message }
+    end
+
+    def rebin_production_run_attrs(production_run_id)
+      instance = production_run(production_run_id)
+      { production_run_rebin_id: production_run_id,
+        farm_id: instance[:farm_id],
+        puc_id: instance[:puc_id],
+        orchard_id: instance[:orchard_id],
+        cultivar_group_id: instance[:cultivar_group_id],
+        cultivar_id: instance[:cultivar_id],
+        season_id: instance[:season_id] }
     end
 
     def move_bin(production_run_id, children)
@@ -691,6 +705,9 @@ module ProductionApp
         params[:tipped] =  res.instance[:tipped]
       end
 
+      error_msg = validate_run_setup_requirements(reworks_run_type, params)
+      return validation_failed_response(OpenStruct.new(success: false, messages: { to_production_run_id: [error_msg] }, to_production_run_id: params[:to_production_run_id])) unless error_msg.nil_or_empty?
+
       res = validate_reworks_permissions(reworks_run_type, params[:pallets_selected])
       return validation_failed_response(res) unless res.success
 
@@ -730,6 +747,16 @@ module ProductionApp
       puts e.backtrace.join("\n")
       ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
       failed_response(e.message)
+    end
+
+    def validate_run_setup_requirements(reworks_run_type, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+      return unless AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE == reworks_run_type
+
+      from_run = prod_repo.find_production_run_flat(params[:from_production_run_id])
+      to_run = prod_repo.find_production_run_flat(params[:to_production_run_id])
+      return "INVALID PRODUCTION RUN: cannot mix Cultivar Groups (From: #{from_run[:cultivar_group_code]}. To: #{to_run[:cultivar_group_code]})" if from_run[:cultivar_group_id] != to_run[:cultivar_group_id]
+      return "INVALID PRODUCTION RUN: cannot mix Cultivars (From: #{from_run[:cultivar_name]}. To: #{to_run[:cultivar_name]})" if !to_run[:allow_cultivar_mixing] && (from_run[:cultivar_id] != to_run[:cultivar_id])
+      return "INVALID PRODUCTION RUN: cannot mix Orchards (From: #{from_run[:orchard_code]}. To: #{to_run[:orchard_code]})" if !to_run[:allow_orchard_mixing] && (from_run[:orchard_id] != to_run[:orchard_id])
     end
 
     def validate_pallets_selected_input(reworks_run_type, params)
