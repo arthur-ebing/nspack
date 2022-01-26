@@ -468,7 +468,15 @@ module ProductionApp
       DB[query].all.group_by { |rec| rec[:packhouse] }
     end
 
-    def system_peripherals
+    def usb_printer_ip(sys_peripheral_id)
+      DB[:plant_resources_system_resources]
+        .join(:plant_resources, id: :plant_resource_id)
+        .join(:system_resources, id: Sequel[:plant_resources][:system_resource_id])
+        .where(Sequel[:plant_resources_system_resources][:system_resource_id] => sys_peripheral_id)
+        .get(:ip_address)
+    end
+
+    def system_peripheral_printers
       query = <<~SQL
         SELECT (SELECT c.plant_resource_code
                 FROM plant_resources c

@@ -345,8 +345,8 @@ module ProductionApp
     def add_peripheral_lookups(res)
       type = res[:equipment_type]
       model = res[:peripheral_model]
-      print_key = Crossbeams::Config::ResourceDefinitions::REMOTE_PRINTER_SET[type] || type
-      print_set = Crossbeams::Config::ResourceDefinitions::PRINTER_SET[print_key][model]
+      # print_key = Crossbeams::Config::ResourceDefinitions::REMOTE_PRINTER_SET[type] || type
+      print_set = Crossbeams::Config::ResourceDefinitions::PRINTER_SET[type][model]
       res.to_h.merge(printer_language: print_set[:lang])
     end
   end
