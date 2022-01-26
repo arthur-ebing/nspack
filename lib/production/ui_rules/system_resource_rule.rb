@@ -137,7 +137,8 @@ module UiRules
 
     def peripheral_types
       # USBCOM - non-rs232 USB device (e.g. scanner for pltz)
-      Crossbeams::Config::ResourceDefinitions::PRINTER_SET.keys + Crossbeams::Config::ResourceDefinitions::REMOTE_PRINTER_SET.keys << 'USBCOM'
+      # Crossbeams::Config::ResourceDefinitions::PRINTER_SET.keys + Crossbeams::Config::ResourceDefinitions::REMOTE_PRINTER_SET.keys << 'USBCOM'
+      Crossbeams::Config::ResourceDefinitions::PRINTER_SET.keys << 'USBCOM'
     end
 
     def set_module_function # rubocop:disable Metrics/CyclomaticComplexity
@@ -172,8 +173,8 @@ module UiRules
 
     def peripheral_models
       if @form_object.equipment_type
-        print_key = Crossbeams::Config::ResourceDefinitions::REMOTE_PRINTER_SET[@form_object.equipment_type] || @form_object.equipment_type
-        Crossbeams::Config::ResourceDefinitions::PRINTER_SET[print_key]&.keys
+        # print_key = Crossbeams::Config::ResourceDefinitions::REMOTE_PRINTER_SET[@form_object.equipment_type] || @form_object.equipment_type
+        Crossbeams::Config::ResourceDefinitions::PRINTER_SET[@form_object.equipment_type]&.keys
       else
         []
       end
@@ -195,12 +196,12 @@ module UiRules
     end
 
     def peripheral_type_change
-      if @params[:changed_value].empty?
-        sel = []
-      else
-        print_key = Crossbeams::Config::ResourceDefinitions::REMOTE_PRINTER_SET[@params[:changed_value]] || @params[:changed_value]
-        sel = Crossbeams::Config::ResourceDefinitions::PRINTER_SET[print_key].keys
-      end
+      sel = if @params[:changed_value].empty?
+              []
+            else
+              # print_key = Crossbeams::Config::ResourceDefinitions::REMOTE_PRINTER_SET[@params[:changed_value]] || @params[:changed_value]
+              Crossbeams::Config::ResourceDefinitions::PRINTER_SET[@params[:changed_value]].keys
+            end
       json_replace_select_options('system_resource_peripheral_model', sel)
     end
   end

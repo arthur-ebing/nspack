@@ -98,8 +98,8 @@ module ProductionApp
                         StripEndOfInput: false) # ???
             peripherals.each do |p|
               if p.plant_resource_type_code == 'PRINTER'
-                print_key = Crossbeams::Config::ResourceDefinitions::REMOTE_PRINTER_SET[p.equipment_type] || p.equipment_type
-                print_set = Crossbeams::Config::ResourceDefinitions::PRINTER_SET[print_key][p.peripheral_model]
+                # print_key = Crossbeams::Config::ResourceDefinitions::REMOTE_PRINTER_SET[p.equipment_type] || p.equipment_type
+                print_set = Crossbeams::Config::ResourceDefinitions::PRINTER_SET[p.equipment_type][p.peripheral_model]
                 xml.Printer(Name: p.system_resource_code,
                             Type: p.equipment_type.sub('remote-', ''),
                             Model: p.peripheral_model,
