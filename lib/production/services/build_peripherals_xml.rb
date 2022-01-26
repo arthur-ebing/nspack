@@ -9,14 +9,14 @@ module ProductionApp
     end
 
     def call
-      peripherals = repo.system_peripherals
+      peripherals = repo.system_peripheral_printers
       xml = build_xml(peripherals)
       success_response('BuildPeripheralsXml was successful', xml)
     end
 
     private
 
-    def build_xml(peripherals) # rubocop:disable Metrics/AbcSize
+    def build_xml(peripherals) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       builder = Nokogiri::XML::Builder.new do |xml|
         xml.SystemSchema do
           xml.Peripherals do
@@ -24,15 +24,17 @@ module ProductionApp
               peripherals.each do |ph, periphs|
                 xml.comment "\n      Packhouse #{ph}\n    "
                 periphs.each do |prt|
-                  print_key = Crossbeams::Config::ResourceDefinitions::REMOTE_PRINTER_SET[prt[:type]] || prt[:type]
-                  print_set = Crossbeams::Config::ResourceDefinitions::PRINTER_SET[print_key][prt[:model]] || {}
+                  ip = prt[:network_interface]
+                  ip = repo.usb_printer_ip(prt[:id]) if ip.nil? && prt[:connection_type] == 'USB'
+                  # print_key = Crossbeams::Config::ResourceDefinitions::REMOTE_PRINTER_SET[prt[:type]] || prt[:type]
+                  print_set = Crossbeams::Config::ResourceDefinitions::PRINTER_SET[prt[:type]][prt[:model]] || {}
                   xml.Printer(Name: prt[:name],
                               Function: prt[:function],
                               Alias: prt[:alias],
-                              Type: prt[:type],
+                              Type: prt[:connection_type] == 'USB' ? "remote-#{prt[:type]}" : prt[:type],
                               Model: prt[:model],
-                              ConnectionType: prt[:connection_type],
-                              NetworkInterface: prt[:network_interface],
+                              ConnectionType: prt[:connection_type], # Force to TCP ????
+                              NetworkInterface: ip, # prt[:network_interface], # Set this to the NTD's ip if this is a USB printer
                               Port: prt[:port],
                               TTL: prt[:ttl],
                               CycleTime: prt[:cycle_time],
