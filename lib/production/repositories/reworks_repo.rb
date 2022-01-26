@@ -529,7 +529,9 @@ module ProductionApp
     def production_run_details(id)
       query = <<~SQL
         SELECT production_runs.id AS production_run_id, packhouse.plant_resource_code AS packhouse_code, line.plant_resource_code AS line_code,
-               farms.farm_code, pucs.puc_code, orchards.orchard_code, cultivar_groups.cultivar_group_code, cultivars.cultivar_name
+               farms.farm_code, pucs.puc_code, orchards.orchard_code, cultivar_groups.cultivar_group_code, cultivars.cultivar_name,
+               colour_percentages.colour_percentage, actual_cold_treatments.treatment_code AS actual_cold_treatment,
+               actual_ripeness_treatments.treatment_code AS actual_ripeness_treatment, rmt_codes.rmt_code
         FROM production_runs
         LEFT JOIN plant_resources packhouse ON packhouse.id = production_runs.packhouse_resource_id
         LEFT JOIN plant_resources line ON line.id = production_runs.production_line_id
@@ -538,6 +540,10 @@ module ProductionApp
         LEFT JOIN orchards ON orchards.id = production_runs.orchard_id
         LEFT JOIN cultivar_groups ON cultivar_groups.id = production_runs.cultivar_group_id
         LEFT JOIN cultivars ON cultivars.id = production_runs.cultivar_id
+        LEFT JOIN colour_percentages ON colour_percentages.id = production_runs.colour_percentage_id
+        LEFT JOIN treatments actual_cold_treatments ON actual_cold_treatments.id = production_runs.actual_cold_treatment_id
+        LEFT JOIN treatments actual_ripeness_treatments ON actual_ripeness_treatments.id = production_runs.actual_ripeness_treatment_id
+        LEFT JOIN rmt_codes ON rmt_codes.id = production_runs.rmt_code_id
         WHERE production_runs.id = #{id}
       SQL
       DB[query].all unless id.nil?

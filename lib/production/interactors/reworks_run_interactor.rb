@@ -637,13 +637,18 @@ module ProductionApp
 
     def rebin_production_run_attrs(production_run_id)
       instance = production_run(production_run_id)
-      { production_run_rebin_id: production_run_id,
-        farm_id: instance[:farm_id],
-        puc_id: instance[:puc_id],
-        orchard_id: instance[:orchard_id],
-        cultivar_group_id: instance[:cultivar_group_id],
-        cultivar_id: instance[:cultivar_id],
-        season_id: instance[:season_id] }
+      attrs =  { production_run_rebin_id: production_run_id,
+                 farm_id: instance[:farm_id],
+                 puc_id: instance[:puc_id],
+                 orchard_id: instance[:orchard_id],
+                 cultivar_group_id: instance[:cultivar_group_id],
+                 cultivar_id: instance[:cultivar_id],
+                 season_id: instance[:season_id],
+                 rmt_code_id: instance[:rmt_code_id],
+                 actual_cold_treatment_id: instance[:actual_cold_treatment_id],
+                 actual_ripeness_treatment_id: instance[:actual_ripeness_treatment_id] }
+      attrs[:colour_percentage_id] = instance[:colour_percentage_id] unless instance[:colour_percentage_id].nil?
+      attrs
     end
 
     def move_bin(production_run_id, children)
@@ -1179,9 +1184,14 @@ module ProductionApp
     end
 
     def production_run_attrs(production_run_id, instance)
-      { production_run_id: production_run_id,
-        packhouse_resource_id: instance[:packhouse_resource_id],
-        production_line_id: instance[:production_line_id] }.merge(farm_details_attrs(instance))
+      attrs = { production_run_id: production_run_id,
+                packhouse_resource_id: instance[:packhouse_resource_id],
+                production_line_id: instance[:production_line_id],
+                rmt_code_id: instance[:rmt_code_id],
+                actual_cold_treatment_id: instance[:actual_cold_treatment_id],
+                actual_ripeness_treatment_id: instance[:actual_ripeness_treatment_id] }.merge(farm_details_attrs(instance))
+      attrs[:colour_percentage_id] = instance[:colour_percentage_id] unless instance[:colour_percentage_id].nil?
+      attrs
     end
 
     def farm_details_attrs(instance)
@@ -1203,7 +1213,11 @@ module ProductionApp
     def production_run_description_changes(production_run_id, instance_data)
       { production_run_id: production_run_id,
         packhouse: instance_data[:packhouse],
-        line: instance_data[:line] }.merge(farm_detail_description_changes(instance_data))
+        line: instance_data[:line],
+        rmt_code: instance_data[:rmt_code],
+        actual_cold_treatment: instance_data[:actual_cold_treatment],
+        actual_ripeness_treatment: instance_data[:actual_ripeness_treatment],
+        colour_percentage: instance_data[:colour_percentage] }.merge(farm_detail_description_changes(instance_data))
     end
 
     def farm_detail_description_changes(instance_data)
