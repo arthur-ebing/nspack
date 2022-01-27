@@ -67,6 +67,7 @@ class Nspack < Roda
             if request.referer.end_with?('manage')
               redirect_via_json(request.referer)
             else
+              # TODO: update grid row... if from grid...
               show_json_notice(res.message)
             end
           else
@@ -120,6 +121,13 @@ class Nspack < Roda
         r.post do
           show_partial_or_page(r) { Quality::Qc::QcSample::SelectTest.call(params[:qc_sample][:id], remote: fetch?(r)) }
         end
+      end
+
+      r.on 'new_presort_sample' do
+        check_auth!('qc', 'new')
+        set_last_grid_url('/list/qc_samples', r)
+        qc_sample_type_id = interactor.presort_sample_type_id
+        show_partial_or_page(r) { Quality::Qc::QcSample::New.call(qc_sample_type_id, context: :presort_run_lot_number, id: nil, remote: fetch?(r)) }
       end
 
       r.on 'new_rmt_delivery_id_sample', Integer, Integer do |qc_sample_type_id, rmt_delivery_id|

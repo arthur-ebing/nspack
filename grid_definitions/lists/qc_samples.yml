@@ -14,7 +14,8 @@
 - :url: "/quality/qc/qc_samples/$:id$/manage"
   :text: manage
   :icon: check-square
-  :hide_if_null: production_run_id
+  :hide_if_false: can_manage
+    # :hide_if_null: production_run_id,presort_run_lot_number
 - :separator: true
 - :url: "/development/statuses/list/qc_samples/$:id$"
   :text: status
