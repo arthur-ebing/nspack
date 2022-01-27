@@ -10,12 +10,15 @@
   \ \"qc_samples\".\"completed_at\",\r\n  \"qc_samples\".\"rmt_bin_ids\",\r\n  \"qc_samples\".\"created_at\",\r\n
   \ \"qc_samples\".\"updated_at\",\r\n  \"locations\".\"location_long_code\" AS coldroom_location_location_long_code,\r\n
   \ \"orchards\".\"orchard_code\",\r\n  \"production_runs\".\"active_run_stage\",\r\n
-  \ \"rmt_deliveries\".\"truck_registration_number\" AS rmt_delivery_truck_registration_number\r\nFROM\r\n
-  \ \"qc_samples\"\r\n  LEFT JOIN \"locations\" ON \"locations\".\"id\" = \"qc_samples\".\"coldroom_location_id\"\r\n
-  \ LEFT JOIN \"orchards\" ON \"orchards\".\"id\" = \"qc_samples\".\"orchard_id\"\r\n
-  \ LEFT JOIN \"production_runs\" ON \"production_runs\".\"id\" = \"qc_samples\".\"production_run_id\"\r\n
-  \ JOIN \"qc_sample_types\" ON \"qc_sample_types\".\"id\" = \"qc_samples\".\"qc_sample_type_id\"\r\n
-  \ LEFT JOIN \"rmt_deliveries\" ON \"rmt_deliveries\".\"id\" = \"qc_samples\".\"rmt_delivery_id\"\r\n"
+  \ \"rmt_deliveries\".\"truck_registration_number\" AS rmt_delivery_truck_registration_number,\r\n
+  \ CASE \"qc_sample_types\".\"qc_sample_type_name\"\r\n  WHEN 'presort' THEN\r\n
+  \   true\r\n  WHEN 'production_run' THEN\r\n    true\r\n  ELSE\r\n    false\r\n
+  \ END AS can_manage\r\nFROM\r\n  \"qc_samples\"\r\n  LEFT JOIN \"locations\" ON
+  \"locations\".\"id\" = \"qc_samples\".\"coldroom_location_id\"\r\n  LEFT JOIN \"orchards\"
+  ON \"orchards\".\"id\" = \"qc_samples\".\"orchard_id\"\r\n  LEFT JOIN \"production_runs\"
+  ON \"production_runs\".\"id\" = \"qc_samples\".\"production_run_id\"\r\n  JOIN \"qc_sample_types\"
+  ON \"qc_sample_types\".\"id\" = \"qc_samples\".\"qc_sample_type_id\"\r\n  LEFT JOIN
+  \"rmt_deliveries\" ON \"rmt_deliveries\".\"id\" = \"qc_samples\".\"rmt_delivery_id\"\r\n"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -388,6 +391,22 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  can_manage:
+    :name: can_manage
+    :sequence_no: 24
+    :caption: Can manage
+    :namespaced_name: 
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
 :query_parameter_definitions:
 - :column: qc_samples.qc_sample_type_id
   :caption: Qc sample type
@@ -402,33 +421,33 @@
   :data_type: :integer
   :control_type: :text
   :default_value: 
-  :ordered_list: true
+  :ordered_list: false
   :ui_priority: 1
-  :list_def:
+  :list_def: 
 - :column: qc_samples.coldroom_location_id
   :caption: Coldroom location
   :data_type: :integer
   :control_type: :text
   :default_value: 
-  :ordered_list: true
+  :ordered_list: false
   :ui_priority: 1
-  :list_def:
+  :list_def: 
 - :column: qc_samples.production_run_id
   :caption: Production run
   :data_type: :integer
   :control_type: :text
   :default_value: 
-  :ordered_list: true
+  :ordered_list: false
   :ui_priority: 1
-  :list_def:
+  :list_def: 
 - :column: qc_samples.orchard_id
   :caption: Orchard
   :data_type: :integer
   :control_type: :text
   :default_value: 
-  :ordered_list: true
+  :ordered_list: false
   :ui_priority: 1
-  :list_def:
+  :list_def: 
 - :column: qc_samples.ref_number
   :caption: Ref number
   :data_type: :string

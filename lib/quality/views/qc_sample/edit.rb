@@ -19,11 +19,12 @@ module Quality
               form.method :update
               form.add_field :id
               form.add_field :qc_sample_type_id
+              form.add_field :presort_run_lot_number
               form.add_field :rmt_delivery_id
               form.add_field :coldroom_location_id
               form.add_field :production_run_id
               form.add_field :orchard_id
-              form.add_field :presort_run_lot_number
+              form.add_field :context
               form.add_field :ref_number
               form.add_field :sample_size
               form.add_field :drawn_at

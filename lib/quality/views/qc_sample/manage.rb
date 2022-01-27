@@ -15,6 +15,7 @@ module Quality
             page.section do |section|
               section.add_control control_type: :link, text: 'Back', url: '/list/qc_samples/with_params?key=incomplete', style: :back_button
               section.add_control(control_type: :dropdown_button, text: 'Production Run QC', items: rules[:items_prodrun]) unless rules[:items_prodrun].empty?
+              section.add_control(control_type: :dropdown_button, text: 'Presort Run QC', items: rules[:items_presort]) unless rules[:items_presort].empty?
             end
             page.row do |row|
               row.column do |col|
