@@ -601,8 +601,14 @@ module ProductionApp
         children = repo.select_values(:pallet_sequences, :id, { pallet_number: attrs[:pallets_selected], production_run_id: attrs[:from_production_run_id] })
         before_attrs = production_run_attrs(attrs[:from_production_run_id], production_run(attrs[:from_production_run_id]))
         after_attrs = production_run_attrs(attrs[:to_production_run_id], production_run(attrs[:to_production_run_id]))
-        change_descriptions = { before: production_run_details(attrs[:from_production_run_id]).sort.to_h,
-                                after: production_run_details(attrs[:to_production_run_id]).sort.to_h }
+        before_descriptions = production_run_details(attrs[:from_production_run_id]).sort.to_h
+        after_descriptions = production_run_details(attrs[:to_production_run_id]).sort.to_h
+        unless before_attrs[:colour_percentage_id].nil?
+          after_attrs.delete(:colour_percentage_id)
+          before_descriptions.delete(:colour_percentage)
+          after_descriptions.delete(:colour_percentage)
+        end
+        change_descriptions = { before: before_descriptions, after: after_descriptions }
         repo.update_pallet_sequence(children, after_attrs)
         children.each do |id|
           repo.update_carton_labels_for_pallet_sequence(id, after_attrs) if repo.individual_cartons?(id)
@@ -621,8 +627,14 @@ module ProductionApp
         children = attrs[:pallets_selected]
         before_attrs = rebin_production_run_attrs(attrs[:from_production_run_id])
         after_attrs = rebin_production_run_attrs(attrs[:to_production_run_id])
-        change_descriptions = { before: production_run_details(attrs[:from_production_run_id]).sort.to_h,
-                                after: production_run_details(attrs[:to_production_run_id]).sort.to_h }
+        before_descriptions = production_run_details(attrs[:from_production_run_id]).sort.to_h
+        after_descriptions = production_run_details(attrs[:to_production_run_id]).sort.to_h
+        unless before_attrs[:colour_percentage_id].nil?
+          after_attrs.delete(:colour_percentage_id)
+          before_descriptions.delete(:colour_percentage)
+          after_descriptions.delete(:colour_percentage)
+        end
+        change_descriptions = { before: before_descriptions, after: after_descriptions }
 
         res = move_bin(attrs[:to_production_run_id], children)
         return res unless res.success
@@ -637,18 +649,17 @@ module ProductionApp
 
     def rebin_production_run_attrs(production_run_id)
       instance = production_run(production_run_id)
-      attrs =  { production_run_rebin_id: production_run_id,
-                 farm_id: instance[:farm_id],
-                 puc_id: instance[:puc_id],
-                 orchard_id: instance[:orchard_id],
-                 cultivar_group_id: instance[:cultivar_group_id],
-                 cultivar_id: instance[:cultivar_id],
-                 season_id: instance[:season_id],
-                 rmt_code_id: instance[:rmt_code_id],
-                 actual_cold_treatment_id: instance[:actual_cold_treatment_id],
-                 actual_ripeness_treatment_id: instance[:actual_ripeness_treatment_id] }
-      attrs[:colour_percentage_id] = instance[:colour_percentage_id] unless instance[:colour_percentage_id].nil?
-      attrs
+      { production_run_rebin_id: production_run_id,
+        farm_id: instance[:farm_id],
+        puc_id: instance[:puc_id],
+        orchard_id: instance[:orchard_id],
+        cultivar_group_id: instance[:cultivar_group_id],
+        cultivar_id: instance[:cultivar_id],
+        season_id: instance[:season_id],
+        rmt_code_id: instance[:rmt_code_id],
+        actual_cold_treatment_id: instance[:actual_cold_treatment_id],
+        actual_ripeness_treatment_id: instance[:actual_ripeness_treatment_id],
+        colour_percentage_id: instance[:colour_percentage_id] }
     end
 
     def move_bin(production_run_id, children)
@@ -1161,18 +1172,23 @@ module ProductionApp
       attrs = res.to_h
       sequence_id = attrs[:pallet_sequence_id]
       sequence = pallet_sequence(sequence_id)
-      before_attrs = production_run_attrs(attrs[:old_production_run_id], sequence)
-      after_attrs = production_run_attrs(attrs[:production_run_id], production_run(attrs[:production_run_id]))
+      before_attrs = production_run_attrs(attrs[:old_production_run_id], sequence).sort.to_h
+      after_attrs = production_run_attrs(attrs[:production_run_id], production_run(attrs[:production_run_id])).sort.to_h
+      before_descriptions_state = production_run_description_changes(attrs[:old_production_run_id], vw_flat_sequence_data(sequence_id)).sort.to_h
+      unless before_attrs[:colour_percentage_id].nil?
+        after_attrs.delete(:colour_percentage_id)
+        before_descriptions_state.delete(:colour_percentage)
+      end
 
-      before_descriptions_state = production_run_description_changes(attrs[:old_production_run_id], vw_flat_sequence_data(sequence_id))
       repo.transaction do
         reworks_run_attrs = reworks_run_attrs(sequence_id, attrs[:reworks_run_type_id])
         repo.update_pallet_sequence(sequence_id, after_attrs)
-        after_descriptions_state = production_run_description_changes(attrs[:production_run_id], vw_flat_sequence_data(sequence_id))
-        change_descriptions = { before: before_descriptions_state.sort.to_h, after: after_descriptions_state.sort.to_h }
+        after_descriptions_state = production_run_description_changes(attrs[:production_run_id], vw_flat_sequence_data(sequence_id)).sort.to_h
+        after_descriptions_state.delete(:colour_percentage) unless before_attrs[:colour_percentage_id].nil?
+        change_descriptions = { before: before_descriptions_state, after: after_descriptions_state }
         rw_res = create_reworks_run_record(reworks_run_attrs.merge(allow_cultivar_group_mixing: attrs[:allow_cultivar_group_mixing]),
                                            AppConst::REWORKS_ACTION_CHANGE_PRODUCTION_RUN,
-                                           before: before_attrs.sort.to_h, after: after_attrs.sort.to_h, change_descriptions: change_descriptions)
+                                           before: before_attrs, after: after_attrs, change_descriptions: change_descriptions)
         return failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
 
         log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id], sequence[:pallet_id], sequence_id, AppConst::REWORKS_ACTION_CHANGE_PRODUCTION_RUN)
@@ -1184,14 +1200,13 @@ module ProductionApp
     end
 
     def production_run_attrs(production_run_id, instance)
-      attrs = { production_run_id: production_run_id,
-                packhouse_resource_id: instance[:packhouse_resource_id],
-                production_line_id: instance[:production_line_id],
-                rmt_code_id: instance[:rmt_code_id],
-                actual_cold_treatment_id: instance[:actual_cold_treatment_id],
-                actual_ripeness_treatment_id: instance[:actual_ripeness_treatment_id] }.merge(farm_details_attrs(instance))
-      attrs[:colour_percentage_id] = instance[:colour_percentage_id] unless instance[:colour_percentage_id].nil?
-      attrs
+      { production_run_id: production_run_id,
+        packhouse_resource_id: instance[:packhouse_resource_id],
+        production_line_id: instance[:production_line_id],
+        rmt_code_id: instance[:rmt_code_id],
+        actual_cold_treatment_id: instance[:actual_cold_treatment_id],
+        actual_ripeness_treatment_id: instance[:actual_ripeness_treatment_id],
+        colour_percentage_id: instance[:colour_percentage_id]  }.merge(farm_details_attrs(instance))
     end
 
     def farm_details_attrs(instance)
