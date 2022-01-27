@@ -111,6 +111,10 @@ module QualityApp
       qc_sample_created_redirect(instance)
     end
 
+    def presort_sample_type_id
+      repo.get_id(:qc_sample_types, qc_sample_type_name: AppConst::QC_SAMPLE_PRESORT)
+    end
+
     private
 
     def repo
@@ -129,6 +133,7 @@ module QualityApp
     def qc_sample_created_redirect(instance)
       return "/raw_materials/deliveries/rmt_deliveries/#{instance.rmt_delivery_id}" if instance.rmt_delivery_id
       return "/quality/qc/qc_samples/#{instance.id}/manage" if instance.production_run_id
+      return "/quality/qc/qc_samples/#{instance.id}/manage" if instance.presort_run_lot_number
 
       '/'
     end

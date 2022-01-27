@@ -42,6 +42,7 @@ module UiRules
       fields[:completed] = { renderer: :label, as_boolean: true }
       fields[:completed_at] = { renderer: :label, format: :without_timezone_or_seconds }
       fields[:rmt_bin_ids] = { renderer: :label }
+      starch_summary = @repo.starch_test_summary(@options[:id])
       fields[:context] = { renderer: :label, caption: context, with_value: context_ref }
       fields[:starch_summary] = { renderer: :label, with_value: starch_summary, invisible: starch_summary.nil? }
       fields[:defects_summary] = { renderer: :label, with_value: defects_summary, invisible: defects_summary.nil? }
@@ -56,6 +57,14 @@ module UiRules
       end
       rules[:items_prodrun] = items_prodrun
       # if delivery, check the type and add items as applies to the type...
+
+      items_presort = []
+      if @form_object[:presort_run_lot_number]
+        items_presort << { url: "/quality/qc/qc_samples/#{@options[:id]}/edit", text: 'Edit', behaviour: :popup }
+        items_presort << { url: "/quality/qc/qc_samples/#{@options[:id]}/print_barcode", text: 'Print', behaviour: :popup }
+        items_presort << { url: "/quality/qc/qc_samples/#{@options[:id]}/qc_test/defects", text: 'Defects test', behaviour: :direct }
+      end
+      rules[:items_presort] = items_presort
 
       obj = @form_object.to_h
       obj[:sample_type] = @repo.get(:qc_sample_types, :qc_sample_type_name, @form_object.qc_sample_type_id)
@@ -97,6 +106,17 @@ module UiRules
     end
 
     def common_fields
+      if @mode == :new
+        context_renderer = { invisible: true }
+      else
+        context, context_ref = @repo.sample_context(@repo.find_qc_sample(@options[:id]))
+        context_renderer = { renderer: :label, caption: context, with_value: context_ref }
+      end
+      presort_renderer = if @options[:context] == :presort_run_lot_number
+                           { required: true }
+                         else
+                           { renderer: :hidden }
+                         end
       {
         qc_test_type_id: { renderer: :select,
                            options: MasterfilesApp::QcRepo.new.for_select_qc_test_types,
@@ -108,11 +128,12 @@ module UiRules
                              hidden_value: @options[:qc_sample_type_id] || @form_object.qc_sample_type_id,
                              caption: 'QC Sample Type',
                              include_hidden_field: true },
+        context: context_renderer,
         rmt_delivery_id: { renderer: :hidden },
         coldroom_location_id: { renderer: :hidden },
         production_run_id: { renderer: :hidden },
         orchard_id: { renderer: :hidden },
-        presort_run_lot_number: { renderer: :hidden },
+        presort_run_lot_number: presort_renderer,
         id: { renderer: :integer, caption: 'QC Sample id' },
         ref_number: { required: true },
         short_description: {},
@@ -122,7 +143,7 @@ module UiRules
         completed_at: {},
         drawn_at: { renderer: :datetime },
         rmt_bin_ids: {},
-        context: { renderer: :hidden },
+        # context: { renderer: :hidden },
         context_key: { renderer: :hidden }
       }
     end
@@ -161,6 +182,10 @@ module UiRules
 
     def desc_ref_production_run_id
       [ProductionApp::ProductionRunRepo.new.production_run_code(@options[:context_key]), @options[:context_key]]
+    end
+
+    def desc_ref_presort_run_lot_number
+      [nil, @options[:context_key]]
     end
 
     private
