@@ -6,6 +6,11 @@
   :icon: view-show
   :title: View
   :popup: true
+- :url: "/raw_materials/bin_assets/bin_asset_transactions/$:bin_asset_transaction_id$/preview_bin_asset_report"
+  :text: Issue/Receipt report
+  :icon: view-show
+  :title: Issue/Receipt report
+  :loading_window: true
 :page_controls:
   - :control_type: :link
     :url: "/raw_materials/bin_assets/bin_asset_transactions/adhoc_transaction/new"
