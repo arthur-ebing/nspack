@@ -12,7 +12,7 @@ class Nspack < Roda
       end
 
       r.on 'preview_bin_asset_report' do
-        jasper_params = JasperParams.new('bin_asset',
+        jasper_params = JasperParams.new('bin_assets',
                                          current_user.login_name,
                                          bin_asset_transaction_item_id: id)
         res = CreateJasperReport.call(jasper_params)
