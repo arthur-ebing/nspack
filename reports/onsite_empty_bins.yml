@@ -1,17 +1,18 @@
 ---
-:caption: Onsite Asset Quantities
+:caption: Onsite Empty Bins
 :sql: "SELECT vw_offsite_bin_asset_transactions.material_owner,\r\n\t   vw_offsite_bin_asset_transactions.container_material_type_code,\r\n\t
   \  vw_offsite_bin_asset_transactions.to_location,\r\n\t   (\"bin_asset_register\".\"quantity_bins\"
   - (COALESCE(issued_by_bin_sales.total_issued, 0) + COALESCE(issued_bins.total_issued,
-  0) - COALESCE(returned_bins.total_received, 0))) AS quantity\r\nFROM vw_offsite_bin_asset_transactions\r\nJOIN
-  \"bin_asset_register\" ON \"bin_asset_register\".\"rmt_container_material_owner_id\"
-  = vw_offsite_bin_asset_transactions.rmt_container_material_owner_id\r\nLEFT JOIN
-  (SELECT material_owner, container_material_type_code,\r\n\t\t   to_location, SUM(quantity_bins)
-  AS total_issued FROM vw_offsite_bin_asset_transactions\r\n\t\t   WHERE transaction_type_code
-  NOT IN ('BIN SALES')\r\n\t\t   GROUP BY material_owner, container_material_type_code,
-  to_location) issued_bins\r\n\t\t   ON issued_bins.material_owner = vw_offsite_bin_asset_transactions.material_owner\r\n\t
-  \      AND issued_bins.container_material_type_code = vw_offsite_bin_asset_transactions.container_material_type_code\r\n\t
-  \      AND issued_bins.to_location = vw_offsite_bin_asset_transactions.to_location\r\nLEFT
+  0) + COALESCE(onsite_full_bins.total_onsite_full_bins, 0) - COALESCE(returned_bins.total_received,
+  0))) AS quantity\r\nFROM vw_offsite_bin_asset_transactions\r\nJOIN \"bin_asset_register\"
+  ON \"bin_asset_register\".\"rmt_container_material_owner_id\" = vw_offsite_bin_asset_transactions.rmt_container_material_owner_id\r\nLEFT
+  JOIN (SELECT material_owner, container_material_type_code,\r\n\t\t   to_location,
+  SUM(quantity_bins) AS total_issued FROM vw_offsite_bin_asset_transactions\r\n\t\t
+  \  WHERE transaction_type_code NOT IN ('BIN SALES')\r\n\t\t   GROUP BY material_owner,
+  container_material_type_code, to_location) issued_bins\r\n\t\t   ON issued_bins.material_owner
+  = vw_offsite_bin_asset_transactions.material_owner\r\n\t       AND issued_bins.container_material_type_code
+  = vw_offsite_bin_asset_transactions.container_material_type_code\r\n\t       AND
+  issued_bins.to_location = vw_offsite_bin_asset_transactions.to_location\r\nLEFT
   JOIN (SELECT material_owner, container_material_type_code,\r\n\t\t   from_location,
   SUM(quantity_bins) AS total_received FROM vw_offsite_bin_asset_transactions\r\n\t\t
   \  GROUP BY material_owner, container_material_type_code, from_location) returned_bins
@@ -24,11 +25,21 @@
   container_material_type_code, to_location) issued_by_bin_sales \r\n\t\t   ON issued_by_bin_sales.material_owner
   = vw_offsite_bin_asset_transactions.material_owner\r\n\t       AND issued_by_bin_sales.container_material_type_code
   = vw_offsite_bin_asset_transactions.container_material_type_code\r\n\t       AND
-  issued_by_bin_sales.to_location = vw_offsite_bin_asset_transactions.to_location\r\nWHERE
+  issued_by_bin_sales.to_location = vw_offsite_bin_asset_transactions.to_location\r\nLEFT
+  JOIN (SELECT fn_party_role_name(rmt_bins.rmt_material_owner_party_role_id) AS material_owner,\r\n\t\t
+  \  rcmt.container_material_type_code, sum(rmt_bins.qty_bins) AS total_onsite_full_bins\r\n\t\t
+  \  FROM rmt_bins\r\n\t\t   LEFT JOIN rmt_container_material_types rcmt ON rmt_bins.rmt_container_material_type_id
+  = rcmt.id\r\n\t\t   WHERE rmt_bins.shipped_asset_number IS NULL AND NOT rmt_bins.bin_tipped
+  AND NOT rmt_bins.scrapped\r\n\t\t   GROUP BY rcmt.container_material_type_code,
+  fn_party_role_name(rmt_bins.rmt_material_owner_party_role_id)) onsite_full_bins
+  \r\n\t\t   ON onsite_full_bins.material_owner = vw_offsite_bin_asset_transactions.material_owner\r\n\t
+  \      AND onsite_full_bins.container_material_type_code = vw_offsite_bin_asset_transactions.container_material_type_code\r\n\t
+  \      AND issued_by_bin_sales.to_location = vw_offsite_bin_asset_transactions.to_location\r\nWHERE
   vw_offsite_bin_asset_transactions.to_location IN ('ONSITE_EMPTY_BIN', 'ONSITE_FULL_BIN')
   \r\nGROUP BY vw_offsite_bin_asset_transactions.material_owner, vw_offsite_bin_asset_transactions.container_material_type_code,
   \r\n         vw_offsite_bin_asset_transactions.to_location, \"bin_asset_register\".\"quantity_bins\",
-  \r\n\t\t issued_bins.total_issued, returned_bins.total_received, issued_by_bin_sales.total_issued"
+  \r\n\t\t issued_bins.total_issued, returned_bins.total_received, issued_by_bin_sales.total_issued,
+  onsite_full_bins.total_onsite_full_bins"
 :limit: 
 :offset: 
 :external_settings:
