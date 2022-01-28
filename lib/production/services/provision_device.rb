@@ -345,16 +345,27 @@ module ProductionApp
         out << ssh.exec!(%([ -f "/etc/udev/rules.d/99-com.rules" ] && sudo cp /etc/udev/rules.d/99-com.rules /etc/udev/rules.d/99-com.rules.bak))
         log
 
-        # 10:
-        result = ssh.exec!(<<~STR)
-          cat << EOF | sudo tee /etc/udev/rules.d/10-usb-serial.rules
-            KERNEL=="ttyACM*", KERNELS=="1-1.1.2", SYMLINK+="ttyACM_DEVICE0"
-            KERNEL=="ttyACM*", KERNELS=="1-1.1.3", SYMLINK+="ttyACM_DEVICE1"
-            KERNEL=="ttyACM*", KERNELS=="1-1.2", SYMLINK+="ttyACM_DEVICE2"
-            KERNEL=="ttyACM*", KERNELS=="1-1.3", SYMLINK+="ttyACM_DEVICE3"
-          EOF
-        STR
-        out << result
+        if for_reterm
+          # 10 (seeed):
+          result = ssh.exec!(<<~STR)
+            cat << EOF | sudo tee /etc/udev/rules.d/10-usb-serial.rules
+              KERNEL=="ttyACM*", KERNELS=="1-1.1", SYMLINK+="ttyACM_DEVICE2"
+              KERNEL=="ttyACM*", KERNELS=="1-1.2", SYMLINK+="ttyACM_DEVICE3"
+            EOF
+          STR
+          out << result
+        else
+          # 10 (pi):
+          result = ssh.exec!(<<~STR)
+            cat << EOF | sudo tee /etc/udev/rules.d/10-usb-serial.rules
+              KERNEL=="ttyACM*", KERNELS=="1-1.1.2", SYMLINK+="ttyACM_DEVICE0"
+              KERNEL=="ttyACM*", KERNELS=="1-1.1.3", SYMLINK+="ttyACM_DEVICE1"
+              KERNEL=="ttyACM*", KERNELS=="1-1.2", SYMLINK+="ttyACM_DEVICE2"
+              KERNEL=="ttyACM*", KERNELS=="1-1.3", SYMLINK+="ttyACM_DEVICE3"
+            EOF
+          STR
+          out << result
+        end
         log
 
         # 50: List of usb devices vendor and product keys (run lsusb when device plugged in to find these codes)
