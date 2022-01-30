@@ -343,11 +343,13 @@ module ProductionApp
     end
 
     def add_peripheral_lookups(res)
-      type = res[:equipment_type]
-      model = res[:peripheral_model]
-      # print_key = Crossbeams::Config::ResourceDefinitions::REMOTE_PRINTER_SET[type] || type
+      attrs = res.to_h
+      return attrs unless attrs.key?(:pixels_mm) # Only printers have the px/mm param
+
+      type = attrs[:equipment_type]
+      model = attrs[:peripheral_model]
       print_set = Crossbeams::Config::ResourceDefinitions::PRINTER_SET[type][model]
-      res.to_h.merge(printer_language: print_set[:lang])
+      attrs.merge(printer_language: print_set[:lang])
     end
   end
 end

@@ -80,6 +80,7 @@ module ProductionApp
             # What does this depend on? Does it matter if it is present in all configs? (e.g. Not at Loftus)
             # Perhaps we need scanner defs
             # and modules can choose to include one.
+            # if .login...
             xml.Scanner(Name: 'RID-01',
                         Type: 'RDM630',
                         Model: 'RDM630',
@@ -96,8 +97,11 @@ module ProductionApp
                         EndOfInput: 'ETX',
                         StripStartOfInput: false,
                         StripEndOfInput: false) # ???
+
+            scanner_count = 0
             peripherals.each do |p|
-              if p.plant_resource_type_code == 'PRINTER'
+              case p.plant_resource_type_code
+              when Crossbeams::Config::ResourceDefinitions::PRINTER
                 # print_key = Crossbeams::Config::ResourceDefinitions::REMOTE_PRINTER_SET[p.equipment_type] || p.equipment_type
                 print_set = Crossbeams::Config::ResourceDefinitions::PRINTER_SET[p.equipment_type][p.peripheral_model]
                 xml.Printer(Name: p.system_resource_code,
@@ -116,6 +120,53 @@ module ProductionApp
                             Username: p.print_username,
                             Password: p.print_password,
                             PixelsMM: p.pixels_mm)
+              when Crossbeams::Config::ResourceDefinitions::SCANNER
+                scanner_count += 1
+                scanner_hash = { Name: p.system_resource_code,
+                                 Type: p.equipment_type, # USBCOM
+                                 Model: p.peripheral_model, # GFS4400
+                                 ReaderID: scanner_count,
+                                 ConnectionType: p.connection_type,
+                                 BufferSize: (p.extended_config || {})['buffer_size'] || '256',
+                                 StartOfInput: (p.extended_config || {})['start_of_input'] || '', # STX, ''
+                                 EndOfInput: (p.extended_config || {})['end_of_input'] || 'CR', # ETX, '', CR, CRLF
+                                 StripStartOfInput: (p.extended_config || {})['strip_start_of_input'] || 'true',
+                                 StripEndOfInput: (p.extended_config || {})['strip_end_of_input'] || 'true' }
+                if p.connection_type == 'TCP'
+                  scanner_hash[:DeviceName] = ''
+                  scanner_hash[:NetworkInterface] = alternate_ip || p.ip_address
+                  scanner_hash[:Port] = p.port
+                else
+                  scanner_hash[:DeviceName] = "/dev/ttyACM_DEVICE#{scanner_count - 1}"
+                end
+                xml.Scanner(scanner_hash)
+              when Crossbeams::Config::ResourceDefinitions::SCALE
+                # <Scale    Name="SCL-01"  Type="MicroA12E" 	Model="MicroA12E" 	DeviceName="/dev/ttyUSB0" ConnectionType="RS232" BufferSize="256" BaudRate="9600" Parity="N" FlowControl="N" DataBits="8" StopBits="1" StartOfInput=""  EndOfInput="CRLF" StripStartOfInput="true" StripEndOfInput="true"  MinWeight="50" MaxWeight="1000" Unit="kg" Debug="false" />
+                xml.Scale(Name: p.system_resource_code,
+                          Type: p.equipment_type,
+                          Model: p.peripheral_model,
+                          DeviceName: '/dev/ttyUSB0',
+                          ConnectionType: p.connection_type, # RS232 / tcp
+                          BufferSize: (p.extended_config || {})['buffer_size'] || '256',
+                          StartOfInput: (p.extended_config || {})['start_of_input'] || '',
+                          EndOfInput: (p.extended_config || {})['end_of_input'] || 'CR',
+                          StripStartOfInput: (p.extended_config || {})['strip_start_of_input'] || 'true',
+                          StripEndOfInput: (p.extended_config || {})['strip_end_of_input'] || 'true',
+                          BaudRate: (p.extended_config || {})['baud_rate'] || 9600,
+                          Parity: (p.extended_config || {})['parity'] || 'N',
+                          FlowControl: (p.extended_config || {})['flow_control'] || 'N',
+                          DataBits: (p.extended_config || {})['data_bits'] || 8,
+                          StopBits: (p.extended_config || {})['stop_bits'] || 1,
+                          MinWeight: 50,
+                          MaxWeight: sys_mod.system_resource_code.start_with?('B') ? 550 : 1800,  # Bin weighing max is 550, pallet weighing 1800.
+                          Unit: 'kg',
+                          Debug: false)
+                # NetworkInterface: alternate_ip || p.ip_address, - currently not required, but TCP scale is possible
+                # Port: p.port,
+                # VendorID: p.connection_type == 'USB' ? print_set[:usb_vendor] : '',
+                # ProductID: p.connection_type == 'USB' ? print_set[:usb_product] : '',
+                # Alias: p.plant_resource_code,
+                # Function: p.module_function)
               else
                 xml.comment "Not yet implemented for #{p.plant_resource_type_code}"
                 xml.OtherNotYetDefined p.system_resource_code

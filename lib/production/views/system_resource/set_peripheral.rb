@@ -31,6 +31,11 @@ module Production
                   col.add_field :port
                   col.add_field :ttl
                   col.add_field :cycle_time
+                  col.add_field :baud_rate
+                  col.add_field :parity
+                  col.add_field :flow_control
+                  col.add_field :data_bits
+                  col.add_field :stop_bits
                 end
                 row.column do |col|
                   col.add_field :module_function
@@ -38,6 +43,11 @@ module Production
                   col.add_field :print_username
                   col.add_field :print_password
                   col.add_field :pixels_mm
+                  col.add_field :buffer_size
+                  col.add_field :start_of_input
+                  col.add_field :end_of_input
+                  col.add_field :strip_start_of_input
+                  col.add_field :strip_end_of_input
                 end
               end
             end

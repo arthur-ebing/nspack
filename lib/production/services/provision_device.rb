@@ -369,10 +369,13 @@ module ProductionApp
         log
 
         # 50: List of usb devices vendor and product keys (run lsusb when device plugged in to find these codes)
+        #     This list must be kept in sync with Crossbeams::Config::ResourceDefinitions::PRINTER_SET
         result = ssh.exec!(<<~STR)
           cat << EOF | sudo tee /etc/udev/rules.d/50-usb-permissions.rules
             # Zebra printer (zebra:gk420d)
             SUBSYSTEM=="usb", ATTR{idVendor}=="0a5f",ATTR{idProduct}=="0080",MODE="0666",GROUP="users"
+            # Zebra printer (zebra:gk420t)
+            SUBSYSTEM=="usb", ATTR{idVendor}=="0a5f",ATTR{idProduct}=="0081",MODE="0666",GROUP="users"
             # Zebra printer (zebra:zd420)
             SUBSYSTEM=="usb", ATTR{idVendor}=="0a5f",ATTR{idProduct}=="0120",MODE="0666",GROUP="users"
             # Zebra printer (zebra:zd230)

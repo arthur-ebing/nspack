@@ -203,7 +203,7 @@ module Crossbeams
       # Peripherals
       SCALE = 'SCALE'
       PRINTER = 'PRINTER'
-      SCANNER = 'SCANNER'
+      SCANNER = 'SCANNER' # (usb/tcp/wedge)
       # SCN- : SCANNER (not required as a plant resource)
 
       # System resource types
@@ -598,24 +598,38 @@ module Crossbeams
         ['Radical', MODULE_DISTRO_TYPE_RAD]
       ].freeze
 
-      MODULE_ROBOT_FUNCTIONS = %w[
-        HTTP-BinTip
+      MODULE_ROBOT_FUNCTIONS_DEPRECATED = %w[
+        HTTP-BinLabel
         HTTP-BinVerification
         HTTP-CartonLabel
+        HTTP-CartonVerification
+        HTTP-PalletBuildup-CV-SplitScreen
+      ].freeze
+
+      MODULE_ROBOT_FUNCTIONS = %w[
+        HTTP-BinTip
+        HTTP-CardRegistration
+        HTTP-ContainerLabel
+        HTTP-ContainerVerification
+        HTTP-ContainerVerification-SplitScreen
         HTTP-PalletBuildup
         HTTP-PalletBuildup-SplitScreen
+        HTTP-PalletMovement
         HTTP-PalletWeighing
         HTTP-RmtBinWeighing
         Server
       ].freeze
 
-      # REMOTE_PRINTER_SET = { 'remote-argox' => 'argox', 'remote-datamax' => 'datamax', 'remote-zebra' => 'zebra' }.freeze
+      # NB. When adding a new usb product id, it must also be added to lib/production/services/provision_device.rb
+      #     (run lsusb when device plugged in to find these codes)
       PRINTER_SET = {
         'argox' => {
           'AR-O4-250' => { lang: 'pplz', usb_vendor: '1664', usb_product: '0D10' },
-          'AR-D4-250' => { lang: 'pplz', usb_vendor: '1664', usb_product: '0E10' }
+          'AR-D4-250' => { lang: 'pplz', usb_vendor: '1664', usb_product: '0E10' },
+          'IX-240' => { lang: 'pplz', usb_vendor: '1664', usb_product: '0E10' } # Don't know what this product id is...
         },
         'zebra' => {
+          'GK420t' => { lang: 'zpl', usb_vendor: '0a5f', usb_product: '0081' },
           'GK420d' => { lang: 'zpl', usb_vendor: '0a5f', usb_product: '0080' },
           'ZD230' => { lang: 'zpl', usb_vendor: '0a5f', usb_product: '0166' },
           'ZD420' => { lang: 'zpl', usb_vendor: '0a5f', usb_product: '0120' }
@@ -624,6 +638,24 @@ module Crossbeams
           'datamax' => { lang: 'pplz', usb_vendor: '', usb_product: '' }
         }
       }.freeze
+
+      SCANNER_SET = {
+        'GenericTCP' => {
+          'Datalogic' => {}
+        },
+        'USBCOM' => {
+          'GFS4400' => {}
+        }
+      }.freeze
+      SCALE_SET = {
+        'MicroA12E' => {
+          'MicroA12E' => {}
+        },
+        'any' => {
+          'any' => {}
+        }
+      }.freeze
+      # MicroA12E
       # printer:
       # Labelling
       # carton_label

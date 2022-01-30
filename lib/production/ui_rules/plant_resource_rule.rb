@@ -119,9 +119,15 @@ module UiRules
                           with_value: plant_resource_type_id_label,
                           caption: 'Plant Resource Type' }
                       end
+      readonly = false
+      if type_renderer[:renderer] == :select
+        plant_resource_type_id = type_renderer[:options].first.last
+        @form_object.plant_resource_code = @repo.next_peripheral_code(plant_resource_type_id)
+        readonly = true
+      end
       {
         plant_resource_type_id: type_renderer,
-        plant_resource_code: { required: true },
+        plant_resource_code: { required: true, readonly: readonly },
         description: { required: true }
       }
     end
