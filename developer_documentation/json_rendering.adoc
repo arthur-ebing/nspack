@@ -188,7 +188,7 @@ NOTE: For this action, you **must** specify `keep_dialog_open: true`. Or use `js
 
 ==== Replace the options in a multi element
 
-Works on `Multi.js` elements only.
+Works on `Multi.js` elements only. If the replacement options array includes values that are already selected in the UI, those options will remain selected.
 
 type:: `:replace_multi_options`.
 

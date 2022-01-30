@@ -635,6 +635,7 @@ const crossbeamsUtils = {
     }
     let nVal = '';
     let nText = '';
+    const selected = Array.from(elem.selectedOptions).map(item => String(item.value));
     while (elem.options.length) elem.remove(0);
     action.replace_multi_options.options.forEach((item) => {
       if (item.constructor === Array) {
@@ -647,6 +648,9 @@ const crossbeamsUtils = {
       const option = document.createElement('option');
       option.value = nVal;
       option.text = nText;
+      if (selected.includes(String(nVal))) {
+        option.selected = true;
+      }
       elem.appendChild(option);
     });
     elem.dispatchEvent(new Event('change'));
