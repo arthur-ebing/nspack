@@ -15,7 +15,7 @@ module MasterfilesApp
       instance = colour_percentage(id)
       success_response("Created colour percentage #{instance.description}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { description: ['This colour percentage already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { colour_percentage: ['This colour percentage already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

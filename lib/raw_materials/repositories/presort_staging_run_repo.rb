@@ -183,6 +183,14 @@ module RawMaterialsApp
         .get(:code)
     end
 
+    def find_colour_percentage_by_percentage_code_and_cultivar(percentage_code, cultivar_id)
+      DB[:cultivar_groups]
+        .join(:cultivars, cultivar_group_id: :id)
+        .join(:colour_percentages, commodity_id: Sequel[:cultivar_groups][:commodity_id])
+        .where(colour_percentage: percentage_code, Sequel[:cultivars][:id] => cultivar_id)
+        .get(Sequel[:colour_percentages][:id])
+    end
+
     def find_container_material_owner_by_container_material_type_and_org_code(container_material_type_id, long_description)
       DB[:rmt_container_material_owners]
         .join(:party_roles, id: :rmt_material_owner_party_role_id)

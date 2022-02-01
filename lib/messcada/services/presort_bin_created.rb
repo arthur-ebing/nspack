@@ -82,7 +82,7 @@ module MesscadaApp
       cold_treatment_code, ripeness_treatment_code = representative_bin['Code_frigo'].split('_')
       actual_cold_treatment_id = repo.get_value(:treatments, :id, treatment_code: cold_treatment_code)
       actual_ripeness_treatment_id = repo.get_value(:treatments, :id, treatment_code: ripeness_treatment_code)
-      colour_percentage_id = repo.get_value(:colour_percentages, :id, colour_percentage: presorted_bin_rmt_product_code.split('_')[2])
+      colour_percentage_id = repo.find_colour_percentage_by_percentage_code_and_cultivar(presorted_bin_rmt_product_code.split('_')[2], presorted_bin_staging_run[:cultivar_id])
       bin_attrs = { season_id: presorted_bin_staging_run[:season_id],
                     presorted: true,
                     cultivar_id: presorted_bin_staging_run[:cultivar_id],
