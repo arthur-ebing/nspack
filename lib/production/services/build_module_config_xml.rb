@@ -29,6 +29,8 @@ module ProductionApp
       return 'No module action defined' if sys_mod.module_action.nil?
 
       net_interface = alternate_ip || sys_mod.ip_address unless gateway.nil?
+      dev_netmask = net_interface.nil? ? nil : netmask
+      robot_peripherals = {}
       action = Crossbeams::Config::ResourceDefinitions::MODULE_ACTIONS[sys_mod.module_action.to_sym]
       builder = Nokogiri::XML::Builder.new(encoding: 'UTF-8') do |xml|
         xml.comment "\n  (C) #{Time.now.year}, NoSoft MesServer XML Setup File\n  "
@@ -42,7 +44,7 @@ module ProductionApp
             xml.LogImage false
           end
           xml.System do
-            xml.Company AppConst::IMPLEMENTATION_OWNER
+            xml.Company AppConst::CLIENT_FULL_NAME
             xml.AutoConfigure false
             xml.LocalInterface alternate_ip || sys_mod.ip_address
             xml.ServerInterface server.ip_address
@@ -70,10 +72,10 @@ module ProductionApp
             xml.Rs232(Name: '/dev/ttyUSB1', Driver: 'jssc', Function: 'RS232', NetworkInterface: 0, Port: 0)
             xml.Usb(Name: '/dev/ttyACM_DEVICE0', Driver: 'usbcom', Function: 'USBIO', NetworkInterface: 0, Port: 0)
             xml.Usb(Name: '/dev/ttyACM_DEVICE1', Driver: 'usbcom', Function: 'USBIO', NetworkInterface: 0, Port: 0)
-            xml.Ethernet(Name: 'Eth01', Function: 'tcpserver', NetworkInterface: net_interface, Port: 2000, NetMask: netmask, GateWay: gateway, TTL: 10_000) # FIXME: gateways may need to be set for vlan?
-            xml.Ethernet(Name: 'Eth02', Function: 'tcpserver', NetworkInterface: net_interface, Port: 2091, NetMask: netmask, GateWay: gateway, TTL: 10_000)
-            xml.Ethernet(Name: 'Eth03', Function: 'tcpserver', NetworkInterface: net_interface, Port: 2095, NetMask: netmask, GateWay: gateway, TTL: 10_000)
-            xml.Ethernet(Name: 'Eth04', Function: 'httpserver', NetworkInterface: net_interface, Port: 2080, NetMask: netmask, GateWay: gateway, TTL: 15_000)
+            xml.Ethernet(Name: 'Eth01', Function: 'tcpserver', NetworkInterface: net_interface, Port: 2000, NetMask: dev_netmask, GateWay: gateway, TTL: 10_000) # FIXME: gateways may need to be set for vlan?
+            xml.Ethernet(Name: 'Eth02', Function: 'tcpserver', NetworkInterface: net_interface, Port: 2091, NetMask: dev_netmask, GateWay: gateway, TTL: 10_000)
+            xml.Ethernet(Name: 'Eth03', Function: 'tcpserver', NetworkInterface: net_interface, Port: 2095, NetMask: dev_netmask, GateWay: gateway, TTL: 10_000)
+            xml.Ethernet(Name: 'Eth04', Function: 'httpserver', NetworkInterface: net_interface, Port: 2080, NetMask: dev_netmask, GateWay: gateway, TTL: 15_000)
           end
 
           xml.Peripherals do
@@ -85,7 +87,7 @@ module ProductionApp
                         Type: 'RDM630',
                         Model: 'RDM630',
                         DeviceName: for_reterm ? '/dev/ttyAMA0' : '/dev/ttyS0',
-                        ReaderId: 1,
+                        ReaderID: 1,
                         ConnectionType: 'RS232',
                         BaudRate: '9600',
                         Parity: 'N',
@@ -100,6 +102,7 @@ module ProductionApp
 
             scanner_count = 0
             peripherals.each do |p|
+              (robot_peripherals[p.plant_resource_type_code] ||= []) << p.plant_resource_code
               case p.plant_resource_type_code
               when Crossbeams::Config::ResourceDefinitions::PRINTER
                 # print_key = Crossbeams::Config::ResourceDefinitions::REMOTE_PRINTER_SET[p.equipment_type] || p.equipment_type
@@ -190,19 +193,33 @@ module ProductionApp
           # 	>
           xml.Robots do
             trigger = action[:transaction_trigger] || 'Button' # NB. PSM has not trigger?
-            xml.Robot(Name: sys_mod.system_resource_code,
-                      Alias: sys_mod.plant_resource_code,
-                      Function: sys_mod.robot_function,
-                      ServerInterface: '',
-                      Port: 80, # 9296, # --> Webapp port
-                      RFID: 'RID-01', # (if sys_mod.login? && not T200?)
-                      AccessControl: sys_mod.login,
-                      TCP: '', # ???
-                      Scanner: '',
-                      Scale: '',
-                      Printer: '',
-                      LabelQuantity: buttons.map { |a| (a.extended_config || {})['no_of_labels_to_print'] }.compact.max || 1,
-                      TransactionTrigger: trigger) do
+            robot_attr = {
+              Name: sys_mod.system_resource_code,
+              Alias: sys_mod.plant_resource_code,
+              Function: sys_mod.robot_function,
+              ServerInterface: '',
+              Port: 80, # 9296, # --> Webapp port
+              RFID: 'RID-01', # (if sys_mod.login? && not T200?)
+              AccessControl: sys_mod.login,
+              TCP: '', # ???
+              LabelQuantity: buttons.map { |a| (a.extended_config || {})['no_of_labels_to_print'] }.compact.max || 1,
+              TransactionTrigger: trigger
+            }
+            robot_attr[:Scanner] = (robot_peripherals[Crossbeams::Config::ResourceDefinitions::SCANNER] || []).join(',')
+            robot_attr[:Scale] = (robot_peripherals[Crossbeams::Config::ResourceDefinitions::SCALE] || []).join(',')
+            robot_attr[:Printer] = (robot_peripherals[Crossbeams::Config::ResourceDefinitions::PRINTER] || []).join(',')
+            # IF url belons up here and not on button...
+            action_detail = Crossbeams::Config::ResourceDefinitions::MODULE_ACTIONS[sys_mod.module_action.to_sym]
+            if action_detail[:url_type] == :scan
+              robot_attr[:URL] = action_detail[:url]
+              robot_attr[:Par1] = action_detail[:Par1]
+              robot_attr[:Par2] = action_detail[:Par2]
+              robot_attr[:Par3] = action_detail[:Par3]
+              robot_attr[:Par4] = action_detail[:Par4]
+              robot_attr[:Par5] = action_detail[:Par5]
+              robot_attr[:Par6] = action_detail[:Par6]
+            end
+            xml.Robot(robot_attr) do
               if sys_mod.module_action == 'carton_labeling'
                 buttons.each_with_index do |button, index|
                   hs = {

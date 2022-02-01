@@ -464,6 +464,7 @@ module Crossbeams
       MODULE_ACTIONS = {
         server: {},
         carton_palletizing: {
+          url_type: :none,
           url: '',
           Par1: '',
           Par2: '',
@@ -475,6 +476,7 @@ module Crossbeams
           WeightUnits: ''
         },
         pallet_movement: {
+          url_type: :none,
           url: '',
           Par1: '',
           Par2: '',
@@ -486,6 +488,7 @@ module Crossbeams
           WeightUnits: ''
         },
         bin_tipping: {
+          url_type: :scan,
           url: '/messcada/rmt/bin_tipping?',
           Par1: 'device',
           Par2: 'bin_number',
@@ -498,6 +501,7 @@ module Crossbeams
           transaction_trigger: 'Scanner'
         },
         bin_tipping_weighing: {
+          url_type: :scan,
           url: '/messcada/rmt/bin_tipping/weighing?',
           Par1: 'device',
           Par2: 'bin_number',
@@ -509,6 +513,7 @@ module Crossbeams
           WeightUnits: 'Kg'
         },
         multi_bin_tipping_weighing: {
+          url_type: :scan,
           url: '/messcada/rmt/bin_tipping/multi_bin_weighing?',
           Par1: 'device',
           Par2: 'bin_number',
@@ -520,6 +525,7 @@ module Crossbeams
           WeightUnits: 'Kg'
         },
         carton_labeling: {
+          url_type: :buttons,
           url: '/messcada/production/carton_labeling?',
           Par1: 'device',
           Par2: 'card_reader',
@@ -529,6 +535,7 @@ module Crossbeams
           WeightUnits: 'Kg'
         },
         carton_verification: {
+          url_type: :scan,
           url: '/messcada/production/carton_verification?',
           Par1: 'device',
           Par2: 'carton_number',
@@ -540,6 +547,7 @@ module Crossbeams
           WeightUnits: 'Kg'
         },
         carton_verification_weighing_labeling: {
+          url_type: :scan,
           url: '/messcada/production/carton_verification/weighing/labeling?',
           Par1: 'device',
           Par2: 'carton_number',
@@ -552,6 +560,7 @@ module Crossbeams
           WeightUnits: 'Kg'
         },
         pallet_weighing: {
+          url_type: :scan,
           url: '/messcada/fg/pallet_weighing?',
           Par1: 'device',
           Par2: 'bin_number',
