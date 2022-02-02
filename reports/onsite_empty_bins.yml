@@ -1,45 +1,51 @@
 ---
 :caption: Onsite Empty Bins
-:sql: "SELECT vw_offsite_bin_asset_transactions.material_owner,\r\n\t   vw_offsite_bin_asset_transactions.container_material_type_code,\r\n\t
-  \  vw_offsite_bin_asset_transactions.to_location,\r\n\t   (\"bin_asset_register\".\"quantity_bins\"
-  - (COALESCE(issued_by_bin_sales.total_issued, 0) + COALESCE(issued_bins.total_issued,
-  0) + COALESCE(onsite_full_bins.total_onsite_full_bins, 0) - COALESCE(returned_bins.total_received,
-  0))) AS quantity\r\nFROM vw_offsite_bin_asset_transactions\r\nJOIN \"bin_asset_register\"
-  ON \"bin_asset_register\".\"rmt_container_material_owner_id\" = vw_offsite_bin_asset_transactions.rmt_container_material_owner_id\r\nLEFT
-  JOIN (SELECT material_owner, container_material_type_code,\r\n\t\t   to_location,
-  SUM(quantity_bins) AS total_issued FROM vw_offsite_bin_asset_transactions\r\n\t\t
-  \  WHERE transaction_type_code NOT IN ('BIN SALES')\r\n\t\t   GROUP BY material_owner,
-  container_material_type_code, to_location) issued_bins\r\n\t\t   ON issued_bins.material_owner
-  = vw_offsite_bin_asset_transactions.material_owner\r\n\t       AND issued_bins.container_material_type_code
-  = vw_offsite_bin_asset_transactions.container_material_type_code\r\n\t       AND
-  issued_bins.to_location = vw_offsite_bin_asset_transactions.to_location\r\nLEFT
-  JOIN (SELECT material_owner, container_material_type_code,\r\n\t\t   from_location,
-  SUM(quantity_bins) AS total_received FROM vw_offsite_bin_asset_transactions\r\n\t\t
-  \  GROUP BY material_owner, container_material_type_code, from_location) returned_bins
-  \r\n\t\t   ON returned_bins.material_owner = vw_offsite_bin_asset_transactions.material_owner\r\n\t
-  \      AND returned_bins.container_material_type_code = vw_offsite_bin_asset_transactions.container_material_type_code\r\n\t
-  \      AND returned_bins.from_location = vw_offsite_bin_asset_transactions.to_location\r\nLEFT
-  JOIN (SELECT material_owner, container_material_type_code,\r\n\t\t   to_location,
-  SUM(quantity_bins) AS total_issued FROM vw_offsite_bin_asset_transactions\r\n\t\t
-  \  WHERE transaction_type_code = 'BIN SALES'\r\n\t\t   GROUP BY material_owner,
-  container_material_type_code, to_location) issued_by_bin_sales \r\n\t\t   ON issued_by_bin_sales.material_owner
-  = vw_offsite_bin_asset_transactions.material_owner\r\n\t       AND issued_by_bin_sales.container_material_type_code
-  = vw_offsite_bin_asset_transactions.container_material_type_code\r\n\t       AND
-  issued_by_bin_sales.to_location = vw_offsite_bin_asset_transactions.to_location\r\nLEFT
-  JOIN (SELECT fn_party_role_name(rmt_bins.rmt_material_owner_party_role_id) AS material_owner,\r\n\t\t
-  \  rcmt.container_material_type_code, sum(rmt_bins.qty_bins) AS total_onsite_full_bins\r\n\t\t
-  \  FROM rmt_bins\r\n\t\t   LEFT JOIN rmt_container_material_types rcmt ON rmt_bins.rmt_container_material_type_id
-  = rcmt.id\r\n\t\t   WHERE rmt_bins.shipped_asset_number IS NULL AND NOT rmt_bins.bin_tipped
-  AND NOT rmt_bins.scrapped\r\n\t\t   GROUP BY rcmt.container_material_type_code,
-  fn_party_role_name(rmt_bins.rmt_material_owner_party_role_id)) onsite_full_bins
-  \r\n\t\t   ON onsite_full_bins.material_owner = vw_offsite_bin_asset_transactions.material_owner\r\n\t
-  \      AND onsite_full_bins.container_material_type_code = vw_offsite_bin_asset_transactions.container_material_type_code\r\n\t
-  \      AND issued_by_bin_sales.to_location = vw_offsite_bin_asset_transactions.to_location\r\nWHERE
-  vw_offsite_bin_asset_transactions.to_location IN ('ONSITE_EMPTY_BIN', 'ONSITE_FULL_BIN')
-  \r\nGROUP BY vw_offsite_bin_asset_transactions.material_owner, vw_offsite_bin_asset_transactions.container_material_type_code,
-  \r\n         vw_offsite_bin_asset_transactions.to_location, \"bin_asset_register\".\"quantity_bins\",
-  \r\n\t\t issued_bins.total_issued, returned_bins.total_received, issued_by_bin_sales.total_issued,
-  onsite_full_bins.total_onsite_full_bins"
+:sql: "select distinct issued_by_bin_sales.material_owner, issued_by_bin_sales.container_material_type_code,vw.to_location\r\n,bin_asset_register.quantity_bins
+  as register_total_qty\r\n,issued_by_bin_sales.total_issued_by_bin_sales  as bin_sales_isses\r\n,other_issues.total_issued
+  as other_issues\r\n,returned_bins.total_returned as total_received\r\n,(COALESCE(issued_by_bin_sales.total_issued_by_bin_sales,0)
+  + COALESCE(other_issues.total_issued,0) - COALESCE(returned_bins.total_returned,0))as
+  total_qty_at_all_offsite \r\n,total_onsite_full_bins.total_onsite_full_bins\r\n,(COALESCE(bin_asset_register.quantity_bins,0)
+  - \r\n\t        ((COALESCE(issued_by_bin_sales.total_issued_by_bin_sales,0) + COALESCE(other_issues.total_issued,0)
+  - COALESCE(returned_bins.total_returned,0)) + (COALESCE(total_onsite_full_bins.total_onsite_full_bins,0))
+  )\r\n ) as total_empty_bins\r\n ,(COALESCE(bin_asset_register.quantity_bins,0) -
+  \r\n\t        ((COALESCE(issued_by_bin_sales.total_issued_by_bin_sales,0) + COALESCE(other_issues.total_issued,0)
+  - COALESCE(returned_bins.total_returned,0)) + (COALESCE(total_onsite_full_bins.total_onsite_full_bins,0))
+  )\r\n ) as quantity\r\nFROM (\r\n\t\tselect SUM(total_issued_by_bin_sales) total_issued_by_bin_sales,material_owner,
+  container_material_type_code,rmt_container_material_owner_id\r\n\t\tfrom(\r\n\t\t\t\tSELECT
+  \   SUM(quantity_bins) AS total_issued_by_bin_sales ,material_owner, container_material_type_code,rmt_container_material_owner_id\r\n\t\t\t\tFROM
+  vw_offsite_bin_asset_transactions\r\n\t\t\t\tWHERE transaction_type_code = 'BIN
+  SALES'  AND to_location != 'ONSITE_EMPTY_BIN' \r\n\t\t\t\tGROUP BY material_owner,container_material_type_code,to_location,rmt_container_material_owner_id\r\n\t\t
+  \   )  as d \r\n\t\tgroup by material_owner, container_material_type_code,rmt_container_material_owner_id
+  \r\n     ) as issued_by_bin_sales\r\nJOIN bin_asset_register ON bin_asset_register.rmt_container_material_owner_id
+  = issued_by_bin_sales.rmt_container_material_owner_id\t\r\nLEFT JOIN (\r\n\t\t\tselect
+  SUM(total_issued) total_issued,material_owner, container_material_type_code,rmt_container_material_owner_id\r\n\t\t\tfrom(\r\n\t\t\t\tSELECT
+  \   SUM(quantity_bins) AS total_issued ,material_owner, container_material_type_code,rmt_container_material_owner_id\r\n\t\t\t\tFROM
+  vw_offsite_bin_asset_transactions\r\n\t\t\t\tWHERE transaction_type_code  NOT IN
+  ('BIN SALES') AND to_location != 'ONSITE_EMPTY_BIN'\r\n\t\t\t\tGROUP BY material_owner,container_material_type_code,to_location,rmt_container_material_owner_id\r\n\t\t\t
+  \   )  as d \r\n\t\t\t\tgroup by material_owner, container_material_type_code,rmt_container_material_owner_id
+  \r\n          ) as other_issues ON bin_asset_register.rmt_container_material_owner_id
+  = other_issues.rmt_container_material_owner_id\r\nLEFT JOIN (\r\n\t\t\tselect SUM(total_returned)
+  total_returned,material_owner, container_material_type_code,rmt_container_material_owner_id\r\n\t\t\tfrom(\r\n\t\t\t\tSELECT
+  \   SUM(quantity_bins) AS total_returned ,material_owner, container_material_type_code,rmt_container_material_owner_id\r\n\t\t\t\tFROM
+  vw_offsite_bin_asset_transactions\r\n\t\t\t\tWHERE transaction_type_code = 'RECEIVE_BINS'\r\n\t\t\t\tGROUP
+  BY material_owner,container_material_type_code,to_location,rmt_container_material_owner_id\r\n\t\t\t
+  \   )  as e\r\n\t\t\t\tgroup by material_owner, container_material_type_code,rmt_container_material_owner_id
+  \r\n          ) as returned_bins ON bin_asset_register.rmt_container_material_owner_id
+  = returned_bins.rmt_container_material_owner_id\t\r\n\t--onsite full bins \t\r\nLEFT
+  JOIN (\t\r\n\t\t\tSelect SUM(total_onsite_full_bins) total_onsite_full_bins,material_owner,
+  container_material_type_code,rmt_container_material_owner_id\r\n       From (\r\n\t\t\t
+  \ SELECT sum(rmt_bins.qty_bins) AS total_onsite_full_bins,fn_party_role_name(rmt_bins.rmt_material_owner_party_role_id)
+  AS material_owner,rcmt.container_material_type_code,\r\n\t\t\t\t   rmt_container_material_owners.id
+  as rmt_container_material_owner_id\r\n\t\t\t\t   FROM rmt_bins \r\n\t\t\t\t   LEFT
+  JOIN rmt_container_material_types rcmt ON rmt_bins.rmt_container_material_type_id
+  \ = rcmt.id \r\n\t\t\t\t   LEFT JOIN rmt_container_material_owners ON rmt_container_material_owners.rmt_container_material_type_id
+  = rcmt.id \r\n\t\t\t\t   WHERE rmt_bins.shipped_asset_number IS NULL AND NOT rmt_bins.bin_tipped
+  AND NOT rmt_bins.scrapped \r\n\t\t\t\t   GROUP BY rcmt.container_material_type_code,fn_party_role_name(rmt_bins.rmt_material_owner_party_role_id),rmt_container_material_owners.id\r\n
+  \             ) as f\r\n\t\t\t group by material_owner, container_material_type_code,rmt_container_material_owner_id
+  \r\n\t\t\t  )as total_onsite_full_bins ON bin_asset_register.rmt_container_material_owner_id
+  = total_onsite_full_bins.rmt_container_material_owner_id\r\nLEFT JOIN vw_offsite_bin_asset_transactions
+  vw ON vw.rmt_container_material_owner_id =  bin_asset_register.rmt_container_material_owner_id\r\nWHERE
+  \ vw.to_location IN ('ONSITE_EMPTY_BIN', 'ONSITE_FULL_BIN')"
 :limit: 
 :offset: 
 :external_settings:
@@ -49,7 +55,7 @@
     :name: material_owner
     :sequence_no: 1
     :caption: Material owner
-    :namespaced_name: vw_offsite_bin_asset_transactions.material_owner
+    :namespaced_name: issued_by_bin_sales.material_owner
     :data_type: :string
     :width: 120
     :format: 
@@ -65,7 +71,7 @@
     :name: container_material_type_code
     :sequence_no: 2
     :caption: Material type
-    :namespaced_name: vw_offsite_bin_asset_transactions.container_material_type_code
+    :namespaced_name: issued_by_bin_sales.container_material_type_code
     :data_type: :string
     :width: 120
     :format: 
@@ -81,7 +87,7 @@
     :name: to_location
     :sequence_no: 3
     :caption: To location
-    :namespaced_name: vw_offsite_bin_asset_transactions.to_location
+    :namespaced_name: vw.to_location
     :data_type: :string
     :width: 120
     :format: 
@@ -93,9 +99,121 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  register_total_qty:
+    :name: register_total_qty
+    :sequence_no: 4
+    :caption: Register total qty
+    :namespaced_name: bin_asset_register.quantity_bins
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  bin_sales_isses:
+    :name: bin_sales_isses
+    :sequence_no: 5
+    :caption: Bin sales isses
+    :namespaced_name: issued_by_bin_sales.total_issued_by_bin_sales
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  other_issues:
+    :name: other_issues
+    :sequence_no: 6
+    :caption: Other issues
+    :namespaced_name: other_issues.total_issued
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  total_received:
+    :name: total_received
+    :sequence_no: 7
+    :caption: Total received
+    :namespaced_name: returned_bins.total_returned
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  total_qty_at_all_offsite:
+    :name: total_qty_at_all_offsite
+    :sequence_no: 8
+    :caption: Total qty at all offsite
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  total_onsite_full_bins:
+    :name: total_onsite_full_bins
+    :sequence_no: 9
+    :caption: Total onsite full bins
+    :namespaced_name: total_onsite_full_bins.total_onsite_full_bins
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  total_empty_bins:
+    :name: total_empty_bins
+    :sequence_no: 10
+    :caption: Total empty bins
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   quantity:
     :name: quantity
-    :sequence_no: 4
+    :sequence_no: 11
     :caption: Quantity
     :namespaced_name: 
     :data_type: :integer
