@@ -123,7 +123,7 @@ module UiRules
       if type_renderer[:renderer] == :select
         plant_resource_type_id = type_renderer[:options].first.last
         @form_object.plant_resource_code = @repo.next_peripheral_code(plant_resource_type_id)
-        readonly = true
+        readonly = !@form_object.plant_resource_code.empty?
       end
       {
         plant_resource_type_id: type_renderer,

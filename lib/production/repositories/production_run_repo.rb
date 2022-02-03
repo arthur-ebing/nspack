@@ -181,7 +181,9 @@ module ProductionApp
         SELECT #{new_id}, plant_resource_id, product_setup_id, label_template_id, packing_method_id, packing_specification_item_id,
                target_customer_party_role_id, work_order_item_id
         FROM product_resource_allocations
+        JOIN plant_resources ON plant_resources.id = product_resource_allocations.plant_resource_id
         WHERE production_run_id = ?
+          AND plant_resources.active
       SQL
       DB[clone_alloc, id].insert
       new_id
@@ -303,6 +305,7 @@ module ProductionApp
         JOIN tree_plant_resources t ON t.ancestor_plant_resource_id = r.production_line_id
         JOIN plant_resources p ON p.id = t.descendant_plant_resource_id AND p.plant_resource_type_id = (SELECT id from plant_resource_types WHERE plant_resource_type_code = 'ROBOT_BUTTON')
         WHERE r.id = ?
+          AND p.active
         AND NOT EXISTS(SELECT id FROM product_resource_allocations a WHERE a.production_run_id = r.id AND a.plant_resource_id = p.id)
       SQL
       insert_ds.insert
@@ -319,6 +322,7 @@ module ProductionApp
           JOIN plant_resources p ON p.id = t.descendant_plant_resource_id
           JOIN plant_resource_types prt ON prt.id = p.plant_resource_type_id AND prt.packpoint
           WHERE r.id = ?
+            AND p.active
           AND NOT EXISTS(SELECT id FROM product_resource_allocations a WHERE a.production_run_id = r.id AND a.plant_resource_id = p.id)
         SQL
         insert_ds.insert
@@ -625,6 +629,7 @@ module ProductionApp
          ELSE
           "fruit_actual_counts_for_packs"."actual_count_for_pack"::text
          END AS size_ref_or_count,
+         "btns"."active"
          "p"."id"
         FROM "production_runs" r
         JOIN "tree_plant_resources" t ON "t"."ancestor_plant_resource_id" = "r"."production_line_id"

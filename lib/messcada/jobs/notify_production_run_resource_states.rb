@@ -52,11 +52,17 @@ module MesscadaApp
           buttons.each do |rec|
             btns << { button: rec[:button],
                       button_id: rec[:id],
-                      enabled: !rec[:product_setup_id].nil? && !rec[:label_template_id].nil?,
+                      enabled: enabled_button?(rec),
                       caption: build_caption(rec) }
           end
           send_bus_message_to_device(mod.first, btns)
         end
+      end
+
+      # A button is enabled if the button itself is active and
+      # there is an associated product setup and label template.
+      def enabled_button?(rec)
+        rec[:active] && !rec[:product_setup_id].nil? && !rec[:label_template_id].nil?
       end
 
       def build_caption(rec)
@@ -85,7 +91,7 @@ module MesscadaApp
                         xml.button do
                           xml.name rec[:button]
                           xml.caption build_caption(rec)
-                          xml.enabled !rec[:product_setup_id].nil? && !rec[:label_template_id].nil?
+                          xml.enabled enabled_button?(rec)
                         end
                       end
                     end

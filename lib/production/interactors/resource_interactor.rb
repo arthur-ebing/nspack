@@ -92,6 +92,30 @@ module ProductionApp
       failed_response(e.message)
     end
 
+    def enable_plant_resource(id)
+      name = plant_resource(id).plant_resource_code
+      repo.transaction do
+        repo.enable_disable_plant_resource(id, enable: true)
+        log_status(:plant_resources, id, 'ENABLED')
+        log_transaction
+      end
+      success_response("Enabled plant resource #{name}")
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def disable_plant_resource(id)
+      name = plant_resource(id).plant_resource_code
+      repo.transaction do
+        repo.enable_disable_plant_resource(id, enable: false)
+        log_status(:plant_resources, id, 'DISABLED')
+        log_transaction
+      end
+      success_response("Disabled plant resource #{name}")
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def set_server_resource(id, params)
       res = validate_system_resource_server_params(params)
       return validation_failed_response(res) if res.failure?

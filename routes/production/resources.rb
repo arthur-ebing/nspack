@@ -102,6 +102,26 @@ class Nspack < Roda
         show_partial { Production::Resources::PlantResource::Edit.call(id) }
       end
 
+      r.on 'disable' do
+        res = interactor.disable_plant_resource(id)
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
+        redirect_to_last_grid(r)
+      end
+
+      r.on 'enable' do
+        res = interactor.enable_plant_resource(id)
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
+        redirect_to_last_grid(r)
+      end
+
       r.on 'print_barcode' do   # PRINT PACKPOINT BARCODE
         r.get do
           show_partial { Production::Resources::PlantResource::PrintBarcode.call(id) }

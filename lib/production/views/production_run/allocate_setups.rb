@@ -15,17 +15,19 @@ module Production
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
-            # page.add_text '<a href="/help/app/production/allocate_setups" target="cbf-help">? HELP</a>'
-            # page.add_help_link url: '/help/app/production/allocate_setups', text: 'Help'
             page.add_help_link path: %i[production allocate_setups]
-            page.add_text "Allocate #{caption}", wrapper: :h2
-            page.add_text rules[:compact_header]
-            page.add_notice 'This is a view-only list of allocations' if rules[:locked_allocations]
-            page.section do |section|
-              section.add_control(control_type: :link,
-                                  text: 'Back',
-                                  url: '/list/production_runs',
-                                  style: :back_button)
+            page.add_text "Allocate #{caption}", wrapper: :h2, css_classes: 'pa0'
+            page.fold_up do |fold|
+              fold.open!
+              fold.caption 'Run details'
+              fold.add_text rules[:compact_header]
+              fold.add_notice 'This is a view-only list of allocations' if rules[:locked_allocations]
+              fold.section do |section|
+                section.add_control(control_type: :link,
+                                    text: 'Back',
+                                    url: '/list/production_runs',
+                                    style: :back_button)
+              end
             end
             page.section do |section|
               section.fit_height!

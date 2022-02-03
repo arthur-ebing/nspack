@@ -51,9 +51,9 @@ module ProductionApp
             xml.ServerPort server.port
             xml.NetMask netmask
             xml.GateWay gateway
-            xml.comment "\n        When to use true for lbl store (nspi CLM && publishing?)\n        When true for LineProdUnit???\n        Why do we need sys pwd?\n    "
+            # xml.comment "\n        When to use true for lbl store (nspi CLM && publishing?)\n        When true for LineProdUnit???\n        Why do we need sys pwd?\n    "
             xml.CentralLabelStore sys_mod.publishing # nspi CLM
-            xml.LineProductionUnit true # ??? CLM?
+            xml.LineProductionUnit true
             xml.SystemPassword AppConst::PROVISION_PW # ????
             xml.Cms false
             xml.Mqtt false
@@ -192,7 +192,7 @@ module ProductionApp
           # 	TransactionTrigger="Button"
           # 	>
           xml.Robots do
-            trigger = action[:transaction_trigger] || 'Button' # NB. PSM has not trigger?
+            trigger = action[:transaction_trigger] || 'Button' # NB. PSM has no trigger?
             robot_attr = {
               Name: sys_mod.system_resource_code,
               Alias: sys_mod.plant_resource_code,
@@ -201,7 +201,7 @@ module ProductionApp
               Port: 80, # 9296, # --> Webapp port
               RFID: 'RID-01', # (if sys_mod.login? && not T200?)
               AccessControl: sys_mod.login,
-              TCP: '', # ???
+              TCP: false,
               LabelQuantity: buttons.map { |a| (a.extended_config || {})['no_of_labels_to_print'] }.compact.max || 1,
               TransactionTrigger: trigger
             }
@@ -237,6 +237,8 @@ module ProductionApp
                   xml.Button(hs)
                   # <Button Name="B1" Enable="true" Caption="Button 1" URL="/messcada/production/carton_labeling?" Par1="device" Par2="identifier" />
                 end
+              else
+                6.times { |n| xml.Button(Name: "B#{n + 1}", Enable: false, Caption: '', URL: '', Par1: '', Par2: '') }
               end
             end
             # buttons - specified by resource tree - or implied by module_action...

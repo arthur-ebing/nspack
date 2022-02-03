@@ -71,6 +71,16 @@
   :title: View System Resource
   :popup: true
   :hide_if_null: system_resource_id
+- :url: "/production/resources/plant_resources/$:id$/disable"
+  :text: Disable
+  :icon: toggle-off
+  :prompt: Disable $:plant_resource_type_code$ "$:plant_resource_code$"?
+  :hide_if_false: active
+- :url: "/production/resources/plant_resources/$:id$/enable"
+  :text: Enable
+  :icon: toggle-off
+  :prompt: Enable $:plant_resource_type_code$ "$:plant_resource_code$"?
+  :hide_if_true: active
 :page_controls:
 - :control_type: :link
   :url: "/production/resources/plant_resources/new"

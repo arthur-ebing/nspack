@@ -290,6 +290,11 @@ module ProductionApp
       DB[:system_resources].where(id: system_resource_id).delete if system_resource_id
     end
 
+    def enable_disable_plant_resource(id, enable: true)
+      DB[:plant_resources].where(id: id).update(active: enable)
+      DB[:system_resources].where(id: DB[:plant_resources].where(id: id).get(:system_resource_id)).update(active: enable)
+    end
+
     def next_peripheral_code(plant_resource_type_id)
       rules = plant_resource_definition(plant_resource_type_id)
       return '' unless rules[:non_editable_code]
