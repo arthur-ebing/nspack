@@ -14,17 +14,27 @@ module Masterfiles
             page.form_errors form_errors
             page.form do |form|
               form.caption 'Edit QA Standard'
-              form.action "/masterfiles/qa/qa_standards/#{id}"
+              form.action "/masterfiles/quality/qa_standards/#{id}"
               form.remote!
               form.method :update
-              form.add_field :qa_standard_name
-              form.add_field :description
-              form.add_field :season_id
-              form.add_field :qa_standard_type_id
-              form.add_field :packed_tm_group_ids
-              form.add_field :target_market_ids
-              form.add_field :internal_standard
-              form.add_field :applies_to_all_markets
+              form.row do |row|
+                row.column do |col|
+                  col.add_field :qa_standard_name
+                  col.add_field :description
+                end
+              end
+              form.row do |row|
+                row.column do |col|
+                  col.add_field :season_id
+                  col.add_field :packed_tm_group_ids
+                  col.add_field :internal_standard
+                end
+                row.column do |col|
+                  col.add_field :qa_standard_type_id
+                  col.add_field :target_market_ids
+                  col.add_field :applies_to_all_markets
+                end
+              end
             end
           end
         end

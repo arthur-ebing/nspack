@@ -12,7 +12,7 @@ module Masterfiles
             page.form_object ui_rule.form_object
             page.form do |form|
               form.caption 'Complete QA Standard Type'
-              form.action "/masterfiles/qa/qa_standard_types/#{id}/complete"
+              form.action "/masterfiles/quality/qa_standard_types/#{id}/complete"
               form.remote!
               form.submit_captions 'Complete'
               form.add_text 'Are you sure you want to complete this qa_standard_type?', wrapper: :h3

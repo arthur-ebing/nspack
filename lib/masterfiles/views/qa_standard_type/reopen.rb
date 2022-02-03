@@ -12,7 +12,7 @@ module Masterfiles
             page.form_object ui_rule.form_object
             page.form do |form|
               form.caption 'Reopen QA Standard Type'
-              form.action "/masterfiles/qa/qa_standard_types/#{id}/reopen"
+              form.action "/masterfiles/quality/qa_standard_types/#{id}/reopen"
               form.remote!
               form.submit_captions 'Reopen'
               form.add_text 'Are you sure you want to reopen this qa_standard_type for editing?', wrapper: :h3

@@ -9,8 +9,8 @@ class TestQaStandardRoutes < RouteTester
   def test_edit
     authorise_pass! permission_check: MasterfilesApp::TaskPermissionCheck::QaStandard
     ensure_exists!(INTERACTOR)
-    Masterfiles::Qa::QaStandard::Edit.stub(:call, bland_page) do
-      get 'masterfiles/qa/qa_standards/1/edit', {}, 'rack.session' => { user_id: 1 }
+    Masterfiles::Quality::QaStandard::Edit.stub(:call, bland_page) do
+      get 'masterfiles/quality/qa_standards/1/edit', {}, 'rack.session' => { user_id: 1 }
     end
     expect_bland_page
   end
@@ -18,15 +18,15 @@ class TestQaStandardRoutes < RouteTester
   def test_edit_fail
     authorise_fail!
     ensure_exists!(INTERACTOR)
-    get 'masterfiles/qa/qa_standards/1/edit', {}, 'rack.session' => { user_id: 1 }
+    get 'masterfiles/quality/qa_standards/1/edit', {}, 'rack.session' => { user_id: 1 }
     expect_permission_error
   end
 
   def test_show
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    Masterfiles::Qa::QaStandard::Show.stub(:call, bland_page) do
-      get 'masterfiles/qa/qa_standards/1', {}, 'rack.session' => { user_id: 1 }
+    Masterfiles::Quality::QaStandard::Show.stub(:call, bland_page) do
+      get 'masterfiles/quality/qa_standards/1', {}, 'rack.session' => { user_id: 1 }
     end
     expect_bland_page
   end
@@ -34,7 +34,7 @@ class TestQaStandardRoutes < RouteTester
   def test_show_fail
     authorise_fail!
     ensure_exists!(INTERACTOR)
-    get 'masterfiles/qa/qa_standards/1', {}, 'rack.session' => { user_id: 1 }
+    get 'masterfiles/quality/qa_standards/1', {}, 'rack.session' => { user_id: 1 }
     expect_permission_error
   end
 
@@ -43,7 +43,7 @@ class TestQaStandardRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     row_vals = Hash.new(1)
     INTERACTOR.any_instance.stubs(:update_qa_standard).returns(ok_response(instance: row_vals))
-    patch_as_fetch 'masterfiles/qa/qa_standards/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    patch_as_fetch 'masterfiles/quality/qa_standards/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_update_grid
   end
 
@@ -51,8 +51,8 @@ class TestQaStandardRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     INTERACTOR.any_instance.stubs(:update_qa_standard).returns(bad_response)
-    Masterfiles::Qa::QaStandard::Edit.stub(:call, bland_page) do
-      patch_as_fetch 'masterfiles/qa/qa_standards/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    Masterfiles::Quality::QaStandard::Edit.stub(:call, bland_page) do
+      patch_as_fetch 'masterfiles/quality/qa_standards/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_json_replace_dialog(has_error: true)
   end
@@ -61,7 +61,7 @@ class TestQaStandardRoutes < RouteTester
     authorise_pass! permission_check: MasterfilesApp::TaskPermissionCheck::QaStandard
     ensure_exists!(INTERACTOR)
     INTERACTOR.any_instance.stubs(:delete_qa_standard).returns(ok_response)
-    delete_as_fetch 'masterfiles/qa/qa_standards/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    delete_as_fetch 'masterfiles/quality/qa_standards/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_delete_from_grid
   end
 
@@ -69,15 +69,15 @@ class TestQaStandardRoutes < RouteTester
     authorise_pass! permission_check: MasterfilesApp::TaskPermissionCheck::QaStandard
     ensure_exists!(INTERACTOR)
     INTERACTOR.any_instance.stubs(:delete_qa_standard).returns(bad_response)
-    delete_as_fetch 'masterfiles/qa/qa_standards/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    delete_as_fetch 'masterfiles/quality/qa_standards/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_error
   end
 
   def test_new
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    Masterfiles::Qa::QaStandard::New.stub(:call, bland_page) do
-      get  'masterfiles/qa/qa_standards/new', {}, 'rack.session' => { user_id: 1 }
+    Masterfiles::Quality::QaStandard::New.stub(:call, bland_page) do
+      get  'masterfiles/quality/qa_standards/new', {}, 'rack.session' => { user_id: 1 }
     end
     expect_bland_page
   end
@@ -85,7 +85,7 @@ class TestQaStandardRoutes < RouteTester
   def test_new_fail
     authorise_fail!
     ensure_exists!(INTERACTOR)
-    get 'masterfiles/qa/qa_standards/new', {}, 'rack.session' => { user_id: 1 }
+    get 'masterfiles/quality/qa_standards/new', {}, 'rack.session' => { user_id: 1 }
     expect_permission_error
   end
 
@@ -94,7 +94,7 @@ class TestQaStandardRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     row_vals = Hash.new(1)
     INTERACTOR.any_instance.stubs(:create_qa_standard).returns(ok_response(instance: row_vals))
-    post_as_fetch 'masterfiles/qa/qa_standards', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    post_as_fetch 'masterfiles/quality/qa_standards', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_add_to_grid(has_notice: true)
   end
 
@@ -102,8 +102,8 @@ class TestQaStandardRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     INTERACTOR.any_instance.stubs(:create_qa_standard).returns(bad_response)
-    Masterfiles::Qa::QaStandard::New.stub(:call, bland_page) do
-      post_as_fetch 'masterfiles/qa/qa_standards', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    Masterfiles::Quality::QaStandard::New.stub(:call, bland_page) do
+      post_as_fetch 'masterfiles/quality/qa_standards', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_json_replace_dialog
   end

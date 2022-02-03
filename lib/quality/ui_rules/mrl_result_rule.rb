@@ -338,6 +338,7 @@ module UiRules
     end
 
     def farm_change
+      puts '>>>>>  farm_change  <<<<<<<'
       repo = MasterfilesApp::FarmRepo.new
       if params[:changed_value].blank?
         pucs = []

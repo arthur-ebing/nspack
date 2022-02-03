@@ -1,0 +1,434 @@
+---
+:caption: MRL Requirements
+:sql: SELECT "mrl_requirements"."id", "mrl_requirements"."season_id", "mrl_requirements"."qa_standard_id",
+  "mrl_requirements"."packed_tm_group_id", "mrl_requirements"."target_market_id",
+  "mrl_requirements"."target_customer_id", "mrl_requirements"."cultivar_group_id",
+  "mrl_requirements"."cultivar_id", "mrl_requirements"."max_num_chemicals_allowed",
+  "mrl_requirements"."require_orchard_level_results", "mrl_requirements"."no_results_equal_failure",
+  "mrl_requirements"."active", "mrl_requirements"."created_at", "mrl_requirements"."updated_at",
+  "cultivar_groups"."cultivar_group_code", "cultivars"."cultivar_name", "target_market_groups"."target_market_group_name"
+  AS packed_tm_group_target_market_group_name, "qa_standards"."qa_standard_name",
+  "seasons"."season_code", fn_party_role_name("mrl_requirements"."target_customer_id")
+  AS target_customer, "target_markets"."target_market_name", fn_current_status('mrl_requirements',
+  "mrl_requirements"."id") AS status FROM "mrl_requirements" LEFT JOIN "cultivar_groups"
+  ON "cultivar_groups"."id" = "mrl_requirements"."cultivar_group_id" LEFT JOIN "cultivars"
+  ON "cultivars"."id" = "mrl_requirements"."cultivar_id" LEFT JOIN "target_market_groups"
+  ON "target_market_groups"."id" = "mrl_requirements"."packed_tm_group_id" JOIN "qa_standards"
+  ON "qa_standards"."id" = "mrl_requirements"."qa_standard_id" JOIN "seasons" ON "seasons"."id"
+  = "mrl_requirements"."season_id" LEFT JOIN "target_markets" ON "target_markets"."id"
+  = "mrl_requirements"."target_market_id"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: mrl_requirements.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  season_id:
+    :name: season_id
+    :sequence_no: 2
+    :caption: Season
+    :namespaced_name: mrl_requirements.season_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  qa_standard_id:
+    :name: qa_standard_id
+    :sequence_no: 3
+    :caption: QA standard
+    :namespaced_name: mrl_requirements.qa_standard_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packed_tm_group_id:
+    :name: packed_tm_group_id
+    :sequence_no: 4
+    :caption: Packed TM group
+    :namespaced_name: mrl_requirements.packed_tm_group_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  target_market_id:
+    :name: target_market_id
+    :sequence_no: 5
+    :caption: Target market
+    :namespaced_name: mrl_requirements.target_market_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  target_customer_id:
+    :name: target_customer_id
+    :sequence_no: 6
+    :caption: Target customer
+    :namespaced_name: mrl_requirements.target_customer_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_group_id:
+    :name: cultivar_group_id
+    :sequence_no: 7
+    :caption: Cultivar group
+    :namespaced_name: mrl_requirements.cultivar_group_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_id:
+    :name: cultivar_id
+    :sequence_no: 8
+    :caption: Cultivar
+    :namespaced_name: mrl_requirements.cultivar_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  max_num_chemicals_allowed:
+    :name: max_num_chemicals_allowed
+    :sequence_no: 9
+    :caption: Max num chemicals allowed
+    :namespaced_name: mrl_requirements.max_num_chemicals_allowed
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  require_orchard_level_results:
+    :name: require_orchard_level_results
+    :sequence_no: 10
+    :caption: Require orchard level results
+    :namespaced_name: mrl_requirements.require_orchard_level_results
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  no_results_equal_failure:
+    :name: no_results_equal_failure
+    :sequence_no: 11
+    :caption: No results equal failure
+    :namespaced_name: mrl_requirements.no_results_equal_failure
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 12
+    :caption: Active
+    :namespaced_name: mrl_requirements.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 13
+    :caption: Created at
+    :namespaced_name: mrl_requirements.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 14
+    :caption: Updated at
+    :namespaced_name: mrl_requirements.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_group_code:
+    :name: cultivar_group_code
+    :sequence_no: 15
+    :caption: Cultivar group code
+    :namespaced_name: cultivar_groups.cultivar_group_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_name:
+    :name: cultivar_name
+    :sequence_no: 16
+    :caption: Cultivar name
+    :namespaced_name: cultivars.cultivar_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packed_tm_group_target_market_group_name:
+    :name: packed_tm_group_target_market_group_name
+    :sequence_no: 17
+    :caption: Packed TM group target market group name
+    :namespaced_name: target_market_groups.target_market_group_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  qa_standard_name:
+    :name: qa_standard_name
+    :sequence_no: 18
+    :caption: QA standard name
+    :namespaced_name: qa_standards.qa_standard_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  season_code:
+    :name: season_code
+    :sequence_no: 19
+    :caption: Season code
+    :namespaced_name: seasons.season_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  target_customer:
+    :name: target_customer
+    :sequence_no: 20
+    :caption: Target customer
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  target_market_name:
+    :name: target_market_name
+    :sequence_no: 21
+    :caption: Target market name
+    :namespaced_name: target_markets.target_market_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 22
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: mrl_requirements.season_id
+  :caption: Season
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT season_code, id FROM seasons ORDER BY season_code
+- :column: mrl_requirements.qa_standard_id
+  :caption: QA standard
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT qa_standard_name, id FROM qa_standards ORDER BY qa_standard_name
+- :column: mrl_requirements.packed_tm_group_id
+  :caption: Packed TM group
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT target_market_group_name, id FROM target_market_groups ORDER BY
+    target_market_group_name
+- :column: mrl_requirements.target_market_id
+  :caption: Target market
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT target_market_name, id FROM target_markets ORDER BY target_market_name
+- :column: mrl_requirements.target_customer_id
+  :caption: Target customer
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: SELECT fn_party_role_name(id), id FROM party_roles WHERE role_id = (SELECT
+    id FROM roles WHERE name = 'ROLE_NAME_GOES_HERE')
+- :column: mrl_requirements.cultivar_group_id
+  :caption: Cultivar group
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT cultivar_group_code, id FROM cultivar_groups ORDER BY cultivar_group_code
+- :column: mrl_requirements.cultivar_id
+  :caption: Cultivar
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT cultivar_name, id FROM cultivars ORDER BY cultivar_name

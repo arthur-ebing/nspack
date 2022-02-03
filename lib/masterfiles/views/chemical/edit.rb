@@ -14,7 +14,7 @@ module Masterfiles
             page.form_errors form_errors
             page.form do |form|
               form.caption 'Edit Chemical'
-              form.action "/masterfiles/qa/chemicals/#{id}"
+              form.action "/masterfiles/quality/chemicals/#{id}"
               form.remote!
               form.method :update
               form.add_field :chemical_name

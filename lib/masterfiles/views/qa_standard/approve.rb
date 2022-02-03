@@ -12,7 +12,7 @@ module Masterfiles
             page.form_object ui_rule.form_object
             page.form do |form|
               form.caption 'Approve or Reject QA Standard'
-              form.action "/masterfiles/qa/qa_standards/#{id}/approve"
+              form.action "/masterfiles/quality/qa_standards/#{id}/approve"
               form.remote!
               form.submit_captions 'Approve or Reject'
               form.add_field :approve_action

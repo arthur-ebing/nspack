@@ -1338,8 +1338,8 @@ class Nspack < Roda
         else
           re_show_form(r, res, url: '/masterfiles/quality/qa_standard_types/new') do
             Masterfiles::Quality::QaStandardType::New.call(form_values: params[:qa_standard_type],
-                                                      form_errors: res.errors,
-                                                      remote: fetch?(r))
+                                                           form_errors: res.errors,
+                                                           remote: fetch?(r))
           end
         end
       end
@@ -1424,8 +1424,8 @@ class Nspack < Roda
         else
           re_show_form(r, res, url: '/masterfiles/quality/chemicals/new') do
             Masterfiles::Quality::Chemical::New.call(form_values: params[:chemical],
-                                                form_errors: res.errors,
-                                                remote: fetch?(r))
+                                                     form_errors: res.errors,
+                                                     remote: fetch?(r))
           end
         end
       end
@@ -1485,9 +1485,7 @@ class Nspack < Roda
 
     r.on 'qa_standards' do
       interactor = MasterfilesApp::QaStandardInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-      r.on 'change', String, String do |change_mode, change_field|
-        puts ">>>>>  handle_ui_change (#{change_field})  <<<<<<<"
-        # handle_ui_change(:qa_standard, change_mode.to_sym, params, { field: change_field.to_sym })
+      r.on 'change', String, String do |_change_mode, change_field|
         handle_ui_change(:qa_standard, change_field.to_sym, params, { field: change_field.to_sym })
       end
 
@@ -1518,12 +1516,157 @@ class Nspack < Roda
         else
           re_show_form(r, res, url: '/masterfiles/quality/qa_standards/new') do
             Masterfiles::Quality::QaStandard::New.call(form_values: params[:qa_standard],
-                                                  form_errors: res.errors,
-                                                  remote: fetch?(r))
+                                                       form_errors: res.errors,
+                                                       remote: fetch?(r))
           end
         end
       end
     end
 
+    # MRL REQUIREMENTS
+    # --------------------------------------------------------------------------
+    r.on 'mrl_requirements', Integer do |id|
+      interactor = MasterfilesApp::MrlRequirementInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:mrl_requirements, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('quality', 'edit')
+        interactor.assert_permission!(:edit, id)
+        show_partial { Masterfiles::Quality::MrlRequirement::Edit.call(id) }
+      end
+
+      # r.on 'complete' do
+      #   r.get do
+      #     check_auth!('quality', 'edit')
+      #     interactor.assert_permission!(:complete, id)
+      #     show_partial { Masterfiles::Quality::MrlRequirement::Complete.call(id) }
+      #   end
+
+      #   r.post do
+      #     res = interactor.complete_a_mrl_requirement(id, params[:mrl_requirement])
+      #     if res.success
+      #       flash[:notice] = res.message
+      #       redirect_to_last_grid(r)
+      #     else
+      #       re_show_form(r, res) { Masterfiles::Quality::MrlRequirement::Complete.call(id, params[:mrl_requirement], res.errors) }
+      #     end
+      #   end
+      # end
+
+      # r.on 'approve' do
+      #   r.get do
+      #     check_auth!('quality', 'approve')
+      #     interactor.assert_permission!(:approve, id)
+      #     show_partial { Masterfiles::Quality::MrlRequirement::Approve.call(id) }
+      #   end
+
+      #   r.post do
+      #     res = interactor.approve_or_reject_a_mrl_requirement(id, params[:mrl_requirement])
+      #     if res.success
+      #       flash[:notice] = res.message
+      #       redirect_to_last_grid(r)
+      #     else
+      #       re_show_form(r, res) { Masterfiles::Quality::MrlRequirement::Approve.call(id, params[:mrl_requirement], res.errors) }
+      #     end
+      #   end
+      # end
+
+      # r.on 'reopen' do
+      #   r.get do
+      #     check_auth!('quality', 'edit')
+      #     interactor.assert_permission!(:reopen, id)
+      #     show_partial { Masterfiles::Quality::MrlRequirement::Reopen.call(id) }
+      #   end
+
+      #   r.post do
+      #     res = interactor.reopen_a_mrl_requirement(id, params[:mrl_requirement])
+      #     if res.success
+      #       flash[:notice] = res.message
+      #       redirect_to_last_grid(r)
+      #     else
+      #       re_show_form(r, res) { Masterfiles::Quality::MrlRequirement::Reopen.call(id, params[:mrl_requirement], res.errors) }
+      #     end
+      #   end
+      # end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('quality', 'read')
+          show_partial { Masterfiles::Quality::MrlRequirement::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_mrl_requirement(id, params[:mrl_requirement])
+          if res.success
+            row_keys = %i[
+              season_id
+              qa_standard_id
+              packed_tm_group_id
+              target_market_id
+              target_customer_id
+              cultivar_group_id
+              cultivar_id
+              max_num_chemicals_allowed
+              require_orchard_level_results
+              no_results_equal_failure
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+          else
+            re_show_form(r, res) { Masterfiles::Quality::MrlRequirement::Edit.call(id, form_values: params[:mrl_requirement], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('quality', 'delete')
+          interactor.assert_permission!(:delete, id)
+          res = interactor.delete_mrl_requirement(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+
+    r.on 'mrl_requirements' do
+      interactor = MasterfilesApp::MrlRequirementInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      # r.on 'ui_change', String do |change_type| # Handle UI behaviours
+      #   handle_ui_change(:mrl_requirement, change_type.to_sym, params)
+      # end
+      r.on 'new' do    # NEW
+        check_auth!('quality', 'new')
+        show_partial_or_page(r) { Masterfiles::Quality::MrlRequirement::New.call(remote: fetch?(r)) }
+      end
+      r.post do        # CREATE
+        res = interactor.create_mrl_requirement(params[:mrl_requirement])
+        if res.success
+          row_keys = %i[
+            id
+            season_id
+            qa_standard_id
+            packed_tm_group_id
+            target_market_id
+            target_customer_id
+            cultivar_group_id
+            cultivar_id
+            max_num_chemicals_allowed
+            require_orchard_level_results
+            no_results_equal_failure
+            active
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
+        else
+          re_show_form(r, res, url: '/masterfiles/quality/mrl_requirements/new') do
+            Masterfiles::Quality::MrlRequirement::New.call(form_values: params[:mrl_requirement],
+                                                           form_errors: res.errors,
+                                                           remote: fetch?(r))
+          end
+        end
+      end
+    end
   end
 end

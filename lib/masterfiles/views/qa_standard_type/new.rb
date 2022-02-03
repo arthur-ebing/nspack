@@ -14,7 +14,7 @@ module Masterfiles
             page.form_errors form_errors
             page.form do |form|
               form.caption 'New QA Standard Type'
-              form.action '/masterfiles/qa/qa_standard_types'
+              form.action '/masterfiles/quality/qa_standard_types'
               form.remote! if remote
               form.add_field :qa_standard_type_code
               form.add_field :description

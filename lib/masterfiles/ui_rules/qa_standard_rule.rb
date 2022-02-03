@@ -56,9 +56,9 @@ module UiRules
         season_id: { renderer: :select, options: MasterfilesApp::CalendarRepo.new.for_select_seasons, disabled_options: MasterfilesApp::CalendarRepo.new.for_select_inactive_seasons, caption: 'Season', required: true },
         qa_standard_type_id: { renderer: :select, options: MasterfilesApp::QaStandardTypeRepo.new.for_select_qa_standard_types, disabled_options: MasterfilesApp::QaStandardTypeRepo.new.for_select_inactive_qa_standard_types, caption: 'QA Standard Type', required: true },
         # packed_tm_group_ids: { caption: 'Packed TM Group IDs' },
-        packed_tm_group_ids: { renderer: :multi, options: @tm_repo.for_select_packed_tm_groups, selected: @form_object.tm_group_ids, caption: 'Packed TM Group IDs' },
+        packed_tm_group_ids: { renderer: :multi, options: @tm_repo.for_select_packed_tm_groups, selected: @form_object.packed_tm_group_ids, caption: 'Packed TM Group IDs' },
         # target_market_ids: {},
-        target_market_ids: { renderer: :multi, options: @tm_repo.for_select_packed_group_tms, selected: @form_object.tm_ids, caption: 'Target Market IDs' },
+        target_market_ids: { renderer: :multi, options: @tm_repo.for_select_packed_group_tms, selected: @form_object.target_market_ids, caption: 'Target Market IDs' },
         internal_standard: { renderer: :checkbox },
         applies_to_all_markets: { renderer: :checkbox }
       }
