@@ -223,10 +223,12 @@ module ProductionApp
     end
 
     def system_resource_xml_for(id)
+      res = validate_device_config(id)
+      note = res.message.split(';').join('<br>') unless res.success
       if repo.system_resource_type_from_resource(id) == Crossbeams::Config::ResourceDefinitions::SERVER
-        success_response('ok', config: ProductionApp::BuildServerConfigXml.call(id).instance)
+        success_response('ok', validation_err: note, config: ProductionApp::BuildServerConfigXml.call(id).instance)
       else
-        success_response('ok', config: ProductionApp::BuildModuleConfigXml.call(id).instance)
+        success_response('ok', validation_err: note, config: ProductionApp::BuildModuleConfigXml.call(id).instance)
       end
     end
 
@@ -268,6 +270,9 @@ module ProductionApp
     end
 
     def provision_device(id, params)
+      res = validate_device_config(id)
+      return res unless res.success
+
       ProvisionDevice.call(id, params[:network_ip], params[:use_network_ip] == 't')
     end
 
@@ -286,6 +291,9 @@ module ProductionApp
     end
 
     def deploy_system_config(id, params) # rubocop:disable Metrics/AbcSize
+      res = validate_device_config(id)
+      return res unless res.success
+
       network_ip = params[:network_ip]
       out = []
       res = if params[:use_network_ip] == 't'
@@ -309,7 +317,20 @@ module ProductionApp
         out << 'Config.xml copied to device'
       end
 
-      out
+      success_response('Deployed', out)
+    end
+
+    def validate_device_config(id)
+      plant_id = repo.get_id(:plant_resources, system_resource_id: id)
+      ids = repo.select_values(:plant_resources_system_resources, :system_resource_id, plant_resource_id: plant_id)
+      res = ValidateConfigModule.call(id, ids)
+      return res unless res.success
+
+      ids.each do |peripheral_id|
+        p_res = ValidateConfigPeripheral.call(peripheral_id)
+        return p_res unless p_res.success
+      end
+      success_response('Config is valid')
     end
 
     def move_plant_resource(id, params)

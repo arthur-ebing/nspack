@@ -420,8 +420,12 @@ class Nspack < Roda
         interactor.assert_system_permission!(:deploy_config, id)
 
         r.on 'loading' do
-          out = interactor.deploy_system_config(id, params[:system_resource])
-          { content: "<pre>#{out.join('<br>')}</pre>", notice: 'Deployed...' }.to_json
+          res = interactor.deploy_system_config(id, params[:system_resource])
+          if res.success
+            { content: "<pre>#{res.instance.join('<br>')}</pre>", notice: 'Deployed...' }.to_json
+          else
+            { content: "<pre>#{res.message}</pre>", error: res.message }.to_json
+          end
         rescue Crossbeams::InfoError => e
           show_json_error(e.message, status: 200)
         end

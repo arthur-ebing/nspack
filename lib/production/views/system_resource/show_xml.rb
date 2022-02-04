@@ -7,7 +7,7 @@ module Production
         def self.call(res, id = nil)
           rules = {}
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page|
+          Crossbeams::Layout::Page.build(rules) do |page|
             page.section do |section|
               section.add_control control_type: :link, text: 'Back', url: '/list/system_resources', style: :back_button
               section.add_control control_type: :link, text: 'Download', url: "/production/resources/system_resources/#{id}/download_xml_config", style: :button, icon: :download if res.instance[:config]
@@ -15,6 +15,7 @@ module Production
 
             if res.instance[:config]
               page.add_text "#{res.instance[:config][:module]} config.xml", wrapper: :h2
+              page.add_notice(res.instance[:validation_err], notice_type: :warning) if res.instance[:validation_err]
               page.add_text res.instance[:config][:xml], syntax: :xml
             end
 
@@ -32,8 +33,6 @@ module Production
               page.add_text res.instance[:peripherals], syntax: :xml
             end
           end
-
-          layout
         end
       end
     end

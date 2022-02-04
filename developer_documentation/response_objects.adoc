@@ -26,6 +26,7 @@ Methods in the class can generate crossbeams responses using the methods:
 * `validation_failed_message_response`
 * `validation_failed_response`
 * `mixed_validation_failed_response`
+* `failed_message_from_validation`
 * `valid_response`
 
 NOTE: There is also a helper method `unwrap_failed_response` which takes a response and returns the message string (including validation errors if present).
@@ -46,6 +47,12 @@ This method is called `failed_response` and always returns `success == false` an
 Can optionally return `instance`.
 
 failed_response :: Requires a failure message.
+
+=== Turning a validation error into a failed response
+
+Use the method `failed_message_from_validation` to present validation errors in a simple message.
+
+failed_message_from_validation :: Requires a `Dry::Validation` object where `failed?` is true.
 
 === Validation responses
 

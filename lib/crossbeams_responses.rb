@@ -46,6 +46,15 @@ module Crossbeams
       end
     end
 
+    # Take a Dry::Validation response and turn it into a failed response.
+    # The error message includes the field validation errors.
+    #
+    # @param validation [Dry::Validation::Result] the Dry::Validation object.
+    # @return [OpenStruct] the response object.
+    def failed_message_from_validation(validation)
+      failed_response(unwrap_failed_response(validation_failed_response(validation)))
+    end
+
     # Create a response object with validation errors from more than one source.
     # Returns:
     #   - success: false.

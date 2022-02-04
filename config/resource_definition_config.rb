@@ -656,6 +656,7 @@ module Crossbeams
           'GFS4400' => {}
         }
       }.freeze
+
       SCALE_SET = {
         'MicroA12E' => {
           'MicroA12E' => {}
