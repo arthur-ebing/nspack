@@ -8,7 +8,7 @@ module EdiApp
           'BS' || lpad(bin_loads.id::text, 6, '0') AS load_id,
           rmt_bins.nett_weight AS weight,
           rmt_classes.description AS class,
-          commodities.code AS fruit_class,
+          commodities.code AS fruit_type,
           coalesce(rmt_sizes.size_code,'UNS') AS bin_size,
           COALESCE(rmt_bins.bin_asset_number, rmt_bins.tipped_asset_number, rmt_bins.shipped_asset_number, rmt_bins.scrapped_bin_asset_number) AS bin_id,
           'BS' || lpad(bin_loads.id::text, 6, '0') AS exit_ref,
