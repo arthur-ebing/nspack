@@ -5,6 +5,12 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 module MasterfilesApp
   class TestMrlRequirementInteractor < MiniTestWithHooks
     include MrlRequirementFactory
+    include PartyFactory
+    include CalendarFactory
+    include TargetMarketFactory
+    include FruitFactory
+    include CommodityFactory
+    include CultivarFactory
 
     def test_repo
       repo = interactor.send(:repo)
@@ -19,6 +25,10 @@ module MasterfilesApp
 
     def test_create_mrl_requirement
       attrs = fake_mrl_requirement.to_h.reject { |k, _| k == :id }
+      attrs[:cultivar_group_id] = nil
+      attrs[:qa_standard_id] = nil
+      attrs[:packed_tm_group_id] = nil
+      attrs[:target_market_id] = nil
       res = interactor.create_mrl_requirement(attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
       assert_instance_of(MrlRequirement, res.instance)
@@ -27,29 +37,38 @@ module MasterfilesApp
 
     def test_create_mrl_requirement_fail
       attrs = fake_mrl_requirement(id: nil).to_h.reject { |k, _| k == :id }
+      attrs[:max_num_chemicals_allowed] = nil
+      attrs[:cultivar_group_id] = nil
+      attrs[:qa_standard_id] = nil
+      attrs[:packed_tm_group_id] = nil
+      attrs[:target_market_id] = nil
       res = interactor.create_mrl_requirement(attrs)
       refute res.success, 'should fail validation'
-      assert_equal ['must be filled'], res.errors[:id]
+      assert_equal ['must be filled'], res.errors[:max_num_chemicals_allowed]
     end
 
     def test_update_mrl_requirement
       id = create_mrl_requirement
-      attrs = interactor.send(:repo).find_hash(:mrl_requirements, id).reject { |k, _| k == :id }
-      value = attrs[:id]
-      attrs[:id] = 'a_change'
+      attrs = interactor.send(:repo).find_hash(:mrl_requirements, id).reject { |k, _| k == :max_num_chemicals_allowed }
+      value = attrs[:max_num_chemicals_allowed]
+      attrs[:max_num_chemicals_allowed] = 23
+      attrs[:cultivar_group_id] = nil
+      attrs[:qa_standard_id] = nil
+      attrs[:packed_tm_group_id] = nil
+      attrs[:target_market_id] = nil
       res = interactor.update_mrl_requirement(id, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
       assert_instance_of(MrlRequirement, res.instance)
-      assert_equal 'a_change', res.instance.id
-      refute_equal value, res.instance.id
+      assert_equal 23, res.instance.max_num_chemicals_allowed
+      refute_equal value, res.instance.max_num_chemicals_allowed
     end
 
     def test_update_mrl_requirement_fail
       id = create_mrl_requirement
-      attrs = interactor.send(:repo).find_hash(:mrl_requirements, id).reject { |k, _| %i[id id].include?(k) }
+      attrs = interactor.send(:repo).find_hash(:mrl_requirements, id).reject { |k, _| %i[id max_num_chemicals_allowed].include?(k) }
       res = interactor.update_mrl_requirement(id, attrs)
       refute res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_equal ['is missing'], res.errors[:id]
+      assert_equal ['is missing'], res.errors[:max_num_chemicals_allowed]
     end
 
     def test_delete_mrl_requirement

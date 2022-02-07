@@ -34,7 +34,7 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def delete_mrl_requirement(id)
+    def delete_mrl_requirement(id) # rubocop:disable Metrics/AbcSize
       name = mrl_requirement(id).id
       repo.transaction do
         repo.delete_mrl_requirement(id)

@@ -20,7 +20,7 @@ module UiRules
       form_name 'mrl_requirement'
     end
 
-    def set_show_fields
+    def set_show_fields # rubocop:disable Metrics/AbcSize
       # season_id_label = MasterfilesApp::SeasonRepo.new.find_season(@form_object.season_id)&.season_code
       # season_id_label = @repo.find(:seasons, MasterfilesApp::Season, @form_object.season_id)&.season_code
       season_id_label = @repo.get(:seasons, :season_code, @form_object.season_id)
@@ -67,7 +67,7 @@ module UiRules
     #   fields[:to] = { renderer: :select, options: user_repo.email_addresses(user_email_group: AppConst::EMAIL_GROUP_MRL_REQUIREMENT_APPROVERS), caption: 'Email address of person to notify', required: true }
     # end
 
-    def common_fields
+    def common_fields # rubocop:disable Metrics/AbcSize
       {
         # season_id: { renderer: :select, options: MasterfilesApp::SeasonRepo.new.for_select_seasons, disabled_options: MasterfilesApp::SeasonRepo.new.for_select_inactive_seasons, caption: 'Season', required: true },
         season_id: { renderer: :select, options: MasterfilesApp::CalendarRepo.new.for_select_seasons, disabled_options: MasterfilesApp::CalendarRepo.new.for_select_inactive_seasons, caption: 'Season', required: true },

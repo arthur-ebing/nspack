@@ -4,7 +4,13 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
 module MasterfilesApp
   class TestQaStandardTypeInteractor < MiniTestWithHooks
-    include QaStandardTypeFactory
+    include MrlRequirementFactory
+    include PartyFactory
+    include CalendarFactory
+    include TargetMarketFactory
+    include FruitFactory
+    include CommodityFactory
+    include CultivarFactory
 
     def test_repo
       repo = interactor.send(:repo)

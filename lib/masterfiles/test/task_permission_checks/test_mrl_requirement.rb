@@ -6,6 +6,12 @@ module MasterfilesApp
   class TestMrlRequirementPermission < Minitest::Test
     include Crossbeams::Responses
     include MrlRequirementFactory
+    include PartyFactory
+    include CalendarFactory
+    include TargetMarketFactory
+    include FruitFactory
+    include CommodityFactory
+    include CultivarFactory
 
     def entity(attrs = {})
       base_attrs = {

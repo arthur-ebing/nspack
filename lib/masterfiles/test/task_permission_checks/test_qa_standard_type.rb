@@ -5,7 +5,13 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 module MasterfilesApp
   class TestQaStandardTypePermission < Minitest::Test
     include Crossbeams::Responses
-    include QaStandardTypeFactory
+    include MrlRequirementFactory
+    include PartyFactory
+    include CalendarFactory
+    include TargetMarketFactory
+    include FruitFactory
+    include CommodityFactory
+    include CultivarFactory
 
     def entity(attrs = {})
       base_attrs = {
