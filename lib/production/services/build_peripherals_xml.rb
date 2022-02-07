@@ -33,8 +33,8 @@ module ProductionApp
                               Alias: prt[:alias],
                               Type: prt[:connection_type] == 'USB' ? "remote-#{prt[:type]}" : prt[:type],
                               Model: prt[:model],
-                              ConnectionType: prt[:connection_type], # Force to TCP ????
-                              NetworkInterface: ip, # prt[:network_interface], # Set this to the NTD's ip if this is a USB printer
+                              ConnectionType: 'TCP', # From the server's point of view, these are all TCP printers.
+                              NetworkInterface: ip,  # This is set to the NTD's ip if this is a USB printer
                               Port: prt[:port],
                               TTL: prt[:ttl],
                               CycleTime: prt[:cycle_time],

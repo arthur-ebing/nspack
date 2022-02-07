@@ -333,6 +333,21 @@ module ProductionApp
       success_response('Config is valid')
     end
 
+    def restart_software(id)
+      mes_repo = MesserverApp::MesserverRepo.new
+      ip = repo.get(:system_resources, :ip_address, id)
+      mes_repo.restart_device(ip)
+      shutdown_device(ip)
+      success_response('Restart request sent to device')
+    end
+
+    def shutdown_device(id)
+      mes_repo = MesserverApp::MesserverRepo.new
+      ip = repo.get(:system_resources, :ip_address, id)
+      mes_repo.shutdown_device(ip)
+      success_response('Shutdown request sent to device')
+    end
+
     def move_plant_resource(id, params)
       new_id = params[:destination_node].to_i
       repo.transaction do

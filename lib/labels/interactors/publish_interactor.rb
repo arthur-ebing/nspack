@@ -51,6 +51,7 @@ module LabelApp
 
       mes_repo = MesserverApp::MesserverRepo.new
       res = mes_repo.send_publish_package(vars[:chosen_printer], vars[:chosen_targets], fname, binary_data)
+      # res = mes_repo.send_publish_package('zebra,argox', vars[:chosen_targets], fname, binary_data)
       if res.success
         success_response('Published labels.', OpenStruct.new(fname: fname, body: res.instance))
       else

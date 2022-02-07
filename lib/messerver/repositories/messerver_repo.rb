@@ -120,6 +120,14 @@ module MesserverApp
       request_uri(gossamer_data_uri(code))
     end
 
+    def restart_device(ip)
+      request_uri(ntd_reboot(ip))
+    end
+
+    def shutdown_device(ip)
+      request_uri(ntd_shutdown(ip))
+    end
+
     private
 
     def publish_part_of_body(printer_type, targets)
@@ -369,6 +377,14 @@ module MesserverApp
 
     def gossamer_data_uri(code)
       URI.parse("#{AppConst::LABEL_SERVER_URI}?Type=GetGossamerData&ListType=yaml&Name=#{code}")
+    end
+
+    def ntd_reboot(ip)
+      URI.parse("#{ip}?Type=Reboot")
+    end
+
+    def ntd_shutdown(ip)
+      URI.parse("#{ip}?Type=Shutdown")
     end
 
     def log_request(request)

@@ -41,6 +41,14 @@
   :text: view XML config
   :icon: code
   :hide_if_true: peripheral,button_type,network_type
+- :url: "/production/resources/system_resources/$:id$/restart"
+  :text: restart MesServer
+  :icon: chevron-right
+  :hide_if_true: peripheral,button_type,network_type
+- :url: "/production/resources/system_resources/$:id$/shutdown"
+  :text: shutdown device
+  :icon: download
+  :hide_if_true: peripheral,button_type,network_type
 - :separator: true
 - :url: "/production/resources/system_resources/$:id$/provision_device"
   :text: provision device

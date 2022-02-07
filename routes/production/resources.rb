@@ -435,6 +435,52 @@ class Nspack < Roda
         end
       end
 
+      r.on 'restart' do
+        check_auth!('resources', 'edit')
+
+        r.get do
+          # Check if seeed/pi
+          show_partial do
+            # confirm for resource...
+            Production::Runs::ProductionRun::Confirm.call(id,
+                                                          url: "/production/resources/system_resources/#{id}/restart",
+                                                          notice: 'Restart the device software?',
+                                                          button_captions: %w[Restart Restarting])
+          end
+        end
+
+        r.post do
+          res = interactor.restart_software(id)
+          if res.success
+            show_json_notice(res.message)
+          else
+            show_json_warning(res.message)
+          end
+        end
+      end
+
+      r.on 'shutdown' do
+        check_auth!('resources', 'edit')
+
+        r.get do
+          show_partial do
+            Production::Runs::ProductionRun::Confirm.call(id,
+                                                          url: "/production/resources/system_resources/#{id}/shutdown",
+                                                          notice: 'Shutdown the device?',
+                                                          button_captions: ['Shutdown', 'Shutting down'])
+          end
+        end
+
+        r.post do
+          res = interactor.shutdown_device(id)
+          if res.success
+            show_json_notice(res.message)
+          else
+            show_json_warning(res.message)
+          end
+        end
+      end
+
       r.on 'get_mac_address' do
         check_auth!('resources', 'edit')
         interactor.assert_system_permission!(:deploy_config, id)
